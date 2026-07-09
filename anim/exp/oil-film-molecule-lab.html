@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>油膜法估测分子大小</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 16px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 286px; gap: 14px; align-items: stretch; }
+  canvas { width: 100%; height: 470px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  input { width: 100%; }
+  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.72; font-size: 14px; }
+  .status { margin-top: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13px; line-height: 1.55; background: #e6fffa; color: #087f5b; font-weight: 700; }
+  .status.bad { background: #fff5f5; color: #c92a2a; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
+  @media (max-width: 780px) { .stage { grid-template-columns: 1fr; } canvas { height: 400px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="700" height="470" aria-label="油膜法估测分子大小实验"></canvas>
+    <section class="panel">
+      <label for="ratio">稀释倍数：1/<span id="ratioVal"></span></label>
+      <input id="ratio" type="range" min="300" max="800" value="500" step="50">
+      <label for="drops">滴数 n：<span id="dropsVal"></span></label>
+      <input id="drops" type="range" min="1" max="5" value="1" step="1">
+      <label for="dropVolume">每滴体积/mL：<span id="dropVolumeVal"></span></label>
+      <input id="dropVolume" type="range" min="0.03" max="0.08" value="0.05" step="0.01">
+      <label for="filmArea">油膜面积/10³cm²：<span id="filmAreaVal"></span></label>
+      <input id="filmArea" type="range" min="2.0" max="10.0" value="5.0" step="0.5">
+      <label for="areaError">面积计数误差：<span id="areaErrorVal"></span></label>
+      <input id="areaError" type="range" min="-12" max="12" value="2" step="1">
+      <div id="readout" class="readout"></div>
+      <div id="status" class="status"></div>
+      <div class="hint">观察任务：改变油膜面积 S，看同样体积的纯油酸铺得越大时，估算分子直径 d 如何变小。</div>
+    </section>
+  </div>
+</div>
+<script>
+const c=document.getElementById('c'),ctx=c.getContext('2d');
+const els={ratio:document.getElementById('ratio'),drops:document.getElementById('drops'),dropVolume:document.getElementById('dropVolume'),filmArea:document.getElementById('filmArea'),areaError:document.getElementById('areaError'),ratioVal:document.getElementById('ratioVal'),dropsVal:document.getElementById('dropsVal'),dropVolumeVal:document.getElementById('dropVolumeVal'),filmAreaVal:document.getElementById('filmAreaVal'),areaErrorVal:document.getElementById('areaErrorVal'),readout:document.getElementById('readout'),status:document.getElementById('status')};
+function draw(){
+  const ratio=+els.ratio.value,n=+els.drops.value,dropMl=+els.dropVolume.value,areaUnit=+els.filmArea.value,err=+els.areaError.value/100;
+  const pureMl=n*dropMl/ratio;
+  const pureM3=pureMl*1e-6;
+  const areaM2=areaUnit*1000*1e-4;
+  const measuredArea=areaM2*(1+err);
+  const diameter=pureM3/measuredArea;
+  const trueDiameter=pureM3/areaM2;
+  const rel=Math.abs(diameter-trueDiameter)/trueDiameter*100;
+  els.ratioVal.textContent=ratio.toFixed(0);els.dropsVal.textContent=n;els.dropVolumeVal.textContent=dropMl.toFixed(2);els.filmAreaVal.textContent=areaUnit.toFixed(1);els.areaErrorVal.textContent=Math.round(err*100)+'%';
+  ctx.clearRect(0,0,c.width,c.height);ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);
+  ctx.fillStyle='#102a43';ctx.font='700 18px system-ui';ctx.textAlign='center';ctx.fillText('油膜法：把纯油酸看成单分子层，d = V/S',350,30);
+  ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1;
+  for(let x=70;x<=450;x+=25){ctx.beginPath();ctx.moveTo(x,70);ctx.lineTo(x,390);ctx.stroke();}
+  for(let y=70;y<=390;y+=25){ctx.beginPath();ctx.moveTo(70,y);ctx.lineTo(450,y);ctx.stroke();}
+  const r=Math.sqrt(areaM2/0.5)*120;
+  ctx.fillStyle='rgba(44,123,229,.16)';ctx.strokeStyle='#2c7be5';ctx.lineWidth=3;
+  ctx.beginPath();
+  for(let a=0;a<Math.PI*2+0.1;a+=0.18){
+    const wobble=1+0.08*Math.sin(5*a)+0.05*Math.cos(9*a);
+    const x=260+Math.cos(a)*r*wobble;
+    const y=230+Math.sin(a)*r*0.72*wobble;
+    if(a===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+  }
+  ctx.closePath();ctx.fill();ctx.stroke();
+  ctx.fillStyle='#2c7be5';ctx.font='700 14px system-ui';ctx.fillText('水面上的单分子油膜 S',260,235);
+  ctx.fillStyle='#f0a500';ctx.beginPath();ctx.arc(120,96,12+3*n,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#f0a500';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(120,112);ctx.bezierCurveTo(142,150,186,178,230,204);ctx.stroke();
+  ctx.fillStyle='#102a43';ctx.font='13px system-ui';ctx.fillText('稀释液滴入水面',128,74);
+  ctx.fillStyle='#486581';ctx.font='13px system-ui';ctx.fillText('方格法数面积：整格加半格，估出 S',260,415);
+  const panelX=492,panelY=92;
+  ctx.fillStyle='#f7f9fc';ctx.strokeStyle='#d9e2ec';ctx.fillRect(panelX,panelY,150,130);ctx.strokeRect(panelX,panelY,150,130);
+  ctx.fillStyle='#102a43';ctx.font='700 14px system-ui';ctx.fillText('体积换算',panelX+75,panelY+24);
+  ctx.font='13px system-ui';ctx.fillStyle='#486581';ctx.fillText('溶液体积：nV滴',panelX+75,panelY+55);
+  ctx.fillText('纯油酸体积：V',panelX+75,panelY+82);
+  ctx.fillText('V = nV滴/稀释倍数',panelX+75,panelY+109);
+  ctx.fillStyle='#7b2cbf';ctx.font='700 15px system-ui';ctx.fillText('d≈'+(diameter*1e10).toFixed(2)+'×10⁻¹⁰m',panelX+75,260);
+  ctx.fillStyle='#486581';ctx.font='13px system-ui';ctx.fillText('d 是油膜厚度，也是单个油酸分子尺度的估计。',350,452);
+  els.readout.innerHTML=[
+    `<div id="r1">纯油酸体积 V=nV滴/稀释倍数≈${pureMl.toExponential(2)}mL=${pureM3.toExponential(2)}m³</div>`,
+    `<div id="r2">油膜面积 S≈${measuredArea.toFixed(3)}m²</div>`,
+    `<div id="r3">分子直径 d=V/S≈${diameter.toExponential(2)}m</div>`,
+    `<div id="r4">换算：d≈${(diameter*1e10).toFixed(2)}×10⁻¹⁰m，相对误差≈${rel.toFixed(1)}%</div>`,
+    `<div id="r5">S 由方格法估算；面积偏大时 d 偏小</div>`
+  ].join('');
+  const ok=diameter>0.8e-10 && diameter<8e-10 && rel<10;
+  els.status.className=ok?'status':'status bad';
+  els.status.textContent=rel>=10?'不通过：面积计数误差偏大，应重新描边并多次数格。':ok?'通过：估算结果在分子尺度 10⁻¹⁰m 量级，符合油膜法目标。':'不通过：结果不在合理分子尺度，检查稀释倍数、滴数或面积单位。';
+}
+Object.values(els).forEach(el=>el.addEventListener('input',draw));draw();
+</script>
+</body>
+</html>

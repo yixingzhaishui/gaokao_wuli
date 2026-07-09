@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>时刻与时间间隔实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#f7f9fc;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px;min-height:540px}
+  .stage{position:relative;background:#fff;border:1px solid #d9e2ec;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;aspect-ratio:940/560;touch-action:none}
+  .tip{position:absolute;left:14px;bottom:12px;background:rgba(16,42,67,.88);color:#d9e2ec;border-radius:7px;padding:6px 9px;font-size:12px;pointer-events:none}
+  .panel{display:flex;flex-direction:column;gap:6px}
+  .card{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:7px}
+  .task{background:#fff7e6;border-left:3px solid #f0a500;color:#486581;font-size:12px;line-height:1.35}
+  .title{font-weight:700;margin-bottom:4px}
+  .param{display:grid;gap:2px;margin:6px 0;font-size:13px}
+  .param span{display:flex;justify-content:space-between;color:#486581}
+  .param b{color:#102a43;font-variant-numeric:tabular-nums}
+  input[type=range]{width:100%;accent-color:#2c7be5}
+  .controls{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #b0bcc9;background:#fff;border-radius:6px;padding:5px 8px;cursor:pointer;font:inherit;font-size:12px}
+  button:hover{background:#eef2f7}
+  .readout{background:#102a43;color:#d9e2ec;border-radius:8px;padding:8px;line-height:1.45;font-size:13px}
+  .readout b{color:#f0a500;font-variant-numeric:tabular-nums}
+  .formula{font-size:12px;line-height:1.35;color:#334e68}
+  .status{font-size:12px;font-weight:700;border-radius:6px;padding:7px;border:1px solid #38b2ac;background:#e6fffa;color:#087f5b;line-height:1.35}
+  .status.warn{border-color:#f0a500;background:#fff7e6;color:#9a6700}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.panel{display:grid;grid-template-columns:1fr 1fr}.task,.readout,.formula,.status{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage">
+    <canvas id="canvas" width="940" height="560" aria-label="时刻与时间间隔交互实验台"></canvas>
+    <div class="tip">可直接拖动红色 t1/t2 游标和橙色速度端点</div>
+  </div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>拖 t1、t2 两个红点，看橙色时间段 Δt；播放后看小车只在这段时间内累积绿色位移。</div>
+    <div class="card">
+      <div class="title">实验参数</div>
+      <label class="param"><span>速度 v <b id="vText">4.0 m/s</b></span><input id="vSlider" type="range" min="1" max="9" step="0.5" value="4"></label>
+      <label class="param"><span>起始时刻 t1 <b id="t1Text">2.0 s</b></span><input id="t1Slider" type="range" min="0" max="9.5" step="0.5" value="2"></label>
+      <label class="param"><span>末时刻 t2 <b id="t2Text">5.0 s</b></span><input id="t2Slider" type="range" min="0.5" max="10" step="0.5" value="5"></label>
+      <div class="controls"><button id="playBtn">播放</button><button id="resetBtn">重置</button></div>
+    </div>
+    <div class="readout" id="readout"></div>
+    <div class="card formula">
+      <div class="title">公式绑定</div>
+      <div>红点是时刻；橙色线段是时间间隔。</div>
+      <div>位移公式用 `Δt=t2-t1`，不是用秒表读数 `t2`。</div>
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const els={v:document.getElementById('vSlider'),t1:document.getElementById('t1Slider'),t2:document.getElementById('t2Slider')};
+  let v=4,t1=2,t2=5,now=0,running=false,drag=null,layout={};
+  const axis={x0:90,x1:850,y:132};
+  const road={x0:110,x1:830,y:330};
+  function clamp(x,a,b){return Math.max(a,Math.min(b,x));}
+  function snap(x,step){return Math.round(x/step)*step;}
+  function tx(t){return axis.x0+(t/10)*(axis.x1-axis.x0);}
+  function timeFromX(x){return clamp((x-axis.x0)/(axis.x1-axis.x0)*10,0,10);}
+  function text(s,x,y,c,a,size,w){
+    ctx.fillStyle=c||'#102a43';
+    ctx.font=(w?w+' ':'')+(size||13)+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';
+    ctx.textAlign=a||'center';ctx.textBaseline='middle';ctx.fillText(s,x,y);
+  }
+  function line(x1,y1,x2,y2,c,w,dash){
+    ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w||2;ctx.setLineDash(dash||[]);
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();
+  }
+  function arrow(x1,y1,x2,y2,c,label,w){
+    const a=Math.atan2(y2-y1,x2-x1);
+    ctx.save();ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w||3;
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    if(Math.hypot(x2-x1,y2-y1)>7){
+      ctx.beginPath();ctx.moveTo(x2,y2);
+      ctx.lineTo(x2-10*Math.cos(a-.45),y2-10*Math.sin(a-.45));
+      ctx.lineTo(x2-10*Math.cos(a+.45),y2-10*Math.sin(a+.45));
+      ctx.closePath();ctx.fill();
+    }
+    if(label) text(label,(x1+x2)/2+8,(y1+y2)/2-12,c,'left',12,'700');
+    ctx.restore();
+  }
+  function box(x,y,w,h,fill,stroke,r){
+    ctx.save();ctx.fillStyle=fill;ctx.strokeStyle=stroke||'#d9e2ec';ctx.lineWidth=1.4;
+    ctx.beginPath();ctx.roundRect(x,y,w,h,r==null?8:r);ctx.fill();ctx.stroke();ctx.restore();
+  }
+  function handle(x,y,label,c){
+    ctx.save();ctx.fillStyle=c||'#e03131';ctx.strokeStyle='#7c1f1f';ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(x,y,9,0,Math.PI*2);ctx.fill();ctx.stroke();
+    text(label,x,y-22,c||'#e03131','center',12,'700');ctx.restore();
+  }
+  function car(x,y){
+    box(x-22,y-13,44,22,'#2c7be5','#1b4f91',5);
+    ctx.fillStyle='#334e68';ctx.beginPath();ctx.arc(x-12,y+12,5,0,Math.PI*2);ctx.arc(x+12,y+12,5,0,Math.PI*2);ctx.fill();
+  }
+  function normalize(){
+    if(t2<t1+0.5) t2=t1+0.5;
+    if(t2>10){t2=10;if(t1>9.5)t1=9.5;}
+    els.v.value=v;els.t1.value=t1;els.t2.value=t2;
+    document.getElementById('vText').textContent=v.toFixed(1)+' m/s';
+    document.getElementById('t1Text').textContent=t1.toFixed(1)+' s';
+    document.getElementById('t2Text').textContent=t2.toFixed(1)+' s';
+  }
+  function draw(){
+    normalize();
+    const dt=t2-t1;
+    const activeTime=clamp(Math.min(now,t2)-t1,0,dt);
+    const xNow=v*activeTime;
+    const xFinal=v*dt;
+    const wrong=v*t2;
+    const xScale=(road.x1-road.x0)/(9*10);
+    ctx.clearRect(0,0,940,560);
+    text('时刻与时间间隔实验台：点是时刻，段才是过程时间',470,32,'#102a43','center',18,'700');
+
+    box(44,60,852,168,'#f8fbff','#d9e2ec');
+    text('时间轴测量区：拖动红点改变 t1、t2，橙色线段长度就是 Δt=t2-t1',470,84,'#334e68','center',14,'700');
+    line(axis.x0,axis.y,axis.x1,axis.y,'#334e68',2);
+    arrow(axis.x1,axis.y,axis.x1+24,axis.y,'#334e68','t/s',2);
+    for(let i=0;i<=10;i++){
+      const x=tx(i);line(x,axis.y-7,x,axis.y+7,'#829ab1',1.5);
+      text(String(i),x,axis.y+24,'#486581','center',11);
+    }
+    line(tx(t1),axis.y-32,tx(t2),axis.y-32,'#f0a500',9);
+    text('Δt = '+dt.toFixed(1)+' s',(tx(t1)+tx(t2))/2,axis.y-50,'#9a6700','center',13,'700');
+    line(tx(t1),axis.y-66,tx(t1),axis.y+36,'#e03131',1.5,[5,4]);
+    line(tx(t2),axis.y-66,tx(t2),axis.y+36,'#e03131',1.5,[5,4]);
+    handle(tx(t1),axis.y,'t1');
+    handle(tx(t2),axis.y,'t2');
+    layout.t1={x:tx(t1),y:axis.y};layout.t2={x:tx(t2),y:axis.y};
+    line(tx(now),axis.y-70,tx(now),axis.y+44,'#7b2cbf',2);
+    ctx.fillStyle='#7b2cbf';ctx.beginPath();ctx.arc(tx(now),axis.y,6,0,Math.PI*2);ctx.fill();
+    text('当前时刻 t='+now.toFixed(1)+'s',tx(now),axis.y-78,'#7b2cbf','center',12,'700');
+
+    box(44,250,852,172,'#fff','#d9e2ec');
+    text('运动过程区：小车进入 t1-t2 区间后，绿色位移条才开始增长',470,274,'#334e68','center',14,'700');
+    line(road.x0,road.y,road.x1,road.y,'#aab8c2',4);
+    line(road.x0,road.y-24,road.x0,road.y+30,'#829ab1',1.5,[4,3]);
+    text('t1 位置',road.x0,road.y+48,'#486581','center',12,'700');
+    const carX=road.x0+xNow*xScale;
+    if(xNow>0){
+      ctx.fillStyle='rgba(26,122,26,.23)';ctx.fillRect(road.x0,road.y-12,xNow*xScale,24);
+      arrow(road.x0,road.y-24,carX,road.y-24,'#1a7a1a','x=v(t-t1)='+xNow.toFixed(1)+'m',3);
+    }
+    const wrongX=road.x0+wrong*xScale;
+    if(wrongX<road.x1){
+      line(wrongX,road.y-42,wrongX,road.y+42,'#e03131',2,[6,5]);
+      text('错用 t2: v·t2='+wrong.toFixed(1)+'m',wrongX,road.y+62,'#e03131','center',11,'700');
+    }
+    const finalX=road.x0+xFinal*xScale;
+    line(finalX,road.y-42,finalX,road.y+42,'#1a7a1a',2,[5,4]);
+    text('正确末位移 vΔt='+xFinal.toFixed(1)+'m',finalX,road.y-58,'#1a7a1a','center',12,'700');
+    car(carX,road.y-18);
+    arrow(carX+24,road.y-18,carX+24+v*16,road.y-18,'#f0a500','v='+v.toFixed(1)+'m/s',3);
+    handle(carX+24+v*16,road.y-18,'拖 v','#f0a500');
+    layout.v={x:carX+24+v*16,y:road.y-18,base:carX+24};
+
+    box(142,452,656,54,activeTime>=dt?'#e6fffa':'#fff7e6',activeTime>=dt?'#38b2ac':'#f0a500');
+    text('x = vΔt = '+v.toFixed(1)+' × ('+t2.toFixed(1)+' - '+t1.toFixed(1)+') = '+xFinal.toFixed(1)+' m',470,474,activeTime>=dt?'#087f5b':'#9a6700','center',16,'700');
+    text('公式里的 t 是过程时长 Δt，不是“第 '+t2.toFixed(1)+' 秒”这个时刻读数。',470,496,'#486581','center',13);
+    update(activeTime,xNow,xFinal,wrong);
+  }
+  function update(activeTime,xNow,xFinal,wrong){
+    document.getElementById('readout').innerHTML='当前时刻 t=<b>'+now.toFixed(1)+' s</b><br>t1=<b>'+t1.toFixed(1)+' s</b>，t2=<b>'+t2.toFixed(1)+' s</b><br>Δt=t2-t1=<b>'+(t2-t1).toFixed(1)+' s</b><br>当前区间位移=<b>'+xNow.toFixed(1)+' m</b><br>区间末位移=<b>'+xFinal.toFixed(1)+' m</b>';
+    const st=document.getElementById('status');
+    st.classList.toggle('warn',now<t2);
+    st.textContent=now<t1?'当前播放头还没进入区间：有时刻读数，但这段过程位移还没开始累积。':now<t2?'正在区间内：位移随已经经历的时间间隔增长。':'到达 t2：正确位移是 vΔt；红色虚线显示错用 t2 会多算。';
+  }
+  function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
+  canvas.addEventListener('pointerdown',e=>{
+    const p=pointer(e);
+    for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30){drag=k;canvas.setPointerCapture(e.pointerId);break;}}
+  });
+  canvas.addEventListener('pointermove',e=>{
+    const p=pointer(e);
+    if(drag){
+      if(drag==='t1') t1=snap(Math.min(timeFromX(p.x),t2-0.5),0.5);
+      if(drag==='t2') t2=snap(Math.max(timeFromX(p.x),t1+0.5),0.5);
+      if(drag==='v') v=snap(clamp((p.x-layout.v.base)/16,1,9),0.5);
+      if(now>10)now=10;draw();return;
+    }
+    let hit=false;for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30)hit=true;}
+    canvas.style.cursor=hit?'grab':'default';
+  });
+  window.addEventListener('pointerup',()=>{drag=null;canvas.style.cursor='default';});
+  els.v.oninput=e=>{v=+e.target.value;draw();};
+  els.t1.oninput=e=>{t1=+e.target.value;if(t1>t2-0.5)t2=t1+0.5;draw();};
+  els.t2.oninput=e=>{t2=+e.target.value;if(t2<t1+0.5)t1=t2-0.5;draw();};
+  document.getElementById('playBtn').onclick=()=>{running=!running;if(now>=10)now=0;document.getElementById('playBtn').textContent=running?'暂停':'播放';};
+  document.getElementById('resetBtn').onclick=()=>{now=0;running=false;document.getElementById('playBtn').textContent='播放';draw();};
+  let last=performance.now();
+  function loop(ts){const d=Math.min(.05,(ts-last)/1000);last=ts;if(running){now+=d;if(now>=10){now=10;running=false;document.getElementById('playBtn').textContent='播放';}draw();}requestAnimationFrame(loop);}
+  draw();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>动量实验台</title>
+<style>
+:root{--ink:#102a43;--line:#d9e2ec;--blue:#2c7be5;--red:#e03131;--green:#159a6b;--gold:#f0a500;--purple:#6f42c1}
+*{box-sizing:border-box}
+body{margin:0;background:#f3f6fa;color:var(--ink);font-family:-apple-system,"PingFang SC",system-ui,sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:14px}
+h2{font-size:17px;margin:0 0 10px}
+.lab{display:grid;grid-template-columns:minmax(0,1fr)292px;gap:12px;align-items:start}
+.stage{background:#fff;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab;background:#fff}
+.panel{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px}
+button{font:inherit;border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 10px;cursor:pointer;width:100%;margin-bottom:10px}
+.read{display:grid;gap:7px}
+.chip{background:#102a43;color:#eef4ff;border-radius:8px;padding:8px 10px;font-size:13px;line-height:1.45}
+.chip b{color:#ffd166}
+.chip.ok{background:#0b7285}.chip.warn{background:#7b341e}
+.hint{margin-top:10px;background:#fff7e6;border-left:3px solid var(--gold);border-radius:6px;padding:9px 11px;font-size:13px;color:#5a6b7b;line-height:1.55}
+.formula{margin-top:10px;border-top:1px solid var(--line);padding-top:10px;font-size:13px;color:#334e68;line-height:1.7}
+@media(max-width:820px){.lab{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2>动量：拖动车身质量和速度箭头，看 p = mv 的方向与大小</h2>
+  <div class="lab">
+    <div class="stage"><canvas id="cv" width="720" height="470" aria-label="动量交互实验台"></canvas></div>
+    <section class="panel">
+      <button id="play">⏸ 暂停运动</button>
+      <button id="reset">复位</button>
+      <div class="read">
+        <div class="chip">质量 m = <b id="mout">2.0</b> kg</div>
+        <div class="chip">速度 v = <b id="vout">3.0</b> m/s</div>
+        <div class="chip ok">动量 p = mv = <b id="pout">6.0</b> kg·m/s</div>
+        <div class="chip">动能 Ek = 1/2 mv² = <b id="eout">9.0</b> J</div>
+        <div class="chip warn">运动状态：<b id="stout">向右匀速</b></div>
+        <div class="chip">取向右为正：<b id="signout">p 为正，方向向右</b></div>
+      </div>
+      <div class="hint"><b>观察任务</b>：拖车身右侧金色把手改变 m，拖蓝色速度箭头端点改变 v 的大小和方向。看车上紫色动量箭头、右侧 p-v 图像点和下方动能柱如何同步变化；把速度拖到左边，注意 p 变负而 Ek 仍为正。</div>
+      <div class="formula">
+        <b>画面绑定</b><br>
+        车身宽度代表 m，蓝色箭头代表 v，紫色箭头代表 p。p-v 图像的斜率就是 m；动能柱只跟 v² 有关，所以速度反向时不会变成负值。
+      </div>
+    </section>
+  </div>
+</div>
+<script>
+(function(){
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+const W=cv.width,H=cv.height;
+let m=2,v=3,drag=null,cartX=150,last=performance.now(),trace=[],running=true;
+const els={m:id('mout'),v:id('vout'),p:id('pout'),e:id('eout'),sign:id('signout'),st:id('stout')};
+function id(s){return document.getElementById(s)}
+function clamp(x,a,b){return Math.max(a,Math.min(b,x))}
+function calc(){return{p:m*v,Ek:.5*m*v*v,w:46+m*26}}
+function pos(e){const r=cv.getBoundingClientRect(),s=cv.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s}}
+function arrow(x1,y1,x2,y2,color,w){
+  const a=Math.atan2(y2-y1,x2-x1),len=Math.hypot(x2-x1,y2-y1);
+  ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=w||3;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  if(len>10){ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.48),y2-10*Math.sin(a-.48));ctx.lineTo(x2-10*Math.cos(a+.48),y2-10*Math.sin(a+.48));ctx.closePath();ctx.fill();}
+}
+function roundRect(x,y,w,h,r){ctx.beginPath();if(ctx.roundRect)ctx.roundRect(x,y,w,h,r);else ctx.rect(x,y,w,h);ctx.fill();ctx.stroke();}
+function drawGrid(){
+  const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#f8fbff');bg.addColorStop(1,'#edf3f8');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(16,42,67,.06)';ctx.lineWidth=1;
+  for(let x=0;x<W;x+=36){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}
+  for(let y=0;y<H;y+=36){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+}
+function drawRuler(){
+  const y=322,x1=42,x2=462;
+  ctx.strokeStyle='#8aa4bd';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x1,y);ctx.lineTo(x2,y);ctx.stroke();
+  ctx.fillStyle='#486581';ctx.font='11px system-ui';ctx.textAlign='center';
+  for(let i=-6;i<=6;i++){
+    const x=x1+(i+6)/12*(x2-x1);
+    ctx.beginPath();ctx.moveTo(x,y-8);ctx.lineTo(x,y+8);ctx.stroke();
+    ctx.fillText(i,x,y+23);
+  }
+  ctx.fillText('速度刻度 m/s（向右为正）',252,y+43);
+}
+function drawCart(){
+  const c=calc(),baseY=255,w=c.w,h=46,x=cartX-w/2;
+  trace.push({x:cartX,y:baseY+30});if(trace.length>34)trace.shift();
+  ctx.fillStyle='rgba(44,123,229,.18)';
+  trace.forEach((t,i)=>{ctx.globalAlpha=(i+1)/trace.length*.55;ctx.beginPath();ctx.arc(t.x,t.y,3.5,0,7);ctx.fill();});
+  ctx.globalAlpha=1;
+  ctx.strokeStyle='#334e68';ctx.fillStyle='#d9ecff';roundRect(x,baseY-h,w,h,6);
+  ctx.fillStyle='#2c7be5';ctx.fillRect(x+10,baseY-h-18,w-20,18);
+  ctx.strokeStyle='#334e68';ctx.strokeRect(x+10,baseY-h-18,w-20,18);
+  ctx.fillStyle='#102a43';ctx.font='700 13px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('m',cartX,baseY-h/2);
+  ctx.fillStyle='#243b53';
+  [[x+18,baseY+3],[x+w-18,baseY+3]].forEach(([wx,wy])=>{ctx.beginPath();ctx.arc(wx,wy,11,0,7);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(wx,wy,4,0,7);ctx.fill();ctx.fillStyle='#243b53';});
+  ctx.fillStyle='#f0a500';ctx.strokeStyle='#8a5a00';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x+w+12,baseY-h/2,10,0,7);ctx.fill();ctx.stroke();
+  ctx.fillStyle='#8a5a00';ctx.font='12px system-ui';ctx.fillText('拖 m',x+w+37,baseY-h/2+4);
+  const vTipX=cartX+v*34,pTipX=cartX+c.p*13;
+  arrow(cartX,baseY-94,vTipX,baseY-94,'#2c7be5',4);
+  ctx.fillStyle='#2c7be5';ctx.beginPath();ctx.arc(vTipX,baseY-94,10,0,7);ctx.fill();
+  ctx.font='700 13px system-ui';ctx.textAlign='center';ctx.fillText('速度 v',cartX+(vTipX-cartX)/2,baseY-112);
+  arrow(cartX,baseY-66,pTipX,baseY-66,'#6f42c1',4);
+  ctx.fillStyle='#6f42c1';ctx.font='700 13px system-ui';ctx.fillText('动量 p=mv',cartX+(pTipX-cartX)/2,baseY-45);
+  ctx.fillStyle='#102a43';ctx.font='13px system-ui';ctx.textAlign='left';
+  ctx.fillText('同一辆车：速度反向时，紫色 p 箭头反向；动能柱仍向上增长。',28,34);
+}
+function drawGraph(){
+  const gx=512,gy=276,gw=165,gh=176,c=calc();
+  ctx.fillStyle='#fff';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1.5;roundRect(gx-18,gy-gh-24,gw+42,gh+74,8);
+  ctx.strokeStyle='#9fb3c8';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(gx,gy-gh);ctx.lineTo(gx,gy+8);ctx.lineTo(gx+gw,gy+8);ctx.stroke();
+  ctx.strokeStyle='#d9e2ec';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(gx,gy-gh/2+4);ctx.lineTo(gx+gw,gy-gh/2+4);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='#486581';ctx.font='11px system-ui';ctx.textAlign='center';ctx.fillText('v',gx+gw+8,gy+22);ctx.save();ctx.translate(gx-26,gy-gh/2);ctx.rotate(-Math.PI/2);ctx.fillText('p',0,0);ctx.restore();
+  const vx=x=>gx+(x+6)/12*gw,py=p=>gy-gh/2+4-p/24*gh*.45;
+  ctx.strokeStyle='#6f42c1';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(vx(-6),py(-6*m));ctx.lineTo(vx(6),py(6*m));ctx.stroke();
+  ctx.fillStyle='#e03131';ctx.beginPath();ctx.arc(vx(v),py(c.p),6,0,7);ctx.fill();
+  ctx.fillStyle='#102a43';ctx.font='700 12px system-ui';ctx.textAlign='center';ctx.fillText('p-v 图像：斜率=m',gx+gw/2,gy-gh-7);
+  const bx=gx+14,by=420,bh=76,barH=clamp(c.Ek/72,0,1)*bh;
+  ctx.fillStyle='#eef4ff';ctx.fillRect(bx,by-bh,40,bh);ctx.fillStyle='#159a6b';ctx.fillRect(bx,by-barH,40,barH);
+  ctx.strokeStyle='#334e68';ctx.strokeRect(bx,by-bh,40,bh);
+  ctx.fillStyle='#102a43';ctx.font='12px system-ui';ctx.textAlign='left';ctx.fillText('Ek 动能柱',bx+50,by-48);ctx.fillText('只看大小，不带正负',bx+50,by-28);
+}
+function update(){
+  const c=calc();
+  els.m.textContent=m.toFixed(1);els.v.textContent=v.toFixed(1);els.p.textContent=c.p.toFixed(1);els.e.textContent=c.Ek.toFixed(1);
+  els.sign.textContent=c.p>0?'p 为正，方向向右':c.p<0?'p 为负，方向向左':'p = 0，没有方向';
+  els.st.textContent=!running?'已暂停':(v>0?'向右匀速运动':v<0?'向左匀速运动':'静止');
+}
+function draw(){drawGrid();drawRuler();drawCart();drawGraph();update();}
+cv.addEventListener('pointerdown',e=>{
+  const pnt=pos(e),c=calc(),baseY=255,w=c.w,x=cartX-w/2,vTipX=cartX+v*34;
+  const vLeft=Math.min(cartX,vTipX)-18,vRight=Math.max(cartX,vTipX)+18;
+  if(Math.hypot(pnt.x-vTipX,pnt.y-(baseY-94))<26||(Math.abs(pnt.y-(baseY-94))<20&&pnt.x>=vLeft&&pnt.x<=vRight)){drag='v';cv.style.cursor='grabbing';return}
+  if(Math.hypot(pnt.x-(x+w+12),pnt.y-(baseY-23))<24){drag='m';cv.style.cursor='grabbing';return}
+});
+cv.addEventListener('pointermove',e=>{
+  if(!drag)return;const pnt=pos(e),baseY=255;
+  if(drag==='v')v=clamp((pnt.x-cartX)/34,-6,6);
+  if(drag==='m')m=clamp((pnt.x-cartX-58)/26,.6,5);
+  draw();
+});
+window.addEventListener('pointerup',()=>{drag=null;cv.style.cursor='grab'});
+id('play').onclick=function(){running=!running;this.textContent=running?'⏸ 暂停运动':'▶ 继续运动';};
+id('reset').onclick=()=>{m=2;v=3;cartX=150;trace=[];draw()};
+function loop(now){
+  const dt=Math.min((now-last)/1000,.05);last=now;
+  if(running)cartX+=v*28*dt;
+  if(cartX>462)cartX=42;if(cartX<42)cartX=462;
+  draw();requestAnimationFrame(loop);
+}
+draw();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

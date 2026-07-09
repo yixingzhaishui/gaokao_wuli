@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>验证动量守恒</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 16px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 286px; gap: 14px; align-items: stretch; }
+  canvas { width: 100%; height: 470px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  input { width: 100%; }
+  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.72; font-size: 14px; }
+  .status { margin-top: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13px; line-height: 1.55; background: #e6fffa; color: #087f5b; font-weight: 700; }
+  .status.bad { background: #fff5f5; color: #c92a2a; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
+  @media (max-width: 780px) { .stage { grid-template-columns: 1fr; } canvas { height: 400px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="700" height="470" aria-label="验证动量守恒实验"></canvas>
+    <section class="panel">
+      <label for="mode">碰撞类型：<span id="modeVal"></span></label>
+      <input id="mode" type="range" min="0" max="1" value="1" step="1">
+      <label for="m1">小车1质量 m1/kg：<span id="m1Val"></span></label>
+      <input id="m1" type="range" min="0.2" max="1.2" value="0.6" step="0.1">
+      <label for="m2">小车2质量 m2/kg：<span id="m2Val"></span></label>
+      <input id="m2" type="range" min="0.2" max="1.2" value="0.8" step="0.1">
+      <label for="v1">碰前 v1/(m/s)：<span id="v1Val"></span></label>
+      <input id="v1" type="range" min="-2" max="3" value="2" step="0.1">
+      <label for="v2">碰前 v2/(m/s)：<span id="v2Val"></span></label>
+      <input id="v2" type="range" min="-2" max="2" value="0" step="0.1">
+      <label for="loss">外界误差/摩擦：<span id="lossVal"></span></label>
+      <input id="loss" type="range" min="0" max="10" value="2" step="1">
+      <div id="readout" class="readout"></div>
+      <div id="status" class="status"></div>
+      <div class="hint">观察任务：比较碰前总动量和碰后总动量；再看动能是否一定守恒。</div>
+    </section>
+  </div>
+</div>
+<script>
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const els = {
+  mode: document.getElementById('mode'),
+  m1: document.getElementById('m1'),
+  m2: document.getElementById('m2'),
+  v1: document.getElementById('v1'),
+  v2: document.getElementById('v2'),
+  loss: document.getElementById('loss'),
+  modeVal: document.getElementById('modeVal'),
+  m1Val: document.getElementById('m1Val'),
+  m2Val: document.getElementById('m2Val'),
+  v1Val: document.getElementById('v1Val'),
+  v2Val: document.getElementById('v2Val'),
+  lossVal: document.getElementById('lossVal'),
+  readout: document.getElementById('readout'),
+  status: document.getElementById('status')
+};
+function calc(mode, m1, m2, v1, v2, loss) {
+  let u1, u2;
+  if (mode === 0) {
+    const v = (m1*v1 + m2*v2) / (m1 + m2);
+    u1 = v; u2 = v;
+  } else {
+    u1 = ((m1-m2)*v1 + 2*m2*v2) / (m1+m2);
+    u2 = (2*m1*v1 + (m2-m1)*v2) / (m1+m2);
+  }
+  const factor = 1 - loss/100;
+  u1 *= factor;
+  u2 *= factor;
+  const p0 = m1*v1 + m2*v2;
+  const p1 = m1*u1 + m2*u2;
+  const k0 = 0.5*m1*v1*v1 + 0.5*m2*v2*v2;
+  const k1 = 0.5*m1*u1*u1 + 0.5*m2*u2*u2;
+  const rel = Math.abs(p1-p0) / Math.max(0.01, Math.abs(p0)) * 100;
+  return { u1,u2,p0,p1,k0,k1,rel };
+}
+function arrow(x1,y1,x2,y2,color) {
+  const a = Math.atan2(y2-y1,x2-x1);
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(x1,y1);
+  ctx.lineTo(x2,y2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-10*Math.cos(a-0.45), y2-10*Math.sin(a-0.45));
+  ctx.lineTo(x2-10*Math.cos(a+0.45), y2-10*Math.sin(a+0.45));
+  ctx.closePath();
+  ctx.fill();
+}
+function cart(x,y,w,h,color,label,v) {
+  ctx.fillStyle = color;
+  ctx.strokeStyle = '#334e68';
+  ctx.lineWidth = 2;
+  ctx.fillRect(x,y,w,h);
+  ctx.strokeRect(x,y,w,h);
+  ctx.fillStyle = '#334e68';
+  ctx.beginPath(); ctx.arc(x+18,y+h+8,8,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(x+w-18,y+h+8,8,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 13px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText(label,x+w/2,y+24);
+  if (Math.abs(v)>0.05) arrow(x+w/2,y-8,x+w/2+v*36,y-8,'#e03131');
+}
+function drawBar(x,y,w,h,val,max,color,label) {
+  ctx.fillStyle = '#f7f9fc';
+  ctx.strokeStyle = '#d9e2ec';
+  ctx.fillRect(x,y,w,h);
+  ctx.strokeRect(x,y,w,h);
+  const zero = x + w/2;
+  const len = Math.max(-w/2, Math.min(w/2, val/max*w/2));
+  ctx.fillStyle = color;
+  ctx.fillRect(len>=0?zero:zero+len, y+8, Math.abs(len), h-16);
+  ctx.fillStyle = '#486581';
+  ctx.font = '12px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText(label + '=' + val.toFixed(3), x+w/2, y+h+16);
+}
+function draw() {
+  const mode = Number(els.mode.value);
+  const m1 = Number(els.m1.value), m2 = Number(els.m2.value);
+  const v1 = Number(els.v1.value), v2 = Number(els.v2.value);
+  const loss = Number(els.loss.value);
+  const q = calc(mode,m1,m2,v1,v2,loss);
+  els.modeVal.textContent = mode===0 ? '完全非弹性' : '弹性';
+  els.m1Val.textContent = m1.toFixed(1);
+  els.m2Val.textContent = m2.toFixed(1);
+  els.v1Val.textContent = v1.toFixed(1);
+  els.v2Val.textContent = v2.toFixed(1);
+  els.lossVal.textContent = loss + '%';
+  ctx.clearRect(0,0,c.width,c.height);
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0,0,c.width,c.height);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 18px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('验证动量守恒：比较碰撞前后总动量', 350, 30);
+  ctx.strokeStyle = '#334e68';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(60,176);
+  ctx.lineTo(640,176);
+  ctx.moveTo(60,328);
+  ctx.lineTo(640,328);
+  ctx.stroke();
+  ctx.fillStyle = '#486581';
+  ctx.font = '13px system-ui';
+  ctx.fillText('碰前（光电门测 v1、v2）',160,132);
+  ctx.fillText('碰后（光电门测 v1′、v2′）',160,284);
+  cart(170,132,90,36,'#d0ebff','m1',v1);
+  cart(410,132,90,36,'#ffe8cc','m2',v2);
+  if (mode===0) {
+    cart(265,284,90,36,'#d0ebff','m1',q.u1);
+    cart(355,284,90,36,'#ffe8cc','m2',q.u2);
+  } else {
+    cart(180,284,90,36,'#d0ebff','m1',q.u1);
+    cart(430,284,90,36,'#ffe8cc','m2',q.u2);
+  }
+  drawBar(82,386,230,34,q.p0,Math.max(1,Math.abs(q.p0),Math.abs(q.p1)),'#2c7be5','p前');
+  drawBar(388,386,230,34,q.p1,Math.max(1,Math.abs(q.p0),Math.abs(q.p1)),'#38b2ac','p后');
+  ctx.fillStyle = '#486581';
+  ctx.font = '13px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('动量看代数和：向右为正。弹性碰撞还近似守恒动能；完全非弹性动能会减少。',350,452);
+  els.readout.innerHTML = [
+    `<div id="r1">p前=m1v1+m2v2=${q.p0.toFixed(3)}kg·m/s</div>`,
+    `<div id="r2">p后=m1v1′+m2v2′=${q.p1.toFixed(3)}kg·m/s</div>`,
+    `<div id="r3">相对差≈${q.rel.toFixed(1)}%</div>`,
+    `<div id="r4">Ek前=${q.k0.toFixed(3)}J，Ek后=${q.k1.toFixed(3)}J</div>`,
+    `<div id="r5">v1′=${q.u1.toFixed(2)}m/s，v2′=${q.u2.toFixed(2)}m/s</div>`
+  ].join('');
+  els.status.className = q.rel < 5 ? 'status' : 'status bad';
+  els.status.textContent = q.rel < 5
+    ? '通过：碰前后总动量在误差范围内接近，实验支持动量守恒。'
+    : '不通过：外界摩擦或测量误差过大，碰前后总动量差异明显。';
+}
+Object.values(els).forEach(el => {
+  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
+});
+draw();
+</script>
+</body>
+</html>

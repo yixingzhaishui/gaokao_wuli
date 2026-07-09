@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>相对论初步：高速运动的时间与长度</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="../common/controls.css">
+<style>
+  body { margin: 0; background: #f7f9fc; color: #102a43; font-family: -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; }
+  .root { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 12px; padding: 12px; box-sizing: border-box; min-height: 540px; }
+  .stage { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; overflow: hidden; }
+  canvas { display: block; width: 100%; height: auto; touch-action: none; cursor: crosshair; }
+  .panel { display: flex; flex-direction: column; gap: 10px; }
+  .card { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 10px; }
+  .task { background: #fff7e6; border-left: 3px solid #f0a500; color: #486581; line-height: 1.5; font-size: 13px; }
+  .title { font-weight: 700; margin-bottom: 6px; }
+  .param { display: grid; gap: 2px; margin: 8px 0; font-size: 13px; }
+  .param span { display: flex; justify-content: space-between; color: #486581; gap: 10px; }
+  .param b { color: #102a43; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  input[type=range] { width: 100%; accent-color: #2c7be5; }
+  .buttons { display: flex; gap: 8px; }
+  button { border: 1px solid #b0bcc9; background: #fff; border-radius: 6px; padding: 6px 10px; cursor: pointer; }
+  button:hover { background: #eef2f7; }
+  .readout { background: #102a43; color: #d9e2ec; border-radius: 8px; padding: 10px; line-height: 1.72; font-size: 13px; }
+  .readout b { color: #f0a500; font-variant-numeric: tabular-nums; }
+  .formula { font-size: 13px; line-height: 1.55; color: #334e68; }
+  .status { font-size: 13px; font-weight: 700; border-radius: 6px; padding: 8px; border: 1px solid #38b2ac; background: #e6fffa; color: #087f5b; }
+  @media (max-width: 760px) { .root { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="820" height="520"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>拖动速度 β=v/c，从 0.1 拖到 0.9：看 γ 如何急剧增大，外部观察者看到的时间变长、运动方向长度变短。</div>
+    <div class="card">
+      <div class="title">参数</div>
+      <label class="param"><span>速度 β=v/c <b id="betaText">0.60</b></span><input id="beta" type="range" min="0" max="0.98" step="0.01" value="0.60"></label>
+      <label class="param"><span>固有时间 Δt0 <b id="timeText">1.0 s</b></span><input id="time0" type="range" min="0.2" max="5" step="0.1" value="1"></label>
+      <label class="param"><span>固有长度 L0 <b id="lengthText">10.0 m</b></span><input id="length0" type="range" min="2" max="30" step="0.5" value="10"></label>
+      <div class="buttons"><button id="play">播放</button><button id="reset">重置</button><button data-case="low">低速</button><button data-case="high">高速</button></div>
+    </div>
+    <div class="readout" id="readout"></div>
+    <div class="card formula">
+      <div class="title">公式对照</div>
+      <div>γ = 1 / √(1-β²)</div>
+      <div>时间膨胀：Δt = γΔt0</div>
+      <div>长度收缩：L = L0/γ</div>
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const root = document.defaultView || globalThis;
+  const state = { running: false, phase: 0, drag: null, hot: {} };
+  const els = {
+    beta: document.getElementById('beta'),
+    time0: document.getElementById('time0'),
+    length0: document.getElementById('length0')
+  };
+
+  function p() {
+    return {
+      beta: parseFloat(els.beta.value),
+      t0: parseFloat(els.time0.value),
+      L0: parseFloat(els.length0.value)
+    };
+  }
+
+  function calc(q) {
+    const gamma = 1 / Math.sqrt(1 - q.beta * q.beta);
+    return { gamma, t: gamma * q.t0, L: q.L0 / gamma };
+  }
+
+  function fmt(n, d) {
+    const v = Math.abs(n) < 0.0001 ? 0 : n;
+    return v.toFixed(d == null ? 2 : d);
+  }
+
+  function text(s, x, y, color, align, size, weight) {
+    ctx.fillStyle = color || '#102a43';
+    ctx.font = (weight ? weight + ' ' : '') + (size || 13) + 'px -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif';
+    ctx.textAlign = align || 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(s, x, y);
+  }
+
+  function arrow(x1, y1, x2, y2, color, width) {
+    const a = Math.atan2(y2 - y1, x2 - x1);
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = width || 2;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - 10 * Math.cos(a - 0.45), y2 - 10 * Math.sin(a - 0.45));
+    ctx.lineTo(x2 - 10 * Math.cos(a + 0.45), y2 - 10 * Math.sin(a + 0.45));
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function box(x, y, w, h, fill, stroke) {
+    ctx.save();
+    ctx.fillStyle = fill;
+    ctx.strokeStyle = stroke || '#d9e2ec';
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, 7);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawShip(q, r) {
+    text('相对论效应：低速几乎看不见，接近光速才明显', 300, 32, '#102a43', 'center', 18, '700');
+    box(52, 70, 500, 190, '#fff', '#d9e2ec');
+    const full = 270;
+    const contracted = full / r.gamma;
+    const x0 = 142, y = 150;
+    box(x0, y - 50, full, 36, '#eef2ff', '#9fb3c8');
+    text('静止测得 L0=' + fmt(q.L0, 1) + 'm', x0 + full / 2, y - 32, '#102a43', 'center', 13, '700');
+    box(x0, y + 24, contracted, 36, '#e6fffa', '#38b2ac');
+    text('运动方向收缩 L=' + fmt(r.L, 1) + 'm', x0 + contracted / 2, y + 42, '#087f5b', 'center', 13, '700');
+    arrow(x0 + contracted + 10, y + 42, x0 + contracted + 80, y + 42, '#2c7be5', 3);
+    text('v=' + fmt(q.beta, 2) + 'c', x0 + contracted + 90, y + 42, '#2c7be5', 'left', 13, '700');
+    const shipX = x0 + 25 + (state.running ? 80 * state.phase : 0);
+    ctx.fillStyle = '#2c7be5';
+    ctx.beginPath();
+    ctx.moveTo(shipX, y + 116);
+    ctx.lineTo(shipX + 62 / r.gamma, y + 92);
+    ctx.lineTo(shipX + 62 / r.gamma, y + 140);
+    ctx.closePath();
+    ctx.fill();
+    text('飞船', shipX + 35 / r.gamma, y + 116, '#fff', 'center', 12, '700');
+  }
+
+  function drawClock(q, r) {
+    box(584, 70, 184, 190, '#fff', '#d9e2ec');
+    text('光钟时间', 676, 96, '#102a43', 'center', 14, '700');
+    const cx = 676, top = 124, bottom = 214;
+    ctx.strokeStyle = '#486581';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(cx - 42, top);
+    ctx.lineTo(cx + 42, top);
+    ctx.moveTo(cx - 42, bottom);
+    ctx.lineTo(cx + 42, bottom);
+    ctx.stroke();
+    const y = top + (bottom - top) * (0.5 - 0.5 * Math.cos(state.phase * Math.PI * 2));
+    ctx.fillStyle = '#f0a500';
+    ctx.beginPath();
+    ctx.arc(cx, y, 7, 0, Math.PI * 2);
+    ctx.fill();
+    text('本钟 Δt0=' + fmt(q.t0, 1) + 's', cx, 238, '#486581', 'center', 12);
+    text('外看 Δt=' + fmt(r.t, 2) + 's', cx, 254, '#087f5b', 'center', 13, '700');
+  }
+
+  function drawGamma(q, r) {
+    box(52, 292, 716, 170, '#fff', '#d9e2ec');
+    text('γ 随 β 的变化', 410, 318, '#102a43', 'center', 14, '700');
+    const left = 104, right = 720, bottom = 420, top = 340;
+    ctx.strokeStyle = '#486581';
+    ctx.beginPath();
+    ctx.moveTo(left, bottom);
+    ctx.lineTo(right, bottom);
+    ctx.moveTo(left, bottom);
+    ctx.lineTo(left, top);
+    ctx.stroke();
+    text('β=v/c', right + 8, bottom + 10, '#486581', 'left', 12);
+    text('γ', left - 15, top, '#486581', 'center', 12);
+    ctx.strokeStyle = '#2c7be5';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    for (let i = 0; i <= 98; i++) {
+      const beta = i / 100;
+      const gamma = 1 / Math.sqrt(1 - beta * beta);
+      const x = left + beta / 0.98 * (right - left);
+      const y = bottom - Math.min(gamma, 5) / 5 * (bottom - top);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    const px = left + q.beta / 0.98 * (right - left);
+    const py = bottom - Math.min(r.gamma, 5) / 5 * (bottom - top);
+    state.hot.gammaPoint = { x: px, y: py };
+    state.hot.gammaAxis = { left, right };
+    ctx.fillStyle = '#e03131';
+    ctx.beginPath();
+    ctx.arc(px, py, 6, 0, Math.PI * 2);
+    ctx.fill();
+    text('当前 γ=' + fmt(r.gamma, 2), px, py - 16, '#e03131', 'center', 12, '700');
+    text('β 很小时 γ≈1；β 接近 1 时 γ 急剧增大。', 410, 448, '#486581', 'center', 13);
+  }
+
+  function updatePanel(q, r) {
+    document.getElementById('betaText').textContent = fmt(q.beta, 2);
+    document.getElementById('timeText').textContent = fmt(q.t0, 1) + ' s';
+    document.getElementById('lengthText').textContent = fmt(q.L0, 1) + ' m';
+    document.getElementById('readout').innerHTML =
+      'γ = <b>' + fmt(r.gamma, 3) + '</b><br>' +
+      'Δt = γΔt0 = <b>' + fmt(r.t, 2) + ' s</b><br>' +
+      'L = L0/γ = <b>' + fmt(r.L, 2) + ' m</b><br>' +
+      '速度：<b>' + fmt(q.beta, 2) + 'c</b>';
+    const status = document.getElementById('status');
+    if (q.beta < 0.3) {
+      status.textContent = '低速：γ 接近 1，相对论效应极小，日常运动可用经典力学。';
+      status.style.background = '#e6fffa';
+      status.style.color = '#087f5b';
+      status.style.borderColor = '#38b2ac';
+    } else if (q.beta < 0.8) {
+      status.textContent = '高速：时间膨胀和长度收缩开始明显。';
+      status.style.background = '#fff7e6';
+      status.style.color = '#9a6700';
+      status.style.borderColor = '#f0a500';
+    } else {
+      status.textContent = '接近光速：γ 急剧增大，经典力学不再适用。';
+      status.style.background = '#fff0f0';
+      status.style.color = '#c92a2a';
+      status.style.borderColor = '#ff6b6b';
+    }
+  }
+
+  function draw() {
+    const qv = p();
+    const r = calc(qv);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    drawShip(qv, r);
+    drawClock(qv, r);
+    drawGamma(qv, r);
+    updatePanel(qv, r);
+  }
+
+  function tick() {
+    if (state.running) {
+      state.phase += 0.01 + parseFloat(els.beta.value) * 0.018;
+      if (state.phase > 1) state.phase = 0;
+    }
+    draw();
+    requestAnimationFrame(tick);
+  }
+
+  Object.values(els).forEach(el => {
+    el.addEventListener('input', function(){
+      state.running = false;
+      document.getElementById('play').textContent = '播放';
+      draw();
+    });
+  });
+  document.getElementById('play').addEventListener('click', function(){
+    state.running = !state.running;
+    this.textContent = state.running ? '暂停' : '播放';
+  });
+  document.getElementById('reset').addEventListener('click', function(){
+    els.beta.value = 0.6;
+    els.time0.value = 1;
+    els.length0.value = 10;
+    state.running = false;
+    state.phase = 0;
+    document.getElementById('play').textContent = '播放';
+    draw();
+  });
+  document.querySelectorAll('button[data-case]').forEach(btn => {
+    btn.addEventListener('click', function(){
+      if (this.dataset.case === 'low') {
+        els.beta.value = 0.1;
+        els.time0.value = 1;
+        els.length0.value = 10;
+      } else {
+        els.beta.value = 0.9;
+        els.time0.value = 1;
+        els.length0.value = 10;
+      }
+      state.running = false;
+      document.getElementById('play').textContent = '播放';
+      draw();
+    });
+  });
+
+  function eventPos(ev) {
+    const src = ev.touches && ev.touches.length ? ev.touches[0] : (ev.changedTouches && ev.changedTouches.length ? ev.changedTouches[0] : ev);
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: (src.clientX - rect.left) * canvas.width / rect.width,
+      y: (src.clientY - rect.top) * canvas.height / rect.height
+    };
+  }
+
+  function dist(a, x, y) {
+    return Math.hypot(a.x - x, a.y - y);
+  }
+
+  function setBetaFromX(x) {
+    const axis = state.hot.gammaAxis;
+    const beta = Math.max(0, Math.min(0.98, (x - axis.left) / (axis.right - axis.left) * 0.98));
+    els.beta.value = beta.toFixed(2);
+  }
+
+  function startDrag(ev) {
+    const pos = eventPos(ev);
+    draw();
+    if (state.hot.gammaPoint && dist(state.hot.gammaPoint, pos.x, pos.y) < 20) {
+      state.drag = 'gamma';
+      setBetaFromX(pos.x);
+      state.running = false;
+      document.getElementById('play').textContent = '播放';
+      draw();
+      if (ev.pointerId != null && canvas.setPointerCapture) canvas.setPointerCapture(ev.pointerId);
+      ev.preventDefault();
+    }
+  }
+
+  function moveDrag(ev) {
+    if (state.drag !== 'gamma') return;
+    setBetaFromX(eventPos(ev).x);
+    draw();
+    ev.preventDefault();
+  }
+
+  function endDrag(ev) {
+    if (state.drag && ev.pointerId != null && canvas.hasPointerCapture && canvas.hasPointerCapture(ev.pointerId)) {
+      canvas.releasePointerCapture(ev.pointerId);
+    }
+    state.drag = null;
+  }
+
+  if (root.PointerEvent) {
+    canvas.addEventListener('pointerdown', startDrag);
+    canvas.addEventListener('pointermove', moveDrag);
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(type => canvas.addEventListener(type, endDrag));
+  } else {
+    canvas.addEventListener('mousedown', startDrag);
+    root.addEventListener('mousemove', moveDrag);
+    root.addEventListener('mouseup', endDrag);
+    canvas.addEventListener('touchstart', startDrag, { passive: false });
+    root.addEventListener('touchmove', moveDrag, { passive: false });
+    root.addEventListener('touchend', endDrag);
+    root.addEventListener('touchcancel', endDrag);
+  }
+  draw();
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>交流电四值</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#eef2f7;color:#102a43}
+.wrap{padding:12px}
+h2{font-size:16px;margin:0 0 8px}
+canvas{display:block;width:100%;max-width:700px;background:#fff;border:1px solid #d9e2ec;border-radius:12px;touch-action:none;cursor:grab}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.chip{background:#102a43;color:#e6eef7;padding:6px 11px;border-radius:8px;font-size:13px}
+.chip b{color:#ffd166}
+.ctrls{display:flex;flex-wrap:wrap;gap:12px;margin:8px 0;align-items:center}
+.ctrls label{display:flex;flex-direction:column;gap:2px;font-size:12px;color:#334e68}
+.ctrls input[type=range]{width:130px;accent-color:#2c7be5}
+.ctrls button{font:inherit;padding:6px 12px;border:1px solid #b0bcc9;background:#fff;border-radius:7px;cursor:pointer}
+.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:9px 12px;border-radius:6px;font-size:13px;color:#5a6b7b;line-height:1.5;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2>交流电四值：瞬时值、峰值、有效值、平均值各管各的</h2>
+  <canvas id="cv" width="700" height="420"></canvas>
+  <div class="chips">
+    <span class="chip">峰值 Uₘ = <b id="umv">311</b> V</span>
+    <span class="chip">有效值 U = <b id="uv">220</b> V</span>
+    <span class="chip">瞬时值 u = <b id="instv">0</b> V</span>
+    <span class="chip">半周期平均值 = <b id="avgv">198</b> V</span>
+    <span class="chip">功率 P = <b id="pv">4840</b> W</span>
+    <span class="chip">状态：<b id="statev">自动扫相位</b></span>
+  </div>
+  <div class="ctrls">
+    <label>峰值 Uₘ = <span id="uml">311</span> V<input id="umr" type="range" min="50" max="400" step="1" value="311"></label>
+    <label>电阻 R = <span id="rl">10</span> Ω<input id="rr" type="range" min="5" max="100" step="5" value="10"></label>
+    <button id="play-btn">暂停</button>
+    <button id="reset-btn">重置</button>
+    <span style="font-size:13px;color:#5a6b7b">或拖红点读瞬时值</span>
+  </div>
+  <div class="hint"><b>观察任务</b>：拖红点沿正弦曲线移动，看瞬时值 u 变正、变负、过零；拖峰值 Uₘ，看有效值始终是 Uₘ/√2。右侧热量柱用有效值算 P=U²/R，而不是用峰值。半周期平均值用于电磁感应电荷量，不用于功率热量。</div>
+</div>
+<script>
+(function(){
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+let Um=311,R=10,phase=0,drag=false,running=true,last=performance.now();
+function U(){return Um/Math.SQRT2}
+function avg(){return 2*Um/Math.PI}
+function inst(){return Um*Math.sin(phase)}
+function P(){return U()*U()/R}
+function sync(){document.getElementById('umv').textContent=Um.toFixed(0);document.getElementById('uv').textContent=U().toFixed(0);document.getElementById('instv').textContent=inst().toFixed(0);document.getElementById('avgv').textContent=avg().toFixed(0);document.getElementById('pv').textContent=P().toFixed(0);document.getElementById('uml').textContent=Um.toFixed(0);document.getElementById('rl').textContent=R.toFixed(0);document.getElementById('statev').textContent=drag?'手动读瞬时值':(running?'自动扫相位':'暂停：拖红点读数')}
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  const gx=50,gy=190,gw=420,amp=120;
+  const bg=ctx.createLinearGradient(gx,55,gx,325);bg.addColorStop(0,'rgba(44,123,229,.08)');bg.addColorStop(.5,'rgba(255,255,255,.5)');bg.addColorStop(1,'rgba(232,89,12,.06)');
+  ctx.fillStyle=bg;ctx.fillRect(gx,55,gw,270);
+  ctx.strokeStyle='#b0bcc9';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(gx,gy);ctx.lineTo(gx+gw,gy);ctx.moveTo(gx,50);ctx.lineTo(gx,330);ctx.stroke();
+  const scale=amp/400;
+  ctx.strokeStyle='#2c7be5';ctx.lineWidth=3;ctx.beginPath();
+  for(let x=0;x<=gw;x++){const ph=x/gw*2*Math.PI,y=gy-Um*Math.sin(ph)*scale;if(x)ctx.lineTo(gx+x,y);else ctx.moveTo(gx+x,y)}
+  ctx.stroke();
+  const yPeak=gy-Um*scale,yEff=gy-U()*scale,yAvg=gy-avg()*scale;
+  function hline(y,col,txt){ctx.strokeStyle=col;ctx.setLineDash([6,4]);ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(gx,y);ctx.lineTo(gx+gw,y);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=col;ctx.font='12px system-ui';ctx.textAlign='left';ctx.fillText(txt,gx+gw+8,y+4)}
+  hline(yPeak,'#e8590c','峰值 Uₘ');hline(yEff,'#2b8a3e','有效值 U=Uₘ/√2');hline(yAvg,'#8a3ffb','半周期平均值');
+  const px=gx+phase/(2*Math.PI)*gw,py=gy-inst()*scale;
+  const glow=ctx.createRadialGradient(px,py,2,px,py,18);glow.addColorStop(0,'rgba(201,42,42,.55)');glow.addColorStop(1,'rgba(201,42,42,0)');ctx.fillStyle=glow;ctx.beginPath();ctx.arc(px,py,18,0,7);ctx.fill();
+  ctx.fillStyle='#c92a2a';ctx.beginPath();ctx.arc(px,py,7,0,7);ctx.fill();
+  ctx.fillStyle='#c92a2a';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText('瞬时值 u',px,py-14);
+  // heat bars
+  const bx=540,base=320,bw=45,acH=Math.min(230,P()/25),wrongH=Math.min(230,Um*Um/R/25);
+  ctx.fillStyle='#dbe4ee';ctx.fillRect(bx,90,bw,230);ctx.fillRect(bx+70,90,bw,230);
+  ctx.fillStyle='#2b8a3e';ctx.fillRect(bx,base-acH,bw,acH);
+  ctx.fillStyle='rgba(232,89,12,.65)';ctx.fillRect(bx+70,base-wrongH,bw,wrongH);
+  ctx.fillStyle='#486581';ctx.font='11px system-ui';ctx.textAlign='center';ctx.fillText('正确',bx+bw/2,340);ctx.fillText('误用峰值',bx+70+bw/2,340);
+  ctx.fillText('热功率柱',bx+58,72);
+  ctx.fillStyle='#243b53';ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillText('功率热量用有效值：P=U²/R；电表/铭牌 220V 是有效值，不是峰值。',35,392);
+  sync();
+}
+function pos(e){const r=cv.getBoundingClientRect(),s=cv.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s}}
+cv.addEventListener('pointerdown',e=>{const p=pos(e);const gx=50,gy=190,gw=420,scale=120/400,px=gx+phase/(2*Math.PI)*gw,py=gy-inst()*scale;if(Math.hypot(p.x-px,p.y-py)<26){drag=true;running=false;document.getElementById('play-btn').textContent='播放';cv.setPointerCapture(e.pointerId)}});
+cv.addEventListener('pointermove',e=>{if(!drag)return;const p=pos(e),gx=50,gw=420;phase=Math.max(0,Math.min(2*Math.PI,(p.x-gx)/gw*2*Math.PI));draw()});
+cv.addEventListener('pointerup',()=>drag=false);cv.addEventListener('pointercancel',()=>drag=false);
+document.getElementById('umr').oninput=e=>{Um=parseFloat(e.target.value);draw()};
+document.getElementById('rr').oninput=e=>{R=parseFloat(e.target.value);draw()};
+document.getElementById('play-btn').onclick=()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';draw()};
+document.getElementById('reset-btn').onclick=()=>{phase=0;running=true;document.getElementById('play-btn').textContent='暂停';draw()};
+function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;if(running&&!drag){phase=(phase+dt*1.6)%(2*Math.PI)}draw();requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

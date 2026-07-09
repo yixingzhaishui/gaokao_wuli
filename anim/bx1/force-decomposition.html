@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>力的分解实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 306px;gap:10px;padding:10px;min-height:540px}
+  .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;touch-action:none}
+  .panel{display:flex;flex-direction:column;gap:8px}
+  .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
+  .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.45}
+  .title{font-weight:800;margin-bottom:5px;color:#0f172a}
+  .small{font-size:12px;line-height:1.5;color:#475569}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:48px}
+  .meter span{display:block;font-size:11px;color:#b6c5d8}
+  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:16px;font-variant-numeric:tabular-nums}
+  .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:30px;cursor:pointer;color:#102a43}
+  button.active{background:#e0f2fe;border-color:#0284c7;color:#075985;font-weight:800}
+  .formula{display:grid;gap:5px;font-size:13px;color:#334155}
+  .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
+  .formula div:last-child{border-bottom:0;padding-bottom:0}
+  .formula b{white-space:nowrap;color:#0f172a}
+  .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="920" height="520" aria-label="力的分解交互实验台"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>拖动斜面顶端手柄改变 θ，再拖动 m、g 仪表；看红色重力始终竖直向下，橙色与蓝色分力如何合成回红色箭头。</div>
+    <div class="card">
+      <div class="title">快速角度</div>
+      <div class="chips">
+        <button data-theta="0">0° 平面</button>
+        <button data-theta="30" class="active">30° 典型</button>
+        <button data-theta="45">45° 对比</button>
+        <button data-theta="60">60° 陡坡</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="title">实时读数</div>
+      <div class="readout">
+        <div class="meter"><span>斜面角 θ</span><b id="thetaText">30°</b></div>
+        <div class="meter"><span>重力 G=mg</span><b id="gForceText">20.0 N</b></div>
+        <div class="meter"><span>沿斜面 G∥</span><b id="parallelText">10.0 N</b></div>
+        <div class="meter"><span>垂直斜面 G⊥</span><b id="perpText">17.3 N</b></div>
+      </div>
+    </div>
+    <div class="card formula">
+      <div><span>红色原力</span><b>G=mg</b></div>
+      <div><span>橙色分力</span><b>G∥=mg sinθ</b></div>
+      <div><span>蓝色分力</span><b>G⊥=mg cosθ</b></div>
+    </div>
+    <div class="card small"><b>可直接操作：</b>抓斜面顶端圆点改角度；抓底部两个仪表改质量 m 和 g。虚线平行四边形闭合，说明分力只是等效替代，不是新增的力。</div>
+    <div class="chips"><button id="playBtn">▶ 播放：θ 自动扫描</button><button id="resetBtn">重置</button></div>
+    <div class="status" id="status">分解后列方程时，G 与 G∥、G⊥ 不要重复计入。</div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const state={theta:30,m:2,g:10,drag:null,playing:false,playDir:1};
+  const els={
+    theta:document.getElementById('thetaText'),
+    gForce:document.getElementById('gForceText'),
+    parallel:document.getElementById('parallelText'),
+    perp:document.getElementById('perpText'),
+    status:document.getElementById('status')
+  };
+  const colors={red:'#dc2626',orange:'#f59e0b',blue:'#2563eb',ink:'#102a43',muted:'#64748b',line:'#94a3b8'};
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  const fmt=(v,d=1)=>v.toFixed(d);
+  function text(s,x,y,c=colors.ink,a='center',size=13,weight='600'){
+    ctx.fillStyle=c;
+    ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;
+    ctx.textAlign=a;
+    ctx.textBaseline='middle';
+    ctx.fillText(s,x,y);
+  }
+  function line(x1,y1,x2,y2,c=colors.line,w=2,dash){
+    ctx.save();
+    ctx.strokeStyle=c;ctx.lineWidth=w;
+    if(dash)ctx.setLineDash(dash);
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    ctx.restore();
+  }
+  function arrow(x1,y1,x2,y2,c,w=3){
+    const a=Math.atan2(y2-y1,x2-x1);
+    line(x1,y1,x2,y2,c,w);
+    ctx.save();
+    ctx.fillStyle=c;
+    ctx.beginPath();
+    ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));
+    ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+  function roundRect(x,y,w,h,r,fill,stroke){
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(x,y,w,h,r);
+    ctx.fillStyle=fill;ctx.fill();
+    if(stroke){ctx.strokeStyle=stroke;ctx.stroke();}
+    ctx.restore();
+  }
+  function geom(){
+    const a=state.theta*Math.PI/180;
+    const base={x:115,y:412};
+    const len=360;
+    const end={x:base.x+len*Math.cos(a),y:base.y-len*Math.sin(a)};
+    const alongUp={x:Math.cos(a),y:-Math.sin(a)};
+    const alongDown={x:-Math.cos(a),y:Math.sin(a)};
+    const normalOut={x:-Math.sin(a),y:-Math.cos(a)};
+    const normalIn={x:Math.sin(a),y:Math.cos(a)};
+    const foot={x:base.x+315*alongUp.x,y:base.y+315*alongUp.y};
+    const block={x:foot.x+34*normalOut.x,y:foot.y+34*normalOut.y};
+    const massKnob={x:170+(state.m-0.5)/(8-0.5)*210,y:470};
+    const gKnob={x:515+(state.g-1.6)/(12-1.6)*210,y:470};
+    return{a,base,len,end,alongUp,alongDown,normalOut,normalIn,foot,block,massKnob,gKnob};
+  }
+  function values(){
+    const G=state.m*state.g;
+    const a=state.theta*Math.PI/180;
+    return{G,parallel:G*Math.sin(a),perp:G*Math.cos(a)};
+  }
+  function drawHandle(x,y,label,active=false){
+    ctx.save();
+    ctx.fillStyle=active?'#fde68a':'#fff';
+    ctx.strokeStyle=active?'#d97706':'#0f172a';
+    ctx.lineWidth=3;
+    ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();
+    text(label,x,y-22,active?'#92400e':colors.ink,'center',12,'800');
+    ctx.restore();
+  }
+  function drawBlock(g){
+    ctx.save();
+    ctx.translate(g.block.x,g.block.y);
+    ctx.rotate(-g.a);
+    roundRect(-43,-24,86,48,6,'#e2e8f0','#334155');
+    line(-35,24,35,24,'#64748b',2);
+    text('物块',0,1,'#102a43','center',13,'800');
+    ctx.restore();
+  }
+  function drawRuler(x1,y1,x2,y2,label){
+    line(x1,y1,x2,y2,'#0f172a',2);
+    for(let i=0;i<=10;i++){
+      const t=i/10,x=x1+(x2-x1)*t,y=y1+(y2-y1)*t;
+      line(x,y-5,x,y+5,'#0f172a',1);
+    }
+    text(label,(x1+x2)/2,y1-18,'#334155','center',12,'700');
+  }
+  function drawMassGauge(g){
+    drawRuler(170,470,380,470,'拖动质量 m');
+    drawHandle(g.massKnob.x,g.massKnob.y,`${fmt(state.m)} kg`,state.drag==='m');
+    drawRuler(515,470,725,470,'拖动 g');
+    drawHandle(g.gKnob.x,g.gKnob.y,`${fmt(state.g)} N/kg`,state.drag==='g');
+  }
+  function drawAngleArc(g){
+    const r=78;
+    ctx.save();
+    ctx.strokeStyle='#475569';
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.arc(g.base.x,g.base.y,r,-g.a,0);
+    ctx.stroke();
+    ctx.restore();
+    text(`θ=${fmt(state.theta,0)}°`,g.base.x+r+26,g.base.y-16,'#334155','center',13,'800');
+  }
+  function drawVectors(g,v){
+    const p=g.block;
+    const scale=Math.min(6.2,200/Math.max(v.G,1));
+    const GEnd={x:p.x,y:p.y+v.G*scale};
+    const paraEnd={x:p.x+g.alongDown.x*v.parallel*scale,y:p.y+g.alongDown.y*v.parallel*scale};
+    const perpEnd={x:p.x+g.normalIn.x*v.perp*scale,y:p.y+g.normalIn.y*v.perp*scale};
+    line(paraEnd.x,paraEnd.y,GEnd.x,GEnd.y,'#94a3b8',2,[6,5]);
+    line(perpEnd.x,perpEnd.y,GEnd.x,GEnd.y,'#94a3b8',2,[6,5]);
+    arrow(p.x,p.y,GEnd.x,GEnd.y,colors.red,4);
+    arrow(p.x,p.y,paraEnd.x,paraEnd.y,colors.orange,4);
+    arrow(p.x,p.y,perpEnd.x,perpEnd.y,colors.blue,4);
+    ctx.save();
+    ctx.fillStyle='#fff';
+    ctx.globalAlpha=.92;
+    roundRect(GEnd.x+10,GEnd.y-19,92,28,6,'#fff','#fecaca');
+    roundRect(paraEnd.x-118,paraEnd.y-11,96,28,6,'#fff','#fed7aa');
+    roundRect(perpEnd.x+8,perpEnd.y-19,102,28,6,'#fff','#bfdbfe');
+    ctx.restore();
+    text('G=mg',GEnd.x+56,GEnd.y-5,colors.red,'center',13,'800');
+    text('G∥',paraEnd.x-70,paraEnd.y+3,'#b45309','center',13,'800');
+    text('G⊥',perpEnd.x+59,perpEnd.y-5,colors.blue,'center',13,'800');
+    roundRect(46,64,255,72,8,'#f8fafc','#cbd5e1');
+    text('等效校验',76,84,'#0f172a','left',14,'900');
+    text('橙色 + 蓝色的虚线终点',76,108,'#475569','left',12,'600');
+    text('落在红色重力箭头末端',76,126,'#475569','left',12,'600');
+  }
+  function updateReadout(v){
+    els.theta.textContent=`${fmt(state.theta,0)}°`;
+    els.gForce.textContent=`${fmt(v.G)} N`;
+    els.parallel.textContent=`${fmt(v.parallel)} N`;
+    els.perp.textContent=`${fmt(v.perp)} N`;
+    const buttons=document.querySelectorAll('[data-theta]');
+    buttons.forEach(btn=>btn.classList.toggle('active',Math.abs(+btn.dataset.theta-state.theta)<.5));
+    if(state.theta<1){
+      els.status.textContent='θ=0° 时，G∥=0：重力只把物体压向水平面，没有沿面下滑分力。';
+    }else if(state.theta>55){
+      els.status.textContent='斜面越陡，G∥ 越接近 G，G⊥ 变小；支持力和摩擦相关量也会变小。';
+    }else{
+      els.status.textContent='分解后列方程时，G 与 G∥、G⊥ 不要重复计入。';
+    }
+    if(state.playing)els.status.textContent+='（播放中：θ 自动变化）';
+  }
+  function draw(){
+    const g=geom(),v=values();
+    ctx.clearRect(0,0,920,520);
+    var _bg=ctx.createLinearGradient(0,0,0,520);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,520);
+    text('力的分解实验台：原力不变，两个分力按选定方向替代它',460,30,'#0f172a','center',19,'900');
+    roundRect(35,54,850,386,8,'#ffffff','#d7dee8');
+    line(g.base.x,g.base.y,g.end.x,g.end.y,'#64748b',5);
+    line(g.base.x,g.base.y,g.end.x,g.base.y,'#cbd5e1',2,[7,6]);
+    drawAngleArc(g);
+    drawBlock(g);
+    drawVectors(g,v);
+    drawHandle(g.end.x,g.end.y,'拖 θ',state.drag==='theta');
+    drawMassGauge(g);
+    text('沿斜面方向负责“下滑趋势”',650,174,'#b45309','center',13,'800');
+    text('垂直斜面方向负责“压紧斜面”',680,208,colors.blue,'center',13,'800');
+    updateReadout(v);
+  }
+  function pos(evt){
+    const r=canvas.getBoundingClientRect();
+    return{x:(evt.clientX-r.left)*canvas.width/r.width,y:(evt.clientY-r.top)*canvas.height/r.height};
+  }
+  function near(a,b,rad=22){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+  function pointerDown(evt){
+    if(state.playing){state.playing=false;document.getElementById('playBtn').textContent='▶ 播放：θ 自动扫描'}
+    const p=pos(evt),g=geom();
+    if(near(p,g.end,28))state.drag='theta';
+    else if(near(p,g.massKnob,24))state.drag='m';
+    else if(near(p,g.gKnob,24))state.drag='g';
+    else state.drag=null;
+    if(state.drag){canvas.setPointerCapture(evt.pointerId);pointerMove(evt);}
+  }
+  function pointerMove(evt){
+    if(!state.drag)return;
+    const p=pos(evt),g=geom();
+    if(state.drag==='theta'){
+      const a=Math.atan2(g.base.y-p.y,p.x-g.base.x)*180/Math.PI;
+      state.theta=clamp(a,0,60);
+    }else if(state.drag==='m'){
+      state.m=clamp(0.5+(p.x-170)/210*(8-0.5),0.5,8);
+    }else if(state.drag==='g'){
+      state.g=clamp(1.6+(p.x-515)/210*(12-1.6),1.6,12);
+    }
+    draw();
+  }
+  function pointerUp(evt){
+    if(state.drag){
+      state.drag=null;
+      try{canvas.releasePointerCapture(evt.pointerId);}catch(e){}
+      draw();
+    }
+  }
+  canvas.addEventListener('pointerdown',pointerDown);
+  canvas.addEventListener('pointermove',pointerMove);
+  canvas.addEventListener('pointerup',pointerUp);
+  canvas.addEventListener('pointercancel',pointerUp);
+  document.querySelectorAll('[data-theta]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      state.theta=+btn.dataset.theta;
+      draw();
+    });
+  });
+  const playBtn=document.getElementById('playBtn');
+  function animate(){
+    if(!state.playing)return;
+    state.theta+=state.playDir*0.5;
+    if(state.theta>=60){state.theta=60;state.playDir=-1;}
+    if(state.theta<=0){state.theta=0;state.playDir=1;}
+    draw();
+    requestAnimationFrame(animate);
+  }
+  playBtn.addEventListener('click',()=>{
+    state.playing=!state.playing;
+    playBtn.textContent=state.playing?'⏸ 暂停':'▶ 播放：θ 自动扫描';
+    if(state.playing){state.playDir=1;animate();}else draw();
+  });
+  document.getElementById('resetBtn').addEventListener('click',()=>{state.playing=false;state.theta=30;playBtn.textContent='▶ 播放：θ 自动扫描';draw();});
+  draw();
+})();
+</script>
+</body>
+</html>

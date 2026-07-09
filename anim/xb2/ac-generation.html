@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>交流电的产生</title>
+<link rel="stylesheet" href="../common/controls.css">
+<style>
+body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#f7f9fc;color:#1f2933}
+.container{padding:12px}
+h2{font-size:16px;margin:0 0 8px;color:#102a43}
+canvas{display:block;width:100%;max-width:760px;background:#fff;border:1px solid #d9e2ec;border-radius:8px}
+.readouts{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0;font-size:13px}
+.readouts .r{background:#102a43;color:#d9e2ec;padding:6px 10px;border-radius:6px}
+.readouts .r b{color:#f0a500}
+.controls{display:flex;flex-wrap:wrap;gap:14px;margin:10px 0;align-items:center}
+.controls label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:#334e68}
+.controls input[type=range]{width:150px;accent-color:#2c7be5}
+.controls button{font:inherit;padding:6px 14px;border:1px solid #b0bcc9;background:#fff;border-radius:6px;cursor:pointer}
+.controls button:hover{background:#eef2f7}
+.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:8px 12px;border-radius:4px;font-size:13px;color:#486581;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>交流电的产生：3D发电机 + 侧视法线 + Φ/e 图像记录</h2>
+  <canvas id="canvas" width="760" height="390"></canvas>
+  <div class="readouts">
+    <span class="r">角速度 ω = <b id="w-v">2.0</b> rad/s</span>
+    <span class="r">法线 n 与 B 夹角 θ = <b id="ph-v">0</b>°</span>
+    <span class="r">瞬时电动势 e = <b id="e-v">0.0</b></span>
+    <span class="r">峰值 E_m = <b id="em-v">—</b></span>
+  </div>
+  <div class="controls">
+    <label>角速度 ω = <span id="w-d">2.0</span> rad/s
+      <input type="range" id="w" min="0.5" max="4" step="0.1" value="2"></label>
+    <button id="play-btn">暂停</button>
+    <button id="reset-btn">重置</button>
+  </div>
+  <div class="hint">
+    <p><b>观察任务</b>：看左侧 3D 发电机线圈在 N-S 磁极间转动，右下侧视小图显示面积法线 n 与 B 的夹角 θ。θ=0° 时磁通量 Φ 最大，但 e=0；θ=90° 时 Φ=0、变化最快，电动势 e 最大。右侧图像同时记录 Φ-t 和 e-t，二者相差 90° 相位。拖<b>ω</b> 变大→ 转得快，峰值 E_m=nBAω 变大、周期变短。</p>
+  </div>
+</div>
+<script>
+(function(){
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  let w=2, t=0, running=true;
+  const n=1, B=1, A=1; // normalized; Em=nBAw
+  const gx0=390, gTop=48, gBot=312, gW=330, gcy=(gTop+gBot)/2;
+  const coilCx=190, coilCy=178, coilR=78;
+  function Em(){return n*B*A*w;}
+  function emf(tt){return Em()*Math.sin(w*tt);} // e = Em sin(wt), coil plane parallel to B at wt=0 -> max cutting
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    // 3D generator lab: magnet poles + rotating coil
+    ctx.fillStyle='#f8fbff';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1.4;ctx.beginPath();ctx.roundRect(24,40,335,292,10);ctx.fill();ctx.stroke();
+    ctx.fillStyle='#5b7083';ctx.font='12px system-ui';ctx.textAlign='left';ctx.fillText('3D透视发电机实物装置：线圈在 N-S 磁极间旋转',42,62);
+    ctx.fillStyle='#d64545';ctx.fillRect(48,102,46,156);ctx.fillStyle='#2c7be5';ctx.fillRect(286,102,46,156);
+    ctx.fillStyle='#fff';ctx.font='bold 20px system-ui';ctx.textAlign='center';ctx.fillText('N',71,185);ctx.fillText('S',309,185);
+    ctx.fillStyle='rgba(44,123,229,0.25)';ctx.fillRect(94,102,192,156);
+    for(let Y=126;Y<244;Y+=30){ctx.strokeStyle='rgba(44,123,229,0.58)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(106,Y);ctx.lineTo(274,Y);ctx.stroke();ctx.fillStyle='rgba(44,123,229,0.58)';ctx.beginPath();ctx.moveTo(274,Y);ctx.lineTo(264,Y-5);ctx.lineTo(264,Y+5);ctx.closePath();ctx.fill();}
+    // rotating coil (3D projection): θ = angle between area normal n and B
+    const ang=w*t;
+    // coil appears as line/ellipse; width ~ cos(ang)
+    ctx.strokeStyle='#e8590c';ctx.lineWidth=4;
+    const halfW=coilR*Math.cos(ang);
+    ctx.beginPath();ctx.ellipse(coilCx,coilCy,Math.abs(halfW)+2,coilR,0,0,Math.PI*2);ctx.stroke();
+    // area normal n in the side/overhead sense
+    const nx=Math.cos(ang), ny=-0.45*Math.sin(ang);
+    ctx.strokeStyle='#1a7a1a';ctx.fillStyle='#1a7a1a';ctx.lineWidth=2.3;
+    ctx.beginPath();ctx.moveTo(coilCx,coilCy);ctx.lineTo(coilCx+58*nx,coilCy+58*ny);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(coilCx+58*nx,coilCy+58*ny);ctx.lineTo(coilCx+58*nx-8*Math.cos(Math.atan2(ny,nx)-0.45),coilCy+58*ny-8*Math.sin(Math.atan2(ny,nx)-0.45));ctx.lineTo(coilCx+58*nx-8*Math.cos(Math.atan2(ny,nx)+0.45),coilCy+58*ny-8*Math.sin(Math.atan2(ny,nx)+0.45));ctx.closePath();ctx.fill();
+    ctx.fillText('n',coilCx+64*nx,coilCy+64*ny);
+    // sides of coil (the two conductors that cut field) — 带辉光真实感
+    for(const s of [1,-1]){const dx=coilCx+s*halfW;const gd=ctx.createRadialGradient(dx,coilCy,1,dx,coilCy,16);gd.addColorStop(0,'rgba(201,42,42,0.6)');gd.addColorStop(1,'rgba(201,42,42,0)');ctx.fillStyle=gd;ctx.beginPath();ctx.arc(dx,coilCy,16,0,7);ctx.fill();}
+    ctx.fillStyle='#c92a2a';
+    ctx.beginPath();ctx.arc(coilCx+halfW,coilCy,6,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(coilCx-halfW,coilCy,6,0,Math.PI*2);ctx.fill();
+    // velocity of side conductors ~ sin(ang): show when cutting fastest
+    ctx.fillStyle='#243b53';ctx.font='12px sans-serif';ctx.textAlign='center';
+    const cutting=Math.abs(Math.sin(ang));
+    ctx.fillText('拖线圈转动',coilCx,318);
+    ctx.font='bold 12px sans-serif';ctx.fillStyle=cutting>0.7?'#c92a2a':'#486581';
+    ctx.fillText('状态：'+(cutting>0.7?'θ≈90°，Φ=0但变化最快 → e 最大':(cutting<0.3?'θ≈0°，Φ最大但瞬时变化率为0 → e=0':'Φ 与 e 正在同步变化')),coilCx,300);
+    // side view / graph panel
+    ctx.fillStyle='#f8fbff';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1.2;ctx.beginPath();ctx.roundRect(374,40,365,292,10);ctx.fill();ctx.stroke();
+    ctx.fillStyle='#334e68';ctx.font='bold 12px system-ui';ctx.textAlign='left';ctx.fillText('侧视/俯视：法线 n 与 B 的夹角；图像记录 Φ 与 e',392,62);
+    ctx.strokeStyle='#b0bcc9';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(gx0,gTop);ctx.lineTo(gx0,gBot);ctx.lineTo(gx0+gW,gBot);ctx.stroke();
+    ctx.strokeStyle='#dbe4ee';ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(gx0,gcy);ctx.lineTo(gx0+gW,gcy);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#829ab1';ctx.font='11px sans-serif';ctx.textAlign='right';ctx.fillText('e',gx0-4,gTop+8);ctx.textAlign='left';ctx.fillText('t',gx0+gW-8,gcy+14);
+    const win=4*Math.PI/w;
+    const scale=90/Math.max(0.5,Em());
+    ctx.strokeStyle='#2c7be5';ctx.lineWidth=2;ctx.beginPath();
+    for(let px=0;px<=gW;px++){const tt=t-win+(px/gW)*win;const yy=gcy-emf(tt)*scale;if(px===0)ctx.moveTo(gx0+px,yy);else ctx.lineTo(gx0+px,yy);}
+    ctx.stroke();
+    ctx.strokeStyle='#f08c00';ctx.lineWidth=2;ctx.setLineDash([5,4]);ctx.beginPath();
+    for(let px=0;px<=gW;px++){const tt=t-win+(px/gW)*win;const yy=gcy-Math.cos(w*tt)*70;if(px===0)ctx.moveTo(gx0+px,yy);else ctx.lineTo(gx0+px,yy);}
+    ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#f08c00';ctx.fillText('Φ=BAcosθ',gx0+12,gTop+20);
+    ctx.fillStyle='#2c7be5';ctx.fillText('e=Eₘsinθ',gx0+12,gTop+38);
+    const e=emf(t);
+    ctx.fillStyle='#c92a2a';ctx.beginPath();ctx.arc(gx0+gW,gcy-e*scale,4,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#243b53';ctx.font='13px sans-serif';ctx.textAlign='left';
+    ctx.fillText('公式绑定：Φ=BAcosθ，e=-NΔΦ/Δt=Eₘsinθ，Eₘ=nBAω='+Em().toFixed(2),18,H-14);
+    ctx.fillText('多视角：3D发电机 + 侧视法线 + Φ/e 图像记录',430,H-14);
+    document.getElementById('w-v').textContent=w.toFixed(1);
+    document.getElementById('ph-v').textContent=Math.round((w*t*180/Math.PI)%360);
+    document.getElementById('e-v').textContent=e.toFixed(2);
+    document.getElementById('em-v').textContent=Em().toFixed(2);
+  }
+  // 直接拖线圈转动（暂停并按指针水平位置设定相位）
+  let dragCoil=false;
+  function pos(e){const r=canvas.getBoundingClientRect(),s=canvas.width/r.width;return{x:((e.touches?e.touches[0].clientX:e.clientX)-r.left)*s,y:((e.touches?e.touches[0].clientY:e.clientY)-r.top)*s};}
+  canvas.addEventListener('pointerdown',e=>{const p=pos(e);if(Math.hypot(p.x-coilCx,p.y-coilCy)<coilR+16){dragCoil=true;running=false;document.getElementById('play-btn').textContent='播放';}});
+  canvas.addEventListener('pointermove',e=>{if(!dragCoil)return;const p=pos(e);const c=Math.max(-1,Math.min(1,(p.x-coilCx)/coilR));let ang=Math.acos(c);if(p.y>coilCy)ang=-ang;t=ang/w;draw();});
+  window.addEventListener('pointerup',()=>dragCoil=false);
+  document.getElementById('w').addEventListener('input',e=>{w=parseFloat(e.target.value);document.getElementById('w-d').textContent=w.toFixed(1);draw();});
+  document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
+  document.getElementById('reset-btn').addEventListener('click',()=>{t=0;draw();});
+  let last=performance.now();
+  function loop(now){const dt=Math.min((now-last)/1000,0.03);last=now;if(running)t+=dt;draw();requestAnimationFrame(loop);}
+  draw();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

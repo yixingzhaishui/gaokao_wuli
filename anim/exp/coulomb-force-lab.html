@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>探究库仑力</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 16px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 286px; gap: 14px; align-items: stretch; }
+  canvas { width: 100%; height: 470px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  input { width: 100%; }
+  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.72; font-size: 14px; }
+  .status { margin-top: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13px; line-height: 1.55; background: #e6fffa; color: #087f5b; font-weight: 700; }
+  .status.bad { background: #fff5f5; color: #c92a2a; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
+  @media (max-width: 780px) { .stage { grid-template-columns: 1fr; } canvas { height: 400px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="700" height="470" aria-label="库仑扭秤实验"></canvas>
+    <section class="panel">
+      <label for="q1">电荷 q1/nC：<span id="q1Val"></span></label>
+      <input id="q1" type="range" min="-50" max="50" value="20" step="5">
+      <label for="q2">电荷 q2/nC：<span id="q2Val"></span></label>
+      <input id="q2" type="range" min="-50" max="50" value="30" step="5">
+      <label for="dist">球心距离 r/m：<span id="distVal"></span></label>
+      <input id="dist" type="range" min="0.06" max="0.24" value="0.10" step="0.01">
+      <label for="mode">图像横轴：<span id="modeVal"></span></label>
+      <input id="mode" type="range" min="0" max="1" value="1" step="1">
+      <label for="leak">电荷漏失/读数误差：<span id="leakVal"></span></label>
+      <input id="leak" type="range" min="0" max="12" value="2" step="1">
+      <div id="readout" class="readout"></div>
+      <div id="status" class="status"></div>
+      <div class="hint">观察任务：固定电荷改变 r，看 F 是否随 1/r² 变化；改变电荷符号，看力的方向如何变化。</div>
+    </section>
+  </div>
+</div>
+<script>
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const els = {
+  q1: document.getElementById('q1'),
+  q2: document.getElementById('q2'),
+  dist: document.getElementById('dist'),
+  mode: document.getElementById('mode'),
+  leak: document.getElementById('leak'),
+  q1Val: document.getElementById('q1Val'),
+  q2Val: document.getElementById('q2Val'),
+  distVal: document.getElementById('distVal'),
+  modeVal: document.getElementById('modeVal'),
+  leakVal: document.getElementById('leakVal'),
+  readout: document.getElementById('readout'),
+  status: document.getElementById('status')
+};
+const k0 = 8.99e9;
+function force(q1n, q2n, r) {
+  return k0 * Math.abs(q1n * 1e-9 * q2n * 1e-9) / (r * r);
+}
+function fmtF(f) {
+  return f >= 0.001 ? f.toFixed(4) : (f * 1000).toFixed(3) + 'm';
+}
+function drawGraph(x0, y0, w, h, mode, q1, q2, r, leak) {
+  ctx.strokeStyle = '#334e68';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(x0, y0);
+  ctx.lineTo(x0 + w, y0);
+  ctx.moveTo(x0, y0);
+  ctx.lineTo(x0, y0 - h);
+  ctx.stroke();
+  ctx.fillStyle = '#486581';
+  ctx.font = '12px system-ui';
+  ctx.textAlign = 'left';
+  ctx.fillText(mode === 0 ? '|q1q2|' : '1/r²', x0 + w + 6, y0 + 4);
+  ctx.fillText('F', x0 - 16, y0 - h - 4);
+  ctx.strokeStyle = '#829ab1';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(x0, y0);
+  ctx.lineTo(x0 + w, y0 - h);
+  ctx.stroke();
+  ctx.fillStyle = '#e03131';
+  for (let i = 1; i <= 8; i++) {
+    let qq1 = q1, qq2 = q2, rr = r;
+    if (mode === 0) qq2 = i * 6 * Math.sign(q2 || 1);
+    if (mode === 1) rr = 0.06 + i * 0.02;
+    const F = force(qq1, qq2, rr) * (1 - leak / 100);
+    const xVal = mode === 0 ? Math.abs(qq1 * qq2) / 2500 : (1 / (rr * rr) - 15) / 270;
+    const yVal = F / 0.004;
+    const px = x0 + Math.max(0, Math.min(1, xVal)) * w;
+    const py = y0 - Math.max(0, Math.min(1, yVal)) * h;
+    ctx.beginPath();
+    ctx.arc(px, py, 4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+function drawCharge(x, y, q, label) {
+  ctx.fillStyle = q >= 0 ? '#ffe8cc' : '#d0ebff';
+  ctx.strokeStyle = q >= 0 ? '#f08c00' : '#2c7be5';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(x, y, 30, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 18px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText(q >= 0 ? '+' : '-', x, y + 6);
+  ctx.font = '13px system-ui';
+  ctx.fillText(label, x, y + 52);
+}
+function draw() {
+  const q1 = Number(els.q1.value);
+  const q2 = Number(els.q2.value);
+  const r = Number(els.dist.value);
+  const mode = Number(els.mode.value);
+  const leak = Number(els.leak.value);
+  const F = force(q1, q2, r);
+  const Fread = F * (1 - leak / 100);
+  const kMeas = Math.abs(q1 * q2) > 0 ? Fread * r * r / Math.abs(q1 * 1e-9 * q2 * 1e-9) : 0;
+  const rel = k0 > 0 ? Math.abs(kMeas - k0) / k0 * 100 : 0;
+  const relation = q1 * q2 > 0 ? '同号相斥' : q1 * q2 < 0 ? '异号相吸' : '有一球不带电';
+  els.q1Val.textContent = q1;
+  els.q2Val.textContent = q2;
+  els.distVal.textContent = r.toFixed(2);
+  els.modeVal.textContent = mode === 0 ? '|q1q2|' : '1/r²';
+  els.leakVal.textContent = leak + '%';
+
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 18px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('库仑扭秤：电荷量与距离决定静电力大小和方向', 350, 30);
+  const x1 = 170, y = 205, x2 = 170 + r * 1250;
+  ctx.strokeStyle = '#d9e2ec';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(x1, y - 92);
+  ctx.lineTo(x1, y);
+  ctx.stroke();
+  drawCharge(x1, y, q1, 'q1');
+  drawCharge(x2, y, q2, 'q2');
+  ctx.strokeStyle = '#334e68';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(x1, y + 82);
+  ctx.lineTo(x2, y + 82);
+  ctx.stroke();
+  ctx.fillStyle = '#486581';
+  ctx.font = '13px system-ui';
+  ctx.fillText('r=' + r.toFixed(2) + 'm', (x1 + x2) / 2, y + 105);
+  const attract = q1 * q2 < 0;
+  const arrowLen = Math.min(72, Fread / 0.004 * 72);
+  ctx.strokeStyle = '#e03131';
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  if (q1 * q2 !== 0) {
+    ctx.moveTo(x1, y - 48);
+    ctx.lineTo(x1 + (attract ? arrowLen : -arrowLen), y - 48);
+    ctx.moveTo(x2, y - 48);
+    ctx.lineTo(x2 + (attract ? -arrowLen : arrowLen), y - 48);
+  }
+  ctx.stroke();
+  ctx.fillStyle = '#e03131';
+  ctx.font = '700 13px system-ui';
+  ctx.fillText(relation, (x1 + x2) / 2, y - 58);
+
+  ctx.fillStyle = '#f7f9fc';
+  ctx.strokeStyle = '#d9e2ec';
+  ctx.fillRect(60, 360, 330, 46);
+  ctx.strokeRect(60, 360, 330, 46);
+  ctx.fillStyle = '#2c7be5';
+  ctx.fillRect(72, 376, Math.min(306, Fread / 0.004 * 306), 14);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 13px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('扭秤等效读数 F≈' + fmtF(Fread) + 'N', 225, 395);
+  drawGraph(452, 384, 180, 210, mode, q1, q2, r, leak);
+  ctx.fillStyle = '#486581';
+  ctx.font = '13px system-ui';
+  ctx.fillText('图像过原点说明 F 与 |q1q2| 成正比，与 r² 成反比。', 350, 452);
+
+  els.readout.innerHTML = [
+    `<div id="r1">方向：${relation}</div>`,
+    `<div id="r2">F理论=k|q1q2|/r²≈${fmtF(F)}N</div>`,
+    `<div id="r3">F读≈${fmtF(Fread)}N</div>`,
+    `<div id="r4">F·r²/|q1q2|≈${(kMeas / 1e9).toFixed(2)}×10^9</div>`,
+    `<div id="r5">相对误差≈${rel.toFixed(1)}%</div>`
+  ].join('');
+  els.status.className = rel < 5 && q1 * q2 !== 0 ? 'status' : 'status bad';
+  els.status.textContent = q1 * q2 === 0
+    ? '不通过：有电荷为 0，无法验证库仑力关系。'
+    : rel < 5
+      ? '通过：反查的静电力常量接近 9.0×10^9。'
+      : '不通过：漏电或读数误差使实验点明显偏离库仑定律。';
+}
+Object.values(els).forEach(el => {
+  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
+});
+draw();
+</script>
+</body>
+</html>

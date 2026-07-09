@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>碰撞与动量守恒</title>
+<link rel="stylesheet" href="../common/controls.css">
+<style>
+body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#f7f9fc;color:#1f2933}
+.container{padding:12px}
+h2{font-size:16px;margin:0 0 8px;color:#102a43}
+canvas{display:block;width:100%;max-width:640px;background:#fff;border:1px solid #d9e2ec;border-radius:8px}
+.readouts{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0;font-size:13px}
+.readouts .r{background:#102a43;color:#d9e2ec;padding:6px 10px;border-radius:6px}
+.readouts .r b{color:#f0a500}
+.readouts .ok{background:#0b7285}
+.controls{display:flex;flex-wrap:wrap;gap:14px;margin:10px 0;align-items:center}
+.controls label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:#334e68}
+.controls input[type=range]{width:120px;accent-color:#2c7be5}
+.controls button{font:inherit;padding:6px 14px;border:1px solid #b0bcc9;background:#fff;border-radius:6px;cursor:pointer}
+.controls button:hover{background:#eef2f7}
+.seg{display:inline-flex;border:1px solid #b0bcc9;border-radius:6px;overflow:hidden}
+.seg button{border:none;border-radius:0;border-right:1px solid #b0bcc9}
+.seg button.active{background:#2c7be5;color:#fff}
+.seg button:last-child{border-right:none}
+.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:8px 12px;border-radius:4px;font-size:13px;color:#486581;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>碰撞与动量守恒：m₁v₁ + m₂v₂ = m₁v₁′ + m₂v₂′</h2>
+  <canvas id="canvas" width="640" height="360"></canvas>
+  <div class="readouts">
+    <span class="r">碰前总动量 p = <b id="p-before">—</b> kg·m/s</span>
+    <span class="r ok">碰后总动量 p′ = <b id="p-after">—</b> kg·m/s</span>
+    <span class="r">碰前动能 = <b id="ek-before">—</b> J</span>
+    <span class="r">碰后动能 = <b id="ek-after">—</b> J</span>
+    <span class="r">碰后 v₁′ = <b id="u1">—</b> m/s</span>
+    <span class="r">碰后 v₂′ = <b id="u2">—</b> m/s</span>
+  </div>
+  <div class="controls">
+    <label>m₁ = <span id="m1-d">1.0</span> kg
+      <input type="range" id="m1" min="0.5" max="4" step="0.1" value="1"></label>
+    <label>v₁ = <span id="v1-d">3.0</span> m/s
+      <input type="range" id="v1" min="-4" max="6" step="0.2" value="3"></label>
+    <label>m₂ = <span id="m2-d">2.0</span> kg
+      <input type="range" id="m2" min="0.5" max="4" step="0.1" value="2"></label>
+    <label>v₂ = <span id="v2-d">0.0</span> m/s
+      <input type="range" id="v2" min="-4" max="6" step="0.2" value="0"></label>
+    <span class="seg" id="mode">
+      <button data-e="1" class="active">弹性碰撞</button>
+      <button data-e="0">完全非弹性</button>
+    </span>
+    <button id="play-btn">播放</button>
+    <button id="reset-btn">重置</button>
+  </div>
+  <div class="hint">
+    <p><b>观察任务</b>：拖车身金色把手改变质量，拖绿色速度箭头端点改变速度；碰撞前后看两个"总动量"读数和下方条形是否始终相等。切换到"完全非弹性"看两车粘在一起同速运动、动能减少，但总动量仍不变。</p>
+  </div>
+</div>
+<script>
+(function(){
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  const groundY=210, scale=34;
+  let m1=1,v1=3,m2=2,v2=0,elastic=1,drag=null;
+  let x1,x2,cur1,cur2,collided,running,fadeMerge;
+  const startX1=120,startX2=430;
+
+  function reset(){
+    x1=startX1;x2=startX2;cur1=v1;cur2=v2;collided=false;running=false;fadeMerge=0;
+    document.getElementById('play-btn').textContent='播放';
+    updateReadouts();draw();
+  }
+  function boxHalf(m){return 16+m*8;}
+
+  function resolveCollision(){
+    // final velocities
+    if(elastic){
+      const u1=((m1-m2)*v1+2*m2*v2)/(m1+m2);
+      const u2=((m2-m1)*v2+2*m1*v1)/(m1+m2);
+      cur1=u1;cur2=u2;
+    }else{
+      const u=(m1*v1+m2*v2)/(m1+m2);
+      cur1=u;cur2=u;fadeMerge=1;
+    }
+    collided=true;
+  }
+
+  function step(dt){
+    if(!running)return;
+    x1+=cur1*scale*dt;
+    x2+=cur2*scale*dt;
+    if(!collided){
+      const gap=(x2-boxHalf(m2))-(x1+boxHalf(m1));
+      if(gap<=0 && (cur1-cur2)>0){
+        // align contact
+        x1 -= gap/2; x2 += gap/2;
+        resolveCollision();
+      }
+    }
+    // stop when off screen
+    if(x1<-100||x2>W+100){running=false;document.getElementById('play-btn').textContent='播放';}
+    draw();
+  }
+
+  function drawBox(x,m,v,color,label){
+    const hw=boxHalf(m), h=26+m*10;
+    ctx.fillStyle=color;
+    ctx.strokeStyle='#243b53';ctx.lineWidth=2;
+    ctx.beginPath();
+    if(ctx.roundRect)ctx.roundRect(x-hw,groundY-h,hw*2,h,5);else ctx.rect(x-hw,groundY-h,hw*2,h);
+    ctx.fill();ctx.stroke();
+    ctx.fillStyle='#fff';ctx.font='bold 12px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(label,x,groundY-h/2-6);
+    ctx.font='11px sans-serif';
+    ctx.fillText(m.toFixed(1)+'kg',x,groundY-h/2+9);
+    ctx.fillStyle='#f0a500';ctx.strokeStyle='#8a5a00';ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(x+hw+10,groundY-h/2,8,0,Math.PI*2);ctx.fill();ctx.stroke();
+    ctx.fillStyle='#8a5a00';ctx.font='10px sans-serif';ctx.textAlign='left';ctx.textBaseline='middle';
+    ctx.fillText('m',x+hw+20,groundY-h/2);
+    // velocity arrow
+    const alen=v*scale*0.6;
+    if(Math.abs(alen)>3){
+      ctx.strokeStyle='#0b7285';ctx.fillStyle='#0b7285';ctx.lineWidth=2.5;
+      const ay=groundY-h-10;
+      ctx.beginPath();ctx.moveTo(x,ay);ctx.lineTo(x+alen,ay);ctx.stroke();
+      const s=alen>0?1:-1;
+      ctx.beginPath();ctx.moveTo(x+alen,ay);ctx.lineTo(x+alen-7*s,ay-4);ctx.lineTo(x+alen-7*s,ay+4);ctx.closePath();ctx.fill();
+      ctx.beginPath();ctx.arc(x+alen,ay,7,0,Math.PI*2);ctx.fill();
+      ctx.font='11px sans-serif';ctx.textAlign=alen>0?'left':'right';
+      ctx.fillText('v='+v.toFixed(2),x+alen+s*4,ay-8);
+    }else{
+      const ay=groundY-h-10;
+      ctx.fillStyle='#0b7285';ctx.beginPath();ctx.arc(x,ay,7,0,Math.PI*2);ctx.fill();
+      ctx.font='11px sans-serif';ctx.textAlign='center';ctx.fillText('拖 v',x,ay-10);
+    }
+  }
+  function bar(x,y,label,value,color){
+    const len=Math.max(-120,Math.min(120,value*14));
+    ctx.fillStyle='#486581';ctx.font='12px sans-serif';ctx.textAlign='right';ctx.textBaseline='middle';
+    ctx.fillText(label,x-8,y);
+    ctx.strokeStyle='#ccd6e0';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+126,y);ctx.stroke();
+    ctx.strokeStyle=color;ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(x+63,y);ctx.lineTo(x+63+len,y);ctx.stroke();
+    ctx.fillStyle=color;ctx.textAlign='left';ctx.fillText(value.toFixed(2),x+138,y);
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    // ground
+    ctx.strokeStyle='#b0bcc9';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(0,groundY);ctx.lineTo(W,groundY);ctx.stroke();
+    for(let gx=0;gx<W;gx+=24){ctx.strokeStyle='#e1e8ef';ctx.beginPath();ctx.moveTo(gx,groundY);ctx.lineTo(gx-8,groundY+8);ctx.stroke();}
+    drawBox(x1,m1,cur1,'#2c7be5','m₁');
+    drawBox(x2,m2,cur2,'#e8590c','m₂');
+    // status text
+    ctx.fillStyle='#243b53';ctx.font='13px sans-serif';ctx.textAlign='left';
+    ctx.fillText(collided?(elastic?'已碰撞（弹性：动能守恒）':'已碰撞（完全非弹性：粘连同速）'):'碰撞前',15,28);
+    const pB=(m1*v1+m2*v2), pA=(m1*cur1+m2*cur2);
+    bar(150,278,'总p前',pB,'#2c7be5');
+    bar(150,314,'总p后',pA,'#0b7285');
+    ctx.fillStyle=Math.abs(pB-pA)<0.02?'#0b7285':'#e8590c';ctx.font='bold 13px sans-serif';ctx.textAlign='left';
+    ctx.fillText(Math.abs(pB-pA)<0.02?'守恒检查通过':'还未到碰撞结算',440,297);
+    updateReadouts();
+  }
+
+  function updateReadouts(){
+    const pB=(m1*v1+m2*v2), pA=(m1*cur1+m2*cur2);
+    const ekB=0.5*m1*v1*v1+0.5*m2*v2*v2, ekA=0.5*m1*cur1*cur1+0.5*m2*cur2*cur2;
+    document.getElementById('p-before').textContent=pB.toFixed(2);
+    document.getElementById('p-after').textContent=pA.toFixed(2);
+    document.getElementById('ek-before').textContent=ekB.toFixed(2);
+    document.getElementById('ek-after').textContent=ekA.toFixed(2);
+    document.getElementById('u1').textContent=cur1.toFixed(2);
+    document.getElementById('u2').textContent=cur2.toFixed(2);
+  }
+
+  function syncControls(){
+    document.getElementById('m1').value=m1;document.getElementById('v1').value=v1;document.getElementById('m2').value=m2;document.getElementById('v2').value=v2;
+    document.getElementById('m1-d').textContent=m1.toFixed(1);document.getElementById('v1-d').textContent=v1.toFixed(1);
+    document.getElementById('m2-d').textContent=m2.toFixed(1);document.getElementById('v2-d').textContent=v2.toFixed(1);
+  }
+  function bind(id,cb){document.getElementById(id).addEventListener('input',e=>{cb(parseFloat(e.target.value));syncControls();reset();});}
+  bind('m1',v=>{m1=v;document.getElementById('m1-d').textContent=v.toFixed(1);});
+  bind('v1',v=>{v1=v;document.getElementById('v1-d').textContent=v.toFixed(1);});
+  bind('m2',v=>{m2=v;document.getElementById('m2-d').textContent=v.toFixed(1);});
+  bind('v2',v=>{v2=v;document.getElementById('v2-d').textContent=v.toFixed(1);});
+  document.querySelectorAll('#mode button').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('#mode button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');elastic=parseInt(b.dataset.e);reset();
+  }));
+  document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
+  document.getElementById('reset-btn').addEventListener('click',reset);
+  function pointerPos(e){const r=canvas.getBoundingClientRect(),s=canvas.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s};}
+  function hitCar(p,x,m,v,which){
+    const hw=boxHalf(m),h=26+m*10,ay=groundY-h-10,tipX=x+v*scale*0.6,mx=x+hw+10,my=groundY-h/2;
+    if(Math.hypot(p.x-tipX,p.y-ay)<18)return 'v'+which;
+    if(Math.hypot(p.x-mx,p.y-my)<18)return 'm'+which;
+    return null;
+  }
+  canvas.addEventListener('pointerdown',e=>{
+    const p=pointerPos(e);
+    drag=hitCar(p,x1,m1,v1,'1')||hitCar(p,x2,m2,v2,'2');
+    if(drag){running=false;document.getElementById('play-btn').textContent='播放';canvas.style.cursor='grabbing';}
+  });
+  canvas.addEventListener('pointermove',e=>{
+    if(!drag)return;const p=pointerPos(e);
+    if(drag==='v1')v1=Math.max(-4,Math.min(6,(p.x-startX1)/(scale*0.6)));
+    if(drag==='v2')v2=Math.max(-4,Math.min(6,(p.x-startX2)/(scale*0.6)));
+    if(drag==='m1')m1=Math.max(.5,Math.min(4,(p.x-startX1-16)/8));
+    if(drag==='m2')m2=Math.max(.5,Math.min(4,(p.x-startX2-16)/8));
+    syncControls();reset();
+  });
+  window.addEventListener('pointerup',()=>{drag=null;canvas.style.cursor='grab';});
+
+  let last=performance.now();
+  function loop(now){const dt=Math.min((now-last)/1000,0.03);last=now;step(dt);requestAnimationFrame(loop);}
+  syncControls();reset();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>功率：做功快慢与瞬时功率</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#edf3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px;min-height:560px}
+  .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;touch-action:none}
+  .panel{display:flex;flex-direction:column;gap:8px}
+  .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
+  .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.45}
+  .title{font-weight:800;margin-bottom:5px;color:#0f172a}
+  .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:31px;cursor:pointer;color:#102a43}
+  button:hover{background:#f1f5f9}
+  .primary{background:#2563eb;color:#fff;border-color:#2563eb;font-weight:800}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:48px}
+  .meter span{display:block;font-size:11px;color:#b6c5d8}
+  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:15px;font-variant-numeric:tabular-nums}
+  .formula{display:grid;gap:5px;font-size:13px;color:#334155}
+  .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
+  .formula div:last-child{border-bottom:0;padding-bottom:0}
+  .formula b{white-space:nowrap;color:#0f172a}
+  .small{font-size:12px;line-height:1.5;color:#475569}
+  .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
+  .status.zero{border-color:#f59e0b;background:#fff7ed;color:#92400e}
+  .status.negative{border-color:#f87171;background:#fff1f2;color:#be123c}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="功率交互实验台"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>拖 W-t 图像上的蓝点，看斜率 P=W/t 怎样变化；再拖速度端点和红色力端点，看瞬时功率是否只看速度方向投影。</div>
+    <button id="playBtn" class="primary">播放</button>
+    <div class="card">
+      <div class="title">快速情境</div>
+      <div class="chips">
+        <button data-case="fast">同功快做</button>
+        <button data-case="slow">同功慢做</button>
+        <button data-case="zero">垂直零功率</button>
+        <button data-case="negative">阻力负功率</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="title">实时读数</div>
+      <div class="readout">
+        <div class="meter"><span>做功 W</span><b id="workText">120 J</b></div>
+        <div class="meter"><span>用时 t</span><b id="timeText">4.0 s</b></div>
+        <div class="meter"><span>平均功率</span><b id="avgText">30.0 W</b></div>
+        <div class="meter"><span>投影 F∥</span><b id="parallelText">30.0 N</b></div>
+        <div class="meter"><span>速度 v</span><b id="speedText">3.0 m/s</b></div>
+        <div class="meter"><span>瞬时功率</span><b id="instText">90.0 W</b></div>
+      </div>
+    </div>
+    <div class="card formula">
+      <div><span>平均功率</span><b>P=W/t</b></div>
+      <div><span>瞬时功率</span><b>P=Fvcosα</b></div>
+      <div><span>投影</span><b>F∥=Fcosα</b></div>
+    </div>
+    <div class="card small"><b>可直接操作：</b>拖左侧蓝点改 W 和 t；拖蓝色速度端点改 v；拖红色力端点改 F 和 α；底部手柄可精调。</div>
+    <div class="status" id="status">正功率：力的投影与速度同向，正在给物体输入能量。</div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+  const state={W:120,t:4,F:30,v:3,alpha:0,running:false,phase:0,drag:null};
+  const els={W:document.getElementById('workText'),t:document.getElementById('timeText'),avg:document.getElementById('avgText'),parallel:document.getElementById('parallelText'),speed:document.getElementById('speedText'),inst:document.getElementById('instText'),status:document.getElementById('status'),play:document.getElementById('playBtn')};
+  const colors={red:'#dc2626',blue:'#2563eb',green:'#0f766e',orange:'#f59e0b',purple:'#7c3aed',ink:'#102a43'};
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  const fmt=(v,d=1)=>Math.abs(v)<1e-8?(0).toFixed(d):v.toFixed(d);
+  function calc(){const rad=state.alpha*Math.PI/180,cos=Math.cos(rad),Pavg=state.W/state.t,Fp=state.F*cos,Pinst=Fp*state.v;return{rad,cos,Pavg,Fp,Pinst}}
+  function sign(v){return Math.abs(v)<.05?'zero':(v>0?'positive':'negative')}
+  function signColor(v){return Math.abs(v)<.05?colors.orange:(v>0?colors.green:colors.red)}
+  function signName(v){return Math.abs(v)<.05?'零功率':(v>0?'正功率':'负功率')}
+  function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){ctx.fillStyle=c;ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+  function line(x1,y1,x2,y2,c='#94a3b8',w=2,dash){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
+  function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore()}
+  function roundRect(x,y,w,h,r,fill,stroke){ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}ctx.restore()}
+  function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-36,c,'center',12,'900')}
+  function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-20,active?'#92400e':c,'center',12,'900');ctx.restore()}
+  function graphGeom(){const left=80,bottom=338,right=392,top=94;return{left,bottom,right,top,point:{x:left+state.t/12*(right-left),y:bottom-state.W/300*(bottom-top)}}}
+  function motionGeom(r){const base={x:660+(state.running?42*Math.sin(state.phase):0),y:274},vTip={x:base.x+state.v*17,y:base.y+56},len=42+state.F*1.55,tip={x:base.x+len*Math.cos(r.rad),y:base.y-len*Math.sin(r.rad)};return{base,vTip,forceTip:tip}}
+  function handles(){return{W:{x:80+state.W/300*150,y:494},t:{x:290+state.t/12*150,y:494},F:{x:505+state.F/80*130,y:494},v:{x:685+state.v/12*130,y:494},a:{x:835+state.alpha/180*70,y:494}}}
+  function point(x,y,c,label,active){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,11,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-20,c,'center',12,'900');ctx.restore()}
+  function drawAverage(r){
+    roundRect(42,58,410,382,8,'#fff','#d7dee8');text('平均功率：W-t 图像斜率',247,88,'#0f172a','center',16,'900');
+    const g=graphGeom();line(g.left,g.bottom,g.right,g.bottom,'#475569',1.5);line(g.left,g.bottom,g.left,g.top,'#475569',1.5);
+    text('t/s',g.right+12,g.bottom+15,'#475569','left',12,'900');text('W/J',g.left-20,g.top,'#475569','center',12,'900');
+    for(let i=0;i<=4;i++){const x=g.left+i/4*(g.right-g.left);line(x,g.bottom-4,x,g.bottom+4,'#94a3b8',1);text(String(i*3),x,g.bottom+18,'#64748b','center',10,'700')}
+    for(let i=1;i<=3;i++){const y=g.bottom-i/3*(g.bottom-g.top);line(g.left-4,y,g.left+4,y,'#94a3b8',1);text(String(i*100),g.left-14,y,'#64748b','right',10,'700')}
+    line(g.left,g.bottom,g.point.x,g.point.y,colors.blue,3);line(g.point.x,g.point.y,g.point.x,g.bottom,'#94a3b8',1.5,[5,4]);line(g.point.x,g.point.y,g.left,g.point.y,'#94a3b8',1.5,[5,4]);
+    point(g.point.x,g.point.y,colors.blue,'拖点',state.drag==='graph');
+    text(`Pavg=${fmt(r.Pavg,1)}W`,247,386,colors.green,'center',20,'900');
+    text('同样的 W，t 越小，斜率越陡，功率越大。',247,420,'#475569','center',12,'700');
+  }
+  function drawInstant(r){
+    roundRect(482,58,390,382,8,'#fff','#d7dee8');text('瞬时功率：力在速度方向的投影 × 速度',677,88,'#0f172a','center',16,'900');
+    const g=motionGeom(r);line(520,g.base.y+74,838,g.base.y+74,'#334155',3);
+    roundRect(g.base.x-38,g.base.y-18,76,38,7,'#dbeafe','#334155');text('物体',g.base.x,g.base.y+1,'#0f172a','center',13,'900');
+    arrow(g.base.x,g.base.y+56,g.vTip.x,g.vTip.y,colors.blue,3);point(g.vTip.x,g.vTip.y,colors.blue,'v',state.drag==='v');
+    arrow(g.base.x,g.base.y-16,g.forceTip.x,g.forceTip.y,colors.red,3);point(g.forceTip.x,g.forceTip.y,colors.red,'F',state.drag==='force');
+    line(g.forceTip.x,g.forceTip.y,g.forceTip.x,g.base.y-16,'#94a3b8',1.5,[5,4]);
+    const fpEnd={x:g.base.x+r.Fp*3,y:g.base.y-16};
+    if(Math.abs(r.Fp)>.15)arrow(g.base.x,g.base.y-16,fpEnd.x,fpEnd.y,signColor(r.Pinst),4);else line(g.base.x-18,g.base.y-16,g.base.x+18,g.base.y-16,colors.orange,4);
+    text(`F∥=${fmt(r.Fp,1)}N`,677,382,signColor(r.Pinst),'center',14,'900');
+    text(`${signName(r.Pinst)}：P=${fmt(r.Pinst,1)}W`,677,412,signColor(r.Pinst),'center',18,'900');
+  }
+  function bottom(){const h=handles();roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(80,494,230,'W',colors.blue);handle(h.W.x,h.W.y,`${fmt(state.W,0)}J`,state.drag==='W',colors.blue);ruler(290,494,440,'t',colors.green);handle(h.t.x,h.t.y,`${fmt(state.t,1)}s`,state.drag==='t',colors.green);ruler(505,494,635,'F',colors.red);handle(h.F.x,h.F.y,`${fmt(state.F,0)}N`,state.drag==='F',colors.red);ruler(685,494,815,'v',colors.blue);handle(h.v.x,h.v.y,`${fmt(state.v,1)}`,state.drag==='vbar',colors.blue);ruler(835,494,905,'α',colors.orange);handle(h.a.x,h.a.y,`${fmt(state.alpha,0)}°`,state.drag==='alpha',colors.orange)}
+  function update(r){els.W.textContent=`${fmt(state.W,0)} J`;els.t.textContent=`${fmt(state.t,1)} s`;els.avg.textContent=`${fmt(r.Pavg,1)} W`;els.parallel.textContent=`${fmt(r.Fp,1)} N`;els.speed.textContent=`${fmt(state.v,1)} m/s`;els.inst.textContent=`${fmt(r.Pinst,1)} W`;els.play.textContent=state.running?'暂停':'播放';els.status.className='status '+sign(r.Pinst);els.status.textContent=Math.abs(r.Pinst)<.05?'瞬时功率为 0：力与速度垂直，或力/速度为 0。':(r.Pinst>0?'正功率：力的投影与速度同向，正在给物体输入能量。':'负功率：力的投影与速度反向，正在从物体取走能量。')}
+  function draw(){const r=calc();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('功率实验台：平均看斜率，瞬时看投影',460,30,'#0f172a','center',19,'900');drawAverage(r);drawInstant(r);bottom();text('公式：P = W/t = Fv（平均功率=总功/时间；瞬时功率=Fv）',460,516,'#334e68','center',13,'700');update(r)}
+  function pos(e){const b=canvas.getBoundingClientRect();return{x:(e.clientX-b.left)*canvas.width/b.width,y:(e.clientY-b.top)*canvas.height/b.height}}
+  function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+  function pointerDown(e){const p=pos(e),r=calc(),gg=graphGeom(),mg=motionGeom(r),h=handles();if(near(p,gg.point,28))state.drag='graph';else if(near(p,mg.vTip,28))state.drag='v';else if(near(p,mg.forceTip,28))state.drag='force';else if(near(p,h.W,26))state.drag='W';else if(near(p,h.t,26))state.drag='t';else if(near(p,h.F,26))state.drag='F';else if(near(p,h.v,26))state.drag='vbar';else if(near(p,h.a,26))state.drag='alpha';else state.drag=null;if(state.drag){state.running=false;canvas.setPointerCapture(e.pointerId);pointerMove(e)}}
+  function pointerMove(e){if(!state.drag)return;const p=pos(e),r=calc(),gg=graphGeom(),mg=motionGeom(r);if(state.drag==='graph'){state.t=clamp((p.x-gg.left)/(gg.right-gg.left)*12,1,12);state.W=clamp((gg.bottom-p.y)/(gg.bottom-gg.top)*300,20,300)}if(state.drag==='W')state.W=clamp((p.x-80)/150*300,20,300);if(state.drag==='t')state.t=clamp((p.x-290)/150*12,1,12);if(state.drag==='F')state.F=clamp((p.x-505)/130*80,0,80);if(state.drag==='vbar'||state.drag==='v')state.v=clamp((p.x-mg.base.x)/17,0,12);if(state.drag==='alpha')state.alpha=clamp((p.x-835)/70*180,0,180);if(state.drag==='force'){const dx=p.x-mg.base.x,dy=p.y-mg.base.y,dist=Math.hypot(dx,dy);state.F=clamp((dist-42)/1.55,0,80);state.alpha=clamp(Math.atan2(-dy,dx)*180/Math.PI,0,180)}draw()}
+  function pointerUp(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
+  canvas.addEventListener('pointerdown',pointerDown);canvas.addEventListener('pointermove',pointerMove);canvas.addEventListener('pointerup',pointerUp);canvas.addEventListener('pointercancel',pointerUp);
+  els.play.addEventListener('click',()=>{state.running=!state.running;draw()});
+  document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='fast'){state.W=120;state.t=2;state.F=30;state.v=3;state.alpha=0}if(c==='slow'){state.W=120;state.t=8;state.F=30;state.v=3;state.alpha=0}if(c==='zero'){state.W=120;state.t=4;state.F=30;state.v=3;state.alpha=90}if(c==='negative'){state.W=120;state.t=4;state.F=30;state.v=3;state.alpha=135}state.running=false;draw()}));
+  function tick(){if(state.running)state.phase=(state.phase+.035)%(Math.PI*2);draw();requestAnimationFrame(tick)}
+  draw();requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

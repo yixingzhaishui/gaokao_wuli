@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>验证平行四边形定则</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 16px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 14px; align-items: stretch; }
+  canvas { width: 100%; height: 460px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  input { width: 100%; }
+  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.75; font-size: 14px; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
+  @media (max-width: 780px) { .stage { grid-template-columns: 1fr; } canvas { height: 390px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="700" height="460" aria-label="平行四边形定则虚拟实验"></canvas>
+    <section class="panel">
+      <label for="f1">F1/N：<span id="f1Val"></span></label>
+      <input id="f1" type="range" min="1" max="8" value="4" step="0.5">
+      <label for="f2">F2/N：<span id="f2Val"></span></label>
+      <input id="f2" type="range" min="1" max="8" value="5" step="0.5">
+      <label for="theta">夹角 θ：<span id="thetaVal"></span></label>
+      <input id="theta" type="range" min="10" max="170" value="70" step="5">
+      <label for="error">作图误差等级：<span id="errorVal"></span></label>
+      <input id="error" type="range" min="0" max="5" value="1" step="1">
+      <div id="readout" class="readout"></div>
+      <div class="hint">观察任务：实验合力必须和理论对角线同时比较大小与方向；O 点相同才叫等效。</div>
+    </section>
+  </div>
+</div>
+<script>
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const els = {
+  f1: document.getElementById('f1'),
+  f2: document.getElementById('f2'),
+  theta: document.getElementById('theta'),
+  error: document.getElementById('error'),
+  f1Val: document.getElementById('f1Val'),
+  f2Val: document.getElementById('f2Val'),
+  thetaVal: document.getElementById('thetaVal'),
+  errorVal: document.getElementById('errorVal'),
+  readout: document.getElementById('readout')
+};
+function arrow(x1, y1, x2, y2, color, w) {
+  const a = Math.atan2(y2-y1, x2-x1);
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = w || 3;
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - 12*Math.cos(a-0.45), y2 - 12*Math.sin(a-0.45));
+  ctx.lineTo(x2 - 12*Math.cos(a+0.45), y2 - 12*Math.sin(a+0.45));
+  ctx.closePath();
+  ctx.fill();
+}
+function draw() {
+  const F1 = Number(els.f1.value);
+  const F2 = Number(els.f2.value);
+  const theta = Number(els.theta.value);
+  const err = Number(els.error.value);
+  const rad = theta * Math.PI / 180;
+  const rx = F1 + F2 * Math.cos(rad);
+  const ry = F2 * Math.sin(rad);
+  const R = Math.hypot(rx, ry);
+  const dir = Math.atan2(ry, rx) * 180 / Math.PI;
+  const Rexp = R * (1 + err * 0.012);
+  const direxp = dir + err * 1.2;
+  els.f1Val.textContent = F1.toFixed(1);
+  els.f2Val.textContent = F2.toFixed(1);
+  els.thetaVal.textContent = theta + '°';
+  els.errorVal.textContent = err;
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#f7f9fc';
+  ctx.fillRect(0, 0, c.width, c.height);
+  const O = {x:250, y:250};
+  const s = 34;
+  const A = {x:O.x + F1*s, y:O.y};
+  const B = {x:O.x + F2*Math.cos(rad)*s, y:O.y - F2*Math.sin(rad)*s};
+  const C = {x:A.x + B.x - O.x, y:A.y + B.y - O.y};
+  ctx.strokeStyle = '#829ab1';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(80, 250);
+  ctx.lineTo(O.x, O.y);
+  ctx.stroke();
+  ctx.fillStyle = '#e03131';
+  ctx.beginPath();
+  ctx.arc(O.x, O.y, 7, 0, Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = '#486581';
+  ctx.font = '13px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('同一结点 O', O.x, O.y + 24);
+  ctx.setLineDash([6,5]);
+  ctx.strokeStyle = '#9fb3c8';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(A.x,A.y); ctx.lineTo(C.x,C.y); ctx.lineTo(B.x,B.y);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  arrow(O.x,O.y,A.x,A.y,'#2c7be5',4);
+  arrow(O.x,O.y,B.x,B.y,'#2c7be5',4);
+  arrow(O.x,O.y,C.x,C.y,'#e03131',5);
+  const expEnd = {x:O.x + Rexp*Math.cos(direxp*Math.PI/180)*s, y:O.y - Rexp*Math.sin(direxp*Math.PI/180)*s};
+  arrow(O.x,O.y,expEnd.x,expEnd.y,'#f0a500',3);
+  ctx.fillStyle = '#2c7be5';
+  ctx.font = '700 14px system-ui';
+  ctx.fillText('F1', A.x+18, A.y+16);
+  ctx.fillText('F2', B.x+18, B.y-16);
+  ctx.fillStyle = '#e03131';
+  ctx.fillText('作图合力', C.x+34, C.y-18);
+  ctx.fillStyle = '#9a6700';
+  ctx.fillText('实验合力', expEnd.x+34, expEnd.y+18);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 17px system-ui';
+  ctx.fillText(`理论 F合=${R.toFixed(2)}N，方向=${dir.toFixed(1)}°`, 500, 78);
+  ctx.fillText(`实验 F=${Rexp.toFixed(2)}N，方向=${direxp.toFixed(1)}°`, 500, 112);
+  ctx.fillStyle = '#486581';
+  ctx.font = '14px system-ui';
+  ctx.fillText('误差越小，橙色实验合力越接近红色平行四边形对角线。', 350, 420);
+  const magErr = Math.abs(Rexp-R)/R*100;
+  const dirErr = Math.abs(direxp-dir);
+  els.readout.innerHTML = [
+    `F1=${F1.toFixed(1)}N，F2=${F2.toFixed(1)}N，θ=${theta}°`,
+    `理论合力=${R.toFixed(2)}N，方向=${dir.toFixed(1)}°`,
+    `实验合力≈${Rexp.toFixed(2)}N，方向≈${direxp.toFixed(1)}°`,
+    `大小误差≈${magErr.toFixed(1)}%，方向误差≈${dirErr.toFixed(1)}°`
+  ].join('<br>');
+}
+Object.values(els).forEach(el => {
+  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
+});
+draw();
+</script>
+</body>
+</html>

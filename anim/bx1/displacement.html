@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>路程与位移实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#f7f9fc;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px;min-height:540px}
+  .stage{position:relative;background:#fff;border:1px solid #d9e2ec;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;aspect-ratio:940/560;touch-action:none}
+  .tip{position:absolute;left:14px;bottom:12px;background:rgba(16,42,67,.88);color:#d9e2ec;border-radius:7px;padding:6px 9px;font-size:12px;pointer-events:none}
+  .panel{display:flex;flex-direction:column;gap:6px}
+  .card{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:7px}
+  .task{background:#fff7e6;border-left:3px solid #f0a500;color:#486581;font-size:12px;line-height:1.35}
+  .title{font-weight:700;margin-bottom:4px}
+  .controls{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #b0bcc9;background:#fff;border-radius:6px;padding:5px 8px;cursor:pointer;font:inherit;font-size:12px}
+  button:hover{background:#eef2f7}
+  .readout{background:#102a43;color:#d9e2ec;border-radius:8px;padding:8px;line-height:1.45;font-size:13px}
+  .readout b{color:#f0a500;font-variant-numeric:tabular-nums}
+  .formula{font-size:12px;line-height:1.35;color:#334e68}
+  .status{font-size:12px;font-weight:700;border-radius:6px;padding:7px;border:1px solid #38b2ac;background:#e6fffa;color:#087f5b;line-height:1.35}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.panel{display:grid;grid-template-columns:1fr 1fr}.task,.readout,.formula,.status{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage">
+    <canvas id="canvas" width="940" height="560" aria-label="路程与位移交互实验台"></canvas>
+    <div class="tip">可拖动 B 终点和蓝色绕路点；播放时紫点沿真实轨迹走</div>
+  </div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>拖蓝色绕路点，看路程变大而红色位移不变；拖 B 终点，看位移箭头和 Δx、Δy 怎样改变。</div>
+    <div class="card">
+      <div class="title">实验控制</div>
+      <div class="controls"><button id="playBtn">播放</button><button id="resetBtn">重置</button><button id="straightBtn">拉直路线</button><button id="loopBtn">回到起点</button></div>
+    </div>
+    <div class="readout" id="readout"></div>
+    <div class="card formula">
+      <div class="title">公式绑定</div>
+      <div>路程 `s`：蓝色轨迹长度累加。</div>
+      <div>位移 `Δr`：红色 A→B 箭头。</div>
+      <div>`|Δr|=√(Δx²+Δy²)`：右侧直角分量尺。</div>
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const A={x:150,y:390};
+  let B={x:690,y:210};
+  let C={x:410,y:110};
+  let prog=0,running=false,drag=null,layout={};
+  const meter=2.2;
+  function text(s,x,y,c,a,size,w){
+    ctx.fillStyle=c||'#102a43';
+    ctx.font=(w?w+' ':'')+(size||13)+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';
+    ctx.textAlign=a||'center';ctx.textBaseline='middle';ctx.fillText(s,x,y);
+  }
+  function line(x1,y1,x2,y2,c,w,dash){
+    ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w||2;ctx.setLineDash(dash||[]);
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();
+  }
+  function arrow(x1,y1,x2,y2,c,label,w){
+    const a=Math.atan2(y2-y1,x2-x1);
+    ctx.save();ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w||3;
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    if(Math.hypot(x2-x1,y2-y1)>8){
+      ctx.beginPath();ctx.moveTo(x2,y2);
+      ctx.lineTo(x2-12*Math.cos(a-.45),y2-12*Math.sin(a-.45));
+      ctx.lineTo(x2-12*Math.cos(a+.45),y2-12*Math.sin(a+.45));
+      ctx.closePath();ctx.fill();
+    }
+    if(label) text(label,(x1+x2)/2+8,(y1+y2)/2-12,c,'left',12,'700');
+    ctx.restore();
+  }
+  function box(x,y,w,h,fill,stroke,r){
+    ctx.save();ctx.fillStyle=fill;ctx.strokeStyle=stroke||'#d9e2ec';ctx.lineWidth=1.4;
+    ctx.beginPath();ctx.roundRect(x,y,w,h,r==null?8:r);ctx.fill();ctx.stroke();ctx.restore();
+  }
+  function handle(x,y,label,c){
+    ctx.save();ctx.fillStyle=c;ctx.strokeStyle='#102a43';ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();
+    text(label,x,y-24,c,'center',12,'700');ctx.restore();
+  }
+  function clampPoint(p){p.x=Math.max(70,Math.min(830,p.x));p.y=Math.max(70,Math.min(455,p.y));}
+  function bez(t){
+    const u=1-t;
+    return {x:u*u*A.x+2*u*t*C.x+t*t*B.x,y:u*u*A.y+2*u*t*C.y+t*t*B.y};
+  }
+  function pathLength(end){
+    let len=0,prev=A,steps=160;
+    for(let i=1;i<=steps;i++){
+      const p=bez(end*i/steps);
+      len+=Math.hypot(p.x-prev.x,p.y-prev.y);
+      prev=p;
+    }
+    return len/meter;
+  }
+  function displacement(){
+    const dx=(B.x-A.x)/meter;
+    const dy=(A.y-B.y)/meter;
+    return {dx,dy,mag:Math.hypot(dx,dy),ang:Math.atan2(dy,dx)*180/Math.PI};
+  }
+  function drawGrid(){
+    ctx.strokeStyle='#eef2f7';ctx.lineWidth=1;
+    for(let x=70;x<=830;x+=44) line(x,62,x,458,'#eef2f7',1);
+    for(let y=70;y<=455;y+=44) line(62,y,842,y,'#eef2f7',1);
+    text('1格≈20 m',798,78,'#829ab1','center',11,'700');
+  }
+  function draw(){
+    clampPoint(B);clampPoint(C);layout={};
+    const d=displacement();
+    const totalS=pathLength(1);
+    const walked=pathLength(prog);
+    const dot=bez(prog);
+    ctx.clearRect(0,0,940,560);
+    text('路程与位移实验台：实际轨迹长度 vs 起点到终点的位置变化',470,32,'#102a43','center',18,'700');
+    box(42,58,856,396,'#fff','#d9e2ec');
+    drawGrid();
+    line(A.x,A.y,B.x,A.y,'#7b8794',1.6,[6,5]);
+    line(B.x,A.y,B.x,B.y,'#7b8794',1.6,[6,5]);
+    text('Δx='+d.dx.toFixed(1)+' m',(A.x+B.x)/2,A.y+22,'#486581','center',12,'700');
+    text('Δy='+d.dy.toFixed(1)+' m',B.x+52,(A.y+B.y)/2,'#486581','center',12,'700');
+
+    line(A.x,A.y,C.x,C.y,'#9fb3c8',1.4,[5,4]);
+    line(C.x,C.y,B.x,B.y,'#9fb3c8',1.4,[5,4]);
+    ctx.strokeStyle='#cfe0f5';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.quadraticCurveTo(C.x,C.y,B.x,B.y);ctx.stroke();
+    ctx.strokeStyle='#2c7be5';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(A.x,A.y);
+    for(let i=1;i<=160;i++){const p=bez(prog*i/160);ctx.lineTo(p.x,p.y);}ctx.stroke();
+    arrow(A.x,A.y,B.x,B.y,'#e03131','位移 Δr',3.5);
+    handle(C.x,C.y,'绕路点','#2c7be5');
+    handle(B.x,B.y,'B 终点','#f0a500');
+    layout.C={x:C.x,y:C.y};layout.B={x:B.x,y:B.y};
+    ctx.fillStyle='#102a43';ctx.beginPath();ctx.arc(A.x,A.y,7,0,Math.PI*2);ctx.fill();
+    text('A 起点',A.x-14,A.y+24,'#102a43','right',12,'700');
+    ctx.fillStyle='#8a3ffb';ctx.beginPath();ctx.arc(dot.x,dot.y,8,0,Math.PI*2);ctx.fill();
+    text('运动点',dot.x+4,dot.y-20,'#8a3ffb','left',12,'700');
+
+    box(106,472,728,52,totalS>d.mag+2?'#fff7e6':'#e6fffa',totalS>d.mag+2?'#f0a500':'#38b2ac');
+    text('路程 s(全程) = '+totalS.toFixed(1)+' m；位移大小 |Δr| = '+d.mag.toFixed(1)+' m；已走路程 = '+walked.toFixed(1)+' m',470,494,'#334e68','center',15,'700');
+    text(totalS>d.mag+2?'绕路时：路程大于位移大小。':'路线拉直时：路程约等于位移大小。',470,516,totalS>d.mag+2?'#9a6700':'#087f5b','center',13);
+    update(walked,totalS,d);
+  }
+  function update(walked,totalS,d){
+    document.getElementById('readout').innerHTML='已走路程=<b>'+walked.toFixed(1)+' m</b><br>全程路程 s=<b>'+totalS.toFixed(1)+' m</b><br>Δx=<b>'+d.dx.toFixed(1)+' m</b>，Δy=<b>'+d.dy.toFixed(1)+' m</b><br>|Δr|=<b>'+d.mag.toFixed(1)+' m</b><br>方向=<b>'+d.ang.toFixed(1)+'°</b>';
+    document.getElementById('status').textContent='拖绕路点只改变蓝色轨迹长度；拖 B 终点才会改变红色位移箭头和 Δx、Δy。';
+  }
+  function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
+  canvas.addEventListener('pointerdown',e=>{
+    const p=pointer(e);
+    for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<32){drag=k;canvas.setPointerCapture(e.pointerId);break;}}
+  });
+  canvas.addEventListener('pointermove',e=>{
+    const p=pointer(e);
+    if(drag){if(drag==='B'){B.x=p.x;B.y=p.y;} if(drag==='C'){C.x=p.x;C.y=p.y;} prog=0;draw();return;}
+    let hit=false;for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<32)hit=true;}
+    canvas.style.cursor=hit?'grab':'default';
+  });
+  window.addEventListener('pointerup',()=>{drag=null;canvas.style.cursor='default';});
+  document.getElementById('playBtn').onclick=()=>{running=!running;if(prog>=1)prog=0;document.getElementById('playBtn').textContent=running?'暂停':'播放';};
+  document.getElementById('resetBtn').onclick=()=>{B={x:690,y:210};C={x:410,y:110};prog=0;running=false;document.getElementById('playBtn').textContent='播放';draw();};
+  document.getElementById('straightBtn').onclick=()=>{C={x:(A.x+B.x)/2,y:(A.y+B.y)/2};prog=0;draw();};
+  document.getElementById('loopBtn').onclick=()=>{B={x:A.x,y:A.y};C={x:470,y:90};prog=0;draw();};
+  let last=performance.now();
+  function loop(ts){const dt=Math.min(.05,(ts-last)/1000);last=ts;if(running){prog+=dt*.28;if(prog>=1){prog=1;running=false;document.getElementById('playBtn').textContent='播放';}draw();}requestAnimationFrame(loop);}
+  draw();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

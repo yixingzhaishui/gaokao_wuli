@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>简谐运动</title>
+<link rel="stylesheet" href="../common/controls.css">
+<style>
+body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#f7f9fc;color:#1f2933}
+.container{padding:12px}
+h2{font-size:16px;margin:0 0 8px;color:#102a43}
+canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid #d9e2ec;border-radius:8px}
+.readouts{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0;font-size:13px}
+.readouts .r{background:#102a43;color:#d9e2ec;padding:6px 10px;border-radius:6px}
+.readouts .r b{color:#f0a500}
+.controls{display:flex;flex-wrap:wrap;gap:14px;margin:10px 0;align-items:center}
+.controls label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:#334e68}
+.controls input[type=range]{width:120px;accent-color:#2c7be5}
+.controls button{font:inherit;padding:6px 14px;border:1px solid #b0bcc9;background:#fff;border-radius:6px;cursor:pointer}
+.controls button:hover{background:#eef2f7}
+.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:8px 12px;border-radius:4px;font-size:13px;color:#486581;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>简谐运动：x = A·sin(2πt/T + φ)</h2>
+  <canvas id="canvas" width="660" height="340"></canvas>
+  <div class="readouts">
+    <span class="r">位移 x = <b id="x-v">0.00</b> cm</span>
+    <span class="r">速度 v = <b id="v-v">0.00</b> cm/s</span>
+    <span class="r">回复力 F = −kx <b id="f-v">0.00</b></span>
+    <span class="r">周期 T = <b id="t-v">2.0</b> s</span>
+  </div>
+  <div class="controls">
+    <label>振幅 A = <span id="a-d">6</span> cm
+      <input type="range" id="a" min="2" max="10" step="0.5" value="6"></label>
+    <label>周期 T = <span id="t-d">2.0</span> s
+      <input type="range" id="t" min="1" max="4" step="0.1" value="2"></label>
+    <button id="play-btn">暂停</button>
+    <button id="reset-btn">重置</button>
+  </div>
+  <div class="hint">
+    <p><b>观察任务</b>：直接拖左侧振子块到一端再释放，右侧 x-t 图幅度同步改变。看振子经过<b>平衡位置</b>时速度最大、回复力为零；到达<b>两端</b>时速度为零、回复力最大且指向平衡位置。拖动 T 改变图像疏密（快慢）。</p>
+  </div>
+</div>
+<script>
+(function(){
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  let A=6,T=2,drag=false;
+  let t=0,running=true;
+  const cy=110, eqX=150, pxPerCm=9;      // spring oscillator area
+  const gx0=330, gTop=30, gBot=190, gW=310; // graph area
+  const graphCy=(gTop+gBot)/2;
+  let trail=[];
+
+  function xOf(tt){return A*Math.sin(2*Math.PI*tt/T);}
+  function vOf(tt){return A*(2*Math.PI/T)*Math.cos(2*Math.PI*tt/T);}
+
+  function drawSpring(x1,x2,y){
+    ctx.strokeStyle='#829ab1';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x1,y);
+    const n=12,dx=(x2-x1)/n;
+    for(let i=0;i<=n;i++){const px=x1+dx*i;const py=y+((i%2===0)?0:(i===0||i===n?0:8));ctx.lineTo(px,i===0||i===n?y:py);}
+    ctx.lineTo(x2,y);ctx.stroke();
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    const x=xOf(t), v=vOf(t);
+    const bx=eqX+x*pxPerCm;
+    // wall
+    ctx.fillStyle='#b0bcc9';ctx.fillRect(30,cy-30,8,60);
+    // spring
+    drawSpring(38,bx-16,cy);
+    // equilibrium marker
+    ctx.strokeStyle='#dbe4ee';ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(eqX,cy-40);ctx.lineTo(eqX,cy+40);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#829ab1';ctx.font='10px sans-serif';ctx.textAlign='center';ctx.fillText('平衡位置',eqX,cy+55);
+    // block（带辉光真实感）
+    const glow=ctx.createRadialGradient(bx,cy,4,bx,cy,34);glow.addColorStop(0,'rgba(44,123,229,0.45)');glow.addColorStop(1,'rgba(44,123,229,0)');
+    ctx.fillStyle=glow;ctx.beginPath();ctx.arc(bx,cy,34,0,7);ctx.fill();
+    ctx.fillStyle='#2c7be5';ctx.strokeStyle='#243b53';ctx.lineWidth=2;
+    ctx.beginPath();if(ctx.roundRect)ctx.roundRect(bx-16,cy-16,32,32,4);else ctx.rect(bx-16,cy-16,32,32);ctx.fill();ctx.stroke();
+    // velocity arrow
+    if(Math.abs(v)>0.5){
+      ctx.strokeStyle='#0b7285';ctx.fillStyle='#0b7285';ctx.lineWidth=2.5;
+      const al=v*pxPerCm*0.18;const ay=cy;
+      ctx.beginPath();ctx.moveTo(bx,ay);ctx.lineTo(bx+al,ay);ctx.stroke();
+      const s=al>0?1:-1;ctx.beginPath();ctx.moveTo(bx+al,ay);ctx.lineTo(bx+al-7*s,ay-4);ctx.lineTo(bx+al-7*s,ay+4);ctx.closePath();ctx.fill();
+    }
+    // restoring force arrow (-kx), pointing to equilibrium
+    if(Math.abs(x)>0.2){
+      ctx.strokeStyle='#c92a2a';ctx.fillStyle='#c92a2a';ctx.lineWidth=2.5;
+      const fl=-x*pxPerCm*0.6;const ay=cy+26;
+      ctx.beginPath();ctx.moveTo(bx,ay);ctx.lineTo(bx+fl,ay);ctx.stroke();
+      const s=fl>0?1:-1;ctx.beginPath();ctx.moveTo(bx+fl,ay);ctx.lineTo(bx+fl-7*s,ay-4);ctx.lineTo(bx+fl-7*s,ay+4);ctx.closePath();ctx.fill();
+      ctx.font='10px sans-serif';ctx.textAlign='center';ctx.fillText('F回',bx+fl/2,ay+14);
+    }
+    // ---- x-t graph ----
+    ctx.strokeStyle='#b0bcc9';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(gx0,gTop);ctx.lineTo(gx0,gBot);ctx.lineTo(gx0+gW,gBot);ctx.stroke();
+    ctx.strokeStyle='#dbe4ee';ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(gx0,graphCy);ctx.lineTo(gx0+gW,graphCy);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#829ab1';ctx.font='11px sans-serif';ctx.textAlign='right';ctx.fillText('x/cm',gx0-4,gTop+6);ctx.textAlign='left';ctx.fillText('t/s',gx0+gW-14,gBot+14);
+    // full sine curve over a fixed window (0..8s worth scaled)
+    const win=4*T; // show 4 periods worth scale mapping to gW
+    ctx.strokeStyle='#2c7be5';ctx.lineWidth=2;ctx.beginPath();
+    for(let px=0;px<=gW;px++){
+      const tt=t-win+ (px/gW)*win; // scrolling: current time at right edge
+      const yy=graphCy - xOf(tt)*7;
+      if(px===0)ctx.moveTo(gx0+px,yy);else ctx.lineTo(gx0+px,yy);
+    }
+    ctx.stroke();
+    // current point marker at right edge
+    const cyPt=graphCy - x*7;
+    ctx.fillStyle='#c92a2a';ctx.beginPath();ctx.arc(gx0+gW,cyPt,4,0,Math.PI*2);ctx.fill();
+    // link line
+    ctx.strokeStyle='rgba(201,42,42,0.3)';ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(bx,cy);ctx.lineTo(gx0+gW,cyPt);ctx.stroke();ctx.setLineDash([]);
+    // formula
+    ctx.fillStyle='#243b53';ctx.font='13px sans-serif';ctx.textAlign='left';
+    ctx.fillText('x = A·sin(2πt/T) = '+A.toFixed(1)+'·sin(2πt/'+T.toFixed(1)+')',20,H-14);
+    ctx.font='bold 12px sans-serif';ctx.fillStyle='#0b7285';
+    ctx.fillText('状态：'+(Math.abs(x)<0.6?'过平衡位置 → 速度最大、回复力为零':(Math.abs(Math.abs(x)-A)<0.6?'到达端点 → 速度为零、回复力最大':'途中 → 速度、回复力此消彼长')),20,26);
+    // readouts
+    document.getElementById('x-v').textContent=x.toFixed(2);
+    document.getElementById('v-v').textContent=v.toFixed(2);
+    document.getElementById('f-v').textContent=(Math.abs(x)<.01?'0':(-x).toFixed(2)+'，'+(x>0?'向左':'向右'));
+    document.getElementById('t-v').textContent=T.toFixed(1);
+  }
+
+  function bind(id,cb){document.getElementById(id).addEventListener('input',e=>{cb(parseFloat(e.target.value));draw();});}
+  bind('a',v=>{A=v;document.getElementById('a-d').textContent=v;});
+  bind('t',v=>{T=v;document.getElementById('t-d').textContent=v.toFixed(1);});
+  document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
+  document.getElementById('reset-btn').addEventListener('click',()=>{t=0;draw();});
+  function pointerPos(e){const r=canvas.getBoundingClientRect(),s=canvas.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s};}
+  canvas.addEventListener('pointerdown',e=>{
+    const p=pointerPos(e),x=xOf(t),bx=eqX+x*pxPerCm;
+    if(Math.hypot(p.x-bx,p.y-cy)<28){
+      drag=true;running=false;document.getElementById('play-btn').textContent='播放';canvas.style.cursor='grabbing';
+    }
+  });
+  canvas.addEventListener('pointermove',e=>{
+    if(!drag)return;
+    const p=pointerPos(e),x=Math.max(-10,Math.min(10,(p.x-eqX)/pxPerCm));
+    A=Math.max(2,Math.abs(x));
+    t=x>=0?T/4:3*T/4;
+    document.getElementById('a').value=A;document.getElementById('a-d').textContent=A.toFixed(1);
+    draw();
+  });
+  window.addEventListener('pointerup',()=>{drag=false;canvas.style.cursor='grab';});
+
+  let last=performance.now();
+  function loop(now){const dt=Math.min((now-last)/1000,0.03);last=now;if(running){t+=dt;}draw();requestAnimationFrame(loop);}
+  draw();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

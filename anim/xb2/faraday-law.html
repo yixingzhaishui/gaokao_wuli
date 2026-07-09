@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>法拉第电磁感应定律</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#eef3f8;color:#102a43}
+.container{padding:12px}
+h2{font-size:16px;margin:0 0 8px;color:#102a43}
+canvas{display:block;width:100%;max-width:780px;background:#f8fbff;border:1px solid #cad7e3;border-radius:8px;touch-action:none;cursor:grab}
+.readouts{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;font-size:13px}
+.r{background:#102a43;color:#e8f1fb;padding:6px 10px;border-radius:6px}
+.r b{color:#ffd166}
+.controls{display:flex;flex-wrap:wrap;gap:12px;margin:10px 0;align-items:center}
+.controls label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:#334e68}
+.controls input[type=range]{width:125px;accent-color:#2c7be5}
+button{font:inherit;padding:6px 12px;border:1px solid #b6c5d4;background:#fff;border-radius:6px;cursor:pointer}
+button.on{background:#2c7be5;color:#fff;border-color:#2c7be5}
+.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:9px 12px;border-radius:4px;font-size:13px;color:#486581;line-height:1.55;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>法拉第定律：3D线圈实验台 + 侧视法线 + 电压表/Φ-E 图像</h2>
+  <canvas id="canvas" width="780" height="500"></canvas>
+  <div class="readouts">
+    <span class="r">Φ = <b id="phi-val">0.00</b> Wb</span>
+    <span class="r">|ΔΦ/Δt| = <b id="rate-val">0.00</b></span>
+    <span class="r">E = n|ΔΦ/Δt| = <b id="e-val">0.00</b> V</span>
+    <span class="r">n = <b id="n-val">3</b> 匝</span>
+    <span class="r">状态：<b id="state-val">—</b></span>
+  </div>
+  <div class="controls">
+    <label>磁场 B = <span id="b-d">0.55</span> T<input id="b" type="range" min="-100" max="100" step="1" value="55"></label>
+    <label>法线夹角 θ = <span id="angle-d">35</span>°<input id="angle" type="range" min="0" max="180" step="1" value="35"></label>
+    <label>面积 A = <span id="area-d">0.70</span> m²<input id="area" type="range" min="40" max="100" step="1" value="70"></label>
+    <label>匝数 n = <span id="turns-d">3</span><input id="turns" type="range" min="1" max="8" step="1" value="3"></label>
+    <label>变化速度 = <span id="speed-d">3</span><input id="speed" type="range" min="0" max="8" step="1" value="3"></label>
+    <button id="play-b">▶ 自动改变 B</button>
+    <button id="play-angle">▶ 自动转动线圈</button>
+    <button id="freeze">停住看 E=0</button>
+    <button id="reset">重置</button>
+  </div>
+  <div class="hint">
+    <b>观察任务</b>：拖动画面里的线圈法线或右侧磁场强度条。先看穿过线圈的磁通量 Φ，再看右下图像的斜率：紫色 Φ 曲线越陡，红色 E 越大。磁场 B 很强但不变时，E 仍可为 0；匝数 n 增大时，同样的 Φ 变化会产生更大的电动势。
+  </div>
+</div>
+<script>
+(function(){
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+const W=canvas.width,H=canvas.height;
+const D=Math.PI/180, lab={x:18,y:40,w:480,h:320}, side={x:520,y:40,w:230,h:320};
+let B=0.55,angle=35,area=0.70,turns=3,speed=3,mode='none',dir=1,t=0;
+let lastPhi=phi(),lastTime=performance.now(),rate=0,trace=[],etrace=[],drag='';
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function phi(){return B*area*Math.cos(angle*D)}
+function eVal(){return turns*Math.abs(rate)}
+function roundRect(x,y,w,h,r,fill,stroke){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke()}}
+function panel(x,y,w,h,title){roundRect(x,y,w,h,8,'#fff','#d7e2ec');ctx.fillStyle='#334e68';ctx.font='bold 12px system-ui';ctx.textAlign='left';ctx.fillText(title,x+10,y+18)}
+function arrow(x1,y1,x2,y2,color,lw=2){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=lw;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-8*Math.cos(a-0.45),y2-8*Math.sin(a-0.45));ctx.lineTo(x2-8*Math.cos(a+0.45),y2-8*Math.sin(a+0.45));ctx.closePath();ctx.fill()}
+function drawTable(){
+  const g=ctx.createLinearGradient(lab.x,lab.y,lab.x,lab.y+lab.h);g.addColorStop(0,'#fff');g.addColorStop(1,'#e9f1f8');
+  roundRect(lab.x,lab.y,lab.w,lab.h,8,g,'#cbd8e4');
+  ctx.strokeStyle='rgba(82,112,140,0.15)';
+  for(let x=lab.x+22;x<lab.x+lab.w;x+=28){ctx.beginPath();ctx.moveTo(x,lab.y+54);ctx.lineTo(x+54,lab.y+lab.h-30);ctx.stroke()}
+  for(let y=lab.y+70;y<lab.y+lab.h;y+=28){ctx.beginPath();ctx.moveTo(lab.x+20,y);ctx.lineTo(lab.x+lab.w-28,y-24);ctx.stroke()}
+  ctx.fillStyle='#5b7083';ctx.font='12px system-ui';ctx.textAlign='left';ctx.fillText('3D实验台：拖动绿色法线或右侧 B 条，观察 Φ 的变化率',lab.x+16,lab.y+24);
+}
+function drawField(){
+  const x1=70,x2=430,density=Math.round(4+Math.abs(B)*9),alpha=0.24+Math.abs(B)*0.55;
+  for(let i=0;i<density;i++){const y=105+i*(185/Math.max(1,density-1));if(B>=0)arrow(x1,y,x2,y,`rgba(44,123,229,${alpha})`,2);else arrow(x2,y,x1,y,`rgba(214,69,69,${alpha})`,2)}
+  ctx.fillStyle=B>=0?'#2c7be5':'#d64545';ctx.font='bold 13px system-ui';ctx.textAlign='center';ctx.fillText(B>=0?'外加磁场 B 向右':'外加磁场 B 向左',250,86);
+  const bx=450,by=84,bh=210;
+  ctx.fillStyle='rgba(44,123,229,0.10)';ctx.fillRect(bx,by,18,bh);
+  ctx.strokeStyle='#9fb3c8';ctx.strokeRect(bx,by,18,bh);
+  ctx.fillStyle=B>=0?'#2c7be5':'#d64545';
+  const mid=by+bh/2,h=Math.abs(B)*bh/2;
+  ctx.fillRect(bx, B>=0?mid-h:mid, 18, h);
+  ctx.fillStyle='#486581';ctx.font='11px system-ui';ctx.textAlign='center';ctx.fillText('拖 B',bx+9,by+bh+18);
+}
+function drawCoil(){
+  const cx=250,cy=204,a=angle*D,rx=35+70*area*Math.abs(Math.cos(a)),ry=54+45*area;
+  ctx.save();ctx.translate(cx,cy);
+  for(let i=0;i<turns;i++){ctx.beginPath();ctx.ellipse((i-(turns-1)/2)*4,0,rx,ry,0,0,7);ctx.strokeStyle='#64748b';ctx.lineWidth=2.2;ctx.stroke()}
+  const nx=Math.cos(a)*118,ny=-Math.sin(a)*70;
+  arrow(0,0,nx,ny,'#16a34a',4);
+  ctx.fillStyle='#16a34a';ctx.font='bold 13px system-ui';ctx.textAlign='center';ctx.fillText('n 法线',nx,ny-12);
+  ctx.restore();
+  ctx.fillStyle='#102a43';ctx.font='13px system-ui';ctx.textAlign='center';ctx.fillText('线圈：面积 A='+area.toFixed(2)+'m²，'+turns+'匝',cx,cy+118);
+}
+function drawSideView(){
+  panel(side.x,side.y,side.w,132,'侧视/俯视：θ 决定 Φ=BScosθ');
+  const ox=side.x+105,oy=side.y+80,a=angle*D;
+  arrow(ox-74,oy,ox+74,oy,B>=0?'#2c7be5':'#d64545',2.2);
+  arrow(ox,oy,ox+64*Math.cos(a),oy-44*Math.sin(a),'#16a34a',3);
+  ctx.strokeStyle='#5b7083';ctx.lineWidth=1.4;ctx.beginPath();ctx.arc(ox,oy,38,-a,0);ctx.stroke();
+  ctx.fillStyle='#334e68';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText('θ='+Math.round(angle)+'°',ox+30,oy-16);
+}
+function drawBulbMeter(){
+  panel(side.x,side.y+146,side.w,174,'电压表/灯泡：E=n|ΔΦ/Δt|');
+  const E=eVal(),mx=side.x+68,my=side.y+242;
+  ctx.strokeStyle='#9fb3c8';ctx.lineWidth=8;ctx.beginPath();ctx.arc(mx,my,38,Math.PI,0);ctx.stroke();
+  ctx.strokeStyle='#d64545';ctx.beginPath();ctx.arc(mx,my,38,Math.PI,Math.PI+clamp(E/3,0,1)*Math.PI);ctx.stroke();
+  const aa=Math.PI+clamp(E/3,0,1)*Math.PI;arrow(mx,my,mx+34*Math.cos(aa),my+34*Math.sin(aa),'#c92a2a',2);
+  ctx.fillStyle='#102a43';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText('电压表 V',mx,my+25);
+  const bx=side.x+162,by=side.y+228,glow=clamp(E/3,0,1);
+  const rg=ctx.createRadialGradient(bx,by,2,bx,by,38);rg.addColorStop(0,'rgba(255,209,102,'+(0.25+glow*0.65)+')');rg.addColorStop(1,'rgba(255,209,102,0)');
+  ctx.fillStyle=rg;ctx.beginPath();ctx.arc(bx,by,38,0,7);ctx.fill();ctx.strokeStyle='#9fb3c8';ctx.lineWidth=2;ctx.beginPath();ctx.arc(bx,by,16,0,7);ctx.stroke();
+  ctx.fillStyle='#486581';ctx.font='11px system-ui';ctx.fillText('灯泡亮度',bx,by+36);
+}
+function drawGraph(){
+  const x=42,y=386,w=700,h=88;
+  roundRect(x,y,w,h,8,'#fff','#d7e2ec');
+  ctx.fillStyle='#334e68';ctx.font='bold 12px system-ui';ctx.textAlign='left';ctx.fillText('图像记录：紫色 Φ 曲线斜率越大，红色 E 越大',x+12,y+18);
+  ctx.strokeStyle='#d7e2ec';ctx.beginPath();ctx.moveTo(x+40,y+h/2);ctx.lineTo(x+w-15,y+h/2);ctx.stroke();
+  trace.push(phi());etrace.push(eVal());if(trace.length>170){trace.shift();etrace.shift()}
+  ctx.strokeStyle='#7c3aed';ctx.lineWidth=2.5;ctx.beginPath();
+  trace.forEach((p,i)=>{const px=x+42+i/169*(w-70),py=y+h/2-p*62;if(i)ctx.lineTo(px,py);else ctx.moveTo(px,py)});ctx.stroke();
+  ctx.strokeStyle='#d64545';ctx.lineWidth=2.5;ctx.beginPath();
+  etrace.forEach((p,i)=>{const px=x+42+i/169*(w-70),py=y+h-12-clamp(p/3,0,1)*(h-30);if(i)ctx.lineTo(px,py);else ctx.moveTo(px,py)});ctx.stroke();
+  ctx.fillStyle='#7c3aed';ctx.font='11px system-ui';ctx.fillText('Φ',x+52,y+34);ctx.fillStyle='#d64545';ctx.fillText('E',x+78,y+34);
+}
+function statusText(){
+  if(Math.abs(rate)<0.006)return 'Φ 不变：E=0';
+  return rate>0?'Φ 正在增大：有感应电动势':'Φ 正在减小：有感应电动势，方向相反';
+}
+function draw(){
+  const now=performance.now(),dt=Math.max(0.016,(now-lastTime)/1000),p=phi();
+  rate=(p-lastPhi)/dt;if(Math.abs(rate)<0.006)rate=0;
+  ctx.clearRect(0,0,W,H);drawTable();drawField();drawCoil();drawSideView();drawBulbMeter();drawGraph();
+  ctx.fillStyle='#243b53';ctx.font='13px system-ui';ctx.textAlign='left';
+  ctx.fillText('公式绑定：Φ=BScosθ；E=n|ΔΦ/Δt|='+turns+'×|'+rate.toFixed(3)+'|='+eVal().toFixed(2)+' V',28,360);
+  ctx.fillText('多视角：3D线圈/磁场 + 侧视法线 + 电压表/灯泡 + Φ-E 图像记录',382,360);
+  document.getElementById('phi-val').textContent=p.toFixed(2);
+  document.getElementById('rate-val').textContent=Math.abs(rate).toFixed(3);
+  document.getElementById('e-val').textContent=eVal().toFixed(2);
+  document.getElementById('n-val').textContent=turns;
+  document.getElementById('state-val').textContent=statusText();
+  document.getElementById('b-d').textContent=B.toFixed(2);
+  document.getElementById('angle-d').textContent=Math.round(angle);
+  document.getElementById('area-d').textContent=area.toFixed(2);
+  document.getElementById('turns-d').textContent=turns;
+  document.getElementById('speed-d').textContent=speed;
+  lastPhi=p;lastTime=now;
+}
+function step(){
+  if(mode==='B'){B+=dir*(speed+1)*0.004;if(B>1){B=1;dir=-1}if(B<-1){B=-1;dir=1}document.getElementById('b').value=Math.round(B*100)}
+  if(mode==='angle'){angle+=dir*(speed+1)*0.42;if(angle>180){angle=180;dir=-1}if(angle<0){angle=0;dir=1}document.getElementById('angle').value=Math.round(angle)}
+  t++;draw();requestAnimationFrame(step);
+}
+function syncFromInputs(){B=Number(document.getElementById('b').value)/100;angle=Number(document.getElementById('angle').value);area=Number(document.getElementById('area').value)/100;turns=Number(document.getElementById('turns').value);speed=Number(document.getElementById('speed').value)}
+['b','angle','area','turns','speed'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{mode='none';document.getElementById('play-b').classList.remove('on');document.getElementById('play-angle').classList.remove('on');syncFromInputs();draw()}));
+function setMode(m){mode=mode===m?'none':m;document.getElementById('play-b').classList.toggle('on',mode==='B');document.getElementById('play-angle').classList.toggle('on',mode==='angle')}
+document.getElementById('play-b').onclick=()=>setMode('B');
+document.getElementById('play-angle').onclick=()=>setMode('angle');
+document.getElementById('freeze').onclick=()=>{mode='none';document.getElementById('play-b').classList.remove('on');document.getElementById('play-angle').classList.remove('on')};
+document.getElementById('reset').onclick=()=>{B=0.55;angle=35;area=0.70;turns=3;speed=3;mode='none';dir=1;trace=[];etrace=[];document.getElementById('b').value=55;document.getElementById('angle').value=35;document.getElementById('area').value=70;document.getElementById('turns').value=3;document.getElementById('speed').value=3;document.getElementById('play-b').classList.remove('on');document.getElementById('play-angle').classList.remove('on');lastPhi=phi();lastTime=performance.now();draw()};
+function pos(e){const r=canvas.getBoundingClientRect(),sx=canvas.width/r.width,sy=canvas.height/r.height;return{x:(e.clientX-r.left)*sx,y:(e.clientY-r.top)*sy}}
+canvas.addEventListener('pointerdown',e=>{const pnt=pos(e);mode='none';document.getElementById('play-b').classList.remove('on');document.getElementById('play-angle').classList.remove('on');if(pnt.x>436&&pnt.x<484&&pnt.y>72&&pnt.y<310){drag='B'}else if(pnt.x<500&&pnt.y<330){drag='angle'}canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing'});
+canvas.addEventListener('pointermove',e=>{if(!drag)return;const pnt=pos(e);if(drag==='B'){B=clamp((205-pnt.y)/125,-1,1);document.getElementById('b').value=Math.round(B*100)}else{const cx=250,cy=204;let deg=Math.atan2(-(pnt.y-cy),pnt.x-cx)/D;angle=clamp(Math.round(deg),0,180);document.getElementById('angle').value=angle}draw()});
+window.addEventListener('pointerup',()=>{drag='';canvas.style.cursor='grab'});
+document.getElementById('reset').click();requestAnimationFrame(step);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>四川高考物理</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <style>
+    :root {
+      --sidebar-width: 320px;
+      --sidebar-bg: #f7f9fc;
+      --sidebar-border: #d9e2ec;
+      --text-main: #102a43;
+      --text-muted: #486581;
+      --accent: #2c7be5;
+    }
+    html, body {
+      font-family: -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      color: var(--text-main);
+      background: #fff;
+    }
+    body.ready {
+      overflow-x: hidden;
+    }
+    .app-nav { font-size: 14px; }
+
+    /* 强制目录在左侧。Docsify 默认在窄屏会把目录折叠/挤到页面流里，
+       本站是学习路径型网页，目录必须始终作为左侧导航存在。 */
+    .sidebar {
+      position: fixed !important;
+      left: 0 !important;
+      top: 0 !important;
+      bottom: 0 !important;
+      width: var(--sidebar-width) !important;
+      min-width: var(--sidebar-width) !important;
+      padding: 18px 0 28px !important;
+      background: var(--sidebar-bg) !important;
+      border-right: 1px solid var(--sidebar-border) !important;
+      overflow-y: auto !important;
+      transform: none !important;
+      z-index: 20;
+    }
+    .sidebar-toggle {
+      display: none !important;
+    }
+    .sidebar .app-name {
+      margin: 0 18px 14px !important;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--sidebar-border);
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+    .sidebar-nav {
+      padding: 0 14px 24px !important;
+    }
+    .sidebar-nav ul {
+      margin: 0 !important;
+    }
+    .sidebar-nav li {
+      margin: 2px 0 !important;
+      line-height: 1.45;
+    }
+    .sidebar-nav a {
+      border-radius: 6px;
+      color: var(--text-muted);
+      display: block;
+      padding: 4px 8px;
+      white-space: normal;
+    }
+    .sidebar-nav a:hover,
+    .sidebar-nav .active > a {
+      background: #e8f1ff;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .content {
+      position: relative !important;
+      left: auto !important;
+      margin-left: var(--sidebar-width) !important;
+      width: calc(100vw - var(--sidebar-width)) !important;
+      max-width: calc(100vw - var(--sidebar-width)) !important;
+      padding-top: 0 !important;
+      box-sizing: border-box;
+    }
+    .markdown-section {
+      max-width: 1080px !important;
+      padding: 30px 36px 80px !important;
+    }
+    .markdown-section iframe {
+      background: #fff;
+      max-width: 100%;
+    }
+    .anchor span {
+      color: var(--text-main);
+    }
+
+    .graph-shell {
+      min-height: 680px;
+      border: 1px solid #d9e2ec;
+      border-radius: 8px;
+      background: #ffffff;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 260px;
+      overflow: hidden;
+    }
+    .graph-stage {
+      min-height: 680px;
+      position: relative;
+    }
+    .graph-stage svg {
+      width: 100%;
+      height: 680px;
+      display: block;
+    }
+    .graph-panel {
+      border-left: 1px solid #d9e2ec;
+      background: #f7f9fc;
+      padding: 14px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .graph-panel h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      color: var(--text-main);
+    }
+    .graph-panel .legend {
+      display: grid;
+      gap: 7px;
+      margin-top: 12px;
+    }
+    .graph-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-right: 8px;
+      margin-bottom: 6px;
+    }
+    .graph-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .graph-tooltip {
+      position: fixed;
+      pointer-events: none;
+      background: #102a43;
+      color: #fff;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      line-height: 1.45;
+      max-width: 260px;
+      box-shadow: 0 10px 24px rgba(16,42,67,.22);
+      z-index: 50;
+      display: none;
+    }
+    .graph-node {
+      cursor: pointer;
+    }
+    .graph-node text {
+      font-size: 11px;
+      paint-order: stroke;
+      stroke: #fff;
+      stroke-width: 3px;
+      stroke-linejoin: round;
+    }
+    .graph-node.dim,
+    .graph-link.dim {
+      opacity: .18;
+    }
+    .graph-node.selected circle {
+      stroke: #f0a500;
+      stroke-width: 4px;
+    }
+    .graph-link {
+      fill: none;
+      stroke-width: 1.6px;
+      opacity: .75;
+    }
+    .graph-loading,
+    .graph-error {
+      padding: 24px;
+      color: var(--text-muted);
+    }
+    @media (max-width: 760px) {
+      :root { --sidebar-width: 270px; }
+      .markdown-section { padding: 24px 18px 70px !important; }
+      .graph-shell { grid-template-columns: 1fr; }
+      .graph-panel { border-left: 0; border-top: 1px solid #d9e2ec; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    window.$docsify = {
+      name: '四川高考物理',
+      loadSidebar: true,
+      // 使用 _sidebar.md 作为唯一学习路径。不能让 Docsify 自动把每个
+      // “9. 公式绑定 / 10. 适用条件”抽成目录，否则学生会跳到没上下文的位置。
+      subMaxLevel: 0,
+      maxLevel: 4,
+      auto2top: true,
+      search: {
+        paths: 'auto',
+        placeholder: '搜索知识点、公式、模型、实验',
+        noData: '没有找到相关内容',
+        depth: 4
+      },
+      pagination: {
+        previousText: '上一节',
+        nextText: '下一节'
+      },
+      plugins: [
+        function(hook, vm) {
+          hook.doneEach(function() {
+            if (location.hash.indexOf('/graph') !== -1) {
+              renderKnowledgeGraph();
+            }
+          });
+        }
+      ]
+    };
+
+    async function renderKnowledgeGraph() {
+      const mount = document.getElementById('knowledge-graph');
+      if (!mount || mount.dataset.rendered === '1') return;
+      mount.dataset.rendered = '1';
+      mount.innerHTML = '<div class="graph-loading">正在加载知识图谱...</div>';
+
+      try {
+        const [graph, progress, idMap] = await Promise.all([
+          fetch('data/graph.json').then(r => r.json()),
+          fetch('data/progress.json').then(r => r.json()),
+          fetch('data/id-map.json').then(r => r.json())
+        ]);
+        if (!window.d3) throw new Error('D3 未加载');
+
+        const progressById = progress || {};
+        const idMapById = idMap || {};
+        const nodes = (graph.nodes || []).map(n => ({
+          ...n,
+          ...(progressById[n.id] || {}),
+          ...(idMapById[n.id] || {})
+        }));
+        const nodeIds = new Set(nodes.map(n => n.id));
+        const links = (graph.edges || []).filter(e => nodeIds.has(e.from) && nodeIds.has(e.to))
+          .map(e => ({ ...e, source: e.from, target: e.to }));
+
+        mount.innerHTML = [
+          '<div class="graph-shell">',
+          '  <div class="graph-stage"><svg role="img" aria-label="四川高考物理知识图谱"></svg></div>',
+          '  <aside class="graph-panel">',
+          '    <h3>知识图谱</h3>',
+          '    <p>点击节点跳到对应知识点；悬停查看模块、完成状态和前后关系。</p>',
+          '    <div class="graph-chip"><span class="graph-dot" style="background:#2c7be5"></span>done</div>',
+          '    <div class="graph-chip"><span class="graph-dot" style="background:#f0a500"></span>partial</div>',
+          '    <div class="graph-chip"><span class="graph-dot" style="background:#9fb3c8"></span>pending</div>',
+          '    <div class="legend">',
+          '      <div><b>prerequisite</b>：前置知识</div>',
+          '      <div><b>application</b>：应用关系</div>',
+          '      <div><b>analogy</b>：类比关系</div>',
+          '      <div><b>model</b>：模型关系</div>',
+          '    </div>',
+          '    <p id="graph-selection" style="margin-top:14px;">当前：未选中节点</p>',
+          '  </aside>',
+          '</div>',
+          '<div class="graph-tooltip" id="graph-tooltip"></div>'
+        ].join('');
+
+        const svg = d3.select(mount).select('svg');
+        const stage = mount.querySelector('.graph-stage');
+        const width = Math.max(720, stage.clientWidth || 900);
+        const height = 680;
+        svg.attr('viewBox', [0, 0, width, height]);
+
+        const moduleOrder = ['必修1','必修2','必修3','选择性必修1','选择性必修2','选择性必修3'];
+        const color = status => status === 'done' ? '#2c7be5' : status === 'partial' ? '#f0a500' : '#9fb3c8';
+        const edgeColor = type => type === 'prerequisite' ? '#486581' : type === 'application' ? '#7b2cbf' : type === 'analogy' ? '#2f9e44' : '#e03131';
+        const moduleX = module => {
+          const i = Math.max(0, moduleOrder.indexOf(module));
+          return 90 + i * ((width - 180) / Math.max(1, moduleOrder.length - 1));
+        };
+
+        nodes.forEach((n, i) => {
+          n.x = moduleX(n.module);
+          n.y = 70 + (i % 11) * 52;
+        });
+
+        svg.append('defs').append('marker')
+          .attr('id', 'graph-arrow')
+          .attr('viewBox', '0 -5 10 10')
+          .attr('refX', 17)
+          .attr('refY', 0)
+          .attr('markerWidth', 6)
+          .attr('markerHeight', 6)
+          .attr('orient', 'auto')
+          .append('path')
+          .attr('d', 'M0,-5L10,0L0,5')
+          .attr('fill', '#829ab1');
+
+        const simulation = d3.forceSimulation(nodes)
+          .force('link', d3.forceLink(links).id(d => d.id).distance(86).strength(0.42))
+          .force('charge', d3.forceManyBody().strength(-280))
+          .force('x', d3.forceX(d => moduleX(d.module)).strength(0.42))
+          .force('y', d3.forceY(height / 2).strength(0.06))
+          .force('collide', d3.forceCollide(34));
+
+        const link = svg.append('g')
+          .attr('stroke-linecap', 'round')
+          .selectAll('path')
+          .data(links)
+          .join('path')
+          .attr('class', 'graph-link')
+          .attr('stroke', d => edgeColor(d.type))
+          .attr('marker-end', 'url(#graph-arrow)');
+
+        const node = svg.append('g')
+          .selectAll('g')
+          .data(nodes)
+          .join('g')
+          .attr('class', 'graph-node')
+          .on('mouseenter', function(event, d) {
+            const tip = document.getElementById('graph-tooltip');
+            tip.innerHTML = '<b>' + d.id + ' ' + d.title + '</b><br>' + d.module + ' · ' + d.level + '档 · ' + d.status;
+            tip.style.left = (event.clientX + 12) + 'px';
+            tip.style.top = (event.clientY + 12) + 'px';
+            tip.style.display = 'block';
+          })
+          .on('mousemove', function(event) {
+            const tip = document.getElementById('graph-tooltip');
+            tip.style.left = (event.clientX + 12) + 'px';
+            tip.style.top = (event.clientY + 12) + 'px';
+          })
+          .on('mouseleave', function() {
+            document.getElementById('graph-tooltip').style.display = 'none';
+          })
+          .on('click', function(event, d) {
+            const related = new Set([d.id]);
+            links.forEach(e => {
+              const s = typeof e.source === 'object' ? e.source.id : e.source;
+              const t = typeof e.target === 'object' ? e.target.id : e.target;
+              if (s === d.id) related.add(t);
+              if (t === d.id) related.add(s);
+            });
+            node.classed('dim', n => !related.has(n.id)).classed('selected', n => n.id === d.id);
+            link.classed('dim', e => !related.has(e.source.id) || !related.has(e.target.id));
+            const selection = document.getElementById('graph-selection');
+            selection.innerHTML = '当前：<b>' + d.id + ' ' + d.title + '</b><br><a href="#/' + d.file + '?id=' + d.slug + '">跳到知识点</a>';
+          })
+          .call(d3.drag()
+            .on('start', (event, d) => {
+              if (!event.active) simulation.alphaTarget(0.25).restart();
+              d.fx = d.x;
+              d.fy = d.y;
+            })
+            .on('drag', (event, d) => {
+              d.fx = event.x;
+              d.fy = event.y;
+            })
+            .on('end', (event, d) => {
+              if (!event.active) simulation.alphaTarget(0);
+              d.fx = null;
+              d.fy = null;
+            }));
+
+        node.append('circle')
+          .attr('r', d => d.level === 'A' ? 16 : 13)
+          .attr('fill', d => color(d.status))
+          .attr('stroke', '#102a43')
+          .attr('stroke-width', 1.2);
+
+        node.append('text')
+          .attr('x', 20)
+          .attr('y', 4)
+          .text(d => d.id + ' ' + d.title);
+
+        const moduleLabels = svg.append('g').selectAll('text')
+          .data(moduleOrder)
+          .join('text')
+          .attr('x', d => moduleX(d))
+          .attr('y', 24)
+          .attr('text-anchor', 'middle')
+          .attr('font-size', 13)
+          .attr('font-weight', 700)
+          .attr('fill', '#334e68')
+          .text(d => d);
+
+        simulation.on('tick', () => {
+          nodes.forEach(d => {
+            d.x = Math.max(36, Math.min(width - 180, d.x));
+            d.y = Math.max(48, Math.min(height - 34, d.y));
+          });
+          link.attr('d', d => {
+            const dx = d.target.x - d.source.x;
+            const dy = d.target.y - d.source.y;
+            const dr = Math.sqrt(dx * dx + dy * dy) * 1.45;
+            return 'M' + d.source.x + ',' + d.source.y + 'A' + dr + ',' + dr + ' 0 0,1 ' + d.target.x + ',' + d.target.y;
+          });
+          node.attr('transform', d => 'translate(' + d.x + ',' + d.y + ')');
+          moduleLabels.attr('x', d => moduleX(d));
+        });
+      } catch (err) {
+        mount.innerHTML = '<div class="graph-error">知识图谱加载失败：' + err.message + '</div>';
+      }
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/zoom-image.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@4/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-katex@latest/dist/docsify-katex.js"></script>
+</body>
+</html>

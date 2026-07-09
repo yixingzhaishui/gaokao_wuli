@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>传感器分压实验台</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#eef3f8;color:#102a43}
+.wrap{padding:12px}
+h2{font-size:16px;margin:0 0 8px}
+canvas{display:block;width:100%;max-width:760px;background:#fff;border:1px solid #d9e2ec;border-radius:12px;touch-action:none;cursor:grab}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:9px 0}
+.chip{background:#102a43;color:#e6eef7;padding:6px 10px;border-radius:8px;font-size:13px}
+.chip b{color:#ffd166}
+.ctrls{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0;align-items:center}
+.ctrls button{font:inherit;padding:7px 11px;border:1px solid #b0bcc9;background:#fff;border-radius:7px;cursor:pointer}
+.ctrls button.active{background:#2c7be5;color:white;border-color:#2c7be5}
+.ctrls label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:#334e68}
+.ctrls input[type=range]{width:140px;accent-color:#2c7be5}
+.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:9px 12px;border-radius:6px;font-size:13px;color:#486581;line-height:1.5;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2>传感器：3D实物输入 + 电路剖面/俯视 + 电压表与阈值图像记录</h2>
+  <canvas id="cv" width="760" height="430"></canvas>
+  <div class="chips">
+    <span class="chip">类型 = <b id="typev">光敏电阻</b></span>
+    <span class="chip"><span id="inputName">光照</span> = <b id="inputv">0</b></span>
+    <span class="chip">敏感电阻 Rₛ = <b id="rsv">20000</b> Ω</span>
+    <span class="chip">输出电压 Uout = <b id="uv">4.00</b> V</span>
+    <span class="chip">阈值 = <b id="thv">2.50</b> V</span>
+    <span class="chip">执行器 = <b id="statev">触发</b></span>
+    <span class="chip">状态：<b id="statusv">自动扫描输入量</b></span>
+  </div>
+  <div class="ctrls">
+    <button data-mode="light" class="active">光敏</button>
+    <button data-mode="temp">热敏</button>
+    <button data-mode="force">力敏</button>
+    <label><span id="inputLabel">光照强度</span> = <span id="inl">0</span><input id="inputr" type="range" min="0" max="100" step="1" value="0"></label>
+    <label>触发阈值 = <span id="thl">2.50</span> V<input id="thr" type="range" min="0.5" max="4.5" step="0.05" value="2.5"></label>
+    <button id="play-btn">暂停扫描</button>
+    <button id="reset-btn">重置</button>
+    <span style="font-size:13px;color:#5a6b7b">也可拖左侧场景里的圆点改变输入</span>
+  </div>
+  <div class="hint"><b>观察任务</b>：切到光敏，拖暗/亮输入，看光照增强时 Rₛ 变小，取 Rₛ 两端电压会下降，路灯熄灭；切到热敏，温度升高时 Rₛ 变小，但从定值电阻 R₀ 取压，报警电压反而升高。</div>
+</div>
+<script>
+(function(){
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+let mode='light',x=0,th=2.5,drag=false,running=true,t=0,last=performance.now(),history=[];
+const Vcc=5,R0=5000;
+const modes={
+  light:{name:'光敏电阻',input:'光照',unit:'%',sample:'sensor',act:'路灯',low:'天黑',high:'天亮',r:v=>20000/(1+0.20*v)},
+  temp:{name:'热敏电阻',input:'温度',unit:'℃',sample:'fixed',act:'报警器',low:'低温',high:'高温',r:v=>12000*Math.exp(-0.028*(v-20))},
+  force:{name:'力敏电阻',input:'压力',unit:'N',sample:'sensor',act:'电子秤信号',low:'轻',high:'重',r:v=>1800+75*v}
+};
+function cfg(){return modes[mode]}
+function Rs(){return cfg().r(x)}
+function Uout(){return cfg().sample==='sensor'?Vcc*Rs()/(Rs()+R0):Vcc*R0/(Rs()+R0)}
+function on(){return Uout()>=th}
+function fmtInput(){return mode==='temp'?Math.round(x):Math.round(x)}
+function sync(){
+  typev.textContent=cfg().name;inputName.textContent=cfg().input;inputv.textContent=fmtInput()+cfg().unit;
+  rsv.textContent=Rs().toFixed(0);uv.textContent=Uout().toFixed(2);thv.textContent=th.toFixed(2);statev.textContent=on()?'触发':'未触发';
+  inputLabel.textContent=cfg().input;inl.textContent=fmtInput()+cfg().unit;thl.textContent=th.toFixed(2);
+  statusv.textContent=drag?'手动拖输入量':(running?'自动扫描输入量':(on()?'暂停：已超过阈值':'暂停：未达阈值'));
+}
+function roundRect(x,y,w,h,fill,stroke,label){
+  ctx.fillStyle=fill;ctx.strokeStyle=stroke;ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();
+  ctx.fillStyle=stroke;ctx.font='13px system-ui';ctx.textAlign='center';ctx.fillText(label,x+w/2,y+h/2+5);
+}
+function arrow(x1,y1,x2,y2,color){
+  ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  const a=Math.atan2(y2-y1,x2-x1),s=9;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-s*Math.cos(a-.45),y2-s*Math.sin(a-.45));ctx.lineTo(x2-s*Math.cos(a+.45),y2-s*Math.sin(a+.45));ctx.closePath();ctx.fill();
+}
+function drawStimulus(){
+  const sx=72,sy=72,w=170,h=245;
+  ctx.fillStyle='#f8fbff';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(sx,sy,w,h,10);ctx.fill();ctx.stroke();
+  ctx.fillStyle='#334e68';ctx.font='bold 12px system-ui';ctx.textAlign='left';ctx.fillText('3D实物场景：拖动输入量',sx+12,sy+20);
+  const cy=sy+h-(x/100)*h;
+  if(mode==='light'){
+    const sun=ctx.createRadialGradient(sx+82,sy+72,5,sx+82,sy+72,55);sun.addColorStop(0,`rgba(255,224,138,${0.45+0.5*x/100})`);sun.addColorStop(1,'rgba(255,193,7,0)');
+    ctx.fillStyle=sun;ctx.beginPath();ctx.arc(sx+82,sy+72,55,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=`rgba(255,193,7,${0.15+0.75*x/100})`;ctx.beginPath();ctx.arc(sx+82,sy+72,40,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#a06a00';ctx.font='38px system-ui';ctx.textAlign='center';ctx.fillText('☀',sx+82,sy+86);
+  }else if(mode==='temp'){
+    ctx.strokeStyle='#c92a2a';ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(sx+86,sy+185);ctx.lineTo(sx+86,sy+55);ctx.stroke();
+    ctx.fillStyle=`rgba(201,42,42,${0.15+0.75*x/100})`;ctx.beginPath();ctx.arc(sx+86,sy+205,24,0,Math.PI*2);ctx.fill();
+  }else{
+    ctx.fillStyle='#d9e2ec';ctx.fillRect(sx+48,sy+175,76,46);
+    ctx.fillStyle='#486581';ctx.font='38px system-ui';ctx.textAlign='center';ctx.fillText('↓',sx+86,sy+85+x*0.7);
+  }
+  ctx.strokeStyle='#2c7be5';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(sx+145,sy+h);ctx.lineTo(sx+145,sy);ctx.stroke();
+  ctx.fillStyle='#2c7be5';ctx.beginPath();ctx.arc(sx+145,cy,9,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#486581';ctx.font='12px system-ui';ctx.textAlign='center';
+  ctx.fillText(cfg().low,sx+145,sy+h+18);ctx.fillText(cfg().high,sx+145,sy-8);
+}
+function drawCircuit(){
+  const cx=365,top=88,bot=315,left=295,right=440,mid=205;
+  ctx.fillStyle='#334e68';ctx.font='bold 12px system-ui';ctx.textAlign='left';ctx.fillText('电路剖面/俯视：敏感电阻进入分压电路',276,84);
+  ctx.strokeStyle='#334e68';ctx.lineWidth=2;ctx.beginPath();
+  ctx.moveTo(left,top);ctx.lineTo(right,top);ctx.lineTo(right,bot);ctx.lineTo(left,bot);ctx.lineTo(left,top);ctx.stroke();
+  ctx.fillStyle='#334e68';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText('5V',left-20,top+7);ctx.fillText('0V',left-20,bot+4);
+  ctx.strokeStyle='#2c7be5';ctx.beginPath();ctx.moveTo(cx,top);ctx.lineTo(cx,mid-28);ctx.stroke();
+  ctx.strokeStyle='#2c7be5';ctx.beginPath();ctx.moveTo(cx,mid-28);
+  for(let k=0;k<6;k++){ctx.lineTo(cx+(k%2?12:-12),mid-28+k*10)}
+  ctx.stroke();ctx.beginPath();ctx.moveTo(cx,mid+35);ctx.lineTo(cx,bot);ctx.stroke();
+  ctx.strokeStyle='#486581';ctx.beginPath();ctx.moveTo(cx,mid+58);ctx.lineTo(cx,mid+92);ctx.stroke();
+  ctx.strokeStyle='#486581';ctx.beginPath();ctx.moveTo(cx,mid+58);
+  for(let k=0;k<6;k++){ctx.lineTo(cx+(k%2?12:-12),mid+58+k*7)}
+  ctx.stroke();
+  ctx.fillStyle='#2c7be5';ctx.fillText('Rₛ='+Rs().toFixed(0)+'Ω',cx+65,mid+5);
+  ctx.fillStyle='#486581';ctx.fillText('R₀=5000Ω',cx+68,mid+84);
+  const tapY=cfg().sample==='sensor'?mid+36:bot;
+  ctx.fillStyle='#c92a2a';ctx.beginPath();ctx.arc(cx,tapY,5,0,Math.PI*2);ctx.fill();
+  arrow(cx+5,tapY,520,180,'#c92a2a');
+  ctx.fillStyle='#c92a2a';ctx.font='12px system-ui';ctx.textAlign='left';ctx.fillText(cfg().sample==='sensor'?'取 Rₛ 两端电压':'取 R₀ 两端电压',cx+18,tapY-8);
+}
+function drawOutput(){
+  ctx.fillStyle='#334e68';ctx.font='bold 12px system-ui';ctx.textAlign='left';ctx.fillText('电压表/阈值图像记录',510,64);
+  roundRect(520,128,90,58,'#fff3bf','#a06a00','比较器');
+  const glow=ctx.createRadialGradient(665,157,2,665,157,on()?46:30);glow.addColorStop(0,on()?'rgba(81,207,102,.55)':'rgba(173,181,189,.35)');glow.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=glow;ctx.beginPath();ctx.arc(665,157,on()?46:30,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=on()?'#2b8a3e':'#adb5bd';ctx.beginPath();ctx.arc(665,157,28,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.font='13px system-ui';ctx.textAlign='center';ctx.fillText(on()?'ON':'OFF',665,162);
+  ctx.fillStyle='#334e68';ctx.font='12px system-ui';ctx.fillText(cfg().act,665,204);
+  ctx.fillStyle='#243b53';ctx.font='13px system-ui';ctx.textAlign='left';
+  ctx.fillText('Uout='+Uout().toFixed(2)+' V '+(on()?'>=':'<')+' 阈值 '+th.toFixed(2)+' V',510,245);
+  ctx.fillText('非电学量 → Rₛ变化 → 分压电压 → 阈值控制',245,382);
+  ctx.fillText('多视角：3D实物场景 + 电路剖面/俯视 + 电压表/图像记录',245,404);
+  const bx=535,base=322,bw=34,uh=Uout()/5*110,thh=th/5*110;
+  ctx.fillStyle='#e6edf5';ctx.fillRect(bx,base-110,bw,110);
+  ctx.fillStyle='#2c7be5';ctx.fillRect(bx,base-uh,bw,uh);
+  ctx.strokeStyle='#c92a2a';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(bx-8,base-thh);ctx.lineTo(bx+bw+8,base-thh);ctx.stroke();
+  ctx.fillStyle='#486581';ctx.font='11px system-ui';ctx.textAlign='center';ctx.fillText('Uout',bx+bw/2,340);ctx.fillText('红线=阈值',bx+78,base-thh+4);
+  history.push({u:Uout(),threshold:th}); if(history.length>130)history.shift();
+  const gx=610,gy=276,gw=124,gh=72;
+  ctx.strokeStyle='#d7e2ec';ctx.lineWidth=1;ctx.strokeRect(gx,gy,gw,gh);
+  ctx.fillStyle='#5b7083';ctx.font='11px system-ui';ctx.textAlign='left';ctx.fillText('图像记录',gx,gy-7);
+  ctx.strokeStyle='#c92a2a';ctx.lineWidth=1.5;ctx.beginPath();const ty=gy+gh-th/5*gh;ctx.moveTo(gx,ty);ctx.lineTo(gx+gw,ty);ctx.stroke();
+  ctx.strokeStyle='#2c7be5';ctx.lineWidth=2;ctx.beginPath();
+  history.forEach((p,i)=>{const px=gx+i/129*gw,py=gy+gh-p.u/5*gh;if(i)ctx.lineTo(px,py);else ctx.moveTo(px,py)});
+  ctx.stroke();
+  ctx.fillStyle='#2c7be5';ctx.fillText('Uout',gx+12,gy+14);
+  ctx.fillStyle='#c92a2a';ctx.fillText('阈值',gx+48,gy+14);
+}
+function draw(){
+  sync();ctx.clearRect(0,0,W,H);
+  drawStimulus();
+  roundRect(275,35,190,35,'#e7f5ff','#1c7ed6',cfg().name);
+  arrow(245,195,285,195,'#334e68');drawCircuit();drawOutput();
+}
+function pos(e){const r=cv.getBoundingClientRect(),s=cv.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s}}
+function setFromY(y){const sy=72,h=245;x=Math.max(0,Math.min(100,(sy+h-y)/h*100));inputr.value=x.toFixed(0)}
+cv.addEventListener('pointerdown',e=>{const p=pos(e);if(p.x>70&&p.x<245&&p.y>60&&p.y<330){drag=true;running=false;document.getElementById('play-btn').textContent='播放扫描';cv.setPointerCapture(e.pointerId);setFromY(p.y);draw()}});
+cv.addEventListener('pointermove',e=>{if(!drag)return;setFromY(pos(e).y);draw()});
+cv.addEventListener('pointerup',()=>drag=false);cv.addEventListener('pointercancel',()=>drag=false);
+document.querySelectorAll('[data-mode]').forEach(btn=>btn.addEventListener('click',()=>{mode=btn.dataset.mode;history=[];document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',b===btn));draw()}));
+inputr.oninput=e=>{x=parseFloat(e.target.value);draw()};
+thr.oninput=e=>{th=parseFloat(e.target.value);draw()};
+document.getElementById('play-btn').onclick=()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停扫描':'播放扫描';draw()};
+document.getElementById('reset-btn').onclick=()=>{mode='light';x=0;th=2.5;t=0;history=[];running=true;inputr.value=x;thr.value=th;document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode==='light'));document.getElementById('play-btn').textContent='暂停扫描';draw()};
+function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;if(running&&!drag){t+=dt;x=50+50*Math.sin(t*.9);inputr.value=x.toFixed(0)}draw();requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>验证机械能守恒</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 16px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 286px; gap: 14px; align-items: stretch; }
+  canvas { width: 100%; height: 470px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  input { width: 100%; }
+  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.72; font-size: 14px; }
+  .status { margin-top: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13px; line-height: 1.55; background: #e6fffa; color: #087f5b; font-weight: 700; }
+  .status.bad { background: #fff5f5; color: #c92a2a; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
+  @media (max-width: 780px) { .stage { grid-template-columns: 1fr; } canvas { height: 400px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="700" height="470" aria-label="验证机械能守恒实验"></canvas>
+    <section class="panel">
+      <label for="height">释放高度 h/m：<span id="heightVal"></span></label>
+      <input id="height" type="range" min="0.5" max="1.8" value="1.2" step="0.1">
+      <label for="mass">重物质量 m/kg：<span id="massVal"></span></label>
+      <input id="mass" type="range" min="0.05" max="0.30" value="0.10" step="0.01">
+      <label for="point">测量点 n：<span id="pointVal"></span></label>
+      <input id="point" type="range" min="5" max="13" value="8" step="1">
+      <label for="loss">阻力损失：<span id="lossVal"></span></label>
+      <input id="loss" type="range" min="0" max="12" value="2" step="1">
+      <div id="readout" class="readout"></div>
+      <div id="status" class="status"></div>
+      <div class="hint">观察任务：调大阻力损失，看 ΔEk 是否小于 ΔEp；移动测量点，看速度是由前后两点间距算出的。</div>
+    </section>
+  </div>
+</div>
+<script>
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const els = {
+  height: document.getElementById('height'),
+  mass: document.getElementById('mass'),
+  point: document.getElementById('point'),
+  loss: document.getElementById('loss'),
+  heightVal: document.getElementById('heightVal'),
+  massVal: document.getElementById('massVal'),
+  pointVal: document.getElementById('pointVal'),
+  lossVal: document.getElementById('lossVal'),
+  readout: document.getElementById('readout'),
+  status: document.getElementById('status')
+};
+const g = 9.8;
+const T = 0.04;
+function yAt(n, loss) {
+  return 0.5 * g * Math.pow(n * T, 2) * (1 - loss);
+}
+function drawBar(x, y, w, h, value, max, color, label) {
+  ctx.strokeStyle = '#d9e2ec';
+  ctx.fillStyle = '#f7f9fc';
+  ctx.fillRect(x, y, w, h);
+  ctx.strokeRect(x, y, w, h);
+  const bh = Math.max(0, Math.min(h, value / max * h));
+  ctx.fillStyle = color;
+  ctx.fillRect(x + 10, y + h - bh, w - 20, bh);
+  ctx.fillStyle = '#486581';
+  ctx.font = '700 13px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText(label, x + w / 2, y + h + 20);
+  ctx.fillStyle = color;
+  ctx.fillText(value.toFixed(3) + 'J', x + w / 2, y + h - bh - 8);
+}
+function drawGraph(x0, y0, w, h, m, loss) {
+  ctx.strokeStyle = '#334e68';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(x0, y0);
+  ctx.lineTo(x0 + w, y0);
+  ctx.moveTo(x0, y0);
+  ctx.lineTo(x0, y0 - h);
+  ctx.stroke();
+  ctx.fillStyle = '#486581';
+  ctx.font = '12px system-ui';
+  ctx.textAlign = 'left';
+  ctx.fillText('ΔEp', x0 + w + 6, y0 + 4);
+  ctx.fillText('ΔEk', x0 - 28, y0 - h - 4);
+  ctx.strokeStyle = '#829ab1';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(x0, y0);
+  ctx.lineTo(x0 + w, y0 - h);
+  ctx.stroke();
+  ctx.fillStyle = '#e03131';
+  for (let n = 5; n <= 13; n++) {
+    const y = yAt(n, loss);
+    const v = (yAt(n + 1, loss) - yAt(n - 1, loss)) / (2 * T);
+    const dep = m * g * y;
+    const dek = 0.5 * m * v * v;
+    const max = 0.9;
+    const px = x0 + Math.min(1, dep / max) * w;
+    const py = y0 - Math.min(1, dek / max) * h;
+    ctx.beginPath();
+    ctx.arc(px, py, 4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+function draw() {
+  const h = Number(els.height.value);
+  const m = Number(els.mass.value);
+  const n = Number(els.point.value);
+  const loss = Number(els.loss.value) / 100;
+  const yPrev = yAt(n - 1, loss);
+  const y = yAt(n, loss);
+  const yNext = yAt(n + 1, loss);
+  const v = (yNext - yPrev) / (2 * T);
+  const dep = m * g * y;
+  const dek = 0.5 * m * v * v;
+  const rel = dep > 0 ? Math.abs(dep - dek) / dep * 100 : 0;
+  const valid = yNext < h;
+  els.heightVal.textContent = h.toFixed(1);
+  els.massVal.textContent = m.toFixed(2);
+  els.pointVal.textContent = n;
+  els.lossVal.textContent = Math.round(loss * 100) + '%';
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 18px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('重物下落：用纸带速度验证 mgh 是否转化为 1/2mv²', 350, 30);
+
+  ctx.strokeStyle = '#334e68';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(78, 70);
+  ctx.lineTo(78, 420);
+  ctx.moveTo(58, 70);
+  ctx.lineTo(210, 70);
+  ctx.stroke();
+  ctx.fillStyle = '#eef4ff';
+  ctx.strokeStyle = '#2c7be5';
+  ctx.lineWidth = 2;
+  ctx.fillRect(98, 82, 78, 36);
+  ctx.strokeRect(98, 82, 78, 36);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '13px system-ui';
+  ctx.fillText('打点计时器', 137, 105);
+  ctx.strokeStyle = '#f0a500';
+  ctx.lineWidth = 8;
+  ctx.beginPath();
+  ctx.moveTo(137, 118);
+  ctx.lineTo(137, 418);
+  ctx.stroke();
+  const scale = 250 / h;
+  for (let i = 1; i <= 14; i++) {
+    const yy = 118 + yAt(i, loss) * scale;
+    if (yy > 418) continue;
+    ctx.fillStyle = i === n ? '#e03131' : '#102a43';
+    ctx.beginPath();
+    ctx.arc(137, yy, i === n ? 5 : 3.3, 0, Math.PI * 2);
+    ctx.fill();
+    if (i === n || i === n - 1 || i === n + 1) {
+      ctx.fillStyle = '#486581';
+      ctx.font = '11px system-ui';
+      ctx.textAlign = 'left';
+      ctx.fillText('点' + i, 150, yy + 4);
+    }
+  }
+  const massY = Math.min(388, 118 + y * scale);
+  ctx.fillStyle = '#ffe8cc';
+  ctx.strokeStyle = '#f08c00';
+  ctx.lineWidth = 2;
+  ctx.fillRect(190, massY - 22, 42, 44);
+  ctx.strokeRect(190, massY - 22, 42, 44);
+  ctx.fillStyle = '#e03131';
+  ctx.font = '700 13px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('v≈' + v.toFixed(2) + 'm/s', 211, massY - 34);
+  ctx.strokeStyle = '#2c7be5';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(260, 118);
+  ctx.lineTo(260, 118 + y * scale);
+  ctx.stroke();
+  ctx.fillStyle = '#2c7be5';
+  ctx.fillText('下落高度 y=' + y.toFixed(3) + 'm', 332, 130 + y * scale / 2);
+
+  const maxE = Math.max(dep, dek, 0.2);
+  drawBar(394, 105, 78, 190, dep, maxE, '#7b2cbf', 'ΔEp=mgy');
+  drawBar(500, 105, 78, 190, dek, maxE, '#2c7be5', 'ΔEk=1/2mv²');
+  drawGraph(410, 420, 210, 90, m, loss);
+  ctx.fillStyle = '#486581';
+  ctx.font = '13px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('灰线表示 ΔEk=ΔEp；红点越贴近灰线，实验越支持守恒。', 515, 320);
+
+  els.readout.innerHTML = [
+    `<div id="r1">纸带周期 T=${T.toFixed(2)}s，测点 n=${n}</div>`,
+    `<div id="r2">v_n≈(y_{n+1}-y_{n-1})/(2T)=${v.toFixed(2)}m/s</div>`,
+    `<div id="r3">ΔEp=mgy=${dep.toFixed(3)}J</div>`,
+    `<div id="r4">ΔEk=1/2mv²=${dek.toFixed(3)}J</div>`,
+    `<div id="r5">相对误差≈${rel.toFixed(1)}%</div>`
+  ].join('');
+  els.status.className = valid && rel < 5 ? 'status' : 'status bad';
+  els.status.textContent = !valid
+    ? '测点太低：前后点超过释放高度，应选更高释放点或更靠前的纸带点。'
+    : rel < 5
+      ? '通过：ΔEk 与 ΔEp 接近，说明阻力较小时机械能近似守恒。'
+      : '不通过：ΔEk 明显小于 ΔEp，阻力或纸带摩擦造成机械能损失。';
+}
+Object.values(els).forEach(el => {
+  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
+});
+draw();
+</script>
+</body>
+</html>

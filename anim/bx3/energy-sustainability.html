@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>能源与可持续发展实验台</title>
+<style>
+:root{--ink:#102a43;--line:#d9e2ec;--red:#e03131;--blue:#2c7be5;--gold:#f0a500;--green:#159a6b}
+*{box-sizing:border-box}
+body{margin:0;background:#f3f6fa;color:var(--ink);font-family:-apple-system,"PingFang SC",system-ui,sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:14px}
+h2{font-size:17px;margin:0 0 10px}
+.lab{display:grid;grid-template-columns:minmax(0,1fr)292px;gap:12px;align-items:start}
+.stage{background:#fff;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab;background:#fff}
+.panel{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px}
+.read{display:grid;gap:7px}
+.chip{background:#102a43;color:#eef4ff;border-radius:8px;padding:8px 10px;font-size:13px;line-height:1.45}
+.chip b{color:#ffd166}
+.hint{margin-top:10px;background:#fff7e6;border-left:3px solid var(--gold);border-radius:6px;padding:9px 11px;font-size:13px;color:#5a6b7b;line-height:1.55}
+.formula{margin-top:10px;border-top:1px solid var(--line);padding-top:10px;font-size:13px;color:#334e68;line-height:1.7}
+@media(max-width:820px){.lab{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2>能源结构：拖用电量、化石占比、效率，看可用能和排放</h2>
+  <div class="lab">
+    <div class="stage"><canvas id="cv" width="720" height="450"></canvas></div>
+    <section class="panel">
+      <div class="read">
+        <div class="chip">用电量 E用 = <b id="usev">100</b> kWh</div>
+        <div class="chip">化石能源占比 = <b id="fossilv">70</b>%</div>
+        <div class="chip">平均发电效率 = <b id="effv">40</b>%</div>
+        <div class="chip">一次能源输入 = <b id="inputv">250</b> kWh</div>
+        <div class="chip">废热/低品质能 = <b id="wastev">150</b> kWh</div>
+        <div class="chip">碳排估算 = <b id="co2v">56</b> kg CO₂</div>
+      </div>
+      <div class="hint"><b>观察任务</b>：拖化石占比，看同样用电量下碳排如何变化；拖效率，看总能量守恒但废热如何减少；拖用电量，看能源需求和排放同步放大；也可点“自动演示”看能源转型（化石占比下降、效率上升）过程中排放的变化趋势。</div>
+      <div class="hint" style="margin-top:8px"><button id="playBtn" style="font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;width:100%">▶ 自动演示（能源转型第 <b id="yearv">0</b> 年）</button></div>
+      <div class="formula"><b>公式绑定</b><br>输入 = 有用电能 ÷ 效率；废热 = 输入 − 有用电能。能量总量守恒（输入=电能+废热），但废热更难再利用，体现能量品质降低；排放 ≈ 用电量×化石占比×排放系数。</div>
+    </section>
+  </div>
+</div>
+<script>
+(function(){
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+let use=100,fossil=70,eff=40,drag=null,playing=false,year=0;
+const els={usev:id('usev'),fossilv:id('fossilv'),effv:id('effv'),inputv:id('inputv'),wastev:id('wastev'),co2v:id('co2v'),yearv:id('yearv')};
+function id(s){return document.getElementById(s)}
+function clamp(x,a,b){return Math.max(a,Math.min(b,x))}
+function input(){return use/(eff/100)}
+function waste(){return input()-use}
+function co2(){return use*(fossil/100)*0.8}
+function pos(e){const rc=cv.getBoundingClientRect(),s=cv.width/rc.width;return{x:(e.clientX-rc.left)*s,y:(e.clientY-rc.top)*s}}
+function knob(x,y,label,color){ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,11,0,7);ctx.fill();ctx.fillStyle=color;ctx.font='700 12px system-ui';ctx.textAlign='center';ctx.fillText(label,x,y-18)}
+function drawRail(y,x,t,label,color){ctx.strokeStyle='#ccd6e0';ctx.lineWidth=6;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(100,y);ctx.lineTo(340,y);ctx.stroke();knob(x,y,label,color)}
+function draw(){
+  ctx.clearRect(0,0,cv.width,cv.height);const bg=ctx.createLinearGradient(0,0,0,cv.height);bg.addColorStop(0,'#f8fbff');bg.addColorStop(1,'#edf3f8');ctx.fillStyle=bg;ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.strokeStyle='rgba(16,42,67,.06)';for(let x=0;x<cv.width;x+=36){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,cv.height);ctx.stroke()}for(let y=0;y<cv.height;y+=36){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(cv.width,y);ctx.stroke()}
+  const ux=100+(use-20)/180*240,fx=100+fossil/100*240,ex=100+(eff-20)/60*240;drawRail(340,ux,0,'用电量','#2c7be5');drawRail(375,fx,0,'化石占比','#e03131');drawRail(410,ex,0,'效率','#159a6b');
+  const x0=420,base=330,scale=230/Math.max(input(),260);[['一次输入',input(),'#8aa0b6'],['有用电能',use,'#2c7be5'],['废热',waste(),'#f0a500'],['CO₂×2',co2()*2,'#e03131']].forEach(([lab,val,col],i)=>{const h=val*scale,x=x0+i*62;ctx.fillStyle=col;ctx.fillRect(x,base-h,38,h);ctx.fillStyle='#334e68';ctx.font='11px system-ui';ctx.textAlign='center';ctx.fillText(lab,x+19,base+18);ctx.fillText(val.toFixed(0),x+19,base-h-8)});
+  ctx.fillStyle='#102a43';ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillText(`能量守恒：输入 ${input().toFixed(0)} = 有用电能 ${use.toFixed(0)} + 废热 ${waste().toFixed(0)} kWh`,24,34);
+  ctx.fillText(`化石占比 ${fossil.toFixed(0)}%，估算排放 ${co2().toFixed(0)} kg CO₂；可再生占比越高，排放越低`,24,54);
+  update();
+}
+function update(){els.usev.textContent=use.toFixed(0);els.fossilv.textContent=fossil.toFixed(0);els.effv.textContent=eff.toFixed(0);els.inputv.textContent=input().toFixed(0);els.wastev.textContent=waste().toFixed(0);els.co2v.textContent=co2().toFixed(0);els.yearv.textContent=year.toFixed(0)}
+cv.addEventListener('pointerdown',e=>{stopPlay();const p=pos(e);const targets=[['use',100+(use-20)/180*240,340],['fossil',100+fossil/100*240,375],['eff',100+(eff-20)/60*240,410]];for(const t of targets)if(Math.hypot(p.x-t[1],p.y-t[2])<24){drag=t[0];return}});
+cv.addEventListener('pointermove',e=>{if(!drag)return;const p=pos(e),x=clamp(p.x,100,340);if(drag==='use')use=20+(x-100)/240*180;if(drag==='fossil')fossil=(x-100)/240*100;if(drag==='eff')eff=20+(x-100)/240*60;draw()});
+window.addEventListener('pointerup',()=>drag=null);
+function stopPlay(){playing=false;id('playBtn').textContent='▶ 自动演示（能源转型第 '+year.toFixed(0)+' 年）'}
+function animate(){
+  if(!playing)return;
+  year+=0.2;
+  fossil=Math.max(20,fossil-0.25);
+  eff=Math.min(55,eff+0.12);
+  draw();
+  if(fossil<=20&&eff>=55){playing=false;id('playBtn').textContent='▶ 自动演示（能源转型第 '+year.toFixed(0)+' 年，已达目标）';return}
+  requestAnimationFrame(animate);
+}
+id('playBtn').onclick=()=>{
+  if(playing){stopPlay();return}
+  if(fossil<=20&&eff>=55){year=0;fossil=70;eff=40;use=100}
+  playing=true;id('playBtn').textContent='⏸ 暂停演示';animate();
+};
+draw();
+})();
+</script>
+</body>
+</html>

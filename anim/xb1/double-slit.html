@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>光的双缝干涉</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#eef2f7;color:#102a43}
+.wrap{padding:12px}
+h2{font-size:16px;margin:0 0 8px}
+canvas{display:block;width:100%;max-width:720px;background:#07101d;border-radius:12px;box-shadow:0 2px 10px rgba(16,42,67,.12);touch-action:none;cursor:grab}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.chip{background:#102a43;color:#e6eef7;padding:6px 11px;border-radius:8px;font-size:13px}
+.chip b{color:#ffd166}
+.ctrls{display:flex;flex-wrap:wrap;gap:12px;margin:8px 0;align-items:center}
+.ctrls label{display:flex;flex-direction:column;gap:2px;font-size:12px;color:#334e68}
+.ctrls input[type=range]{width:120px;accent-color:#2c7be5}
+.btn{font:inherit;font-size:13px;padding:6px 12px;border:1px solid #b0bcc9;background:#fff;border-radius:8px;cursor:pointer}
+.btn:hover{background:#eef2f7}
+.btn.on{background:#2c7be5;color:#fff;border-color:#2c7be5}
+.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:9px 12px;border-radius:6px;font-size:13px;color:#5a6b7b;line-height:1.5;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2>光的双缝干涉：条纹间距 Δx = Lλ/d</h2>
+  <canvas id="cv" width="720" height="420"></canvas>
+  <div class="chips">
+    <span class="chip">波长 λ = <b id="lam">550</b> nm</span>
+    <span class="chip">双缝间距 d = <b id="dw">0.20</b> mm</span>
+    <span class="chip">缝到屏 L = <b id="Lv">1.0</b> m</span>
+    <span class="chip">条纹间距 Δx = <b id="dx">—</b> mm</span>
+  </div>
+  <div class="ctrls">
+    <button class="btn on" id="play">⏸ 暂停</button>
+    <button class="btn" id="reset">重置</button>
+    <label>波长 λ = <span id="ll">550</span> nm<input type="range" id="lamr" min="400" max="700" step="10" value="550"></label>
+    <label>双缝间距 d = <span id="dl">0.20</span> mm<input type="range" id="dr" min="0.10" max="0.50" step="0.02" value="0.20"></label>
+    <label>缝到屏 L = <span id="Ll">1.0</span> m<input type="range" id="Lr" min="0.5" max="2.0" step="0.1" value="1.0"></label>
+    <span style="font-size:13px;color:#5a6b7b">或拖双缝/屏幕</span>
+  </div>
+  <div class="hint"><b>怎么玩</b>：单色光过双缝后，两列<b>相干圆形波</b>持续向右传播、相互叠加（播放时波前在动），在屏上形成<b>等间距</b>的明暗条纹。青色亮纹处两波<b>路程差 Δr=kλ</b>（同相加强），暗纹处 <b>Δr=(k+½)λ</b>（反相抵消）。拖<b>两条缝</b>改变 d：缝距越大条纹越<b>窄</b>；拖<b>右侧屏幕</b>改变 L：屏越远条纹越宽；拖<b>λ</b>变大（偏红）条纹也变宽。始终满足 Δx=Lλ/d，右侧标尺读出 Δx。</div>
+</div>
+<script>
+(function(){
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+let lam=550,d=0.20,L=1.0,t=0,playing=true;
+const plateX=180,cy=H/2;
+function screenX(){return 440+(L-0.5)*120;}
+function wlColor(l){let r,g,b;if(l<440){r=.3;g=0;b=1;}else if(l<490){r=0;g=(l-440)/50;b=1;}else if(l<510){r=0;g=1;b=1-(l-490)/20;}else if(l<580){r=(l-510)/70;g=1;b=0;}else if(l<645){r=1;g=1-(l-580)/65;b=0;}else{r=1;g=0;b=0;}return[r*255|0,g*255|0,b*255|0];}
+function dxMM(){return L*(lam*1e-9)/(d*1e-3)*1000;}
+function render(){
+  ctx.fillStyle='#07101d';ctx.fillRect(0,0,W,H);
+  const col=wlColor(lam);
+  const scrX=screenX();
+  const sy=Math.max(24,d*160), s1=cy-sy, s2=cy+sy; // slit positions (visual sep ∝ d)
+  // interference field between plate and screen (compute intensity on coarse grid)
+  const step=4;
+  for(let y=20;y<H-20;y+=step)for(let x=plateX+8;x<scrX;x+=step){
+    const r1=Math.hypot(x-plateX,y-s1),r2=Math.hypot(x-plateX,y-s2);
+    const kk=2*Math.PI/(lam/12);
+    const amp=Math.cos(kk*r1-t*6)+Math.cos(kk*r2-t*6);
+    const I=amp*amp/4; // 0..1
+    ctx.fillStyle='rgba('+col[0]+','+col[1]+','+col[2]+','+(I*0.5)+')';
+    ctx.fillRect(x,y,step,step);
+  }
+  // 双缝辉光真实感（两个相干点源）
+  for(const sy2 of [s1,s2]){const gg=ctx.createRadialGradient(plateX,sy2,1,plateX,sy2,50);gg.addColorStop(0,'rgba('+col[0]+','+col[1]+','+col[2]+',0.6)');gg.addColorStop(1,'rgba('+col[0]+','+col[1]+','+col[2]+',0)');ctx.fillStyle=gg;ctx.beginPath();ctx.arc(plateX,sy2,50,0,7);ctx.fill();}
+  // plate with two slits
+  ctx.fillStyle='#2b3a4d';ctx.fillRect(plateX-6,20,12,(s1-5)-20);ctx.fillRect(plateX-6,s1+5,12,(s2-5)-(s1+5));ctx.fillRect(plateX-6,s2+5,12,(H-20)-(s2+5));
+  ctx.fillStyle='#ff6a56';ctx.font='11px system-ui';ctx.textAlign='center';ctx.fillText('双缝',plateX,16);ctx.fillText('d',plateX-16,cy+3);
+  ctx.strokeStyle='#ffb703';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(plateX,cy);ctx.lineTo(plateX,cy-sy);ctx.moveTo(plateX-10,cy);ctx.lineTo(plateX+10,cy);ctx.moveTo(plateX-10,cy-sy);ctx.lineTo(plateX+10,cy-sy);ctx.stroke();
+  ctx.strokeStyle='#8ecae6';ctx.beginPath();ctx.moveTo(plateX,H-36);ctx.lineTo(scrX,H-36);ctx.moveTo(plateX,H-42);ctx.lineTo(plateX,H-30);ctx.moveTo(scrX,H-42);ctx.lineTo(scrX,H-30);ctx.stroke();
+  ctx.fillStyle='#8ecae6';ctx.fillText('L',plateX+(scrX-plateX)/2,H-42);
+  // incoming light
+  ctx.strokeStyle='rgba('+col[0]+','+col[1]+','+col[2]+',0.5)';ctx.lineWidth=2;
+  for(let x=plateX-20;x>10;x-=lam/12){const xx=x-((t*40)%(lam/12));if(xx>6){ctx.beginPath();ctx.moveTo(xx,40);ctx.lineTo(xx,H-40);ctx.stroke();}}
+  // screen intensity strip: I ∝ cos^2(π y d /(λL)) -> visual via dx
+  const scale=26/Math.max(0.05,dxMM());
+  for(let y=20;y<H-20;y++){const ymm=(y-cy)/scale;const beta=Math.PI*ymm/Math.max(0.001,dxMM());const I=Math.cos(beta)*Math.cos(beta);ctx.fillStyle='rgba('+col[0]+','+col[1]+','+col[2]+','+I+')';ctx.fillRect(scrX,y,90,1);}
+  ctx.fillStyle='#5a7a99';ctx.font='11px system-ui';ctx.textAlign='center';ctx.fillText('屏',scrX+45,16);
+  // Δx ruler (one fringe)
+  ctx.strokeStyle='#fff';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(scrX+92,cy);ctx.lineTo(scrX+92,cy-26);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(scrX+88,cy);ctx.lineTo(scrX+96,cy);ctx.moveTo(scrX+88,cy-26);ctx.lineTo(scrX+96,cy-26);ctx.stroke();
+  ctx.fillStyle='#e6eef7';ctx.textAlign='left';ctx.fillText('Δx',scrX+98,cy-13);
+  // formula
+  ctx.fillStyle='#e6eef7';ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillText('Δx = Lλ/d = '+dxMM().toFixed(2)+' mm',18,H-14);
+  document.getElementById('lam').textContent=lam;document.getElementById('dw').textContent=d.toFixed(2);
+  document.getElementById('Lv').textContent=L.toFixed(1);document.getElementById('dx').textContent=dxMM().toFixed(2);
+}
+let dragSlit=false,dragScreen=false;
+function pos(e){const r=cv.getBoundingClientRect(),s=cv.width/r.width;return{x:((e.touches?e.touches[0].clientX:e.clientX)-r.left)*s,y:((e.touches?e.touches[0].clientY:e.clientY)-r.top)*s};}
+cv.addEventListener('pointerdown',e=>{const p=pos(e);const scrX=screenX();if(Math.abs(p.x-scrX)<36){dragScreen=true;cv.setPointerCapture(e.pointerId);}else if(Math.abs(p.x-plateX)<26){dragSlit=true;cv.setPointerCapture(e.pointerId);}});
+cv.addEventListener('pointermove',e=>{if(!dragSlit&&!dragScreen)return;const p=pos(e);if(dragSlit){d=Math.max(0.10,Math.min(0.50,Math.abs(p.y-cy)/160));document.getElementById('dr').value=d;document.getElementById('dl').textContent=d.toFixed(2);}else{L=Math.max(0.5,Math.min(2.0,(p.x-440)/120+0.5));L=Math.round(L*10)/10;document.getElementById('Lr').value=L;document.getElementById('Ll').textContent=L.toFixed(1);}});
+window.addEventListener('pointerup',()=>{dragSlit=false;dragScreen=false;});
+document.getElementById('play').onclick=function(){playing=!playing;this.classList.toggle('on',playing);this.textContent=playing?'⏸ 暂停':'▶ 播放';};
+document.getElementById('reset').onclick=function(){t=0;lam=550;d=0.20;L=1.0;document.getElementById('lamr').value=550;document.getElementById('dr').value=0.20;document.getElementById('Lr').value=1.0;document.getElementById('ll').textContent=550;document.getElementById('dl').textContent='0.20';document.getElementById('Ll').textContent='1.0';};
+document.getElementById('lamr').addEventListener('input',e=>{lam=parseInt(e.target.value);document.getElementById('ll').textContent=lam;});
+document.getElementById('dr').addEventListener('input',e=>{d=parseFloat(e.target.value);document.getElementById('dl').textContent=d.toFixed(2);});
+document.getElementById('Lr').addEventListener('input',e=>{L=parseFloat(e.target.value);document.getElementById('Ll').textContent=L.toFixed(1);});
+let last=performance.now();
+function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;if(playing)t+=dt;render();requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

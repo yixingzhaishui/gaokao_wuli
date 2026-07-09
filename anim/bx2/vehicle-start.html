@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>机车启动实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#edf3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px;min-height:560px}
+  .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;touch-action:none}
+  .panel{display:flex;flex-direction:column;gap:8px}
+  .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
+  .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.45}
+  .title{font-weight:800;margin-bottom:5px;color:#0f172a}
+  .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:31px;cursor:pointer;color:#102a43}
+  button:hover{background:#f1f5f9}
+  button.active,.primary{background:#2563eb;color:#fff;border-color:#2563eb;font-weight:800}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:48px}
+  .meter span{display:block;font-size:11px;color:#b6c5d8}
+  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:15px;font-variant-numeric:tabular-nums}
+  .formula{display:grid;gap:5px;font-size:13px;color:#334155}
+  .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
+  .formula div:last-child{border-bottom:0;padding-bottom:0}
+  .small{font-size:12px;line-height:1.5;color:#475569}
+  .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
+  .status.warn{border-color:#f59e0b;background:#fff7ed;color:#92400e}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="机车启动交互实验台"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>拖 F-v 图像上的黑点或车下速度端点，看恒功率时 F、a 如何变小；切换恒牵引力，找 v1 后怎样进入恒功率。</div>
+    <button id="playBtn" class="primary">播放</button>
+    <div class="card">
+      <div class="title">启动方式</div>
+      <div class="chips"><button data-mode="power">恒功率</button><button data-mode="force">先恒牵引力</button></div>
+    </div>
+    <div class="card">
+      <div class="title">快速情境</div>
+      <div class="chips">
+        <button data-case="nearMax">接近最大</button>
+        <button data-case="highDrag">阻力增大</button>
+        <button data-case="beforeV1">临界前</button>
+        <button data-case="afterV1">临界后</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="title">实时读数</div>
+      <div class="readout">
+        <div class="meter"><span>牵引力 F</span><b id="forceText">7500 N</b></div>
+        <div class="meter"><span>输出功率 P</span><b id="powerText">60.0 kW</b></div>
+        <div class="meter"><span>加速度 a</span><b id="accText">4.58 m/s²</b></div>
+        <div class="meter"><span>最大速度</span><b id="vmaxText">30.0 m/s</b></div>
+        <div class="meter"><span>临界速度 v1</span><b id="v1Text">12.0 m/s</b></div>
+        <div class="meter"><span>当前速度 v</span><b id="speedText">8.0 m/s</b></div>
+      </div>
+    </div>
+    <div class="card formula">
+      <div><span>功率</span><b>P=Fv</b></div>
+      <div><span>动力学</span><b>F-f=ma</b></div>
+      <div><span>最大速度</span><b>vmax=P额/f</b></div>
+    </div>
+    <div class="card small"><b>可直接操作：</b>拖 F-v 图当前点或速度端点改 v；底部手柄可改 P额、f、m、F0、v。多视角：左侧是 F-v 图像记录，右侧/下方是侧视机车、速度端点和实时读数。</div>
+    <div class="status" id="status">恒功率阶段：v 变大使 F=P/v 变小，合力和加速度逐渐减小。</div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+  const state={mode:'power',Pr:60000,f:2000,m:1200,F0:5000,v:8,running:false,phase:0,drag:null};
+  const els={force:document.getElementById('forceText'),power:document.getElementById('powerText'),acc:document.getElementById('accText'),vmax:document.getElementById('vmaxText'),v1:document.getElementById('v1Text'),speed:document.getElementById('speedText'),status:document.getElementById('status'),play:document.getElementById('playBtn')};
+  const colors={red:'#dc2626',blue:'#2563eb',purple:'#7c3aed',green:'#0f766e',orange:'#f59e0b',ink:'#102a43'};
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  const fmt=(v,d=1)=>Math.abs(v)<1e-8?(0).toFixed(d):v.toFixed(d);
+  function calc(){
+    const vmax=state.Pr/state.f,v1=state.Pr/state.F0;
+    let F,Pout,stage;
+    if(state.mode==='power'){F=state.Pr/Math.max(state.v,.5);Pout=state.Pr;stage='恒功率阶段'}
+    else if(state.v<=v1){F=state.F0;Pout=state.F0*state.v;stage='恒牵引力匀加速阶段'}
+    else{F=state.Pr/Math.max(state.v,.5);Pout=state.Pr;stage='达到额定功率后的变加速阶段'}
+    const a=(F-state.f)/state.m;
+    return{vmax,v1,F,Pout,stage,a};
+  }
+  function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){ctx.fillStyle=c;ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+  function line(x1,y1,x2,y2,c='#94a3b8',w=2,dash){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
+  function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore()}
+  function roundRect(x,y,w,h,r,fill,stroke){ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}ctx.restore()}
+  function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-36,c,'center',12,'900')}
+  function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-20,active?'#92400e':c,'center',12,'900');ctx.restore()}
+  function axisGeom(r){const left=76,bottom=420,right=474,top=95,maxV=Math.max(40,r.vmax*1.18,r.v1*1.25),maxF=Math.max(state.F0,state.Pr/1,state.f)*1.08;return{left,bottom,right,top,maxV,maxF,px:left+state.v/maxV*(right-left),py:bottom-r.F/maxF*(bottom-top),yf:bottom-state.f/maxF*(bottom-top),xmax:left+r.vmax/maxV*(right-left),xv1:left+r.v1/maxV*(right-left)}}
+  function carGeom(){return{base:{x:680+(state.running?34*Math.sin(state.phase):0),y:246},vTip:{x:680+state.v*6,y:326}}}
+  function handles(){return{P:{x:82+(state.Pr/1000-20)/140*130,y:494},f:{x:250+(state.f-500)/5500*130,y:494},m:{x:418+(state.m-600)/2400*130,y:494},F0:{x:586+(state.F0-2500)/9500*130,y:494},v:{x:754+state.v/40*130,y:494}}}
+  function point(x,y,c,label,active){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-20,c,'center',12,'900');ctx.restore()}
+  function drawGraph(r){
+    roundRect(42,58,480,382,8,'#fff','#d7dee8');text('F-v 图：当前点、阻力线与最大速度',282,88,'#0f172a','center',16,'900');
+    const g=axisGeom(r);line(g.left,g.bottom,g.right,g.bottom,'#475569',1.5);line(g.left,g.bottom,g.left,g.top,'#475569',1.5);text('v',g.right+12,g.bottom+14,'#475569','left',12,'900');text('F',g.left-18,g.top,'#475569','center',12,'900');
+    ctx.strokeStyle=colors.red;ctx.lineWidth=2.7;ctx.beginPath();
+    if(state.mode==='force'){const yF0=g.bottom-state.F0/g.maxF*(g.bottom-g.top);ctx.moveTo(g.left,yF0);ctx.lineTo(g.xv1,yF0);for(let i=0;i<=100;i++){const v=r.v1+(g.maxV-r.v1)*i/100,x=g.left+v/g.maxV*(g.right-g.left),y=g.bottom-(state.Pr/Math.max(v,.5))/g.maxF*(g.bottom-g.top);ctx.lineTo(x,y)}}
+    else{for(let i=0;i<=120;i++){const v=1+(g.maxV-1)*i/120,x=g.left+v/g.maxV*(g.right-g.left),y=g.bottom-(state.Pr/v)/g.maxF*(g.bottom-g.top);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}}
+    ctx.stroke();
+    line(g.left,g.yf,g.right,g.yf,colors.purple,2,[6,5]);text('F=f',g.right-26,g.yf-14,colors.purple,'center',12,'900');
+    line(g.xmax,g.bottom,g.xmax,g.top,colors.green,1.6,[4,4]);text('vmax',g.xmax,g.top+16,colors.green,'center',12,'900');
+    if(state.mode==='force'){line(g.xv1,g.bottom,g.xv1,g.top,colors.orange,1.6,[4,4]);text('v1',g.xv1,g.top+34,colors.orange,'center',12,'900')}
+    ctx.fillStyle='#0f172a';ctx.beginPath();ctx.arc(g.px,g.py,7,0,Math.PI*2);ctx.fill();point(g.px,g.py,'#0f172a','拖 v',state.drag==='graph');
+    text(`F=${fmt(r.F,0)}N, a=${fmt(r.a,2)}m/s²`,282,426,r.a>.03?colors.green:colors.orange,'center',14,'900');
+  }
+  function drawCar(r){
+    roundRect(552,58,320,382,8,'#fff','#d7dee8');text('车辆受力与速度',712,88,'#0f172a','center',16,'900');
+    const g=carGeom(),roadY=g.base.y+62;line(590,roadY,838,roadY,'#334155',3);
+    roundRect(g.base.x-46,g.base.y-22,92,42,7,'#dbeafe','#334155');ctx.fillStyle='#0f172a';ctx.beginPath();ctx.arc(g.base.x-25,g.base.y+22,8,0,Math.PI*2);ctx.arc(g.base.x+28,g.base.y+22,8,0,Math.PI*2);ctx.fill();text('车',g.base.x,g.base.y,'#0f172a','center',13,'900');
+    arrow(g.base.x+50,g.base.y-12,g.base.x+50+Math.min(130,28+r.F/85),g.base.y-12,colors.red,3);text('F牵',g.base.x+114,g.base.y-32,colors.red,'center',12,'900');
+    arrow(g.base.x-50,g.base.y,g.base.x-50-Math.min(100,24+state.f/80),g.base.y,colors.purple,3);text('f',g.base.x-104,g.base.y-20,colors.purple,'center',12,'900');
+    arrow(g.base.x-5,g.base.y+80,g.vTip.x,g.vTip.y,colors.blue,3);point(g.vTip.x,g.vTip.y,colors.blue,'v',state.drag==='vtip');text(`v=${fmt(state.v,1)}m/s`,g.base.x+56,g.base.y+106,colors.blue,'center',12,'900');
+    roundRect(592,360,240,50,8,r.a>.03?'#ecfdf5':'#fff7ed',r.a>.03?'#14b8a6':'#f59e0b');text(r.stage,712,380,r.a>.03?colors.green:colors.orange,'center',13,'900');text(`P=${fmt(r.Pout/1000,1)}kW`,712,402,'#475569','center',12,'900');
+  }
+  function bottom(){const h=handles();roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(82,494,212,'P额',colors.red);handle(h.P.x,h.P.y,`${fmt(state.Pr/1000,0)}kW`,state.drag==='P',colors.red);ruler(250,494,380,'f',colors.purple);handle(h.f.x,h.f.y,`${fmt(state.f/1000,1)}kN`,state.drag==='f',colors.purple);ruler(418,494,548,'m',colors.green);handle(h.m.x,h.m.y,`${fmt(state.m,0)}`,state.drag==='m',colors.green);ruler(586,494,716,'F0',colors.orange);handle(h.F0.x,h.F0.y,`${fmt(state.F0/1000,1)}kN`,state.drag==='F0',colors.orange);ruler(754,494,884,'v',colors.blue);handle(h.v.x,h.v.y,`${fmt(state.v,1)}`,state.drag==='vbar',colors.blue)}
+  function update(r){
+    els.force.textContent=`${fmt(r.F,0)} N`;els.power.textContent=`${fmt(r.Pout/1000,1)} kW`;els.acc.textContent=`${fmt(r.a,2)} m/s²`;els.vmax.textContent=`${fmt(r.vmax,1)} m/s`;els.v1.textContent=`${fmt(r.v1,1)} m/s`;els.speed.textContent=`${fmt(state.v,1)} m/s`;els.play.textContent=state.running?'暂停':'播放';
+    document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===state.mode));
+    els.status.classList.toggle('warn',state.v>=r.vmax*.95||r.a<=.08);
+    els.status.textContent=state.v>=r.vmax*.95||r.a<=.08?'接近最大速度：F≈f，合力接近 0，加速度接近 0。':(state.mode==='force'&&state.v<=r.v1?'恒牵引力阶段：F 不变，a 不变；P=Fv 正在增大。':'恒功率阶段：v 变大使 F=P/v 变小，合力和加速度逐渐减小。');
+  }
+  function draw(){const r=calc();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('机车启动实验台：功率限制牵引力，合力决定加速度',460,30,'#0f172a','center',19,'900');drawGraph(r);drawCar(r);bottom();update(r)}
+  function pos(e){const b=canvas.getBoundingClientRect();return{x:(e.clientX-b.left)*canvas.width/b.width,y:(e.clientY-b.top)*canvas.height/b.height}}
+  function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+  function pointerDown(e){const p=pos(e),r=calc(),ag=axisGeom(r),cg=carGeom(),h=handles();if(near(p,{x:ag.px,y:ag.py},28))state.drag='graph';else if(near(p,cg.vTip,28))state.drag='vtip';else if(near(p,h.P,26))state.drag='P';else if(near(p,h.f,26))state.drag='f';else if(near(p,h.m,26))state.drag='m';else if(near(p,h.F0,26))state.drag='F0';else if(near(p,h.v,26))state.drag='vbar';else state.drag=null;if(state.drag){state.running=false;canvas.setPointerCapture(e.pointerId);pointerMove(e)}}
+  function pointerMove(e){if(!state.drag)return;const p=pos(e),r=calc(),ag=axisGeom(r),cg=carGeom();if(state.drag==='graph')state.v=clamp((p.x-ag.left)/(ag.right-ag.left)*ag.maxV,1,Math.min(40,r.vmax*1.08));if(state.drag==='vtip')state.v=clamp((p.x-(cg.base.x-5))/6,1,40);if(state.drag==='P')state.Pr=clamp((20+(p.x-82)/130*140)*1000,20000,160000);if(state.drag==='f')state.f=clamp(500+(p.x-250)/130*5500,500,6000);if(state.drag==='m')state.m=clamp(600+(p.x-418)/130*2400,600,3000);if(state.drag==='F0')state.F0=clamp(2500+(p.x-586)/130*9500,2500,12000);if(state.drag==='vbar')state.v=clamp((p.x-754)/130*40,1,40);draw()}
+  function pointerUp(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
+  canvas.addEventListener('pointerdown',pointerDown);canvas.addEventListener('pointermove',pointerMove);canvas.addEventListener('pointerup',pointerUp);canvas.addEventListener('pointercancel',pointerUp);
+  els.play.addEventListener('click',()=>{state.running=!state.running;draw()});
+  document.querySelectorAll('[data-mode]').forEach(btn=>btn.addEventListener('click',()=>{state.mode=btn.dataset.mode;state.running=false;draw()}));
+  document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='nearMax'){state.mode='power';state.Pr=60000;state.f=2000;state.v=29}if(c==='highDrag'){state.mode='power';state.Pr=60000;state.f=4000;state.v=12}if(c==='beforeV1'){state.mode='force';state.Pr=60000;state.F0=6000;state.f=2000;state.v=6}if(c==='afterV1'){state.mode='force';state.Pr=60000;state.F0=6000;state.f=2000;state.v=16}state.running=false;draw()}));
+  function tick(){if(state.running){const r=calc();state.v=clamp(state.v+Math.max(0,r.a)*.045,1,r.vmax);state.phase=(state.phase+.04)%(Math.PI*2)}draw();requestAnimationFrame(tick)}
+  draw();requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

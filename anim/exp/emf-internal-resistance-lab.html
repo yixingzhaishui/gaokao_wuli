@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>测电源电动势和内阻</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 16px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 286px; gap: 14px; align-items: stretch; }
+  canvas { width: 100%; height: 470px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  input { width: 100%; }
+  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.72; font-size: 14px; }
+  .status { margin-top: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13px; line-height: 1.55; background: #e6fffa; color: #087f5b; font-weight: 700; }
+  .status.bad { background: #fff5f5; color: #c92a2a; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
+  @media (max-width: 780px) { .stage { grid-template-columns: 1fr; } canvas { height: 400px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="700" height="470" aria-label="测电源电动势和内阻实验"></canvas>
+    <section class="panel">
+      <label for="emf">电动势 E/V：<span id="emfVal"></span></label>
+      <input id="emf" type="range" min="1.0" max="6.0" value="3.0" step="0.1">
+      <label for="inner">内阻 r/Ω：<span id="innerVal"></span></label>
+      <input id="inner" type="range" min="0.2" max="3.0" value="1.0" step="0.1">
+      <label for="outer">外阻 R/Ω：<span id="outerVal"></span></label>
+      <input id="outer" type="range" min="1" max="20" value="5" step="0.5">
+      <label for="spread">测量组数：<span id="spreadVal"></span></label>
+      <input id="spread" type="range" min="3" max="8" value="6" step="1">
+      <label for="error">电压表读数误差：<span id="errorVal"></span></label>
+      <input id="error" type="range" min="-6" max="6" value="1" step="1">
+      <div id="readout" class="readout"></div>
+      <div id="status" class="status"></div>
+      <div class="hint">观察任务：改变外阻 R，观察 U-I 点沿直线移动；看纵截距和斜率如何读出 E、r。</div>
+    </section>
+  </div>
+</div>
+<script>
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const els = {
+  emf: document.getElementById('emf'),
+  inner: document.getElementById('inner'),
+  outer: document.getElementById('outer'),
+  spread: document.getElementById('spread'),
+  error: document.getElementById('error'),
+  emfVal: document.getElementById('emfVal'),
+  innerVal: document.getElementById('innerVal'),
+  outerVal: document.getElementById('outerVal'),
+  spreadVal: document.getElementById('spreadVal'),
+  errorVal: document.getElementById('errorVal'),
+  readout: document.getElementById('readout'),
+  status: document.getElementById('status')
+};
+function calc(E, r, R, err) {
+  const I = E / (R + r);
+  const U = I * R;
+  return { I, U, Uread: U * (1 + err) };
+}
+function line(x1,y1,x2,y2,color,w=3) {
+  ctx.strokeStyle = color || '#334e68';
+  ctx.lineWidth = w;
+  ctx.beginPath();
+  ctx.moveTo(x1,y1);
+  ctx.lineTo(x2,y2);
+  ctx.stroke();
+}
+function meter(x,y,label,value) {
+  ctx.fillStyle = '#eef4ff';
+  ctx.strokeStyle = '#2c7be5';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(x,y,34,0,Math.PI*2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 15px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText(label,x,y-6);
+  ctx.font = '12px system-ui';
+  ctx.fillText(value,x,y+14);
+}
+function draw() {
+  const E = Number(els.emf.value);
+  const r = Number(els.inner.value);
+  const R = Number(els.outer.value);
+  const n = Number(els.spread.value);
+  const err = Number(els.error.value) / 100;
+  const q = calc(E, r, R, err);
+  const Imax = E / r;
+  els.emfVal.textContent = E.toFixed(1);
+  els.innerVal.textContent = r.toFixed(1);
+  els.outerVal.textContent = R.toFixed(1);
+  els.spreadVal.textContent = n;
+  els.errorVal.textContent = Math.round(err*100) + '%';
+
+  ctx.clearRect(0,0,c.width,c.height);
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0,0,c.width,c.height);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 18px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('U-I 图像法：纵截距为 E，斜率绝对值为内阻 r', 350, 30);
+
+  line(78,238,150,238);
+  meter(190,238,'A',q.I.toFixed(3)+'A');
+  line(224,238,330,238);
+  ctx.fillStyle = '#f7f9fc';
+  ctx.strokeStyle = '#334e68';
+  ctx.lineWidth = 2;
+  ctx.fillRect(330,214,132,48);
+  ctx.strokeRect(330,214,132,48);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 13px system-ui';
+  ctx.fillText('滑动变阻器 R',396,243);
+  line(462,238,612,238);
+  line(612,238,612,330);
+  line(612,330,78,330);
+  line(78,330,78,238);
+  ctx.fillStyle = '#fff7e6';
+  ctx.strokeStyle = '#f08c00';
+  ctx.fillRect(116,306,108,48);
+  ctx.strokeRect(116,306,108,48);
+  ctx.fillStyle = '#102a43';
+  ctx.fillText('电源 E, r',170,335);
+  meter(396,142,'V',q.Uread.toFixed(2)+'V');
+  line(342,214,374,172,'#2c7be5',2);
+  line(450,214,418,172,'#2c7be5',2);
+
+  const gx = 430, gy = 410, gw = 210, gh = 245;
+  ctx.strokeStyle = '#334e68';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(gx,gy);
+  ctx.lineTo(gx+gw,gy);
+  ctx.moveTo(gx,gy);
+  ctx.lineTo(gx,gy-gh);
+  ctx.stroke();
+  ctx.strokeStyle = '#38b2ac';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(gx,gy - E/E*gh);
+  ctx.lineTo(gx + Math.min(1, Imax/Math.max(1,Imax))*gw, gy);
+  ctx.stroke();
+  ctx.fillStyle = '#e03131';
+  for (let i=0;i<n;i++) {
+    const Ri = 2 + i * 18 / Math.max(1,n-1);
+    const qi = calc(E,r,Ri,err);
+    const px = gx + Math.min(1, qi.I / Imax) * gw;
+    const py = gy - Math.min(1, qi.Uread / E) * gh;
+    ctx.beginPath();
+    ctx.arc(px,py,4,0,Math.PI*2);
+    ctx.fill();
+  }
+  ctx.fillStyle = '#7b2cbf';
+  ctx.beginPath();
+  ctx.arc(gx + Math.min(1, q.I/Imax)*gw, gy - Math.min(1, q.Uread/E)*gh, 7,0,Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = '#486581';
+  ctx.font = '12px system-ui';
+  ctx.fillText('U', gx-16, gy-gh-4);
+  ctx.fillText('I', gx+gw+12, gy+4);
+  ctx.fillText('纵截距 E', gx+42, gy-gh-18);
+  ctx.fillText('斜率=-r', gx+128, gy-100);
+  ctx.fillText('红点：多组测量；紫点：当前 R', gx+104, gy+30);
+
+  ctx.fillStyle = '#486581';
+  ctx.font = '13px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('公式绑定：U=E-Ir。图像向右下倾斜，说明电流越大，内阻压降 Ir 越大。',350,452);
+
+  els.readout.innerHTML = [
+    `<div id="r1">I=E/(R+r)≈${q.I.toFixed(3)}A</div>`,
+    `<div id="r2">U=E-Ir≈${q.U.toFixed(2)}V，U读≈${q.Uread.toFixed(2)}V</div>`,
+    `<div id="r3">U-I 图像纵截距≈E=${E.toFixed(2)}V</div>`,
+    `<div id="r4">斜率≈-r=-${r.toFixed(2)}Ω</div>`,
+    `<div id="r5">内阻消耗功率 I²r≈${(q.I*q.I*r).toFixed(2)}W</div>`
+  ].join('');
+  els.status.className = q.I < 1.2 ? 'status' : 'status bad';
+  els.status.textContent = q.I < 1.2
+    ? '通过：当前工作点可用于作 U-I 图像，截距和斜率可读出 E、r。'
+    : '不通过：电流过大，电源发热和内阻压降明显，应增大外阻。';
+}
+Object.values(els).forEach(el => {
+  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
+});
+draw();
+</script>
+</body>
+</html>

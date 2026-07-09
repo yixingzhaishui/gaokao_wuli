@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>变压器</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#f2f5f9;color:#1f2933}
+.container{padding:12px}
+h2{font-size:16px;margin:0 0 8px}
+canvas{display:block;width:100%;max-width:700px;background:#fff;border:1px solid #d9e2ec;border-radius:10px;touch-action:none;cursor:grab}
+.readouts{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;font-size:13px}
+.readouts .r{background:#102a43;color:#d9e2ec;padding:6px 10px;border-radius:7px}
+.readouts .r b{color:#ffd166}
+.controls{display:flex;flex-wrap:wrap;gap:12px;margin:10px 0;align-items:center}
+.controls label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:#334e68}
+.controls input[type=range]{width:130px;accent-color:#2c7be5}
+.controls button{font:inherit;padding:6px 12px;border:1px solid #b0bcc9;background:#fff;border-radius:7px;cursor:pointer}
+.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:9px 12px;border-radius:6px;font-size:13px;color:#486581;line-height:1.5;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>理想变压器：匝数定电压，功率守恒定电流</h2>
+  <canvas id="canvas" width="700" height="420"></canvas>
+  <div class="readouts">
+    <span class="r">U₁ = <b id="u1-val">220</b> V</span>
+    <span class="r">U₂ = <b id="u2-val">22.0</b> V</span>
+    <span class="r">I₁ = <b id="i1-val">0.20</b> A</span>
+    <span class="r">I₂ = <b id="i2-val">2.00</b> A</span>
+    <span class="r">P₁≈P₂ = <b id="p-val">44</b> W</span>
+    <span class="r">n₁:n₂ = <b id="ratio-val">1000:100</b></span>
+    <span class="r" id="type-val">降压变压器</span>
+  </div>
+  <div class="controls">
+    <label>初级匝数 n₁ = <span id="n1-display">1000</span>
+      <input type="range" id="n1" min="100" max="2000" step="50" value="1000"></label>
+    <label>次级匝数 n₂ = <span id="n2-display">100</span>
+      <input type="range" id="n2" min="50" max="2000" step="50" value="100"></label>
+    <label>输入有效值 U₁ = <span id="u1-display">220</span> V
+      <input type="range" id="u1" min="10" max="380" step="10" value="220"></label>
+    <label>负载电阻 R = <span id="r-display">11</span> Ω
+      <input type="range" id="load-r" min="2" max="100" step="1" value="11"></label>
+    <button id="play-btn">暂停</button>
+    <button id="reset-btn">重置</button>
+  </div>
+  <div class="hint"><b>观察任务</b>：拖左右线圈或滑动 n₁、n₂，看 U₂ 跟 n₂/n₁ 同步；比较同一时刻两侧电流，电压高的一侧电流较小（I₁/I₂=n₂/n₁）。拖负载 R 时，功率按 U₂²/R 改变。所有电压电流读数都是有效值。</div>
+</div>
+<script>
+(function(){
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  let n1=1000,n2=100,U1=220,loadR=11;
+  let running=true,t=0,dragN=null;
+
+  function U2(){return U1*n2/n1}
+  function I2(){return U2()/loadR}
+  function P(){return U2()*I2()}
+  function I1(){return P()/U1}
+  function type(){return n1>n2?'降压变压器':(n1<n2?'升压变压器':'等压变压器')}
+
+  function updateReadouts(){
+    document.getElementById('u1-val').textContent=U1.toFixed(0);
+    document.getElementById('u2-val').textContent=U2().toFixed(1);
+    document.getElementById('i1-val').textContent=I1().toFixed(2);
+    document.getElementById('i2-val').textContent=I2().toFixed(2);
+    document.getElementById('p-val').textContent=P().toFixed(0);
+    document.getElementById('ratio-val').textContent=n1+':'+n2;
+    document.getElementById('type-val').textContent=type();
+    document.getElementById('n1-display').textContent=n1.toFixed(0);
+    document.getElementById('n2-display').textContent=n2.toFixed(0);
+    document.getElementById('u1-display').textContent=U1.toFixed(0);
+    document.getElementById('r-display').textContent=loadR.toFixed(0);
+  }
+
+  function arrow(x1,y1,x2,y2,color,w){
+    ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    const a=Math.atan2(y2-y1,x2-x1),s=8+w;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-s*Math.cos(a-.45),y2-s*Math.sin(a-.45));ctx.lineTo(x2-s*Math.cos(a+.45),y2-s*Math.sin(a+.45));ctx.closePath();ctx.fill();
+  }
+
+  function coil(x,y,n,color,label,u,i){
+    const turns=Math.max(3,Math.min(14,Math.round(n/150)));
+    const top=y-80,spacing=160/(turns-1);
+    ctx.strokeStyle=color;ctx.lineWidth=2;
+    for(let k=0;k<turns;k++){ctx.beginPath();ctx.ellipse(x,top+k*spacing,18,7,0,0,Math.PI*2);ctx.stroke();}
+    ctx.fillStyle=color;ctx.font='12px system-ui';ctx.textAlign='center';
+    ctx.fillText(label+'='+n+'匝',x,y+105);
+    ctx.fillText('U='+u.toFixed(1)+'V  I='+i.toFixed(2)+'A',x,y+122);
+    ctx.fillText('上下拖线圈改匝数',x,y-100);
+  }
+
+  function drawBars(){
+    const bx=565,base=325,bw=35;
+    const uH=Math.min(150,U2()/4),iH=Math.min(150,I2()*24),pH=Math.min(150,P()/8);
+    ctx.fillStyle='#e6edf5';ctx.fillRect(bx,base-150,bw,150);ctx.fillRect(bx+45,base-150,bw,150);ctx.fillRect(bx+90,base-150,bw,150);
+    ctx.fillStyle='#2c7be5';ctx.fillRect(bx,base-uH,bw,uH);
+    ctx.fillStyle='#e03131';ctx.fillRect(bx+45,base-iH,bw,iH);
+    ctx.fillStyle='#f08c00';ctx.fillRect(bx+90,base-pH,bw,pH);
+    ctx.fillStyle='#486581';ctx.font='11px system-ui';ctx.textAlign='center';
+    ctx.fillText('U₂',bx+bw/2,342);ctx.fillText('I₂',bx+45+bw/2,342);ctx.fillText('P₂',bx+90+bw/2,342);
+    ctx.fillText('副边读数柱',bx+62,158);
+  }
+
+  function draw(){
+    updateReadouts();
+    ctx.clearRect(0,0,W,H);
+    const cx=320,cy=195;
+    const pulse=running?Math.sin(t):Math.sin(t);
+    if(running)t+=0.045;
+
+    const glow=ctx.createRadialGradient(cx,cy,5,cx,cy,125);
+    glow.addColorStop(0,'rgba(240,165,0,'+(0.14+0.14*Math.abs(pulse))+')');
+    glow.addColorStop(1,'rgba(240,165,0,0)');
+    ctx.fillStyle=glow;ctx.fillRect(cx-130,cy-95,260,190);
+    ctx.strokeStyle='#486581';ctx.lineWidth=4;ctx.strokeRect(cx-100,cy-75,200,150);
+    ctx.beginPath();ctx.moveTo(cx-100,cy);ctx.lineTo(cx+100,cy);ctx.stroke();
+
+    coil(cx-72,cy,n1,'#c92a2a','n₁',U1,I1());
+    coil(cx+72,cy,n2,'#1864ab','n₂',U2(),I2());
+
+    arrow(cx-85,cy-55,cx+72+16*pulse,cy-55,'#f08c00',2);
+    arrow(cx+85,cy+55,cx-72-16*pulse,cy+55,'#f08c00',2);
+    arrow(55,cy-35,cx-105,cy-35,'#c92a2a',Math.max(1.5,Math.min(7,I1()*8)));
+    arrow(cx+105,cy-35,540,cy-35,'#1864ab',Math.max(1.5,Math.min(7,I2()*2)));
+
+    ctx.strokeStyle='#334e68';ctx.lineWidth=1.5;ctx.beginPath();
+    ctx.moveTo(55,cy-55);ctx.lineTo(55,cy+55);ctx.lineTo(cx-72,cy+55);ctx.moveTo(55,cy-55);ctx.lineTo(cx-72,cy-55);ctx.stroke();
+    ctx.beginPath();ctx.arc(55,cy,18,0,Math.PI*2);ctx.stroke();
+    ctx.fillStyle='#334e68';ctx.font='11px system-ui';ctx.textAlign='center';ctx.fillText('AC',55,cy+4);
+
+    ctx.strokeStyle='#334e68';ctx.beginPath();ctx.moveTo(cx+72,cy-55);ctx.lineTo(540,cy-55);ctx.lineTo(540,cy+55);ctx.lineTo(cx+72,cy+55);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(528,cy-30);ctx.lineTo(540,cy-20);ctx.lineTo(528,cy-10);ctx.lineTo(540,cy);ctx.lineTo(528,cy+10);ctx.lineTo(540,cy+20);ctx.lineTo(528,cy+30);ctx.stroke();
+    ctx.fillStyle='#334e68';ctx.fillText('R='+loadR+'Ω',575,cy+5);
+
+    drawBars();
+    ctx.fillStyle='#243b53';ctx.font='13px system-ui';ctx.textAlign='left';
+    ctx.fillText('U₂ = U₁×n₂/n₁ = '+U1+'×'+n2+'/'+n1+' = '+U2().toFixed(1)+' V',28,382);
+    ctx.fillText('P₁≈P₂ = '+P().toFixed(0)+' W；I₁=P/U₁='+I1().toFixed(2)+' A，I₂=P/U₂='+I2().toFixed(2)+' A',28,402);
+  }
+
+  function pos(e){const r=canvas.getBoundingClientRect(),s=canvas.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s};}
+  function setTurns(which,y){
+    const cy=195;
+    const frac=Math.max(0,Math.min(1,(cy+70-y)/140));
+    const val=Math.round((100+frac*1900)/50)*50;
+    if(which==='n1'){n1=val;document.getElementById('n1').value=val;}else{n2=val;document.getElementById('n2').value=val;}
+  }
+  canvas.addEventListener('pointerdown',e=>{const p=pos(e),cx=320,cy=195;if(p.y>cy-105&&p.y<cy+125){if(Math.abs(p.x-(cx-72))<34){dragN='n1';canvas.setPointerCapture(e.pointerId)}else if(Math.abs(p.x-(cx+72))<34){dragN='n2';canvas.setPointerCapture(e.pointerId)}}});
+  canvas.addEventListener('pointermove',e=>{if(!dragN)return;setTurns(dragN,pos(e).y);draw();});
+  canvas.addEventListener('pointerup',()=>dragN=null);
+  canvas.addEventListener('pointercancel',()=>dragN=null);
+  document.getElementById('n1').addEventListener('input',e=>{n1=parseFloat(e.target.value);draw();});
+  document.getElementById('n2').addEventListener('input',e=>{n2=parseFloat(e.target.value);draw();});
+  document.getElementById('u1').addEventListener('input',e=>{U1=parseFloat(e.target.value);draw();});
+  document.getElementById('load-r').addEventListener('input',e=>{loadR=parseFloat(e.target.value);draw();});
+  document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
+  document.getElementById('reset-btn').addEventListener('click',()=>{n1=1000;n2=100;U1=220;loadR=11;t=0;document.getElementById('n1').value=n1;document.getElementById('n2').value=n2;document.getElementById('u1').value=U1;document.getElementById('load-r').value=loadR;draw();});
+  draw();
+  function loop(){draw();requestAnimationFrame(loop)}
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

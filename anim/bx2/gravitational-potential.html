@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>重力势能实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#edf3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px;min-height:560px}
+  .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;touch-action:none}
+  .panel{display:flex;flex-direction:column;gap:8px}
+  .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
+  .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.45}
+  .title{font-weight:800;margin-bottom:5px;color:#0f172a}
+  .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:31px;cursor:pointer;color:#102a43}
+  button:hover{background:#f1f5f9}
+  .primary{background:#2563eb;color:#fff;border-color:#2563eb;font-weight:800}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:48px}
+  .meter span{display:block;font-size:11px;color:#b6c5d8}
+  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:15px;font-variant-numeric:tabular-nums}
+  .formula{display:grid;gap:5px;font-size:13px;color:#334155}
+  .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
+  .formula div:last-child{border-bottom:0;padding-bottom:0}
+  .small{font-size:12px;line-height:1.5;color:#475569}
+  .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
+  .status.zero{border-color:#f59e0b;background:#fff7ed;color:#92400e}
+  .status.negative{border-color:#f87171;background:#fff1f2;color:#be123c}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="重力势能交互实验台"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>拖橙色参考面，看 Ep1、Ep2 一起变；再拖 A、B 点，看 ΔEp 与 WG 只由高度差决定。</div>
+    <button id="playBtn" class="primary">播放</button>
+    <div class="card">
+      <div class="title">快速情境</div>
+      <div class="chips">
+        <button data-case="drop">下降</button>
+        <button data-case="rise">上升</button>
+        <button data-case="same">等高</button>
+        <button data-case="shift">换参考面</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="title">实时读数</div>
+      <div class="readout">
+        <div class="meter"><span>初势能 Ep1</span><b id="ep1Text">140.0 J</b></div>
+        <div class="meter"><span>末势能 Ep2</span><b id="ep2Text">40.0 J</b></div>
+        <div class="meter"><span>势能变化 ΔEp</span><b id="depText">-100.0 J</b></div>
+        <div class="meter"><span>重力做功 WG</span><b id="wgText">100.0 J</b></div>
+        <div class="meter"><span>高度差 h1-h2</span><b id="dhText">5.0 m</b></div>
+        <div class="meter"><span>参考面 h0</span><b id="h0Text">0.0 m</b></div>
+      </div>
+    </div>
+    <div class="card formula">
+      <div><span>势能</span><b>Ep=mg(h-h0)</b></div>
+      <div><span>变化</span><b>ΔEp=Ep2-Ep1</b></div>
+      <div><span>重力功</span><b>WG=-ΔEp</b></div>
+    </div>
+    <div class="card small"><b>可直接操作：</b>拖 A 点、B 点改变初末高度；拖橙色参考面改零势能面；底部手柄可精调 m、h1、h2、h0。</div>
+    <div class="status" id="status">物体下降：重力做正功，重力势能减少。</div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+  const g=10,state={m:2,h1:7,h2:2,h0:0,u:0,running:false,drag:null};
+  const els={ep1:document.getElementById('ep1Text'),ep2:document.getElementById('ep2Text'),dep:document.getElementById('depText'),wg:document.getElementById('wgText'),dh:document.getElementById('dhText'),h0:document.getElementById('h0Text'),status:document.getElementById('status'),play:document.getElementById('playBtn')};
+  const colors={red:'#dc2626',blue:'#2563eb',purple:'#7c3aed',green:'#0f766e',orange:'#f59e0b',ink:'#102a43'};
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  const fmt=(v,d=1)=>Math.abs(v)<.05?(0).toFixed(d):v.toFixed(d);
+  function calc(){const Ep1=state.m*g*(state.h1-state.h0),Ep2=state.m*g*(state.h2-state.h0),dEp=Ep2-Ep1,WG=-dEp;return{Ep1,Ep2,dEp,WG,dh:state.h1-state.h2}}
+  function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){ctx.fillStyle=c;ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+  function line(x1,y1,x2,y2,c='#94a3b8',w=2,dash){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
+  function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-12*Math.cos(a-.42),y2-12*Math.sin(a-.42));ctx.lineTo(x2-12*Math.cos(a+.42),y2-12*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore()}
+  function roundRect(x,y,w,h,r,fill,stroke){ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}ctx.restore()}
+  function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-36,c,'center',12,'900')}
+  function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-20,active?'#92400e':c,'center',12,'900');ctx.restore()}
+  function yFor(h){return 405-(h+3)/13*310}
+  function heightFor(y){return clamp((405-y)/310*13-3,-3,10)}
+  function geom(){const A={x:230,y:yFor(state.h1)},B={x:400,y:yFor(state.h2)},h0Y=yFor(state.h0),body={x:A.x+(B.x-A.x)*state.u,y:A.y+(B.y-A.y)*state.u};return{A,B,h0Y,body}}
+  function handles(){return{m:{x:82+(state.m-.5)/7.5*150,y:494},h1:{x:292+(state.h1+3)/13*150,y:494},h2:{x:502+(state.h2+3)/13*150,y:494},h0:{x:712+(state.h0+3)/13*150,y:494}}}
+  function point(x,y,c,label,active){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,11,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-22,c,'center',12,'900');ctx.restore()}
+  function drawScene(r){
+    const gm=geom();roundRect(42,58,510,382,8,'#fff','#d7dee8');text('参考面是零点：Ep 会变，ΔEp 和 WG 不乱',297,88,'#0f172a','center',16,'900');
+    line(96,405,500,405,'#334155',2);line(118,92,118,420,'#475569',2);
+    for(let h=-2;h<=10;h+=2){const y=yFor(h);line(112,y,500,y,'#e2e8f0',1);text(`${h}m`,104,y,'#64748b','right',11,'700')}
+    line(82,gm.h0Y,510,gm.h0Y,colors.orange,3,[8,5]);text(`参考面 h0=${fmt(state.h0)}m`,396,gm.h0Y-18,colors.orange,'center',13,'900');point(500,gm.h0Y,colors.orange,'h0',state.drag==='h0line');
+    point(gm.A.x,gm.A.y,colors.blue,'A',state.drag==='A');point(gm.B.x,gm.B.y,colors.purple,'B',state.drag==='B');
+    arrow(gm.A.x,gm.A.y,gm.B.x,gm.B.y,colors.green,2.5);text('A→B',315,(gm.A.y+gm.B.y)/2-20,colors.green,'center',13,'900');
+    ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(gm.body.x,gm.body.y,15,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#0f172a';ctx.stroke();arrow(gm.body.x,gm.body.y+18,gm.body.x,gm.body.y+75,colors.red,3);text('mg',gm.body.x+20,gm.body.y+54,colors.red,'left',13,'900');
+    text(`WG=mg(h1-h2)=${fmt(r.WG)}J`,297,424,r.WG>=0?colors.green:colors.red,'center',15,'900');
+  }
+  function drawBars(r){
+    roundRect(582,58,290,382,8,'#fff','#d7dee8');text('能量柱',727,88,'#0f172a','center',16,'900');
+    const rows=[['Ep1',r.Ep1,colors.blue],['Ep2',r.Ep2,colors.purple],['ΔEp',r.dEp,colors.orange],['WG',r.WG,colors.green]];
+    const max=Math.max(20,...rows.map(x=>Math.abs(x[1]))),base=270;
+    line(620,base,840,base,'#475569',1.4);
+    rows.forEach((row,i)=>{const x=628+i*52,h=Math.abs(row[1])/max*118,c=row[1]>=0?row[2]:colors.red;ctx.fillStyle=c;if(row[1]>=0)ctx.fillRect(x,base-h,30,h);else ctx.fillRect(x,base,30,h);ctx.strokeStyle='#0f172a';ctx.strokeRect(x,row[1]>=0?base-h:base,30,Math.max(1,h));text(row[0],x+15,404,'#475569','center',12,'900');text(fmt(row[1],0),x+15,row[1]>=0?base-h-12:base+h+14,c,'center',12,'900')});
+    roundRect(622,326,210,48,7,'#ecfdf5','#14b8a6');text('WG = -ΔEp',727,350,colors.green,'center',16,'900');
+    text('换参考面只平移 Ep1/Ep2',727,430,'#475569','center',12,'900');
+  }
+  function bottom(){const h=handles();roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(82,494,232,'m',colors.green);handle(h.m.x,h.m.y,`m=${fmt(state.m)}`,state.drag==='m',colors.green);ruler(292,494,442,'h1',colors.blue);handle(h.h1.x,h.h1.y,`h1=${fmt(state.h1)}`,state.drag==='h1',colors.blue);ruler(502,494,652,'h2',colors.purple);handle(h.h2.x,h.h2.y,`h2=${fmt(state.h2)}`,state.drag==='h2',colors.purple);ruler(712,494,862,'h0',colors.orange);handle(h.h0.x,h.h0.y,`h0=${fmt(state.h0)}`,state.drag==='h0',colors.orange)}
+  function update(r){els.ep1.textContent=`${fmt(r.Ep1)} J`;els.ep2.textContent=`${fmt(r.Ep2)} J`;els.dep.textContent=`${fmt(r.dEp)} J`;els.wg.textContent=`${fmt(r.WG)} J`;els.dh.textContent=`${fmt(r.dh)} m`;els.h0.textContent=`${fmt(state.h0)} m`;els.play.textContent=state.running?'暂停':'播放';els.status.className='status '+(Math.abs(r.WG)<.05?'zero':(r.WG>0?'positive':'negative'));els.status.textContent=Math.abs(r.WG)<.05?'初末高度相同，重力做功为 0；参考面怎么选都不改变这个结论。':(r.WG>0?'物体下降：重力做正功，重力势能减少。':'物体上升：重力做负功，重力势能增加。')}
+  function draw(){const r=calc();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('重力势能实验台：零点可选，变化不变',460,30,'#0f172a','center',19,'900');drawScene(r);drawBars(r);bottom();update(r)}
+  function pos(e){const b=canvas.getBoundingClientRect();return{x:(e.clientX-b.left)*canvas.width/b.width,y:(e.clientY-b.top)*canvas.height/b.height}}
+  function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+  function pointerDown(e){const p=pos(e),gm=geom(),h=handles();if(near(p,gm.A,28))state.drag='A';else if(near(p,gm.B,28))state.drag='B';else if(Math.abs(p.y-gm.h0Y)<18&&p.x>80&&p.x<520)state.drag='h0line';else if(near(p,h.m,26))state.drag='m';else if(near(p,h.h1,26))state.drag='h1';else if(near(p,h.h2,26))state.drag='h2';else if(near(p,h.h0,26))state.drag='h0';else state.drag=null;if(state.drag){state.running=false;canvas.setPointerCapture(e.pointerId);pointerMove(e)}}
+  function pointerMove(e){if(!state.drag)return;const p=pos(e);if(state.drag==='A')state.h1=heightFor(p.y);if(state.drag==='B')state.h2=heightFor(p.y);if(state.drag==='h0line')state.h0=heightFor(p.y);if(state.drag==='m')state.m=clamp(.5+(p.x-82)/150*7.5,.5,8);if(state.drag==='h1')state.h1=clamp(-3+(p.x-292)/150*13,-3,10);if(state.drag==='h2')state.h2=clamp(-3+(p.x-502)/150*13,-3,10);if(state.drag==='h0')state.h0=clamp(-3+(p.x-712)/150*13,-3,10);draw()}
+  function pointerUp(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
+  canvas.addEventListener('pointerdown',pointerDown);canvas.addEventListener('pointermove',pointerMove);canvas.addEventListener('pointerup',pointerUp);canvas.addEventListener('pointercancel',pointerUp);
+  els.play.addEventListener('click',()=>{state.running=!state.running;draw()});
+  document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='drop'){state.h1=7;state.h2=2;state.h0=0}if(c==='rise'){state.h1=1;state.h2=7;state.h0=0}if(c==='same'){state.h1=4;state.h2=4;state.h0=-1}if(c==='shift'){state.h1=7;state.h2=2;state.h0=5}state.u=0;state.running=false;draw()}));
+  function tick(){if(state.running){state.u+=.01;if(state.u>1)state.u=0}draw();requestAnimationFrame(tick)}
+  draw();requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

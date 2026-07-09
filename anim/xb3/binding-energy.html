@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>结合能与质量亏损</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 14px; align-items: stretch; }
+  canvas { width: 100%; height: 430px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  input { width: 100%; }
+  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.8; font-size: 14px; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
+  @media (max-width: 760px) { .stage { grid-template-columns: 1fr; } canvas { height: 360px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="680" height="430" aria-label="结合能与质量亏损模型"></canvas>
+    <section class="panel">
+      <label for="a">核子数 A：<span id="aVal"></span></label>
+      <input id="a" type="range" min="2" max="240" value="56" step="1">
+      <label for="eb">总结合能 Eb/MeV：<span id="ebVal"></span></label>
+      <input id="eb" type="range" min="5" max="2000" value="492" step="1">
+      <label for="compare">对比核平均结合能：<span id="compareVal"></span></label>
+      <input id="compare" type="range" min="1" max="9" value="7" step="0.1">
+      <div id="readout" class="readout"></div>
+      <div class="hint">观察任务：不要只看总结合能，比较稳定性时看平均结合能 Eb/A。</div>
+    </section>
+  </div>
+</div>
+<script>
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const els = {
+  a: document.getElementById('a'),
+  eb: document.getElementById('eb'),
+  compare: document.getElementById('compare'),
+  aVal: document.getElementById('aVal'),
+  ebVal: document.getElementById('ebVal'),
+  compareVal: document.getElementById('compareVal'),
+  readout: document.getElementById('readout')
+};
+function drawBar(x, y, w, h, value, max, color, label) {
+  ctx.fillStyle = '#e9eef5';
+  ctx.fillRect(x, y, w, h);
+  ctx.fillStyle = color;
+  ctx.fillRect(x, y, Math.min(w, w * value / max), h);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '14px system-ui';
+  ctx.textAlign = 'left';
+  ctx.fillText(label, x, y - 8);
+}
+function draw() {
+  const A = Number(els.a.value);
+  const Eb = Number(els.eb.value);
+  const avg = Eb / A;
+  const dm = Eb / 931.5;
+  const cmp = Number(els.compare.value);
+  els.aVal.textContent = A;
+  els.ebVal.textContent = Eb;
+  els.compareVal.textContent = cmp.toFixed(1) + ' MeV/核子';
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#f7f9fc';
+  ctx.fillRect(0, 0, c.width, c.height);
+
+  ctx.fillStyle = '#fff7e6';
+  ctx.strokeStyle = '#f0a500';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(135, 145, 72, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  for (let i = 0; i < Math.min(A, 48); i++) {
+    const angle = i * 2.399;
+    const r = 8 + Math.sqrt(i) * 8;
+    ctx.fillStyle = i % 2 ? '#2c7be5' : '#e03131';
+    ctx.beginPath();
+    ctx.arc(135 + Math.cos(angle) * r, 145 + Math.sin(angle) * r, 5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.fillStyle = '#486581';
+  ctx.font = '13px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('原子核：核子结合越紧，平均结合能越大', 160, 246);
+
+  drawBar(340, 92, 250, 26, Eb, 2000, '#2c7be5', '总结合能 Eb');
+  drawBar(340, 168, 250, 26, avg, 9, '#e03131', '平均结合能 Eb/A');
+  drawBar(340, 244, 250, 26, dm, 2.2, '#f0a500', '质量亏损 Δm');
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 16px system-ui';
+  ctx.textAlign = 'left';
+  ctx.fillText(`${Eb.toFixed(0)} MeV`, 604, 112);
+  ctx.fillText(`${avg.toFixed(2)} MeV/核子`, 604, 188);
+  ctx.fillText(`${dm.toFixed(3)} u`, 604, 264);
+  ctx.fillStyle = avg > cmp ? '#087f5b' : '#b30000';
+  ctx.font = '700 17px system-ui';
+  ctx.fillText(avg > cmp ? '本核平均结合能更大，通常更稳定' : '对比核平均结合能更大，通常更稳定', 340, 334);
+
+  els.readout.innerHTML = [
+    `A=${A}，Eb=${Eb.toFixed(0)} MeV`,
+    `平均结合能 Eb/A=${avg.toFixed(2)} MeV/核子`,
+    `质量亏损 Δm=Eb/931.5≈${dm.toFixed(3)} u`,
+    `对比：${cmp.toFixed(1)} MeV/核子，${avg > cmp ? '本核更稳定' : '对比核更稳定'}`
+  ].join('<br>');
+}
+Object.values(els).forEach(el => {
+  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
+});
+draw();
+</script>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>平均速度与瞬时速度实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#f7f9fc;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px;min-height:540px}
+  .stage{position:relative;background:#fff;border:1px solid #d9e2ec;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;aspect-ratio:940/560;touch-action:none}
+  .tip{position:absolute;left:14px;bottom:12px;background:rgba(16,42,67,.88);color:#d9e2ec;border-radius:7px;padding:6px 9px;font-size:12px;pointer-events:none}
+  .panel{display:flex;flex-direction:column;gap:6px}
+  .card{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:7px}
+  .task{background:#fff7e6;border-left:3px solid #f0a500;color:#486581;font-size:12px;line-height:1.35}
+  .title{font-weight:700;margin-bottom:4px}
+  .param{display:grid;gap:2px;margin:6px 0;font-size:13px}
+  .param span{display:flex;justify-content:space-between;color:#486581}
+  .param b{color:#102a43;font-variant-numeric:tabular-nums}
+  input[type=range]{width:100%;accent-color:#2c7be5}
+  .controls{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #b0bcc9;background:#fff;border-radius:6px;padding:5px 8px;cursor:pointer;font:inherit;font-size:12px}
+  button:hover{background:#eef2f7}
+  .readout{background:#102a43;color:#d9e2ec;border-radius:8px;padding:8px;line-height:1.45;font-size:13px}
+  .readout b{color:#f0a500;font-variant-numeric:tabular-nums}
+  .formula{font-size:12px;line-height:1.35;color:#334e68}
+  .status{font-size:12px;font-weight:700;border-radius:6px;padding:7px;border:1px solid #38b2ac;background:#e6fffa;color:#087f5b;line-height:1.35}
+  .status.warn{border-color:#f0a500;background:#fff7e6;color:#9a6700}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.panel{display:grid;grid-template-columns:1fr 1fr}.task,.readout,.formula,.status{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage">
+    <canvas id="canvas" width="940" height="560" aria-label="平均速度与瞬时速度交互实验台"></canvas>
+    <div class="tip">可拖动 x-t 图上的 P、Q 两点；Q 越靠近 P，平均速度越接近瞬时速度</div>
+  </div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>拖 Q 点靠近 P 点，看橙色割线逐渐贴近蓝色切线；拖 P 点，看瞬时速度随时刻怎样变。</div>
+    <div class="card">
+      <div class="title">运动参数</div>
+      <label class="param"><span>初速度 v0 <b id="v0Text">2.0 m/s</b></span><input id="v0Slider" type="range" min="0" max="10" step="0.2" value="2"></label>
+      <label class="param"><span>加速度 a <b id="aText">1.5 m/s²</b></span><input id="aSlider" type="range" min="0" max="4" step="0.1" value="1.5"></label>
+      <div class="controls"><button id="shrinkBtn">缩小 Δt</button><button id="uniformBtn">设为匀速</button></div>
+      <div class="controls" style="margin-top:6px"><button id="playBtn">▶ 播放：Δt 自动逼近0</button><button id="resetBtn">重置播放</button></div>
+    </div>
+    <div class="readout" id="readout"></div>
+    <div class="card formula">
+      <div class="title">公式绑定</div>
+      <div>平均速度 `v̄=Δx/Δt`：橙色割线斜率。</div>
+      <div>瞬时速度 `v=lim(Δt→0)Δx/Δt`：蓝色切线斜率。</div>
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const els={v0:document.getElementById('v0Slider'),a:document.getElementById('aSlider')};
+  let v0=2,a=1.5,t=3,dt=1.5,drag=null,layout={},playing=false,dt0=1.5;
+  const graph={ox:84,oy:408,w:500,h:300,tMax:6};
+  function xAt(tt){return v0*tt+0.5*a*tt*tt;}
+  function vAt(tt){return v0+a*tt;}
+  function xMax(){return Math.max(12,xAt(6)*1.12);}
+  function sx(tt){return graph.ox+tt/graph.tMax*graph.w;}
+  function sy(x){return graph.oy-x/xMax()*graph.h;}
+  function timeFromX(px){return Math.max(0.05,Math.min(5.95,(px-graph.ox)/graph.w*graph.tMax));}
+  function snap(x,step){return Math.round(x/step)*step;}
+  function text(s,x,y,c,a0,size,w){
+    ctx.fillStyle=c||'#102a43';
+    ctx.font=(w?w+' ':'')+(size||13)+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';
+    ctx.textAlign=a0||'center';ctx.textBaseline='middle';ctx.fillText(s,x,y);
+  }
+  function line(x1,y1,x2,y2,c,w,dash){
+    ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w||2;ctx.setLineDash(dash||[]);
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();
+  }
+  function arrow(x1,y1,x2,y2,c,label,w){
+    const ang=Math.atan2(y2-y1,x2-x1);
+    ctx.save();ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w||3;
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    if(Math.hypot(x2-x1,y2-y1)>8){
+      ctx.beginPath();ctx.moveTo(x2,y2);
+      ctx.lineTo(x2-11*Math.cos(ang-.45),y2-11*Math.sin(ang-.45));
+      ctx.lineTo(x2-11*Math.cos(ang+.45),y2-11*Math.sin(ang+.45));
+      ctx.closePath();ctx.fill();
+    }
+    if(label) text(label,(x1+x2)/2+8,(y1+y2)/2-12,c,'left',12,'700');
+    ctx.restore();
+  }
+  function box(x,y,w,h,fill,stroke,r){
+    ctx.save();ctx.fillStyle=fill;ctx.strokeStyle=stroke||'#d9e2ec';ctx.lineWidth=1.4;
+    ctx.beginPath();ctx.roundRect(x,y,w,h,r==null?8:r);ctx.fill();ctx.stroke();ctx.restore();
+  }
+  function handle(x,y,label,c){
+    ctx.save();ctx.fillStyle=c;ctx.strokeStyle='#102a43';ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(x,y,9,0,Math.PI*2);ctx.fill();ctx.stroke();
+    text(label,x,y-22,c,'center',12,'700');ctx.restore();
+  }
+  function drawAxes(){
+    line(graph.ox,graph.oy,graph.ox+graph.w+24,graph.oy,'#334e68',2);
+    line(graph.ox,graph.oy,graph.ox,graph.oy-graph.h-20,'#334e68',2);
+    text('t/s',graph.ox+graph.w+42,graph.oy,'#486581','center',12,'700');
+    text('x/m',graph.ox-24,graph.oy-graph.h-26,'#486581','center',12,'700');
+    for(let i=0;i<=6;i++){line(sx(i),graph.oy-5,sx(i),graph.oy+5,'#829ab1',1.5);text(String(i),sx(i),graph.oy+21,'#486581','center',11);}
+    for(let i=0;i<=4;i++){const val=xMax()*i/4;line(graph.ox-5,sy(val),graph.ox+5,sy(val),'#829ab1',1.5);text(val.toFixed(0),graph.ox-18,sy(val),'#486581','right',10);}
+  }
+  function drawCurve(){
+    ctx.strokeStyle='#334e68';ctx.lineWidth=3;ctx.beginPath();
+    for(let i=0;i<=100;i++){const tt=6*i/100,xx=xAt(tt),px=sx(tt),py=sy(xx);if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}
+    ctx.stroke();
+  }
+  function draw(){
+    if(t+dt>6)dt=6-t;if(dt<0.05)dt=0.05;
+    layout={};
+    const t1=t,t2=t+dt,x1=xAt(t1),x2=xAt(t2),vInst=vAt(t1),vAvg=(x2-x1)/(t2-t1),diff=Math.abs(vAvg-vInst);
+    ctx.clearRect(0,0,940,560);
+    text('平均速度与瞬时速度实验台：割线斜率逼近切线斜率',470,32,'#102a43','center',18,'700');
+    box(44,58,852,386,'#fff','#d9e2ec');
+    drawAxes();drawCurve();
+    const p1={x:sx(t1),y:sy(x1)},p2={x:sx(t2),y:sy(x2)};
+    line(p1.x,p1.y,p2.x,p2.y,'#f0a500',3);
+    const tangentDt=0.75;
+    const ta=Math.max(0,t1-tangentDt),tb=Math.min(6,t1+tangentDt);
+    const tangentY1=x1-vInst*(t1-ta), tangentY2=x1+vInst*(tb-t1);
+    line(sx(ta),sy(tangentY1),sx(tb),sy(tangentY2),'#2c7be5',3);
+    line(p1.x,graph.oy,p1.x,p1.y,'#7b2cbf',1.5,[5,4]);
+    line(p2.x,graph.oy,p2.x,p2.y,'#f0a500',1.5,[5,4]);
+    handle(p1.x,p1.y,'P(t)','#7b2cbf');
+    handle(p2.x,p2.y,'Q(t+Δt)','#f0a500');
+    layout.P={x:p1.x,y:p1.y};layout.Q={x:p2.x,y:p2.y};
+    text('橙色割线：平均速度 v̄=Δx/Δt',352,92,'#9a6700','center',13,'700');
+    text('蓝色切线：瞬时速度 v',352,114,'#2c7be5','center',13,'700');
+
+    const sceneX=650,baseY=174;
+    line(sceneX-12,baseY,sceneX+198,baseY,'#aab8c2',4);
+    const carX=sceneX+25+Math.min(150,x1/xMax()*170);
+    ctx.save();ctx.shadowColor='rgba(51,78,104,.4)';ctx.shadowBlur=8;
+    box(carX-22,baseY-24,44,24,'#d9e2ec','#334e68',5);
+    ctx.restore();
+    ctx.fillStyle='#334e68';ctx.beginPath();ctx.arc(carX-13,baseY+2,5,0,Math.PI*2);ctx.arc(carX+13,baseY+2,5,0,Math.PI*2);ctx.fill();
+    arrow(carX+22,baseY-12,carX+22+Math.min(105,vInst*8),baseY-12,'#2c7be5','v瞬',3);
+    text('这一刻的小车速度箭头',sceneX+95,baseY+38,'#486581','center',12,'700');
+
+    const barX=650,barY=250,barW=190,scaleV=Math.max(vAt(6),vAvg,8)*1.12;
+    text('速度读数条',barX+95,barY-20,'#334e68','center',13,'700');
+    ctx.fillStyle='rgba(240,165,0,.25)';ctx.fillRect(barX,barY,barW*vAvg/scaleV,24);ctx.strokeStyle='#f0a500';ctx.strokeRect(barX,barY,barW*vAvg/scaleV,24);text('v̄='+vAvg.toFixed(3),barX+70,barY+12,'#9a6700','center',12,'700');
+    ctx.fillStyle='rgba(44,123,229,.25)';ctx.fillRect(barX,barY+46,barW*vInst/scaleV,24);ctx.strokeStyle='#2c7be5';ctx.strokeRect(barX,barY+46,barW*vInst/scaleV,24);text('v='+vInst.toFixed(3),barX+70,barY+58,'#2c7be5','center',12,'700');
+    text('|v̄-v|='+diff.toFixed(3)+' m/s',barX+95,barY+100,diff<0.08?'#087f5b':'#9a6700','center',13,'700');
+
+    box(142,466,656,52,diff<0.08?'#e6fffa':'#fff7e6',diff<0.08?'#38b2ac':'#f0a500');
+    text('v̄ = [x(t+Δt)-x(t)]/Δt = '+vAvg.toFixed(3)+' m/s；v = v0+at = '+vInst.toFixed(3)+' m/s',470,486,'#334e68','center',14,'700');
+    text(diff<0.08?'Δt 很小：平均速度正在逼近瞬时速度。':'继续把 Q 拖近 P：割线会逼近切线。',470,508,diff<0.08?'#087f5b':'#9a6700','center',13);
+    update(vAvg,vInst,diff);
+  }
+  function update(vAvg,vInst,diff){
+    document.getElementById('v0Text').textContent=v0.toFixed(1)+' m/s';
+    document.getElementById('aText').textContent=a.toFixed(1)+' m/s²';
+    document.getElementById('readout').innerHTML='t=<b>'+t.toFixed(2)+' s</b><br>Δt=<b>'+dt.toFixed(2)+' s</b><br>平均速度 v̄=<b>'+vAvg.toFixed(3)+' m/s</b><br>瞬时速度 v=<b>'+vInst.toFixed(3)+' m/s</b><br>差值=<b>'+diff.toFixed(3)+' m/s</b><br>播放状态：<b>'+(playing?'逼近中':'暂停')+'</b>';
+    const st=document.getElementById('status');
+    st.classList.toggle('warn',diff>=0.08);
+    st.textContent=diff<0.08?'极限思想可见：Δt 很小时，割线斜率几乎等于切线斜率。':'平均速度描述一段过程；瞬时速度描述 P 点这一刻。拖 Q 靠近 P 再观察。';
+  }
+  function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
+  canvas.addEventListener('pointerdown',e=>{
+    const p=pointer(e);
+    for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30){drag=k;canvas.setPointerCapture(e.pointerId);break;}}
+  });
+  canvas.addEventListener('pointermove',e=>{
+    const p=pointer(e);
+    if(drag){
+      if(drag==='P'){t=snap(Math.min(timeFromX(p.x),5.95),0.05);if(t+dt>6)dt=6-t;}
+      if(drag==='Q'){const tq=snap(timeFromX(p.x),0.05);dt=Math.max(0.05,tq-t);if(t+dt>6)dt=6-t;}
+      draw();return;
+    }
+    let hit=false;for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30)hit=true;}
+    canvas.style.cursor=hit?'grab':'default';
+  });
+  window.addEventListener('pointerup',()=>{drag=null;canvas.style.cursor='default';});
+  els.v0.oninput=e=>{v0=+e.target.value;draw();};
+  els.a.oninput=e=>{a=+e.target.value;draw();};
+  document.getElementById('shrinkBtn').onclick=()=>{dt=Math.max(0.05,dt/2);draw();};
+  document.getElementById('uniformBtn').onclick=()=>{a=0;els.a.value=0;draw();};
+  function animate(){
+    if(!playing)return;
+    dt*=0.965;
+    if(dt<=0.06){dt=0.06;playing=false;document.getElementById('playBtn').textContent='▶ 播放：Δt 自动逼近0';draw();return;}
+    draw();
+    requestAnimationFrame(animate);
+  }
+  document.getElementById('playBtn').onclick=()=>{
+    playing=!playing;
+    document.getElementById('playBtn').textContent=playing?'⏸ 暂停':'▶ 播放：Δt 自动逼近0';
+    if(playing){dt0=dt;animate();}else draw();
+  };
+  document.getElementById('resetBtn').onclick=()=>{playing=false;dt=dt0>0.1?dt0:1.5;document.getElementById('playBtn').textContent='▶ 播放：Δt 自动逼近0';draw();};
+  draw();
+})();
+</script>
+</body>
+</html>

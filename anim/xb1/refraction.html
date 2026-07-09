@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>光的折射</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#eef2f7;color:#102a43}
+.wrap{padding:12px}
+h2{font-size:16px;margin:0 0 8px}
+canvas{display:block;width:100%;max-width:660px;background:#0b1220;border-radius:12px;box-shadow:0 2px 10px rgba(16,42,67,.12);touch-action:none;cursor:grab}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.chip{background:#102a43;color:#e6eef7;padding:6px 11px;border-radius:8px;font-size:13px}
+.chip b{color:#ffd166}
+.ctrls{display:flex;flex-wrap:wrap;gap:12px;margin:8px 0;align-items:center}
+.ctrls label{display:flex;flex-direction:column;gap:2px;font-size:12px;color:#334e68}
+.ctrls input[type=range]{width:120px;accent-color:#2c7be5}
+.btn{font:inherit;font-size:13px;padding:6px 12px;border:1px solid #b0bcc9;background:#fff;border-radius:8px;cursor:pointer}
+.btn:hover{background:#eef2f7}
+.btn.on{background:#2c7be5;color:#fff;border-color:#2c7be5}
+.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:9px 12px;border-radius:6px;font-size:13px;color:#5a6b7b;line-height:1.5;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2>光的折射：n₁sinθ₁ = n₂sinθ₂（光进玻璃变慢 → 偏向法线）</h2>
+  <canvas id="cv" width="660" height="420"></canvas>
+  <div class="chips">
+    <span class="chip">入射角 θ₁ = <b id="i">45</b>°</span>
+    <span class="chip">折射率 n = <b id="n">1.50</b></span>
+    <span class="chip">折射角 θ₂ = <b id="r">—</b>°</span>
+    <span class="chip">玻璃中光速 v = <b id="sp">—</b>·c</span>
+  </div>
+  <div class="ctrls">
+    <button class="btn on" id="play">⏸ 暂停</button>
+    <button class="btn" id="reset">重置</button>
+    <label>入射角 θ₁ = <span id="il">45</span>°<input type="range" id="ir" min="0" max="85" step="1" value="45"></label>
+    <label>玻璃折射率 n = <span id="nl">1.50</span><input type="range" id="nr" min="1.1" max="2.4" step="0.05" value="1.5"></label>
+    <span style="font-size:13px;color:#5a6b7b">或<b>拖动入射光线</b></span>
+  </div>
+  <div class="hint"><b>怎么玩</b>：黄色<b>光脉冲</b>沿入射光线射到界面 O（播放时在动），在界面处分成<b>折射光</b>（进入玻璃）和微弱的反射光。注意脉冲进入玻璃后<b>走得更慢</b>（v=c/n）——正是"光变慢"让波前偏转、折射光<b>偏向法线</b>。拖<b>入射角 θ₁</b>：折射角 θ₂ 随之变，始终满足 sinθ₁/sinθ₂=n；拖<b>折射率 n</b> 变大 → 折射光弯折更厉害、玻璃中光速更小。可直接拖入射光线改角度。</div>
+</div>
+<script>
+(function(){
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height,D=Math.PI/180;
+let i=45,n=1.5,t=0,playing=true,dragRay=false;
+const ox=W/2,oy=H/2,L=190;
+let pulses=[],emit=0;
+function geom(){
+  const ir=i*D;const sinr=Math.sin(ir)/n;const r2=Math.asin(Math.min(1,sinr));
+  const inc={x1:ox-L*Math.sin(ir),y1:oy-L*Math.cos(ir)}; // incident start (upper region)
+  const refr={x2:ox+L*Math.sin(r2),y2:oy+L*Math.cos(r2)};
+  return {ir,r2,inc,refr};
+}
+function step(dt){
+  emit-=dt; if(emit<=0){emit=0.32;pulses.push({s:0});}
+  for(const p of pulses){const vAir=260,vGlass=vAir/n;p.s+=(p.s<L?vAir:vGlass)*dt;}
+  pulses=pulses.filter(p=>p.s<2*L);
+}
+function render(){
+  ctx.fillStyle='#0b1220';ctx.fillRect(0,0,W,H);
+  // media
+  ctx.fillStyle='#0e1830';ctx.fillRect(0,0,W,oy);
+  ctx.fillStyle='#14233f';ctx.fillRect(0,oy,W,H-oy);
+  ctx.fillStyle='#6a86ad';ctx.font='12px system-ui';ctx.textAlign='left';ctx.fillText('空气 n₁=1',12,20);ctx.fillText('玻璃 n₂=n（光更慢）',12,H-12);
+  ctx.strokeStyle='#33445f';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,oy);ctx.lineTo(W,oy);ctx.stroke();
+  // normal
+  ctx.strokeStyle='#5a6b86';ctx.setLineDash([6,4]);ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(ox,oy-150);ctx.lineTo(ox,oy+150);ctx.stroke();ctx.setLineDash([]);
+  const g=geom();
+  // 界面处辉光真实感
+  const glow=ctx.createRadialGradient(ox,oy,2,ox,oy,60);glow.addColorStop(0,'rgba(255,209,102,0.5)');glow.addColorStop(1,'rgba(255,209,102,0)');
+  ctx.fillStyle=glow;ctx.beginPath();ctx.arc(ox,oy,60,0,7);ctx.fill();
+  // rays（带辉光）
+  ctx.save();ctx.shadowColor='#ffb648';ctx.shadowBlur=10;
+  ctx.strokeStyle='#e8890c';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(g.inc.x1,g.inc.y1);ctx.lineTo(ox,oy);ctx.stroke();
+  ctx.strokeStyle='#2c7be5';ctx.beginPath();ctx.moveTo(ox,oy);ctx.lineTo(g.refr.x2,g.refr.y2);ctx.stroke();
+  ctx.restore();
+  // weak reflected
+  ctx.strokeStyle='rgba(232,137,12,.35)';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(ox,oy);ctx.lineTo(ox+L*0.5*Math.sin(g.ir),oy-L*0.5*Math.cos(g.ir));ctx.stroke();
+  // pulses along path
+  for(const p of pulses){let x,y;if(p.s<L){const f=p.s/L;x=g.inc.x1+(ox-g.inc.x1)*f;y=g.inc.y1+(oy-g.inc.y1)*f;}else{const f=(p.s-L)/L;x=ox+(g.refr.x2-ox)*f;y=oy+(g.refr.y2-oy)*f;}
+    ctx.fillStyle=p.s<L?'#ffd166':'#7fb2ff';ctx.beginPath();ctx.arc(x,y,3.6,0,7);ctx.fill();}
+  // angle arcs
+  ctx.strokeStyle='#e8890c';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(ox,oy,32,-Math.PI/2-g.ir,-Math.PI/2);ctx.stroke();
+  ctx.fillStyle='#e8890c';ctx.font='12px system-ui';ctx.fillText('θ₁',ox-30,oy-30);
+  ctx.strokeStyle='#2c7be5';ctx.beginPath();ctx.arc(ox,oy,32,Math.PI/2,Math.PI/2+g.r2);ctx.stroke();
+  ctx.fillStyle='#7fb2ff';ctx.fillText('θ₂',ox+18,oy+36);
+  // O
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(ox,oy,3,0,7);ctx.fill();
+  // formula
+  ctx.fillStyle='#e6eef7';ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillText('sinθ₁ / sinθ₂ = n = '+n.toFixed(2)+'  →  θ₂ = '+(g.r2/D).toFixed(1)+'°',18,H-30);
+  // 状态反馈
+  ctx.font='bold 13px system-ui';ctx.fillStyle='#ffd166';
+  ctx.fillText('状态：θ₁>θ₂，光进玻璃变慢、'+(n>1.6?'弯折加强':'弯折减弱')+'（偏向法线）',18,H-50);
+  document.getElementById('i').textContent=i;document.getElementById('n').textContent=n.toFixed(2);
+  document.getElementById('r').textContent=(g.r2/D).toFixed(1);document.getElementById('sp').textContent=(1/n).toFixed(3);
+}
+function pos(e){const r=cv.getBoundingClientRect(),s=cv.width/r.width;return{x:((e.touches?e.touches[0].clientX:e.clientX)-r.left)*s,y:((e.touches?e.touches[0].clientY:e.clientY)-r.top)*s};}
+cv.addEventListener('pointerdown',e=>{const p=pos(e);if(p.y<oy&&Math.hypot(p.x-ox,p.y-oy)>30){dragRay=true;}});
+cv.addEventListener('pointermove',e=>{if(!dragRay)return;const p=pos(e);const ang=Math.atan2(ox-p.x,oy-p.y);i=Math.max(0,Math.min(85,Math.round(ang/D)));document.getElementById('ir').value=i;document.getElementById('il').textContent=i;});
+window.addEventListener('pointerup',()=>dragRay=false);
+document.getElementById('play').onclick=function(){playing=!playing;this.classList.toggle('on',playing);this.textContent=playing?'⏸ 暂停':'▶ 播放';};
+document.getElementById('reset').onclick=function(){i=45;n=1.5;pulses=[];document.getElementById('ir').value=45;document.getElementById('nr').value=1.5;document.getElementById('il').textContent=45;document.getElementById('nl').textContent='1.50';};
+document.getElementById('ir').addEventListener('input',e=>{i=parseInt(e.target.value);document.getElementById('il').textContent=i;});
+document.getElementById('nr').addEventListener('input',e=>{n=parseFloat(e.target.value);document.getElementById('nl').textContent=n.toFixed(2);});
+let last=performance.now();
+function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;if(playing)step(dt);render();requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

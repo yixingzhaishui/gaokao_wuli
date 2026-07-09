@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>x-t 图像实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#f7f9fc;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px;min-height:540px}
+  .stage{position:relative;background:#fff;border:1px solid #d9e2ec;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;aspect-ratio:940/560;touch-action:none}
+  .tip{position:absolute;left:14px;bottom:12px;background:rgba(16,42,67,.88);color:#d9e2ec;border-radius:7px;padding:6px 9px;font-size:12px;pointer-events:none}
+  .panel{display:flex;flex-direction:column;gap:6px}
+  .card{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:7px}
+  .task{background:#fff7e6;border-left:3px solid #f0a500;color:#486581;font-size:12px;line-height:1.35}
+  .title{font-weight:700;margin-bottom:4px}
+  .mode{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #b0bcc9;background:#fff;border-radius:6px;padding:5px 8px;cursor:pointer;font:inherit;font-size:12px}
+  button:hover{background:#eef2f7}
+  button.active{background:#2c7be5;border-color:#2c7be5;color:#fff;font-weight:700}
+  .readout{background:#102a43;color:#d9e2ec;border-radius:8px;padding:8px;line-height:1.45;font-size:13px}
+  .readout b{color:#f0a500;font-variant-numeric:tabular-nums}
+  .formula{font-size:12px;line-height:1.35;color:#334e68}
+  .status{font-size:12px;font-weight:700;border-radius:6px;padding:7px;border:1px solid #f0a500;background:#fff7e6;color:#9a6700;line-height:1.35}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.panel{display:grid;grid-template-columns:1fr 1fr}.task,.readout,.formula,.status{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage">
+    <canvas id="canvas" width="940" height="560" aria-label="x-t 图像交互实验台"></canvas>
+    <div class="tip">可拖动 x-t 图上的 P、Q 点；看图上点怎样对应直线轨道上的小车位置</div>
+  </div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>拖 P 点读某时刻位置；拖 Q 点量割线斜率；再看上方真实小车只在水平轨道上运动，x-t 图线不是轨迹。</div>
+    <div class="card">
+      <div class="title">运动类型</div>
+      <div class="mode">
+        <button id="mUniform" class="active">匀速</button><button id="mAccel">加速</button>
+        <button id="mDecel">减速</button><button id="mStill">静止</button>
+      </div>
+      <div class="mode" style="margin-top:6px"><button id="playBtn">▶ 播放：小车随时间运动</button><button id="resetBtn">重置播放</button></div>
+    </div>
+    <div class="readout" id="readout"></div>
+    <div class="card formula">
+      <div class="title">公式绑定</div>
+      <div>图上点 `(t,x)`：某时刻的位置。</div>
+      <div>割线斜率 `Δx/Δt`：平均速度。</div>
+      <div>切线斜率：该时刻瞬时速度。</div>
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  let mode='uniform', t=3, dt=1.5, drag=null, layout={}, playing=false, playClock=0;
+  const graph={ox:84,oy:420,w:500,h:300,tMax:6};
+  function params(){
+    if(mode==='uniform')return{x0:0,v0:4,a:0,name:'匀速直线'};
+    if(mode==='accel')return{x0:0,v0:1.5,a:1.2,name:'加速'};
+    if(mode==='decel')return{x0:4,v0:7,a:-1.4,name:'减速'};
+    return{x0:10,v0:0,a:0,name:'静止'};
+  }
+  function xAt(tt){const p=params();return p.x0+p.v0*tt+0.5*p.a*tt*tt;}
+  function vAt(tt){const p=params();return p.v0+p.a*tt;}
+  function bounds(){
+    let min=0,max=0;
+    for(let i=0;i<=60;i++){const x=xAt(6*i/60);min=Math.min(min,x);max=Math.max(max,x);}
+    const pad=Math.max(4,(max-min)*.18);return{min:min-pad,max:max+pad};
+  }
+  function sx(tt){return graph.ox+tt/graph.tMax*graph.w;}
+  function sy(x){const b=bounds();return graph.oy-(x-b.min)/(b.max-b.min)*graph.h;}
+  function timeFromX(x){return Math.max(0.05,Math.min(5.95,(x-graph.ox)/graph.w*graph.tMax));}
+  function snap(x,s){return Math.round(x/s)*s;}
+  function text(s,x,y,c,a,size,w){ctx.fillStyle=c||'#102a43';ctx.font=(w?w+' ':'')+(size||13)+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';ctx.textAlign=a||'center';ctx.textBaseline='middle';ctx.fillText(s,x,y);}
+  function line(x1,y1,x2,y2,c,w,dash){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w||2;ctx.setLineDash(dash||[]);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();}
+  function box(x,y,w,h,fill,stroke,r){ctx.save();ctx.fillStyle=fill;ctx.strokeStyle=stroke||'#d9e2ec';ctx.lineWidth=1.4;ctx.beginPath();ctx.roundRect(x,y,w,h,r==null?8:r);ctx.fill();ctx.stroke();ctx.restore();}
+  function handle(x,y,label,c){ctx.save();ctx.fillStyle=c;ctx.strokeStyle='#102a43';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,9,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-22,c,'center',12,'700');ctx.restore();}
+  function drawAxes(){
+    const b=bounds();
+    line(graph.ox,graph.oy,graph.ox+graph.w+24,graph.oy,'#334e68',2);
+    line(graph.ox,graph.oy,graph.ox,graph.oy-graph.h-20,'#334e68',2);
+    text('t/s',graph.ox+graph.w+42,graph.oy,'#486581','center',12,'700');
+    text('x/m',graph.ox-26,graph.oy-graph.h-26,'#486581','center',12,'700');
+    for(let i=0;i<=6;i++){line(sx(i),graph.oy-5,sx(i),graph.oy+5,'#829ab1',1.4);text(String(i),sx(i),graph.oy+21,'#486581','center',11);}
+    for(let i=0;i<=4;i++){const val=b.min+(b.max-b.min)*i/4;line(graph.ox-5,sy(val),graph.ox+5,sy(val),'#829ab1',1.4);text(val.toFixed(0),graph.ox-18,sy(val),'#486581','right',10);}
+  }
+  function drawCurve(){
+    ctx.strokeStyle='#334e68';ctx.lineWidth=3;ctx.beginPath();
+    for(let i=0;i<=120;i++){const tt=6*i/120,px=sx(tt),py=sy(xAt(tt));if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}
+    ctx.stroke();
+  }
+  function draw(){
+    if(t+dt>6)dt=6-t;if(dt<0.05)dt=0.05;layout={};
+    const t1=t,t2=t+dt,x1=xAt(t1),x2=xAt(t2),v=vAt(t1),vAvg=(x2-x1)/dt;
+    ctx.clearRect(0,0,940,560);
+    text('x-t 图像实验台：图上点是“时间-位置记录”，不是空间轨迹',470,32,'#102a43','center',18,'700');
+    box(44,58,852,112,'#f8fbff','#d9e2ec');
+    text('真实运动轨道：小车只在一条直线上运动',470,84,'#334e68','center',14,'700');
+    const roadX0=130,roadX1=810,roadY=128;
+    line(roadX0,roadY,roadX1,roadY,'#aab8c2',4);
+    const b=bounds();
+    const carX=roadX0+(x1-b.min)/(b.max-b.min)*(roadX1-roadX0);
+    ctx.save();ctx.shadowColor='rgba(44,123,229,.5)';ctx.shadowBlur=10;
+    box(carX-24,roadY-28,48,24,'#2c7be5','#1b4f91',5);
+    ctx.restore();
+    ctx.fillStyle='#334e68';ctx.beginPath();ctx.arc(carX-14,roadY,5,0,Math.PI*2);ctx.arc(carX+14,roadY,5,0,Math.PI*2);ctx.fill();
+    text('x='+x1.toFixed(1)+'m',carX,roadY-46,'#2c7be5','center',12,'700');
+    if(Math.abs(v)>0.05){const dir=v>0?1:-1;line(carX,roadY-16,carX+dir*Math.min(120,Math.abs(v)*14),roadY-16,'#2c7be5',3);text('v',carX+dir*Math.min(120,Math.abs(v)*14)+12,roadY-16,'#2c7be5','center',12,'700');}
+
+    box(44,190,852,260,'#fff','#d9e2ec');
+    drawAxes();drawCurve();
+    const p1={x:sx(t1),y:sy(x1)},p2={x:sx(t2),y:sy(x2)};
+    line(p1.x,p1.y,p2.x,p2.y,'#f0a500',3);
+    const tl=.8,ta=Math.max(0,t1-tl),tb=Math.min(6,t1+tl);
+    line(sx(ta),sy(x1-v*(t1-ta)),sx(tb),sy(x1+v*(tb-t1)),'#7b2cbf',2.5,[6,4]);
+    line(p1.x,graph.oy,p1.x,p1.y,'#2c7be5',1.5,[5,4]);
+    line(graph.ox,p1.y,p1.x,p1.y,'#2c7be5',1.5,[5,4]);
+    handle(p1.x,p1.y,'P(t)','#2c7be5');handle(p2.x,p2.y,'Q','#f0a500');
+    layout.P={x:p1.x,y:p1.y};layout.Q={x:p2.x,y:p2.y};
+    text('P 点读数：(t='+t1.toFixed(2)+'s, x='+x1.toFixed(2)+'m)',330,216,'#2c7be5','center',13,'700');
+    text('割线斜率='+vAvg.toFixed(2)+' m/s；切线斜率='+v.toFixed(2)+' m/s',330,238,'#7b2cbf','center',13,'700');
+
+    box(132,470,676,52,'#fff7e6','#f0a500');
+    text('不要把 x-t 图线当运动轨迹：真实轨迹在上方水平路面，图线只是位置 x 随时间 t 的记录。',470,492,'#9a6700','center',14,'700');
+    update(vAvg,v);
+  }
+  function update(vAvg,v){
+    document.getElementById('readout').innerHTML='运动类型=<b>'+params().name+'</b><br>t=<b>'+t.toFixed(2)+' s</b><br>x=<b>'+xAt(t).toFixed(2)+' m</b><br>割线斜率=<b>'+vAvg.toFixed(2)+' m/s</b><br>切线斜率 v=<b>'+v.toFixed(2)+' m/s</b><br>播放状态：<b>'+(playing?'播放中':'暂停')+'</b>';
+    document.getElementById('status').textContent='x-t 图的斜率表示速度；交点才表示同一时刻同一位置，图线形状不是空间路线。';
+  }
+  function setMode(m){
+    mode=m;t=3;dt=1.5;
+    [['mUniform','uniform'],['mAccel','accel'],['mDecel','decel'],['mStill','still']].forEach(p=>document.getElementById(p[0]).classList.toggle('active',m===p[1]));
+    draw();
+  }
+  function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
+  canvas.addEventListener('pointerdown',e=>{
+    if(playing){playing=false;document.getElementById('playBtn').textContent='▶ 播放：小车随时间运动';}
+    const p=pointer(e);for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30){drag=k;canvas.setPointerCapture(e.pointerId);break;}}});
+  canvas.addEventListener('pointermove',e=>{
+    const p=pointer(e);
+    if(drag){if(drag==='P'){t=snap(timeFromX(p.x),.05);if(t+dt>6)dt=6-t;} if(drag==='Q'){dt=Math.max(.05,snap(timeFromX(p.x)-t,.05));if(t+dt>6)dt=6-t;} draw();return;}
+    let hit=false;for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30)hit=true;}canvas.style.cursor=hit?'grab':'default';
+  });
+  window.addEventListener('pointerup',()=>{drag=null;canvas.style.cursor='default';});
+  document.getElementById('mUniform').onclick=()=>setMode('uniform');
+  document.getElementById('mAccel').onclick=()=>setMode('accel');
+  document.getElementById('mDecel').onclick=()=>setMode('decel');
+  document.getElementById('mStill').onclick=()=>setMode('still');
+  function animate(){
+    if(!playing)return;
+    playClock+=0.02;
+    t=playClock%5.9;
+    if(t+dt>6)dt=6-t;
+    draw();
+    requestAnimationFrame(animate);
+  }
+  document.getElementById('playBtn').onclick=()=>{
+    playing=!playing;
+    document.getElementById('playBtn').textContent=playing?'⏸ 暂停':'▶ 播放：小车随时间运动';
+    if(playing){playClock=t;animate();}else draw();
+  };
+  document.getElementById('resetBtn').onclick=()=>{playing=false;playClock=0;t=3;dt=1.5;document.getElementById('playBtn').textContent='▶ 播放：小车随时间运动';draw();};
+  draw();
+})();
+</script>
+</body>
+</html>

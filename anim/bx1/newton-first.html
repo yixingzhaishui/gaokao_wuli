@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>牛顿第一定律实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 306px;gap:10px;padding:10px;min-height:540px}
+  .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;touch-action:none}
+  .panel{display:flex;flex-direction:column;gap:8px}
+  .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
+  .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.45}
+  .title{font-weight:800;margin-bottom:5px;color:#0f172a}
+  .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:30px;cursor:pointer;color:#102a43}
+  button.active{background:#e0f2fe;border-color:#0284c7;color:#075985;font-weight:800}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:48px}
+  .meter span{display:block;font-size:11px;color:#b6c5d8}
+  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:16px;font-variant-numeric:tabular-nums}
+  .formula{display:grid;gap:5px;font-size:13px;color:#334155}
+  .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
+  .formula div:last-child{border-bottom:0;padding-bottom:0}
+  .formula b{white-space:nowrap;color:#0f172a}
+  .small{font-size:12px;line-height:1.5;color:#475569}
+  .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
+  .status.warn{border-color:#f59e0b;background:#fff7ed;color:#b45309}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="920" height="520" aria-label="牛顿第一定律交互实验台"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>拖动粗糙度尺把 μ 变小；看频闪点、停止距离和 v-t 图怎样变化。把 μ 拖到 0，看速度是否保持不变。</div>
+    <div class="card">
+      <div class="title">快速情境</div>
+      <div class="chips">
+        <button data-mu="0.45">粗糙毛毡</button>
+        <button data-mu="0.20" class="active">普通木板</button>
+        <button data-mu="0.04">近似光滑</button>
+        <button data-mu="0">理想无阻</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="title">实时读数</div>
+      <div class="readout">
+        <div class="meter"><span>初速度 v0</span><b id="v0Text">6.0 m/s</b></div>
+        <div class="meter"><span>摩擦因数 μ</span><b id="muText">0.20</b></div>
+        <div class="meter"><span>观察时刻 t</span><b id="timeText">2.0 s</b></div>
+        <div class="meter"><span>当前速度 v</span><b id="vText">2.0 m/s</b></div>
+      </div>
+    </div>
+    <div class="card formula">
+      <div><span>合力为 0</span><b>v 保持不变</b></div>
+      <div><span>有摩擦</span><b>a=-μg</b></div>
+      <div><span>停止距离</span><b>s停=v0²/(2μg)</b></div>
+    </div>
+    <div class="card small"><b>可直接操作：</b>抓蓝色速度发射器改变 v0；抓粗糙度尺改变 μ；抓时间尺红点改变观察时刻。</div>
+    <div class="chips"><button id="playBtn">▶ 播放：小车随时间运动</button><button id="resetBtn">重置</button></div>
+    <div class="status" id="status">有摩擦：合力不为 0，速度被改变，最后停止。</div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const state={v0:6,mu:.2,t:2,drag:null,playing:false};
+  const g=10;
+  const els={
+    v0:document.getElementById('v0Text'),
+    mu:document.getElementById('muText'),
+    time:document.getElementById('timeText'),
+    v:document.getElementById('vText'),
+    status:document.getElementById('status')
+  };
+  const colors={blue:'#2563eb',red:'#dc2626',ink:'#102a43',muted:'#64748b',line:'#94a3b8',green:'#0f766e',orange:'#f59e0b'};
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  const fmt=(v,d=1)=>v.toFixed(d);
+  function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){
+    ctx.fillStyle=c;
+    ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;
+    ctx.textAlign=a;
+    ctx.textBaseline='middle';
+    ctx.fillText(s,x,y);
+  }
+  function line(x1,y1,x2,y2,c=colors.line,w=2,dash){
+    ctx.save();
+    ctx.strokeStyle=c;ctx.lineWidth=w;
+    if(dash)ctx.setLineDash(dash);
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    ctx.restore();
+  }
+  function arrow(x1,y1,x2,y2,c,w=3){
+    const a=Math.atan2(y2-y1,x2-x1);
+    line(x1,y1,x2,y2,c,w);
+    ctx.save();
+    ctx.fillStyle=c;
+    ctx.beginPath();
+    ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));
+    ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+  function roundRect(x,y,w,h,r,fill,stroke){
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(x,y,w,h,r);
+    ctx.fillStyle=fill;ctx.fill();
+    if(stroke){ctx.strokeStyle=stroke;ctx.stroke();}
+    ctx.restore();
+  }
+  function values(t=state.t){
+    const mu=state.mu<.005?0:state.mu;
+    const a=mu*g;
+    const stopT=mu===0?Infinity:state.v0/a;
+    const useT=Math.min(t,stopT);
+    const x=state.v0*useT-.5*a*useT*useT;
+    const v=Math.max(0,state.v0-a*t);
+    const stopDist=mu===0?Infinity:state.v0*state.v0/(2*a);
+    return{a,mu,stopT,useT,x,v,stopDist};
+  }
+  function geom(){
+    const vKnob={x:94+state.v0/12*210,y:74};
+    const muKnob={x:112+state.mu/.6*250,y:438};
+    const tKnob={x:488+state.t/8*250,y:438};
+    return{vKnob,muKnob,tKnob};
+  }
+  function drawHandle(x,y,label,active=false,c=colors.blue){
+    ctx.save();
+    ctx.fillStyle=active?'#fde68a':'#fff';
+    ctx.strokeStyle=active?'#d97706':c;
+    ctx.lineWidth=3;
+    ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();
+    text(label,x,y-22,active?'#92400e':c,'center',12,'900');
+    ctx.restore();
+  }
+  function drawRuler(x1,y,x2,label,c){
+    line(x1,y,x2,y,'#0f172a',2);
+    for(let i=0;i<=10;i++){
+      const x=x1+(x2-x1)*i/10;
+      line(x,y-5,x,y+5,'#0f172a',1);
+    }
+    text(label,(x1+x2)/2,y-18,c||'#334155','center',12,'900');
+  }
+  function drawSurface(trackX,trackY,trackW){
+    line(trackX,trackY,trackX+trackW,trackY,'#334155',5);
+    const rough=Math.round(state.mu/.6*10);
+    for(let i=0;i<16;i++){
+      const x=trackX+i*32;
+      ctx.strokeStyle=i<rough?'#b45309':'#cbd5e1';
+      ctx.lineWidth=i<rough?3:2;
+      ctx.beginPath();
+      ctx.moveTo(x,trackY+10);
+      ctx.lineTo(x+18,trackY+10+(i<rough?8:2));
+      ctx.stroke();
+    }
+  }
+  function drawCar(q){
+    const trackX=74,trackY=300,trackW=460,scale=20;
+    drawSurface(trackX,trackY,trackW);
+    const carX=Math.min(trackX+trackW-66,trackX+q.x*scale);
+    roundRect(carX,trackY-36,64,34,7,'#e2e8f0','#334155');
+    ctx.fillStyle='#0f172a';
+    ctx.beginPath();ctx.arc(carX+16,trackY+3,6,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(carX+48,trackY+3,6,0,Math.PI*2);ctx.fill();
+    arrow(carX+64,trackY-22,carX+64+Math.min(86,q.v*9),trackY-22,colors.blue,4);
+    if(q.mu>0 && q.v>0)arrow(carX+2,trackY-14,carX-52,trackY-14,colors.red,3);
+    text(`v=${fmt(q.v)}m/s`,carX+118,trackY-40,colors.blue,'center',13,'900');
+    if(q.mu>0)text('摩擦力',carX-54,trackY-34,colors.red,'center',12,'900');
+    for(let t=0;t<=Math.min(8,Number.isFinite(q.stopT)?q.stopT:8);t+=.5){
+      const p=values(t);
+      const x=Math.min(trackX+trackW-10,trackX+p.x*scale);
+      ctx.fillStyle=t<=state.t?'#2563eb':'#cbd5e1';
+      ctx.globalAlpha=t<=state.t?.75:.45;
+      ctx.beginPath();ctx.arc(x,trackY+28,3.5,0,Math.PI*2);ctx.fill();
+      ctx.globalAlpha=1;
+    }
+    text(`停止距离：${Number.isFinite(q.stopDist)?fmt(q.stopDist)+' m':'无限远'}`,304,356,'#475569','center',13,'900');
+  }
+  function drawGraph(q){
+    roundRect(558,72,300,244,8,'#f8fafc','#d7dee8');
+    text('v-t 图：斜率来自合力',708,98,'#0f172a','center',16,'900');
+    const ox=604,oy=268,w=220,h=140,tMax=8,vMax=12;
+    for(let x=0;x<=8;x+=2)line(ox+x/tMax*w,oy-h,ox+x/tMax*w,oy,'#e2e8f0',1);
+    for(let v=0;v<=12;v+=3)line(ox,oy-v/vMax*h,ox+w,oy-v/vMax*h,'#e2e8f0',1);
+    arrow(ox,oy,ox+w+16,oy,'#334155',2);
+    arrow(ox,oy,ox,oy-h-16,'#334155',2);
+    text('t',ox+w+26,oy,'#475569','left',12,'800');
+    text('v',ox-8,oy-h-22,'#475569','right',12,'800');
+    ctx.save();
+    ctx.strokeStyle=colors.blue;ctx.lineWidth=3;ctx.beginPath();
+    for(let i=0;i<=80;i++){
+      const t=i/10,p=values(t);
+      const x=ox+t/tMax*w,y=oy-p.v/vMax*h;
+      if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    }
+    ctx.stroke();ctx.restore();
+    const px=ox+state.t/tMax*w,py=oy-q.v/vMax*h;
+    ctx.fillStyle=colors.red;ctx.beginPath();ctx.arc(px,py,6,0,Math.PI*2);ctx.fill();
+    text(q.mu===0?'水平线：速度不变':'向下斜：速度被改变',708,294,q.mu===0?colors.green:colors.red,'center',13,'900');
+  }
+  function update(q){
+    els.v0.textContent=`${fmt(state.v0)} m/s`;
+    els.mu.textContent=fmt(state.mu,2);
+    els.time.textContent=`${fmt(state.t)} s`;
+    els.v.textContent=`${fmt(q.v)} m/s`;
+    document.querySelectorAll('[data-mu]').forEach(btn=>btn.classList.toggle('active',Math.abs(+btn.dataset.mu-state.mu)<.005));
+    els.status.className='status'+(q.mu===0?'':' warn');
+    els.status.textContent=(q.mu===0?'理想无阻：合力为 0，小车保持原来的速度做匀速直线运动。':'有摩擦：合力不为 0，速度被改变，最后停止。')+(state.playing?'（播放中：t 自动前进）':'');
+  }
+  function draw(){
+    const q=values(),g0=geom();
+    ctx.clearRect(0,0,920,520);
+    var _bg=ctx.createLinearGradient(0,0,0,520);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,520);
+    text('牛顿第一定律实验台：力不是维持运动的原因，力改变运动状态',460,30,'#0f172a','center',19,'900');
+    roundRect(42,56,498,330,8,'#fff','#d7dee8');
+    arrow(94,74,g0.vKnob.x,g0.vKnob.y,colors.blue,4);
+    drawHandle(g0.vKnob.x,g0.vKnob.y,`v0=${fmt(state.v0)}`,state.drag==='v0',colors.blue);
+    drawCar(q);
+    drawGraph(q);
+    roundRect(42,404,816,76,8,'#fff','#d7dee8');
+    drawRuler(112,438,362,'拖 μ：光滑 → 粗糙',colors.red);
+    drawHandle(g0.muKnob.x,g0.muKnob.y,`μ=${fmt(state.mu,2)}`,state.drag==='mu',colors.red);
+    drawRuler(488,438,738,'拖 t：观察时刻',colors.orange);
+    drawHandle(g0.tKnob.x,g0.tKnob.y,`${fmt(state.t)}s`,state.drag==='t',colors.orange);
+    update(q);
+  }
+  function pos(evt){
+    const r=canvas.getBoundingClientRect();
+    return{x:(evt.clientX-r.left)*canvas.width/r.width,y:(evt.clientY-r.top)*canvas.height/r.height};
+  }
+  function near(a,b,rad=24){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+  function pointerDown(evt){
+    if(state.playing){state.playing=false;document.getElementById('playBtn').textContent='▶ 播放：小车随时间运动'}
+    const p=pos(evt),g0=geom();
+    if(near(p,g0.vKnob,28))state.drag='v0';
+    else if(near(p,g0.muKnob,28))state.drag='mu';
+    else if(near(p,g0.tKnob,28))state.drag='t';
+    else state.drag=null;
+    if(state.drag){canvas.setPointerCapture(evt.pointerId);pointerMove(evt);}
+  }
+  function pointerMove(evt){
+    if(!state.drag)return;
+    const p=pos(evt);
+    if(state.drag==='v0'){
+      state.v0=clamp((p.x-94)/210*12,1,12);
+    }else if(state.drag==='mu'){
+      state.mu=clamp((p.x-112)/250*.6,0,.6);
+    }else if(state.drag==='t'){
+      state.t=clamp((p.x-488)/250*8,0,8);
+    }
+    draw();
+  }
+  function pointerUp(evt){
+    if(state.drag){
+      state.drag=null;
+      try{canvas.releasePointerCapture(evt.pointerId);}catch(e){}
+      draw();
+    }
+  }
+  canvas.addEventListener('pointerdown',pointerDown);
+  canvas.addEventListener('pointermove',pointerMove);
+  canvas.addEventListener('pointerup',pointerUp);
+  canvas.addEventListener('pointercancel',pointerUp);
+  document.querySelectorAll('[data-mu]').forEach(btn=>btn.addEventListener('click',()=>{state.mu=+btn.dataset.mu;draw();}));
+  const playBtn=document.getElementById('playBtn');
+  function animate(){
+    if(!state.playing)return;
+    state.t=Math.min(8,state.t+0.04);
+    draw();
+    if(state.t>=8){state.playing=false;playBtn.textContent='▶ 播放：小车随时间运动';return}
+    requestAnimationFrame(animate);
+  }
+  playBtn.addEventListener('click',()=>{
+    state.playing=!state.playing;
+    playBtn.textContent=state.playing?'⏸ 暂停':'▶ 播放：小车随时间运动';
+    if(state.playing){if(state.t>=8)state.t=0;animate();}else draw();
+  });
+  document.getElementById('resetBtn').addEventListener('click',()=>{state.playing=false;state.t=0;playBtn.textContent='▶ 播放：小车随时间运动';draw();});
+  draw();
+})();
+</script>
+</body>
+</html>

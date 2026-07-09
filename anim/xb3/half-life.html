@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>半衰期：一半一半减少</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 14px; align-items: stretch; }
+  canvas { width: 100%; height: 430px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  input { width: 100%; }
+  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.8; font-size: 14px; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
+  @media (max-width: 760px) { .stage { grid-template-columns: 1fr; } canvas { height: 360px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="680" height="430" aria-label="半衰期衰减模型"></canvas>
+    <section class="panel">
+      <label for="n0">初始核数 N0：<span id="n0Val"></span></label>
+      <input id="n0" type="range" min="20" max="120" value="80" step="10">
+      <label for="half">半衰期 T：<span id="halfVal"></span></label>
+      <input id="half" type="range" min="1" max="10" value="4" step="1">
+      <label for="time">经过时间 t：<span id="timeVal"></span></label>
+      <input id="time" type="range" min="0" max="30" value="8" step="1">
+      <div id="readout" class="readout"></div>
+      <div class="hint">观察任务：把 t 调到 T、2T、3T，观察剩余比例依次约为 1/2、1/4、1/8。</div>
+    </section>
+  </div>
+</div>
+<script>
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const els = {
+  n0: document.getElementById('n0'),
+  half: document.getElementById('half'),
+  time: document.getElementById('time'),
+  n0Val: document.getElementById('n0Val'),
+  halfVal: document.getElementById('halfVal'),
+  timeVal: document.getElementById('timeVal'),
+  readout: document.getElementById('readout')
+};
+function draw() {
+  const n0 = Number(els.n0.value);
+  const T = Number(els.half.value);
+  const t = Number(els.time.value);
+  const factor = Math.pow(0.5, t / T);
+  const remain = Math.round(n0 * factor);
+  els.n0Val.textContent = n0;
+  els.halfVal.textContent = T;
+  els.timeVal.textContent = t;
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#f7f9fc';
+  ctx.fillRect(0, 0, c.width, c.height);
+
+  const cols = 12;
+  const size = 13;
+  for (let i = 0; i < n0; i++) {
+    const x = 36 + (i % cols) * 20;
+    const y = 48 + Math.floor(i / cols) * 20;
+    ctx.fillStyle = i < remain ? '#2c7be5' : '#d9e2ec';
+    ctx.beginPath();
+    ctx.arc(x, y, size / 2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 15px system-ui';
+  ctx.textAlign = 'left';
+  ctx.fillText('左侧格点：蓝色为未衰变，灰色为已衰变', 28, 252);
+
+  const ox = 330, oy = 340, w = 300, h = 230;
+  ctx.strokeStyle = '#334e68';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(ox, oy);
+  ctx.lineTo(ox + w, oy);
+  ctx.moveTo(ox, oy);
+  ctx.lineTo(ox, oy - h);
+  ctx.stroke();
+  ctx.fillStyle = '#486581';
+  ctx.font = '12px system-ui';
+  ctx.fillText('t', ox + w + 8, oy + 4);
+  ctx.fillText('N', ox - 18, oy - h - 4);
+  ctx.strokeStyle = '#e03131';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  for (let px = 0; px <= w; px += 4) {
+    const tt = px / w * 30;
+    const yy = oy - Math.pow(0.5, tt / T) * h;
+    if (px === 0) ctx.moveTo(ox + px, yy); else ctx.lineTo(ox + px, yy);
+  }
+  ctx.stroke();
+  const dotX = ox + t / 30 * w;
+  const dotY = oy - factor * h;
+  ctx.fillStyle = '#e03131';
+  ctx.beginPath();
+  ctx.arc(dotX, dotY, 7, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#829ab1';
+  ctx.setLineDash([5, 5]);
+  ctx.beginPath();
+  ctx.moveTo(dotX, oy);
+  ctx.lineTo(dotX, dotY);
+  ctx.lineTo(ox, dotY);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 16px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText(`N=N0(1/2)^(t/T)`, 480, 70);
+  ctx.fillStyle = '#486581';
+  ctx.font = '14px system-ui';
+  ctx.fillText(`t/T=${(t/T).toFixed(2)}，剩余比例=${(factor*100).toFixed(1)}%`, 480, 96);
+
+  els.readout.innerHTML = [
+    `N0=${n0}，T=${T}，t=${t}`,
+    `t/T=${(t / T).toFixed(2)} 个半衰期`,
+    `N=N0(1/2)^(t/T)≈${remain}`,
+    `已衰变≈${n0 - remain}，剩余比例≈${(factor * 100).toFixed(1)}%`
+  ].join('<br>');
+}
+Object.values(els).forEach(el => {
+  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
+});
+draw();
+</script>
+</body>
+</html>

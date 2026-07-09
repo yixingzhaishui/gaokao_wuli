@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>B1-13 自由落体实验台</title>
+<style>
+  *{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:#243b53;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+  .wrap{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px}.stage{position:relative;background:#fff;border:1px solid #d9e2ec;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;aspect-ratio:940/560;touch-action:none}.hint{position:absolute;left:14px;bottom:12px;background:#243b53;color:white;border-radius:6px;padding:7px 10px;font-size:12px}
+  .panel{display:flex;flex-direction:column;gap:8px}.box{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:9px}.task{background:#fff8e6;border-color:#f0a202;font-size:13px;line-height:1.5}
+  .buttons{display:grid;grid-template-columns:1fr 1fr;gap:6px}button{border:1px solid #bcccdc;background:white;color:#243b53;border-radius:6px;padding:8px 6px;font-weight:700;cursor:pointer}button.active{background:#2f80ed;color:white;border-color:#2f80ed}
+  .readout{background:#102a43;color:white;border-radius:7px;padding:10px;font-size:13px;line-height:1.65;font-weight:700}.readout b{color:#ffd166}.formula{font-size:13px;line-height:1.55}.warn{border-color:#f0a202;color:#7c4d00;background:#fff8e6;font-size:13px;line-height:1.5;font-weight:700}
+  @media (max-width:850px){.wrap{grid-template-columns:1fr}.panel{grid-row:2}.hint{position:static;border-radius:0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage"><canvas id="canvas" width="940" height="560" aria-label="自由落体交互实验台"></canvas><div class="hint">可拖动高度线 H、v-t 斜率点 g、橙色时间游标和质量旋钮</div></div>
+  <div class="panel">
+    <div class="box task"><b>观察任务：</b>拖质量旋钮只会改变球大小，不会改变两球同一高度；拖 g 看 v-t 斜率和落地时间；拖高度线看 t落 是否按 √H 变化。</div>
+    <div class="box"><b>环境</b><div class="buttons" style="margin-top:7px"><button id="mEarth" class="active">地球</button><button id="mMoon">月球</button><button id="mJupiter">木星</button><button id="mLow">低重力</button></div></div>
+    <div class="box"><button id="play" style="width:100%">▶ 播放下落</button></div>
+    <div class="readout" id="readout"></div>
+    <div class="box formula"><b>公式绑定</b><br>v=gt：v-t 纵坐标。<br>h=1/2gt²：v-t 面积。<br>v²=2gH：落地速度。<br>公式里没有 m。</div>
+    <div class="box warn" id="status"></div>
+  </div>
+</div>
+<script>
+(() => {
+  const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'),readout=document.getElementById('readout'),status=document.getElementById('status');
+  const buttons={earth:document.getElementById('mEarth'),moon:document.getElementById('mMoon'),jupiter:document.getElementById('mJupiter'),low:document.getElementById('mLow')};
+  const s={H:45,g:9.8,t:2,m:4,mode:'earth'}; const scene={x:70,top:52,bot:454,w:310}; const gv={ox:470,oy:430,w:330,h:300,tMax:5,vMax:55}; let drag=null,layout={};
+  function clamp(v,a,b){return Math.max(a,Math.min(b,v));} function tLand(){return Math.sqrt(2*s.H/s.g)} function vLand(){return Math.sqrt(2*s.g*s.H)} function tEff(){return Math.min(s.t,tLand())} function fallen(t){return Math.min(s.H,0.5*s.g*t*t)} function heightLeft(t){return Math.max(0,s.H-fallen(t))}
+  function yOfH(h){return scene.bot-h/80*(scene.bot-scene.top)} function hFromY(y){return clamp((scene.bot-y)/(scene.bot-scene.top)*80,5,80)} function gx(t){return gv.ox+t/gv.tMax*gv.w} function gy(v){return gv.oy-v/gv.vMax*gv.h} function tFromX(x){return clamp((x-gv.ox)/gv.w*gv.tMax,0,gv.tMax)} function gFromY(y){return clamp((gv.vMax+(gv.oy-y)/gv.h*0-gv.vMax),0,1)}
+  function line(x1,y1,x2,y2,c,w=1,d=[]){ctx.save();ctx.setLineDash(d);ctx.strokeStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()} function text(a,x,y,c='#243b53',z=13,al='left',wt='600'){ctx.fillStyle=c;ctx.font=`${wt} ${z}px system-ui`;ctx.textAlign=al;ctx.textBaseline='middle';ctx.fillText(a,x,y)}
+  function arrow(x1,y1,x2,y2,c,w=3){line(x1,y1,x2,y2,c,w);const a=Math.atan2(y2-y1,x2-x1),l=10;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-l*Math.cos(a-.55),y2-l*Math.sin(a-.55));ctx.lineTo(x2-l*Math.cos(a+.55),y2-l*Math.sin(a+.55));ctx.closePath();ctx.fillStyle=c;ctx.fill()} function handle(x,y,l,c){ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fillStyle=c;ctx.fill();ctx.strokeStyle='white';ctx.lineWidth=3;ctx.stroke();text(l,x+14,y-15,c,13)}
+  function card(x,y,w,h){ctx.fillStyle='#f7fbff';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke()}
+  function setMode(m){s.mode=m;if(m==='earth')s.g=9.8;if(m==='moon')s.g=1.6;if(m==='jupiter')s.g=24;if(m==='low')s.g=4;Object.entries(buttons).forEach(([k,b])=>b.classList.toggle('active',k===m));s.t=Math.min(s.t,tLand());draw()} Object.entries(buttons).forEach(([k,b])=>b.addEventListener('click',()=>setMode(k)));
+  function drawScene(){card(50,36,365,462);line(scene.x,scene.bot,scene.x+scene.w,scene.bot,'#334e68',3);const hY=yOfH(s.H);line(scene.x,hY,scene.x+scene.w,hY,'#f08c00',2,[6,5]);handle(scene.x+scene.w+8,hY,'H','#f08c00');layout.H={x:scene.x+scene.w+8,y:hY};text(`H=${s.H.toFixed(1)} m`,scene.x+12,hY-14,'#f08c00',13);for(let h=0;h<=80;h+=20){const y=yOfH(h);line(scene.x-6,y,scene.x+scene.w,y,'#d9e2ec');text(String(h),scene.x-12,y,'#627d98',11,'right','500')}
+    const y=yOfH(heightLeft(tEff())), r1=9, r2=clamp(5+s.m*1.3,8,22); for(let tt=0;tt<=tEff()+1e-6;tt+=0.25){const yy=yOfH(heightLeft(tt));ctx.fillStyle='rgba(240,140,0,.32)';ctx.beginPath();ctx.arc(scene.x+120,yy,4,0,Math.PI*2);ctx.arc(scene.x+205,yy,4,0,Math.PI*2);ctx.fill()}
+    ctx.fillStyle='#2f80ed';ctx.beginPath();ctx.arc(scene.x+120,y,r1,0,Math.PI*2);ctx.fill();ctx.fillStyle='#e03131';ctx.beginPath();ctx.arc(scene.x+205,y,r2,0,Math.PI*2);ctx.fill();arrow(scene.x+240,y,scene.x+240,y+clamp(s.g*3,18,70),'#7b2cbf',4);arrow(scene.x+245,y,scene.x+245,y+clamp(s.g*tEff()*2,16,90),'#2f80ed',3);text('两球同高：质量不同，下落规律相同',232,64,'#334e68',14,'center','800');
+    line(scene.x+40,488,scene.x+260,488,'#bcccdc',3);const mx=scene.x+40+(s.m-.1)/(10-.1)*220;handle(mx,488,'m','#e03131');layout.m={x:mx,y:488};text(`质量 m=${s.m.toFixed(1)} kg，只改红球大小`,232,518,'#0b7285',13,'center','800')}
+  function drawGraph(){card(438,36,410,462);line(gv.ox,gv.oy,gv.ox+gv.w+28,gv.oy,'#334e68',2);line(gv.ox,gv.oy,gv.ox,gv.oy-gv.h-20,'#334e68',2);text('t/s',gv.ox+gv.w+38,gv.oy+5,'#334e68',13);text('v/(m/s)',gv.ox-42,gv.oy-gv.h-22,'#334e68',13);for(let t=0;t<=5;t++){line(gx(t),gv.oy-5,gx(t),gv.oy+5,'#9fb3c8');text(String(t),gx(t),gv.oy+20,'#627d98',11,'center','500')}for(let v=0;v<=50;v+=10){line(gv.ox-5,gy(v),gv.ox+gv.w,gy(v),'#d9e2ec');text(String(v),gv.ox-12,gy(v),'#627d98',11,'right','500')}
+    const tl=tLand(), te=tEff(), vl=vLand();ctx.fillStyle='rgba(240,140,0,.23)';ctx.beginPath();ctx.moveTo(gv.ox,gv.oy);ctx.lineTo(gx(te),gv.oy);ctx.lineTo(gx(te),gy(s.g*te));ctx.closePath();ctx.fill();line(gv.ox,gy(0),gx(tl),gy(vl),'#2f80ed',3);line(gx(tl),gv.oy,gx(tl),gy(vl),'#12b886',2,[6,5]);handle(gx(3),gy(3*s.g),'调g','#7b2cbf');layout.g={x:gx(3),y:gy(3*s.g)};handle(gx(te),gy(s.g*te),'t','#f08c00');layout.t={x:gx(te),y:gy(s.g*te)};text(`面积 h=${fallen(te).toFixed(1)} m`,gx(Math.max(.6,te*.55)),gy(s.g*te*.45)+18,'#f08c00',13);text(`落地：t=${tl.toFixed(2)} s, v=${vl.toFixed(1)} m/s`,640,74,'#0b7285',14,'center','800')}
+  function draw(){var _bg=ctx.createLinearGradient(0,0,0,560);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,940,560);layout={};drawScene();drawGraph();const te=tEff(),tl=tLand(),vl=vLand();readout.innerHTML=`H=<b>${s.H.toFixed(1)}</b> m<br>g=<b>${s.g.toFixed(2)}</b> m/s²<br>m=<b>${s.m.toFixed(1)}</b> kg<br>t=<b>${te.toFixed(2)}</b> s<br>已下落=<b>${fallen(te).toFixed(2)}</b> m<br>当前 v=<b>${(s.g*te).toFixed(2)}</b> m/s<br>t落=<b>${tl.toFixed(2)}</b> s<br>v落=<b>${vl.toFixed(2)}</b> m/s`;status.textContent=s.t>=tl?'已落地：v²=2gH，质量 m 仍不出现在公式中。':(s.g<2?'月球 g 小：斜率小、落地慢；质量仍无关。':'自由落体只由 H 和 g 决定；质量只改变画面大小。')}
+  function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}} canvas.addEventListener('pointerdown',e=>{const p=pointer(e);for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30){drag=k;canvas.setPointerCapture(e.pointerId);break}}});
+  canvas.addEventListener('pointermove',e=>{const p=pointer(e);if(drag==='H')s.H=Math.round(hFromY(p.y));if(drag==='m')s.m=Math.round(clamp(.1+(p.x-(scene.x+40))/220*(10-.1),.1,10)*10)/10;if(drag==='t')s.t=Math.round(tFromX(p.x)*20)/20;if(drag==='g')s.g=Math.round(clamp((gv.oy-p.y)/gv.h*gv.vMax/3,1,24)*10)/10;if(drag){draw();return}let hit=false;for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30)hit=true}canvas.style.cursor=hit?'grab':'default'});window.addEventListener('pointerup',()=>{drag=null;canvas.style.cursor='default'});draw();
+  const playBtn=document.getElementById('play');let running=false,last=performance.now();
+  playBtn.addEventListener('click',()=>{if(s.t>=tLand())s.t=0;running=!running;playBtn.textContent=running?'⏸ 暂停':'▶ 播放下落';});
+  function loop(now){const dt=Math.min((now-last)/1000,.05);last=now;if(running){s.t=Math.min(tLand(),s.t+dt);if(s.t>=tLand()){running=false;playBtn.textContent='▶ 重新下落';}draw();}requestAnimationFrame(loop);}
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

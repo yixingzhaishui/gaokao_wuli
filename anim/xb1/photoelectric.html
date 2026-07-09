@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>光电效应</title>
+<link rel="stylesheet" href="../common/controls.css">
+<style>
+body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#f7f9fc;color:#1f2933}
+.container{padding:12px}
+h2{font-size:16px;margin:0 0 8px;color:#102a43}
+canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid #d9e2ec;border-radius:8px;touch-action:none;cursor:grab}
+.readouts{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0;font-size:13px}
+.readouts .r{background:#102a43;color:#d9e2ec;padding:6px 10px;border-radius:6px}
+.readouts .r b{color:#f0a500}
+.controls{display:flex;flex-wrap:wrap;gap:14px;margin:10px 0;align-items:center}
+.controls label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:#334e68}
+.controls input[type=range]{width:130px;accent-color:#2c7be5}
+.controls button{font:inherit;padding:6px 14px;border:1px solid #b0bcc9;background:#fff;border-radius:6px;cursor:pointer}
+.controls button:hover{background:#eef2f7}
+.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:8px 12px;border-radius:4px;font-size:13px;color:#486581;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>光电效应：Eₖ = hν − W₀（频率不够，再强也不发射）</h2>
+  <canvas id="canvas" width="660" height="360"></canvas>
+  <div class="readouts">
+    <span class="r">频率 ν = <b id="nu-v">7.0</b> ×10¹⁴ Hz</span>
+    <span class="r">逸出功 W₀ = <b id="w-v">2.3</b> eV</span>
+    <span class="r">截止频率 ν₀ = <b id="nu0-v">—</b> ×10¹⁴ Hz</span>
+    <span class="r">最大初动能 Eₖ = <b id="ek-v">—</b> eV</span>
+    <span class="r">状态：<b id="st-v">—</b></span>
+  </div>
+  <div class="controls">
+    <label>光频率 ν = <span id="nu-d">7.0</span> ×10¹⁴ Hz
+      <input type="range" id="nu" min="3" max="12" step="0.1" value="7"></label>
+    <label>逸出功 W₀ = <span id="w-d">2.3</span> eV
+      <input type="range" id="w" min="1.5" max="4.5" step="0.1" value="2.3"></label>
+    <label>光强 = <span id="int-d">中</span>
+      <input type="range" id="int" min="1" max="3" step="1" value="2"></label>
+    <button id="play-btn">暂停</button>
+    <button id="reset-btn">重置</button>
+    <span style="font-size:13px;color:#486581">或拖能量条端点</span>
+  </div>
+  <div class="hint">
+    <p><b>观察任务</b>：光照到金属上。拖<b>蓝色 hν 条端点</b>改频率：低于截止频率 ν₀=W₀/h 时<b>一个电子都打不出</b>（无论多强）；超过 ν₀ 才有电子逸出，且 ν 越高电子飞得越快（最大初动能 Eₖ=hν−W₀ 越大）。拖<b>光强</b>：只改变逸出电子的<b>数量</b>（多少），<b>不改变</b>每个电子的最大动能。拖<b>灰色 W₀ 条端点</b>：金属越"难逸出"，截止频率越高。</p>
+  </div>
+</div>
+<script>
+(function(){
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  const h=6.63e-34, e=1.6e-19, hEV=4.136e-15; // eV·s
+  let nu=7.0, w=2.3, inten=2, t=0, running=true,dragBar='';
+  let electrons=[];
+  const metalX=180, metalTop=90, metalBot=270;
+  function nu0(){return w/ hEV /1e14;} // in ×10^14 Hz
+  function ek(){return Math.max(0, hEV*nu*1e14 - w);} // eV
+  function emitting(){return nu >= nu0();}
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    // light beam
+    const col = nu<4.5?'#8a3ffb': nu<6?'#2c7be5': nu<7.5?'#12b886': nu<9?'#f0a500':'#e8590c';
+    for(let k=0;k<inten*3;k++){
+      ctx.strokeStyle=col;ctx.globalAlpha=0.5;ctx.lineWidth=2;
+      const y=metalTop+ (k*11)% (metalBot-metalTop);
+      ctx.beginPath();ctx.moveTo(20,y);ctx.lineTo(metalX-4,y+8);ctx.stroke();
+    }
+    ctx.globalAlpha=1;
+    ctx.fillStyle='#5a7a99';ctx.font='12px sans-serif';ctx.textAlign='center';ctx.fillText('入射光 ν',80,metalTop-14);
+    // 金属表面辉光真实感（发射越强越亮）
+    const glow=ctx.createRadialGradient(metalX+11,(metalTop+metalBot)/2,2,metalX+11,(metalTop+metalBot)/2,70);
+    const gA=emitting()?0.15+0.12*inten:0.03;
+    glow.addColorStop(0,'rgba('+ (nu<5?'138,63,251':'240,165,0') +','+gA+')');glow.addColorStop(1,'rgba(240,165,0,0)');
+    ctx.fillStyle=glow;ctx.beginPath();ctx.arc(metalX+11,(metalTop+metalBot)/2,70,0,7);ctx.fill();
+    // metal plate
+    ctx.fillStyle='#8592a0';ctx.fillRect(metalX,metalTop,22,metalBot-metalTop);
+    ctx.fillStyle='#5a7a99';ctx.fillText('金属',metalX+11,metalBot+18);ctx.fillText('W₀',metalX+11,metalBot+32);
+    // collector
+    ctx.fillStyle='#b0bcc9';ctx.fillRect(600,metalTop,16,metalBot-metalTop);
+    ctx.fillStyle='#5a7a99';ctx.fillText('集电极',608,metalTop-14);
+    // electrons
+    ctx.fillStyle='#c92a2a';
+    for(const el of electrons){ctx.beginPath();ctx.arc(el.x,el.y,4,0,Math.PI*2);ctx.fill();}
+    // status text
+    ctx.font='bold 14px sans-serif';ctx.textAlign='left';
+    if(emitting()){ctx.fillStyle='#1a7a1a';ctx.fillText('ν ≥ ν₀：有光电子逸出，Eₖ=hν−W₀='+ek().toFixed(2)+' eV',markX(),70);}
+    else{ctx.fillStyle='#c92a2a';ctx.fillText('ν < ν₀：无光电子（光再强也没用）',markX(),70);}
+    // energy bar
+    drawEnergyBar();
+    document.getElementById('nu-v').textContent=nu.toFixed(1);
+    document.getElementById('w-v').textContent=w.toFixed(1);
+    document.getElementById('nu0-v').textContent=nu0().toFixed(2);
+    document.getElementById('ek-v').textContent=ek().toFixed(2);
+    document.getElementById('st-v').textContent=emitting()?'发射电子':'低于截止频率';
+  }
+  function markX(){return 200;}
+  function drawEnergyBar(){
+    const bx=300, by=300, bw=320;
+    const photon=hEV*nu*1e14;
+    ctx.font='11px sans-serif';ctx.textAlign='left';
+    // photon energy hν
+    ctx.fillStyle='#2c7be5';ctx.fillRect(bx,by,Math.min(bw,photon/6*bw),12);
+    ctx.fillStyle='#243b53';ctx.fillText('hν = '+photon.toFixed(2)+' eV',bx,by-4);
+    drawHandle(bx+Math.min(bw,photon/6*bw),by+6,'#2c7be5');
+    // W0 portion
+    ctx.fillStyle='#8592a0';ctx.fillRect(bx,by+16,Math.min(bw,w/6*bw),12);
+    ctx.fillText('W₀ = '+w.toFixed(2)+' eV',bx,by+16+22);
+    drawHandle(bx+Math.min(bw,w/6*bw),by+22,'#8592a0');
+    // Ek portion
+    ctx.fillStyle='#1a7a1a';ctx.fillRect(bx+Math.min(bw,w/6*bw),by+16,Math.max(0,ek()/6*bw),12);
+    ctx.fillStyle='#1a7a1a';ctx.fillText('Eₖ='+ek().toFixed(2)+' eV',bx+Math.min(bw,w/6*bw)+4,by+16+22);
+  }
+  function drawHandle(x,y,col){ctx.fillStyle='#fff';ctx.strokeStyle=col;ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,6,0,Math.PI*2);ctx.fill();ctx.stroke();}
+  function step(dt){
+    t+=dt;
+    if(emitting() && Math.random()<inten*0.25){
+      const speed=120+ek()*160;
+      electrons.push({x:metalX+22,y:metalTop+20+Math.random()*(metalBot-metalTop-40),vx:speed});
+    }
+    for(const el of electrons)el.x+=el.vx*dt;
+    electrons=electrons.filter(el=>el.x<600);
+  }
+  function sync(){
+    document.getElementById('nu').value=nu;document.getElementById('w').value=w;document.getElementById('int').value=inten;
+    document.getElementById('nu-d').textContent=nu.toFixed(1);document.getElementById('w-d').textContent=w.toFixed(1);
+    document.getElementById('int-d').textContent=['','低','中','高'][inten];
+  }
+  function pos(e){const r=canvas.getBoundingClientRect(),s=canvas.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s};}
+  canvas.addEventListener('pointerdown',e=>{const p=pos(e);const bx=300,by=300,bw=320;const photon=hEV*nu*1e14;const hx=bx+Math.min(bw,photon/6*bw),wx=bx+Math.min(bw,w/6*bw);if(Math.hypot(p.x-hx,p.y-(by+6))<18){dragBar='nu';canvas.setPointerCapture(e.pointerId);}else if(Math.hypot(p.x-wx,p.y-(by+22))<18){dragBar='w';canvas.setPointerCapture(e.pointerId);}});
+  canvas.addEventListener('pointermove',e=>{if(!dragBar)return;const p=pos(e);const bx=300,bw=320;const energy=Math.max(0.8,Math.min(6,(p.x-bx)/bw*6));if(dragBar==='nu'){nu=Math.max(3,Math.min(12,Math.round((energy/(hEV*1e14))*10)/10));}else{w=Math.max(1.5,Math.min(4.5,Math.round(energy*10)/10));}sync();draw();});
+  canvas.addEventListener('pointerup',()=>{dragBar='';});
+  canvas.addEventListener('pointercancel',()=>{dragBar='';});
+  function bind(id,cb){document.getElementById(id).addEventListener('input',e=>{cb(parseFloat(e.target.value));sync();draw();});}
+  bind('nu',v=>{nu=v;document.getElementById('nu-d').textContent=v.toFixed(1);});
+  bind('w',v=>{w=v;document.getElementById('w-d').textContent=v.toFixed(1);});
+  bind('int',v=>{inten=v;document.getElementById('int-d').textContent=['','低','中','高'][v];});
+  document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
+  document.getElementById('reset-btn').addEventListener('click',()=>{electrons=[];t=0;nu=7.0;w=2.3;inten=2;sync();draw();});
+  let last=performance.now();
+  function loop(now){const dt=Math.min((now-last)/1000,0.03);last=now;if(running)step(dt);draw();requestAnimationFrame(loop);}
+  sync();draw();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

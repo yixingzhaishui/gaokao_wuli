@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>理想气体状态</title>
+<link rel="stylesheet" href="../common/controls.css">
+<style>
+body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#f7f9fc;color:#1f2933}
+.container{padding:12px}
+h2{font-size:16px;margin:0 0 8px;color:#102a43}
+canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid #d9e2ec;border-radius:8px}
+.readouts{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0;font-size:13px}
+.readouts .r{background:#102a43;color:#d9e2ec;padding:6px 10px;border-radius:6px}
+.readouts .r b{color:#f0a500}
+.controls{display:flex;flex-wrap:wrap;gap:14px;margin:10px 0;align-items:center}
+.controls label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:#334e68}
+.controls input[type=range]{width:130px;accent-color:#2c7be5}
+.controls button{font:inherit;padding:6px 14px;border:1px solid #b0bcc9;background:#fff;border-radius:6px;cursor:pointer}
+.controls button:hover{background:#eef2f7}
+.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:8px 12px;border-radius:4px;font-size:13px;color:#486581;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>理想气体：pV/T = 常量（pV = nRT）</h2>
+  <canvas id="canvas" width="660" height="330"></canvas>
+  <div class="readouts">
+    <span class="r">体积 V = <b id="v-v">1.0</b></span>
+    <span class="r">温度 T = <b id="t-v">300</b> K</span>
+    <span class="r">压强 p = nRT/V = <b id="p-v">—</b></span>
+    <span class="r">pV/T = <b id="k-v">—</b>（守恒）</span>
+  </div>
+  <div class="controls">
+    <label>体积 V = <span id="v-d">1.0</span>
+      <input type="range" id="v" min="0.4" max="2.0" step="0.05" value="1"></label>
+    <label>温度 T = <span id="t-d">300</span> K
+      <input type="range" id="t" min="150" max="600" step="10" value="300"></label>
+    <button id="play-btn">暂停</button>
+    <button id="reset-btn">重置</button>
+  </div>
+  <div class="hint">
+    <p><b>观察任务</b>：气缸里封闭一定量理想气体。拖<b>体积 V</b> 变小（压缩活塞）→分子撞壁更频繁→压强 p 变大（等温时 pV=常量，玻意耳定律）；拖<b>温度 T</b> 升高→分子跑得更快撞得更猛→p 变大（等容时 p/T=常量，查理定律）。无论怎么拖，右上角 <b>pV/T 始终不变</b>（理想气体状态方程）。分子速度随 T 变化，撞壁频繁程度随 V、T 变化。</p>
+  </div>
+</div>
+<script>
+(function(){
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  let V=1.0, T=300, running=true;
+  const nR=1; // p = nRT/V (normalized)
+  const cylX=40, cylTop=40, cylBot=290, cylMaxW=280;
+  const N=40; let mol=[];
+  function init(){mol=[];for(let i=0;i<N;i++){const a=Math.random()*Math.PI*2;mol.push({x:Math.random(),y:Math.random(),ang:a});}}
+  function pistonX(){return cylX + (V/2.0)*cylMaxW;} // piston position ~ V
+  function p(){return nR*T/V;}
+  function step(dt){
+    const sp=Math.sqrt(T/300)*1.1;
+    for(const m of mol){m.x+=Math.cos(m.ang)*sp*dt; m.y+=Math.sin(m.ang)*sp*dt;
+      if(m.x<0.02){m.ang=Math.PI-m.ang;m.x=0.02;} if(m.x>0.98){m.ang=Math.PI-m.ang;m.x=0.98;}
+      if(m.y<0.02){m.ang=-m.ang;m.y=0.02;} if(m.y>0.98){m.ang=-m.ang;m.y=0.98;}
+    }
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    const pistX=pistonX();
+    // cylinder
+    ctx.strokeStyle='#334e68';ctx.lineWidth=3;
+    ctx.beginPath();ctx.moveTo(cylX,cylTop);ctx.lineTo(cylX,cylBot);ctx.lineTo(pistX,cylBot);ctx.moveTo(cylX,cylTop);ctx.lineTo(pistX,cylTop);ctx.stroke();
+    // gas region
+    ctx.fillStyle='rgba(44,123,229,0.06)';ctx.fillRect(cylX,cylTop,pistX-cylX,cylBot-cylTop);
+    // molecules
+    ctx.fillStyle='#2c7be5';
+    for(const m of mol){const mx=cylX+m.x*(pistX-cylX);const my=cylTop+m.y*(cylBot-cylTop);ctx.beginPath();ctx.arc(mx,my,3,0,Math.PI*2);ctx.fill();}
+    // piston
+    ctx.fillStyle='#8592a0';ctx.fillRect(pistX,cylTop-6,14,cylBot-cylTop+12);
+    ctx.strokeStyle='#5a6b7b';ctx.strokeRect(pistX,cylTop-6,14,cylBot-cylTop+12);
+    ctx.fillStyle='#334e68';ctx.font='12px sans-serif';ctx.textAlign='center';ctx.fillText('活塞',pistX+7,cylTop-12);
+    // pressure arrows on piston (more/denser when p large)
+    ctx.strokeStyle='#c92a2a';ctx.fillStyle='#c92a2a';ctx.lineWidth=2;
+    const na=Math.round(2+p()*2.2);
+    for(let i=0;i<na;i++){const yy=cylTop+20+i*(cylBot-cylTop-40)/Math.max(1,na-1);
+      ctx.beginPath();ctx.moveTo(pistX-18,yy);ctx.lineTo(pistX-2,yy);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(pistX-2,yy);ctx.lineTo(pistX-9,yy-4);ctx.lineTo(pistX-9,yy+4);ctx.closePath();ctx.fill();}
+    // p-V point
+    const gx0=430,gTop=40,gBot=280,gW=190;
+    ctx.strokeStyle='#b0bcc9';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(gx0,gTop);ctx.lineTo(gx0,gBot);ctx.lineTo(gx0+gW,gBot);ctx.stroke();
+    ctx.fillStyle='#829ab1';ctx.font='11px sans-serif';ctx.textAlign='left';ctx.fillText('p',gx0+4,gTop+2);ctx.fillText('V',gx0+gW-10,gBot+14);
+    const px=gx0 + (V/2.0)*gW; const py=gBot - (p()/ (nR*600/0.4))*(gBot-gTop);
+    ctx.fillStyle='#e8590c';ctx.beginPath();ctx.arc(px,Math.max(gTop,py),5,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#243b53';ctx.font='13px sans-serif';ctx.textAlign='left';
+    ctx.fillText('pV/T = '+ (p()*V/T).toFixed(4)+'（常量）',gx0-6,gBot+30);
+    document.getElementById('v-v').textContent=V.toFixed(2);
+    document.getElementById('t-v').textContent=T;
+    document.getElementById('p-v').textContent=p().toFixed(2);
+    document.getElementById('k-v').textContent=(p()*V/T).toFixed(4);
+  }
+  function bind(id,cb){document.getElementById(id).addEventListener('input',e=>{cb(parseFloat(e.target.value));draw();});}
+  bind('v',x=>{V=x;document.getElementById('v-d').textContent=x.toFixed(2);});
+  bind('t',x=>{T=x;document.getElementById('t-d').textContent=x;});
+  document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
+  document.getElementById('reset-btn').addEventListener('click',()=>{V=1;T=300;document.getElementById('v').value=1;document.getElementById('t').value=300;document.getElementById('v-d').textContent='1.00';document.getElementById('t-d').textContent='300';init();draw();});
+  init();
+  let last=performance.now();
+  function loop(now){const dt=Math.min((now-last)/1000,0.03);last=now;if(running)step(dt);draw();requestAnimationFrame(loop);}
+  draw();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

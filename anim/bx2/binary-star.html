@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>双星模型实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#edf3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px;min-height:560px}
+  .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;touch-action:none}
+  .panel{display:flex;flex-direction:column;gap:8px}
+  .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
+  .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.45}
+  .title{font-weight:800;margin-bottom:5px;color:#0f172a}
+  .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:31px;cursor:pointer;color:#102a43}
+  button:hover{background:#f1f5f9}
+  .primary{background:#2563eb;color:#fff;border-color:#2563eb;font-weight:800}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:48px}
+  .meter span{display:block;font-size:11px;color:#b6c5d8}
+  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:15px;font-variant-numeric:tabular-nums}
+  .formula{display:grid;gap:5px;font-size:13px;color:#334155}
+  .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
+  .formula div:last-child{border-bottom:0;padding-bottom:0}
+  .formula b{white-space:nowrap;color:#0f172a}
+  .small{font-size:12px;line-height:1.5;color:#475569}
+  .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="双星模型交互实验台"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>抓任一颗星向外拖，看 L 增大时周期怎样变长；再改质量，看共同质心如何靠近质量大的星。</div>
+    <button id="playBtn" class="primary">播放</button>
+    <div class="card">
+      <div class="title">快速情境</div>
+      <div class="chips">
+        <button data-case="equal">等质量</button>
+        <button data-case="heavy1">星1更重</button>
+        <button data-case="heavy2">星2更重</button>
+        <button data-case="wide">距离变大</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="title">实时读数</div>
+      <div class="readout">
+        <div class="meter"><span>星1半径 r1</span><b id="r1Text">1.43 R</b></div>
+        <div class="meter"><span>星2半径 r2</span><b id="r2Text">3.57 R</b></div>
+        <div class="meter"><span>角速度 ω</span><b id="omegaText">0.237</b></div>
+        <div class="meter"><span>周期 T</span><b id="periodText">26.5</b></div>
+        <div class="meter"><span>星1速度 v1</span><b id="v1Text">0.34</b></div>
+        <div class="meter"><span>星2速度 v2</span><b id="v2Text">0.85</b></div>
+      </div>
+    </div>
+    <div class="card formula">
+      <div><span>质心关系</span><b>m1r1=m2r2</b></div>
+      <div><span>两星距离</span><b>r1+r2=L</b></div>
+      <div><span>周期</span><b>T=2π√[L³/G(m1+m2)]</b></div>
+    </div>
+    <div class="card small"><b>可直接操作：</b>抓星体改距离和相位；拖底部 m1、m2、L、相位手柄。紫色箭头表示两星引力大小相等、方向相反。</div>
+    <div class="status" id="status">m1 更大，所以 r1 更小；两星角速度和周期相同。</div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+  const state={m1:5,m2:2,L:5,phase:0.35,running:false,drag:null};
+  const els={
+    r1:document.getElementById('r1Text'),r2:document.getElementById('r2Text'),omega:document.getElementById('omegaText'),
+    period:document.getElementById('periodText'),v1:document.getElementById('v1Text'),v2:document.getElementById('v2Text'),
+    status:document.getElementById('status'),play:document.getElementById('playBtn')
+  };
+  const colors={red:'#dc2626',blue:'#2563eb',purple:'#7c3aed',green:'#0f766e',orange:'#f59e0b',ink:'#102a43'};
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  const fmt=(v,d=2)=>Math.abs(v)<1e-8?(0).toFixed(d):v.toFixed(d);
+  function values(){
+    const sum=state.m1+state.m2,r1=state.m2/sum*state.L,r2=state.m1/sum*state.L;
+    const omega=Math.sqrt(sum/(state.L*state.L*state.L)),T=2*Math.PI/omega,F=state.m1*state.m2/(state.L*state.L);
+    return{sum,r1,r2,omega,T,F,v1:omega*r1,v2:omega*r2,check1:state.m1*r1,check2:state.m2*r2};
+  }
+  function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){
+    ctx.fillStyle=c;ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;
+    ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y);
+  }
+  function line(x1,y1,x2,y2,c='#94a3b8',w=2,dash){
+    ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();
+  }
+  function arrow(x1,y1,x2,y2,c,w=3){
+    const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);
+    ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-12*Math.cos(a-.42),y2-12*Math.sin(a-.42));
+    ctx.lineTo(x2-12*Math.cos(a+.42),y2-12*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore();
+  }
+  function roundRect(x,y,w,h,r,fill,stroke){
+    ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();
+    if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}ctx.restore();
+  }
+  function ruler(x1,y,x2,label,c){
+    line(x1,y,x2,y,'#0f172a',2);
+    for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}
+    text(label,(x1+x2)/2,y-36,c,'center',12,'900');
+  }
+  function handle(x,y,label,active,c){
+    ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;
+    ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();
+    text(label,x,y-20,active?'#92400e':c,'center',12,'900');ctx.restore();
+  }
+  function geom(){
+    const v=values(),O={x:310,y:252},s=42,a=state.phase;
+    const p1={x:O.x-v.r1*s*Math.cos(a),y:O.y-v.r1*s*Math.sin(a)};
+    const p2={x:O.x+v.r2*s*Math.cos(a),y:O.y+v.r2*s*Math.sin(a)};
+    return{...v,O,s,p1,p2};
+  }
+  function handles(){
+    return{
+      m1:{x:86+(state.m1-1)/7*150,y:494},
+      m2:{x:292+(state.m2-1)/7*150,y:494},
+      L:{x:500+(state.L-2.2)/5.8*150,y:494},
+      phase:{x:720+(state.phase%(Math.PI*2))/(Math.PI*2)*120,y:494}
+    };
+  }
+  function drawOrbit(){
+    const g=geom(),a=state.phase,tx=-Math.sin(a),ty=Math.cos(a);
+    roundRect(42,58,560,382,8,'#fff','#d7dee8');
+    ctx.save();ctx.strokeStyle='#94a3b8';ctx.lineWidth=2;ctx.setLineDash([7,5]);
+    ctx.beginPath();ctx.arc(g.O.x,g.O.y,g.r1*g.s,0,Math.PI*2);ctx.stroke();
+    ctx.beginPath();ctx.arc(g.O.x,g.O.y,g.r2*g.s,0,Math.PI*2);ctx.stroke();ctx.restore();
+    line(g.p1.x,g.p1.y,g.p2.x,g.p2.y,'#cbd5e1',2);
+    ctx.fillStyle=colors.red;ctx.beginPath();ctx.arc(g.O.x,g.O.y,6,0,Math.PI*2);ctx.fill();
+    text('共同质心 O',g.O.x,g.O.y-19,colors.red,'center',12,'900');
+    star(g.p1.x,g.p1.y,12+state.m1*1.9,'#dbeafe','#334155','星1',state.drag==='star1');
+    star(g.p2.x,g.p2.y,12+state.m2*1.9,colors.blue,'#102a43','星2',state.drag==='star2');
+    arrow(g.p1.x,g.p1.y,g.p1.x+(g.p2.x-g.p1.x)*.24,g.p1.y+(g.p2.y-g.p1.y)*.24,colors.purple,3);
+    arrow(g.p2.x,g.p2.y,g.p2.x+(g.p1.x-g.p2.x)*.24,g.p2.y+(g.p1.y-g.p2.y)*.24,colors.purple,3);
+    arrow(g.p1.x,g.p1.y,g.p1.x+tx*g.v1*54,g.p1.y+ty*g.v1*54,'#334155',2.5);
+    arrow(g.p2.x,g.p2.y,g.p2.x-tx*g.v2*54,g.p2.y-ty*g.v2*54,colors.blue,2.5);
+    text('F 大小相等',310,420,colors.purple,'center',13,'900');
+    text(`m1r1=${fmt(g.check1,2)}，m2r2=${fmt(g.check2,2)}`,310,394,'#475569','center',13,'900');
+  }
+  function star(x,y,r,fill,stroke,label,active){
+    ctx.save();ctx.fillStyle=fill;ctx.strokeStyle=active?'#d97706':stroke;ctx.lineWidth=active?4:1.6;
+    ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.stroke();
+    text(label,x,y+r+16,stroke,'center',12,'900');ctx.restore();
+  }
+  function drawBars(g){
+    roundRect(642,78,214,254,8,'#fff','#d7dee8');
+    text('半径与速度',749,108,'#0f172a','center',15,'900');
+    const rows=[['r1',g.r1,'#334155'],['r2',g.r2,colors.blue],['v1',g.v1,'#334155'],['v2',g.v2,colors.blue]];
+    const max=Math.max(...rows.map(r=>r[1]));
+    rows.forEach((row,i)=>{
+      const y=140+i*45,w=112*row[1]/max;
+      text(row[0],680,y+8,'#475569','right',12,'900');
+      ctx.fillStyle=row[2];ctx.fillRect(694,y,w,16);
+      text(fmt(row[1]),812,y+8,'#0f172a','left',12,'900');
+    });
+    roundRect(642,360,214,58,8,'#f8fafc','#d7dee8');
+    text(`F=${fmt(g.F,3)}`,749,382,colors.purple,'center',14,'900');
+    text('两星相互作用力大小相等',749,404,'#475569','center',12,'900');
+  }
+  function bottom(){
+    const h=handles();
+    roundRect(48,458,820,62,8,'#fff','#d7dee8');
+    ruler(86,494,236,'m1', '#334155');handle(h.m1.x,h.m1.y,`m1=${fmt(state.m1,1)}`,state.drag==='m1','#334155');
+    ruler(292,494,442,'m2',colors.blue);handle(h.m2.x,h.m2.y,`m2=${fmt(state.m2,1)}`,state.drag==='m2',colors.blue);
+    ruler(500,494,650,'L',colors.purple);handle(h.L.x,h.L.y,`L=${fmt(state.L,1)}`,state.drag==='L',colors.purple);
+    ruler(720,494,840,'相位',colors.orange);handle(h.phase.x,h.phase.y,'相位',state.drag==='phase',colors.orange);
+  }
+  function update(g){
+    els.r1.textContent=`${fmt(g.r1)} R`;els.r2.textContent=`${fmt(g.r2)} R`;
+    els.omega.textContent=fmt(g.omega,3);els.period.textContent=fmt(g.T,1);
+    els.v1.textContent=fmt(g.v1,2);els.v2.textContent=fmt(g.v2,2);els.play.textContent=state.running?'暂停':'播放';
+    els.status.textContent=Math.abs(state.m1-state.m2)<.12?'质量相等：共同质心在中点，两星半径相等。':(state.m1>state.m2?'m1 更大，所以 r1 更小；两星角速度和周期相同。':'m2 更大，所以 r2 更小；两星角速度和周期相同。');
+  }
+  function draw(){
+    const g=geom();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);
+    text('双星模型实验台：两颗星都绕共同质心转',460,30,'#0f172a','center',19,'900');
+    drawOrbit();drawBars(g);bottom();update(g);
+  }
+  function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+  function near(a,b,rad=28){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+  function pointerDown(e){
+    const p=pos(e),g=geom(),h=handles();
+    if(near(p,g.p1,30))state.drag='star1';
+    else if(near(p,g.p2,30))state.drag='star2';
+    else if(near(p,h.m1,26))state.drag='m1';
+    else if(near(p,h.m2,26))state.drag='m2';
+    else if(near(p,h.L,26))state.drag='L';
+    else if(near(p,h.phase,26))state.drag='phase';
+    else state.drag=null;
+    if(state.drag){state.running=false;canvas.setPointerCapture(e.pointerId);pointerMove(e)}
+  }
+  function pointerMove(e){
+    if(!state.drag)return;
+    const p=pos(e),g=geom(),dx=p.x-g.O.x,dy=p.y-g.O.y,dist=Math.hypot(dx,dy);
+    if(state.drag==='m1')state.m1=clamp(1+(p.x-86)/150*7,1,8);
+    if(state.drag==='m2')state.m2=clamp(1+(p.x-292)/150*7,1,8);
+    if(state.drag==='L')state.L=clamp(2.2+(p.x-500)/150*5.8,2.2,8);
+    if(state.drag==='phase')state.phase=clamp((p.x-720)/120*Math.PI*2,0,Math.PI*2);
+    if(state.drag==='star1'){
+      state.phase=Math.atan2(dy,dx)+Math.PI;
+      const factor=(state.m1+state.m2)/state.m2;
+      state.L=clamp(dist/g.s*factor,2.2,8);
+    }
+    if(state.drag==='star2'){
+      state.phase=Math.atan2(dy,dx);
+      const factor=(state.m1+state.m2)/state.m1;
+      state.L=clamp(dist/g.s*factor,2.2,8);
+    }
+    draw();
+  }
+  function pointerUp(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
+  canvas.addEventListener('pointerdown',pointerDown);canvas.addEventListener('pointermove',pointerMove);
+  canvas.addEventListener('pointerup',pointerUp);canvas.addEventListener('pointercancel',pointerUp);
+  els.play.addEventListener('click',()=>{state.running=!state.running;draw()});
+  document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{
+    const c=btn.dataset.case;
+    if(c==='equal'){state.m1=4;state.m2=4;state.L=5;state.phase=.35}
+    if(c==='heavy1'){state.m1=7;state.m2=2;state.L=5;state.phase=.35}
+    if(c==='heavy2'){state.m1=2;state.m2=7;state.L=5;state.phase=.35}
+    if(c==='wide'){state.m1=5;state.m2=2;state.L=7.5;state.phase=.35}
+    state.running=false;draw();
+  }));
+  function tick(){
+    if(state.running){state.phase=(state.phase+values().omega*.018)%(Math.PI*2)}
+    draw();requestAnimationFrame(tick);
+  }
+  draw();requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>核能：质量亏损转化为能量</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 14px; align-items: stretch; }
+  canvas { width: 100%; height: 430px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  input { width: 100%; }
+  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.8; font-size: 14px; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
+  @media (max-width: 760px) { .stage { grid-template-columns: 1fr; } canvas { height: 360px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="680" height="430" aria-label="核能质能方程模型"></canvas>
+    <section class="panel">
+      <label for="dm">质量亏损 Δm/u：<span id="dmVal"></span></label>
+      <input id="dm" type="range" min="0" max="0.30" value="0.20" step="0.01">
+      <label for="count">反应次数：<span id="countVal"></span></label>
+      <input id="count" type="range" min="1" max="100" value="20" step="1">
+      <label for="type">反应类型：<span id="typeVal"></span></label>
+      <input id="type" type="range" min="0" max="1" value="0" step="1">
+      <div id="readout" class="readout"></div>
+      <div class="hint">观察任务：改变质量亏损，看单次能量线性变化；改变次数，看总能量累加。</div>
+    </section>
+  </div>
+</div>
+<script>
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const els = {
+  dm: document.getElementById('dm'),
+  count: document.getElementById('count'),
+  type: document.getElementById('type'),
+  dmVal: document.getElementById('dmVal'),
+  countVal: document.getElementById('countVal'),
+  typeVal: document.getElementById('typeVal'),
+  readout: document.getElementById('readout')
+};
+function draw() {
+  const dm = Number(els.dm.value);
+  const count = Number(els.count.value);
+  const type = Number(els.type.value);
+  const typeName = type === 0 ? '裂变' : '聚变';
+  const e1 = dm * 931.5;
+  const total = e1 * count;
+  els.dmVal.textContent = dm.toFixed(2);
+  els.countVal.textContent = count;
+  els.typeVal.textContent = typeName;
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#f7f9fc';
+  ctx.fillRect(0, 0, c.width, c.height);
+
+  ctx.fillStyle = '#eef4ff';
+  ctx.strokeStyle = '#2c7be5';
+  ctx.lineWidth = 2;
+  ctx.fillRect(46, 76, 160, 92);
+  ctx.strokeRect(46, 76, 160, 92);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 16px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText(typeName + '前', 126, 112);
+  ctx.fillText('m前', 126, 142);
+  ctx.strokeStyle = '#e03131';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(224, 122);
+  ctx.lineTo(318, 122);
+  ctx.stroke();
+  ctx.fillStyle = '#e03131';
+  ctx.beginPath();
+  ctx.moveTo(318, 122);
+  ctx.lineTo(304, 114);
+  ctx.lineTo(304, 130);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = '#fff7e6';
+  ctx.strokeStyle = '#f0a500';
+  ctx.fillRect(338, 76, 160, 92);
+  ctx.strokeRect(338, 76, 160, 92);
+  ctx.fillStyle = '#102a43';
+  ctx.fillText(typeName + '后', 418, 112);
+  ctx.fillText('m后 = m前 - Δm', 418, 142);
+
+  const barMax = 280;
+  const barW = Math.min(barMax, e1 / 280 * barMax);
+  ctx.fillStyle = '#e03131';
+  ctx.fillRect(98, 246, barW, 28);
+  ctx.fillStyle = '#486581';
+  ctx.textAlign = 'left';
+  ctx.font = '14px system-ui';
+  ctx.fillText('单次释放能量 E1', 98, 236);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 16px system-ui';
+  ctx.fillText(`${e1.toFixed(1)} MeV`, 390, 268);
+
+  const totalW = Math.min(barMax, total / 10000 * barMax);
+  ctx.fillStyle = '#f0a500';
+  ctx.fillRect(98, 316, totalW, 28);
+  ctx.fillStyle = '#486581';
+  ctx.font = '14px system-ui';
+  ctx.fillText('总释放能量 E总', 98, 306);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 16px system-ui';
+  ctx.fillText(`${total.toFixed(1)} MeV`, 390, 338);
+  ctx.textAlign = 'center';
+  ctx.font = '700 18px system-ui';
+  ctx.fillText('E = Δmc²，1u c²≈931.5MeV', 350, 54);
+  ctx.fillStyle = '#486581';
+  ctx.font = '14px system-ui';
+  ctx.fillText('质量亏损越大，释放能量越大；大量反应的能量按次数累加。', 350, 394);
+
+  els.readout.innerHTML = [
+    `反应类型=${typeName}`,
+    `Δm=${dm.toFixed(2)} u`,
+    `单次能量 E1=Δm×931.5≈${e1.toFixed(1)} MeV`,
+    `反应 ${count} 次：E总≈${total.toFixed(1)} MeV`
+  ].join('<br>');
+}
+Object.values(els).forEach(el => {
+  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
+});
+draw();
+</script>
+</body>
+</html>

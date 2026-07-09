@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>运动合成与分解实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#edf3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px;min-height:560px}
+  .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;touch-action:none}
+  .panel{display:flex;flex-direction:column;gap:8px}
+  .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
+  .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.45}
+  .title{font-weight:800;margin-bottom:5px;color:#0f172a}
+  .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:31px;cursor:pointer;color:#102a43}
+  .primary{background:#2563eb;color:#fff;border-color:#2563eb}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:48px}
+  .meter span{display:block;font-size:11px;color:#b6c5d8}
+  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:16px;font-variant-numeric:tabular-nums}
+  .formula{display:grid;gap:5px;font-size:13px;color:#334155}
+  .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
+  .formula div:last-child{border-bottom:0;padding-bottom:0}
+  .formula b{white-space:nowrap;color:#0f172a}
+  .small{font-size:12px;line-height:1.5;color:#475569}
+  .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
+  .status.warn{border-color:#f59e0b;background:#fff7ed;color:#b45309}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="小船过河运动合成交互实验台"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>抓绿色船头速度箭头，看它不是实际航向；红色合速度和黑色航迹才是岸上看到的运动。</div>
+    <button id="playBtn" class="primary">播放</button>
+    <div class="card">
+      <div class="title">快速情境</div>
+      <div class="chips">
+        <button data-case="cross">垂直划</button>
+        <button data-case="aim">正对到达</button>
+        <button data-case="fastWater">水更快</button>
+        <button data-case="wide">河更宽</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="title">实时读数</div>
+      <div class="readout">
+        <div class="meter"><span>沿河分量 vx</span><b id="vxText">2.00 m/s</b></div>
+        <div class="meter"><span>过河分量 vy</span><b id="vyText">4.00 m/s</b></div>
+        <div class="meter"><span>过河时间 t</span><b id="timeText">20.0 s</b></div>
+        <div class="meter"><span>下游偏移 x</span><b id="driftText">40.0 m</b></div>
+      </div>
+    </div>
+    <div class="card formula">
+      <div><span>合速度</span><b>v合=v船/水+v水/岸</b></div>
+      <div><span>过河时间</span><b>t=d/vy</b></div>
+      <div><span>下游偏移</span><b>x=vx t</b></div>
+    </div>
+    <div class="card small"><b>可直接操作：</b>抓绿色船速箭头端点、紫色水流箭头端点，或拖底部 v船、v水、θ、d 手柄。</div>
+    <div class="status" id="status">垂直河岸分量决定时间，沿河分量决定偏移。</div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const state={vb:4,vw:2,theta:90,d:80,t:.55,running:false,drag:null};
+  const els={vx:document.getElementById('vxText'),vy:document.getElementById('vyText'),time:document.getElementById('timeText'),drift:document.getElementById('driftText'),status:document.getElementById('status'),play:document.getElementById('playBtn')};
+  const colors={red:'#dc2626',blue:'#2563eb',purple:'#7c3aed',green:'#0f766e',orange:'#f59e0b',ink:'#102a43'};
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  const fmt=(v,d=1)=>Math.abs(v)<1e-6?(0).toFixed(d):v.toFixed(d);
+  function values(){const a=state.theta*Math.PI/180,bx=state.vb*Math.cos(a),by=state.vb*Math.sin(a),vx=state.vw+bx,vy=Math.max(.05,by),speed=Math.hypot(vx,vy),time=state.d/vy,drift=vx*time;return{a,bx,by,vx,vy,speed,time,drift,straight:Math.abs(drift)<1}}
+  function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){ctx.fillStyle=c;ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+  function line(x1,y1,x2,y2,c='#94a3b8',w=2,dash){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
+  function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore()}
+  function roundRect(x,y,w,h,r,fill,stroke){ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}ctx.restore()}
+  function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-36,c,'center',12,'900')}
+  function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-20,active?'#92400e':c,'center',12,'900');ctx.restore()}
+  function geom(){return{vb:{x:94+(state.vb-1)/7*150,y:494},vw:{x:292+state.vw/6*150,y:494},theta:{x:500+(state.theta-20)/140*170,y:494},d:{x:728+(state.d-30)/130*120,y:494}}}
+  function boatPoint(v){const left=104,bottom=404,top=102,scaleY=(bottom-top)/state.d,progress=state.running?state.t:.55,endX=left+v.drift*scaleY;return{x:left+(endX-left)*progress,y:bottom-(bottom-top)*progress,left,bottom,top,scaleY,endX}}
+  function boatShape(x,y){ctx.save();ctx.translate(x,y);ctx.fillStyle='#f59e0b';ctx.strokeStyle='#102a43';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(24,0);ctx.lineTo(0,-15);ctx.lineTo(-18,-9);ctx.lineTo(-18,9);ctx.lineTo(0,15);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore()}
+  function vectorEnds(p,v){const s=23;return{boat:{x:p.x+v.bx*s,y:p.y-v.by*s},water:{x:p.x+state.vw*s,y:p.y},result:{x:p.x+v.vx*s,y:p.y-v.vy*s}}}
+  function drawRiver(v){
+    roundRect(42,58,550,382,8,'#fff','#d7dee8');
+    const left=104,right=544,top=102,bottom=404;
+    ctx.fillStyle='#dff4ff';ctx.fillRect(left,top,right-left,bottom-top);ctx.strokeStyle='#2563eb';ctx.lineWidth=2;ctx.strokeRect(left,top,right-left,bottom-top);
+    for(let y=128;y<390;y+=36)arrow(left+18,y,left+82,y,'rgba(37,99,235,.45)',2);
+    text('水流',left+80,82,colors.blue,'center',13,'900');text('对岸',right+12,top,'#475569','left',12,'900');text('出发岸',right+12,bottom,'#475569','left',12,'900');
+    const p=boatPoint(v);
+    line(left,bottom,p.endX,top,'#334155',3);line(p.endX,top,p.endX,bottom,'#94a3b8',2,[6,5]);
+    boatShape(p.x,p.y);
+    const ends=vectorEnds(p,v);
+    arrow(p.x,p.y,ends.boat.x,ends.boat.y,colors.green,4);text('v船/水',ends.boat.x+10,ends.boat.y-8,colors.green,'left',12,'900');
+    arrow(p.x,p.y,ends.water.x,ends.water.y,colors.purple,4);text('v水/岸',ends.water.x+10,ends.water.y+14,colors.purple,'left',12,'900');
+    arrow(p.x,p.y,ends.result.x,ends.result.y,colors.red,4);text('v合',ends.result.x+10,ends.result.y-8,colors.red,'left',13,'900');
+    ['boat','water'].forEach(key=>{const e=ends[key];ctx.save();ctx.fillStyle=state.drag===key?'#fde68a':'#fff';ctx.strokeStyle=state.drag===key?'#d97706':(key==='boat'?colors.green:colors.purple);ctx.lineWidth=3;ctx.beginPath();ctx.arc(e.x,e.y,9,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore()});
+    text(`下游偏移 x=${fmt(v.drift,1)}m`,(left+p.endX)/2,bottom+22,Math.abs(v.drift)<1?colors.green:colors.orange,'center',13,'900');
+  }
+  function drawExplain(v){
+    roundRect(620,74,244,144,8,'#f8fafc','#d7dee8');text('船头方向不是实际航向',742,102,'#0f172a','center',15,'900');text('绿色：船相对水',742,138,colors.green,'center',13,'900');text('紫色：水相对岸',742,166,colors.purple,'center',13,'900');text('红色：岸上实际看到',742,194,colors.red,'center',13,'900');
+    roundRect(620,252,244,118,8,'#fff','#d7dee8');text('当前结果',742,280,'#0f172a','center',15,'900');text(v.straight?'正对到达':'会被冲偏',742,318,v.straight?colors.green:colors.orange,'center',19,'900');text(`t=${fmt(v.time,1)}s，x=${fmt(v.drift,1)}m`,742,348,'#475569','center',12,'700');
+  }
+  function update(v){els.vx.textContent=`${fmt(v.vx,2)} m/s`;els.vy.textContent=`${fmt(v.vy,2)} m/s`;els.time.textContent=`${fmt(v.time,1)} s`;els.drift.textContent=`${fmt(v.drift,1)} m`;els.status.className='status'+(v.straight?'':' warn');els.status.textContent=v.straight?'船头上游分量抵消水流：合速度垂直河岸，正对到达。':'垂直河岸分量决定时间，沿河分量决定偏移。';els.play.textContent=state.running?'暂停':'播放'}
+  function draw(){const v=values(),g0=geom();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('运动合成与分解实验台：合运动是矢量和，不是船头指向',460,30,'#0f172a','center',19,'900');drawRiver(v);drawExplain(v);roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(94,494,244,'v船',colors.green);handle(g0.vb.x,g0.vb.y,`v船=${fmt(state.vb)}`,state.drag==='vb',colors.green);ruler(292,494,442,'v水',colors.purple);handle(g0.vw.x,g0.vw.y,`v水=${fmt(state.vw)}`,state.drag==='vw',colors.purple);ruler(500,494,670,'θ',colors.red);handle(g0.theta.x,g0.theta.y,`θ=${fmt(state.theta,0)}°`,state.drag==='theta',colors.red);ruler(728,494,848,'d',colors.orange);handle(g0.d.x,g0.d.y,`d=${fmt(state.d,0)}m`,state.drag==='d',colors.orange);update(v)}
+  function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+  function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+  function down(e){const p=pos(e),v=values(),bp=boatPoint(v),ends=vectorEnds(bp,v),g0=geom();if(near(p,ends.boat,30))state.drag='boat';else if(near(p,ends.water,30))state.drag='water';else if(near(p,g0.vb,26))state.drag='vb';else if(near(p,g0.vw,26))state.drag='vw';else if(near(p,g0.theta,26))state.drag='theta';else if(near(p,g0.d,26))state.drag='d';else state.drag=null;if(state.drag){state.running=false;canvas.setPointerCapture(e.pointerId);move(e)}}
+  function move(e){if(!state.drag)return;const p=pos(e),v=values(),bp=boatPoint(v),s=23;if(state.drag==='vb')state.vb=clamp(1+(p.x-94)/150*7,1,8);if(state.drag==='vw')state.vw=clamp((p.x-292)/150*6,0,6);if(state.drag==='theta')state.theta=clamp(20+(p.x-500)/170*140,20,160);if(state.drag==='d')state.d=clamp(30+(p.x-728)/120*130,30,160);if(state.drag==='water')state.vw=clamp((p.x-bp.x)/s,0,6);if(state.drag==='boat'){const dx=p.x-bp.x,dy=bp.y-p.y;state.vb=clamp(Math.hypot(dx,dy)/s,1,8);state.theta=clamp(Math.atan2(dy,dx)*180/Math.PI,20,160)}draw()}
+  function up(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
+  canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
+  els.play.addEventListener('click',()=>{state.running=!state.running;draw()});
+  document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='cross'){state.vb=4;state.vw=2;state.theta=90;state.d=80}if(c==='aim'){state.vb=4;state.vw=2;state.theta=120;state.d=80}if(c==='fastWater'){state.vb=4;state.vw=4;state.theta=90;state.d=80}if(c==='wide'){state.vb=4;state.vw=2;state.theta=90;state.d=140}draw()}));
+  function tick(){if(state.running){state.t+=.005;if(state.t>1)state.t=0}draw();requestAnimationFrame(tick)}
+  draw();requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

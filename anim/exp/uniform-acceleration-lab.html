@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>探究匀变速直线运动规律</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 16px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 14px; align-items: stretch; }
+  canvas { width: 100%; height: 460px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  input { width: 100%; }
+  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.75; font-size: 14px; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
+  @media (max-width: 780px) { .stage { grid-template-columns: 1fr; } canvas { height: 390px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="700" height="460" aria-label="匀变速实验纸带和 v-t 图"></canvas>
+    <section class="panel">
+      <label for="v0">初速度 v0/(m/s)：<span id="v0Val"></span></label>
+      <input id="v0" type="range" min="0" max="1.8" value="0.4" step="0.1">
+      <label for="acc">加速度 a/(m/s²)：<span id="accVal"></span></label>
+      <input id="acc" type="range" min="0" max="4" value="1.6" step="0.2">
+      <label for="period">计数点间隔 Δt/s：<span id="periodVal"></span></label>
+      <input id="period" type="range" min="0.04" max="0.12" value="0.08" step="0.02">
+      <label for="noise">测量误差等级：<span id="noiseVal"></span></label>
+      <input id="noise" type="range" min="0" max="5" value="1" step="1">
+      <div id="readout" class="readout"></div>
+      <div class="hint">观察任务：看相邻位移差是否近似相等；再看 v-t 点是否接近直线，斜率是否等于加速度。</div>
+    </section>
+  </div>
+</div>
+<script>
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const els = {
+  v0: document.getElementById('v0'),
+  acc: document.getElementById('acc'),
+  period: document.getElementById('period'),
+  noise: document.getElementById('noise'),
+  v0Val: document.getElementById('v0Val'),
+  accVal: document.getElementById('accVal'),
+  periodVal: document.getElementById('periodVal'),
+  noiseVal: document.getElementById('noiseVal'),
+  readout: document.getElementById('readout')
+};
+function pos(v0, a, t) { return v0 * t + 0.5 * a * t * t; }
+function pseudoNoise(k, level) { return Math.sin(k * 12.9898) * 0.0015 * level; }
+function draw() {
+  const v0 = Number(els.v0.value);
+  const a = Number(els.acc.value);
+  const dt = Number(els.period.value);
+  const noise = Number(els.noise.value);
+  els.v0Val.textContent = v0.toFixed(1);
+  els.accVal.textContent = a.toFixed(1);
+  els.periodVal.textContent = dt.toFixed(2);
+  els.noiseVal.textContent = noise;
+  const x = [];
+  for (let i = 0; i <= 8; i++) x.push(pos(v0, a, i * dt) + pseudoNoise(i, noise));
+  const seg = [];
+  for (let i = 1; i <= 8; i++) seg.push(x[i] - x[i - 1]);
+  const diffs = [];
+  for (let i = 1; i < seg.length; i++) diffs.push(seg[i] - seg[i - 1]);
+  const v = [];
+  const t = [];
+  for (let i = 1; i < 8; i++) {
+    v.push((x[i + 1] - x[i - 1]) / (2 * dt));
+    t.push(i * dt);
+  }
+  const slope = (v[v.length - 1] - v[0]) / (t[t.length - 1] - t[0]);
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#f7f9fc';
+  ctx.fillRect(0, 0, c.width, c.height);
+
+  const scale = 440 / Math.max(x[8], 0.1);
+  ctx.fillStyle = '#fff7e6';
+  ctx.strokeStyle = '#f0a500';
+  ctx.lineWidth = 2;
+  ctx.fillRect(48, 72, 520, 30);
+  ctx.strokeRect(48, 72, 520, 30);
+  for (let i = 0; i <= 8; i++) {
+    const px = 68 + x[i] * scale;
+    ctx.fillStyle = '#102a43';
+    ctx.beginPath();
+    ctx.arc(px, 87, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#486581';
+    ctx.font = '11px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText(String(i), px, 122);
+  }
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 15px system-ui';
+  ctx.fillText('纸带计数点：相等时间 Δt', 300, 48);
+
+  ctx.fillStyle = '#486581';
+  ctx.font = '13px system-ui';
+  ctx.textAlign = 'left';
+  ctx.fillText(`相邻位移差平均 ≈ ${(diffs.reduce((p,q)=>p+q,0)/diffs.length).toFixed(4)} m`, 52, 160);
+  ctx.fillText(`理论 aΔt² = ${(a * dt * dt).toFixed(4)} m`, 52, 184);
+
+  const ox = 380, oy = 392, gw = 260, gh = 210;
+  ctx.strokeStyle = '#334e68';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(ox, oy);
+  ctx.lineTo(ox + gw, oy);
+  ctx.moveTo(ox, oy);
+  ctx.lineTo(ox, oy - gh);
+  ctx.stroke();
+  ctx.fillStyle = '#486581';
+  ctx.font = '12px system-ui';
+  ctx.fillText('t', ox + gw + 8, oy + 4);
+  ctx.fillText('v', ox - 18, oy - gh - 4);
+  const maxT = Math.max(...t);
+  const maxV = Math.max(...v, 0.5);
+  ctx.strokeStyle = '#e03131';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  v.forEach((vv, i) => {
+    const px = ox + t[i] / maxT * gw;
+    const py = oy - vv / maxV * gh;
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  });
+  ctx.stroke();
+  v.forEach((vv, i) => {
+    const px = ox + t[i] / maxT * gw;
+    const py = oy - vv / maxV * gh;
+    ctx.fillStyle = '#e03131';
+    ctx.beginPath();
+    ctx.arc(px, py, 5, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 15px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText(`v-t 图像斜率 ≈ ${slope.toFixed(2)} m/s²`, 510, 156);
+  ctx.fillStyle = '#486581';
+  ctx.font = '14px system-ui';
+  ctx.fillText('若速度点接近直线，说明加速度近似恒定。', 350, 434);
+
+  els.readout.innerHTML = [
+    `理论：v=v0+at，当前 a=${a.toFixed(1)}m/s²`,
+    `相邻位移差平均≈${(diffs.reduce((p,q)=>p+q,0)/diffs.length).toFixed(4)}m`,
+    `理论 aΔt²=${(a * dt * dt).toFixed(4)}m`,
+    `v-t 图像斜率≈${slope.toFixed(2)}m/s²`
+  ].join('<br>');
+}
+Object.values(els).forEach(el => {
+  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
+});
+draw();
+</script>
+</body>
+</html>

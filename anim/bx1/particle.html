@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>质点模型实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#f7f9fc;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px;min-height:540px}
+  .stage{position:relative;background:#fff;border:1px solid #d9e2ec;border-radius:8px;overflow:hidden;min-height:0}
+  canvas{display:block;width:100%;height:auto;aspect-ratio:940/560;touch-action:none}
+  .hint{position:absolute;left:14px;bottom:12px;background:rgba(16,42,67,.88);color:#d9e2ec;border-radius:7px;padding:6px 9px;font-size:12px;pointer-events:none}
+  .panel{display:flex;flex-direction:column;gap:6px;min-width:0}
+  .card{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:7px}
+  .task{background:#fff7e6;border-left:3px solid #f0a500;color:#486581;line-height:1.35;font-size:12px}
+  .title{font-weight:700;margin-bottom:4px}
+  .param{display:grid;gap:1px;margin:5px 0;font-size:13px}
+  .param span{display:flex;justify-content:space-between;color:#486581;gap:10px}
+  .param b{color:#102a43;font-variant-numeric:tabular-nums;white-space:nowrap}
+  input[type=range]{width:100%;accent-color:#2c7be5}
+  .stepper,.mode,.transport{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:2px}
+  .mode{grid-template-columns:1fr 1fr}
+  button{border:1px solid #b0bcc9;background:#fff;border-radius:6px;padding:4px 7px;cursor:pointer;min-width:0;font:inherit;font-size:12px}
+  button:hover{background:#eef2f7}
+  button.active{background:#2c7be5;border-color:#2c7be5;color:#fff;font-weight:700}
+  .readout{background:#102a43;color:#d9e2ec;border-radius:8px;padding:8px;line-height:1.45;font-size:13px}
+  .readout b{color:#f0a500;font-variant-numeric:tabular-nums}
+  .formula{font-size:12px;line-height:1.35;color:#334e68}
+  .status{font-size:12px;font-weight:700;border-radius:6px;padding:7px;border:1px solid #38b2ac;background:#e6fffa;color:#087f5b;line-height:1.35}
+  .status.bad{border-color:#f08c00;background:#fff7e6;color:#9a6700}
+  @media(max-width:760px){
+    .root{grid-template-columns:1fr;min-height:auto}
+    canvas{height:auto;min-height:430px}
+    .panel{display:grid;grid-template-columns:1fr 1fr}
+    .task,.formula,.status,.readout{grid-column:1/-1}
+  }
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage">
+    <canvas id="canvas" width="940" height="560" aria-label="质点模型交互实验台"></canvas>
+    <div class="hint">可直接拖动橙色手柄：车身长度 l、研究范围 s</div>
+  </div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>拖动车身右端和终点手柄，比较整车与蓝点；切换研究任务，看同一物体什么时候能简化成质点。</div>
+    <div class="card">
+      <div class="title">实验条件</div>
+      <label class="param"><span>车身长度 l <b id="lenText">4 m</b></span><input id="len" type="range" min="1" max="20" step="1" value="4"></label>
+      <div class="stepper"><button data-step="len" data-dir="-1">缩短 l</button><button data-step="len" data-dir="1">加长 l</button></div>
+      <label class="param"><span>研究范围 s <b id="distText">400 km</b></span><input id="dist" type="range" min="5" max="800" step="5" value="400"></label>
+      <div class="stepper"><button data-step="dist" data-dir="-1">减小 s</button><button data-step="dist" data-dir="1">增大 s</button></div>
+      <div class="mode">
+        <button id="modePath" class="active">行程</button><button id="modePass">过线</button>
+        <button id="modeTurn">转动</button><button id="modePosture">姿态</button>
+      </div>
+      <div class="transport"><button id="playBtn">播放</button><button id="resetBtn">重置</button></div>
+    </div>
+    <div class="readout" id="readout"></div>
+    <div class="card formula">
+      <div class="title">判据绑定</div>
+      <div>l：车身标尺和橙色长度手柄</div>
+      <div>s：路尺终点和研究范围手柄</div>
+      <div>l/s 很小且只研究整体位置，才可质点化</div>
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const els={len:document.getElementById('len'),dist:document.getElementById('dist')};
+  const playBtn=document.getElementById('playBtn');
+  const modes={path:'行程',pass:'过线',turn:'转动',posture:'姿态'};
+  let mode='path';
+  let running=false;
+  let progress=0;
+  let last=performance.now();
+  let drag=null;
+  let layout=null;
+
+  function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
+  function q(){return{l:+els.len.value,s:+els.dist.value,mode,progress};}
+  function verdict(d){
+    const ratio=d.l/(d.s*1000);
+    const shape=d.mode!=='path';
+    return{ratio,shape,ok:!shape&&ratio<0.01};
+  }
+  function setParam(name,value){
+    const el=els[name];
+    value=Math.round(clamp(value,+el.min,+el.max)/(+el.step||1))*(+el.step||1);
+    el.value=String(clamp(value,+el.min,+el.max));
+    draw();
+  }
+  function text(s,x,y,c,a,size,w){
+    ctx.fillStyle=c||'#102a43';
+    ctx.font=(w?w+' ':'')+(size||13)+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';
+    ctx.textAlign=a||'center';
+    ctx.textBaseline='middle';
+    ctx.fillText(s,x,y);
+  }
+  function line(x1,y1,x2,y2,c,w,dash){
+    ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w||2;ctx.setLineDash(dash||[]);
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();
+  }
+  function arrow(x1,y1,x2,y2,c,w){
+    const a=Math.atan2(y2-y1,x2-x1);
+    ctx.save();ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w||2;
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-10*Math.cos(a-.45),y2-10*Math.sin(a-.45));
+    ctx.lineTo(x2-10*Math.cos(a+.45),y2-10*Math.sin(a+.45));
+    ctx.closePath();ctx.fill();ctx.restore();
+  }
+  function box(x,y,w,h,fill,stroke,r){
+    ctx.save();ctx.fillStyle=fill;ctx.strokeStyle=stroke||'#d9e2ec';ctx.lineWidth=1.4;
+    ctx.beginPath();ctx.roundRect(x,y,w,h,r==null?8:r);ctx.fill();ctx.stroke();ctx.restore();
+  }
+  function handle(x,y,label){
+    ctx.save();
+    ctx.fillStyle='#f0a500';
+    ctx.strokeStyle='#7c5700';
+    ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(x,y,9,0,Math.PI*2);ctx.fill();ctx.stroke();
+    text(label,x,y-20,'#7c5700','center',12,'700');
+    ctx.restore();
+  }
+  function drawWheel(x,y,r,spin){
+    ctx.fillStyle='#243b53';ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#fff';ctx.lineWidth=2;
+    for(let i=0;i<4;i++){
+      const a=spin+i*Math.PI/2;
+      line(x,y,x+Math.cos(a)*r*.72,y+Math.sin(a)*r*.72,'#fff',2);
+    }
+  }
+  function car(x,y,w,tilt,wheelSpin){
+    const h=34;
+    ctx.save();
+    ctx.translate(x+w/2,y+h/2);
+    ctx.rotate(tilt||0);
+    ctx.translate(-w/2,-h/2);
+    ctx.fillStyle='#d9e2ec';
+    ctx.strokeStyle='#334e68';
+    ctx.lineWidth=2;
+    ctx.beginPath();ctx.roundRect(0,0,w,h,6);ctx.fill();ctx.stroke();
+    ctx.fillStyle='#9fb3c8';
+    ctx.beginPath();
+    ctx.moveTo(w*.24,0);ctx.lineTo(w*.38,-18);ctx.lineTo(w*.66,-18);ctx.lineTo(w*.78,0);ctx.closePath();ctx.fill();ctx.stroke();
+    drawWheel(w*.22,h+3,11,wheelSpin);
+    drawWheel(w*.78,h+3,11,wheelSpin);
+    ctx.restore();
+  }
+  function scaleLine(x,y,w,d){
+    line(x,y,x+w,y,'#aab8c2',4);
+    for(let i=0;i<=4;i++){
+      const px=x+w*i/4;
+      line(px,y-7,px,y+7,'#829ab1',2);
+      text((d.s*i/4).toFixed(0)+' km',px,y+23,'#627d98','center',12);
+    }
+  }
+  function modeMessage(d,v){
+    if(d.mode==='path') return v.ok?'只研究整体位置：蓝点和整车位置等效。':'行程很短或物体太长：尺寸不可忽略。';
+    if(d.mode==='pass') return '研究过线/过桥：前端和后端不是同一时刻通过，车长必须保留。';
+    if(d.mode==='turn') return '研究车轮转动：点没有半径、轮辐和转角，不能替代车轮。';
+    return '研究姿态：点没有车头方向和倾角，不能表示姿态变化。';
+  }
+  function drawGauge(x,y,v){
+    box(x,y,222,72,'#f8fbff','#d9e2ec',7);
+    text('模型判据尺',x+111,y+15,'#334e68','center',13,'700');
+    const gx=x+22, gy=y+42, gw=178;
+    line(gx,gy,gx+gw,gy,'#d9e2ec',8);
+    line(gx,gy,gx+gw*Math.min(1,v.ratio/.03),gy,v.ok?'#38b2ac':'#f0a500',8);
+    const critical=gx+gw*(.01/.03);
+    line(critical,gy-13,critical,gy+13,'#e03131',2);
+    text('1% 临界',critical,gy+25,'#e03131','center',11,'700');
+    const p=gx+gw*Math.min(1,v.ratio/.03);
+    ctx.fillStyle=v.ok?'#087f5b':'#9a6700';
+    ctx.beginPath();ctx.arc(p,gy,7,0,Math.PI*2);ctx.fill();
+  }
+  function draw(){
+    const d=q();
+    const v=verdict(d);
+    ctx.clearRect(0,0,940,560);
+    var _bg=ctx.createLinearGradient(0,0,0,560);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,940,560);
+    text('质点模型实验台：先选研究任务，再判断能否忽略大小和形状',470,30,'#102a43','center',18,'700');
+
+    const trackX=90, trackW=610;
+    const visualScale=Math.max(.33,Math.min(1.05,Math.log10(d.s+10)/Math.log10(810)));
+    const roadW=trackW*visualScale;
+    const left=trackX+(trackW-roadW)/2;
+    const right=left+roadW;
+    const carW=Math.max(42,Math.min(164,31+d.l*5.6));
+    const travel=Math.max(0,roadW-carW-26);
+    const carX=left+13+travel*d.progress;
+    const pointX=left+roadW*d.progress;
+    const carY=136;
+    const wheelSpin=d.progress*d.s*0.08;
+    const tilt=d.mode==='posture'?Math.sin(d.progress*Math.PI*2)*0.23-0.12:0;
+
+    layout={left,right,carX,carY,carW,rangeY:172,lenHandle:{x:carX+carW,y:carY+17},rangeHandle:{x:right,y:172}};
+
+    box(38,58,864,184,'#f8fbff','#d9e2ec');
+    text('实物视图：车身有长度 l，前端、后端、车轮、姿态都看得见',470,82,'#334e68','center',14,'700');
+    scaleLine(left,172,roadW,d);
+    line(right,104,right,214,d.mode==='pass'?'#e03131':'#7b8794',d.mode==='pass'?3:1.5,d.mode==='pass'?[]:[5,5]);
+    text(d.mode==='pass'?'终点/停止线':'研究终点 s',right,96,d.mode==='pass'?'#e03131':'#486581','center',12,'700');
+    arrow(left,126,left+roadW*d.progress,126,'#2c7be5',3);
+    text('整体位置 x='+(d.s*d.progress).toFixed(1)+' km',left+Math.max(88,roadW*d.progress),106,'#2c7be5','center',13,'700');
+    car(carX,carY,carW,tilt,wheelSpin);
+    line(carX,carY+58,carX+carW,carY+58,'#f0a500',4);
+    line(carX,carY+50,carX,carY+66,'#f0a500',2);
+    line(carX+carW,carY+50,carX+carW,carY+66,'#f0a500',2);
+    text('l = '+d.l+' m',carX+carW/2,carY+78,'#7c5700','center',12,'700');
+    handle(carX+carW,carY+17,'拖 l');
+    handle(right,172,'拖 s');
+
+    box(38,262,584,154,'#fff','#d9e2ec');
+    text('质点近似视图：蓝点只保留“整体位置”，不保留车身细节',330,285,'#334e68','center',14,'700');
+    scaleLine(left,358,roadW,d);
+    ctx.fillStyle=v.ok?'#2c7be5':'#f08c00';
+    ctx.beginPath();ctx.arc(pointX,323,9,0,Math.PI*2);ctx.fill();
+    arrow(left,323,pointX,323,v.ok?'#2c7be5':'#f08c00',3);
+    text('蓝点：质点位置',pointX,300,v.ok?'#2c7be5':'#f08c00','center',13,'700');
+
+    if(d.mode==='pass'){
+      const rear=carX;
+      const front=carX+carW;
+      line(right,292,right,394,'#e03131',3);
+      arrow(rear,390,front,390,'#f0a500',3);
+      text('前端和后端相差一个车长 l，过线时间不同',330,398,'#9a6700','center',13,'700');
+    }else if(d.mode==='turn'){
+      ctx.strokeStyle='#f08c00';ctx.lineWidth=3;ctx.beginPath();ctx.arc(carX+carW*.78,173,25,-.5,Math.PI*1.35);ctx.stroke();
+      arrow(carX+carW*.78+19,151,carX+carW*.78+4,148,'#f08c00',2);
+      text('转动需要半径和角度，蓝点无法表示轮辐方向',330,398,'#9a6700','center',13,'700');
+    }else if(d.mode==='posture'){
+      line(carX+carW*.52,carY+13,carX+carW*.82,carY+2,'#f08c00',3);
+      text('姿态需要车头方向和倾角，蓝点没有“朝向”',330,398,'#9a6700','center',13,'700');
+    }else{
+      text('只看整体位移时，蓝点与整车的 x 读数同步',330,398,v.ok?'#087f5b':'#9a6700','center',13,'700');
+    }
+
+    drawGauge(648,274,v);
+    box(648,358,222,58,v.ok?'#e6fffa':'#fff7e6',v.ok?'#38b2ac':'#f0a500');
+    text(v.ok?'可看作质点':'不能看作质点',759,378,v.ok?'#087f5b':'#9a6700','center',16,'700');
+    text(modeMessage(d,v),759,399,v.ok?'#087f5b':'#9a6700','center',12,'700');
+
+    box(118,438,704,48,v.ok?'#e6fffa':'#fff7e6',v.ok?'#38b2ac':'#f0a500');
+    text('判据：l/s = '+(v.ratio*100).toFixed(4)+'%，研究任务 = '+modes[d.mode],470,458,'#334e68','center',14,'700');
+    text(d.mode==='path'?'把形状遮住，只保留整体位置，运动学计算不变。':'此任务正关心大小、形状、转动或姿态，遮住它们就会丢信息。',470,480,'#486581','center',13);
+    update(d,v);
+  }
+  function update(d,v){
+    document.getElementById('lenText').textContent=d.l+' m';
+    document.getElementById('distText').textContent=d.s+' km';
+    document.getElementById('readout').innerHTML='任务=<b>'+modes[d.mode]+'</b><br>l/s=<b>'+(v.ratio*100).toFixed(4)+'%</b><br>位置 x=<b>'+(d.s*d.progress).toFixed(1)+' km</b><br>结论=<b>'+(v.ok?'可质点化':'不可质点化')+'</b>';
+    const st=document.getElementById('status');
+    st.classList.toggle('bad',!v.ok);
+    st.textContent=v.ok?'通过：本题只关心整体位置，大小和形状对结论影响可忽略。':'打回：当前任务需要车长、转角、姿态或各部分差异，不能用一个点替代。';
+  }
+  function setMode(m){
+    mode=m;
+    Object.keys(modes).forEach(k=>document.getElementById('mode'+(k==='path'?'Path':k==='pass'?'Pass':k==='turn'?'Turn':'Posture')).classList.toggle('active',m===k));
+    draw();
+  }
+  function tick(now){
+    const dt=Math.min(.05,(now-last)/1000);
+    last=now;
+    if(running){
+      progress+=dt*.16;
+      if(progress>=1)progress=0;
+      draw();
+    }
+    requestAnimationFrame(tick);
+  }
+  function pointer(e){
+    const r=canvas.getBoundingClientRect();
+    return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};
+  }
+  canvas.addEventListener('pointerdown',e=>{
+    const p=pointer(e);
+    if(!layout)return;
+    const dl=Math.hypot(p.x-layout.lenHandle.x,p.y-layout.lenHandle.y);
+    const ds=Math.hypot(p.x-layout.rangeHandle.x,p.y-layout.rangeHandle.y);
+    if(dl<28){drag='len';canvas.setPointerCapture(e.pointerId);}
+    else if(ds<28){drag='dist';canvas.setPointerCapture(e.pointerId);}
+  });
+  canvas.addEventListener('pointermove',e=>{
+    const p=pointer(e);
+    if(drag&&layout){
+      if(drag==='len'){
+        const w=clamp(p.x-layout.carX,42,164);
+        setParam('len',(w-31)/5.6);
+      }else{
+        const roadW=clamp(p.x-layout.left,120,610);
+        const t=(roadW/610);
+        const target=Math.pow(10,t*Math.log10(810))-10;
+        setParam('dist',target);
+      }
+      return;
+    }
+    if(layout){
+      const overLen=Math.hypot(p.x-layout.lenHandle.x,p.y-layout.lenHandle.y)<28;
+      const overDist=Math.hypot(p.x-layout.rangeHandle.x,p.y-layout.rangeHandle.y)<28;
+      canvas.style.cursor=overLen||overDist?'grab':'default';
+    }
+  });
+  window.addEventListener('pointerup',()=>{drag=null;canvas.style.cursor='default';});
+  Object.values(els).forEach(el=>el.addEventListener('input',draw));
+  document.querySelectorAll('[data-step]').forEach(btn=>btn.addEventListener('click',()=>{
+    const el=els[btn.dataset.step],step=+el.step||1,dir=+btn.dataset.dir;
+    el.value=Math.max(+el.min,Math.min(+el.max,+el.value+dir*step));
+    el.dispatchEvent(new Event('input',{bubbles:true}));
+  }));
+  playBtn.onclick=()=>{running=!running;playBtn.textContent=running?'暂停':'播放';last=performance.now();draw();};
+  document.getElementById('resetBtn').onclick=()=>{progress=0;running=false;playBtn.textContent='播放';draw();};
+  document.getElementById('modePath').onclick=()=>setMode('path');
+  document.getElementById('modePass').onclick=()=>setMode('pass');
+  document.getElementById('modeTurn').onclick=()=>setMode('turn');
+  document.getElementById('modePosture').onclick=()=>setMode('posture');
+  draw();
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

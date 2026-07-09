@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>功：力在位移方向上的积累效果</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#edf3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px;min-height:560px}
+  .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;touch-action:none}
+  .panel{display:flex;flex-direction:column;gap:8px}
+  .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
+  .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.45}
+  .title{font-weight:800;margin-bottom:5px;color:#0f172a}
+  .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:31px;cursor:pointer;color:#102a43}
+  button:hover{background:#f1f5f9}
+  .primary{background:#2563eb;color:#fff;border-color:#2563eb;font-weight:800}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:48px}
+  .meter span{display:block;font-size:11px;color:#b6c5d8}
+  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:15px;font-variant-numeric:tabular-nums}
+  .formula{display:grid;gap:5px;font-size:13px;color:#334155}
+  .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
+  .formula div:last-child{border-bottom:0;padding-bottom:0}
+  .formula b{white-space:nowrap;color:#0f172a}
+  .small{font-size:12px;line-height:1.5;color:#475569}
+  .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
+  .status.zero{border-color:#f59e0b;background:#fff7ed;color:#92400e}
+  .status.negative{border-color:#f87171;background:#fff1f2;color:#be123c}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="功的定义交互实验台"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>抓红色力箭头端点绕着箱子转，看投影 F∥ 怎样变短、变零、反向；抓蓝色位移终点，看 W 是否随 s 成正比。</div>
+    <button id="playBtn" class="primary">播放</button>
+    <div class="card">
+      <div class="title">快速情境</div>
+      <div class="chips">
+        <button data-case="positive">正功</button>
+        <button data-case="zero">零功</button>
+        <button data-case="negative">负功</button>
+        <button data-case="none">无位移</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="title">实时读数</div>
+      <div class="readout">
+        <div class="meter"><span>力 F</span><b id="forceText">20 N</b></div>
+        <div class="meter"><span>位移 s</span><b id="sText">5.0 m</b></div>
+        <div class="meter"><span>夹角 α</span><b id="alphaText">37°</b></div>
+        <div class="meter"><span>cosα</span><b id="cosText">0.80</b></div>
+        <div class="meter"><span>投影 F∥</span><b id="parallelText">16.0 N</b></div>
+        <div class="meter"><span>功 W</span><b id="workText">79.9 J</b></div>
+      </div>
+    </div>
+    <div class="card formula">
+      <div><span>投影</span><b>F∥=Fcosα</b></div>
+      <div><span>功</span><b>W=F∥s=Fscosα</b></div>
+      <div><span>单位</span><b>1 J=1 N·m</b></div>
+    </div>
+    <div class="card small"><b>可直接操作：</b>拖红色力箭头端点改 F 和 α；拖蓝色 B 点改位移 s；底部手柄可精调 F、s、α。</div>
+    <div class="status" id="status">正功：F∥ 与位移同向，力在推动物体沿位移方向运动。</div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+  const state={F:20,s:5,alpha:37,running:false,t:0,drag:null};
+  const els={
+    F:document.getElementById('forceText'),s:document.getElementById('sText'),alpha:document.getElementById('alphaText'),
+    cos:document.getElementById('cosText'),parallel:document.getElementById('parallelText'),work:document.getElementById('workText'),
+    status:document.getElementById('status'),play:document.getElementById('playBtn')
+  };
+  const colors={red:'#dc2626',blue:'#2563eb',green:'#0f766e',orange:'#f59e0b',purple:'#7c3aed',ink:'#102a43'};
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  const fmt=(v,d=1)=>Math.abs(v)<1e-8?(0).toFixed(d):v.toFixed(d);
+  function calc(){const rad=state.alpha*Math.PI/180,cos=Math.cos(rad),Fp=state.F*cos,W=Fp*state.s;return{rad,cos,Fp,W}}
+  function sign(v){return Math.abs(v)<.05?'zero':(v>0?'positive':'negative')}
+  function signName(v){return Math.abs(v)<.05?'零功':(v>0?'正功':'负功')}
+  function signColor(v){return Math.abs(v)<.05?colors.orange:(v>0?colors.green:colors.red)}
+  function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){
+    ctx.fillStyle=c;ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;
+    ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y);
+  }
+  function line(x1,y1,x2,y2,c='#94a3b8',w=2,dash){
+    ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();
+  }
+  function arrow(x1,y1,x2,y2,c,w=3){
+    const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);
+    ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));
+    ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore();
+  }
+  function roundRect(x,y,w,h,r,fill,stroke){
+    ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();
+    if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}ctx.restore();
+  }
+  function ruler(x1,y,x2,label,c){
+    line(x1,y,x2,y,'#0f172a',2);
+    for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}
+    text(label,(x1+x2)/2,y-36,c,'center',12,'900');
+  }
+  function handle(x,y,label,active,c){
+    ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;
+    ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();
+    text(label,x,y-20,active?'#92400e':c,'center',12,'900');ctx.restore();
+  }
+  function geom(){
+    const A={x:90,y:320},scaleS=34,boxX=A.x+state.s*scaleS*(state.running?(.5+.5*Math.sin(state.t)):0.72);
+    const anchor={x:boxX+28,y:A.y-45},len=42+state.F*2.4,rad=state.alpha*Math.PI/180;
+    const tip={x:anchor.x+len*Math.cos(rad),y:anchor.y-len*Math.sin(rad)};
+    return{A,scaleS,B:{x:A.x+state.s*scaleS,y:A.y+52},box:{x:boxX,y:A.y-20},anchor,tip,len};
+  }
+  function handles(){
+    return{
+      F:{x:94+state.F/60*170,y:494},
+      s:{x:335+state.s/10*170,y:494},
+      a:{x:604+state.alpha/180*220,y:494}
+    };
+  }
+  function drawScene(r){
+    const g=geom();
+    roundRect(42,58,560,382,8,'#fff','#d7dee8');
+    line(62,g.A.y+10,540,g.A.y+10,'#334155',3);
+    for(let x=68;x<536;x+=26)line(x,g.A.y+10,x-12,g.A.y+24,'#d7dee8',1);
+    arrow(g.A.x,g.A.y+52,g.B.x,g.B.y,colors.blue,3);
+    text('A',g.A.x-12,g.B.y,'#475569','right',13,'900');
+    point(g.B.x,g.B.y,colors.blue,'B',state.drag==='B');
+    text(`s=${fmt(state.s,1)}m`,(g.A.x+g.B.x)/2,g.B.y+26,colors.blue,'center',13,'900');
+    roundRect(g.box.x-34,g.box.y-28,68,42,7,'#dbeafe','#334155');
+    text('箱子',g.box.x,g.box.y-7,'#0f172a','center',13,'900');
+    arrow(g.anchor.x,g.anchor.y,g.tip.x,g.tip.y,colors.red,3);
+    point(g.tip.x,g.tip.y,colors.red,'拖 F',state.drag==='force');
+    text(`F=${fmt(state.F,0)}N`,g.tip.x+10,g.tip.y-12,colors.red,'left',13,'900');
+    line(g.tip.x,g.tip.y,g.tip.x,g.anchor.y,'#94a3b8',1.6,[5,4]);
+    const fpEnd={x:g.anchor.x+r.Fp*5.2,y:g.anchor.y};
+    if(Math.abs(r.Fp)>0.15)arrow(g.anchor.x,g.anchor.y,fpEnd.x,fpEnd.y,signColor(r.W),4);
+    else line(g.anchor.x-18,g.anchor.y,g.anchor.x+18,g.anchor.y,colors.orange,4);
+    text(`F∥=${fmt(r.Fp,1)}N`,g.anchor.x+88,g.anchor.y+24,signColor(r.W),'left',13,'900');
+    ctx.save();ctx.strokeStyle=colors.orange;ctx.lineWidth=2;ctx.beginPath();ctx.arc(g.anchor.x,g.anchor.y,36,-r.rad,0,r.rad>0);ctx.stroke();ctx.restore();
+    text('α',g.anchor.x+43*Math.cos(r.rad/2),g.anchor.y-43*Math.sin(r.rad/2),colors.orange,'center',14,'900');
+    text('只看力在位移方向上的投影',310,426,'#475569','center',13,'900');
+  }
+  function point(x,y,c,label,active){
+    ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;
+    ctx.beginPath();ctx.arc(x,y,11,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-22,c,'center',12,'900');ctx.restore();
+  }
+  function drawGraph(r){
+    const x=642,y=76,w=214,h=180,left=x+28,right=x+w-18,mid=y+96,top=y+44,bottom=y+h-28,max=Math.max(1,state.F*state.s);
+    roundRect(x,y,w,h,8,'#fff','#d7dee8');
+    text('W-α 图像',x+w/2,y+24,'#0f172a','center',15,'900');
+    line(left,mid,right,mid,'#cbd5e1',1);line(left,top,left,bottom,'#cbd5e1',1);
+    text('0°',left,bottom+14,'#475569','center',11,'700');text('90°',(left+right)/2,bottom+14,'#475569','center',11,'700');text('180°',right,bottom+14,'#475569','center',11,'700');
+    ctx.strokeStyle=colors.blue;ctx.lineWidth=2;ctx.beginPath();
+    for(let a=0;a<=180;a+=2){const px=left+a/180*(right-left),py=mid-Math.cos(a*Math.PI/180)*(bottom-top)/2;if(a===0)ctx.moveTo(px,py);else ctx.lineTo(px,py)}
+    ctx.stroke();
+    const px=left+state.alpha/180*(right-left),py=mid-r.W/max*(bottom-top)/2;
+    ctx.fillStyle=signColor(r.W);ctx.beginPath();ctx.arc(px,py,6,0,Math.PI*2);ctx.fill();text('当前',px,py-16,signColor(r.W),'center',12,'900');
+    roundRect(642,292,214,126,8,'#fff','#d7dee8');
+    text('做功读数',749,318,'#0f172a','center',15,'900');
+    text(`${signName(r.W)}：W=${fmt(r.W,1)}J`,749,356,signColor(r.W),'center',20,'900');
+    text('正负号来自 F∥ 方向',749,392,'#475569','center',12,'900');
+  }
+  function bottom(){
+    const h=handles();
+    roundRect(48,458,820,62,8,'#fff','#d7dee8');
+    ruler(94,494,264,'F',colors.red);handle(h.F.x,h.F.y,`F=${fmt(state.F,0)}N`,state.drag==='F',colors.red);
+    ruler(335,494,505,'s',colors.blue);handle(h.s.x,h.s.y,`s=${fmt(state.s,1)}m`,state.drag==='s',colors.blue);
+    ruler(604,494,824,'α',colors.orange);handle(h.a.x,h.a.y,`α=${fmt(state.alpha,0)}°`,state.drag==='alpha',colors.orange);
+  }
+  function update(r){
+    els.F.textContent=`${fmt(state.F,0)} N`;els.s.textContent=`${fmt(state.s,1)} m`;els.alpha.textContent=`${fmt(state.alpha,0)}°`;
+    els.cos.textContent=fmt(r.cos,2);els.parallel.textContent=`${fmt(r.Fp,1)} N`;els.work.textContent=`${fmt(r.W,1)} J`;
+    els.play.textContent=state.running?'暂停':'播放';
+    els.status.className='status '+sign(r.W);
+    if(state.F<.05||state.s<.05)els.status.textContent='没有力或没有位移，功为 0；有力但没有位移也不做功。';
+    else if(Math.abs(r.W)<.05)els.status.textContent='零功：力垂直于位移，投影 F∥ 为 0，例如支持力对水平位移不做功。';
+    else if(r.W>0)els.status.textContent='正功：F∥ 与位移同向，力在推动物体沿位移方向运动。';
+    else els.status.textContent='负功：F∥ 与位移反向，力在阻碍物体沿位移方向运动。';
+  }
+  function draw(){const r=calc();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('功的实验台：先看投影，再算 W=Fscosα',460,30,'#0f172a','center',19,'900');drawScene(r);drawGraph(r);bottom();update(r)}
+  function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+  function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+  function pointerDown(e){
+    const p=pos(e),g=geom(),h=handles();
+    if(near(p,g.tip,28))state.drag='force';
+    else if(near(p,g.B,28))state.drag='B';
+    else if(near(p,h.F,26))state.drag='F';
+    else if(near(p,h.s,26))state.drag='s';
+    else if(near(p,h.a,26))state.drag='alpha';
+    else state.drag=null;
+    if(state.drag){state.running=false;canvas.setPointerCapture(e.pointerId);pointerMove(e)}
+  }
+  function pointerMove(e){
+    if(!state.drag)return;
+    const p=pos(e),g=geom();
+    if(state.drag==='F')state.F=clamp((p.x-94)/170*60,0,60);
+    if(state.drag==='s'||state.drag==='B')state.s=clamp((p.x-g.A.x)/g.scaleS,0,10);
+    if(state.drag==='alpha')state.alpha=clamp((p.x-604)/220*180,0,180);
+    if(state.drag==='force'){
+      const dx=p.x-g.anchor.x,dy=p.y-g.anchor.y,dist=Math.hypot(dx,dy);
+      state.F=clamp((dist-42)/2.4,0,60);
+      state.alpha=clamp(Math.atan2(-dy,dx)*180/Math.PI,0,180);
+    }
+    draw();
+  }
+  function pointerUp(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
+  canvas.addEventListener('pointerdown',pointerDown);canvas.addEventListener('pointermove',pointerMove);
+  canvas.addEventListener('pointerup',pointerUp);canvas.addEventListener('pointercancel',pointerUp);
+  els.play.addEventListener('click',()=>{state.running=!state.running;draw()});
+  document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{
+    const c=btn.dataset.case;
+    if(c==='positive'){state.F=20;state.s=5;state.alpha=37}
+    if(c==='zero'){state.F=20;state.s=5;state.alpha=90}
+    if(c==='negative'){state.F=20;state.s=5;state.alpha=130}
+    if(c==='none'){state.F=20;state.s=0;state.alpha=37}
+    state.running=false;draw();
+  }));
+  function tick(){if(state.running)state.t=(state.t+.035)%(Math.PI*2);draw();requestAnimationFrame(tick)}
+  draw();requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

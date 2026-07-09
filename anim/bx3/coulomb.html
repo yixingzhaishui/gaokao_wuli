@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>库仑定律</title>
+<link rel="stylesheet" href="../common/controls.css">
+<style>
+body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#f7f9fc;color:#1f2933}
+.container{padding:12px}
+canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid #d9e2ec;border-radius:8px;touch-action:none;cursor:crosshair}
+.readouts{display:flex;flex-wrap:wrap;gap:12px;margin:10px 0;font-size:14px}
+.readouts .r{background:#102a43;color:#d9e2ec;padding:6px 12px;border-radius:6px}
+.readouts .r b{color:#f0a500}
+.controls{display:flex;flex-wrap:wrap;gap:16px;margin:10px 0;align-items:center}
+.controls label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:#334e68}
+.controls input[type=range]{width:140px;accent-color:#2c7be5}
+.controls button{font:inherit;padding:6px 16px;border:1px solid #b0bcc9;background:#fff;border-radius:6px;cursor:pointer}
+.controls button:hover{background:#eef2f7}
+.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:8px 12px;border-radius:4px;font-size:13px;color:#486581;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>库仑定律：F = k·q₁q₂/r²</h2>
+  <canvas id="canvas" width="600" height="340"></canvas>
+  <div class="readouts">
+    <span class="r">距离 r = <b id="r-val">3.0</b> m</span>
+    <span class="r">力 F = <b id="f-val">2.00</b> N</span>
+    <span class="r">k·q₁q₂ = <b id="kq-val">18.0</b> N·m²</span>
+    <span class="r" id="type-val">斥力（同号）</span>
+  </div>
+  <div class="controls">
+    <label>q₁ = <span id="q1-display">+3.0</span> μC
+      <input type="range" id="q1" min="-10" max="10" step="0.5" value="3"></label>
+    <label>q₂ = <span id="q2-display">+2.0</span> μC
+      <input type="range" id="q2" min="-10" max="10" step="0.5" value="2"></label>
+    <label>距离 r = <span id="r-display">3.0</span> m
+      <input type="range" id="r" min="1" max="8" step="0.1" value="3"></label>
+    <button id="play-btn">播放</button>
+    <button id="reset-btn">重置</button>
+    <button data-case="double">距离翻倍</button>
+    <button data-case="opposite">异号相吸</button>
+  </div>
+  <div class="hint">
+    <p><b>观察任务</b>：拖动 r 看力如何按平方反比减小；拖动 q₁ 或 q₂ 看力如何正比变化；把 q₁ 拖到负值看力从斥力变引力。</p>
+  </div>
+</div>
+<script>
+(function(){
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  let q1=3,q2=2,r=3;
+  let running=false,t=0,drag=null;
+  let hot={q1:{x:0,y:0},q2:{x:0,y:0},cy:0};
+  const k=9; // 简化 k=9 N·m²/μC² (实际 9×10⁹ N·m²/C²，这里 q 用 μC 简化)
+  const scale=40; // px per meter
+
+  function calcF(){
+    const sign=q1*q2;
+    const f=k*Math.abs(q1*q2)/(r*r);
+    return {f:f,sign:sign,attractive:sign<0};
+  }
+
+  function updateReadouts(){
+    const res=calcF();
+    document.getElementById('r-val').textContent=r.toFixed(2);
+    document.getElementById('f-val').textContent=res.f.toFixed(2);
+    document.getElementById('kq-val').textContent=(k*Math.abs(q1*q2)).toFixed(1);
+    const tv=document.getElementById('type-val');
+    if(q1*q2>0) tv.textContent='斥力（同号）';
+    else if(q1*q2<0) tv.textContent='引力（异号）';
+    else tv.textContent='无力（有电荷为零）';
+  }
+
+  function drawCharge(x,y,q,label){
+    const color=q>0?'#e03131':(q<0?'#2c7be5':'#aab8c2');
+    const glow=ctx.createRadialGradient(x,y,3,x,y,18+Math.abs(q)*3);glow.addColorStop(0,q>0?'rgba(224,49,49,0.5)':'rgba(44,123,229,0.5)');glow.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=glow;ctx.beginPath();ctx.arc(x,y,18+Math.abs(q)*3,0,7);ctx.fill();
+    ctx.fillStyle=color;
+    ctx.beginPath();
+    ctx.arc(x,y,18,0,Math.PI*2);
+    ctx.fill();
+    ctx.strokeStyle='#334e68';
+    ctx.lineWidth=2;
+    ctx.stroke();
+    ctx.fillStyle='#fff';
+    ctx.font='bold 14px sans-serif';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText(q>0?'+':(q<0?'−':'0'),x,y);
+    ctx.fillStyle='#334e68';
+    ctx.font='12px sans-serif';
+    ctx.fillText(label,x,y+30);
+    ctx.fillText(q.toFixed(1)+' μC',x,y+45);
+  }
+
+  function drawArrow(x1,y1,x2,y2,color){
+    ctx.strokeStyle=color;
+    ctx.fillStyle=color;
+    ctx.lineWidth=2.5;
+    ctx.beginPath();
+    ctx.moveTo(x1,y1);
+    ctx.lineTo(x2,y2);
+    ctx.stroke();
+    const ang=Math.atan2(y2-y1,x2-x1);
+    ctx.beginPath();
+    ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-8*Math.cos(ang-0.4),y2-8*Math.sin(ang-0.4));
+    ctx.lineTo(x2-8*Math.cos(ang+0.4),y2-8*Math.sin(ang+0.4));
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    const cy=H/2;
+    const rPx=r*scale;
+    const x1=W/2-rPx/2;
+    const x2=W/2+rPx/2;
+    hot={q1:{x:x1,y:cy},q2:{x:x2,y:cy},cy};
+    // distance line
+    ctx.strokeStyle='#aab8c2';
+    ctx.lineWidth=1;
+    ctx.setLineDash([4,3]);
+    ctx.beginPath();
+    ctx.moveTo(x1,cy);
+    ctx.lineTo(x2,cy);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    // r label
+    ctx.fillStyle='#486581';
+    ctx.font='12px sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText('r = '+r.toFixed(1)+' m',W/2,cy-8);
+    // charges
+    drawCharge(x1,cy,q1,'q₁');
+    drawCharge(x2,cy,q2,'q₂');
+    // force arrows
+    const res=calcF();
+    const fLen=Math.min(80,res.f*15+10);
+    if(q1*q2>0){
+      // repulsive: q1 pushed left, q2 pushed right
+      drawArrow(x1-20,cy,x1-20-fLen,cy,'#e03131');
+      drawArrow(x2+20,cy,x2+20+fLen,cy,'#e03131');
+      ctx.fillStyle='#e03131';
+      ctx.font='11px sans-serif';
+      ctx.textAlign='center';
+      ctx.fillText('F',x1-20-fLen/2,cy-12);
+      ctx.fillText('F',x2+20+fLen/2,cy-12);
+    }else if(q1*q2<0){
+      // attractive: q1 pulled right, q2 pulled left
+      drawArrow(x1+20,cy,x1+20+fLen,cy,'#2c7be5');
+      drawArrow(x2-20,cy,x2-20-fLen,cy,'#2c7be5');
+      ctx.fillStyle='#2c7be5';
+      ctx.font='11px sans-serif';
+      ctx.textAlign='center';
+      ctx.fillText('F',x1+20+fLen/2,cy-12);
+      ctx.fillText('F',x2-20-fLen/2,cy-12);
+    }
+    // formula
+    ctx.fillStyle='#243b53';
+    ctx.font='13px sans-serif';
+    ctx.textAlign='left';
+    ctx.fillText('F = k·|q₁q₂| / r² = '+k+'×|'+q1.toFixed(1)+'×'+q2.toFixed(1)+'|/'+r.toFixed(1)+'² = '+res.f.toFixed(2)+' N',15,H-15);
+    ctx.font='bold 12px sans-serif';ctx.fillStyle=res.attractive?'#2c7be5':'#e03131';
+    ctx.fillText('状态：'+(q1*q2===0?'有电荷为零，无力':(res.attractive?'异号相吸（引力）':'同号相斥（斥力）'))+'；r 减小 → F 加强（平方反比）',15,20);
+  }
+
+  // oscillation animation: charges vibrate
+  function step(dt){
+    if(!running)return;
+    t+=dt;
+    draw();
+  }
+
+  document.getElementById('q1').addEventListener('input',e=>{q1=parseFloat(e.target.value);document.getElementById('q1-display').textContent=(q1>=0?'+':'')+q1.toFixed(1);updateReadouts();draw();});
+  document.getElementById('q2').addEventListener('input',e=>{q2=parseFloat(e.target.value);document.getElementById('q2-display').textContent=(q2>=0?'+':'')+q2.toFixed(1);updateReadouts();draw();});
+  document.getElementById('r').addEventListener('input',e=>{r=parseFloat(e.target.value);document.getElementById('r-display').textContent=r.toFixed(1);updateReadouts();draw();});
+  document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
+  document.getElementById('reset-btn').addEventListener('click',()=>{
+    running=false;t=0;q1=3;q2=2;r=3;
+    document.getElementById('play-btn').textContent='播放';
+    document.getElementById('q1').value=q1;
+    document.getElementById('q2').value=q2;
+    document.getElementById('r').value=r;
+    document.getElementById('q1-display').textContent='+3.0';
+    document.getElementById('q2-display').textContent='+2.0';
+    document.getElementById('r-display').textContent='3.0';
+    updateReadouts();draw();
+  });
+  document.querySelectorAll('button[data-case]').forEach(btn=>btn.addEventListener('click',()=>{
+    if(btn.dataset.case==='double'){r=6;q1=3;q2=2;}
+    else{r=3;q1=3;q2=-2;}
+    document.getElementById('q1').value=q1;
+    document.getElementById('q2').value=q2;
+    document.getElementById('r').value=r;
+    document.getElementById('q1-display').textContent=(q1>=0?'+':'')+q1.toFixed(1);
+    document.getElementById('q2-display').textContent=(q2>=0?'+':'')+q2.toFixed(1);
+    document.getElementById('r-display').textContent=r.toFixed(1);
+    updateReadouts();draw();
+  }));
+
+  function eventPos(ev){const b=canvas.getBoundingClientRect();const src=ev.touches&&ev.touches.length?ev.touches[0]:(ev.changedTouches&&ev.changedTouches.length?ev.changedTouches[0]:ev);return{x:(src.clientX-b.left)*canvas.width/b.width,y:(src.clientY-b.top)*canvas.height/b.height};}
+  function setDistanceFromPointer(pos){
+    const fixed=drag==='q1'?hot.q2:hot.q1;
+    r=Math.max(1,Math.min(8,Math.abs(pos.x-fixed.x)/scale));
+    document.getElementById('r').value=r;
+    document.getElementById('r-display').textContent=r.toFixed(1);
+    updateReadouts();draw();
+  }
+  canvas.addEventListener('pointerdown',ev=>{const p=eventPos(ev);if(Math.hypot(p.x-hot.q1.x,p.y-hot.q1.y)<28)drag='q1';else if(Math.hypot(p.x-hot.q2.x,p.y-hot.q2.y)<28)drag='q2';if(drag){ev.preventDefault();}});
+  canvas.addEventListener('pointermove',ev=>{if(!drag)return;setDistanceFromPointer(eventPos(ev));ev.preventDefault();});
+  ['pointerup','pointercancel','pointerleave'].forEach(type=>canvas.addEventListener(type,()=>{drag=null;}));
+
+  let lastTime=performance.now();
+  function loop(now){const dt=Math.min((now-lastTime)/1000,0.05);lastTime=now;step(dt);requestAnimationFrame(loop);}
+  updateReadouts();draw();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

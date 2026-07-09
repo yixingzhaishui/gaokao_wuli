@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>等势面实验台</title>
+<style>
+:root{--ink:#102a43;--muted:#52677a;--line:#d9e2ec;--blue:#2c7be5;--red:#e03131;--green:#159a6b;--gold:#f0a500}
+*{box-sizing:border-box}
+body{margin:0;background:#f3f6fa;color:var(--ink);font-family:-apple-system,"PingFang SC",system-ui,sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:14px}
+h2{font-size:17px;margin:0 0 10px}
+.lab{display:grid;grid-template-columns:minmax(0,1fr)292px;gap:12px;align-items:start}
+.stage{position:relative;background:#fff;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab;background:#fff}
+.panel{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px}
+.seg{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:10px}
+button{font:inherit;border:0;background:#fff;padding:8px 10px;cursor:pointer}
+button.on{background:var(--blue);color:#fff}
+.tools{display:grid;gap:8px;margin:10px 0}
+.tools button{border:1px solid var(--line);border-radius:8px;text-align:left}
+.tools button.active{border-color:var(--green);background:#e9fff6;color:#087f5b;font-weight:700}
+.read{display:grid;gap:7px;margin-top:10px}
+.chip{background:#102a43;color:#eef4ff;border-radius:8px;padding:8px 10px;font-size:13px;line-height:1.45}
+.chip b{color:#ffd166}
+.hint{margin-top:10px;background:#fff7e6;border-left:3px solid var(--gold);border-radius:6px;padding:9px 11px;font-size:13px;color:#5a6b7b;line-height:1.55}
+.formula{margin-top:10px;border-top:1px solid var(--line);padding-top:10px;font-size:13px;line-height:1.7;color:#334e68}
+@media(max-width:820px){.lab{grid-template-columns:1fr}.panel{min-height:0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2>等势面：拖动探针，看 φ、E、W=qΔφ 如何绑定到画面</h2>
+  <div class="lab">
+    <div class="stage"><canvas id="cv" width="720" height="470" aria-label="等势面交互实验台"></canvas></div>
+    <section class="panel">
+      <div class="seg" id="mode">
+        <button class="on" data-mode="point">点电荷</button>
+        <button data-mode="uniform">匀强电场</button>
+      </div>
+      <div class="tools">
+        <button id="lock" class="active">锁定等势面拖动</button>
+        <button id="free">自由拖动探针</button>
+        <button id="playBtn">▶ 自动演示（外力沿等势线拖探针）</button>
+        <button id="reset">复位</button>
+      </div>
+      <div class="read">
+        <div class="chip">探针电势 φ = <b id="phi">0</b> V</div>
+        <div class="chip">场强 E = <b id="emag">0</b> V/m，方向 <b id="edir">—</b></div>
+        <div class="chip">A→B 电势差 Δφ = <b id="dphi">0</b> V</div>
+        <div class="chip">做功 W=qΔφ = <b id="work">0</b> J（取 q=1 C）</div>
+        <div class="chip">路径状态：<b id="state">—</b></div>
+      </div>
+      <div class="hint"><b>观察任务</b>：先开“锁定等势面拖动”，用外力沿蓝色等势线拖黄色探针，看 Δφ 和 W 是否保持 0；再自由拖动到另一条等势线，看 φ、E 和做功如何改变。注意：这里显示的是测量路径，不是电荷自由释放后的运动轨迹。</div>
+      <div class="formula">
+        <b>公式绑定</b><br>
+        蓝线：φ 相同的点；红箭头：E，始终垂直蓝线；黄色探针：被外力缓慢移动的电荷位置。沿蓝线拖动时 Δφ=φ_A−φ_B=0，所以电场力做功 W=qΔφ=0；跨过等势线移动时 Δφ≠0，W 随之改变。
+      </div>
+    </section>
+  </div>
+</div>
+<script>
+(function(){
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+const W=cv.width,H=cv.height;
+let mode='point',locked=true,drag=null;
+let charge={x:340,y:235,q:1};
+let probe={x:500,y:170};
+let anchor={x:probe.x,y:probe.y,phi:0};
+const K=600;
+const els={phi:gid('phi'),emag:gid('emag'),edir:gid('edir'),dphi:gid('dphi'),work:gid('work'),state:gid('state')};
+let playing=false,playT=0;
+function gid(id){return document.getElementById(id)}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function drawArrow(x,y,ang,len,color,w){
+  ctx.save();ctx.translate(x,y);ctx.rotate(ang);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=w||2.2;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(len,0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(len,0);ctx.lineTo(len-9,-5);ctx.lineTo(len-9,5);ctx.closePath();ctx.fill();ctx.restore();
+}
+function values(p){
+  if(mode==='point'){
+    const dx=p.x-charge.x,dy=p.y-charge.y,r=Math.max(34,Math.hypot(dx,dy));
+    const phi=K/r, e=K/(r*r)*100;
+    return {phi,e,ang:Math.atan2(dy,dx),dir:'径向向外'};
+  }
+  const left=120,right=600,len=right-left,x=clamp(p.x,left,right);
+  const phi=12*(1-(x-left)/len), e=12/(len/100);
+  return {phi,e,ang:0,dir:'从高电势到低电势'};
+}
+function reset(){
+  charge={x:340,y:235,q:1};
+  probe=mode==='point'?{x:500,y:170}:{x:440,y:150};
+  anchor={x:probe.x,y:probe.y,phi:values(probe).phi};
+  render();
+}
+function pos(e){const r=cv.getBoundingClientRect(),s=cv.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s}}
+function startDrag(e){
+  const p=pos(e);
+  if(mode==='point'&&Math.hypot(p.x-charge.x,p.y-charge.y)<28){drag='charge';cv.style.cursor='grabbing';return}
+  if(Math.hypot(p.x-probe.x,p.y-probe.y)<24){drag='probe';anchor={x:probe.x,y:probe.y,phi:values(probe).phi};cv.style.cursor='grabbing';return}
+}
+function moveDrag(e){
+  if(!drag)return;const p=pos(e);
+  if(drag==='charge'){charge.x=clamp(p.x,110,610);charge.y=clamp(p.y,90,380)}
+  if(drag==='probe'){
+    if(locked&&mode==='point'){
+      const r=Math.max(45,Math.hypot(anchor.x-charge.x,anchor.y-charge.y));
+      const a=Math.atan2(p.y-charge.y,p.x-charge.x);
+      probe.x=charge.x+Math.cos(a)*r;probe.y=charge.y+Math.sin(a)*r;
+    }else if(locked&&mode==='uniform'){
+      probe.x=anchor.x;probe.y=clamp(p.y,78,392);
+    }else{
+      probe.x=clamp(p.x,70,650);probe.y=clamp(p.y,60,410);
+    }
+  }
+  render();
+}
+function stopDrag(){drag=null;cv.style.cursor='grab'}
+function drawCharge(){
+  const g=ctx.createRadialGradient(charge.x-10,charge.y-10,4,charge.x,charge.y,28);
+  g.addColorStop(0,'#ffb0a2');g.addColorStop(1,'#e03131');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(charge.x,charge.y,25,0,7);ctx.fill();
+  ctx.strokeStyle='rgba(16,42,67,.45)';ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle='#fff';ctx.font='700 24px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('+',charge.x,charge.y+1);
+}
+function drawUniform(){
+  const left=120,right=600,top=74,bottom=392;
+  ctx.fillStyle='#fff8f0';ctx.fillRect(left,top,right-left,bottom-top);
+  ctx.strokeStyle='#d9e2ec';ctx.strokeRect(left,top,right-left,bottom-top);
+  ctx.fillStyle='#e03131';ctx.fillRect(left-12,top,12,bottom-top);
+  ctx.fillStyle='#2c7be5';ctx.fillRect(right,top,12,bottom-top);
+  ctx.fillStyle='#102a43';ctx.font='700 13px system-ui';ctx.textAlign='center';ctx.fillText('12 V',left-8,top-14);ctx.fillText('0 V',right+10,top-14);
+  for(let i=0;i<=6;i++){
+    const x=left+(right-left)*i/6,phi=12*(1-i/6);
+    ctx.setLineDash([7,5]);ctx.strokeStyle='#2c7be5';ctx.lineWidth=i===0||i===6?1.2:2;
+    ctx.beginPath();ctx.moveTo(x,top+10);ctx.lineTo(x,bottom-10);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#2c7be5';ctx.font='12px system-ui';ctx.fillText(phi.toFixed(0)+'V',x,bottom+22);
+  }
+  for(let y=118;y<=344;y+=56)drawArrow(left+45,y,0,right-left-90,'#e03131',2.4);
+  ctx.fillStyle='#e03131';ctx.font='700 13px system-ui';ctx.fillText('E 垂直等势面，高电势 → 低电势',360,48);
+}
+function drawPoint(){
+  const levels=[12,9,6,3]; // 等差电势线，便于用疏密判断场强
+  levels.forEach(level=>{
+    const r=K/level;
+    ctx.setLineDash([7,5]);ctx.strokeStyle='#2c7be5';ctx.lineWidth=2;ctx.beginPath();ctx.arc(charge.x,charge.y,r,0,7);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#2c7be5';ctx.font='12px system-ui';ctx.textAlign='left';ctx.fillText(level.toFixed(0)+'V',charge.x+r+6,charge.y-4);
+  });
+  drawCharge();
+  for(let a=0;a<Math.PI*2;a+=Math.PI/6){
+    drawArrow(charge.x+Math.cos(a)*38,charge.y+Math.sin(a)*38,a,95,'rgba(224,49,49,.72)',2.2);
+    drawArrow(charge.x+Math.cos(a)*150,charge.y+Math.sin(a)*150,a,48,'rgba(224,49,49,.42)',1.8);
+  }
+  ctx.fillStyle='#e03131';ctx.font='700 13px system-ui';ctx.textAlign='center';ctx.fillText('等差等势线：相邻 Δφ=3V；越靠近电荷越密，E 越大',360,44);
+}
+function drawProbe(){
+  const v=values(probe),a=anchor.phi-v.phi;
+  const eLen=Math.min(78,22+v.e*1.7);
+  drawArrow(probe.x+Math.cos(v.ang)*14,probe.y+Math.sin(v.ang)*14,v.ang,eLen,'#e03131',3);
+  ctx.fillStyle='#ffd166';ctx.strokeStyle='#8a5a00';ctx.lineWidth=2;
+  ctx.beginPath();ctx.arc(probe.x,probe.y,10,0,7);ctx.fill();ctx.stroke();
+  ctx.fillStyle='#5a3d00';ctx.font='700 11px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('q',probe.x,probe.y+1);
+  ctx.fillStyle='#102a43';ctx.font='12px system-ui';ctx.textBaseline='alphabetic';ctx.fillText('B 探针(外力拖动)',probe.x+52,probe.y-12);
+  ctx.fillStyle='#087f5b';ctx.beginPath();ctx.arc(anchor.x,anchor.y,5,0,7);ctx.fill();
+  ctx.fillStyle='#087f5b';ctx.fillText('A 起点',anchor.x+28,anchor.y+4);
+  ctx.strokeStyle='rgba(8,127,91,.55)';ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(anchor.x,anchor.y);ctx.lineTo(probe.x,probe.y);ctx.stroke();ctx.setLineDash([]);
+  els.phi.textContent=v.phi.toFixed(2);
+  els.emag.textContent=v.e.toFixed(2);
+  els.edir.textContent=v.dir;
+  els.dphi.textContent=a.toFixed(2);
+  els.work.textContent=a.toFixed(2);
+  els.state.textContent=Math.abs(a)<0.05?'沿等势面巡航，W≈0（合格状态）':'跨越等势面，正在做功';
+}
+function render(){
+  ctx.clearRect(0,0,W,H);
+  const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#f8fbff');bg.addColorStop(1,'#eef4f9');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(16,42,67,.07)';ctx.lineWidth=1;
+  for(let x=0;x<W;x+=36){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}
+  for(let y=0;y<H;y+=36){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+  mode==='point'?drawPoint():drawUniform();
+  drawProbe();
+  ctx.fillStyle='#52677a';ctx.font='13px system-ui';ctx.textAlign='left';
+  ctx.fillText(locked?'锁定：外力拖探针沿同一等势面移动（不是自由运动轨迹）':'自由：外力拖探针跨过不同等势面',18,H-20);
+}
+function stopPlay(){playing=false;gid('playBtn').textContent='▶ 自动演示（外力沿等势线拖探针）'}
+function animate(){
+  if(!playing)return;
+  playT+=0.02;
+  if(mode==='point'){
+    const r=Math.max(45,Math.hypot(anchor.x-charge.x,anchor.y-charge.y));
+    probe.x=charge.x+Math.cos(playT)*r;probe.y=charge.y+Math.sin(playT)*r;
+  }else{
+    probe.x=anchor.x;probe.y=150+90*Math.sin(playT);
+  }
+  render();
+  requestAnimationFrame(animate);
+}
+cv.addEventListener('pointerdown',(e)=>{stopPlay();startDrag(e)});
+cv.addEventListener('pointermove',moveDrag);
+window.addEventListener('pointerup',stopDrag);
+gid('lock').onclick=()=>{locked=true;gid('lock').classList.add('active');gid('free').classList.remove('active');anchor={x:probe.x,y:probe.y,phi:values(probe).phi};render()};
+gid('free').onclick=()=>{locked=false;gid('free').classList.add('active');gid('lock').classList.remove('active');anchor={x:probe.x,y:probe.y,phi:values(probe).phi};render()};
+gid('playBtn').onclick=()=>{
+  playing=!playing;
+  if(playing){anchor={x:probe.x,y:probe.y,phi:values(probe).phi};playT=0;gid('playBtn').textContent='⏸ 暂停演示';animate()}
+  else stopPlay();
+};
+gid('reset').onclick=()=>{stopPlay();reset()};
+document.querySelectorAll('#mode button').forEach(b=>b.onclick=()=>{stopPlay();mode=b.dataset.mode;document.querySelectorAll('#mode button').forEach(x=>x.classList.toggle('on',x===b));reset()});
+reset();
+})();
+</script>
+</body>
+</html>

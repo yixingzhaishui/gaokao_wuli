@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>卫星变轨实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#edf3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px;min-height:560px}
+  .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;touch-action:none}
+  .panel{display:flex;flex-direction:column;gap:8px}
+  .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
+  .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.45}
+  .title{font-weight:800;margin-bottom:5px;color:#0f172a}
+  .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .stageBtns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:31px;cursor:pointer;color:#102a43}
+  button:hover{background:#f1f5f9}
+  button.active,.primary{background:#2563eb;color:#fff;border-color:#2563eb;font-weight:800}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:48px}
+  .meter span{display:block;font-size:11px;color:#b6c5d8}
+  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:15px;font-variant-numeric:tabular-nums}
+  .formula{display:grid;gap:5px;font-size:13px;color:#334155}
+  .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
+  .formula div:last-child{border-bottom:0;padding-bottom:0}
+  .formula b{white-space:nowrap;color:#0f172a}
+  .small{font-size:12px;line-height:1.5;color:#475569}
+  .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="卫星变轨交互实验台"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>拖右侧第一次点火点或左侧第二次点火点，看低圆、高圆和转移椭圆怎样一起改变；比较 v1、vt1、vt2、v2。</div>
+    <button id="playBtn" class="primary">播放</button>
+    <div class="card">
+      <div class="title">阶段</div>
+      <div class="stageBtns">
+        <button data-stage="0">低圆</button>
+        <button data-stage="1">转移</button>
+        <button data-stage="2">高圆</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="title">快速情境</div>
+      <div class="chips">
+        <button data-case="small">小升轨</button>
+        <button data-case="sync">到同步轨</button>
+        <button data-case="large">大升轨</button>
+        <button data-case="reset">重置</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="title">实时读数</div>
+      <div class="readout">
+        <div class="meter"><span>低圆 v1</span><b id="v1Text">6.89 km/s</b></div>
+        <div class="meter"><span>近地点 vt1</span><b id="vt1Text">8.51 km/s</b></div>
+        <div class="meter"><span>远地点 vt2</span><b id="vt2Text">1.68 km/s</b></div>
+        <div class="meter"><span>高圆 v2</span><b id="v2Text">3.07 km/s</b></div>
+        <div class="meter"><span>第一次 Δv1</span><b id="dv1Text">1.62 km/s</b></div>
+        <div class="meter"><span>第二次 Δv2</span><b id="dv2Text">1.39 km/s</b></div>
+      </div>
+    </div>
+    <div class="card formula">
+      <div><span>圆轨速度</span><b>v=√(GM/r)</b></div>
+      <div><span>椭圆速度</span><b>v=√[GM(2/r-1/a)]</b></div>
+      <div><span>半长轴</span><b>a=(r1+r2)/2</b></div>
+    </div>
+    <div class="card small"><b>可直接操作：</b>抓橙色第一次点火点改 r1，抓紫色第二次点火点改 r2，抓红色卫星沿转移轨道看当前位置速度。</div>
+    <div class="status" id="status">转移椭圆：同一点速度从 v1 变为 vt1，轨道立刻改变。</div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+  const Re=6371,mu=398600.4418;
+  const state={r1:1.35,r2:6.62,stage:1,u:0.28,running:false,drag:null};
+  const els={
+    v1:document.getElementById('v1Text'),vt1:document.getElementById('vt1Text'),vt2:document.getElementById('vt2Text'),
+    v2:document.getElementById('v2Text'),dv1:document.getElementById('dv1Text'),dv2:document.getElementById('dv2Text'),
+    status:document.getElementById('status'),play:document.getElementById('playBtn')
+  };
+  const colors={red:'#dc2626',blue:'#2563eb',purple:'#7c3aed',green:'#0f766e',orange:'#f59e0b',ink:'#102a43'};
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  const fmt=(v,d=2)=>Math.abs(v)<1e-8?(0).toFixed(d):v.toFixed(d);
+  function values(){
+    if(state.r2<state.r1+.5)state.r2=state.r1+.5;
+    const r1=state.r1*Re,r2=state.r2*Re,a=(r1+r2)/2;
+    const v1=Math.sqrt(mu/r1),v2=Math.sqrt(mu/r2),vt1=Math.sqrt(mu*(2/r1-1/a)),vt2=Math.sqrt(mu*(2/r2-1/a));
+    return{r1,r2,a,v1,v2,vt1,vt2,dv1:vt1-v1,dv2:v2-vt2,total:vt1-v1+v2-vt2};
+  }
+  function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){
+    ctx.fillStyle=c;ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;
+    ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y);
+  }
+  function line(x1,y1,x2,y2,c='#94a3b8',w=2,dash){
+    ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();
+  }
+  function arrow(x1,y1,x2,y2,c,w=3){
+    const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);
+    ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));
+    ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore();
+  }
+  function roundRect(x,y,w,h,r,fill,stroke){
+    ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();
+    if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}ctx.restore();
+  }
+  function ruler(x1,y,x2,label,c){
+    line(x1,y,x2,y,'#0f172a',2);
+    for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}
+    text(label,(x1+x2)/2,y-36,c,'center',12,'900');
+  }
+  function handle(x,y,label,active,c){
+    ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;
+    ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();
+    text(label,x,y-20,active?'#92400e':c,'center',12,'900');ctx.restore();
+  }
+  function scaleFor(){return 205/8.2}
+  function geom(){
+    const O={x:315,y:253},s=scaleFor(),R1=state.r1*s,R2=state.r2*s,a=(state.r1+state.r2)/2*s,b=Math.sqrt(state.r1*state.r2)*s,c=(state.r2-state.r1)/2*s,C={x:O.x-c,y:O.y};
+    const E=state.u*Math.PI;
+    const transferSat={x:C.x+a*Math.cos(E),y:C.y+b*Math.sin(E)};
+    const lowA=state.u*Math.PI*2,highA=Math.PI+state.u*Math.PI*2;
+    const lowSat={x:O.x+R1*Math.cos(lowA),y:O.y+R1*Math.sin(lowA)};
+    const highSat={x:O.x+R2*Math.cos(highA),y:O.y+R2*Math.sin(highA)};
+    return{O,s,R1,R2,a,b,C,per:{x:O.x+R1,y:O.y},apo:{x:O.x-R2,y:O.y},transferSat,lowSat,highSat,E};
+  }
+  function satGeom(){
+    const g=geom();
+    if(state.stage===0){const A=state.u*Math.PI*2;return{p:g.lowSat,t:{x:-Math.sin(A),y:Math.cos(A)},label:'v1'}}
+    if(state.stage===2){const A=Math.PI+state.u*Math.PI*2;return{p:g.highSat,t:{x:-Math.sin(A),y:Math.cos(A)},label:'v2'}}
+    const dx=-g.a*Math.sin(g.E),dy=g.b*Math.cos(g.E),L=Math.hypot(dx,dy)||1;
+    return{p:g.transferSat,t:{x:dx/L,y:dy/L},label:state.u<.5?'vt1→vt2':'vt2'};
+  }
+  function drawOrbit(v){
+    roundRect(42,58,560,382,8,'#fff','#d7dee8');
+    const g=geom(),sg=satGeom();
+    ctx.save();ctx.strokeStyle='#94a3b8';ctx.lineWidth=2;ctx.setLineDash([7,5]);
+    ctx.beginPath();ctx.arc(g.O.x,g.O.y,g.R1,0,Math.PI*2);ctx.stroke();
+    ctx.beginPath();ctx.arc(g.O.x,g.O.y,g.R2,0,Math.PI*2);ctx.stroke();ctx.restore();
+    ctx.save();ctx.strokeStyle=colors.blue;ctx.lineWidth=2.8;ctx.beginPath();ctx.ellipse(g.C.x,g.C.y,g.a,g.b,0,0,Math.PI*2);ctx.stroke();ctx.restore();
+    ctx.fillStyle='#dbeafe';ctx.beginPath();ctx.arc(g.O.x,g.O.y,28,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#334155';ctx.stroke();
+    text('地球',g.O.x,g.O.y,'#334155','center',12,'900');
+    line(g.O.x,g.O.y,g.per.x,g.per.y,'#cbd5e1',2);line(g.O.x,g.O.y,g.apo.x,g.apo.y,'#cbd5e1',2);
+    point(g.per.x,g.per.y,colors.orange,'第一次点火',state.drag==='per');
+    point(g.apo.x,g.apo.y,colors.purple,'第二次点火',state.drag==='apo');
+    arrow(g.per.x,g.per.y,g.per.x,g.per.y-58,colors.orange,3);text(`Δv1=${fmt(v.dv1)}`,g.per.x+48,g.per.y-48,colors.orange,'center',12,'900');
+    arrow(g.apo.x,g.apo.y,g.apo.x,g.apo.y+58,colors.purple,3);text(`Δv2=${fmt(v.dv2)}`,g.apo.x-48,g.apo.y+48,colors.purple,'center',12,'900');
+    ctx.fillStyle=colors.red;ctx.beginPath();ctx.arc(sg.p.x,sg.p.y,9,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#0f172a';ctx.stroke();
+    ctx.save();ctx.strokeStyle=state.drag==='sat'?'#d97706':colors.red;ctx.lineWidth=3;ctx.beginPath();ctx.arc(sg.p.x,sg.p.y,19,0,Math.PI*2);ctx.stroke();ctx.restore();
+    arrow(sg.p.x,sg.p.y,sg.p.x+sg.t.x*64,sg.p.y+sg.t.y*64,colors.red,3);
+    text(sg.label,sg.p.x+sg.t.x*78,sg.p.y+sg.t.y*78,colors.red,'center',12,'900');
+    text('同一点速度改变，轨道就改变',315,426,'#475569','center',13,'900');
+  }
+  function point(x,y,c,label,active){
+    ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,7,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle=active?'#d97706':'#0f172a';ctx.lineWidth=active?4:1.5;ctx.stroke();
+    text(label,x,y-22,c,'center',12,'900');ctx.restore();
+  }
+  function drawBars(v){
+    roundRect(642,74,214,248,8,'#fff','#d7dee8');
+    text('速度对比',749,104,'#0f172a','center',15,'900');
+    const rows=[['v1',v.v1,'#94a3b8'],['vt1',v.vt1,colors.orange],['vt2',v.vt2,colors.blue],['v2',v.v2,colors.purple]];
+    const max=Math.max(...rows.map(r=>r[1]));
+    rows.forEach((r,i)=>{
+      const y=134+i*45,w=110*r[1]/max;
+      text(r[0],678,y+8,'#475569','right',12,'900');
+      ctx.fillStyle=r[2];ctx.fillRect(690,y,w,16);
+      text(`${fmt(r[1])}`,806,y+8,'#0f172a','left',12,'900');
+    });
+    roundRect(642,350,214,68,8,'#f8fafc','#d7dee8');
+    text(`总 Δv=${fmt(v.total)} km/s`,749,374,'#0f172a','center',15,'900');
+    text('升轨两次都沿切线加速',749,398,'#475569','center',12,'900');
+  }
+  function bottom(v){
+    const h=handles();
+    roundRect(48,458,820,62,8,'#fff','#d7dee8');
+    ruler(90,494,270,'低圆 r1',colors.orange);handle(h.r1.x,h.r1.y,`r1=${fmt(state.r1,1)}R`,state.drag==='r1',colors.orange);
+    ruler(350,494,555,'高圆 r2',colors.purple);handle(h.r2.x,h.r2.y,`r2=${fmt(state.r2,1)}R`,state.drag==='r2',colors.purple);
+    ruler(646,494,826,'轨道位置',colors.red);handle(h.u.x,h.u.y,`${fmt(state.u*100,0)}%`,state.drag==='u',colors.red);
+  }
+  function handles(){
+    return{
+      r1:{x:90+(state.r1-1)/(3-1)*180,y:494},
+      r2:{x:350+(state.r2-2.2)/(8.2-2.2)*205,y:494},
+      u:{x:646+state.u*180,y:494}
+    };
+  }
+  function update(v){
+    els.v1.textContent=`${fmt(v.v1)} km/s`;els.vt1.textContent=`${fmt(v.vt1)} km/s`;
+    els.vt2.textContent=`${fmt(v.vt2)} km/s`;els.v2.textContent=`${fmt(v.v2)} km/s`;
+    els.dv1.textContent=`${fmt(v.dv1)} km/s`;els.dv2.textContent=`${fmt(v.dv2)} km/s`;
+    document.querySelectorAll('[data-stage]').forEach(btn=>btn.classList.toggle('active',+btn.dataset.stage===state.stage));
+    els.play.textContent=state.running?'暂停':'播放';
+    els.status.textContent=state.stage===0?'低圆轨道：速度等于 v1；在同一点若加速到 vt1，就进入转移椭圆。':(state.stage===1?'转移椭圆：不能套圆轨速度公式，近地点快、远地点慢。':'高圆轨道：第二次加速到 v2 后，才稳定在高圆轨道。');
+  }
+  function draw(){
+    const v=values();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);
+    text('卫星变轨实验台：两次切向点火，不是把圆轨慢慢拉大',460,30,'#0f172a','center',19,'900');
+    drawOrbit(v);drawBars(v);bottom(v);update(v);
+  }
+  function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+  function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+  function pointerDown(e){
+    const p=pos(e),g=geom(),h=handles(),sg=satGeom();
+    if(near(p,g.per,28))state.drag='per';
+    else if(near(p,g.apo,28))state.drag='apo';
+    else if(near(p,sg.p,30))state.drag='sat';
+    else if(near(p,h.r1,26))state.drag='r1';
+    else if(near(p,h.r2,26))state.drag='r2';
+    else if(near(p,h.u,26))state.drag='u';
+    else state.drag=null;
+    if(state.drag){state.running=false;canvas.setPointerCapture(e.pointerId);pointerMove(e)}
+  }
+  function pointerMove(e){
+    if(!state.drag)return;
+    const p=pos(e),g=geom();
+    if(state.drag==='r1'||state.drag==='per')state.r1=clamp((p.x-g.O.x)/g.s,1,Math.min(3,state.r2-.5));
+    if(state.drag==='r2'||state.drag==='apo')state.r2=clamp((g.O.x-p.x)/g.s,Math.max(2.2,state.r1+.5),8.2);
+    if(state.drag==='u')state.u=clamp((p.x-646)/180,0,1);
+    if(state.drag==='sat'){
+      if(state.stage!==1)state.stage=1;
+      const t=Math.atan2((p.y-g.C.y)/Math.max(1,g.b),(p.x-g.C.x)/Math.max(1,g.a));
+      let E=t;if(E<0)E+=Math.PI*2;if(E>Math.PI)E=Math.PI;
+      state.u=clamp(E/Math.PI,0,1);
+    }
+    draw();
+  }
+  function pointerUp(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
+  canvas.addEventListener('pointerdown',pointerDown);canvas.addEventListener('pointermove',pointerMove);
+  canvas.addEventListener('pointerup',pointerUp);canvas.addEventListener('pointercancel',pointerUp);
+  document.querySelectorAll('[data-stage]').forEach(btn=>btn.addEventListener('click',()=>{state.stage=+btn.dataset.stage;state.running=false;draw()}));
+  document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{
+    const c=btn.dataset.case;
+    if(c==='small'){state.r1=1.25;state.r2=2.4;state.stage=1;state.u=.35}
+    if(c==='sync'){state.r1=1.35;state.r2=6.62;state.stage=1;state.u=.28}
+    if(c==='large'){state.r1=1.1;state.r2=8.0;state.stage=1;state.u=.2}
+    if(c==='reset'){state.r1=1.35;state.r2=6.62;state.stage=1;state.u=.28}
+    state.running=false;draw();
+  }));
+  els.play.addEventListener('click',()=>{state.running=!state.running;draw()});
+  function tick(){
+    if(state.running){state.u=(state.u+.0035)%1}
+    draw();requestAnimationFrame(tick);
+  }
+  draw();requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

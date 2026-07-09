@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>安培力</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#eef3f8;color:#102a43}
+.container{padding:12px}
+h2{font-size:16px;margin:0 0 8px;color:#102a43}
+canvas{display:block;width:100%;max-width:780px;background:#f8fbff;border:1px solid #cad7e3;border-radius:8px;touch-action:none;cursor:grab}
+.readouts{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;font-size:13px}
+.r{background:#102a43;color:#e8f1fb;padding:6px 10px;border-radius:6px}
+.r b{color:#ffd166}
+.controls{display:flex;flex-wrap:wrap;gap:12px;margin:10px 0;align-items:center}
+.controls label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:#334e68}
+.controls input[type=range]{width:118px;accent-color:#2c7be5}
+button{font:inherit;padding:6px 12px;border:1px solid #b6c5d4;background:#fff;border-radius:6px;cursor:pointer}
+.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:9px 12px;border-radius:4px;font-size:13px;color:#486581;line-height:1.55;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>安培力：3D蹄形磁铁实验台 + 俯视夹角 + 侧视力方向</h2>
+  <canvas id="canvas" width="780" height="500"></canvas>
+  <div class="readouts">
+    <span class="r">B = <b id="b-v">0.50</b> T</span>
+    <span class="r">I = <b id="i-v">4.0</b> A</span>
+    <span class="r">L = <b id="l-v">0.5</b> m</span>
+    <span class="r">θ = <b id="th-v">90</b>°</span>
+    <span class="r">测力计 F = <b id="f-v">—</b> N</span>
+    <span class="r">方向：<b id="dir-v">—</b></span>
+  </div>
+  <div class="controls">
+    <label>B 强度 = <span id="b-d">0.50</span> T<input type="range" id="b" min="0" max="1" step="0.05" value="0.5"></label>
+    <label>电流 I = <span id="i-d">4.0</span> A<input type="range" id="i" min="0" max="10" step="0.5" value="4"></label>
+    <label>导线长 L = <span id="l-d">0.5</span> m<input type="range" id="l" min="0.1" max="1" step="0.1" value="0.5"></label>
+    <label>夹角 θ = <span id="th-d">90</span>°<input type="range" id="th" min="0" max="90" step="5" value="90"></label>
+    <button id="play-btn">暂停电流</button>
+    <button id="reset-btn">重置</button>
+  </div>
+  <div class="hint">
+    <b>观察任务</b>：直接拖左侧实验台里的橙色导线端点改变 θ。看 3D 蹄形磁铁中 B 从 N 指向 S，导线电流 I 与 B 的夹角改变时，右侧测力计、俯视夹角图和 F-θ 图像怎样同步变化。θ=0° 时导线与磁场平行，测力计归零；θ=90° 时 F 最大。侧视截面用 ⊗/⊙ 告诉你安培力垂直纸面方向。
+  </div>
+</div>
+<script>
+(function(){
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+const W=canvas.width,H=canvas.height;
+let B=0.5,I=4,L=0.5,theta=90,t=0,running=true,drag='';
+const lab={x:18,y:42,w:480,h:390}, side={x:520,y:42,w:230,h:390};
+const c={x:265,y:250}, D=Math.PI/180;
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function F(){return B*I*L*Math.sin(theta*D)}
+function roundRect(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath()}
+function panel(x,y,w,h,title){ctx.fillStyle='#fff';ctx.strokeStyle='#d7e2ec';ctx.lineWidth=1;roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.fillStyle='#334e68';ctx.font='bold 12px system-ui';ctx.textAlign='left';ctx.fillText(title,x+10,y+18)}
+function arrow(x1,y1,x2,y2,color,lw=2){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=lw;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-8*Math.cos(a-0.45),y2-8*Math.sin(a-0.45));ctx.lineTo(x2-8*Math.cos(a+0.45),y2-8*Math.sin(a+0.45));ctx.closePath();ctx.fill()}
+function wireEnds(){
+  const len=95+L*170,a=-theta*D;
+  return {x1:c.x-len/2*Math.cos(a),y1:c.y-len/2*Math.sin(a),x2:c.x+len/2*Math.cos(a),y2:c.y+len/2*Math.sin(a),a,len};
+}
+function drawTable(){
+  const g=ctx.createLinearGradient(lab.x,lab.y,lab.x,lab.y+lab.h);g.addColorStop(0,'#fff');g.addColorStop(1,'#e9f1f8');
+  ctx.fillStyle=g;ctx.strokeStyle='#cbd8e4';roundRect(lab.x,lab.y,lab.w,lab.h,8);ctx.fill();ctx.stroke();
+  ctx.strokeStyle='rgba(82,112,140,0.18)';ctx.lineWidth=1;
+  for(let x=lab.x+18;x<lab.x+lab.w;x+=28){ctx.beginPath();ctx.moveTo(x,lab.y+48);ctx.lineTo(x+52,lab.y+lab.h-28);ctx.stroke()}
+  for(let y=lab.y+66;y<lab.y+lab.h;y+=28){ctx.beginPath();ctx.moveTo(lab.x+16,y);ctx.lineTo(lab.x+lab.w-26,y-24);ctx.stroke()}
+  ctx.fillStyle='#5b7083';ctx.font='12px system-ui';ctx.textAlign='left';ctx.fillText('3D实验台：蹄形磁铁间的通电导线',lab.x+16,lab.y+24);
+}
+function drawMagnet(){
+  ctx.save();
+  ctx.shadowColor='rgba(16,42,67,0.18)';ctx.shadowBlur=12;ctx.shadowOffsetY=8;
+  ctx.fillStyle='#d64545';roundRect(95,118,72,210,10);ctx.fill();
+  ctx.fillStyle='#2c7be5';roundRect(363,118,72,210,10);ctx.fill();
+  ctx.shadowBlur=0;ctx.fillStyle='rgba(255,255,255,0.25)';
+  ctx.beginPath();ctx.moveTo(105,118);ctx.lineTo(176,118);ctx.lineTo(192,102);ctx.lineTo(121,102);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(373,118);ctx.lineTo(444,118);ctx.lineTo(460,102);ctx.lineTo(389,102);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#fff';ctx.font='bold 24px system-ui';ctx.textAlign='center';ctx.fillText('N',131,232);ctx.fillText('S',399,232);
+  ctx.restore();
+  const alpha=0.18+B*0.5;
+  for(let y=150;y<=315;y+=34){
+    arrow(177,y,353,y,'rgba(44,123,229,'+alpha+')',2.2);
+  }
+  ctx.fillStyle='#2c7be5';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText('匀强磁场 B：N → S',265,112);
+}
+function drawWire(){
+  const e=wireEnds(),force=F();
+  ctx.strokeStyle='#e8590c';ctx.lineWidth=8;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(e.x1,e.y1);ctx.lineTo(e.x2,e.y2);ctx.stroke();
+  ctx.lineCap='butt';
+  const dots=Math.max(2,Math.round(I));
+  for(let k=0;k<dots;k++){
+    const p=(t*(0.18+I*0.04)+k/dots)%1,x=e.x1+(e.x2-e.x1)*p,y=e.y1+(e.y2-e.y1)*p;
+    const rg=ctx.createRadialGradient(x,y,0,x,y,7);rg.addColorStop(0,'#ffe08a');rg.addColorStop(1,'rgba(232,89,12,0)');
+    ctx.fillStyle=rg;ctx.beginPath();ctx.arc(x,y,7,0,7);ctx.fill();
+  }
+  ctx.fillStyle='#fff';ctx.strokeStyle='#e8590c';ctx.lineWidth=2;
+  ctx.beginPath();ctx.arc(e.x1,e.y1,8,0,7);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.arc(e.x2,e.y2,8,0,7);ctx.fill();ctx.stroke();
+  arrow(e.x1+(e.x2-e.x1)*0.55,e.y1+(e.y2-e.y1)*0.55,e.x1+(e.x2-e.x1)*0.78,e.y1+(e.y2-e.y1)*0.78,'#e8590c',2.5);
+  ctx.fillStyle='#e8590c';ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillText('I',e.x2+12,e.y2+4);
+  if(force>0.02){
+    const r=clamp(16+force*20,18,52);
+    ctx.strokeStyle='#1a7a1a';ctx.fillStyle='#1a7a1a';ctx.lineWidth=3;
+    ctx.beginPath();ctx.arc(c.x,c.y,r,0,7);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(c.x-r*0.45,c.y-r*0.45);ctx.lineTo(c.x+r*0.45,c.y+r*0.45);ctx.moveTo(c.x+r*0.45,c.y-r*0.45);ctx.lineTo(c.x-r*0.45,c.y+r*0.45);ctx.stroke();
+    ctx.font='13px system-ui';ctx.fillText('F ⊗',c.x+r+10,c.y+4);
+  }else{
+    ctx.fillStyle='#c92a2a';ctx.font='bold 14px system-ui';ctx.textAlign='center';ctx.fillText('I ∥ B，F = 0',c.x,c.y-34);
+  }
+}
+function drawTopView(){
+  panel(side.x,side.y,side.w,124,'俯视：I 与 B 的夹角 θ');
+  const ox=side.x+118,oy=side.y+78;
+  arrow(ox-72,oy,ox+72,oy,'#2c7be5',2);
+  const a=-theta*D;arrow(ox,oy,ox+72*Math.cos(a),oy+72*Math.sin(a),'#e8590c',3);
+  ctx.strokeStyle='#5b7083';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(ox,oy,42,a,0);ctx.stroke();
+  ctx.fillStyle='#334e68';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText('θ='+theta+'°',ox+22,oy-18);
+}
+function drawSideView(){
+  panel(side.x,side.y+136,side.w,118,'侧视：F 垂直于 I-B 平面');
+  const x=side.x+76,y=side.y+206,force=F();
+  ctx.fillStyle='#eef3f8';ctx.strokeStyle='#cbd8e4';ctx.lineWidth=1.5;ctx.fillRect(side.x+26,side.y+170,176,64);ctx.strokeRect(side.x+26,side.y+170,176,64);
+  ctx.fillStyle='#2c7be5';ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillText('B →',side.x+38,side.y+192);
+  ctx.fillStyle='#e8590c';ctx.fillText('I 斜穿磁场',side.x+38,side.y+218);
+  if(force>0.02){
+    ctx.strokeStyle='#1a7a1a';ctx.lineWidth=3;ctx.beginPath();ctx.arc(x+92,y,19,0,7);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(x+80,y-12);ctx.lineTo(x+104,y+12);ctx.moveTo(x+104,y-12);ctx.lineTo(x+80,y+12);ctx.stroke();
+    ctx.fillStyle='#1a7a1a';ctx.fillText('F ⊗',x+118,y+4);
+  }else{ctx.fillStyle='#c92a2a';ctx.fillText('F=0',x+100,y+4)}
+}
+function drawMeterGraph(){
+  panel(side.x,side.y+266,side.w,166,'测力计 + F-θ 图像');
+  const force=F(),mx=side.x+68,my=side.y+352;
+  ctx.strokeStyle='#9fb3c8';ctx.lineWidth=8;ctx.beginPath();ctx.arc(mx,my,40,Math.PI,0);ctx.stroke();
+  ctx.strokeStyle='#1a7a1a';ctx.beginPath();ctx.arc(mx,my,40,Math.PI,Math.PI+clamp(force/5,0,1)*Math.PI);ctx.stroke();
+  const a=Math.PI+clamp(force/5,0,1)*Math.PI;arrow(mx,my,mx+36*Math.cos(a),my+36*Math.sin(a),'#c92a2a',2);
+  ctx.fillStyle='#102a43';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText('测力计',mx,my+25);
+  const gx=side.x+126,gy=side.y+304,gw=84,gh=92;
+  ctx.strokeStyle='#d7e2ec';ctx.lineWidth=1;ctx.strokeRect(gx,gy,gw,gh);
+  ctx.fillStyle='#5b7083';ctx.font='11px system-ui';ctx.textAlign='left';ctx.fillText('F = BIL sinθ',gx-4,gy-8);
+  ctx.strokeStyle='#2c7be5';ctx.beginPath();ctx.moveTo(gx,gy+gh);ctx.lineTo(gx+gw,gy+gh);ctx.moveTo(gx,gy+gh);ctx.lineTo(gx,gy);ctx.stroke();
+  ctx.strokeStyle='#1a7a1a';ctx.lineWidth=2;ctx.beginPath();
+  for(let deg=0;deg<=90;deg+=3){
+    const f=B*I*L*Math.sin(deg*D),x=gx+deg/90*gw,y=gy+gh-clamp(f/5,0,1)*gh;
+    if(deg)ctx.lineTo(x,y);else ctx.moveTo(x,y);
+  }
+  ctx.stroke();
+  ctx.fillStyle='#c92a2a';ctx.beginPath();ctx.arc(gx+theta/90*gw,gy+gh-clamp(force/5,0,1)*gh,4,0,7);ctx.fill();
+}
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  drawTable();drawMagnet();drawWire();drawTopView();drawSideView();drawMeterGraph();
+  const force=F();
+  ctx.fillStyle='#243b53';ctx.font='13px system-ui';ctx.textAlign='left';
+  ctx.fillText('公式绑定：F = BIL·sinθ = '+B.toFixed(2)+'×'+I.toFixed(1)+'×'+L.toFixed(1)+'×sin'+theta+'° = '+force.toFixed(3)+' N',28,H-20);
+  ctx.fillText('多视角：3D实验台 + 俯视夹角 + 侧视方向 + 测力计/图像',390,H-20);
+  ctx.fillStyle=theta<5?'#c92a2a':'#1a7a1a';ctx.font='bold 12px system-ui';ctx.fillText(theta<5?'状态：θ≈0°，电流∥磁场，F=0':'状态：θ 越接近 90°，测力计读数越大',30,30);
+  document.getElementById('b-v').textContent=B.toFixed(2);
+  document.getElementById('i-v').textContent=I.toFixed(1);
+  document.getElementById('l-v').textContent=L.toFixed(1);
+  document.getElementById('th-v').textContent=theta;
+  document.getElementById('f-v').textContent=force.toFixed(3);
+  document.getElementById('dir-v').textContent=force>0.02?'指向纸内 ⊗':'无方向';
+}
+function sync(){
+  document.getElementById('b').value=B;document.getElementById('i').value=I;document.getElementById('l').value=L;document.getElementById('th').value=theta;
+  document.getElementById('b-d').textContent=B.toFixed(2);document.getElementById('i-d').textContent=I.toFixed(1);document.getElementById('l-d').textContent=L.toFixed(1);document.getElementById('th-d').textContent=theta;
+}
+function pos(e){const r=canvas.getBoundingClientRect(),sx=canvas.width/r.width,sy=canvas.height/r.height;return{x:(e.clientX-r.left)*sx,y:(e.clientY-r.top)*sy}}
+canvas.addEventListener('pointerdown',e=>{
+  const p=pos(e),end=wireEnds();
+  if(Math.hypot(p.x-end.x2,p.y-end.y2)<28){drag='theta';canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing'}
+  else if(Math.hypot(p.x-end.x1,p.y-end.y1)<28){drag='length';canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing'}
+});
+canvas.addEventListener('pointermove',e=>{
+  if(!drag)return;const p=pos(e);
+  if(drag==='theta')theta=clamp(Math.round(Math.abs(Math.atan2(p.y-c.y,p.x-c.x))/D/5)*5,0,90);
+  if(drag==='length'){const len=2*Math.hypot(p.x-c.x,p.y-c.y);L=clamp(Math.round(((len-95)/170)*10)/10,0.1,1)}
+  sync();draw();
+});
+window.addEventListener('pointerup',()=>{drag='';canvas.style.cursor='grab'});
+function bind(id,fn){document.getElementById(id).addEventListener('input',e=>{fn(parseFloat(e.target.value));sync();draw()})}
+bind('b',v=>B=v);bind('i',v=>I=v);bind('l',v=>L=v);bind('th',v=>theta=v);
+document.getElementById('play-btn').onclick=function(){running=!running;this.textContent=running?'暂停电流':'播放电流'};
+document.getElementById('reset-btn').onclick=()=>{B=0.5;I=4;L=0.5;theta=90;t=0;sync();draw()};
+let last=performance.now();
+function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;if(running)t+=dt;draw();requestAnimationFrame(loop)}
+sync();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

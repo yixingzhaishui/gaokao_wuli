@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>粒子物理初步：分类与守恒</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 14px; align-items: stretch; }
+  canvas { width: 100%; height: 430px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  input { width: 100%; }
+  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.8; font-size: 14px; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
+  @media (max-width: 760px) { .stage { grid-template-columns: 1fr; } canvas { height: 360px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="680" height="430" aria-label="粒子分类模型"></canvas>
+    <section class="panel">
+      <label for="particle">粒子类型：<span id="particleVal"></span></label>
+      <input id="particle" type="range" min="0" max="5" value="2" step="1">
+      <label for="anti">反粒子开关：<span id="antiVal"></span></label>
+      <input id="anti" type="range" min="0" max="1" value="0" step="1">
+      <label for="check">守恒检查：<span id="checkVal"></span></label>
+      <input id="check" type="range" min="0" max="1" value="1" step="1">
+      <div id="readout" class="readout"></div>
+      <div class="hint">观察任务：切换质子、中子、电子、夸克，看基本粒子和复合粒子的区别；打开反粒子看电荷反号。</div>
+    </section>
+  </div>
+</div>
+<script>
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const els = {
+  particle: document.getElementById('particle'),
+  anti: document.getElementById('anti'),
+  check: document.getElementById('check'),
+  particleVal: document.getElementById('particleVal'),
+  antiVal: document.getElementById('antiVal'),
+  checkVal: document.getElementById('checkVal'),
+  readout: document.getElementById('readout')
+};
+const particles = [
+  { name: '电子 e', cls: '轻子', charge: -1, comp: '基本粒子', detail: '不由夸克组成' },
+  { name: '中微子 ν', cls: '轻子', charge: 0, comp: '基本粒子', detail: '电中性，参与弱相互作用' },
+  { name: '质子 p', cls: '强子', charge: 1, comp: 'uud', detail: '由两个 u 和一个 d 组成' },
+  { name: '中子 n', cls: '强子', charge: 0, comp: 'udd', detail: '由一个 u 和两个 d 组成' },
+  { name: 'u 夸克', cls: '夸克', charge: 2/3, comp: '基本粒子', detail: '电荷 +2/3e' },
+  { name: 'd 夸克', cls: '夸克', charge: -1/3, comp: '基本粒子', detail: '电荷 -1/3e' }
+];
+function chargeText(q) {
+  if (q === 0) return '0';
+  if (q === 1) return '+1e';
+  if (q === -1) return '-1e';
+  if (q > 0) return '+2/3e';
+  return '-1/3e';
+}
+function draw() {
+  const p = particles[Number(els.particle.value)];
+  const anti = Number(els.anti.value) === 1;
+  const check = Number(els.check.value) === 1;
+  const charge = anti ? -p.charge : p.charge;
+  els.particleVal.textContent = p.name;
+  els.antiVal.textContent = anti ? '反粒子' : '普通粒子';
+  els.checkVal.textContent = check ? '显示' : '隐藏';
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#f7f9fc';
+  ctx.fillRect(0, 0, c.width, c.height);
+  const boxes = [
+    {x:50,y:58,w:160,h:112,label:'轻子',color:'#eef4ff'},
+    {x:260,y:58,w:160,h:112,label:'夸克',color:'#fff7e6'},
+    {x:470,y:58,w:160,h:112,label:'强子',color:'#f8f0ff'}
+  ];
+  boxes.forEach(b => {
+    ctx.fillStyle = b.color;
+    ctx.strokeStyle = p.cls === b.label ? '#e03131' : '#d9e2ec';
+    ctx.lineWidth = p.cls === b.label ? 4 : 2;
+    ctx.fillRect(b.x, b.y, b.w, b.h);
+    ctx.strokeRect(b.x, b.y, b.w, b.h);
+    ctx.fillStyle = '#102a43';
+    ctx.font = '700 18px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText(b.label, b.x + b.w/2, b.y + 42);
+  });
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 34px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText((anti ? '反' : '') + p.name, 340, 234);
+  ctx.font = '17px system-ui';
+  ctx.fillStyle = '#486581';
+  ctx.fillText(`分类：${p.cls}；组成：${p.comp}；电荷：${chargeText(charge)}`, 340, 270);
+  ctx.fillText(p.detail, 340, 304);
+  if (check) {
+    ctx.fillStyle = '#eef4ff';
+    ctx.strokeStyle = '#2c7be5';
+    ctx.lineWidth = 2;
+    ctx.fillRect(142, 332, 396, 54);
+    ctx.strokeRect(142, 332, 396, 54);
+    ctx.fillStyle = '#102a43';
+    ctx.font = '700 15px system-ui';
+    ctx.fillText('守恒观念：粒子反应先检查电荷守恒，再看能量和动量条件。', 340, 364);
+  }
+  els.readout.innerHTML = [
+    `对象=${anti ? '反' : ''}${p.name}`,
+    `分类=${p.cls}，组成=${p.comp}`,
+    `电荷=${chargeText(charge)}；${anti ? '反粒子电荷取相反数' : '普通粒子'}`,
+    check ? '反应判断：先查电荷守恒，再查能量动量。' : '已隐藏守恒提示。'
+  ].join('<br>');
+}
+Object.values(els).forEach(el => {
+  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
+});
+draw();
+</script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>水平圆周与圆锥摆实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#edf3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px;min-height:560px}
+  .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;touch-action:none}
+  .panel{display:flex;flex-direction:column;gap:8px}
+  .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
+  .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.45}
+  .title{font-weight:800;margin-bottom:5px;color:#0f172a}
+  .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:31px;cursor:pointer;color:#102a43}
+  .primary{background:#2563eb;color:#fff;border-color:#2563eb}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:48px}
+  .meter span{display:block;font-size:11px;color:#b6c5d8}
+  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:16px;font-variant-numeric:tabular-nums}
+  .formula{display:grid;gap:5px;font-size:13px;color:#334155}
+  .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
+  .formula div:last-child{border-bottom:0;padding-bottom:0}
+  .formula b{white-space:nowrap;color:#0f172a}
+  .small{font-size:12px;line-height:1.5;color:#475569}
+  .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
+  .status.warn{border-color:#f59e0b;background:#fff7ed;color:#b45309}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="水平圆周与圆锥摆交互实验台"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>抓侧视图小球向外拖，看 θ、r、Tsinθ 和速度同时变大；再换大质量，看周期是否改变。</div>
+    <button id="playBtn" class="primary">播放</button>
+    <div class="card">
+      <div class="title">快速情境</div>
+      <div class="chips">
+        <button data-case="base">基础</button>
+        <button data-case="largeAngle">大摆角</button>
+        <button data-case="long">长绳</button>
+        <button data-case="heavy">大质量</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="title">实时读数</div>
+      <div class="readout">
+        <div class="meter"><span>半径 r</span><b id="rText">0.57 m</b></div>
+        <div class="meter"><span>速度 v</span><b id="vText">1.40 m/s</b></div>
+        <div class="meter"><span>绳拉力 T</span><b id="tensionText">6.0 N</b></div>
+        <div class="meter"><span>周期</span><b id="periodText">2.56 s</b></div>
+      </div>
+    </div>
+    <div class="card formula">
+      <div><span>竖直平衡</span><b>Tcosθ=mg</b></div>
+      <div><span>水平向心</span><b>Tsinθ=mv²/r</b></div>
+      <div><span>几何</span><b>r=Lsinθ</b></div>
+    </div>
+    <div class="card small"><b>可直接操作：</b>抓侧视图小球改变 L 和 θ，或拖底部 m、L、θ、位置四个手柄。向心力是 T 的水平分力，不是第三个力。</div>
+    <div class="status" id="status">竖直方向平衡，水平方向的合力提供向心力。</div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'),G=9.8;
+  const state={m:.5,L:1,theta:35,phase:.25,running:false,drag:null};
+  const els={r:document.getElementById('rText'),v:document.getElementById('vText'),tension:document.getElementById('tensionText'),period:document.getElementById('periodText'),status:document.getElementById('status'),play:document.getElementById('playBtn')};
+  const colors={red:'#dc2626',blue:'#2563eb',purple:'#7c3aed',green:'#0f766e',orange:'#f59e0b',ink:'#102a43'};
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  const fmt=(v,d=2)=>Math.abs(v)<1e-6?(0).toFixed(d):v.toFixed(d);
+  function values(){const th=state.theta*Math.PI/180,sin=Math.sin(th),cos=Math.cos(th),tan=Math.tan(th),r=state.L*sin,omega=Math.sqrt(G/(state.L*cos)),v=omega*r,tension=state.m*G/cos,Fc=state.m*G*tan,period=2*Math.PI/omega;return{th,sin,cos,tan,r,omega,v,tension,Fc,period}}
+  function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){ctx.fillStyle=c;ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+  function line(x1,y1,x2,y2,c='#94a3b8',w=2,dash){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
+  function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore()}
+  function roundRect(x,y,w,h,r,fill,stroke){ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}ctx.restore()}
+  function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-36,c,'center',12,'900')}
+  function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-20,active?'#92400e':c,'center',12,'900');ctx.restore()}
+  function geom(){return{m:{x:92+(state.m-.1)/1.9*150,y:494},L:{x:296+(state.L-.4)/1.6*150,y:494},theta:{x:508+(state.theta-8)/57*150,y:494},phase:{x:728+(state.phase%(Math.PI*2))/(Math.PI*2)*120,y:494}}}
+  function sideGeom(v){const pivot={x:214,y:96},scale=132,bob={x:pivot.x+state.L*v.sin*scale,y:pivot.y+state.L*v.cos*scale};return{pivot,scale,bob}}
+  function drawSide(v){
+    roundRect(42,58,418,382,8,'#fff','#d7dee8');text('侧视图：拉力分解',251,86,'#0f172a','center',15,'900');
+    const g=sideGeom(v),p=g.pivot,b=g.bob,rr=state.L*v.sin*g.scale;
+    line(p.x,p.y,p.x,b.y,'#94a3b8',2,[6,5]);line(p.x-78,p.y,p.x+78,p.y,'#334155',4);line(p.x,p.y,b.x,b.y,'#334155',3);
+    ctx.save();ctx.strokeStyle='#94a3b8';ctx.setLineDash([5,4]);ctx.beginPath();ctx.ellipse(p.x,b.y,rr,15,0,0,Math.PI*2);ctx.stroke();ctx.restore();
+    arrow(b.x,b.y,b.x,b.y+64,colors.red,3);text('mg',b.x+20,b.y+54,colors.red,'left',12,'900');
+    arrow(b.x,b.y,b.x-78*v.sin,b.y-78*v.cos,colors.blue,3);text('T',b.x-66*v.sin-10,b.y-66*v.cos,colors.blue,'right',12,'900');
+    arrow(b.x,b.y,b.x-Math.min(120,38+v.Fc*12),b.y,colors.purple,3);text('Tsinθ=F向',b.x-96,b.y-18,colors.purple,'center',12,'900');
+    line(p.x,b.y,b.x,b.y,'#64748b',2);text(`r=${fmt(v.r)}m`,p.x+rr/2,b.y+28,'#475569','center',12,'900');
+    ctx.strokeStyle=colors.orange;ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x,p.y+38,32,Math.PI/2-v.th,Math.PI/2);ctx.stroke();text(`θ=${fmt(state.theta,0)}°`,p.x+50,p.y+54,colors.orange,'left',12,'900');
+    ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(b.x,b.y,12,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();
+    ctx.save();ctx.fillStyle=state.drag==='bob'?'#fde68a':'#fff';ctx.strokeStyle=state.drag==='bob'?'#d97706':colors.blue;ctx.lineWidth=3;ctx.beginPath();ctx.arc(b.x,b.y,7,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();
+    text('只有 mg 和 T 两个实际力；F向 是水平合力效果。',251,420,'#475569','center',12,'900');
+  }
+  function drawTop(v){
+    roundRect(486,58,380,382,8,'#fff','#d7dee8');text('俯视图：速度切线，向心力指圆心',676,86,'#0f172a','center',15,'900');
+    const c={x:676,y:254},R=clamp(v.r*155,44,154),bx=c.x+R*Math.cos(state.phase),by=c.y+R*Math.sin(state.phase),tx=-Math.sin(state.phase),ty=Math.cos(state.phase);
+    ctx.save();ctx.strokeStyle='#94a3b8';ctx.setLineDash([6,5]);ctx.beginPath();ctx.arc(c.x,c.y,R,0,Math.PI*2);ctx.stroke();ctx.restore();
+    line(c.x,c.y,bx,by,'#cbd5e1',2);arrow(bx,by,bx+tx*Math.min(96,36+v.v*32),by+ty*Math.min(96,36+v.v*32),colors.green,3);text('v',bx+tx*78,by+ty*78,colors.green,'center',12,'900');
+    arrow(bx,by,c.x,c.y,colors.purple,3);text('F向', (bx+c.x)/2,(by+c.y)/2-14,colors.purple,'center',12,'900');
+    ctx.fillStyle='#0f172a';ctx.beginPath();ctx.arc(c.x,c.y,4,0,Math.PI*2);ctx.fill();ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(bx,by,11,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();
+    roundRect(546,376,260,42,7,'#f8fafc','#d7dee8');text('只改 m：T、F向 变大；v、周期不变。',676,397,'#475569','center',12,'900');
+  }
+  function update(v){els.r.textContent=`${fmt(v.r)} m`;els.v.textContent=`${fmt(v.v)} m/s`;els.tension.textContent=`${fmt(v.tension,1)} N`;els.period.textContent=`${fmt(v.period)} s`;els.status.className='status'+(state.theta>58?' warn':'');els.status.textContent=state.theta>58?'摆角很大：拉力和水平分力显著增大，要检查绳是否能承受。':'竖直方向平衡，水平方向的合力提供向心力。';els.play.textContent=state.running?'暂停':'播放'}
+  function draw(){const v=values(),g0=geom();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('水平圆周与圆锥摆实验台：T 分解为竖直平衡与水平向心',460,30,'#0f172a','center',19,'900');drawSide(v);drawTop(v);roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(92,494,242,'m',colors.purple);handle(g0.m.x,g0.m.y,`m=${fmt(state.m,1)}kg`,state.drag==='m',colors.purple);ruler(296,494,446,'L',colors.blue);handle(g0.L.x,g0.L.y,`L=${fmt(state.L,1)}m`,state.drag==='L',colors.blue);ruler(508,494,658,'θ',colors.orange);handle(g0.theta.x,g0.theta.y,`θ=${fmt(state.theta,0)}°`,state.drag==='theta',colors.orange);ruler(728,494,848,'位置',colors.green);handle(g0.phase.x,g0.phase.y,'转动',state.drag==='phase',colors.green);update(v)}
+  function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+  function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+  function down(e){const p=pos(e),v=values(),sg=sideGeom(v),g0=geom();if(near(p,sg.bob,30))state.drag='bob';else if(near(p,g0.m,26))state.drag='m';else if(near(p,g0.L,26))state.drag='L';else if(near(p,g0.theta,26))state.drag='theta';else if(near(p,g0.phase,26))state.drag='phase';else state.drag=null;if(state.drag){state.running=false;canvas.setPointerCapture(e.pointerId);move(e)}}
+  function move(e){if(!state.drag)return;const p=pos(e);if(state.drag==='m')state.m=clamp(.1+(p.x-92)/150*1.9,.1,2);if(state.drag==='L')state.L=clamp(.4+(p.x-296)/150*1.6,.4,2);if(state.drag==='theta')state.theta=clamp(8+(p.x-508)/150*57,8,65);if(state.drag==='phase')state.phase=clamp((p.x-728)/120*Math.PI*2,0,Math.PI*2);if(state.drag==='bob'){const pivot={x:214,y:96},dx=p.x-pivot.x,dy=p.y-pivot.y,len=Math.hypot(dx,dy);state.L=clamp(len/132,.4,2);state.theta=clamp(Math.atan2(Math.max(0,dx),Math.max(1,dy))*180/Math.PI,8,65)}draw()}
+  function up(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
+  canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
+  els.play.addEventListener('click',()=>{state.running=!state.running;draw()});
+  document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='base'){state.m=.5;state.L=1;state.theta=35}if(c==='largeAngle'){state.m=.5;state.L=1;state.theta=58}if(c==='long'){state.m=.5;state.L=1.8;state.theta=35}if(c==='heavy'){state.m=1.5;state.L=1;state.theta=35}draw()}));
+  function tick(){if(state.running){state.phase=(state.phase+values().omega*.016)%(Math.PI*2)}draw();requestAnimationFrame(tick)}
+  draw();requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

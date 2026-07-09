@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>动能定理实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#edf3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px;min-height:560px}
+  .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;touch-action:none}
+  .panel{display:flex;flex-direction:column;gap:8px}
+  .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
+  .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.45}
+  .title{font-weight:800;margin-bottom:5px;color:#0f172a}
+  .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:31px;cursor:pointer;color:#102a43}
+  button:hover{background:#f1f5f9}
+  .primary{background:#2563eb;color:#fff;border-color:#2563eb;font-weight:800}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:48px}
+  .meter span{display:block;font-size:11px;color:#b6c5d8}
+  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:15px;font-variant-numeric:tabular-nums}
+  .formula{display:grid;gap:5px;font-size:13px;color:#334155}
+  .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
+  .formula div:last-child{border-bottom:0;padding-bottom:0}
+  .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
+  .status.warn{border-color:#f59e0b;background:#fff7ed;color:#92400e}
+  .small{font-size:12px;line-height:1.5;color:#475569}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="动能定理交互实验台"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>抓斜面顶点 A 改高度和角度，看重力做功与摩擦负功如何进入账本；拖滑块看过程位置，但最终只比较 A、B 两个状态。</div>
+    <button id="playBtn" class="primary">播放</button>
+    <div class="card">
+      <div class="title">快速情境</div>
+      <div class="chips">
+        <button data-case="smooth">无摩擦</button>
+        <button data-case="rough">粗糙面</button>
+        <button data-case="steep">更陡</button>
+        <button data-case="stuck">到不了底</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="title">实时读数</div>
+      <div class="readout">
+        <div class="meter"><span>重力功 WG</span><b id="wgText">100.0 J</b></div>
+        <div class="meter"><span>摩擦功 Wf</span><b id="wfText">-69.3 J</b></div>
+        <div class="meter"><span>合力总功</span><b id="wtText">30.7 J</b></div>
+        <div class="meter"><span>动能变化</span><b id="deText">30.7 J</b></div>
+        <div class="meter"><span>末速度 v2</span><b id="v2Text">5.5 m/s</b></div>
+        <div class="meter"><span>斜面路程 s</span><b id="pathText">10.0 m</b></div>
+      </div>
+    </div>
+    <div class="card formula">
+      <div><span>账本</span><b>W合=WG+Wf+WN</b></div>
+      <div><span>动能变化</span><b>ΔEk=Ek2-Ek1</b></div>
+      <div><span>定理</span><b>W合=ΔEk</b></div>
+    </div>
+    <div class="card small"><b>可直接操作：</b>拖 A 点改 h 和 θ；拖滑块看过程位置；底部手柄可调 m、v1、h、μ、θ。</div>
+    <div class="status" id="status">通过：W合 = ΔEk，做功账本和动能变化对上了。</div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+  const g=10,state={m:2,v1:0,h:5,mu:.2,theta:30,u:0,running:false,drag:null};
+  const els={wg:document.getElementById('wgText'),wf:document.getElementById('wfText'),wt:document.getElementById('wtText'),de:document.getElementById('deText'),v2:document.getElementById('v2Text'),path:document.getElementById('pathText'),status:document.getElementById('status'),play:document.getElementById('playBtn')};
+  const colors={red:'#dc2626',blue:'#2563eb',purple:'#7c3aed',green:'#0f766e',orange:'#f59e0b',ink:'#102a43'};
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  const fmt=(v,d=1)=>Math.abs(v)<.05?(0).toFixed(d):v.toFixed(d);
+  function calc(){const rad=state.theta*Math.PI/180,s=state.h/Math.sin(rad),WG=state.m*g*state.h,Wf=-state.mu*state.m*g*Math.cos(rad)*s,WN=0,Wt=WG+Wf,Ek1=.5*state.m*state.v1*state.v1,Ek2=Ek1+Wt,reaches=Ek2>=0,v2=Math.sqrt(2*Math.max(0,Ek2)/state.m),dEk=Ek2-Ek1;return{rad,s,WG,Wf,WN,Wt,Ek1,Ek2,dEk,reaches,v2}}
+  function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){ctx.fillStyle=c;ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+  function line(x1,y1,x2,y2,c='#94a3b8',w=2,dash){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
+  function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-12*Math.cos(a-.42),y2-12*Math.sin(a-.42));ctx.lineTo(x2-12*Math.cos(a+.42),y2-12*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore()}
+  function roundRect(x,y,w,h,r,fill,stroke){ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}ctx.restore()}
+  function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-36,c,'center',12,'900')}
+  function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-20,active?'#92400e':c,'center',12,'900');ctx.restore()}
+  function geom(){const B={x:90,y:385},scale=22,dy=state.h*scale,dx=dy/Math.tan(state.theta*Math.PI/180),A={x:B.x+dx,y:B.y-dy},block={x:A.x+(B.x-A.x)*state.u,y:A.y+(B.y-A.y)*state.u};return{A,B,block,scale}}
+  function handles(){return{m:{x:76+(state.m-.5)/7.5*120,y:494},v1:{x:236+state.v1/8*120,y:494},h:{x:396+(state.h-1)/11*120,y:494},mu:{x:556+state.mu/.8*120,y:494},theta:{x:736+(state.theta-15)/45*120,y:494}}}
+  function point(x,y,c,label,active){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,11,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-22,c,'center',12,'900');ctx.restore()}
+  function drawSlope(r){
+    const g0=geom();roundRect(42,58,500,382,8,'#fff','#d7dee8');text('过程：A 到 B，比较总功和动能变化',292,88,'#0f172a','center',16,'900');
+    ctx.fillStyle='#f8fafc';ctx.strokeStyle='#334155';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(g0.B.x,g0.B.y);ctx.lineTo(g0.A.x,g0.A.y);ctx.lineTo(g0.A.x,g0.B.y);ctx.closePath();ctx.fill();ctx.stroke();
+    line(g0.A.x,g0.A.y,g0.A.x,g0.B.y,colors.orange,1.6,[5,4]);text(`h=${fmt(state.h)}m`,g0.A.x+26,(g0.A.y+g0.B.y)/2,colors.orange,'left',12,'900');
+    point(g0.A.x,g0.A.y,colors.blue,'A',state.drag==='A');text('B',g0.B.x-14,g0.B.y+20,colors.red,'right',13,'900');
+    const b=g0.block,dir={x:(g0.B.x-g0.A.x),y:(g0.B.y-g0.A.y)},L=Math.hypot(dir.x,dir.y)||1;dir.x/=L;dir.y/=L;
+    ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(b.x,b.y-12,13,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#0f172a';ctx.stroke();point(b.x,b.y-12,colors.red,'滑块',state.drag==='block');
+    arrow(b.x,b.y-12,b.x,b.y+48,colors.red,2.5);text('mg',b.x+22,b.y+35,colors.red,'left',12,'900');
+    if(state.mu>.01){arrow(b.x,b.y-12,b.x-dir.x*58,b.y-12-dir.y*58,colors.purple,2.5);text('f',b.x-dir.x*68,b.y-12-dir.y*68,colors.purple,'center',12,'900')}
+    arrow(b.x,b.y-12,b.x+dir.x*54,b.y+dir.y*54,colors.blue,2.5);text('v',b.x+dir.x*68,b.y+dir.y*68,colors.blue,'center',12,'900');
+    text(`s=${fmt(r.s)}m，θ=${fmt(state.theta,0)}°`,292,424,'#475569','center',13,'900');
+  }
+  function drawLedger(r){
+    roundRect(572,58,300,382,8,'#fff','#d7dee8');text('做功账本',722,88,'#0f172a','center',16,'900');
+    const rows=[['WG',r.WG,colors.blue],['Wf',r.Wf,colors.red],['WN',r.WN,'#94a3b8'],['W合',r.Wt,colors.purple],['ΔEk',r.dEk,colors.orange]];
+    const max=Math.max(1,...rows.map(x=>Math.abs(x[1]))),base=258;
+    line(604,base,844,base,'#475569',1.3);
+    rows.forEach((row,i)=>{const x=614+i*48,h=Math.abs(row[1])/max*110;ctx.fillStyle=row[2];if(row[1]>=0)ctx.fillRect(x,base-h,28,h);else ctx.fillRect(x,base,28,h);ctx.strokeStyle='#0f172a';ctx.strokeRect(x,row[1]>=0?base-h:base,28,Math.max(1,h));text(row[0],x+14,394,'#475569','center',12,'900');text(fmt(row[1]),x+14,row[1]>=0?base-h-12:base+h+14,row[2],'center',11,'900')});
+    roundRect(604,320,240,44,7,r.reaches?'#ecfdf5':'#fff7ed',r.reaches?'#14b8a6':'#f59e0b');text(r.reaches?'W合 = ΔEk 通过':'动能耗尽，到不了 B',724,342,r.reaches?colors.green:colors.orange,'center',14,'900');
+  }
+  function bottom(){const h=handles();roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(76,494,196,'m',colors.green);handle(h.m.x,h.m.y,`m=${fmt(state.m)}`,state.drag==='m',colors.green);ruler(236,494,356,'v1',colors.blue);handle(h.v1.x,h.v1.y,`v1=${fmt(state.v1)}`,state.drag==='v1',colors.blue);ruler(396,494,516,'h',colors.orange);handle(h.h.x,h.h.y,`h=${fmt(state.h)}`,state.drag==='h',colors.orange);ruler(556,494,676,'μ',colors.red);handle(h.mu.x,h.mu.y,`μ=${fmt(state.mu,2)}`,state.drag==='mu',colors.red);ruler(736,494,856,'θ',colors.purple);handle(h.theta.x,h.theta.y,`${fmt(state.theta,0)}°`,state.drag==='theta',colors.purple)}
+  function update(r){els.wg.textContent=`${fmt(r.WG)} J`;els.wf.textContent=`${fmt(r.Wf)} J`;els.wt.textContent=`${fmt(r.Wt)} J`;els.de.textContent=`${fmt(r.dEk)} J`;els.v2.textContent=`${fmt(r.v2)} m/s`;els.path.textContent=`${fmt(r.s)} m`;els.play.textContent=state.running?'暂停':'播放';els.status.classList.toggle('warn',!r.reaches);els.status.textContent=r.reaches?'通过：W合 = ΔEk，做功账本和动能变化对上了。':'到不了底端：摩擦负功太大，按能量账本算到底端前动能已耗尽。'}
+  function draw(){const r=calc();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('动能定理实验台：外力总功等于动能变化',460,30,'#0f172a','center',19,'900');drawSlope(r);drawLedger(r);bottom();update(r)}
+  function pos(e){const b=canvas.getBoundingClientRect();return{x:(e.clientX-b.left)*canvas.width/b.width,y:(e.clientY-b.top)*canvas.height/b.height}}
+  function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+  function pointerDown(e){const p=pos(e),g0=geom(),h=handles();if(near(p,g0.A,30))state.drag='A';else if(near(p,{x:g0.block.x,y:g0.block.y-12},30))state.drag='block';else if(near(p,h.m,26))state.drag='m';else if(near(p,h.v1,26))state.drag='v1';else if(near(p,h.h,26))state.drag='h';else if(near(p,h.mu,26))state.drag='mu';else if(near(p,h.theta,26))state.drag='theta';else state.drag=null;if(state.drag){state.running=false;canvas.setPointerCapture(e.pointerId);pointerMove(e)}}
+  function pointerMove(e){if(!state.drag)return;const p=pos(e),g0=geom();if(state.drag==='A'){const dy=clamp(g0.B.y-p.y,22,264),dx=clamp(p.x-g0.B.x,80,500);state.h=clamp(dy/g0.scale,1,12);state.theta=clamp(Math.atan2(dy,dx)*180/Math.PI,15,60)}if(state.drag==='block'){const vx=g0.B.x-g0.A.x,vy=g0.B.y-g0.A.y,L2=vx*vx+vy*vy;state.u=clamp(((p.x-g0.A.x)*vx+(p.y-g0.A.y)*vy)/L2,0,1)}if(state.drag==='m')state.m=clamp(.5+(p.x-76)/120*7.5,.5,8);if(state.drag==='v1')state.v1=clamp((p.x-236)/120*8,0,8);if(state.drag==='h')state.h=clamp(1+(p.x-396)/120*11,1,12);if(state.drag==='mu')state.mu=clamp((p.x-556)/120*.8,0,.8);if(state.drag==='theta')state.theta=clamp(15+(p.x-736)/120*45,15,60);draw()}
+  function pointerUp(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
+  canvas.addEventListener('pointerdown',pointerDown);canvas.addEventListener('pointermove',pointerMove);canvas.addEventListener('pointerup',pointerUp);canvas.addEventListener('pointercancel',pointerUp);
+  els.play.addEventListener('click',()=>{state.running=!state.running;draw()});
+  document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='smooth'){state.mu=0;state.h=5;state.theta=30;state.v1=0}if(c==='rough'){state.mu=.35;state.h=5;state.theta=30;state.v1=0}if(c==='steep'){state.mu=.2;state.h=7;state.theta=52;state.v1=0}if(c==='stuck'){state.mu=.75;state.h=4;state.theta=20;state.v1=0}state.u=0;state.running=false;draw()}));
+  function tick(){if(state.running){state.u+=.01;if(state.u>=1){state.u=1;state.running=false}}draw();requestAnimationFrame(tick)}
+  draw();requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

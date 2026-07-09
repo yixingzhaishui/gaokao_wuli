@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>远距离输电</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#eef3f8;color:#102a43}
+.wrap{padding:12px}
+h2{font-size:16px;margin:0 0 8px}
+canvas{display:block;width:100%;max-width:760px;background:#fff;border:1px solid #d9e2ec;border-radius:12px;touch-action:none;cursor:grab}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:9px 0}
+.chip{background:#102a43;color:#e6eef7;padding:6px 10px;border-radius:8px;font-size:13px}
+.chip b{color:#ffd166}
+.ctrls{display:flex;flex-wrap:wrap;gap:12px;margin:8px 0;align-items:center}
+.ctrls label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:#334e68}
+.ctrls input[type=range]{width:135px;accent-color:#2c7be5}
+.ctrls button{font:inherit;padding:6px 12px;border:1px solid #b0bcc9;background:#fff;border-radius:7px;cursor:pointer}
+.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:9px 12px;border-radius:6px;font-size:13px;color:#486581;line-height:1.5;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2>远距离输电：电压越高，线路 I²r 损耗越小</h2>
+  <canvas id="cv" width="760" height="430"></canvas>
+  <div class="chips">
+    <span class="chip">输送功率 P = <b id="pv">100</b> kW</span>
+    <span class="chip">输送电压 U = <b id="uv">10.0</b> kV</span>
+    <span class="chip">线路电流 I = <b id="iv">10.0</b> A</span>
+    <span class="chip">线路损耗 P损 = <b id="lossv">1.0</b> kW</span>
+    <span class="chip">电压损失 ΔU = <b id="duv">0.10</b> kV</span>
+    <span class="chip">用户功率 = <b id="userv">99.0</b> kW</span>
+    <span class="chip">效率 = <b id="effv">99.0</b>%</span>
+    <span class="chip">状态：<b id="statev">自动演示高压降损</b></span>
+  </div>
+  <div class="ctrls">
+    <label>输送功率 P = <span id="pl">100</span> kW<input id="pr" type="range" min="50" max="500" step="10" value="100"></label>
+    <label>输送电压 U = <span id="ul">10.0</span> kV<input id="ur" type="range" min="1" max="50" step="0.5" value="10"></label>
+    <label>线路总电阻 r = <span id="rl">10</span> Ω<input id="rr" type="range" min="1" max="50" step="1" value="10"></label>
+    <button id="play-btn">暂停演示</button>
+    <button id="reset-btn">重置</button>
+    <span style="font-size:13px;color:#5a6b7b">也可拖右下曲线上的蓝点改电压</span>
+  </div>
+  <div class="hint"><b>观察任务</b>：保持 P 和 r 不变，拖蓝点把 U 从 1 kV 拉到 10 kV，看 I 变为 1/10，而 P损=I²r 变为 1/100。线路损耗用线路电流 I 算，不用输送电压 U 直接套 U²/r。</div>
+</div>
+<script>
+(function(){
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+let P=100,U=10,r=10,drag=false,t=0,running=true,last=performance.now();
+function I(){return P/U}
+function loss(){return I()*I()*r/1000}
+function dU(){return I()*r/1000}
+function userP(){return Math.max(0,P-loss())}
+function eff(){return Math.max(0,userP()/P*100)}
+function sync(){
+  pv.textContent=P.toFixed(0);uv.textContent=U.toFixed(1);iv.textContent=I().toFixed(1);lossv.textContent=loss().toFixed(1);
+  duv.textContent=dU().toFixed(2);userv.textContent=userP().toFixed(1);effv.textContent=eff().toFixed(1);
+  pl.textContent=P.toFixed(0);ul.textContent=U.toFixed(1);rl.textContent=r.toFixed(0);
+  statev.textContent=drag?'手动拖电压点':(running?'自动演示高压降损':(loss()>P*.2?'低压高损耗':'暂停观察读数'));
+}
+function rect(x,y,w,h,fill,stroke,label){
+  ctx.fillStyle=fill;ctx.strokeStyle=stroke;ctx.lineWidth=1.5;ctx.fillRect(x,y,w,h);ctx.strokeRect(x,y,w,h);
+  ctx.fillStyle=stroke;ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText(label,x+w/2,y+h/2+4);
+}
+function drawTower(x){
+  ctx.strokeStyle='#607d98';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,220);ctx.lineTo(x-24,318);ctx.lineTo(x+24,318);ctx.closePath();ctx.moveTo(x-15,255);ctx.lineTo(x+15,255);ctx.moveTo(x-19,280);ctx.lineTo(x+19,280);ctx.stroke();
+}
+function plot(){
+  const gx=458,gy=90,gw=250,gh=210;
+  ctx.strokeStyle='#b0bcc9';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(gx,gy+gh);ctx.lineTo(gx+gw,gy+gh);ctx.moveTo(gx,gy);ctx.lineTo(gx,gy+gh);ctx.stroke();
+  ctx.fillStyle='#486581';ctx.font='11px system-ui';ctx.textAlign='left';ctx.fillText('P损=(P/U)²r',gx+6,gy+14);ctx.fillText('U 越大，损耗按平方下降',gx+6,gy+30);
+  const maxLoss=Math.max(20,(P/1)*(P/1)*r/1000);
+  ctx.strokeStyle='#e8590c';ctx.lineWidth=2.5;ctx.beginPath();
+  for(let k=0;k<=180;k++){
+    const u=1+k/180*49,ls=(P/u)*(P/u)*r/1000;
+    const x=gx+(u-1)/49*gw,y=gy+gh-Math.min(1,ls/maxLoss)*gh;
+    if(k)ctx.lineTo(x,y);else ctx.moveTo(x,y);
+  }
+  ctx.stroke();
+  const px=gx+(U-1)/49*gw,py=gy+gh-Math.min(1,loss()/maxLoss)*gh;
+  ctx.fillStyle='#1c7ed6';ctx.beginPath();ctx.arc(px,py,8,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#1c7ed6';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText(U.toFixed(1)+' kV',px,py-13);
+}
+function draw(){
+  sync();
+  ctx.clearRect(0,0,W,H);
+  const heat=Math.min(1,loss()/P),flow=Math.min(1,I()/100);
+  const sky=ctx.createLinearGradient(0,70,0,320);sky.addColorStop(0,'rgba(208,235,255,.32)');sky.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=sky;ctx.fillRect(18,78,535,250);
+  rect(30,130,64,46,'#e6edf5','#334e68','发电机');
+  rect(120,120,60,66,'#d0ebff','#1c7ed6','升压');
+  drawTower(240);drawTower(350);
+  rect(390,120,60,66,'#d0ebff','#1c7ed6','降压');
+  rect(480,130,64,46,'#e6edf5','#334e68','用户');
+  ctx.strokeStyle=`rgba(232,89,12,${0.18+0.72*heat})`;ctx.lineWidth=4+10*flow;ctx.beginPath();ctx.moveTo(180,140);ctx.bezierCurveTo(230,98,310,98,390,140);ctx.stroke();
+  ctx.strokeStyle=`rgba(232,89,12,${0.12+0.55*heat})`;ctx.beginPath();ctx.moveTo(180,166);ctx.bezierCurveTo(230,208,310,208,390,166);ctx.stroke();
+  for(let k=0;k<9;k++){
+    const p=(t*(0.25+flow*.8)+k/9)%1, x=180+(390-180)*p, y=140+Math.sin(p*Math.PI)*-42;
+    const g=ctx.createRadialGradient(x,y,0,x,y,7+flow*8);g.addColorStop(0,'rgba(255,209,102,.85)');g.addColorStop(1,'rgba(255,209,102,0)');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,7+flow*8,0,7);ctx.fill();
+  }
+  ctx.fillStyle=`rgba(232,89,12,${0.08+0.35*heat})`;ctx.fillRect(205,222,168,42);
+  ctx.fillStyle='#c92a2a';ctx.font='13px system-ui';ctx.textAlign='center';
+  ctx.fillText('线路发热损耗 P损 = I²r = '+loss().toFixed(1)+' kW',290,248);
+  ctx.fillStyle='#243b53';ctx.font='13px system-ui';
+  ctx.fillText('I=P/U='+P.toFixed(0)+' kW ÷ '+U.toFixed(1)+' kV = '+I().toFixed(1)+' A',34,366);
+  ctx.fillText('ΔU=Ir='+I().toFixed(1)+'×'+r+' Ω = '+dU().toFixed(2)+' kV；用户得到约 '+userP().toFixed(1)+' kW',34,388);
+  const bx=600,base=382,bw=44,lh=Math.min(120,loss()/Math.max(P,1)*140),uh=Math.min(120,userP()/Math.max(P,1)*120);
+  ctx.fillStyle='#e6edf5';ctx.fillRect(bx,base-120,bw,120);ctx.fillRect(bx+60,base-120,bw,120);
+  ctx.fillStyle='#e8590c';ctx.fillRect(bx,base-lh,bw,lh);
+  ctx.fillStyle='#2b8a3e';ctx.fillRect(bx+60,base-uh,bw,uh);
+  ctx.fillStyle='#486581';ctx.font='11px system-ui';ctx.textAlign='center';ctx.fillText('损耗',bx+bw/2,400);ctx.fillText('到达',bx+60+bw/2,400);
+  plot();
+}
+function pos(e){const q=cv.getBoundingClientRect(),s=cv.width/q.width;return{x:(e.clientX-q.left)*s,y:(e.clientY-q.top)*s}}
+function setUFromX(x){U=Math.max(1,Math.min(50,1+(x-458)/250*49));document.getElementById('ur').value=U.toFixed(1)}
+cv.addEventListener('pointerdown',e=>{const p=pos(e),gx=458,gy=90,gw=250,gh=210,px=gx+(U-1)/49*gw;if(p.x>gx-10&&p.x<gx+gw+10&&p.y>gy-20&&p.y<gy+gh+20&&Math.abs(p.x-px)<28){drag=true;running=false;document.getElementById('play-btn').textContent='播放演示';cv.setPointerCapture(e.pointerId);setUFromX(p.x);draw()}});
+cv.addEventListener('pointermove',e=>{if(!drag)return;setUFromX(pos(e).x);draw()});
+cv.addEventListener('pointerup',()=>drag=false);cv.addEventListener('pointercancel',()=>drag=false);
+pr.oninput=e=>{P=parseFloat(e.target.value);draw()};
+ur.oninput=e=>{U=parseFloat(e.target.value);draw()};
+rr.oninput=e=>{r=parseFloat(e.target.value);draw()};
+document.getElementById('play-btn').onclick=()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停演示':'播放演示';draw()};
+document.getElementById('reset-btn').onclick=()=>{P=100;U=10;r=10;t=0;running=true;pr.value=P;ur.value=U;rr.value=r;document.getElementById('play-btn').textContent='暂停演示';draw()};
+function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;if(running&&!drag){t+=dt;U=1+24*(0.5+0.5*Math.sin(t*.65));ur.value=U.toFixed(1)}draw();requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>开普勒定律实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#edf3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px;min-height:560px}
+  .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;touch-action:none}
+  .panel{display:flex;flex-direction:column;gap:8px}
+  .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
+  .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.45}
+  .title{font-weight:800;margin-bottom:5px;color:#0f172a}
+  .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:31px;cursor:pointer;color:#102a43}
+  .primary{background:#2563eb;color:#fff;border-color:#2563eb;font-weight:800}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:48px}
+  .meter span{display:block;font-size:11px;color:#b6c5d8}
+  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:16px;font-variant-numeric:tabular-nums}
+  .formula{display:grid;gap:5px;font-size:13px;color:#334155}
+  .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
+  .formula div:last-child{border-bottom:0;padding-bottom:0}
+  .formula b{white-space:nowrap;color:#0f172a}
+  .small{font-size:12px;line-height:1.5;color:#475569}
+  .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="开普勒定律交互实验台"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>拖太阳改变偏心率 e，看太阳始终在焦点；拖椭圆右端改变 a，看周期 T 按 T²/a³ 变化。</div>
+    <button id="playBtn" class="primary">播放</button>
+    <div class="card">
+      <div class="title">快速情境</div>
+      <div class="chips">
+        <button data-case="circle">近圆轨道</button>
+        <button data-case="ellipse">偏心较大</button>
+        <button data-case="largeA">大半长轴</button>
+        <button data-case="heavy">大中心质量</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="title">实时读数</div>
+      <div class="readout">
+        <div class="meter"><span>近日距</span><b id="rpText">0.70 AU</b></div>
+        <div class="meter"><span>远日距</span><b id="raText">1.30 AU</b></div>
+        <div class="meter"><span>周期 T</span><b id="periodText">1.00 年</b></div>
+        <div class="meter"><span>T²/a³</span><b id="kText">1.00</b></div>
+      </div>
+    </div>
+    <div class="card formula">
+      <div><span>第一定律</span><b>太阳在焦点</b></div>
+      <div><span>第二定律</span><b>等时扫等面积</b></div>
+      <div><span>第三定律</span><b>T²/a³=4π²/GM</b></div>
+    </div>
+    <div class="card small"><b>可直接操作：</b>拖太阳改变 e，拖椭圆右端改变 a，拖行星改变观察位置，或拖底部 a、e、M 手柄。</div>
+    <div class="status" id="status">偏心率越大，近日点越近、速度越快；太阳在焦点，不在椭圆中心。</div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+  const state={a:1,e:.3,mu:1,M:.5,running:false,drag:null};
+  const els={rp:document.getElementById('rpText'),ra:document.getElementById('raText'),period:document.getElementById('periodText'),k:document.getElementById('kText'),status:document.getElementById('status'),play:document.getElementById('playBtn')};
+  const colors={red:'#dc2626',blue:'#2563eb',purple:'#7c3aed',green:'#0f766e',orange:'#f59e0b',ink:'#102a43'};
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  const fmt=(v,d=2)=>Math.abs(v)<1e-6?(0).toFixed(d):v.toFixed(d);
+  function solveE(M,e){let E=M;for(let i=0;i<8;i++)E=E-(E-e*Math.sin(E)-M)/(1-e*Math.cos(E));return E}
+  function values(){const T=Math.sqrt(state.a*state.a*state.a/state.mu),rp=state.a*(1-state.e),ra=state.a*(1+state.e),ratio=(1+state.e)/(1-state.e),K=1/state.mu,E=solveE(state.M%(Math.PI*2),state.e);return{T,rp,ra,ratio,K,E}}
+  function layout(){const cx=318,cy=252,scale=118/Math.max(state.a,1.05),A=state.a*scale,B=state.a*Math.sqrt(1-state.e*state.e)*scale,C=state.a*state.e*scale;return{cx,cy,scale,A,B,C,sun:{x:cx-C,y:cy},right:{x:cx+A,y:cy}}}
+  function orbitPoint(E,L=layout()){return{x:L.cx+L.A*Math.cos(E),y:L.cy+L.B*Math.sin(E)}}
+  function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){ctx.fillStyle=c;ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+  function line(x1,y1,x2,y2,c='#94a3b8',w=2,dash){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
+  function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore()}
+  function roundRect(x,y,w,h,r,fill,stroke){ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}ctx.restore()}
+  function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-36,c,'center',12,'900')}
+  function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-20,active?'#92400e':c,'center',12,'900');ctx.restore()}
+  function geom(){return{a:{x:100+(state.a-.6)/2.4*170,y:494},e:{x:364+state.e/.75*170,y:494},mu:{x:638+(state.mu-.5)/2.5*170,y:494}}}
+  function sector(sun,pts,c){ctx.save();ctx.fillStyle=c;ctx.globalAlpha=.25;ctx.beginPath();ctx.moveTo(sun.x,sun.y);pts.forEach(p=>ctx.lineTo(p.x,p.y));ctx.closePath();ctx.fill();ctx.restore()}
+  function drawOrbit(v,L){
+    roundRect(42,58,560,382,8,'#fff','#d7dee8');
+    ctx.strokeStyle='#334155';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(L.cx,L.cy,L.A,L.B,0,0,Math.PI*2);ctx.stroke();
+    line(L.cx-L.A,L.cy,L.cx+L.A,L.cy,'#94a3b8',2,[6,5]);text('半长轴 a',L.cx,L.cy+20,'#475569','center',12,'900');
+    const planet=orbitPoint(v.E,L),sun=L.sun,near=orbitPoint(Math.PI,L),far=orbitPoint(0,L);
+    sector(sun,[Math.PI,Math.PI+.12,Math.PI+.24,Math.PI+.36].map(E=>orbitPoint(E,L)),colors.orange);
+    sector(sun,[0,.08,.16,.24,.32,.40,.48].map(E=>orbitPoint(E,L)),colors.green);
+    ctx.fillStyle=colors.orange;ctx.beginPath();ctx.arc(sun.x,sun.y,12,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#9a6700';ctx.stroke();
+    ctx.save();ctx.fillStyle=state.drag==='sun'?'#fde68a':'#fff';ctx.strokeStyle=state.drag==='sun'?'#d97706':colors.orange;ctx.lineWidth=3;ctx.beginPath();ctx.arc(sun.x,sun.y,19,0,Math.PI*2);ctx.stroke();ctx.restore();
+    text('太阳在焦点',sun.x,sun.y+32,'#b45309','center',12,'900');
+    ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(planet.x,planet.y,9,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();
+    ctx.save();ctx.fillStyle=state.drag==='planet'?'#fde68a':'#fff';ctx.strokeStyle=state.drag==='planet'?'#d97706':colors.blue;ctx.lineWidth=3;ctx.beginPath();ctx.arc(planet.x,planet.y,15,0,Math.PI*2);ctx.stroke();ctx.restore();
+    arrow(planet.x,planet.y,planet.x-(planet.y-sun.y)*.34,planet.y+(planet.x-sun.x)*.34,colors.green,3);text('v',planet.x-(planet.y-sun.y)*.42,planet.y+(planet.x-sun.x)*.42,colors.green,'center',13,'900');
+    text('近日点快',near.x,near.y-22,colors.red,'center',12,'900');text('远日点慢',far.x,far.y-22,'#475569','center',12,'900');
+    handle(L.right.x,L.right.y,'a',state.drag==='aDirect',colors.purple);
+    text('相同时间扫过相同面积：近日点角度变化大，远日点角度变化小',322,424,'#475569','center',12,'900');
+  }
+  function drawThird(v){
+    roundRect(630,82,238,300,8,'#fff','#d7dee8');text('第三定律',749,110,'#0f172a','center',15,'900');
+    const base=330,max=158;[[1,'a=1'],[state.a,'当前'],[2,'a=2']].forEach((it,i)=>{const T=Math.sqrt(it[0]*it[0]*it[0]/state.mu),h=Math.min(max,T/Math.sqrt(8/state.mu)*max),x=682+i*48;ctx.fillStyle=i===1?colors.blue:'#dbe4ee';ctx.fillRect(x,base-h,30,h);text(it[1],x+15,base+16,'#475569','center',11,'900');text(fmt(T,2),x+15,base-h-12,'#102a43','center',11,'900')});
+    roundRect(668,348,162,34,7,'#f8fafc','#d7dee8');text(`T²/a³=${fmt(v.K)}`,749,365,colors.purple,'center',13,'900');
+  }
+  function update(v){els.rp.textContent=`${fmt(v.rp)} AU`;els.ra.textContent=`${fmt(v.ra)} AU`;els.period.textContent=`${fmt(v.T)} 年`;els.k.textContent=fmt(v.K);els.status.textContent=state.e===0?'e=0 时轨道为圆，太阳也在圆心。':'偏心率越大，近日点越近、速度越快；太阳在焦点，不在椭圆中心。';els.play.textContent=state.running?'暂停':'播放'}
+  function draw(){const v=values(),L=layout(),g0=geom();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('开普勒定律实验台：椭圆焦点、等面积、T²/a³',460,30,'#0f172a','center',19,'900');drawOrbit(v,L);drawThird(v);roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(100,494,270,'a',colors.purple);handle(g0.a.x,g0.a.y,`a=${fmt(state.a,1)}`,state.drag==='a',colors.purple);ruler(364,494,534,'e',colors.orange);handle(g0.e.x,g0.e.y,`e=${fmt(state.e)}`,state.drag==='e',colors.orange);ruler(638,494,808,'M',colors.green);handle(g0.mu.x,g0.mu.y,`M=${fmt(state.mu,1)}`,state.drag==='mu',colors.green);update(v)}
+  function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+  function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+  function down(e){const p=pos(e),v=values(),L=layout(),planet=orbitPoint(v.E,L),g0=geom();if(near(p,L.sun,28))state.drag='sun';else if(near(p,L.right,28))state.drag='aDirect';else if(near(p,planet,26))state.drag='planet';else if(near(p,g0.a,26))state.drag='a';else if(near(p,g0.e,26))state.drag='e';else if(near(p,g0.mu,26))state.drag='mu';else state.drag=null;if(state.drag){state.running=false;canvas.setPointerCapture(e.pointerId);move(e)}}
+  function move(e){if(!state.drag)return;const p=pos(e),L=layout();if(state.drag==='a')state.a=clamp(.6+(p.x-100)/170*2.4,.6,3);if(state.drag==='e')state.e=clamp((p.x-364)/170*.75,0,.75);if(state.drag==='mu')state.mu=clamp(.5+(p.x-638)/170*2.5,.5,3);if(state.drag==='aDirect')state.a=clamp((p.x-L.cx)/(L.scale||100),.6,3);if(state.drag==='sun')state.e=clamp((L.cx-p.x)/(state.a*L.scale),0,.75);if(state.drag==='planet'){const E=Math.atan2((p.y-L.cy)/L.B,(p.x-L.cx)/L.A);state.M=(E-state.e*Math.sin(E)+Math.PI*2)%(Math.PI*2)}draw()}
+  function up(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
+  canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
+  els.play.addEventListener('click',()=>{state.running=!state.running;draw()});
+  document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='circle'){state.a=1;state.e=0;state.mu=1}if(c==='ellipse'){state.a=1;state.e=.65;state.mu=1}if(c==='largeA'){state.a=2.2;state.e=.3;state.mu=1}if(c==='heavy'){state.a=1;state.e=.3;state.mu=2.5}draw()}));
+  function tick(){if(state.running){state.M=(state.M+.018/values().T)%(Math.PI*2)}draw();requestAnimationFrame(tick)}
+  draw();requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

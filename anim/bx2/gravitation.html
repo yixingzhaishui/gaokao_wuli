@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>万有引力定律实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#edf3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px;min-height:560px}
+  .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;touch-action:none}
+  .panel{display:flex;flex-direction:column;gap:8px}
+  .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
+  .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.45}
+  .title{font-weight:800;margin-bottom:5px;color:#0f172a}
+  .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:31px;cursor:pointer;color:#102a43}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:48px}
+  .meter span{display:block;font-size:11px;color:#b6c5d8}
+  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:16px;font-variant-numeric:tabular-nums}
+  .formula{display:grid;gap:5px;font-size:13px;color:#334155}
+  .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
+  .formula div:last-child{border-bottom:0;padding-bottom:0}
+  .formula b{white-space:nowrap;color:#0f172a}
+  .small{font-size:12px;line-height:1.5;color:#475569}
+  .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
+  .status.warn{border-color:#f59e0b;background:#fff7ed;color:#b45309}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="万有引力定律交互实验台"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>抓右侧蓝色天体水平拖动，观察 r 翻倍时 F 是否约变为 1/4；注意两侧红箭头始终等长反向。</div>
+    <div class="card">
+      <div class="title">快速情境</div>
+      <div class="chips">
+        <button data-case="base">地月量级</button>
+        <button data-case="doubleR">距离翻倍</button>
+        <button data-case="doubleM">质量翻倍</button>
+        <button data-case="near">距离更近</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="title">实时读数</div>
+      <div class="readout">
+        <div class="meter"><span>当前引力 F</span><b id="fText">7.13e19 N</b></div>
+        <div class="meter"><span>2r 时引力</span><b id="f2Text">1.78e19 N</b></div>
+        <div class="meter"><span>质心距离 r</span><b id="rText">6.4e7 m</b></div>
+        <div class="meter"><span>比例判断</span><b id="ratioText">1/4</b></div>
+      </div>
+    </div>
+    <div class="card formula">
+      <div><span>大小</span><b>F=GMm/r²</b></div>
+      <div><span>质量</span><b>F∝Mm</b></div>
+      <div><span>距离</span><b>F∝1/r²</b></div>
+    </div>
+    <div class="card small"><b>可直接操作：</b>抓右侧天体改变质心距离，或拖底部 M、m、r 手柄。半径外观只帮助感知质量，公式里的 r 是质心距离。</div>
+    <div class="status" id="status">两物体受到的引力大小相等、方向相反，沿质心连线。</div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'),G=6.67e-11;
+  const state={M:6,m:7.3,r:6.4,drag:null,pulse:0};
+  const els={f:document.getElementById('fText'),f2:document.getElementById('f2Text'),r:document.getElementById('rText'),ratio:document.getElementById('ratioText'),status:document.getElementById('status')};
+  const colors={red:'#dc2626',blue:'#2563eb',purple:'#7c3aed',green:'#0f766e',orange:'#f59e0b',ink:'#102a43'};
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  function values(){const M=state.M*1e24,m=state.m*1e22,r=state.r*1e7,F=G*M*m/(r*r);return{M,m,r,F,F2:F/4}}
+  function sci(n,d=2){if(!isFinite(n)||n===0)return'0';const e=Math.floor(Math.log10(Math.abs(n)));const a=n/Math.pow(10,e);return `${a.toFixed(d)}e${e}`}
+  function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){ctx.fillStyle=c;ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+  function line(x1,y1,x2,y2,c='#94a3b8',w=2,dash){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
+  function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore()}
+  function roundRect(x,y,w,h,r,fill,stroke){ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}ctx.restore()}
+  function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-36,c,'center',12,'900')}
+  function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-20,active?'#92400e':c,'center',12,'900');ctx.restore()}
+  function geom(){return{M:{x:108+(state.M-1)/7*160,y:494},m:{x:350+(state.m-1)/8*160,y:494},r:{x:644+(state.r-2)/10*190,y:494}}}
+  function bodyGeom(){const x1=150,y=230,sep=170+(state.r-2)/10*310,x2=x1+sep,R1=25+state.M*3.2,R2=16+state.m*1.6;return{x1,x2,y,R1,R2}}
+  function drawBodies(v){
+    roundRect(42,58,560,382,8,'#fff','#d7dee8');
+    const b=bodyGeom(),len=clamp(22+Math.log10(v.F/1e18+1)*18,28,112);
+    line(b.x1,b.y,b.x2,b.y,'#94a3b8',2,[6,5]);text('r 是两质心距离', (b.x1+b.x2)/2,b.y-24,'#475569','center',13,'900');
+    ctx.fillStyle='#dbe4ee';ctx.beginPath();ctx.arc(b.x1,b.y,b.R1,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#334155';ctx.stroke();text('M',b.x1,b.y,'#102a43','center',16,'900');
+    ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(b.x2,b.y,b.R2,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();text('m',b.x2,b.y,'#fff','center',16,'900');
+    ctx.save();ctx.fillStyle=state.drag==='body'?'#fde68a':'#fff';ctx.strokeStyle=state.drag==='body'?'#d97706':colors.blue;ctx.lineWidth=3;ctx.beginPath();ctx.arc(b.x2,b.y,b.R2+7,0,Math.PI*2);ctx.stroke();ctx.restore();
+    arrow(b.x1+b.R1,b.y,b.x1+b.R1+len,b.y,colors.red,4);arrow(b.x2-b.R2,b.y,b.x2-b.R2-len,b.y,colors.red,4);
+    text('F',b.x1+b.R1+len+12,b.y,colors.red,'left',13,'900');text('F',b.x2-b.R2-len-12,b.y,colors.red,'right',13,'900');
+    roundRect(106,352,392,48,8,'#f8fafc','#d7dee8');text('同一对相互作用力：大小相等、方向相反，作用在不同物体上。',302,376,'#475569','center',13,'900');
+  }
+  function drawGraph(v){
+    roundRect(630,78,238,312,8,'#fff','#d7dee8');text('F-r 反平方曲线',749,106,'#0f172a','center',15,'900');
+    const gx=668,gy=148,gw=150,gh=154;
+    line(gx,gy+gh,gx+gw+18,gy+gh,'#475569',2);line(gx,gy+gh,gx,gy-18,'#475569',2);text('r',gx+gw+22,gy+gh,'#475569','left',12,'900');text('F',gx-10,gy-20,'#475569','right',12,'900');
+    ctx.save();ctx.strokeStyle=colors.blue;ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=120;i++){const rr=2+i/120*10,ff=1/(rr*rr),x=gx+i/120*gw,y=gy+gh-(ff-1/144)/(1/4-1/144)*(gh-14);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke();ctx.restore();
+    const px=gx+(state.r-2)/10*gw,ff=1/(state.r*state.r),py=gy+gh-(ff-1/144)/(1/4-1/144)*(gh-14);
+    ctx.fillStyle=colors.red;ctx.beginPath();ctx.arc(px,py,6+Math.sin(state.pulse)*1.2,0,Math.PI*2);ctx.fill();text('当前',px,py-14,colors.red,'center',12,'900');
+    roundRect(672,326,152,38,7,'#fff7ed','#f59e0b');text('r 翻倍 → F 变 1/4',748,345,'#b45309','center',12,'900');
+  }
+  function update(v){els.f.textContent=`${sci(v.F)} N`;els.f2.textContent=`${sci(v.F2)} N`;els.r.textContent=`${sci(v.r)} m`;els.ratio.textContent='1/4';els.status.className='status'+(state.r<3?' warn':'');els.status.textContent=state.r<3?'距离很近时引力迅速增大；仍要确认能否看作质点或均匀球体。':'两物体受到的引力大小相等、方向相反，沿质心连线。'}
+  function draw(){const v=values(),g0=geom();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('万有引力定律实验台：质量相乘，距离平方反比',460,30,'#0f172a','center',19,'900');drawBodies(v);drawGraph(v);roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(108,494,268,'M',colors.purple);handle(g0.M.x,g0.M.y,`M=${state.M.toFixed(1)}`,state.drag==='M',colors.purple);ruler(350,494,510,'m',colors.blue);handle(g0.m.x,g0.m.y,`m=${state.m.toFixed(1)}`,state.drag==='m',colors.blue);ruler(644,494,834,'r',colors.orange);handle(g0.r.x,g0.r.y,`r=${state.r.toFixed(1)}`,state.drag==='r',colors.orange);update(v)}
+  function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+  function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+  function down(e){const p=pos(e),b=bodyGeom(),g0=geom();if(near(p,{x:b.x2,y:b.y},b.R2+18))state.drag='body';else if(near(p,g0.M,26))state.drag='M';else if(near(p,g0.m,26))state.drag='m';else if(near(p,g0.r,26))state.drag='r';else state.drag=null;if(state.drag){canvas.setPointerCapture(e.pointerId);move(e)}}
+  function move(e){if(!state.drag)return;const p=pos(e);if(state.drag==='M')state.M=clamp(1+(p.x-108)/160*7,1,8);if(state.drag==='m')state.m=clamp(1+(p.x-350)/160*8,1,9);if(state.drag==='r')state.r=clamp(2+(p.x-644)/190*10,2,12);if(state.drag==='body')state.r=clamp(2+(p.x-320)/310*10,2,12);draw()}
+  function up(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
+  canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
+  document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='base'){state.M=6;state.m=7.3;state.r=6.4}if(c==='doubleR'){state.M=6;state.m=7.3;state.r=12}if(c==='doubleM'){state.M=8;state.m=7.3;state.r=6.4}if(c==='near'){state.M=6;state.m=7.3;state.r=2.8}draw()}));
+  function tick(){state.pulse=(state.pulse+.05)%(Math.PI*2);draw();requestAnimationFrame(tick)}
+  draw();requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

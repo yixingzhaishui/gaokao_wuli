@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>放射性衰变：A 和 Z 的变化</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 14px; align-items: stretch; }
+  canvas { width: 100%; height: 430px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  input { width: 100%; }
+  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.8; font-size: 14px; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
+  @media (max-width: 760px) { .stage { grid-template-columns: 1fr; } canvas { height: 360px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="680" height="430" aria-label="放射性衰变模型"></canvas>
+    <section class="panel">
+      <label for="type">衰变类型：<span id="typeVal"></span></label>
+      <input id="type" type="range" min="0" max="2" value="0" step="1">
+      <label for="z">母核质子数 Z：<span id="zVal"></span></label>
+      <input id="z" type="range" min="20" max="92" value="92" step="1">
+      <label for="n">母核中子数 N：<span id="nVal"></span></label>
+      <input id="n" type="range" min="20" max="150" value="146" step="1">
+      <div id="readout" class="readout"></div>
+      <div class="hint">观察任务：切换 α、β、γ，盯住左上角 A 和左下角 Z；最后用质量数和电荷数守恒检查。</div>
+    </section>
+  </div>
+</div>
+<script>
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const els = {
+  type: document.getElementById('type'),
+  z: document.getElementById('z'),
+  n: document.getElementById('n'),
+  typeVal: document.getElementById('typeVal'),
+  zVal: document.getElementById('zVal'),
+  nVal: document.getElementById('nVal'),
+  readout: document.getElementById('readout')
+};
+const labels = ['α 衰变', 'β⁻ 衰变', 'γ 衰变'];
+function daughter(a, z, t) {
+  if (t === 0) return { a: a - 4, z: z - 2, particle: '⁴₂He', note: 'α：A-4，Z-2', prop: '电离强，穿透弱' };
+  if (t === 1) return { a, z: z + 1, particle: '⁰₋₁e', note: 'β⁻：A 不变，Z+1', prop: '高速电子流，穿透中等' };
+  return { a, z, particle: 'γ', note: 'γ：A、Z 不变', prop: '高频电磁波，穿透强' };
+}
+function drawNucleus(x, y, title, a, z, color) {
+  ctx.fillStyle = color;
+  ctx.strokeStyle = '#334e68';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(x, y, 58, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 18px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText(title, x, y - 14);
+  ctx.font = '700 20px system-ui';
+  ctx.fillText(`${a}/${z}X`, x, y + 18);
+}
+function arrow(x1, y1, x2, y2, color) {
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+  const ang = Math.atan2(y2 - y1, x2 - x1);
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - 12 * Math.cos(ang - 0.45), y2 - 12 * Math.sin(ang - 0.45));
+  ctx.lineTo(x2 - 12 * Math.cos(ang + 0.45), y2 - 12 * Math.sin(ang + 0.45));
+  ctx.closePath();
+  ctx.fill();
+}
+function draw() {
+  const t = Number(els.type.value);
+  const z = Number(els.z.value);
+  const n = Number(els.n.value);
+  const a = z + n;
+  const d = daughter(a, z, t);
+  els.typeVal.textContent = labels[t];
+  els.zVal.textContent = z;
+  els.nVal.textContent = n;
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#f7f9fc';
+  ctx.fillRect(0, 0, c.width, c.height);
+
+  drawNucleus(120, 190, '母核', a, z, '#fff7e6');
+  arrow(190, 190, 312, 190, '#e03131');
+  drawNucleus(390, 190, '子核', d.a, d.z, '#eef4ff');
+  arrow(430, 145, 570, 84, t === 0 ? '#e03131' : t === 1 ? '#2c7be5' : '#7b2cbf');
+  ctx.fillStyle = t === 0 ? '#e03131' : t === 1 ? '#2c7be5' : '#7b2cbf';
+  ctx.font = '700 24px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText(d.particle, 598, 84);
+  ctx.font = '15px system-ui';
+  ctx.fillText(d.note, 596, 120);
+  ctx.fillStyle = '#486581';
+  ctx.fillText(d.prop, 596, 150);
+
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 16px system-ui';
+  ctx.fillText('守恒检查', 340, 304);
+  ctx.font = '14px system-ui';
+  ctx.fillStyle = '#486581';
+  let rightA = d.a + (t === 0 ? 4 : 0);
+  let rightZ = d.z + (t === 0 ? 2 : t === 1 ? -1 : 0);
+  ctx.fillText(`质量数：左 A=${a}，右 A=${rightA}，${rightA === a ? '守恒' : '不守恒'}`, 340, 334);
+  ctx.fillText(`电荷数：左 Z=${z}，右 Z=${rightZ}，${rightZ === z ? '守恒' : '不守恒'}`, 340, 362);
+  ctx.fillText('配平衰变方程时，左上角质量数和左下角电荷数都要守恒。', 340, 394);
+
+  els.readout.innerHTML = [
+    `母核：A=${a}，Z=${z}`,
+    `衰变类型=${labels[t]}，放出=${d.particle}`,
+    `子核：A'=${d.a}，Z'=${d.z}`,
+    `规则：${d.note}；${d.prop}`
+  ].join('<br>');
+}
+Object.values(els).forEach(el => {
+  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
+});
+draw();
+</script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>测玻璃折射率</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 16px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 286px; gap: 14px; align-items: stretch; }
+  canvas { width: 100%; height: 470px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  input { width: 100%; }
+  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.72; font-size: 14px; }
+  .status { margin-top: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13px; line-height: 1.55; background: #e6fffa; color: #087f5b; font-weight: 700; }
+  .status.bad { background: #fff5f5; color: #c92a2a; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
+  @media (max-width: 780px) { .stage { grid-template-columns: 1fr; } canvas { height: 400px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="700" height="470" aria-label="测玻璃折射率实验"></canvas>
+    <section class="panel">
+      <label for="incident">入射角 i/°：<span id="incidentVal"></span></label>
+      <input id="incident" type="range" min="10" max="70" value="45" step="1">
+      <label for="ntrue">玻璃真实 n：<span id="ntrueVal"></span></label>
+      <input id="ntrue" type="range" min="1.30" max="1.80" value="1.50" step="0.01">
+      <label for="error">角度读数误差/°：<span id="errorVal"></span></label>
+      <input id="error" type="range" min="-3" max="3" value="1" step="0.5">
+      <label for="pin">插针间距/cm：<span id="pinVal"></span></label>
+      <input id="pin" type="range" min="2" max="10" value="6" step="1">
+      <div id="readout" class="readout"></div>
+      <div id="status" class="status"></div>
+      <div class="hint">观察任务：增大入射角，看折射角如何变化；调小插针间距，看为什么光路方向更难确定。</div>
+    </section>
+  </div>
+</div>
+<script>
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const els = {
+  incident: document.getElementById('incident'),
+  ntrue: document.getElementById('ntrue'),
+  error: document.getElementById('error'),
+  pin: document.getElementById('pin'),
+  incidentVal: document.getElementById('incidentVal'),
+  ntrueVal: document.getElementById('ntrueVal'),
+  errorVal: document.getElementById('errorVal'),
+  pinVal: document.getElementById('pinVal'),
+  readout: document.getElementById('readout'),
+  status: document.getElementById('status')
+};
+function rad(d){return d*Math.PI/180}
+function deg(r){return r*180/Math.PI}
+function ray(x1,y1,x2,y2,color){
+  const a=Math.atan2(y2-y1,x2-x1);
+  ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=4;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-12*Math.cos(a-.45),y2-12*Math.sin(a-.45));ctx.lineTo(x2-12*Math.cos(a+.45),y2-12*Math.sin(a+.45));ctx.closePath();ctx.fill();
+}
+function draw(){
+  const i=Number(els.incident.value), n=Number(els.ntrue.value), err=Number(els.error.value), pin=Number(els.pin.value);
+  const r=deg(Math.asin(Math.sin(rad(i))/n));
+  const imeas=i+err, rmeas=r-err*0.6;
+  const nmeas=Math.sin(rad(imeas))/Math.sin(rad(rmeas));
+  const rel=Math.abs(nmeas-n)/n*100;
+  els.incidentVal.textContent=i.toFixed(0);
+  els.ntrueVal.textContent=n.toFixed(2);
+  els.errorVal.textContent=err.toFixed(1);
+  els.pinVal.textContent=pin.toFixed(0);
+  ctx.clearRect(0,0,c.width,c.height);
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);
+  ctx.fillStyle='#102a43';ctx.font='700 18px system-ui';ctx.textAlign='center';
+  ctx.fillText('测玻璃折射率：描光路，量 i 和 r，算 n=sin i/sin r',350,30);
+  const left=170, top=110, w=310, h=220, O={x:left+w/2,y:top};
+  ctx.fillStyle='rgba(44,123,229,.12)';ctx.strokeStyle='#2c7be5';ctx.lineWidth=3;
+  ctx.fillRect(left,top,w,h);ctx.strokeRect(left,top,w,h);
+  ctx.setLineDash([6,5]);ctx.strokeStyle='#829ab1';ctx.beginPath();ctx.moveTo(O.x,65);ctx.lineTo(O.x,350);ctx.stroke();ctx.setLineDash([]);
+  const len=150;
+  const xi=O.x-len*Math.sin(rad(i)), yi=O.y-len*Math.cos(rad(i));
+  const xr=O.x+len*Math.sin(rad(r)), yr=O.y+len*Math.cos(rad(r));
+  ray(xi,yi,O.x,O.y,'#e03131');
+  ray(O.x,O.y,xr,yr,'#38b2ac');
+  ctx.fillStyle='#102a43';ctx.font='13px system-ui';
+  ctx.fillText('空气',110,80);ctx.fillText('玻璃砖',110,315);
+  ctx.fillStyle='#e03131';ctx.fillText('i='+i.toFixed(0)+'°',O.x-70,O.y-34);
+  ctx.fillStyle='#087f5b';ctx.fillText('r='+r.toFixed(1)+'°',O.x+72,O.y+52);
+  const gap=pin*7;
+  ctx.fillStyle='#7b2cbf';
+  [[xi,yi],[xi+(O.x-xi)*gap/len, yi+(O.y-yi)*gap/len],[xr,yr],[xr-(xr-O.x)*gap/len, yr-(yr-O.y)*gap/len]].forEach((p,idx)=>{
+    ctx.beginPath();ctx.arc(p[0],p[1],5,0,Math.PI*2);ctx.fill();
+    ctx.fillText('P'+(idx+1),p[0]+14,p[1]-8);
+  });
+  const gx=520,gy=374,gw=120,gh=230;
+  ctx.strokeStyle='#334e68';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(gx,gy);ctx.lineTo(gx+gw,gy);ctx.moveTo(gx,gy);ctx.lineTo(gx,gy-gh);ctx.stroke();
+  ctx.strokeStyle='#38b2ac';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(gx,gy);ctx.lineTo(gx+gw,gy-gh*.85);ctx.stroke();
+  ctx.fillStyle='#e03131';ctx.beginPath();ctx.arc(gx+Math.sin(rad(imeas))*gw,gy-Math.sin(rad(rmeas))*gh,6,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#486581';ctx.font='12px system-ui';ctx.textAlign='center';
+  ctx.fillText('sin r',gx-24,gy-gh-4);ctx.fillText('sin i',gx+gw+24,gy+4);ctx.fillText('斜率≈n',gx+62,gy+26);
+  ctx.fillText('插针越远，光线方向越准；角度太小，sin 比值误差会放大。',350,452);
+  els.readout.innerHTML=[
+    `<div id="r1">测得 i≈${imeas.toFixed(1)}°，r≈${rmeas.toFixed(1)}°</div>`,
+    `<div id="r2">n=sin i/sin r≈${nmeas.toFixed(3)}</div>`,
+    `<div id="r3">真实 n≈${n.toFixed(3)}，相对误差≈${rel.toFixed(1)}%</div>`,
+    `<div id="r4">光从空气入玻璃：r&lt;i，折射线偏向法线</div>`,
+    `<div id="r5">插针间距=${pin.toFixed(0)}cm，用来确定入射线和出射线方向</div>`
+  ].join('');
+  const ok=rel<5 && i>=25 && pin>=4;
+  els.status.className=ok?'status':'status bad';
+  els.status.textContent=i<25?'不通过：入射角太小，角度读数相对误差大。':pin<4?'不通过：插针间距太小，光线方向不够准。':rel<5?'通过：由 sin i/sin r 得到的折射率接近真实值。':'不通过：角度读数误差偏大，折射率偏离明显。';
+}
+Object.values(els).forEach(el=>el.addEventListener('input',draw));
+draw();
+</script>
+</body>
+</html>

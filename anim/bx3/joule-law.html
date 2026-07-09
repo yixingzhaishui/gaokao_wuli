@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>焦耳定律实验台</title>
+<style>
+:root{--ink:#102a43;--line:#d9e2ec;--red:#e03131;--blue:#2c7be5;--gold:#f0a500;--green:#159a6b}
+*{box-sizing:border-box}
+body{margin:0;background:#f3f6fa;color:var(--ink);font-family:-apple-system,"PingFang SC",system-ui,sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:14px}
+h2{font-size:17px;margin:0 0 10px}
+.lab{display:grid;grid-template-columns:minmax(0,1fr)292px;gap:12px;align-items:start}
+.stage{background:#fff;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab;background:#fff}
+.panel{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px}
+.seg{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:10px}
+.seg button{border:0;border-radius:0}
+button{font:inherit;border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 10px;cursor:pointer}
+button.on{background:#2c7be5;color:#fff}
+.read{display:grid;gap:7px}
+.chip{background:#102a43;color:#eef4ff;border-radius:8px;padding:8px 10px;font-size:13px;line-height:1.45}
+.chip b{color:#ffd166}
+.hint{margin-top:10px;background:#fff7e6;border-left:3px solid var(--gold);border-radius:6px;padding:9px 11px;font-size:13px;color:#5a6b7b;line-height:1.55}
+.formula{margin-top:10px;border-top:1px solid var(--line);padding-top:10px;font-size:13px;color:#334e68;line-height:1.7}
+@media(max-width:820px){.lab{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2>焦耳定律：拖 I、R、t，看 Q=I²Rt 和非纯电阻分流</h2>
+  <div class="lab">
+    <div class="stage"><canvas id="cv" width="720" height="450"></canvas></div>
+    <section class="panel">
+      <div class="seg" id="mode"><button class="on" data-mode="pure">纯电阻</button><button data-mode="motor">电动机</button></div>
+      <div class="read">
+        <div class="chip">电流 I = <b id="iv">2.0</b> A</div>
+        <div class="chip">电阻 R = <b id="rv">5.0</b> Ω</div>
+        <div class="chip">时间 t = <b id="tv">10</b> s</div>
+        <div class="chip">电热 Q = I²Rt = <b id="qv">200</b> J</div>
+        <div class="chip">输入电能 W = <b id="wv">200</b> J</div>
+        <div class="chip">其他能量 = <b id="ov">0</b> J</div>
+        <div class="chip">发热状态：<b id="statev">静止</b></div>
+      </div>
+      <div class="hint"><b>观察任务</b>：拖 I 看热量按平方增长；拖 R、t 看 Q 按正比增长。切到电动机模式，看输入电能 W=UIt 大部分变机械能，线圈发热仍只按 I²Rt 算；点击“播放”看热量随时间从 0 累积到 Q 的过程，及发热区亮度同步变化。</div>
+      <div class="hint" style="margin-top:8px"><button id="playBtn" style="font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;width:100%">▶ 播放：随时间累积发热</button></div>
+      <div class="formula"><b>公式绑定</b><br>红色热量柱读 Q=I²Rt；绿色柱读非纯电阻的其他能量。纯电阻时 W=Q；电动机时 W&gt;Q。</div>
+    </section>
+  </div>
+</div>
+<script>
+(function(){
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+let mode='pure',I=2,R=5,t=10,drag=null,playing=false,elapsed=0;
+const els={iv:id('iv'),rv:id('rv'),tv:id('tv'),qv:id('qv'),wv:id('wv'),ov:id('ov'),statev:id('statev')};
+function id(s){return document.getElementById(s)}
+function clamp(x,a,b){return Math.max(a,Math.min(b,x))}
+function Qnow(){return I*I*R*(playing?elapsed:t)}
+function Q(){return I*I*R*t}
+function U(){return mode==='pure'?I*R:220}
+function W(){return U()*I*t}
+function other(){return Math.max(0,W()-Q())}
+function pos(e){const r=cv.getBoundingClientRect(),s=cv.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s}}
+function drawKnob(x,y,label,val,color){ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,11,0,7);ctx.fill();ctx.fillStyle=color;ctx.font='700 13px system-ui';ctx.textAlign='center';ctx.fillText(label+' '+val,x,y-18)}
+function draw(){
+  ctx.clearRect(0,0,cv.width,cv.height);const bg=ctx.createLinearGradient(0,0,0,cv.height);bg.addColorStop(0,'#f8fbff');bg.addColorStop(1,'#edf3f8');ctx.fillStyle=bg;ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.strokeStyle='rgba(16,42,67,.06)';for(let x=0;x<cv.width;x+=36){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,cv.height);ctx.stroke()}for(let y=0;y<cv.height;y+=36){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(cv.width,y);ctx.stroke()}
+  ctx.strokeStyle='#5b7089';ctx.lineWidth=6;ctx.beginPath();ctx.rect(105,110,265,160);ctx.stroke();
+  const glow=Math.min(1,Qnow()/1000);const g=ctx.createRadialGradient(238,110,5,238,110,80);g.addColorStop(0,'rgba(224,49,49,'+(0.25+glow*.45)+')');g.addColorStop(1,'rgba(224,49,49,0)');ctx.fillStyle=g;ctx.fillRect(140,35,200,160);
+  ctx.strokeStyle='#f0a500';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(180,110);for(let i=0;i<10;i++)ctx.lineTo(180+i*12,110+(i%2?10:-10));ctx.stroke();ctx.fillStyle='#8a5a00';ctx.font='13px system-ui';ctx.textAlign='center';ctx.fillText(mode==='pure'?'纯电阻发热':'电机线圈发热',240,88);
+  if(mode==='motor'){ctx.strokeStyle='#159a6b';ctx.lineWidth=3;ctx.beginPath();ctx.arc(300,190,32,0,7);ctx.stroke();ctx.fillStyle='#159a6b';ctx.fillText('机械输出',300,236)}
+  const ix=90+I/5*210,rx=90+R/12*210,tx=90+t/30*210;ctx.strokeStyle='#ccd6e0';ctx.lineWidth=6;[['I',350,ix,'#e03131'],['R',380,rx,'#f0a500'],['t',410,tx,'#2c7be5']].forEach(([lab,y,x,col])=>{ctx.strokeStyle='#ccd6e0';ctx.beginPath();ctx.moveTo(90,y);ctx.lineTo(300,y);ctx.stroke();drawKnob(x,y,lab,lab==='I'?I.toFixed(1):lab==='R'?R.toFixed(1):t.toFixed(0),col)});
+  const base=342,scale=220/Math.max(W(),Q(),200);[['Q热',Qnow(),'#e03131',455],['W电',W(),'#2c7be5',520],['其他',other(),'#159a6b',585]].forEach(([lab,val,col,x])=>{const h=val*scale;ctx.fillStyle=col;ctx.fillRect(x,base-h,34,h);ctx.fillStyle='#334e68';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText(lab,x+17,base+20);ctx.fillText(val.toFixed(0)+'J',x+17,base-h-8)});
+  ctx.fillStyle='#102a43';ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillText(`Q=I²Rt=${I.toFixed(1)}²×${R.toFixed(1)}×${(playing?elapsed:t).toFixed(1)}=${Qnow().toFixed(0)}J；${mode==='pure'?'纯电阻 W=Q':'电动机 W=UIt，Q 只是线圈热'}`,24,34);
+  update();
+}
+function update(){els.iv.textContent=I.toFixed(1);els.rv.textContent=R.toFixed(1);els.tv.textContent=t.toFixed(0);els.qv.textContent=Q().toFixed(0);els.wv.textContent=W().toFixed(0);els.ov.textContent=other().toFixed(0);els.statev.textContent=playing?'累积中 t='+elapsed.toFixed(1)+'s':(elapsed>0?'已播完，Q 累积完成':'静止')}
+cv.addEventListener('pointerdown',e=>{const p=pos(e);const tests=[['I',90+I/5*210,350],['R',90+R/12*210,380],['t',90+t/30*210,410]];for(const a of tests)if(Math.hypot(p.x-a[1],p.y-a[2])<24){drag=a[0];return}});
+cv.addEventListener('pointermove',e=>{if(!drag)return;const p=pos(e),x=clamp(p.x,90,300);if(drag==='I')I=(x-90)/210*5;if(drag==='R')R=(x-90)/210*12;if(drag==='t')t=(x-90)/210*30;draw()});
+window.addEventListener('pointerup',()=>drag=null);
+document.querySelectorAll('#mode button').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;document.querySelectorAll('#mode button').forEach(x=>x.classList.toggle('on',x===b));draw()});
+function animate(){
+  if(!playing)return;
+  elapsed+=t/180;
+  if(elapsed>=t){elapsed=t;playing=false;id('playBtn').textContent='▶ 播放：随时间累积发热';draw();return}
+  draw();
+  requestAnimationFrame(animate);
+}
+id('playBtn').onclick=()=>{
+  if(playing){playing=false;id('playBtn').textContent='▶ 播放：随时间累积发热';draw();return}
+  elapsed=0;playing=true;id('playBtn').textContent='⏸ 暂停';animate();
+};
+draw();
+})();
+</script>
+</body>
+</html>

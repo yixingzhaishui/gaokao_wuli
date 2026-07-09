@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>探究单摆周期公式</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 16px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 286px; gap: 14px; align-items: stretch; }
+  canvas { width: 100%; height: 470px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  input { width: 100%; }
+  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.72; font-size: 14px; }
+  .status { margin-top: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13px; line-height: 1.55; background: #e6fffa; color: #087f5b; font-weight: 700; }
+  .status.bad { background: #fff5f5; color: #c92a2a; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
+  @media (max-width: 780px) { .stage { grid-template-columns: 1fr; } canvas { height: 400px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="700" height="470" aria-label="单摆周期实验"></canvas>
+    <section class="panel">
+      <label for="length">摆长 L/m：<span id="lengthVal"></span></label>
+      <input id="length" type="range" min="0.30" max="1.50" value="1.00" step="0.05">
+      <label for="angle">初始摆角 θ/°：<span id="angleVal"></span></label>
+      <input id="angle" type="range" min="2" max="25" value="6" step="1">
+      <label for="cycles">计时次数 N：<span id="cyclesVal"></span></label>
+      <input id="cycles" type="range" min="5" max="50" value="30" step="5">
+      <label for="gravity">当地 g/(m/s²)：<span id="gravityVal"></span></label>
+      <input id="gravity" type="range" min="8.0" max="10.5" value="9.8" step="0.1">
+      <label for="error">计时误差：<span id="errorVal"></span></label>
+      <input id="error" type="range" min="-4" max="4" value="1" step="1">
+      <div id="readout" class="readout"></div>
+      <div id="status" class="status"></div>
+      <div class="hint">观察任务：增大摆长，看 T² 是否与 L 成正比；增大摆角，看小角度条件为何必要。</div>
+    </section>
+  </div>
+</div>
+<script>
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const els = {
+  length: document.getElementById('length'),
+  angle: document.getElementById('angle'),
+  cycles: document.getElementById('cycles'),
+  gravity: document.getElementById('gravity'),
+  error: document.getElementById('error'),
+  lengthVal: document.getElementById('lengthVal'),
+  angleVal: document.getElementById('angleVal'),
+  cyclesVal: document.getElementById('cyclesVal'),
+  gravityVal: document.getElementById('gravityVal'),
+  errorVal: document.getElementById('errorVal'),
+  readout: document.getElementById('readout'),
+  status: document.getElementById('status')
+};
+function period(L,g,deg) {
+  const small = 2*Math.PI*Math.sqrt(L/g);
+  const rad = deg*Math.PI/180;
+  return small * (1 + rad*rad/16);
+}
+function drawGraph(x0,y0,w,h,g) {
+  ctx.strokeStyle = '#334e68';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(x0,y0);
+  ctx.lineTo(x0+w,y0);
+  ctx.moveTo(x0,y0);
+  ctx.lineTo(x0,y0-h);
+  ctx.stroke();
+  ctx.strokeStyle = '#38b2ac';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  for (let i=0;i<=10;i++) {
+    const L = 0.3 + i*0.12;
+    const T2 = 4*Math.PI*Math.PI*L/g;
+    const px = x0 + (L-0.3)/1.2*w;
+    const py = y0 - Math.min(1,T2/6)*h;
+    if (i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+  ctx.fillStyle = '#486581';
+  ctx.font = '12px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('T²-L 图像', x0+w/2, y0+24);
+  ctx.fillText('L', x0+w+12, y0+4);
+  ctx.fillText('T²', x0-16, y0-h-4);
+}
+function draw() {
+  const L = Number(els.length.value);
+  const deg = Number(els.angle.value);
+  const N = Number(els.cycles.value);
+  const g = Number(els.gravity.value);
+  const err = Number(els.error.value) / 100;
+  const T = period(L,g,deg);
+  const total = N*T*(1+err);
+  const Tmeas = total/N;
+  const gCalc = 4*Math.PI*Math.PI*L/(Tmeas*Tmeas);
+  const rel = Math.abs(gCalc-g)/g*100;
+  els.lengthVal.textContent = L.toFixed(2);
+  els.angleVal.textContent = deg.toFixed(0);
+  els.cyclesVal.textContent = N;
+  els.gravityVal.textContent = g.toFixed(1);
+  els.errorVal.textContent = Math.round(err*100) + '%';
+
+  ctx.clearRect(0,0,c.width,c.height);
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0,0,c.width,c.height);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 18px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('单摆周期：测多次全振动，验证 T² 与 L 成正比', 350, 30);
+  const px = 220, py = 82, scale = 220/1.5;
+  const len = L*scale;
+  const rad = deg*Math.PI/180;
+  const bx = px + len*Math.sin(rad);
+  const by = py + len*Math.cos(rad);
+  ctx.strokeStyle = '#334e68';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(px-90,py);
+  ctx.lineTo(px+90,py);
+  ctx.stroke();
+  ctx.strokeStyle = '#2c7be5';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(px,py);
+  ctx.lineTo(bx,by);
+  ctx.stroke();
+  ctx.fillStyle = '#ffe8cc';
+  ctx.strokeStyle = '#f08c00';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(bx,by,18,0,Math.PI*2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.strokeStyle = '#d9e2ec';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(px,py,len,-Math.PI/2,Math.PI/2);
+  ctx.stroke();
+  ctx.fillStyle = '#486581';
+  ctx.font = '13px system-ui';
+  ctx.fillText('摆长 L 是悬点到球心', px+120, py+90);
+  ctx.fillText('小角度：θ 通常不超过 5°~10°', px+140, py+118);
+
+  ctx.fillStyle = '#f7f9fc';
+  ctx.strokeStyle = '#d9e2ec';
+  ctx.fillRect(72,360,300,50);
+  ctx.strokeRect(72,360,300,50);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 14px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('计时 ' + N + ' 次：t≈' + total.toFixed(2) + 's，T=t/N≈' + Tmeas.toFixed(3) + 's', 222, 391);
+  drawGraph(450,390,175,240,g);
+  ctx.fillStyle = '#e03131';
+  const pxg = 450 + (L-0.3)/1.2*175;
+  const pyg = 390 - Math.min(1,Tmeas*Tmeas/6)*240;
+  ctx.beginPath();
+  ctx.arc(pxg,pyg,6,0,Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = '#486581';
+  ctx.font = '13px system-ui';
+  ctx.fillText('斜率=4π²/g，可由图像求 g。', 350, 452);
+
+  els.readout.innerHTML = [
+    `<div id="r1">T理论≈2π√(L/g)=${(2*Math.PI*Math.sqrt(L/g)).toFixed(3)}s</div>`,
+    `<div id="r2">计时 t=${total.toFixed(2)}s，T=t/N=${Tmeas.toFixed(3)}s</div>`,
+    `<div id="r3">T²/L≈${(Tmeas*Tmeas/L).toFixed(3)}s²/m</div>`,
+    `<div id="r4">g测=4π²L/T²≈${gCalc.toFixed(2)}m/s²</div>`,
+    `<div id="r5">相对误差≈${rel.toFixed(1)}%</div>`
+  ].join('');
+  const ok = deg <= 10 && rel < 5;
+  els.status.className = ok ? 'status' : 'status bad';
+  els.status.textContent = deg > 10
+    ? '不通过：摆角过大，小角度近似变差，应减小摆角。'
+    : rel < 5
+      ? '通过：T² 与 L 的关系和 g 的反算在误差范围内合理。'
+      : '不通过：计时误差较大，应多测几次全振动并取平均。';
+}
+Object.values(els).forEach(el => {
+  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
+});
+draw();
+</script>
+</body>
+</html>

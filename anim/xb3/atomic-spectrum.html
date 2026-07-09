@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>原子光谱：元素指纹</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 14px; align-items: stretch; }
+  canvas { width: 100%; height: 430px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  input { width: 100%; }
+  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.8; font-size: 14px; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
+  @media (max-width: 760px) { .stage { grid-template-columns: 1fr; } canvas { height: 360px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="680" height="430" aria-label="原子光谱模拟"></canvas>
+    <section class="panel">
+      <label for="element">元素：<span id="elementVal"></span></label>
+      <input id="element" type="range" min="0" max="2" value="0" step="1">
+      <label for="excite">激发强度：<span id="exciteVal"></span></label>
+      <input id="excite" type="range" min="1" max="5" value="3" step="1">
+      <label for="mode">光谱模式：<span id="modeVal"></span></label>
+      <input id="mode" type="range" min="0" max="1" value="0" step="1">
+      <div id="readout" class="readout"></div>
+      <div class="hint">观察任务：切换元素看谱线位置变化；提高激发强度看亮度变化；切到吸收模式看亮线变成连续背景上的暗线。</div>
+    </section>
+  </div>
+</div>
+<script>
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const els = {
+  element: document.getElementById('element'),
+  excite: document.getElementById('excite'),
+  mode: document.getElementById('mode'),
+  elementVal: document.getElementById('elementVal'),
+  exciteVal: document.getElementById('exciteVal'),
+  modeVal: document.getElementById('modeVal'),
+  readout: document.getElementById('readout')
+};
+const data = [
+  { name: '氢 H', lines: [410, 434, 486, 656], colors: ['#7b2cbf', '#3f37c9', '#2c7be5', '#e03131'] },
+  { name: '氦 He', lines: [447, 501, 587, 667], colors: ['#3f37c9', '#38b2ac', '#f0a500', '#e03131'] },
+  { name: '钠 Na', lines: [589, 590], colors: ['#f0a500', '#ffd43b'] }
+];
+function xFor(lambda) { return 110 + (lambda - 380) / (700 - 380) * 480; }
+function drawGradient(x, y, w, h) {
+  const g = ctx.createLinearGradient(x, 0, x + w, 0);
+  g.addColorStop(0, '#7b2cbf');
+  g.addColorStop(0.18, '#2c7be5');
+  g.addColorStop(0.42, '#38b2ac');
+  g.addColorStop(0.66, '#f0a500');
+  g.addColorStop(1, '#e03131');
+  ctx.fillStyle = g;
+  ctx.fillRect(x, y, w, h);
+}
+function draw() {
+  const idx = Number(els.element.value);
+  const excite = Number(els.excite.value);
+  const absorb = Number(els.mode.value) === 1;
+  const item = data[idx];
+  els.elementVal.textContent = item.name;
+  els.exciteVal.textContent = excite;
+  els.modeVal.textContent = absorb ? '吸收光谱' : '发射光谱';
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#f7f9fc';
+  ctx.fillRect(0, 0, c.width, c.height);
+
+  ctx.fillStyle = '#eef4ff';
+  ctx.strokeStyle = '#2c7be5';
+  ctx.lineWidth = 2;
+  ctx.fillRect(30, 84, 86, 92);
+  ctx.strokeRect(30, 84, 86, 92);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 15px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText(item.name + ' 放电管', 73, 68);
+  ctx.strokeStyle = '#f0a500';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  for (let x = 48; x <= 98; x += 4) {
+    const y = 130 + Math.sin((x - 48) / 7) * 22;
+    if (x === 48) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+  ctx.fillStyle = '#334e68';
+  ctx.fillRect(150, 62, 15, 168);
+  ctx.clearRect(154, 124, 7, 44);
+  ctx.fillStyle = '#e6fffa';
+  ctx.strokeStyle = '#38b2ac';
+  ctx.beginPath();
+  ctx.moveTo(220, 92);
+  ctx.lineTo(285, 145);
+  ctx.lineTo(220, 198);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  const sx = 110, sy = 285, sw = 480, sh = 74;
+  ctx.fillStyle = '#101820';
+  ctx.fillRect(sx, sy, sw, sh);
+  if (absorb) {
+    drawGradient(sx, sy, sw, sh);
+  }
+  item.lines.forEach((lambda, i) => {
+    const x = xFor(lambda);
+    const bright = 0.28 + excite * 0.14;
+    ctx.strokeStyle = absorb ? 'rgba(0,0,0,0.78)' : item.colors[i % item.colors.length];
+    ctx.globalAlpha = absorb ? 0.95 : bright;
+    ctx.lineWidth = item.lines.length <= 2 ? 7 : 5;
+    ctx.beginPath();
+    ctx.moveTo(x, sy);
+    ctx.lineTo(x, sy + sh);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = '#486581';
+    ctx.font = '12px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText(lambda + ' nm', x, sy + sh + 20);
+  });
+  ctx.strokeStyle = '#334e68';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(sx, sy, sw, sh);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 16px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText(absorb ? '连续背景上的暗线：吸收光谱' : '黑背景上的亮线：发射光谱', 350, 250);
+  ctx.fillStyle = '#486581';
+  ctx.font = '14px system-ui';
+  ctx.fillText('谱线位置由元素能级差决定，亮度主要由光子数决定。', 350, 398);
+
+  const first = item.lines[0];
+  const freq = 3e8 / (first * 1e-9);
+  const ev = 4.136e-15 * freq;
+  els.readout.innerHTML = [
+    `元素=${item.name}，模式=${absorb ? '吸收' : '发射'}`,
+    `可见谱线=${item.lines.join(' nm, ')} nm`,
+    `示例：λ=${first} nm，ν≈${freq.toExponential(2)} Hz`,
+    `hν≈${ev.toFixed(2)} eV；强度等级=${excite}`
+  ].join('<br>');
+}
+Object.values(els).forEach(el => {
+  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
+});
+draw();
+</script>
+</body>
+</html>

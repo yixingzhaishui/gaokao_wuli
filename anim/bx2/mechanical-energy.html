@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>机械能守恒实验台：势能、动能与耗散</title>
+<link rel="icon" href="data:,">
+<style>
+  :root {
+    --ink: #102a43;
+    --muted: #486581;
+    --line: #d9e2ec;
+    --blue: #2c7be5;
+    --purple: #7b2cbf;
+    --green: #087f5b;
+    --orange: #f08c00;
+    --red: #c92a2a;
+    --paper: #f7f9fc;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  }
+  .lab {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 12px;
+    padding: 12px;
+    min-height: 540px;
+  }
+  .stage, .card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+  }
+  .stage { overflow: hidden; position: relative; }
+  canvas { display: block; width: 100%; height: auto; touch-action: none; cursor: crosshair; }
+  .hint {
+    position: absolute;
+    left: 12px;
+    bottom: 10px;
+    color: var(--muted);
+    background: rgba(255,255,255,.9);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+  .panel { display: flex; flex-direction: column; gap: 10px; }
+  .card { padding: 10px; }
+  .task {
+    background: #fff7e6;
+    border-left: 3px solid var(--orange);
+    color: var(--muted);
+    line-height: 1.5;
+    font-size: 13px;
+  }
+  .title { font-weight: 700; margin-bottom: 7px; }
+  .param { display: grid; gap: 3px; margin: 9px 0; font-size: 13px; }
+  .param span { display: flex; justify-content: space-between; gap: 10px; color: var(--muted); }
+  .param b { color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  input[type=range] { width: 100%; accent-color: var(--blue); }
+  .buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+  button {
+    border: 1px solid #b0bcc9;
+    background: #fff;
+    border-radius: 6px;
+    padding: 7px 8px;
+    cursor: pointer;
+    color: var(--ink);
+    font-size: 13px;
+  }
+  button:hover { background: #eef2f7; }
+  button.primary { background: #e8f2ff; border-color: #8bbcff; color: #174ea6; font-weight: 700; }
+  .readout {
+    background: var(--ink);
+    color: #d9e2ec;
+    border-radius: 8px;
+    padding: 10px;
+    line-height: 1.75;
+    font-size: 13px;
+  }
+  .readout b { color: #ffd166; font-variant-numeric: tabular-nums; }
+  .formula { font-size: 13px; line-height: 1.55; color: #334e68; }
+  .status {
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 6px;
+    padding: 8px;
+    border: 1px solid #38b2ac;
+    background: #e6fffa;
+    color: var(--green);
+  }
+  @media (max-width: 780px) {
+    .lab { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="lab">
+  <div class="stage">
+    <canvas id="canvas" width="920" height="540" aria-label="机械能守恒实验台"></canvas>
+    <div class="hint">可直接拖动小球改变位置，拖动橙色高度手柄改变初始高度</div>
+  </div>
+  <div class="panel">
+    <div class="card task">
+      <b>观察任务：</b>先把 μ 调到 0，拖动小球沿轨道下滑，看 Ep 减少多少、Ek 就增加多少；再增大 μ，看机械能减少到哪里去了。
+    </div>
+    <div class="card">
+      <div class="title">实验控制</div>
+      <label class="param"><span>质量 m <b id="mText">2.0 kg</b></span><input id="m" type="range" min="0.5" max="8" step="0.1" value="2"></label>
+      <label class="param"><span>初始高度 h <b id="hText">5.0 m</b></span><input id="h" type="range" min="1" max="8" step="0.1" value="5"></label>
+      <label class="param"><span>摩擦因数 μ <b id="muText">0.00</b></span><input id="mu" type="range" min="0" max="0.45" step="0.01" value="0"></label>
+      <label class="param"><span>过程位置 <b id="uText">0%</b></span><input id="u" type="range" min="0" max="1" step="0.01" value="0"></label>
+      <div class="buttons">
+        <button class="primary" id="play">播放</button>
+        <button id="reset">重置</button>
+        <button data-case="smooth">光滑守恒</button>
+        <button data-case="rough">粗糙失守</button>
+        <button data-case="high">增大高度</button>
+        <button data-case="mass">质量变大</button>
+      </div>
+    </div>
+    <div class="readout">
+      Ek=<b id="ekText">0.0 J</b>　Ep=<b id="epText">100.0 J</b><br>
+      E机=<b id="emText">100.0 J</b>　E内=<b id="eintText">0.0 J</b><br>
+      E总=<b id="etotText">100.0 J</b>　v=<b id="vText">0.0 m/s</b>
+    </div>
+    <div class="card formula">
+      <div class="title">公式对照</div>
+      <div>E机 = Ek + Ep，对应蓝/紫/绿能量柱。</div>
+      <div>μ=0：E机 不变，Ep 减少量全部进入 Ek。</div>
+      <div>μ>0：ΔE机 = W其他，减少量进入 E内。</div>
+      <div>E总 = E机 + E内，始终等于初始 mgh。</div>
+    </div>
+    <div class="status" id="status">机械能守恒：只有重力做功，E机保持不变。</div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const root = document.defaultView || globalThis;
+  const g = 10;
+  const theta = 32 * Math.PI / 180;
+  const els = {
+    m: document.getElementById('m'),
+    h: document.getElementById('h'),
+    mu: document.getElementById('mu'),
+    u: document.getElementById('u')
+  };
+  const ui = {
+    mText: document.getElementById('mText'),
+    hText: document.getElementById('hText'),
+    muText: document.getElementById('muText'),
+    uText: document.getElementById('uText'),
+    ekText: document.getElementById('ekText'),
+    epText: document.getElementById('epText'),
+    emText: document.getElementById('emText'),
+    eintText: document.getElementById('eintText'),
+    etotText: document.getElementById('etotText'),
+    vText: document.getElementById('vText'),
+    status: document.getElementById('status'),
+    play: document.getElementById('play')
+  };
+  const state = { running: false, drag: null, hot: {}, lastTime: 0 };
+
+  function clamp(v, min, max) {
+    return Math.max(min, Math.min(max, v));
+  }
+
+  function fmt(n, d) {
+    const v = Math.abs(n) < 0.0005 ? 0 : n;
+    return v.toFixed(d == null ? 1 : d);
+  }
+
+  function p() {
+    return {
+      m: Number(els.m.value),
+      h: Number(els.h.value),
+      mu: Number(els.mu.value),
+      u: Number(els.u.value)
+    };
+  }
+
+  function setValue(name, value) {
+    const el = els[name];
+    el.value = String(clamp(value, Number(el.min), Number(el.max)));
+  }
+
+  function stopRun() {
+    state.running = false;
+    ui.play.textContent = '播放';
+  }
+
+  function calc(q) {
+    const path = q.h / Math.sin(theta);
+    const hNow = q.h * (1 - q.u);
+    const ep = q.m * g * hNow;
+    const loss = q.mu * q.m * g * Math.cos(theta) * path * q.u;
+    const ekRaw = q.m * g * q.h * q.u - loss;
+    const ek = Math.max(0, ekRaw);
+    const eint = q.m * g * q.h - ep - ek;
+    const em = ek + ep;
+    const etot = em + eint;
+    const v = Math.sqrt(Math.max(0, 2 * ek / q.m));
+    return { path, hNow, ep, ek, eint, em, etot, loss, v };
+  }
+
+  function text(s, x, y, color, align, size, weight) {
+    ctx.fillStyle = color || '#102a43';
+    ctx.font = (weight ? weight + ' ' : '') + (size || 13) + 'px -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif';
+    ctx.textAlign = align || 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(s, x, y);
+  }
+
+  function box(x, y, w, h, fill, stroke) {
+    ctx.save();
+    ctx.fillStyle = fill || '#fff';
+    ctx.strokeStyle = stroke || '#d9e2ec';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, 8);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function line(x1, y1, x2, y2, color, width, dash) {
+    ctx.save();
+    ctx.strokeStyle = color || '#486581';
+    ctx.lineWidth = width || 1;
+    ctx.setLineDash(dash || []);
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function arrow(x1, y1, x2, y2, color, width) {
+    const a = Math.atan2(y2 - y1, x2 - x1);
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = width || 2;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - 10 * Math.cos(a - 0.45), y2 - 10 * Math.sin(a - 0.45));
+    ctx.lineTo(x2 - 10 * Math.cos(a + 0.45), y2 - 10 * Math.sin(a + 0.45));
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function trackGeometry(q) {
+    const bottom = { x: 88, y: 276 };
+    const scaleY = 26;
+    const hPx = q.h * scaleY;
+    const pathPx = hPx / Math.sin(theta);
+    const top = { x: bottom.x + pathPx * Math.cos(theta), y: bottom.y - hPx };
+    const ball = {
+      x: top.x + (bottom.x - top.x) * q.u,
+      y: top.y + (bottom.y - top.y) * q.u
+    };
+    return { bottom, top, ball, hPx, pathPx, scaleY };
+  }
+
+  function drawTrack(q, r) {
+    const geo = trackGeometry(q);
+    state.hot.ball = { x: geo.ball.x, y: geo.ball.y - 12, radius: 18, geo };
+    state.hot.height = { x: geo.top.x + 36, y: geo.top.y, geo };
+
+    box(24, 48, 536, 250, '#fff', '#d9e2ec');
+    text('实物过程：拖动小球看能量转化', 292, 74, '#102a43', 'center', 16, '700');
+    line(54, geo.bottom.y, 518, geo.bottom.y, '#d9e2ec', 2);
+    line(geo.bottom.x, geo.bottom.y, geo.top.x, geo.top.y, '#334e68', 4);
+    line(geo.top.x, geo.top.y, geo.bottom.x, geo.top.y, '#9fb3c8', 1.2, [5, 4]);
+    line(geo.bottom.x, geo.bottom.y, geo.bottom.x, geo.top.y, '#f08c00', 2.4, [6, 5]);
+    text('h=' + fmt(q.h, 1) + 'm', geo.bottom.x - 38, (geo.bottom.y + geo.top.y) / 2, '#f08c00', 'center', 13, '700');
+    ctx.fillStyle = '#fff7e6';
+    ctx.strokeStyle = '#f08c00';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(geo.top.x + 36, geo.top.y, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    text('拖 h', geo.top.x + 36, geo.top.y - 18, '#b36b00', 'center', 11, '700');
+
+    const roughLen = 120;
+    if (q.mu > 0.005) {
+      line(geo.bottom.x + 30, geo.bottom.y - 2, geo.bottom.x + roughLen, geo.bottom.y - 72, '#c92a2a', 5);
+      text('粗糙段 μ=' + fmt(q.mu, 2), geo.bottom.x + 104, geo.bottom.y - 88, '#c92a2a', 'center', 12, '700');
+    }
+
+    ctx.fillStyle = '#2c7be5';
+    ctx.strokeStyle = '#174ea6';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(geo.ball.x, geo.ball.y - 12, 14, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    text('小球', geo.ball.x, geo.ball.y - 38, '#174ea6', 'center', 12, '700');
+    if (r.v > 0.05) {
+      arrow(geo.ball.x + 14, geo.ball.y - 12, geo.ball.x + 14 + Math.min(80, r.v * 9) * Math.cos(theta), geo.ball.y - 12 + Math.min(80, r.v * 9) * Math.sin(theta), '#e03131', 2.8);
+      text('v=' + fmt(r.v, 1) + 'm/s', geo.ball.x + 78, geo.ball.y + 16, '#e03131', 'center', 12, '700');
+    }
+    text('当前高度 ' + fmt(r.hNow, 1) + 'm', geo.ball.x, geo.ball.y + 18, '#486581', 'center', 12);
+    text(q.mu === 0 ? '光滑：支持力不做功，只有重力做功。' : '有摩擦：机械能转化为内能，E机会减少。', 292, 34, q.mu === 0 ? '#087f5b' : '#c92a2a', 'center', 13, '700');
+  }
+
+  function drawGraph(q, r) {
+    box(594, 48, 302, 250, '#fff', '#d9e2ec');
+    text('过程图像：E 随位置变化', 745, 74, '#102a43', 'center', 16, '700');
+    const gx = 640, gy = 112, gw = 210, gh = 132;
+    const baseY = gy + gh;
+    const maxE = q.m * g * q.h;
+    line(gx, baseY, gx + gw, baseY, '#486581', 1.4);
+    line(gx, baseY, gx, gy, '#486581', 1.4);
+    text('位置', gx + gw + 18, baseY + 12, '#486581', 'center', 12);
+    text('能量', gx - 18, gy - 8, '#486581', 'center', 12);
+    function py(v) { return baseY - (v / maxE) * gh; }
+    function curve(color, fn) {
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2.4;
+      ctx.beginPath();
+      for (let i = 0; i <= 100; i++) {
+        const u = i / 100;
+        const c = calc({ m: q.m, h: q.h, mu: q.mu, u });
+        const x = gx + gw * u;
+        const y = py(fn(c));
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
+    curve('#7b2cbf', c => c.ep);
+    curve('#2c7be5', c => c.ek);
+    curve('#087f5b', c => c.em);
+    if (q.mu > 0.005) curve('#c92a2a', c => c.eint);
+    const xNow = gx + gw * q.u;
+    line(xNow, gy - 8, xNow, baseY + 8, '#f08c00', 1.6, [5, 4]);
+    text('Ep', gx + 28, py(maxE * .86), '#7b2cbf', 'left', 12, '700');
+    text('Ek', gx + gw - 38, py(Math.max(8, r.ek)), '#2c7be5', 'left', 12, '700');
+    text('E机', gx + gw - 50, py(r.em) - 12, '#087f5b', 'left', 12, '700');
+    if (q.mu > 0.005) text('E内', gx + gw - 50, py(r.eint) + 14, '#c92a2a', 'left', 12, '700');
+    text('E总=' + fmt(r.etot, 1) + 'J', 745, 274, '#102a43', 'center', 13, '700');
+  }
+
+  function drawBars(q, r) {
+    box(24, 322, 872, 174, '#fff', '#d9e2ec');
+    text('能量账本：机械能是否守恒，看 E机；总能量守恒，看 E机 + E内', 460, 348, '#102a43', 'center', 15, '700');
+    const items = [
+      { key: 'Ek', value: r.ek, color: '#2c7be5' },
+      { key: 'Ep', value: r.ep, color: '#7b2cbf' },
+      { key: 'E机', value: r.em, color: '#087f5b' },
+      { key: 'E内', value: r.eint, color: '#c92a2a' },
+      { key: 'E总', value: r.etot, color: '#f08c00' }
+    ];
+    const base = 430;
+    const maxE = q.m * g * q.h;
+    line(110, base, 830, base, '#486581', 1.5);
+    items.forEach((item, i) => {
+      const x = 150 + i * 135;
+      const h = Math.max(2, item.value / maxE * 62);
+      ctx.fillStyle = item.color;
+      ctx.fillRect(x, base - h, 54, h);
+      ctx.strokeStyle = '#102a43';
+      ctx.strokeRect(x, base - 62, 54, 62);
+      text(item.key, x + 27, 474, '#334e68', 'center', 13, '700');
+      text(fmt(item.value, 1), x + 27, base - h - 12, item.color, 'center', 12, '700');
+    });
+    text(q.mu === 0 ? '守恒检查：E机 = E总，绿色柱不变。' : '不守恒检查：E机减少，红色 E内 增加，但橙色 E总不变。', 460, 310, q.mu === 0 ? '#087f5b' : '#c92a2a', 'center', 13, '700');
+  }
+
+  function updatePanel(q, r) {
+    ui.mText.textContent = fmt(q.m, 1) + ' kg';
+    ui.hText.textContent = fmt(q.h, 1) + ' m';
+    ui.muText.textContent = fmt(q.mu, 2);
+    ui.uText.textContent = Math.round(q.u * 100) + '%';
+    ui.ekText.textContent = fmt(r.ek, 1) + ' J';
+    ui.epText.textContent = fmt(r.ep, 1) + ' J';
+    ui.emText.textContent = fmt(r.em, 1) + ' J';
+    ui.eintText.textContent = fmt(r.eint, 1) + ' J';
+    ui.etotText.textContent = fmt(r.etot, 1) + ' J';
+    ui.vText.textContent = fmt(r.v, 1) + ' m/s';
+    if (q.mu === 0) {
+      ui.status.textContent = '机械能守恒：只有重力做功，E机保持不变。';
+      ui.status.style.background = '#e6fffa';
+      ui.status.style.color = '#087f5b';
+      ui.status.style.borderColor = '#38b2ac';
+    } else {
+      ui.status.textContent = '机械能不守恒：摩擦做负功，E机减少并转化为内能。';
+      ui.status.style.background = '#fff0f0';
+      ui.status.style.color = '#c92a2a';
+      ui.status.style.borderColor = '#ff6b6b';
+    }
+  }
+
+  function draw() {
+    const q = p();
+    const r = calc(q);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#f7f9fc';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    drawTrack(q, r);
+    drawGraph(q, r);
+    drawBars(q, r);
+    updatePanel(q, r);
+  }
+
+  function eventPos(ev) {
+    const src = ev.touches && ev.touches.length ? ev.touches[0] : (ev.changedTouches && ev.changedTouches.length ? ev.changedTouches[0] : ev);
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: (src.clientX - rect.left) * canvas.width / rect.width,
+      y: (src.clientY - rect.top) * canvas.height / rect.height
+    };
+  }
+
+  function dist(a, x, y) {
+    return Math.hypot(a.x - x, a.y - y);
+  }
+
+  function setProgressFromPoint(pos) {
+    const geo = state.hot.ball.geo;
+    const vx = geo.bottom.x - geo.top.x;
+    const vy = geo.bottom.y - geo.top.y;
+    const wx = pos.x - geo.top.x;
+    const wy = pos.y - geo.top.y;
+    const u = (wx * vx + wy * vy) / (vx * vx + vy * vy);
+    setValue('u', u);
+  }
+
+  function setHeightFromPoint(pos) {
+    const geo = state.hot.height.geo;
+    const h = (geo.bottom.y - pos.y) / geo.scaleY;
+    setValue('h', h);
+  }
+
+  function startDrag(ev) {
+    const pos = eventPos(ev);
+    draw();
+    if (state.hot.ball && dist(state.hot.ball, pos.x, pos.y) < 28) state.drag = 'ball';
+    else if (state.hot.height && dist(state.hot.height, pos.x, pos.y) < 24) state.drag = 'height';
+    if (state.drag) {
+      stopRun();
+      if (ev.pointerId != null && canvas.setPointerCapture) canvas.setPointerCapture(ev.pointerId);
+      ev.preventDefault();
+    }
+  }
+
+  function moveDrag(ev) {
+    if (!state.drag) return;
+    const pos = eventPos(ev);
+    if (state.drag === 'ball') setProgressFromPoint(pos);
+    if (state.drag === 'height') setHeightFromPoint(pos);
+    draw();
+    ev.preventDefault();
+  }
+
+  function endDrag(ev) {
+    if (state.drag && ev.pointerId != null && canvas.hasPointerCapture && canvas.hasPointerCapture(ev.pointerId)) {
+      canvas.releasePointerCapture(ev.pointerId);
+    }
+    state.drag = null;
+  }
+
+  if (root.PointerEvent) {
+    canvas.addEventListener('pointerdown', startDrag);
+    canvas.addEventListener('pointermove', moveDrag);
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(type => canvas.addEventListener(type, endDrag));
+  } else {
+    canvas.addEventListener('mousedown', startDrag);
+    root.addEventListener('mousemove', moveDrag);
+    root.addEventListener('mouseup', endDrag);
+    canvas.addEventListener('touchstart', startDrag, { passive: false });
+    root.addEventListener('touchmove', moveDrag, { passive: false });
+    root.addEventListener('touchend', endDrag);
+    root.addEventListener('touchcancel', endDrag);
+  }
+
+  Object.values(els).forEach(el => {
+    el.addEventListener('input', () => {
+      stopRun();
+      draw();
+    });
+  });
+
+  ui.play.addEventListener('click', () => {
+    state.running = !state.running;
+    ui.play.textContent = state.running ? '暂停' : '播放';
+    state.lastTime = performance.now();
+  });
+
+  document.getElementById('reset').addEventListener('click', () => {
+    setValue('m', 2);
+    setValue('h', 5);
+    setValue('mu', 0);
+    setValue('u', 0);
+    stopRun();
+    draw();
+  });
+
+  document.querySelectorAll('button[data-case]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const name = btn.dataset.case;
+      if (name === 'smooth') {
+        setValue('m', 2); setValue('h', 5); setValue('mu', 0); setValue('u', 0.75);
+      } else if (name === 'rough') {
+        setValue('m', 2); setValue('h', 5); setValue('mu', 0.25); setValue('u', 0.75);
+      } else if (name === 'high') {
+        setValue('m', 2); setValue('h', 7); setValue('mu', 0); setValue('u', 1);
+      } else {
+        setValue('m', 5); setValue('h', 5); setValue('mu', 0); setValue('u', 1);
+      }
+      stopRun();
+      draw();
+    });
+  });
+
+  function tick(now) {
+    if (state.running) {
+      const dt = Math.min(0.035, (now - state.lastTime) / 1000 || 0.016);
+      state.lastTime = now;
+      let next = Number(els.u.value) + dt * 0.35;
+      if (next > 1) next = 0;
+      els.u.value = String(next);
+    }
+    draw();
+    requestAnimationFrame(tick);
+  }
+
+  draw();
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>导轨模型 3D 多视角</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#eef3f8;color:#102a43}
+.container{padding:12px}
+h2{font-size:16px;margin:0 0 8px;color:#102a43}
+canvas{display:block;width:100%;max-width:780px;background:#f8fbff;border:1px solid #cad7e3;border-radius:8px;touch-action:none;cursor:grab}
+.readouts{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;font-size:13px}
+.r{background:#102a43;color:#e8f1fb;padding:6px 10px;border-radius:6px}
+.r b{color:#ffd166}
+.controls{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0;align-items:center}
+.controls label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:#334e68}
+.controls input[type=range]{width:116px;accent-color:#2c7be5}
+button{font:inherit;padding:6px 12px;border:1px solid #b6c5d4;background:#fff;border-radius:6px;cursor:pointer}
+button.on{background:#2c7be5;color:#fff;border-color:#2c7be5}
+.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:9px 12px;border-radius:4px;font-size:13px;color:#486581;line-height:1.55;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>导轨模型 3D 透视实验台：动生电动势 E = BLv</h2>
+  <canvas id="canvas" width="780" height="500"></canvas>
+  <div class="readouts">
+    <span class="r">E = BLv = <b id="e-v">0.00</b> V</span>
+    <span class="r">I = E/R = <b id="i-v">0.00</b> A</span>
+    <span class="r">F安 = BIL = <b id="f-v">0.00</b> N</span>
+    <span class="r">P = I²R = <b id="p-v">0.00</b> W</span>
+    <span class="r">状态：<b id="state-v">—</b></span>
+  </div>
+  <div class="controls">
+    <label>速度 v = <span id="v-d">5.0</span> m/s<input id="v" type="range" min="-90" max="90" step="1" value="50"></label>
+    <label>磁场 B = <span id="b-d">0.60</span> T<input id="b" type="range" min="-100" max="100" step="1" value="60"></label>
+    <label>导轨宽度 L = <span id="l-d">0.58</span> m<input id="l" type="range" min="25" max="90" step="1" value="58"></label>
+    <label>电阻 R = <span id="r-d">2.0</span> Ω<input id="r" type="range" min="5" max="100" step="1" value="20"></label>
+    <label>3D观察角 = <span id="cam-d">18</span>°<input id="cam" type="range" min="-55" max="55" step="1" value="18"></label>
+    <button id="play-btn" class="on">暂停</button>
+    <button id="reverse-b">磁场反向</button>
+    <button id="reverse-v">速度反向</button>
+    <button id="reset-btn">重置</button>
+  </div>
+  <div class="hint">
+    <b>观察任务</b>：先在左侧 <b>3D 透视实验台装置</b>分清三条方向：绿色 v 沿导轨方向，蓝色/红色 B 垂直穿过导轨平面，橙色 I 沿闭合回路。再看右上<b>俯视图像</b>确认面积 S=Lx 如何变化，右中放大图看杆内电荷被 qvB 推向两端。反向 v 或 B，电流方向会变，但安培力始终阻碍杆运动。
+  </div>
+</div>
+<script>
+(function(){
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+let playing=true,last=performance.now(),xRod=0.62,trail=[],dragRod=false,lastDragX=0,lastDragT=performance.now();
+function el(id){return document.getElementById(id)}
+function raw(id){return Number(el(id).value)}
+function v(){return raw('v')/10}
+function B(){return raw('b')/100}
+function L(){return raw('l')/100}
+function R(){return raw('r')/10}
+function cam(){return raw('cam')*Math.PI/180}
+function E(){return B()*L()*v()}
+function I(){return R()>0?E()/R():0}
+function F(){return Math.abs(B()*I()*L())}
+function P(){return I()*I()*R()}
+function sgn(x){return x<0?-1:x>0?1:0}
+function clamp(x,a,b){return Math.max(a,Math.min(b,x))}
+function rr(x,y,w,h,r,fill,stroke){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke()}}
+function text(s,x,y,size=12,color='#334e68',weight='700',align='left'){ctx.fillStyle=color;ctx.font=`${weight} ${size}px system-ui`;ctx.textAlign=align;ctx.fillText(s,x,y)}
+function arrow(x1,y1,x2,y2,color,lw=2,label=''){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=lw;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-9*Math.cos(a-.48),y2-9*Math.sin(a-.48));ctx.lineTo(x2-9*Math.cos(a+.48),y2-9*Math.sin(a+.48));ctx.closePath();ctx.fill();ctx.lineCap='butt';if(label)text(label,x2+7*Math.cos(a),y2+7*Math.sin(a)-4,12,color,'900')}
+function project(p){const ca=Math.cos(cam()),sa=Math.sin(cam());const xr=p.x*ca-p.z*sa,zr=p.x*sa+p.z*ca;const sc=255/(255+zr*.34);return{x:250+xr*sc,y:255+p.y*sc-zr*.18,sc}}
+function line3(a,b,color,lw=5){const p=project(a),q=project(b);ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();ctx.lineCap='butt'}
+function arrow3(a,b,color,lw=3,label=''){const p=project(a),q=project(b);arrow(p.x,p.y,q.x,q.y,color,lw,label)}
+function drawPanel(){
+  rr(18,38,488,314,8,'#fff','#d7e2ec');
+  text('3D透视实验台装置：v、B、L 三个方向必须分清',36,64,13,'#334e68','900');
+  ctx.strokeStyle='rgba(82,112,140,0.16)';
+  for(let x=46;x<486;x+=28){ctx.beginPath();ctx.moveTo(x,90);ctx.lineTo(x+52,326);ctx.stroke()}
+  for(let y=108;y<330;y+=28){ctx.beginPath();ctx.moveTo(44,y);ctx.lineTo(486,y-22);ctx.stroke()}
+}
+function drawField3D(){
+  const col=B()>=0?'rgba(44,123,229,.36)':'rgba(214,69,69,.36)';
+  for(let ix=-2;ix<=3;ix++)for(let iy=-2;iy<=2;iy++){
+    const base={x:-175+ix*66,y:iy*42,z:0};
+    arrow3({x:base.x,y:base.y,z:B()>=0?-70:70},{x:base.x,y:base.y,z:B()>=0?70:-70},col,1.7);
+  }
+}
+function drawRails(){
+  const half=50+L()*110,left=-170,right=-170+xRod*388,z=0;
+  const area=[project({x:left,y:-half,z}),project({x:right,y:-half,z}),project({x:right,y:half,z}),project({x:left,y:half,z})];
+  ctx.beginPath();area.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();ctx.fillStyle='rgba(124,58,237,.12)';ctx.fill();ctx.strokeStyle='rgba(124,58,237,.38)';ctx.lineWidth=2;ctx.stroke();
+  line3({x:left,y:-half,z},{x:right+54,y:-half,z},'#475569',7);
+  line3({x:left,y:half,z},{x:right+54,y:half,z},'#475569',7);
+  line3({x:left,y:-half,z},{x:left,y:half,z},'#64748b',7);
+  line3({x:right,y:-half-10,z},{x:right,y:half+10,z},'#0f172a',12);
+  line3({x:right,y:-half-3,z},{x:right,y:half+3,z},'#ffb703',6);
+  const mid={x:right,y:0,z};
+  if(Math.abs(v())>.04)arrow3(mid,{x:right+sgn(v())*78,y:0,z},'#16a34a',4,'v');
+  if(Math.abs(B())>.02)arrow3({x:right+28,y:0,z:B()>0?-56:56},{x:right+28,y:0,z:B()>0?56:-56},B()>0?'#2563eb':'#dc2626',4,'B');
+  if(Math.abs(v())>.04&&Math.abs(B())>.02)arrow3({x:right,y:26,z},{x:right-sgn(v())*62,y:26,z},'#dc2626',4,'F安');
+  drawCurrent3D(left,right,half,z);
+  const top=project({x:right+16,y:-half,z}),bot=project({x:right+16,y:half,z});
+  if(Math.abs(E())>.02){text(E()>0?'+':'−',top.x,top.y-8,22,E()>0?'#dc2626':'#2563eb','950','center');text(E()>0?'−':'+',bot.x,bot.y+20,22,E()>0?'#2563eb':'#dc2626','950','center')}
+  text('R',project({x:left-8,y:0,z}).x-16,project({x:left-8,y:0,z}).y+6,22,'#ea580c','950');
+  text('L',project({x:right+36,y:0,z}).x+10,project({x:right+36,y:0,z}).y+4,13,'#334e68','900');
+  return {left,right,half};
+}
+function drawCurrent3D(left,right,half,z){
+  if(Math.abs(I())<.01)return;
+  const c='#ea580c',cw=I()>0;
+  if(cw){arrow3({x:left+28,y:-half,z},{x:right-30,y:-half,z},c,3,'I');arrow3({x:right,y:-half+24,z},{x:right,y:half-24,z},c,3);arrow3({x:right-30,y:half,z},{x:left+28,y:half,z},c,3);arrow3({x:left,y:half-24,z},{x:left,y:-half+24,z},c,3)}
+  else{arrow3({x:right-30,y:-half,z},{x:left+28,y:-half,z},c,3,'I');arrow3({x:right,y:half-24,z},{x:right,y:-half+24,z},c,3);arrow3({x:left+28,y:half,z},{x:right-30,y:half,z},c,3);arrow3({x:left,y:-half+24,z},{x:left,y:half-24,z},c,3)}
+}
+function drawTopView(){
+  rr(524,38,232,138,8,'#fff','#d7e2ec');text('俯视：扫过面积 S=Lx',540,63,13,'#334e68','900');
+  const left=552,right=552+xRod*160,top=85,bottom=85+L()*112;
+  ctx.fillStyle='rgba(124,58,237,.13)';ctx.fillRect(left,top,right-left,bottom-top);ctx.strokeStyle='rgba(124,58,237,.50)';ctx.setLineDash([6,4]);ctx.strokeRect(left,top,right-left,bottom-top);ctx.setLineDash([]);
+  ctx.strokeStyle='#475569';ctx.lineWidth=5;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(left,top);ctx.lineTo(736,top);ctx.moveTo(left,bottom);ctx.lineTo(736,bottom);ctx.stroke();ctx.lineCap='butt';
+  ctx.strokeStyle='#0f172a';ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(right,top-7);ctx.lineTo(right,bottom+7);ctx.stroke();
+  if(Math.abs(v())>.04)arrow(right,(top+bottom)/2,right+sgn(v())*38,(top+bottom)/2,'#16a34a',3,'v');
+  text(B()>=0?'B：向外 •':'B：向里 ×',540,162,11,B()>=0?'#2563eb':'#dc2626','850');
+}
+function drawRodInside(){
+  rr(524,188,232,116,8,'#fff','#d7e2ec');text('杆内放大：qvB 分离电荷',540,213,13,'#334e68','900');
+  const x=636,y1=232,y2=282;ctx.strokeStyle='#0f172a';ctx.lineWidth=12;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x,y1);ctx.lineTo(x,y2);ctx.stroke();ctx.strokeStyle='#f8fafc';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(x,y1+3);ctx.lineTo(x,y2-3);ctx.stroke();ctx.lineCap='butt';
+  if(Math.abs(E())>.02){text(E()>0?'+':'−',x,y1-11,20,E()>0?'#dc2626':'#2563eb','950','center');text(E()>0?'−':'+',x,y2+24,20,E()>0?'#2563eb':'#dc2626','950','center');arrow(x-72,(y1+y2)/2,x-28,(y1+y2)/2,'#16a34a',3,'v');arrow(x+34,(y1+y2)/2,x+34,E()>0?y1+6:y2-6,'#0891b2',3,'qvB')}
+  text('电荷分离 → 电势差',540,294,11,'#486581','800');
+}
+function drawMeterPower(){
+  rr(524,316,232,68,8,'#fff','#d7e2ec');
+  text('能量链：外力做功 → 电能/热',540,342,13,'#334e68','900');
+  const bar=clamp(P()/20,0,1);ctx.fillStyle='#e6edf5';ctx.fillRect(540,356,176,12);ctx.fillStyle='#f08c00';ctx.fillRect(540,356,176*bar,12);text('P=I²R',720,367,11,'#f08c00','900');
+}
+function drawGraph(){
+  rr(28,400,724,78,8,'#fff','#d7e2ec');text('Φ 图像：斜率 dΦ/dt = BLv；v=0 时 E=0',44,424,13,'#334e68','900');
+  const ox=58,oy=458,w=660;ctx.strokeStyle='#cbd5e1';ctx.beginPath();ctx.moveTo(ox,oy);ctx.lineTo(ox+w,oy);ctx.stroke();
+  if(trail.length>1){ctx.beginPath();trail.forEach((p,i)=>{const x=ox+i*w/150,y=oy-p*34;if(i)ctx.lineTo(x,y);else ctx.moveTo(x,y)});ctx.strokeStyle='#7c3aed';ctx.lineWidth=2.5;ctx.stroke()}
+  text('Φ',44,446,11,'#7c3aed','900');text('dΦ/dt=BLv='+E().toFixed(2),610,424,11,'#7c3aed','900');
+}
+function update(dt){if(playing){xRod+=v()*dt*.012;if(xRod<.20)xRod=.20;if(xRod>.94)xRod=.94}trail.push(B()*L()*xRod);if(trail.length>151)trail.shift()}
+function draw(){
+  ctx.clearRect(0,0,780,500);ctx.fillStyle='#f8fbff';ctx.fillRect(0,0,780,500);
+  drawPanel();drawField3D();drawRails();drawTopView();drawRodInside();drawMeterPower();drawGraph();
+  ctx.fillStyle='rgba(255,255,255,0.88)';ctx.fillRect(36,358,462,34);
+  text('公式：E=BLv='+E().toFixed(2)+'V，I=E/R='+I().toFixed(2)+'A，F安=BIL='+F().toFixed(2)+'N，P=I²R='+P().toFixed(2)+'W',42,374,11,'#243b53','700');
+  text('多视角：3D透视导轨 + 俯视扫面积 + 杆内电荷分离 + Φ/功率记录',42,388,11,'#243b53','700');
+}
+function sync(){
+  el('v-d').textContent=v().toFixed(1);el('b-d').textContent=B().toFixed(2);el('l-d').textContent=L().toFixed(2);el('r-d').textContent=R().toFixed(1);el('cam-d').textContent=raw('cam');
+  el('e-v').textContent=Math.abs(E()).toFixed(2);el('i-v').textContent=Math.abs(I()).toFixed(2);el('f-v').textContent=F().toFixed(2);el('p-v').textContent=P().toFixed(2);
+  el('state-v').textContent=Math.abs(v())<.05?'v=0，E=0':(F()>0?'安培力阻碍运动':'无明显电流');
+}
+function pos(e){const r=canvas.getBoundingClientRect(),sx=canvas.width/r.width,sy=canvas.height/r.height;return{x:(e.clientX-r.left)*sx,y:(e.clientY-r.top)*sy}}
+canvas.addEventListener('pointerdown',e=>{const p=pos(e);if(p.x>70&&p.x<500&&p.y>90&&p.y<335){dragRod=true;playing=false;el('play-btn').classList.remove('on');el('play-btn').textContent='播放';lastDragX=p.x;lastDragT=performance.now();canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing'}});
+canvas.addEventListener('pointermove',e=>{if(!dragRod)return;const p=pos(e),now=performance.now();xRod=clamp((p.x-95)/388,.2,.94);const sp=(p.x-lastDragX)/Math.max((now-lastDragT)/1000,0.016);el('v').value=clamp(Math.round(sp/8),-90,90);lastDragX=p.x;lastDragT=now;trail=[];sync();draw()});
+window.addEventListener('pointerup',()=>{dragRod=false;canvas.style.cursor='grab'});
+['v','b','l','r','cam'].forEach(id=>el(id).addEventListener('input',()=>{trail=[];sync();draw()}));
+el('play-btn').onclick=function(){playing=!playing;this.classList.toggle('on',playing);this.textContent=playing?'暂停':'播放'};
+el('reverse-b').onclick=()=>{el('b').value=-raw('b');trail=[];sync();draw()};
+el('reverse-v').onclick=()=>{el('v').value=-raw('v');trail=[];sync();draw()};
+el('reset-btn').onclick=()=>{xRod=.62;trail=[];sync();draw()};
+function loop(now){const dt=Math.min((now-last)/1000,.05);last=now;update(dt);sync();draw();requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

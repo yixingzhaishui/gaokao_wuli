@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>平抛运动实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#edf3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px;min-height:560px}
+  .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;touch-action:none}
+  .panel{display:flex;flex-direction:column;gap:8px}
+  .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
+  .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.45}
+  .title{font-weight:800;margin-bottom:5px;color:#0f172a}
+  .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:31px;cursor:pointer;color:#102a43}
+  .primary{background:#2563eb;color:#fff;border-color:#2563eb}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:48px}
+  .meter span{display:block;font-size:11px;color:#b6c5d8}
+  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:16px;font-variant-numeric:tabular-nums}
+  .formula{display:grid;gap:5px;font-size:13px;color:#334155}
+  .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
+  .formula div:last-child{border-bottom:0;padding-bottom:0}
+  .formula b{white-space:nowrap;color:#0f172a}
+  .small{font-size:12px;line-height:1.5;color:#475569}
+  .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="平抛运动交互实验台"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>拖大蓝色 v0 箭头，看射程变大但落地时间不变；拖高桌面，看时间和射程一起变大。</div>
+    <button id="playBtn" class="primary">播放</button>
+    <div class="card">
+      <div class="title">快速情境</div>
+      <div class="chips">
+        <button data-case="base">基础</button>
+        <button data-case="fast">初速更大</button>
+        <button data-case="high">高度更高</button>
+        <button data-case="moon">小 g</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="title">实时读数</div>
+      <div class="readout">
+        <div class="meter"><span>落地时间</span><b id="timeText">1.26 s</b></div>
+        <div class="meter"><span>水平射程</span><b id="rangeText">12.6 m</b></div>
+        <div class="meter"><span>当前 vy</span><b id="vyText">6.3 m/s</b></div>
+        <div class="meter"><span>落地速度</span><b id="vText">16.1 m/s</b></div>
+      </div>
+    </div>
+    <div class="card formula">
+      <div><span>水平</span><b>x=v0t</b></div>
+      <div><span>竖直</span><b>y=1/2gt²</b></div>
+      <div><span>落地时间</span><b>t=√(2h/g)</b></div>
+    </div>
+    <div class="card small"><b>可直接操作：</b>抓蓝色 v0 箭头端点、桌面高度手柄，或拖底部 v0、h、g、t 四个手柄。多视角：左侧是侧视实物轨迹，右侧是分运动图像记录和读数。</div>
+    <div class="status" id="status">水平匀速、竖直自由落体，两个分运动同时发生。</div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const state={v0:10,h:8,g:10,t:.5,running:false,drag:null};
+  const els={time:document.getElementById('timeText'),range:document.getElementById('rangeText'),vy:document.getElementById('vyText'),v:document.getElementById('vText'),status:document.getElementById('status'),play:document.getElementById('playBtn')};
+  const colors={red:'#dc2626',blue:'#2563eb',purple:'#7c3aed',green:'#0f766e',orange:'#f59e0b',ink:'#102a43'};
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  const fmt=(v,d=1)=>v.toFixed(d);
+  function values(){const tf=Math.sqrt(2*state.h/state.g),range=state.v0*tf,tc=clamp(state.t,0,tf),x=state.v0*tc,y=.5*state.g*tc*tc,vy=state.g*tc,vLand=Math.sqrt(state.v0*state.v0+2*state.g*state.h),theta=Math.atan2(Math.sqrt(2*state.g*state.h),state.v0)*180/Math.PI;return{tf,range,tc,x,y,vy,vLand,theta}}
+  function layout(v){const bottom=398,left=96,heightPx=80+(state.h-2)/18*220,top=bottom-heightPx,yScale=heightPx/state.h,xScale=Math.min(440/Math.max(v.range,1),32);return{bottom,left,top,heightPx,yScale,xScale,launchX:left+58,launchY:top}}
+  function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){ctx.fillStyle=c;ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+  function line(x1,y1,x2,y2,c='#94a3b8',w=2,dash){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
+  function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore()}
+  function roundRect(x,y,w,h,r,fill,stroke){ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}ctx.restore()}
+  function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-36,c,'center',12,'900')}
+  function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-20,active?'#92400e':c,'center',12,'900');ctx.restore()}
+  function geom(v){const tf=v.tf;return{v0:{x:104+(state.v0-2)/28*150,y:494},h:{x:300+(state.h-2)/18*150,y:494},g:{x:500+(state.g-1)/19*150,y:494},t:{x:704+state.t/Math.max(tf,.1)*150,y:494}}}
+  function pointAt(t,L){return{x:L.launchX+state.v0*t*L.xScale,y:L.launchY+.5*state.g*t*t*L.yScale}}
+  function drawScene(v,L){
+    roundRect(42,58,560,382,8,'#fff','#d7dee8');
+    line(72,L.bottom,568,L.bottom,'#334155',3);
+    roundRect(72,L.top,82,L.heightPx,4,'#dbe4ee','#334155');
+    text(`h=${fmt(state.h)}m`,86,L.top+L.heightPx/2,'#475569','left',12,'900');
+    line(64,L.top,64,L.bottom,colors.orange,3);handle(64,L.top,`h`,state.drag==='heightDirect',colors.orange);
+    ctx.save();ctx.strokeStyle='#334155';ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=120;i++){const p=pointAt(v.tf*i/120,L);if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y)}ctx.stroke();ctx.restore();
+    for(let i=0;i<=6;i++){const tt=v.tf*i/6,p=pointAt(tt,L);ctx.fillStyle=colors.red;ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fill();ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(p.x,L.launchY,3,0,Math.PI*2);ctx.fill();ctx.fillStyle=colors.purple;ctx.beginPath();ctx.arc(L.launchX,p.y,3,0,Math.PI*2);ctx.fill()}
+    const p=pointAt(v.tc,L);
+    ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(p.x,p.y,11,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();
+    const v0End={x:L.launchX+40+state.v0*4,y:L.launchY};
+    arrow(L.launchX,L.launchY,v0End.x,v0End.y,colors.blue,4);text(`v0=${fmt(state.v0)}m/s`,v0End.x+12,v0End.y-12,colors.blue,'left',13,'900');
+    ctx.save();ctx.fillStyle=state.drag==='v0Direct'?'#fde68a':'#fff';ctx.strokeStyle=state.drag==='v0Direct'?'#d97706':colors.blue;ctx.lineWidth=3;ctx.beginPath();ctx.arc(v0End.x,v0End.y,9,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();
+    arrow(p.x,p.y,p.x+state.v0*4,p.y,colors.blue,3);text('vx=v0',p.x+state.v0*4+10,p.y,colors.blue,'left',12,'900');
+    if(v.tc>0)arrow(p.x,p.y,p.x,p.y+Math.min(96,v.vy*4),colors.purple,3);
+    text('vy=gt',p.x-12,p.y+Math.min(80,v.vy*2)+18,colors.purple,'right',12,'900');
+    line(L.launchX,L.bottom,L.launchX+v.range*L.xScale,L.bottom,colors.orange,5);
+    text(`x=${fmt(v.range)}m`,L.launchX+v.range*L.xScale/2,L.bottom+22,colors.orange,'center',13,'900');
+    text('蓝点等间距：水平匀速；紫点间距增大：竖直加速',312,428,'#475569','center',13,'900');
+  }
+  function drawExplain(v){
+    roundRect(632,80,230,122,8,'#f8fafc','#d7dee8');text('谁决定什么？',747,106,'#0f172a','center',15,'900');text('时间只由 h 和 g 决定',747,140,colors.purple,'center',13,'900');text('射程由 v0 × 时间决定',747,170,colors.orange,'center',13,'900');
+    roundRect(632,244,230,120,8,'#fff','#d7dee8');text('当前落地',747,272,'#0f172a','center',15,'900');text(`t=${fmt(v.tf,2)}s`,747,308,colors.purple,'center',18,'900');text(`v=${fmt(v.vLand)}m/s，θ=${fmt(v.theta)}°`,747,338,'#475569','center',12,'700');
+  }
+  function update(v){els.time.textContent=`${fmt(v.tf,2)} s`;els.range.textContent=`${fmt(v.range)} m`;els.vy.textContent=`${fmt(v.vy)} m/s`;els.v.textContent=`${fmt(v.vLand)} m/s`;els.status.textContent='落地时间由竖直方向决定；v0 只通过 x=v0t 改变射程。';els.play.textContent=state.running?'暂停':'播放'}
+  function draw(){const v=values(),L=layout(v),g0=geom(v);ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('平抛运动实验台：水平匀速 + 竖直自由落体',460,30,'#0f172a','center',19,'900');drawScene(v,L);drawExplain(v);roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(104,494,254,'v0',colors.blue);handle(g0.v0.x,g0.v0.y,`v0=${fmt(state.v0)}`,state.drag==='v0',colors.blue);ruler(300,494,450,'h',colors.orange);handle(g0.h.x,g0.h.y,`h=${fmt(state.h)}`,state.drag==='h',colors.orange);ruler(500,494,650,'g',colors.purple);handle(g0.g.x,g0.g.y,`g=${fmt(state.g)}`,state.drag==='g',colors.purple);ruler(704,494,854,'t',colors.green);handle(g0.t.x,g0.t.y,`t=${fmt(v.tc,2)}s`,state.drag==='t',colors.green);update(v)}
+  function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+  function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+  function directGeom(){const v=values(),L=layout(v),v0End={x:L.launchX+40+state.v0*4,y:L.launchY};return{v,L,v0End,height:{x:64,y:L.top}}}
+  function down(e){const p=pos(e),v=values(),g0=geom(v),d=directGeom();if(near(p,d.v0End,30))state.drag='v0Direct';else if(near(p,d.height,28))state.drag='heightDirect';else if(near(p,g0.v0,26))state.drag='v0';else if(near(p,g0.h,26))state.drag='h';else if(near(p,g0.g,26))state.drag='g';else if(near(p,g0.t,26))state.drag='t';else state.drag=null;if(state.drag){state.running=false;canvas.setPointerCapture(e.pointerId);move(e)}}
+  function move(e){if(!state.drag)return;const p=pos(e),v=values();if(state.drag==='v0')state.v0=clamp(2+(p.x-104)/150*28,2,30);if(state.drag==='h')state.h=clamp(2+(p.x-300)/150*18,2,20);if(state.drag==='g')state.g=clamp(1+(p.x-500)/150*19,1,20);if(state.drag==='t')state.t=clamp((p.x-704)/150*v.tf,0,v.tf);if(state.drag==='v0Direct')state.v0=clamp((p.x-136)/4,2,30);if(state.drag==='heightDirect'){const bottom=398,heightPx=clamp(bottom-p.y,80,300);state.h=clamp(2+(heightPx-80)/220*18,2,20)}draw()}
+  function up(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
+  canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
+  els.play.addEventListener('click',()=>{state.running=!state.running;draw()});
+  document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='base'){state.v0=10;state.h=8;state.g=10;state.t=.5}if(c==='fast'){state.v0=20;state.h=8;state.g=10;state.t=.5}if(c==='high'){state.v0=10;state.h=16;state.g=10;state.t=.5}if(c==='moon'){state.v0=10;state.h=8;state.g=1.6;state.t=.5}draw()}));
+  function tick(){if(state.running){const v=values();state.t+=.012;if(state.t>v.tf)state.t=0}draw();requestAnimationFrame(tick)}
+  draw();requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

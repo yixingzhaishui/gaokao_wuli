@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>电磁波传播</title>
+<link rel="stylesheet" href="../common/controls.css">
+<style>
+body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#f7f9fc;color:#1f2933}
+.container{padding:12px}
+canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid #d9e2ec;border-radius:8px}
+.readouts{display:flex;flex-wrap:wrap;gap:12px;margin:10px 0;font-size:14px}
+.readouts .r{background:#102a43;color:#d9e2ec;padding:6px 12px;border-radius:6px}
+.readouts .r b{color:#f0a500}
+.controls{display:flex;flex-wrap:wrap;gap:16px;margin:10px 0;align-items:center}
+.controls label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:#334e68}
+.controls input[type=range]{width:140px;accent-color:#2c7be5}
+.controls button{font:inherit;padding:6px 16px;border:1px solid #b0bcc9;background:#fff;border-radius:6px;cursor:pointer}
+.controls button:hover{background:#eef2f7}
+.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:8px 12px;border-radius:4px;font-size:13px;color:#486581;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>电磁波：E ⊥ B ⊥ 传播方向 k</h2>
+  <canvas id="canvas" width="600" height="380"></canvas>
+  <div class="readouts">
+    <span class="r">频率 f = <b id="f-val">2.0</b> GHz</span>
+    <span class="r">波长 λ = <b id="lam-val">150</b> mm</span>
+    <span class="r">周期 T = <b id="t-val">0.50</b> ns</span>
+    <span class="r">播放状态：<b id="state-val">播放中</b></span>
+  </div>
+  <div class="controls">
+    <label>频率 f = <span id="f-display">2.0</span> GHz
+      <input type="range" id="freq" min="0.5" max="5" step="0.1" value="2"></label>
+    <label>振幅 = <span id="a-display">40</span>
+      <input type="range" id="amp" min="10" max="60" step="2" value="40"></label>
+    <button id="play-btn">暂停</button>
+    <button id="reset-btn">重置</button>
+  </div>
+  <div class="hint">
+    <p><b>观察任务</b>：看红色 E 场（竖直方向）和蓝色 B 场（垂直纸面方向的投影）如何同频同相振动，且都垂直于传播方向（绿色箭头 k）。拖动 f 或画面里的 λ 手柄，看波长如何反比变化。</p>
+  </div>
+</div>
+<script>
+(function(){
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  let freq=2,amp=40;
+  let running=true,t=0,dragLambda=false;
+  const c=3e8; // speed of light
+
+  function updateReadouts(){
+    const lambda=c/(freq*1e9)*1000; // mm
+    const T=1/(freq*1e9)*1e9; // ns
+    document.getElementById('f-val').textContent=freq.toFixed(1);
+    document.getElementById('lam-val').textContent=lambda.toFixed(0);
+    document.getElementById('t-val').textContent=T.toFixed(2);
+    document.getElementById('state-val').textContent=running?'播放中：E、B 同频同相振动':'已暂停';
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    const cx=80,cy=H/2;
+    const len=W-120;
+    // propagation axis (k direction)
+    ctx.strokeStyle='#486581';ctx.lineWidth=1.5;
+    ctx.setLineDash([5,3]);
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+len,cy);ctx.stroke();
+    ctx.setLineDash([]);
+    // k arrow
+    ctx.strokeStyle='#2c7be5';ctx.fillStyle='#2c7be5';ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.moveTo(cx+len-12,cy-5);ctx.lineTo(cx+len,cy);ctx.lineTo(cx+len-12,cy+5);
+    ctx.closePath();ctx.fill();
+    ctx.fillText('k（传播方向）',cx+len-80,cy+22);
+    // energy flux point (Poynting vector S=E×B) glowing, riding the wavefront
+    const sx=cx+((t*freq*160)%len);
+    const sg=ctx.createRadialGradient(sx,cy,1,sx,cy,14);
+    sg.addColorStop(0,'rgba(255,214,102,.95)');sg.addColorStop(1,'rgba(255,214,102,0)');
+    ctx.save();ctx.shadowColor='rgba(255,214,102,.9)';ctx.shadowBlur=16;
+    ctx.fillStyle=sg;ctx.beginPath();ctx.arc(sx,cy,7,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+    ctx.fillStyle='#8a5a00';ctx.font='11px sans-serif';ctx.textAlign='center';ctx.fillText('S=E×B',sx,cy-70);
+    // wavelength visual: freq maps to spatial wavelength on screen
+    const screenLambda=300/freq; // px
+    const phase=t*freq*2*Math.PI*2; // animation speed
+    // E field (vertical, red) — sine wave above axis
+    ctx.strokeStyle='#e03131';ctx.lineWidth=2;
+    ctx.beginPath();
+    for(let i=0;i<=len;i++){
+      const x=cx+i;
+      const y=cy-amp*Math.sin(2*Math.PI*i/screenLambda+phase);
+      if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    // E field arrows at intervals
+    for(let i=0;i<len;i+=20){
+      const x=cx+i;
+      const y=cy-amp*Math.sin(2*Math.PI*i/screenLambda+phase);
+      const dy=y-cy;
+      if(Math.abs(dy)>5){
+        ctx.strokeStyle='#e03131';ctx.fillStyle='#e03131';ctx.lineWidth=1.5;
+        ctx.beginPath();
+        ctx.moveTo(x,cy);ctx.lineTo(x,y);
+        ctx.stroke();
+        const sign=dy<0?-1:1;
+        ctx.beginPath();
+        ctx.moveTo(x,y);
+        ctx.lineTo(x-3,y+6*sign);
+        ctx.lineTo(x+3,y+6*sign);
+        ctx.closePath();ctx.fill();
+      }
+    }
+    // B field (horizontal/depth, blue) — shown as sine wave below axis (represents B perpendicular to E and k)
+    ctx.strokeStyle='#2c7be5';ctx.lineWidth=2;
+    ctx.beginPath();
+    for(let i=0;i<=len;i++){
+      const x=cx+i;
+      const y=cy+amp*0.7*Math.sin(2*Math.PI*i/screenLambda+phase);
+      if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    // B field arrows
+    for(let i=0;i<len;i+=20){
+      const x=cx+i;
+      const y=cy+amp*0.7*Math.sin(2*Math.PI*i/screenLambda+phase);
+      const dy=y-cy;
+      if(Math.abs(dy)>5){
+        ctx.strokeStyle='#2c7be5';ctx.fillStyle='#2c7be5';ctx.lineWidth=1.5;
+        ctx.beginPath();
+        ctx.moveTo(x,cy);ctx.lineTo(x,y);
+        ctx.stroke();
+        const sign=dy>0?1:-1;
+        ctx.beginPath();
+        ctx.moveTo(x,y);
+        ctx.lineTo(x-3,y-6*sign);
+        ctx.lineTo(x+3,y-6*sign);
+        ctx.closePath();ctx.fill();
+      }
+    }
+    // labels
+    ctx.fillStyle='#e03131';ctx.font='13px sans-serif';ctx.textAlign='left';
+    ctx.fillText('E（电场，竖直）',cx,cy-amp-15);
+    ctx.fillStyle='#2c7be5';
+    ctx.fillText('B（磁场，垂直于E和k）',cx,cy+amp*0.7+20);
+    // wavelength bracket
+    const lamX1=cx+20;
+    const lamX2=cx+20+screenLambda;
+    if(lamX2<cx+len){
+      ctx.strokeStyle='#486581';ctx.lineWidth=1;
+      ctx.beginPath();
+      ctx.moveTo(lamX1,cy+amp+30);ctx.lineTo(lamX2,cy+amp+30);
+      ctx.moveTo(lamX1,cy+amp+25);ctx.lineTo(lamX1,cy+amp+35);
+      ctx.moveTo(lamX2,cy+amp+25);ctx.lineTo(lamX2,cy+amp+35);
+      ctx.stroke();
+      ctx.fillStyle='#486581';ctx.font='11px sans-serif';ctx.textAlign='center';
+      ctx.fillText('λ',lamX1+(lamX2-lamX1)/2,cy+amp+45);
+      ctx.fillStyle='#f0a500';
+      ctx.beginPath();ctx.arc(lamX2,cy+amp+30,8,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#8a5a00';ctx.font='11px sans-serif';ctx.fillText('拖 λ',lamX2+22,cy+amp+34);
+    }
+    // formula
+    ctx.fillStyle='#243b53';ctx.font='12px sans-serif';ctx.textAlign='left';
+    ctx.fillText('c = λ·f = '+(c/(freq*1e9)*1000).toFixed(0)+' mm × '+freq.toFixed(1)+' GHz = 3×10⁸ m/s',15,H-10);
+  }
+
+  let lastTime=performance.now();
+  function loop(now){
+    const dt=Math.min((now-lastTime)/1000,0.05);
+    lastTime=now;
+    if(running)t+=dt;
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  document.getElementById('freq').addEventListener('input',e=>{freq=parseFloat(e.target.value);document.getElementById('f-display').textContent=freq.toFixed(1);updateReadouts();});
+  document.getElementById('amp').addEventListener('input',e=>{amp=parseFloat(e.target.value);document.getElementById('a-display').textContent=amp.toFixed(0);});
+  document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';updateReadouts();});
+  document.getElementById('reset-btn').addEventListener('click',()=>{t=0;draw();});
+
+  updateReadouts();requestAnimationFrame(loop);
+  function pointerPos(e){const r=canvas.getBoundingClientRect();const s=canvas.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s};}
+  canvas.addEventListener('pointerdown',e=>{
+    const p=pointerPos(e),cx=80,cy=H/2,screenLambda=300/freq,lamX2=cx+20+screenLambda,hy=cy+amp+30;
+    if(Math.hypot(p.x-lamX2,p.y-hy)<24){dragLambda=true;canvas.style.cursor='grabbing';}
+  });
+  canvas.addEventListener('pointermove',e=>{
+    if(!dragLambda)return;
+    const p=pointerPos(e),cx=80;
+    const screenLambda=Math.max(60,Math.min(600,p.x-(cx+20)));
+    freq=Math.max(0.5,Math.min(5,300/screenLambda));
+    document.getElementById('freq').value=freq;
+    document.getElementById('f-display').textContent=freq.toFixed(1);
+    updateReadouts();
+  });
+  window.addEventListener('pointerup',()=>{dragLambda=false;canvas.style.cursor='grab';});
+})();
+</script>
+</body>
+</html>

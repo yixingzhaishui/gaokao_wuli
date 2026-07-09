@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>自感</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#eef2f7;color:#102a43}
+.wrap{padding:12px}
+h2{font-size:16px;margin:0 0 8px}
+canvas{display:block;width:100%;max-width:700px;background:#fff;border:1px solid #d9e2ec;border-radius:12px;touch-action:none;cursor:pointer}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.chip{background:#102a43;color:#e6eef7;padding:6px 11px;border-radius:8px;font-size:13px}
+.chip b{color:#ffd166}
+.ctrls{display:flex;flex-wrap:wrap;gap:12px;margin:8px 0;align-items:center}
+.ctrls label{display:flex;flex-direction:column;gap:2px;font-size:12px;color:#334e68}
+.ctrls input[type=range]{width:130px;accent-color:#2c7be5}
+.btn{font:inherit;font-size:13px;padding:6px 12px;border:1px solid #b0bcc9;background:#fff;border-radius:8px;cursor:pointer}
+.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:9px 12px;border-radius:6px;font-size:13px;color:#5a6b7b;line-height:1.5;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2>自感：线圈阻碍自身电流变化（电流不能突变）</h2>
+  <canvas id="cv" width="700" height="420"></canvas>
+  <div class="chips">
+    <span class="chip">自感系数 L = <b id="lv">2.0</b> H</span>
+    <span class="chip">时间常数 τ=L/R = <b id="tauv">1.0</b> s</span>
+    <span class="chip">电流 I = <b id="iv">0.00</b> A</span>
+    <span class="chip">状态：<b id="statev">断开</b></span>
+  </div>
+  <div class="ctrls">
+    <button class="btn" id="toggle">闭合开关</button>
+    <button class="btn" id="play-btn">暂停自动通断</button>
+    <button class="btn" id="reset-btn">重置</button>
+    <label>L = <span id="ll">2.0</span> H<input id="lr" type="range" min="0.2" max="5" step="0.1" value="2"></label>
+    <label>R = <span id="rl">2.0</span> Ω<input id="rr" type="range" min="1" max="6" step="0.5" value="2"></label>
+    <span style="font-size:13px;color:#5a6b7b">或直接拨动开关</span>
+  </div>
+  <div class="hint"><b>观察任务</b>：直接拨动开关。闭合瞬间，线圈产生自感电动势阻碍电流增大，灯泡慢慢变亮；断开瞬间，线圈维持原电流，灯泡会闪一下再熄灭。拖 L 变大：电流上升更慢，断电余辉更久。核心结论：自感阻碍的是<b>电流变化</b>，不是阻碍电流本身。</div>
+</div>
+<script>
+(function(){
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+let L=2,R=2,closed=false,t=0,I=0,flash=0,history=[],last=performance.now(),dragSwitch=false,autoDemo=true,demoClock=0;
+const V=6;
+function targetI(){return closed?V/R:0}
+function tau(){return L/R}
+function sync(){document.getElementById('lv').textContent=L.toFixed(1);document.getElementById('tauv').textContent=tau().toFixed(2);document.getElementById('iv').textContent=I.toFixed(2);document.getElementById('statev').textContent=closed?'通电：阻碍增大':'断电：维持减小';document.getElementById('ll').textContent=L.toFixed(1);document.getElementById('rl').textContent=R.toFixed(1);document.getElementById('toggle').textContent=closed?'断开开关':'闭合开关'}
+function step(dt){
+  const k=1-Math.exp(-dt/Math.max(0.05,tau()));
+  const before=I;
+  I+=(targetI()-I)*k;
+  if(!closed)flash=Math.max(0,flash-dt*2.2);
+  history.push(I); if(history.length>180)history.shift();
+  if(closed&&I>before)flash=0;
+}
+function bulb(x,y,bright,label){
+  const g=ctx.createRadialGradient(x,y,4,x,y,46);g.addColorStop(0,'rgba(255,214,102,'+Math.min(1,bright)+')');g.addColorStop(1,'rgba(255,214,102,0)');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,48,0,7);ctx.fill();
+  ctx.strokeStyle='#f0a500';ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,20,0,7);ctx.stroke();
+  ctx.fillStyle='#8a5a00';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText(label,x,y+42);
+}
+function drawSwitch(){
+  const sx=130,sy=260;
+  ctx.strokeStyle='#334e68';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(sx-46,sy);ctx.lineTo(sx-10,sy);ctx.moveTo(sx+45,sy);ctx.lineTo(sx+78,sy);ctx.stroke();
+  ctx.fillStyle='#334e68';ctx.beginPath();ctx.arc(sx-10,sy,5,0,7);ctx.arc(sx+45,sy,5,0,7);ctx.fill();
+  ctx.strokeStyle=closed?'#2b8a3e':'#e8590c';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(sx-10,sy);ctx.lineTo(closed?sx+45:sx+34,closed?sy:sy-34);ctx.stroke();
+  ctx.fillStyle='#486581';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText('可拨开关',sx+18,sy+32);
+}
+function drawCoil(x,y){
+  ctx.strokeStyle='#1971c2';ctx.lineWidth=4;ctx.beginPath();
+  for(let k=0;k<7;k++){ctx.arc(x+k*15,y,9,Math.PI,0,false)}
+  ctx.stroke();ctx.fillStyle='#1971c2';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText('线圈 L',x+45,y+36);
+  if(Math.abs(I)>0.04){ctx.fillStyle='rgba(25,113,194,.16)';ctx.fillRect(x-12,y-34,122,26)}
+}
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='#334e68';ctx.lineWidth=4;
+  ctx.beginPath();ctx.moveTo(70,260);ctx.lineTo(70,110);ctx.lineTo(185,110);ctx.stroke();
+  drawSwitch();
+  ctx.beginPath();ctx.moveTo(208,260);ctx.lineTo(300,260);ctx.lineTo(300,110);ctx.stroke();
+  bulb(235,110,Math.min(1,I/(V/R)+flash),'灯泡');
+  drawCoil(340,110);
+  ctx.beginPath();ctx.moveTo(445,110);ctx.lineTo(590,110);ctx.lineTo(590,260);ctx.lineTo(208,260);ctx.stroke();
+  ctx.fillStyle='#e03131';ctx.font='13px system-ui';ctx.textAlign='left';
+  if(closed)ctx.fillText('闭合：自感电动势阻碍 I 增大，灯慢慢亮',30,34);
+  else ctx.fillText(flash>0.05?'断开瞬间：线圈维持电流，灯闪亮后熄灭':'断开：I 已衰减到 0',30,34);
+  // Current graph
+  const gx=410,gy=330,gw=240,gh=95;ctx.strokeStyle='#b0bcc9';ctx.lineWidth=1;ctx.strokeRect(gx,gy-gh,gw,gh);
+  ctx.fillStyle='#486581';ctx.font='11px system-ui';ctx.textAlign='center';ctx.fillText('I-t 曲线：不能突变',gx+gw/2,gy+16);
+  ctx.strokeStyle='#2b8a3e';ctx.lineWidth=2;ctx.beginPath();history.forEach((val,i)=>{const x=gx+i/(180-1)*gw,y=gy-Math.min(1,val/(V/R))*gh;if(i)ctx.lineTo(x,y);else ctx.moveTo(x,y)});ctx.stroke();
+  ctx.fillStyle='#243b53';ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillText('通电：I=Imax(1-e^{-t/τ})；断电：I 延迟衰减，τ=L/R',30,H-18);
+  sync();
+}
+function setClosed(next){if(next===closed)return;if(closed&&!next)flash=Math.min(1.4,I/(V/R)+0.4);if(!closed&&next)flash=0;closed=next;t=0}
+function toggle(){setClosed(!closed)}
+function pos(e){const r=cv.getBoundingClientRect(),s=cv.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s}}
+function setSwitchFromPoint(p){setClosed(p.x>145)}
+cv.addEventListener('pointerdown',e=>{const p=pos(e);if(p.x>80&&p.x<210&&p.y>210&&p.y<295){autoDemo=false;document.getElementById('play-btn').textContent='播放自动通断';dragSwitch=true;cv.setPointerCapture(e.pointerId);setSwitchFromPoint(p);draw()}});
+cv.addEventListener('pointermove',e=>{if(!dragSwitch)return;setSwitchFromPoint(pos(e));draw()});
+cv.addEventListener('pointerup',()=>dragSwitch=false);
+cv.addEventListener('pointercancel',()=>dragSwitch=false);
+document.getElementById('toggle').onclick=toggle;
+document.getElementById('play-btn').onclick=()=>{autoDemo=!autoDemo;demoClock=0;document.getElementById('play-btn').textContent=autoDemo?'暂停自动通断':'播放自动通断'};
+document.getElementById('reset-btn').onclick=()=>{closed=false;t=0;I=0;flash=0;history=[];autoDemo=true;demoClock=0;document.getElementById('play-btn').textContent='暂停自动通断';draw()};
+document.getElementById('lr').oninput=e=>{L=parseFloat(e.target.value);draw()};
+document.getElementById('rr').oninput=e=>{R=parseFloat(e.target.value);draw()};
+function loop(now){const dt=Math.min((now-last)/1000,0.04);last=now;t+=dt;if(autoDemo){demoClock+=dt;if(demoClock>2.6){setClosed(!closed);demoClock=0}}step(dt);draw();requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>超重与失重实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 306px;gap:10px;padding:10px;min-height:540px}
+  .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;touch-action:none}
+  .panel{display:flex;flex-direction:column;gap:8px}
+  .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
+  .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.45}
+  .title{font-weight:800;margin-bottom:5px;color:#0f172a}
+  .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:30px;cursor:pointer;color:#102a43}
+  button.active{background:#e0f2fe;border-color:#0284c7;color:#075985;font-weight:800}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:48px}
+  .meter span{display:block;font-size:11px;color:#b6c5d8}
+  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:16px;font-variant-numeric:tabular-nums}
+  .formula{display:grid;gap:5px;font-size:13px;color:#334155}
+  .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
+  .formula div:last-child{border-bottom:0;padding-bottom:0}
+  .formula b{white-space:nowrap;color:#0f172a}
+  .small{font-size:12px;line-height:1.5;color:#475569}
+  .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
+  .status.warn{border-color:#f59e0b;background:#fff7ed;color:#b45309}
+  .status.bad{border-color:#f87171;background:#fef2f2;color:#b91c1c}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="920" height="520" aria-label="超重与失重交互实验台"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>拖动电梯旁的加速度手柄：向上时看秤读数 N 变大，向下时变小；拖到自由下落时，确认 N=0 但 mg 仍存在。</div>
+    <div class="card">
+      <div class="title">快速情境</div>
+      <div class="chips">
+        <button data-a="2">加速向上</button>
+        <button data-a="0" class="active">匀速/静止</button>
+        <button data-a="-2">加速向下</button>
+        <button data-free="1">自由下落</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="title">实时读数</div>
+      <div class="readout">
+        <div class="meter"><span>真实重力 mg</span><b id="gForceText">600 N</b></div>
+        <div class="meter"><span>视重 N</span><b id="nText">600 N</b></div>
+        <div class="meter"><span>加速度 a</span><b id="aText">0.0 m/s²</b></div>
+        <div class="meter"><span>质量 m</span><b id="mText">60 kg</b></div>
+      </div>
+    </div>
+    <div class="card formula">
+      <div><span>取向上为正</span><b>N-mg=ma</b></div>
+      <div><span>秤的读数</span><b>N=m(g+a)</b></div>
+      <div><span>完全失重</span><b>N=0, mg 仍在</b></div>
+    </div>
+    <div class="card small"><b>可直接操作：</b>抓紫色加速度手柄改 a；抓底部质量尺改 m，抓 g 尺改重力场强。</div>
+    <div class="status" id="status">正常：N=mg，视重等于真实重力。</div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const state={m:60,a:0,g:10,drag:null};
+  const els={G:document.getElementById('gForceText'),N:document.getElementById('nText'),a:document.getElementById('aText'),m:document.getElementById('mText'),status:document.getElementById('status')};
+  const colors={red:'#dc2626',blue:'#2563eb',purple:'#7c3aed',ink:'#102a43',muted:'#64748b',green:'#0f766e',orange:'#f59e0b'};
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  const fmt=(v,d=1)=>v.toFixed(d);
+  function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){ctx.fillStyle=c;ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+  function line(x1,y1,x2,y2,c='#94a3b8',w=2,dash){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
+  function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore()}
+  function roundRect(x,y,w,h,r,fill,stroke){ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}ctx.restore()}
+  function values(){const G=state.m*state.g;const rawN=state.m*(state.g+state.a);const N=Math.max(0,rawN);return{G,N,rawN,contact:rawN>0}}
+  function geom(){return{acc:{x:456,y:250-state.a/10*110},mass:{x:118+(state.m-20)/80*250,y:448},grav:{x:512+(state.g-1.6)/(10-1.6)*250,y:448}}}
+  function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-22,active?'#92400e':c,'center',12,'900');ctx.restore()}
+  function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-18,c,'center',12,'900')}
+  function drawPerson(x,y){
+    ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(x,y,16,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle=colors.blue;ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(x,y+16);ctx.lineTo(x,y+76);ctx.moveTo(x-28,y+42);ctx.lineTo(x+28,y+42);ctx.moveTo(x,y+76);ctx.lineTo(x-22,y+118);ctx.moveTo(x,y+76);ctx.lineTo(x+22,y+118);ctx.stroke();
+  }
+  function drawScene(v,g0){
+    roundRect(42,58,500,320,8,'#fff','#d7dee8');
+    roundRect(154,86,210,250,4,'#f8fafc','#334155');
+    line(154,336,364,336,'#334155',5);
+    roundRect(220,314,78,22,5,'#e0f2fe','#2563eb');
+    text('体重秤',259,325,'#075985','center',12,'900');
+    drawPerson(259,160);
+    const scale=Math.min(120,Math.max(v.G,v.N,1)/Math.max(v.G,v.N,1)*86);
+    const nLen=v.N===0?0:Math.min(120,v.N/Math.max(v.G,v.N)*100);
+    const gLen=Math.min(120,v.G/Math.max(v.G,v.N)*100);
+    if(v.N>0)arrow(259,314,259,314-nLen,colors.red,4);
+    arrow(259,176,259,176+gLen,colors.red,4);
+    text(`N=${fmt(v.N,0)}N`,278,314-nLen/2,colors.red,'left',12,'900');
+    text(`mg=${fmt(v.G,0)}N`,278,176+gLen/2,colors.red,'left',12,'900');
+    line(456,140,456,360,'#0f172a',2);
+    arrow(456,250,456,250-state.a/10*90,colors.purple,4);
+    handle(g0.acc.x,g0.acc.y,`a=${fmt(state.a)}`,state.drag==='a',colors.purple);
+    text('拖 a：向上为正',456,384,colors.purple,'center',12,'900');
+  }
+  function drawScale(v){
+    roundRect(570,70,270,150,8,'#f8fafc','#d7dee8');
+    text('体重秤读数',705,96,'#0f172a','center',15,'900');
+    text(`${fmt(v.N,0)} N`,705,145,v.N>v.G?colors.orange:v.N<v.G?colors.red:colors.green,'center',30,'900');
+    text(`真实重力 mg=${fmt(v.G,0)}N`,705,190,'#475569','center',13,'900');
+    roundRect(570,244,270,136,8,'#fff','#d7dee8');
+    text('N 与 mg 对比',614,266,'#0f172a','left',14,'900');
+    const max=Math.max(v.G,v.N,1);
+    line(666,302,666+v.N/max*140,302,colors.blue,10);
+    line(666,340,666+v.G/max*140,340,colors.red,10);
+    text(`N=${fmt(v.N,0)}`,654,302,colors.blue,'right',12,'900');
+    text(`mg=${fmt(v.G,0)}`,654,340,colors.red,'right',12,'900');
+    text(v.N>v.G?'超重':v.N<v.G?'失重':'正常',814,322,v.N>v.G?colors.orange:v.N<v.G?colors.red:colors.green,'right',14,'900');
+  }
+  function update(v){
+    els.G.textContent=`${fmt(v.G,0)} N`;els.N.textContent=`${fmt(v.N,0)} N`;els.a.textContent=`${fmt(state.a)} m/s²`;els.m.textContent=`${fmt(state.m,0)} kg`;
+    document.querySelectorAll('[data-a]').forEach(btn=>btn.classList.toggle('active',Math.abs(+btn.dataset.a-state.a)<.05));
+    let cls='status',msg='正常：N=mg，视重等于真实重力。';
+    if(v.rawN<=0){cls='status bad';msg='完全失重：N=0，但真实重力 mg 仍然存在。';}
+    else if(state.a>0){cls='status warn';msg='超重：加速度向上，N>mg，秤读数变大。';}
+    else if(state.a<0){cls='status bad';msg='失重：加速度向下，N<mg，秤读数变小。';}
+    els.status.className=cls;els.status.textContent=msg;
+  }
+  function draw(){const v=values(),g0=geom();ctx.clearRect(0,0,920,520);var _bg=ctx.createLinearGradient(0,0,0,520);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,520);text('超重与失重实验台：重力 mg 没变，变的是支持力 N',460,30,'#0f172a','center',19,'900');drawScene(v,g0);drawScale(v);roundRect(42,404,816,76,8,'#fff','#d7dee8');ruler(118,448,368,'拖 m：轻 → 重',colors.blue);handle(g0.mass.x,g0.mass.y,`m=${fmt(state.m,0)}`,state.drag==='m',colors.blue);ruler(512,448,762,'拖 g：月球 → 地球',colors.orange);handle(g0.grav.x,g0.grav.y,`g=${fmt(state.g)}`,state.drag==='g',colors.orange);update(v)}
+  function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+  function near(a,b,rad=26){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+  function down(e){const p=pos(e),g0=geom();if(near(p,g0.acc,30))state.drag='a';else if(near(p,g0.mass,28))state.drag='m';else if(near(p,g0.grav,28))state.drag='g';else state.drag=null;if(state.drag){canvas.setPointerCapture(e.pointerId);move(e)}}
+  function move(e){if(!state.drag)return;const p=pos(e);if(state.drag==='a')state.a=clamp((250-p.y)/110*10,-10,10);if(state.drag==='m')state.m=clamp(20+(p.x-118)/250*80,20,100);if(state.drag==='g')state.g=clamp(1.6+(p.x-512)/250*(10-1.6),1.6,10);draw()}
+  function up(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
+  canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
+  document.querySelectorAll('[data-a]').forEach(btn=>btn.addEventListener('click',()=>{state.a=+btn.dataset.a;draw()}));
+  document.querySelector('[data-free]').addEventListener('click',()=>{state.a=-state.g;draw()});
+  draw();
+})();
+</script>
+</body>
+</html>

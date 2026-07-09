@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>弹簧瞬时问题实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#edf3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px;min-height:560px}
+  .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;touch-action:none}
+  .panel{display:flex;flex-direction:column;gap:8px}
+  .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
+  .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.45}
+  .title{font-weight:800;margin-bottom:5px;color:#0f172a}
+  .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:31px;cursor:pointer;color:#102a43}
+  .primary{background:#2563eb;color:#fff;border-color:#2563eb}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:48px}
+  .meter span{display:block;font-size:11px;color:#b6c5d8}
+  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:16px;font-variant-numeric:tabular-nums}
+  .formula{display:grid;gap:5px;font-size:13px;color:#334155}
+  .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
+  .formula div:last-child{border-bottom:0;padding-bottom:0}
+  .formula b{white-space:nowrap;color:#0f172a}
+  .small{font-size:12px;line-height:1.5;color:#475569}
+  .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="弹簧瞬时问题交互实验台"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>拖动左图下方 T0 拉力箭头，看 t=0- 的弹簧被拉长；再点剪断，看右图绳力变 0，而弹簧长度和 F弹 瞬时不变。</div>
+    <button id="cutBtn" class="primary">剪断绳</button>
+    <div class="card">
+      <div class="title">快速情境</div>
+      <div class="chips">
+        <button data-case="base">基础</button>
+        <button data-case="largeT">大拉力</button>
+        <button data-case="smallM">小质量</button>
+        <button data-case="soft">软弹簧</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="title">实时读数</div>
+      <div class="readout">
+        <div class="meter"><span>形变量 x</span><b id="xText">0.300 m</b></div>
+        <div class="meter"><span>弹簧力 F弹</span><b id="fText">30.0 N</b></div>
+        <div class="meter"><span>剪断后 T</span><b id="afterTText">0 N</b></div>
+        <div class="meter"><span>瞬时加速度 a</span><b id="aText">5.0 m/s²</b></div>
+      </div>
+    </div>
+    <div class="card formula">
+      <div><span>剪断前</span><b>kx=mg+T0</b></div>
+      <div><span>剪断瞬间</span><b>x 不突变</b></div>
+      <div><span>剪断后</span><b>a=T0/m</b></div>
+    </div>
+    <div class="card small"><b>可直接操作：</b>抓左图蓝色 T0 箭头末端，或拖底部 m、k、T0 三个手柄。多视角：左图是 t=0- 侧视实物场景，右图是 t=0+ 瞬时受力，底部图像记录“瞬时不变，随后才变”。</div>
+    <div class="chips"><button id="playBtn">▶ 播放：0+ 后极短过程</button><button id="resetBtn">重置</button></div>
+    <div class="status" id="status">准备剪断：左图平衡，右图预览剪断后一瞬间。</div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const state={m:2,k:100,T:10,g:10,cut:false,drag:null,playing:false,playT:0};
+  const els={x:document.getElementById('xText'),f:document.getElementById('fText'),afterT:document.getElementById('afterTText'),a:document.getElementById('aText'),status:document.getElementById('status'),cut:document.getElementById('cutBtn')};
+  const colors={red:'#dc2626',blue:'#2563eb',orange:'#f59e0b',purple:'#7c3aed',ink:'#102a43',green:'#0f766e'};
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  const fmt=(v,d=1)=>v.toFixed(d);
+  function values(){const mg=state.m*state.g,F=mg+state.T,x=F/state.k,a=state.T/state.m;return{mg,F,x,a}}
+  function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){ctx.fillStyle=c;ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+  function line(x1,y1,x2,y2,c='#94a3b8',w=2,dash){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
+  function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore()}
+  function roundRect(x,y,w,h,r,fill,stroke){ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}ctx.restore()}
+  function spring(cx,top,len){ctx.save();ctx.strokeStyle='#334155';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(cx,top);const n=8,amp=13,seg=len/(n*2);for(let i=1;i<=n*2;i++)ctx.lineTo(cx+(i%2?amp:-amp),top+i*seg);ctx.lineTo(cx,top+len);ctx.stroke();ctx.restore()}
+  function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-36,c,'center',12,'900')}
+  function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-20,active?'#92400e':c,'center',12,'900');ctx.restore()}
+  function geom(){return{m:{x:98+(state.m-.5)/4.5*150,y:494},k:{x:300+(state.k-50)/200*150,y:494},T:{x:502+state.T/40*160,y:494},g:{x:716+(state.g-9.8)/.2*120,y:494}}}
+  function drawSetup(cx,title,after,q){
+    roundRect(cx-160,56,320,368,8,'#fff','#d7dee8');
+    text(title,cx,82,'#0f172a','center',16,'900');
+    const top=112,stretch=76+Math.min(132,q.x*210),massY=top+stretch;
+    line(cx-80,top,cx+80,top,'#334155',4);
+    spring(cx,top,stretch);
+    roundRect(cx-36,massY,72,44,6,colors.blue,'#102a43');
+    text('m',cx,massY+22,'#fff','center',16,'900');
+    const fLen=clamp(q.F/Math.max(q.mg,1)*58,42,130),gLen=clamp(q.mg/20*44,42,108),tLen=clamp(state.T/40*86,0,98),aLen=clamp(q.a/12*100,0,118);
+    arrow(cx,massY,cx,massY-fLen,colors.red,4);
+    text(`F弹=${fmt(q.F)}N`,cx+13,massY-fLen/2,colors.red,'left',13,'900');
+    arrow(cx-25,massY+20,cx-25,massY+20+gLen,colors.red,4);
+    text(`mg=${fmt(q.mg)}N`,cx-38,massY+56,colors.red,'right',13,'900');
+    if(after){
+      line(cx+25,massY+44,cx+25,massY+88,'#94a3b8',4,[7,5]);
+      text('T=0',cx+38,massY+72,'#64748b','left',13,'900');
+      if(q.a>0){arrow(cx+95,massY+36,cx+95,massY+36-aLen,colors.purple,4);text(`a=${fmt(q.a)}m/s²`,cx+108,massY+30-aLen/2,colors.purple,'left',13,'900')}
+      text('剪断后：绳力突变，弹簧力不突变',cx,398,colors.green,'center',13,'900');
+    }else{
+      line(cx+25,massY+44,cx+25,massY+90,'#334155',3);
+      if(state.T>0)arrow(cx+25,massY+44,cx+25,massY+44+tLen,colors.blue,4);
+      text(`T0=${fmt(state.T,0)}N`,cx+38,massY+76,colors.blue,'left',13,'900');
+      ctx.save();ctx.fillStyle=state.drag==='Tarrow'?'#fde68a':'#fff';ctx.strokeStyle=state.drag==='Tarrow'?'#d97706':colors.blue;ctx.lineWidth=3;ctx.beginPath();ctx.arc(cx+25,massY+44+tLen,9,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();
+      text('剪断前：F弹 = mg + T0，a=0',cx,398,'#475569','center',13,'900');
+    }
+    text(`x=${fmt(q.x,3)}m`,cx,372,'#475569','center',13,'900');
+  }
+  function drawTimeline(q){
+    const x=420,y=438,w=360,h=74;
+    roundRect(x,y,w,h,8,'#fff','#d7dee8');
+    text('图像记录：0+ 瞬时不变，随后才变化',x+w/2,y+16,'#0f172a','center',13,'900');
+    line(x+36,y+50,x+w-28,y+50,'#cbd5e1',2);
+    line(x+36,y+50,x+150,y+50,colors.green,5);
+    line(x+150,y+50,x+w-34,y+32,colors.orange,3);
+    text('t=0+',x+38,y+64,'#475569','center',11,'900');
+    text('F弹保持原读数',x+104,y+34,colors.green,'center',11,'900');
+    text('之后随形变量改变',x+248,y+26,colors.orange,'center',11,'900');
+    const dotX=x+36+Math.min(1,state.playT/2.2)*(w-70);
+    ctx.fillStyle=colors.purple;
+    ctx.beginPath();ctx.arc(dotX,y+50,7,0,Math.PI*2);ctx.fill();
+    text(`t=${fmt(state.playT,2)}s`,dotX,y+66,colors.purple,'center',11,'900');
+  }
+  function update(q){els.x.textContent=`${fmt(q.x,3)} m`;els.f.textContent=`${fmt(q.F)} N`;els.afterT.textContent='0 N';els.a.textContent=`${fmt(q.a)} m/s²`;els.cut.textContent=state.cut?'复位到剪断前':'剪断绳';els.status.textContent=(state.cut?`已剪断：T 立刻为 0，弹簧仍保持 ${fmt(q.F)} N，物块瞬时向上加速。`:'准备剪断：左图平衡，右图预览剪断后一瞬间。')+(state.playing?'（播放中：紫点显示 0+ 后时间线）':'')}
+  function draw(){const q=values(),g0=geom();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('弹簧瞬时问题实验台：弹簧力看形变量，绳力看约束是否还在',460,30,'#0f172a','center',19,'900');drawSetup(240,'t=0- 剪断前',false,q);drawSetup(620,'t=0+ 剪断后',true,q);drawTimeline(q);roundRect(48,458,350,62,8,'#fff','#d7dee8');ruler(68,494,145,'m',colors.blue);handle(68+(state.m-.5)/4.5*77,494,`m=${fmt(state.m)}`,state.drag==='m',colors.blue);ruler(160,494,238,'k',colors.green);handle(160+(state.k-50)/200*78,494,`k=${fmt(state.k,0)}`,state.drag==='k',colors.green);ruler(254,494,332,'T0',colors.purple);handle(254+state.T/40*78,494,`T0=${fmt(state.T,0)}`,state.drag==='T',colors.purple);if(state.cut){roundRect(438,218,84,38,8,'#ecfdf5','#14b8a6');text('已剪断',480,237,colors.green,'center',13,'900')}else{roundRect(438,218,84,38,8,'#fff7ed','#f59e0b');text('准备剪断',480,237,'#b45309','center',13,'900')}update(q)}
+  function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+  function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+  function tArrowPoint(){const q=values(),top=112,stretch=76+Math.min(132,q.x*210),massY=top+stretch,tLen=clamp(state.T/40*86,0,98);return{x:265,y:massY+44+tLen}}
+  function down(e){if(state.playing){state.playing=false;document.getElementById('playBtn').textContent='▶ 播放：0+ 后极短过程'}const p=pos(e);if(near(p,tArrowPoint(),28))state.drag='Tarrow';else if(near(p,{x:68+(state.m-.5)/4.5*77,y:494},26))state.drag='m';else if(near(p,{x:160+(state.k-50)/200*78,y:494},26))state.drag='k';else if(near(p,{x:254+state.T/40*78,y:494},26))state.drag='T';else state.drag=null;if(state.drag){canvas.setPointerCapture(e.pointerId);move(e)}}
+  function move(e){if(!state.drag)return;const p=pos(e);if(state.drag==='m')state.m=clamp(.5+(p.x-68)/77*4.5,.5,5);if(state.drag==='k')state.k=clamp(50+(p.x-160)/78*200,50,250);if(state.drag==='T')state.T=clamp((p.x-254)/78*40,0,40);if(state.drag==='Tarrow'){const q=values(),top=112,stretch=76+Math.min(132,q.x*210),baseY=top+stretch+44;state.T=clamp((p.y-baseY)/98*40,0,40)}draw()}
+  function up(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
+  canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
+  els.cut.addEventListener('click',()=>{state.cut=!state.cut;draw()});
+  document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='base'){state.m=2;state.k=100;state.T=10;state.g=10}if(c==='largeT'){state.m=2;state.k=100;state.T=32;state.g=10}if(c==='smallM'){state.m=1;state.k=120;state.T=18;state.g=10}if(c==='soft'){state.m=2;state.k=60;state.T=18;state.g=10}draw()}));
+  const playBtn=document.getElementById('playBtn');
+  function animate(){if(!state.playing)return;state.playT=Math.min(2.2,state.playT+0.035);draw();if(state.playT>=2.2){state.playing=false;playBtn.textContent='▶ 播放：0+ 后极短过程';draw();return}requestAnimationFrame(animate)}
+  playBtn.addEventListener('click',()=>{state.playing=!state.playing;state.cut=true;playBtn.textContent=state.playing?'⏸ 暂停':'▶ 播放：0+ 后极短过程';if(state.playing){state.playT=0;animate()}else draw()});
+  document.getElementById('resetBtn').addEventListener('click',()=>{state.playing=false;state.playT=0;state.cut=false;playBtn.textContent='▶ 播放：0+ 后极短过程';draw()});
+  draw();
+})();
+</script>
+</body>
+</html>

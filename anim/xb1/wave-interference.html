@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>波的干涉</title>
+<link rel="stylesheet" href="../common/controls.css">
+<style>
+body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#f7f9fc;color:#1f2933}
+.container{padding:12px}
+h2{font-size:16px;margin:0 0 8px;color:#102a43}
+canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid #d9e2ec;border-radius:8px}
+.readouts{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0;font-size:13px}
+.readouts .r{background:#102a43;color:#d9e2ec;padding:6px 10px;border-radius:6px}
+.readouts .r b{color:#f0a500}
+.controls{display:flex;flex-wrap:wrap;gap:14px;margin:10px 0;align-items:center}
+.controls label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:#334e68}
+.controls input[type=range]{width:120px;accent-color:#2c7be5}
+.controls button{font:inherit;padding:6px 14px;border:1px solid #b0bcc9;background:#fff;border-radius:6px;cursor:pointer}
+.controls button:hover{background:#eef2f7}
+.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:8px 12px;border-radius:4px;font-size:13px;color:#486581;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>波的干涉：Δr=kλ 加强，Δr=(k+½)λ 减弱</h2>
+  <canvas id="canvas" width="660" height="360"></canvas>
+  <div class="readouts">
+    <span class="r">波长 λ = <b id="lam-v">40</b> px</span>
+    <span class="r">双源间距 d = <b id="d-v">120</b> px</span>
+    <span class="r">测试点路程差 Δr = <b id="dr-v">0</b> px</span>
+    <span class="r">该点：<b id="st-v">—</b></span>
+  </div>
+  <div class="controls">
+    <label>波长 λ = <span id="lam-d">40</span> px
+      <input type="range" id="lam" min="20" max="70" step="2" value="40"></label>
+    <label>双源间距 d = <span id="d-d">120</span> px
+      <input type="range" id="d" min="40" max="200" step="10" value="120"></label>
+    <button id="play-btn">暂停</button>
+    <button id="reset-btn">重置</button>
+  </div>
+  <div class="hint">
+    <p><b>观察任务</b>：两个同频同相波源发出的圆形波叠加。亮暗相间的<b>稳定条纹</b>就是干涉图样。拖动<b>白色测试点</b>（或看它自动移动），读它到两源的<b>路程差 Δr</b>：当 Δr=0,λ,2λ…（kλ）时该点<b>振动加强</b>；当 Δr=½λ,1.5λ…时<b>振动减弱</b>。拖动 λ 或 d 看条纹疏密变化。</p>
+  </div>
+</div>
+<script>
+(function(){
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  let lam=40,d=120,t=0,running=true;
+  const cx=W/2, cy=170;
+  function sources(){return [{x:cx-d/2,y:cy},{x:cx+d/2,y:cy}];}
+  let testX=cx+90,testY=60, dragging=false, dragSource=false;
+  const img=ctx.createImageData(W,H);
+
+  function field(x,y,tt){
+    const s=sources();
+    let sum=0;
+    for(const p of s){
+      const r=Math.hypot(x-p.x,y-p.y);
+      // circular wave, amplitude decays slowly with r
+      const amp=1/Math.sqrt(1+r/40);
+      sum+=amp*Math.sin(2*Math.PI*(tt - r/lam));
+    }
+    return sum; // range about [-2,2]
+  }
+
+  function draw(){
+    // render field to image (step 2px for perf)
+    const data=img.data;
+    for(let y=0;y<H;y+=2){
+      for(let x=0;x<W;x+=2){
+        const v=field(x,y,t); // -2..2
+        // map to blue(neg)-white(0)-red(pos)
+        const n=Math.max(-1,Math.min(1,v/2));
+        let r,g,b;
+        if(n>=0){r=255;g=255-Math.round(n*150);b=255-Math.round(n*180);}
+        else{const m=-n;r=255-Math.round(m*180);g=255-Math.round(m*120);b=255;}
+        for(let dy=0;dy<2;dy++)for(let dx=0;dx<2;dx++){
+          const idx=((y+dy)*W+(x+dx))*4;
+          data[idx]=r;data[idx+1]=g;data[idx+2]=b;data[idx+3]=255;
+        }
+      }
+    }
+    ctx.putImageData(img,0,0);
+    // sources
+    const s=sources();
+    for(const p of s){const gg=ctx.createRadialGradient(p.x,p.y,1,p.x,p.y,46);gg.addColorStop(0,'rgba(255,210,120,0.5)');gg.addColorStop(1,'rgba(255,210,120,0)');ctx.fillStyle=gg;ctx.beginPath();ctx.arc(p.x,p.y,46,0,7);ctx.fill();}
+    ctx.fillStyle='#102a43';
+    for(const p of s){ctx.beginPath();ctx.arc(p.x,p.y,6,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#fff';ctx.font='10px sans-serif';ctx.textAlign='center';ctx.fillText('S',p.x,p.y+3);ctx.fillStyle='#102a43';}
+    // lines from sources to test point
+    const r1=Math.hypot(testX-s[0].x,testY-s[0].y);
+    const r2=Math.hypot(testX-s[1].x,testY-s[1].y);
+    ctx.strokeStyle='rgba(16,42,67,0.55)';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(s[0].x,s[0].y);ctx.lineTo(testX,testY);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(s[1].x,s[1].y);ctx.lineTo(testX,testY);ctx.stroke();
+    // test point
+    ctx.fillStyle='#fff';ctx.strokeStyle='#102a43';ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(testX,testY,7,0,Math.PI*2);ctx.fill();ctx.stroke();
+    // readouts
+    const dr=Math.abs(r1-r2);
+    const ratio=dr/lam;
+    const nearInt=Math.abs(ratio-Math.round(ratio));
+    let state;
+    if(nearInt<0.12)state='加强 (Δr≈'+Math.round(ratio)+'λ)';
+    else if(Math.abs(ratio-Math.floor(ratio)-0.5)<0.12)state='减弱 (Δr≈'+(Math.floor(ratio)+0.5)+'λ)';
+    else state='中间态';
+    document.getElementById('lam-v').textContent=lam;
+    document.getElementById('d-v').textContent=d;
+    document.getElementById('dr-v').textContent=Math.round(dr)+' ('+ratio.toFixed(2)+'λ)';
+    document.getElementById('st-v').textContent=state;
+    ctx.fillStyle='#243b53';ctx.font='13px sans-serif';ctx.textAlign='left';
+    ctx.fillText('Δr = |r₁−r₂| = '+Math.round(dr)+' px = '+ratio.toFixed(2)+'λ',18,H-14);
+  }
+
+  function pos(e){const rc=canvas.getBoundingClientRect();const sx=canvas.width/rc.width;
+    const cxp=(e.touches?e.touches[0].clientX:e.clientX);const cyp=(e.touches?e.touches[0].clientY:e.clientY);
+    return {x:(cxp-rc.left)*sx,y:(cyp-rc.top)*sx};}
+  canvas.addEventListener('pointerdown',e=>{
+    const p=pos(e),s=sources();
+    if(Math.hypot(p.x-testX,p.y-testY)<24){dragging=true;return}
+    if(Math.hypot(p.x-s[0].x,p.y-s[0].y)<24||Math.hypot(p.x-s[1].x,p.y-s[1].y)<24){dragSource=true;return}
+  });
+  canvas.addEventListener('pointermove',e=>{
+    const p=pos(e);
+    if(dragging){testX=Math.max(10,Math.min(W-10,p.x));testY=Math.max(10,Math.min(H-30,p.y));draw();}
+    if(dragSource){d=Math.round(Math.max(40,Math.min(200,2*Math.abs(p.x-cx)))/10)*10;document.getElementById('d').value=d;document.getElementById('d-d').textContent=d;draw();}
+  });
+  window.addEventListener('pointerup',()=>{dragging=false;dragSource=false;});
+  function bind(id,cb){document.getElementById(id).addEventListener('input',e=>{cb(parseFloat(e.target.value));draw();});}
+  bind('lam',v=>{lam=v;document.getElementById('lam-d').textContent=v;});
+  bind('d',v=>{d=v;document.getElementById('d-d').textContent=v;});
+  document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
+  document.getElementById('reset-btn').addEventListener('click',()=>{testX=cx+90;testY=60;draw();});
+  let last=performance.now();
+  function loop(now){const dt=Math.min((now-last)/1000,0.03);last=now;if(running)t+=dt;draw();requestAnimationFrame(loop);}
+  draw();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

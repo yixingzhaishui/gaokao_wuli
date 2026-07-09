@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>机械波的形成与传播</title>
+<link rel="stylesheet" href="../common/controls.css">
+<style>
+body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#f7f9fc;color:#1f2933}
+.container{padding:12px}
+h2{font-size:16px;margin:0 0 8px;color:#102a43}
+canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid #d9e2ec;border-radius:8px}
+.readouts{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0;font-size:13px}
+.readouts .r{background:#102a43;color:#d9e2ec;padding:6px 10px;border-radius:6px}
+.readouts .r b{color:#f0a500}
+.controls{display:flex;flex-wrap:wrap;gap:14px;margin:10px 0;align-items:center}
+.controls label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:#334e68}
+.controls input[type=range]{width:120px;accent-color:#2c7be5}
+.controls button{font:inherit;padding:6px 14px;border:1px solid #b0bcc9;background:#fff;border-radius:6px;cursor:pointer}
+.controls button:hover{background:#eef2f7}
+.controls .seg{display:flex;gap:0}
+.controls .seg button{border-radius:0}
+.controls .seg button:first-child{border-radius:6px 0 0 6px}
+.controls .seg button:last-child{border-radius:0 6px 6px 0}
+.controls .seg button.on{background:#2c7be5;color:#fff;border-color:#2c7be5}
+.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:8px 12px;border-radius:4px;font-size:13px;color:#486581;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>机械波：v = λf（一个周期传播一个波长）</h2>
+  <canvas id="canvas" width="660" height="360"></canvas>
+  <div class="readouts">
+    <span class="r">波长 λ = <b id="lam-v">120</b> px</span>
+    <span class="r">频率 f = <b id="f-v">1.0</b> Hz</span>
+    <span class="r">周期 T = <b id="t-v">1.00</b> s</span>
+    <span class="r">波速 v = λf = <b id="v-v">120</b> px/s</span>
+  </div>
+  <div class="controls">
+    <label>波长 λ = <span id="lam-d">120</span> px
+      <input type="range" id="lam" min="60" max="220" step="5" value="120"></label>
+    <label>频率 f = <span id="f-d">1.0</span> Hz
+      <input type="range" id="f" min="0.4" max="2.0" step="0.1" value="1"></label>
+    <div class="seg" id="mode">
+      <button data-m="wave" class="on">波形图 y-x</button>
+      <button data-m="vib">振动图 y-t</button>
+    </div>
+    <button id="play-btn">暂停</button>
+    <button id="reset-btn">重置</button>
+  </div>
+  <div class="hint">
+    <p><b>观察任务</b>：红色质点只上下振动、并不随波前进——波传的是<b>振动形式和能量</b>，不是介质。拖动 <b>λ</b> 看波形疏密变化、波速随之变；拖动 <b>f</b> 看质点上下更快、波速变大（v=λf）。切到<b>振动图 y-t</b> 看单个质点随时间的位移曲线——它和波形图（某一时刻的空间照片）形状像但含义完全不同。</p>
+  </div>
+</div>
+<script>
+(function(){
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  let lam=120,f=1,drag=null,lamAnchor=40,lamHandle=160;
+  let t=0,running=true,mode='wave';
+  const A=44, midY=150;
+  const x0=40, xW=580;           // wave medium region
+  let markX=x0+200;              // tracked particle x-position (fixed point in space)
+  // y(x,t) = A sin(2π(t/T - x/λ)) : wave moving +x
+  function yOf(x,tt){return A*Math.sin(2*Math.PI*(tt*f - (x-x0)/lam));}
+
+  function drawAxes(){
+    ctx.strokeStyle='#dbe4ee';ctx.setLineDash([4,3]);
+    ctx.beginPath();ctx.moveTo(x0,midY);ctx.lineTo(x0+xW,midY);ctx.stroke();ctx.setLineDash([]);
+  }
+
+  function drawWave(){
+    // dotted equilibrium row of medium particles
+    ctx.clearRect(0,0,W,H);
+    drawAxes();
+    // draw many medium particles at their instantaneous displacement
+    ctx.fillStyle='#c3d0e0';
+    for(let x=x0;x<=x0+xW;x+=20){
+      const y=midY - yOf(x,t);
+      ctx.beginPath();ctx.arc(x,y,2.5,0,Math.PI*2);ctx.fill();
+    }
+    // smooth wave curve
+    ctx.strokeStyle='#2c7be5';ctx.lineWidth=2.5;ctx.beginPath();
+    for(let x=x0;x<=x0+xW;x++){
+      const y=midY - yOf(x,t);
+      if(x===x0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    // wavelength bracket (between two adjacent crests near left)
+    // find a crest x where phase = π/2
+    const crest1=x0+ ((0.25 - (t*f%1))*lam) ; // approximate first crest
+    let cx=crest1; while(cx<x0+10)cx+=lam;
+    if(cx+lam<x0+xW){
+      ctx.strokeStyle='#0b7285';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(cx,midY-A-14);ctx.lineTo(cx+lam,midY-A-14);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(cx,midY-A-18);ctx.lineTo(cx,midY-A-10);ctx.moveTo(cx+lam,midY-A-18);ctx.lineTo(cx+lam,midY-A-10);ctx.stroke();
+      ctx.fillStyle='#0b7285';ctx.font='12px sans-serif';ctx.textAlign='center';
+      ctx.fillText('λ',cx+lam/2,midY-A-20);
+      lamAnchor=cx;lamHandle=cx+lam;
+      ctx.fillStyle='#f0a500';ctx.strokeStyle='#8a5a00';ctx.lineWidth=2;ctx.beginPath();ctx.arc(lamHandle,midY-A-14,8,0,Math.PI*2);ctx.fill();ctx.stroke();
+    }
+    // propagation direction arrow
+    ctx.strokeStyle='#829ab1';ctx.fillStyle='#829ab1';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(x0+xW-70,midY+A+34);ctx.lineTo(x0+xW-20,midY+A+34);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(x0+xW-20,midY+A+34);ctx.lineTo(x0+xW-28,midY+A+30);ctx.lineTo(x0+xW-28,midY+A+38);ctx.closePath();ctx.fill();
+    ctx.font='11px sans-serif';ctx.textAlign='left';ctx.fillText('传播方向 v',x0+xW-150,midY+A+38);
+    // tracked particle (red) — only moves vertically
+    const py=midY - yOf(markX,t);
+    ctx.strokeStyle='#f3d9d9';ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(markX,midY-A-6);ctx.lineTo(markX,midY+A+6);ctx.stroke();ctx.setLineDash([]);
+    const glow=ctx.createRadialGradient(markX,py,2,markX,py,22);glow.addColorStop(0,'rgba(201,42,42,0.5)');glow.addColorStop(1,'rgba(201,42,42,0)');
+    ctx.fillStyle=glow;ctx.beginPath();ctx.arc(markX,py,22,0,7);ctx.fill();
+    ctx.fillStyle='#c92a2a';ctx.beginPath();ctx.arc(markX,py,6,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#c92a2a';ctx.font='11px sans-serif';ctx.textAlign='center';ctx.fillText('拖质点',markX,midY+A+30);
+    // vertical velocity arrow of the particle: vy = -A*2πf cos(...)
+    const vy = -A*2*Math.PI*f*Math.cos(2*Math.PI*(t*f-(markX-x0)/lam));
+    const av=Math.max(-40,Math.min(40,vy*0.12));
+    if(Math.abs(av)>3){
+      ctx.strokeStyle='#c92a2a';ctx.fillStyle='#c92a2a';ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(markX+14,py);ctx.lineTo(markX+14,py-av);ctx.stroke();
+      const s=av>0?1:-1;
+      ctx.beginPath();ctx.moveTo(markX+14,py-av);ctx.lineTo(markX+10,py-av+6*s);ctx.lineTo(markX+18,py-av+6*s);ctx.closePath();ctx.fill();
+      ctx.font='10px sans-serif';ctx.fillText('质点只上下动',markX+22,py);
+    }
+    ctx.fillStyle='#243b53';ctx.font='13px sans-serif';ctx.textAlign='left';
+    ctx.fillText('y(x,t) = A·sin[2π(t/T − x/λ)]，波形以 v=λf 向右平移',20,H-14);
+    ctx.font='bold 12px sans-serif';ctx.fillStyle='#c92a2a';
+    ctx.fillText('状态：红色质点只上下振动、并不随波迁移，波传递的是振动形式与能量',20,24);
+  }
+
+  function drawVib(){
+    ctx.clearRect(0,0,W,H);
+    drawAxes();
+    // y-t graph of the tracked particle: shows its displacement over past time
+    const win=4/f; // 4 periods
+    ctx.strokeStyle='#b0bcc9';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(x0,midY-A-20);ctx.lineTo(x0,midY+A+20);ctx.lineTo(x0+xW,midY);ctx.stroke();
+    ctx.fillStyle='#829ab1';ctx.font='11px sans-serif';ctx.textAlign='right';ctx.fillText('y',x0-6,midY-A-14);
+    ctx.textAlign='left';ctx.fillText('t',x0+xW-10,midY+14);
+    ctx.strokeStyle='#c92a2a';ctx.lineWidth=2.5;ctx.beginPath();
+    for(let px=0;px<=xW;px++){
+      const tt=t-win+(px/xW)*win;
+      const yy=midY - A*Math.sin(2*Math.PI*(tt*f-(markX-x0)/lam));
+      if(px===0)ctx.moveTo(x0+px,yy);else ctx.lineTo(x0+px,yy);
+    }
+    ctx.stroke();
+    // current point
+    const cy=midY - A*Math.sin(2*Math.PI*(t*f-(markX-x0)/lam));
+    ctx.fillStyle='#c92a2a';ctx.beginPath();ctx.arc(x0+xW,cy,5,0,Math.PI*2);ctx.fill();
+    // period bracket
+    const Tpx=(1/f)/win*xW;
+    ctx.strokeStyle='#0b7285';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(x0+10,midY+A+10);ctx.lineTo(x0+10+Tpx,midY+A+10);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(x0+10,midY+A+6);ctx.lineTo(x0+10,midY+A+14);ctx.moveTo(x0+10+Tpx,midY+A+6);ctx.lineTo(x0+10+Tpx,midY+A+14);ctx.stroke();
+    ctx.fillStyle='#0b7285';ctx.font='12px sans-serif';ctx.textAlign='center';ctx.fillText('T = 1/f',x0+10+Tpx/2,midY+A+26);
+    ctx.fillStyle='#243b53';ctx.font='13px sans-serif';ctx.textAlign='left';
+    ctx.fillText('振动图：单个质点 y 随时间 t 变化，横轴是时间不是空间',20,H-14);
+  }
+
+  function draw(){
+    if(mode==='wave')drawWave();else drawVib();
+    document.getElementById('lam-v').textContent=lam;
+    document.getElementById('f-v').textContent=f.toFixed(1);
+    document.getElementById('t-v').textContent=(1/f).toFixed(2);
+    document.getElementById('v-v').textContent=Math.round(lam*f);
+  }
+  function bind(id,cb){document.getElementById(id).addEventListener('input',e=>{cb(parseFloat(e.target.value));draw();});}
+  bind('lam',v=>{lam=v;document.getElementById('lam-d').textContent=v;});
+  bind('f',v=>{f=v;document.getElementById('f-d').textContent=v.toFixed(1);});
+  document.querySelectorAll('#mode button').forEach(b=>b.addEventListener('click',()=>{
+    mode=b.dataset.m;document.querySelectorAll('#mode button').forEach(x=>x.classList.remove('on'));b.classList.add('on');draw();
+  }));
+  document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
+  document.getElementById('reset-btn').addEventListener('click',()=>{t=0;draw();});
+  function pointerPos(e){const r=canvas.getBoundingClientRect(),s=canvas.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s};}
+  canvas.addEventListener('pointerdown',e=>{
+    if(mode!=='wave')return;
+    const p=pointerPos(e),py=midY-yOf(markX,t);
+    if(Math.hypot(p.x-markX,p.y-py)<24||Math.abs(p.x-markX)<12&&p.y>midY-A-12&&p.y<midY+A+40){drag='probe';canvas.style.cursor='grabbing';return}
+    if(Math.hypot(p.x-lamHandle,p.y-(midY-A-14))<24){drag='lam';canvas.style.cursor='grabbing';return}
+  });
+  canvas.addEventListener('pointermove',e=>{
+    if(!drag)return;const p=pointerPos(e);
+    if(drag==='probe')markX=Math.max(x0+20,Math.min(x0+xW-20,p.x));
+    if(drag==='lam'){
+      lam=Math.round(Math.max(60,Math.min(220,p.x-lamAnchor))/5)*5;
+      document.getElementById('lam').value=lam;document.getElementById('lam-d').textContent=lam;
+    }
+    draw();
+  });
+  window.addEventListener('pointerup',()=>{drag=null;canvas.style.cursor='grab';});
+  let last=performance.now();
+  function loop(now){const dt=Math.min((now-last)/1000,0.03);last=now;if(running)t+=dt;draw();requestAnimationFrame(loop);}
+  draw();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

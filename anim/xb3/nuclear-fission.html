@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>核裂变链式反应</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 14px; align-items: stretch; }
+  canvas { width: 100%; height: 430px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  input { width: 100%; }
+  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.8; font-size: 14px; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
+  @media (max-width: 760px) { .stage { grid-template-columns: 1fr; } canvas { height: 360px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="680" height="430" aria-label="核裂变链式反应模型"></canvas>
+    <section class="panel">
+      <label for="neutrons">每次释放中子数：<span id="neutronsVal"></span></label>
+      <input id="neutrons" type="range" min="1" max="4" value="3" step="1">
+      <label for="absorb">控制棒吸收比例：<span id="absorbVal"></span></label>
+      <input id="absorb" type="range" min="0" max="80" value="50" step="5">
+      <label for="gen">代数：<span id="genVal"></span></label>
+      <input id="gen" type="range" min="1" max="6" value="4" step="1">
+      <div id="readout" class="readout"></div>
+      <div class="hint">观察任务：让 k 接近 1，看看链式反应如何保持稳定；k 大于 1 会增长，k 小于 1 会衰减。</div>
+    </section>
+  </div>
+</div>
+<script>
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const els = {
+  neutrons: document.getElementById('neutrons'),
+  absorb: document.getElementById('absorb'),
+  gen: document.getElementById('gen'),
+  neutronsVal: document.getElementById('neutronsVal'),
+  absorbVal: document.getElementById('absorbVal'),
+  genVal: document.getElementById('genVal'),
+  readout: document.getElementById('readout')
+};
+function stateLabel(k) {
+  if (k > 1.08) return '增长';
+  if (k < 0.92) return '衰减';
+  return '稳定可控';
+}
+function draw() {
+  const n = Number(els.neutrons.value);
+  const absorb = Number(els.absorb.value) / 100;
+  const gen = Number(els.gen.value);
+  const k = n * (1 - absorb);
+  els.neutronsVal.textContent = n;
+  els.absorbVal.textContent = Math.round(absorb * 100) + '%';
+  els.genVal.textContent = gen;
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#f7f9fc';
+  ctx.fillRect(0, 0, c.width, c.height);
+
+  const startX = 70;
+  for (let g = 0; g < gen; g++) {
+    const x = startX + g * 95;
+    const count = Math.min(12, Math.max(1, Math.round(Math.pow(k, g))));
+    ctx.fillStyle = '#486581';
+    ctx.font = '13px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText(`第${g}代`, x, 44);
+    for (let i = 0; i < count; i++) {
+      const y = 82 + i * 24;
+      ctx.fillStyle = '#fff7e6';
+      ctx.strokeStyle = '#f0a500';
+      ctx.beginPath();
+      ctx.arc(x, y, 11, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      if (g < gen - 1 && i < 4) {
+        ctx.strokeStyle = '#2c7be5';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x + 13, y);
+        ctx.lineTo(x + 78, 96 + i * 22);
+        ctx.stroke();
+      }
+    }
+  }
+  ctx.fillStyle = '#e03131';
+  ctx.fillRect(575, 74, 32, 210);
+  ctx.fillStyle = '#fff';
+  ctx.save();
+  ctx.translate(592, 180);
+  ctx.rotate(-Math.PI / 2);
+  ctx.font = '700 14px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('控制棒吸收中子', 0, 0);
+  ctx.restore();
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 18px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText(`有效增殖系数 k≈${k.toFixed(2)}，状态：${stateLabel(k)}`, 340, 344);
+  ctx.fillStyle = '#486581';
+  ctx.font = '14px system-ui';
+  ctx.fillText('k>1 增长，k=1 稳定，k<1 衰减；核电站追求可控稳定。', 340, 386);
+
+  els.readout.innerHTML = [
+    `每次释放中子数=${n}`,
+    `控制棒吸收=${Math.round(absorb * 100)}%，有效中子系数 k≈${k.toFixed(2)}`,
+    `显示 ${gen} 代后趋势：${stateLabel(k)}`,
+    `控制棒吸收中子，慢化剂负责减速中子`
+  ].join('<br>');
+}
+Object.values(els).forEach(el => {
+  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
+});
+draw();
+</script>
+</body>
+</html>

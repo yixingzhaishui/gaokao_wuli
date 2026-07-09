@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>练习使用多用电表</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 16px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 286px; gap: 14px; align-items: stretch; }
+  canvas { width: 100%; height: 470px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  input { width: 100%; }
+  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.72; font-size: 14px; }
+  .status { margin-top: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13px; line-height: 1.55; background: #e6fffa; color: #087f5b; font-weight: 700; }
+  .status.bad { background: #fff5f5; color: #c92a2a; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
+  @media (max-width: 780px) { .stage { grid-template-columns: 1fr; } canvas { height: 400px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="700" height="470" aria-label="多用电表练习"></canvas>
+    <section class="panel">
+      <label for="mode">测量模式：<span id="modeVal"></span></label>
+      <input id="mode" type="range" min="0" max="2" value="2" step="1">
+      <label for="range">量程/倍率：<span id="rangeVal"></span></label>
+      <input id="range" type="range" min="0" max="2" value="1" step="1">
+      <label for="value">被测量旋钮：<span id="valueVal"></span></label>
+      <input id="value" type="range" min="1" max="100" value="47" step="1">
+      <label for="zero">欧姆调零：<span id="zeroVal"></span></label>
+      <input id="zero" type="range" min="0" max="100" value="100" step="5">
+      <label for="power">被测电路带电：<span id="powerVal"></span></label>
+      <input id="power" type="range" min="0" max="1" value="0" step="1">
+      <div id="readout" class="readout"></div>
+      <div id="status" class="status"></div>
+      <div class="hint">观察任务：测电阻时先断电、选倍率、短接表笔调零，再读表盘数并乘倍率。</div>
+    </section>
+  </div>
+</div>
+<script>
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const els = {
+  mode: document.getElementById('mode'),
+  range: document.getElementById('range'),
+  value: document.getElementById('value'),
+  zero: document.getElementById('zero'),
+  power: document.getElementById('power'),
+  modeVal: document.getElementById('modeVal'),
+  rangeVal: document.getElementById('rangeVal'),
+  valueVal: document.getElementById('valueVal'),
+  zeroVal: document.getElementById('zeroVal'),
+  powerVal: document.getElementById('powerVal'),
+  readout: document.getElementById('readout'),
+  status: document.getElementById('status')
+};
+const modes = ['直流电压 V', '直流电流 A', '电阻 Ω'];
+const vRanges = [2.5, 10, 50];
+const aRanges = [0.1, 0.5, 2.0];
+const ohmMul = [1, 10, 100];
+function drawNeedle(cx, cy, radius, ratio, ohmMode) {
+  const start = Math.PI * 0.82;
+  const end = Math.PI * 0.18;
+  const t = Math.max(0, Math.min(1, ratio));
+  const ang = ohmMode ? start + (1-t) * (end-start) : start + t * (end-start);
+  ctx.strokeStyle = '#e03131';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.lineTo(cx + radius*Math.cos(ang), cy - radius*Math.sin(ang));
+  ctx.stroke();
+  ctx.fillStyle = '#334e68';
+  ctx.beginPath();
+  ctx.arc(cx, cy, 6, 0, Math.PI*2);
+  ctx.fill();
+}
+function drawDial(cx, cy, radius, ohmMode) {
+  ctx.strokeStyle = '#334e68';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, Math.PI*1.18, Math.PI*1.82);
+  ctx.stroke();
+  ctx.fillStyle = '#486581';
+  ctx.font = '12px system-ui';
+  ctx.textAlign = 'center';
+  for (let i=0;i<=10;i++) {
+    const t = i/10;
+    const ang = Math.PI*0.82 + t*(Math.PI*0.18 - Math.PI*0.82);
+    const x1 = cx + (radius-8)*Math.cos(ang);
+    const y1 = cy - (radius-8)*Math.sin(ang);
+    const x2 = cx + radius*Math.cos(ang);
+    const y2 = cy - radius*Math.sin(ang);
+    ctx.strokeStyle = '#829ab1';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x1,y1);
+    ctx.lineTo(x2,y2);
+    ctx.stroke();
+    if (i%2===0) {
+      const label = ohmMode ? (i===0 ? '∞' : String((10-i)*10)) : String(i*10);
+      ctx.fillText(label, cx + (radius+18)*Math.cos(ang), cy - (radius+18)*Math.sin(ang)+4);
+    }
+  }
+}
+function draw() {
+  const mode = Number(els.mode.value);
+  const rangeIndex = Number(els.range.value);
+  const raw = Number(els.value.value);
+  const zero = Number(els.zero.value);
+  const powered = Number(els.power.value) === 1;
+  let rangeText = '', trueText = '', connection = '', ratio = 0, result = '', ok = true, problem = '';
+  if (mode === 0) {
+    const V = raw / 10;
+    const range = vRanges[rangeIndex];
+    ratio = V / range;
+    rangeText = range + 'V';
+    trueText = V.toFixed(1) + 'V';
+    connection = '电压表并联，红表笔接高电势端';
+    result = ratio > 1 ? '超量程' : V.toFixed(2) + 'V';
+    ok = ratio <= 1 && ratio >= 0.15;
+    problem = ratio > 1 ? '超量程，先换更大量程。' : ratio < 0.15 ? '偏转太小，应换小量程提高精度。' : '量程合适。';
+  } else if (mode === 1) {
+    const A = raw / 100;
+    const range = aRanges[rangeIndex];
+    ratio = A / range;
+    rangeText = range + 'A';
+    trueText = A.toFixed(2) + 'A';
+    connection = '电流表串联接入，电流从红表笔流入';
+    result = ratio > 1 ? '超量程' : A.toFixed(3) + 'A';
+    ok = ratio <= 1 && ratio >= 0.15;
+    problem = ratio > 1 ? '超量程，可能损坏表头。' : ratio < 0.15 ? '偏转太小，应换小量程。' : '量程合适。';
+  } else {
+    const R = raw * 10;
+    const mul = ohmMul[rangeIndex];
+    const scale = R / mul;
+    const zeroFactor = zero / 100;
+    ratio = Math.max(0, Math.min(1, 1 - scale / 100)) * zeroFactor;
+    rangeText = '×' + mul;
+    trueText = R.toFixed(0) + 'Ω';
+    connection = '断开电源，红黑表笔接被测电阻两端';
+    const readScale = scale / Math.max(0.2, zeroFactor);
+    result = readScale.toFixed(1) + '×' + mul + '=' + (readScale*mul).toFixed(0) + 'Ω';
+    ok = !powered && zero >= 90 && scale >= 5 && scale <= 90;
+    problem = powered ? '测电阻必须先断开被测电路电源。' : zero < 90 ? '换挡后未欧姆调零，读数不可靠。' : scale < 5 || scale > 90 ? '表针位置太靠边，应换倍率。' : '倍率和调零合适。';
+  }
+  els.modeVal.textContent = modes[mode];
+  els.rangeVal.textContent = rangeText;
+  els.valueVal.textContent = trueText;
+  els.zeroVal.textContent = zero + '%';
+  els.powerVal.textContent = powered ? '是' : '否';
+
+  ctx.clearRect(0,0,c.width,c.height);
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0,0,c.width,c.height);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 18px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('多用电表：选挡、接法、调零、读数换算', 350, 30);
+
+  ctx.fillStyle = '#f7f9fc';
+  ctx.strokeStyle = '#334e68';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.roundRect(86,70,300,330,12);
+  ctx.fill();
+  ctx.stroke();
+  drawDial(236,260,128,mode===2);
+  drawNeedle(236,260,110,ratio,mode===2);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 16px system-ui';
+  ctx.fillText('MULTIMETER',236,104);
+  ctx.font = '13px system-ui';
+  ctx.fillText(modes[mode] + '  ' + rangeText,236,130);
+  ctx.fillStyle = '#d9e2ec';
+  ctx.strokeStyle = '#829ab1';
+  ctx.fillRect(154,318,164,42);
+  ctx.strokeRect(154,318,164,42);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 14px system-ui';
+  ctx.fillText('读数：' + result,236,344);
+  ctx.fillStyle = '#e03131';
+  ctx.beginPath(); ctx.arc(182,392,10,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#102a43';
+  ctx.beginPath(); ctx.arc(290,392,10,0,Math.PI*2); ctx.fill();
+  ctx.font = '12px system-ui';
+  ctx.fillText('红',182,418);
+  ctx.fillText('黑',290,418);
+
+  ctx.fillStyle = '#fff7e6';
+  ctx.strokeStyle = '#f08c00';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.roundRect(448,94,164,110,8);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 15px system-ui';
+  ctx.fillText('被测对象',530,124);
+  ctx.font = '13px system-ui';
+  ctx.fillText(trueText,530,154);
+  ctx.fillText(powered ? '带电' : '断电/独立',530,180);
+  ctx.strokeStyle = '#e03131';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(182,392);
+  ctx.lineTo(470,204);
+  ctx.stroke();
+  ctx.strokeStyle = '#102a43';
+  ctx.beginPath();
+  ctx.moveTo(290,392);
+  ctx.lineTo(590,204);
+  ctx.stroke();
+  ctx.fillStyle = '#486581';
+  ctx.font = '13px system-ui';
+  ctx.textAlign = 'left';
+  ctx.fillText('接法：' + connection, 430, 260);
+  ctx.fillText('规则：先选较大量程；偏转小再换小量程。', 430, 292);
+  ctx.fillText('欧姆挡：换挡后短接表笔调零。', 430, 324);
+  ctx.fillText('测电阻：被测电路必须断电。', 430, 356);
+
+  els.readout.innerHTML = [
+    `<div id="r1">模式=${modes[mode]}，量程/倍率=${rangeText}</div>`,
+    `<div id="r2">表针位置≈${Math.round(ratio*100)}% 满偏</div>`,
+    `<div id="r3">接法=${connection}</div>`,
+    `<div id="r4">读数结果：${result}</div>`,
+    `<div id="r5">${problem}</div>`
+  ].join('');
+  els.status.className = ok ? 'status' : 'status bad';
+  els.status.textContent = ok ? '通过：挡位、接法和读数条件合格。' : '不通过：' + problem;
+}
+Object.values(els).forEach(el => {
+  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
+});
+draw();
+</script>
+</body>
+</html>

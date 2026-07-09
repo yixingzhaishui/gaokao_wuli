@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>同步卫星实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#edf3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px;min-height:560px}
+  .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;touch-action:none}
+  .panel{display:flex;flex-direction:column;gap:8px}
+  .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
+  .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.45}
+  .title{font-weight:800;margin-bottom:5px;color:#0f172a}
+  .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:31px;cursor:pointer;color:#102a43}
+  button:hover{background:#f1f5f9}
+  .primary{background:#2563eb;color:#fff;border-color:#2563eb;font-weight:800}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:48px}
+  .meter span{display:block;font-size:11px;color:#b6c5d8}
+  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:15px;font-variant-numeric:tabular-nums}
+  .formula{display:grid;gap:5px;font-size:13px;color:#334155}
+  .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
+  .formula div:last-child{border-bottom:0;padding-bottom:0}
+  .formula b{white-space:nowrap;color:#0f172a}
+  .small{font-size:12px;line-height:1.5;color:#475569}
+  .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
+  .status.bad{border-color:#f59e0b;background:#fff7ed;color:#92400e}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="同步卫星交互实验台"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>抓卫星向内外拖，看 T 是否仍为 24h；再把倾角调大，看周期同步时为什么也不能静止在同一点上空。</div>
+    <button id="playBtn" class="primary">播放</button>
+    <div class="card">
+      <div class="title">快速情境</div>
+      <div class="chips">
+        <button data-case="sync">静止卫星</button>
+        <button data-case="low">低轨快跑</button>
+        <button data-case="inclined">倾斜同步</button>
+        <button data-case="reverse">反向同步</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="title">实时读数</div>
+      <div class="readout">
+        <div class="meter"><span>周期 T</span><b id="periodText">24.0 h</b></div>
+        <div class="meter"><span>离地高度 h</span><b id="heightText">35786 km</b></div>
+        <div class="meter"><span>线速度 v</span><b id="speedText">3.07 km/s</b></div>
+        <div class="meter"><span>经度漂移</span><b id="driftText">0°/日</b></div>
+      </div>
+    </div>
+    <div class="card formula">
+      <div><span>周期半径</span><b>T²=4π²r³/GM</b></div>
+      <div><span>同步条件</span><b>T=24h</b></div>
+      <div><span>静止条件</span><b>赤道 + 同向</b></div>
+    </div>
+    <div class="card small"><b>可直接操作：</b>拖卫星改半径和经度；拖底部 r、i、经度手柄；点“反向同步”看周期相同但方向错误时仍不静止。</div>
+    <div class="status" id="status">同步、赤道、同向同时满足：卫星固定在同一经度上空。</div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+  const Re=6371, rSync=42164, mu=398600.4418;
+  const state={rR:rSync/Re,inc:0,phase:0,earth:0,running:false,direction:1,drag:null};
+  const els={
+    period:document.getElementById('periodText'),height:document.getElementById('heightText'),
+    speed:document.getElementById('speedText'),drift:document.getElementById('driftText'),
+    status:document.getElementById('status'),play:document.getElementById('playBtn')
+  };
+  const colors={red:'#dc2626',blue:'#2563eb',purple:'#7c3aed',green:'#0f766e',orange:'#f59e0b',ink:'#102a43'};
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  const fmt=(v,d=1)=>Math.abs(v)<1e-8?(0).toFixed(d):v.toFixed(d);
+  function values(){
+    const r=state.rR*Re,T=24*Math.pow(r/rSync,1.5),h=r-Re,v=Math.sqrt(mu/r);
+    const omegaRatio=state.direction*24/T,drift=360*(omegaRatio-1),periodOk=Math.abs(T-24)<0.35;
+    const equatorOk=state.inc<0.6,directionOk=state.direction===1,stationary=periodOk&&equatorOk&&directionOk;
+    return{r,T,h,v,omegaRatio,drift,periodOk,equatorOk,directionOk,stationary};
+  }
+  function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){
+    ctx.fillStyle=c;ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;
+    ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y);
+  }
+  function line(x1,y1,x2,y2,c='#94a3b8',w=2,dash){
+    ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();
+  }
+  function arrow(x1,y1,x2,y2,c,w=3){
+    const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);
+    ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-12*Math.cos(a-.42),y2-12*Math.sin(a-.42));
+    ctx.lineTo(x2-12*Math.cos(a+.42),y2-12*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore();
+  }
+  function roundRect(x,y,w,h,r,fill,stroke){
+    ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();
+    if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}ctx.restore();
+  }
+  function ruler(x1,y,x2,label,c){
+    line(x1,y,x2,y,'#0f172a',2);
+    for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}
+    text(label,(x1+x2)/2,y-36,c,'center',12,'900');
+  }
+  function handle(x,y,label,active,c){
+    ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;
+    ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();
+    text(label,x,y-20,active?'#92400e':c,'center',12,'900');ctx.restore();
+  }
+  function handles(){
+    return{
+      r:{x:90+(state.rR-3.2)/(8.4-3.2)*190,y:494},
+      inc:{x:340+state.inc/45*160,y:494},
+      phase:{x:586+((state.phase+Math.PI)/(Math.PI*2))*145,y:494},
+      dir:{x:818,y:494}
+    };
+  }
+  function orbitGeom(v){
+    const O={x:304,y:252},earth=46,scale=(state.rR-3.2)/(8.4-3.2),Rpx=116+scale*112;
+    const theta=state.earth*v.omegaRatio+state.phase;
+    const flatten=Math.cos(state.inc*Math.PI/180),sx=O.x+Rpx*Math.cos(theta),sy=O.y+Rpx*Math.sin(theta)*flatten;
+    const groundTheta=state.earth+state.phase,gx=O.x+earth*Math.cos(groundTheta),gy=O.y+earth*Math.sin(groundTheta)*.32;
+    return{O,earth,Rpx,theta,sat:{x:sx,y:sy},ground:{x:gx,y:gy},flatten};
+  }
+  function drawEarth(g){
+    ctx.fillStyle='#dbeafe';ctx.beginPath();ctx.arc(g.O.x,g.O.y,g.earth,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#334155';ctx.stroke();
+    ctx.strokeStyle='#0f766e';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(g.O.x,g.O.y,g.earth,g.earth*.32,0,0,Math.PI*2);ctx.stroke();
+    text('赤道',g.O.x+65,g.O.y+3,colors.green,'left',12,'900');
+    ctx.fillStyle=colors.red;ctx.beginPath();ctx.arc(g.ground.x,g.ground.y,5,0,Math.PI*2);ctx.fill();
+    text('目标经度',g.ground.x,g.ground.y+20,colors.red,'center',12,'900');
+  }
+  function drawOrbit(v){
+    roundRect(42,58,560,382,8,'#fff','#d7dee8');
+    const g=orbitGeom(v);
+    drawEarth(g);
+    ctx.save();ctx.strokeStyle=v.stationary?colors.blue:(v.equatorOk?colors.orange:colors.purple);ctx.lineWidth=2.5;ctx.setLineDash([8,5]);
+    ctx.beginPath();ctx.ellipse(g.O.x,g.O.y,g.Rpx,g.Rpx*g.flatten,0,0,Math.PI*2);ctx.stroke();ctx.restore();
+    line(g.O.x,g.O.y,g.sat.x,g.sat.y,'#cbd5e1',2);
+    const tx=-Math.sin(g.theta),ty=Math.cos(g.theta)*g.flatten,dir=state.direction;
+    arrow(g.sat.x,g.sat.y,g.sat.x+tx*dir*66,g.sat.y+ty*dir*66,colors.blue,3);
+    text(state.direction===1?'同向':'反向',g.sat.x+tx*dir*82,g.sat.y+ty*dir*82,colors.blue,'center',12,'900');
+    ctx.fillStyle=v.stationary?colors.blue:'#f59e0b';ctx.beginPath();ctx.arc(g.sat.x,g.sat.y,10,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#0f172a';ctx.stroke();
+    ctx.save();ctx.strokeStyle=state.drag==='sat'?'#d97706':colors.orange;ctx.lineWidth=3;ctx.beginPath();ctx.arc(g.sat.x,g.sat.y,20,0,Math.PI*2);ctx.stroke();ctx.restore();
+    text('卫星',g.sat.x,g.sat.y-25,v.stationary?colors.blue:'#92400e','center',12,'900');
+    text(`r=${fmt(state.rR,2)}R`,(g.O.x+g.sat.x)/2,(g.O.y+g.sat.y)/2-16,'#475569','center',12,'900');
+    const groundLon=(state.phase*180/Math.PI+360)%360;
+    text(`经度 ${fmt(groundLon,0)}°`,g.O.x,426,'#475569','center',13,'900');
+  }
+  function drawCondition(v){
+    roundRect(642,76,214,256,8,'#fff','#d7dee8');
+    text('地球静止卫星三条件',749,106,'#0f172a','center',15,'900');
+    [
+      ['T=24h',v.periodOk],
+      ['轨道在赤道平面',v.equatorOk],
+      ['与地球自转同向',v.directionOk]
+    ].forEach((row,k)=>{
+      const y=137+k*60;roundRect(668,y,162,38,7,row[1]?'#ecfdf5':'#fff7ed',row[1]?'#14b8a6':'#f59e0b');
+      text((row[1]?'OK ':'× ')+row[0],749,y+19,row[1]?'#0f766e':'#92400e','center',12,'900');
+    });
+    roundRect(642,354,214,62,8,v.stationary?'#ecfdf5':'#fff7ed',v.stationary?'#14b8a6':'#f59e0b');
+    text(v.stationary?'相对地面静止':'相对地面不静止',749,376,v.stationary?'#0f766e':'#92400e','center',14,'900');
+    text(v.stationary?'同一高度、同一周期':'会漂移或南北摆动',749,400,v.stationary?'#0f766e':'#92400e','center',12,'900');
+  }
+  function update(v){
+    els.period.textContent=`${fmt(v.T,1)} h`;
+    els.height.textContent=`${fmt(v.h,0)} km`;
+    els.speed.textContent=`${fmt(v.v,2)} km/s`;
+    els.drift.textContent=`${fmt(v.drift,0)}°/日`;
+    els.status.classList.toggle('bad',!v.stationary);
+    els.status.textContent=v.stationary?'同步、赤道、同向同时满足：卫星固定在同一经度上空。':(!v.periodOk?'半径改变后 T 不再等于 24h，卫星相对地面产生东西向漂移。':(!v.equatorOk?'周期同步但轨道倾斜，地面投影会上下摆动，不是静止卫星。':'周期同步但方向相反，相对地面快速掠过。'));
+    els.play.textContent=state.running?'暂停':'播放';
+  }
+  function draw(){
+    const v=values(),h=handles();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);
+    text('同步卫星实验台：不是任意高度都能“静止”',460,30,'#0f172a','center',19,'900');
+    drawOrbit(v);drawCondition(v);
+    text('公式：T = 2π√(r³/GM)，同步卫星 T=24h 唯一确定 r≈6.6R（必在赤道上空）',460,448,'#334e68','center',13,'700');
+    roundRect(48,458,820,62,8,'#fff','#d7dee8');
+    ruler(90,494,280,'r/R',colors.orange);handle(h.r.x,h.r.y,`r=${fmt(state.rR,2)}R`,state.drag==='r',colors.orange);
+    ruler(340,494,500,'倾角 i',colors.purple);handle(h.inc.x,h.inc.y,`i=${fmt(state.inc,0)}°`,state.drag==='inc',colors.purple);
+    ruler(586,494,731,'经度',colors.red);handle(h.phase.x,h.phase.y,`${fmt((state.phase*180/Math.PI+360)%360,0)}°`,state.drag==='phase',colors.red);
+    handle(h.dir.x,h.dir.y,state.direction===1?'同向':'反向',state.drag==='dir',state.direction===1?colors.green:colors.red);
+    update(v);
+  }
+  function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+  function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+  function pointerDown(e){
+    const p=pos(e),v=values(),og=orbitGeom(v),h=handles();
+    if(near(p,og.sat,32))state.drag='sat';
+    else if(near(p,h.r,26))state.drag='r';
+    else if(near(p,h.inc,26))state.drag='inc';
+    else if(near(p,h.phase,26))state.drag='phase';
+    else if(near(p,h.dir,28))state.drag='dir';
+    else state.drag=null;
+    if(state.drag==='dir'){state.direction*=-1;state.drag=null;draw();return}
+    if(state.drag){state.running=false;canvas.setPointerCapture(e.pointerId);pointerMove(e)}
+  }
+  function pointerMove(e){
+    if(!state.drag)return;
+    const p=pos(e),v=values(),og=orbitGeom(v);
+    if(state.drag==='r')state.rR=clamp(3.2+(p.x-90)/190*(8.4-3.2),3.2,8.4);
+    if(state.drag==='inc')state.inc=clamp((p.x-340)/160*45,0,45);
+    if(state.drag==='phase')state.phase=clamp((p.x-586)/145*Math.PI*2-Math.PI,-Math.PI,Math.PI);
+    if(state.drag==='sat'){
+      const dx=p.x-og.O.x,dy=p.y-og.O.y,dist=Math.hypot(dx,dy),scale=clamp((dist-116)/112,0,1);
+      state.rR=3.2+scale*(8.4-3.2);
+      state.phase=Math.atan2(dy/Math.max(.12,Math.cos(state.inc*Math.PI/180)),dx)-state.earth*v.omegaRatio;
+      while(state.phase>Math.PI)state.phase-=Math.PI*2;
+      while(state.phase<-Math.PI)state.phase+=Math.PI*2;
+    }
+    draw();
+  }
+  function pointerUp(e){
+    if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}
+  }
+  canvas.addEventListener('pointerdown',pointerDown);canvas.addEventListener('pointermove',pointerMove);
+  canvas.addEventListener('pointerup',pointerUp);canvas.addEventListener('pointercancel',pointerUp);
+  els.play.addEventListener('click',()=>{state.running=!state.running;draw()});
+  document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{
+    const c=btn.dataset.case;
+    if(c==='sync'){state.rR=rSync/Re;state.inc=0;state.direction=1;state.phase=0}
+    if(c==='low'){state.rR=3.5;state.inc=0;state.direction=1;state.phase=-.45}
+    if(c==='inclined'){state.rR=rSync/Re;state.inc=28;state.direction=1;state.phase=.35}
+    if(c==='reverse'){state.rR=rSync/Re;state.inc=0;state.direction=-1;state.phase=0}
+    state.running=false;draw();
+  }));
+  function tick(){
+    if(state.running)state.earth=(state.earth+0.014)%(Math.PI*2);
+    draw();requestAnimationFrame(tick);
+  }
+  draw();requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

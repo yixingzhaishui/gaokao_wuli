@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>电场线</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#eef2f7;color:#102a43}
+.wrap{padding:12px}
+h2{font-size:16px;margin:0 0 8px}
+canvas{display:block;width:100%;max-width:720px;background:#0d1b2a;border-radius:12px;box-shadow:0 2px 10px rgba(16,42,67,.12);touch-action:none;cursor:grab}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.chip{background:#102a43;color:#e6eef7;padding:6px 11px;border-radius:8px;font-size:13px}
+.chip b{color:#ffd166}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0;align-items:center;font-size:13px;color:#5a6b7b}
+.btn{font:inherit;font-size:13px;padding:6px 11px;border:1px solid #d9e2ec;background:#fff;border-radius:8px;cursor:pointer}
+.btn:hover{background:#f0f4f9}
+.btn.on{background:#2c7be5;color:#fff;border-color:#2c7be5}
+.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:9px 12px;border-radius:6px;font-size:13px;color:#5a6b7b;line-height:1.5;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2>电场线：切线=场强方向，疏密=强弱，由正到负、不相交不闭合</h2>
+  <canvas id="cv" width="720" height="440"></canvas>
+  <div class="chips">
+    <span class="chip">小磁针处场强方向：<b id="dir">—</b></span>
+    <span class="chip">该点场强强弱：<b id="mag">—</b></span>
+    <span class="chip">释放的电荷：<b id="pst">未释放</b></span>
+  </div>
+  <div class="tools">
+    <span>场景：</span>
+    <button class="btn on" data-preset="dipole">等量异种（偶极子）</button>
+    <button class="btn" data-preset="pos">单个正电荷</button>
+    <button class="btn" data-preset="neg">单个负电荷</button>
+    <button class="btn" data-preset="like">等量同种</button>
+    <button class="btn" id="release">▶ 从小磁针处释放 +q</button>
+    <button class="btn" id="reset">重置</button>
+  </div>
+  <div class="hint"><b>怎么玩</b>：拖动红/蓝电荷，电场线实时重画——线从<b>正电荷发出、到负电荷终止</b>，越<b>密</b>处场越<b>强</b>。拖黄色<b>小磁针</b>到任意位置，绿箭头总沿<b>电场线切线</b>指向该点场强方向。点<b>"释放 +q"</b>：一个静止的正电荷从小磁针处被释放，你会看到它<b>沿电场线方向被电场力推着加速运动</b>（初速为零时轨迹与电场线重合）——这就是"电场线切线 = 受力/加速度方向"。任意两条电场线<b>永不相交、不闭合</b>。</div>
+</div>
+<script>
+(function(){
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height,k=6000;
+let charges=[],probe={x:360,y:100},drag=null,dragProbe=false;
+let particle=null; // {x,y,vx,vy}
+function preset(name){
+  if(name==='dipole')charges=[{x:250,y:230,q:1},{x:470,y:230,q:-1}];
+  else if(name==='pos')charges=[{x:360,y:230,q:1}];
+  else if(name==='neg')charges=[{x:360,y:230,q:-1}];
+  else charges=[{x:250,y:230,q:1},{x:470,y:230,q:1}];
+  particle=null;
+}
+preset('dipole');
+function field(x,y){let ex=0,ey=0;for(const c of charges){const dx=x-c.x,dy=y-c.y;let r2=dx*dx+dy*dy;if(r2<180)r2=180;const r=Math.sqrt(r2),e=k*c.q/r2;ex+=e*dx/r;ey+=e*dy/r;}return{ex,ey,mag:Math.hypot(ex,ey)};}
+function chargeR(c){return Math.abs(c.q)*8+17;}
+function trace(sx,sy,dir){ctx.beginPath();ctx.moveTo(sx,sy);let x=sx,y=sy,arrowAt=26;
+  for(let i=0;i<600;i++){const f=field(x,y);if(f.mag<1e-4)break;const ux=dir*f.ex/f.mag,uy=dir*f.ey/f.mag;x+=ux*3.5;y+=uy*3.5;if(x<-20||x>W+20||y<-20||y>H+20)break;ctx.lineTo(x,y);
+    if(--arrowAt===0){arrowAt=30;const a=Math.atan2(uy,ux);ctx.save();ctx.fillStyle='rgba(255,225,150,.9)';ctx.translate(x,y);ctx.rotate(a);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(-6,-3);ctx.lineTo(-6,3);ctx.closePath();ctx.fill();ctx.restore();}
+    let hit=false;for(const o of charges){if(o.q*dir<0&&Math.hypot(x-o.x,y-o.y)<16){hit=true;break;}}if(hit)break;}
+  ctx.stroke();}
+function drawCharge(c){const r=chargeR(c),col=c.q>0?['#ff8a76','#e8342a']:['#7bb6ff','#2f6fd0'];const g=ctx.createRadialGradient(c.x-r*.3,c.y-r*.3,2,c.x,c.y,r);g.addColorStop(0,col[0]);g.addColorStop(1,col[1]);
+  ctx.save();ctx.shadowColor=c.q>0?'rgba(232,52,42,.55)':'rgba(47,111,208,.55)';ctx.shadowBlur=16;ctx.fillStyle=g;ctx.beginPath();ctx.arc(c.x,c.y,r,0,7);ctx.fill();ctx.restore();
+  ctx.strokeStyle='rgba(255,255,255,.5)';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(c.x,c.y,r,0,7);ctx.stroke();
+  ctx.fillStyle='#fff';ctx.font='bold 20px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(c.q>0?'+':'−',c.x,c.y+1);}
+let trail=[];
+function render(){
+  const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#12233a');bg.addColorStop(1,'#0a1622');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(255,220,150,.8)';ctx.lineWidth=1.6;
+  const hasPos=charges.some(c=>c.q>0);
+  for(const c of charges){
+    if(c.q>0){const n=Math.round(10*Math.abs(c.q));for(let i=0;i<n;i++)trace(c.x+Math.cos(i/n*6.283)*(chargeR(c)+2),c.y+Math.sin(i/n*6.283)*(chargeR(c)+2),1);}
+    else if(!hasPos){const n=Math.round(10*Math.abs(c.q));for(let i=0;i<n;i++)trace(c.x+Math.cos(i/n*6.283)*(chargeR(c)+2),c.y+Math.sin(i/n*6.283)*(chargeR(c)+2),-1);}
+  }
+  for(const c of charges)drawCharge(c);
+  // released particle trail + body
+  if(trail.length>1){ctx.strokeStyle='rgba(46,204,113,.7)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(trail[0].x,trail[0].y);for(const p of trail)ctx.lineTo(p.x,p.y);ctx.stroke();}
+  if(particle){ctx.save();ctx.shadowColor='rgba(46,204,113,.9)';ctx.shadowBlur=12;ctx.fillStyle='#2ecc71';ctx.beginPath();ctx.arc(particle.x,particle.y,7,0,7);ctx.fill();ctx.restore();ctx.fillStyle='#0a3';ctx.font='bold 10px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('+q',particle.x,particle.y+1);}
+  // probe compass
+  const f=field(probe.x,probe.y);
+  ctx.save();ctx.shadowColor='rgba(255,209,102,.8)';ctx.shadowBlur=12;ctx.fillStyle='#ffd166';ctx.beginPath();ctx.arc(probe.x,probe.y,8,0,7);ctx.fill();ctx.restore();
+  ctx.strokeStyle='#8a5a00';ctx.lineWidth=1.4;ctx.beginPath();ctx.arc(probe.x,probe.y,8,0,7);ctx.stroke();
+  if(f.mag>1e-4){const a=Math.atan2(f.ey,f.ex);ctx.save();ctx.translate(probe.x,probe.y);ctx.rotate(a);ctx.strokeStyle='#38d9a9';ctx.fillStyle='#38d9a9';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-2,0);ctx.lineTo(32,0);ctx.stroke();ctx.beginPath();ctx.moveTo(32,0);ctx.lineTo(25,-5);ctx.lineTo(25,5);ctx.closePath();ctx.fill();ctx.restore();ctx.fillStyle='#38d9a9';ctx.font='12px system-ui';ctx.textAlign='left';ctx.fillText('E 沿切线',probe.x+12,probe.y-12);}
+  const deg=f.mag>1e-4?(Math.atan2(f.ey,f.ex)*180/Math.PI):null;
+  document.getElementById('dir').textContent=deg==null?'—':(deg.toFixed(0)+'°');
+  document.getElementById('mag').textContent=f.mag<1e-4?'≈0':(f.mag>90?'强（线密）':(f.mag>30?'中':'弱（线疏）'));
+}
+function step(dt){
+  if(!particle)return;
+  const f=field(particle.x,particle.y);
+  particle.vx+=f.ex*0.02*dt;particle.vy+=f.ey*0.02*dt; // +q: a along E
+  particle.x+=particle.vx*dt;particle.y+=particle.vy*dt;
+  trail.push({x:particle.x,y:particle.y});if(trail.length>240)trail.shift();
+  let done=particle.x<0||particle.x>W||particle.y<0||particle.y>H;
+  for(const c of charges)if(c.q<0&&Math.hypot(particle.x-c.x,particle.y-c.y)<chargeR(c)+4)done=true;
+  if(done){document.getElementById('pst').textContent='已到达/离开';particle=null;}
+  else document.getElementById('pst').textContent='v='+Math.hypot(particle.vx,particle.vy).toFixed(0)+'（沿线加速）';
+}
+function pos(e){const r=cv.getBoundingClientRect(),s=cv.width/r.width,X=e.touches?e.touches[0].clientX:e.clientX,Y=e.touches?e.touches[0].clientY:e.clientY;return{x:(X-r.left)*s,y:(Y-r.top)*s};}
+cv.addEventListener('pointerdown',e=>{const p=pos(e);if(Math.hypot(p.x-probe.x,p.y-probe.y)<16){dragProbe=true;return;}for(let i=charges.length-1;i>=0;i--)if(Math.hypot(p.x-charges[i].x,p.y-charges[i].y)<chargeR(charges[i])){drag=i;return;}});
+cv.addEventListener('pointermove',e=>{if(drag===null&&!dragProbe)return;const p=pos(e);p.x=Math.max(16,Math.min(W-16,p.x));p.y=Math.max(16,Math.min(H-16,p.y));if(dragProbe)probe=p;else{charges[drag].x=p.x;charges[drag].y=p.y;}});
+window.addEventListener('pointerup',()=>{drag=null;dragProbe=false;});
+document.querySelectorAll('[data-preset]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-preset]').forEach(x=>x.classList.toggle('on',x===b));preset(b.dataset.preset);trail=[];});
+document.getElementById('release').onclick=()=>{particle={x:probe.x,y:probe.y,vx:0,vy:0};trail=[{x:probe.x,y:probe.y}];};
+document.getElementById('reset').onclick=()=>{particle=null;trail=[];document.getElementById('pst').textContent='未释放';};
+let last=performance.now();
+function loop(now){const dt=Math.min((now-last)/1000,0.033)*60;last=now;step(dt);render();requestAnimationFrame(loop);}
+render();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

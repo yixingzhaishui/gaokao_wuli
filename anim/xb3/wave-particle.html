@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>波粒二象性</title>
+<link rel="icon" href="data:,">
+<style>
+  body{margin:0;background:#f7f9fc;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}.root{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:10px;padding:10px;box-sizing:border-box;min-height:540px}.stage{background:#fff;border:1px solid #d9e2ec;border-radius:8px;overflow:hidden}canvas{display:block;width:100%;height:auto}.panel{display:flex;flex-direction:column;gap:7px}.card{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:8px}.task{background:#fff7e6;border-left:3px solid #f0a500;color:#486581;line-height:1.38;font-size:12px}.title{font-weight:700;margin-bottom:4px}.param{display:grid;gap:2px;margin:6px 0;font-size:13px}.param span{display:flex;justify-content:space-between;color:#486581;gap:10px}.param b{color:#102a43;font-variant-numeric:tabular-nums;white-space:nowrap}input[type=range]{width:100%;accent-color:#2c7be5}.readout{background:#102a43;color:#d9e2ec;border-radius:8px;padding:8px;line-height:1.45;font-size:13px}.readout b{color:#f0a500}.formula{font-size:13px;line-height:1.42;color:#334e68}.status{font-size:12px;font-weight:700;border-radius:6px;padding:7px;border:1px solid #38b2ac;background:#e6fffa;color:#087f5b;line-height:1.35}@media(max-width:780px){.root{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="root"><div class="stage"><canvas id="canvas" width="850" height="520"></canvas></div><div class="panel">
+  <div class="card task"><b>观察任务：</b>调 ν 看光子能量；调光强看光子数量；调 p 看德布罗意波长。</div>
+  <div class="card"><div class="title">参数</div>
+    <label class="param"><span>光频率 ν <b id="nuText">6.0×10¹⁴ Hz</b></span><input id="nu" type="range" min="3" max="12" step="0.1" value="6"></label>
+    <label class="param"><span>光强 <b id="iText">中</b></span><input id="intensity" type="range" min="1" max="5" step="1" value="3"></label>
+    <label class="param"><span>粒子动量 p <b id="pText">2.0 h/单位</b></span><input id="mom" type="range" min="0.8" max="5" step="0.1" value="2"></label>
+  </div>
+  <div class="readout" id="readout"></div>
+  <div class="card formula"><div class="title">量子关系</div><div>光子：E = hν</div><div>实物粒子：λ = h/p</div></div>
+  <div class="status" id="status"></div>
+</div></div>
+<script>
+(function(){'use strict';const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');const els={nu:document.getElementById('nu'),intensity:document.getElementById('intensity'),mom:document.getElementById('mom')};const hEV=4.136e-15;function fmt(n,d){return n.toFixed(d)}function p(){const nu=+els.nu.value,int=+els.intensity.value,mom=+els.mom.value,E=hEV*nu*1e14,lambda=1/mom;return{nu,int,mom,E,lambda}}function text(s,x,y,c,a,size,w){ctx.fillStyle=c||'#102a43';ctx.font=(w?w+' ':'')+(size||13)+'px -apple-system,\"PingFang SC\",sans-serif';ctx.textAlign=a||'center';ctx.textBaseline='middle';ctx.fillText(s,x,y)}function box(x,y,w,h,fill,stroke){ctx.save();ctx.fillStyle=fill;ctx.strokeStyle=stroke||'#d9e2ec';ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.restore()}function wave(x0,y0,w,amp,cycles,c){ctx.strokeStyle=c;ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=w;i++){const y=y0+Math.sin(i/w*cycles*Math.PI*2)*amp;if(i===0)ctx.moveTo(x0+i,y);else ctx.lineTo(x0+i,y)}ctx.stroke()}function draw(){const q=p();ctx.clearRect(0,0,850,520);ctx.fillStyle='#fff';ctx.fillRect(0,0,850,520);text('波粒二象性：光有光子能量，实物粒子有德布罗意波长',425,34,'#102a43','center',18,'700');box(54,80,350,310,'#fff','#d9e2ec');text('光：波动性 + 粒子性',229,108,'#102a43','center',16,'700');wave(92,162,270,28,q.nu/2,'#2c7be5');text('波形：频率越高越密',227,210,'#486581','center',13);for(let i=0;i<q.int;i++){ctx.fillStyle='#f0a500';ctx.beginPath();ctx.arc(112+i*48,278,10,0,Math.PI*2);ctx.fill()}text('光子数：光强越大越多',227,326,'#486581','center',13);box(452,80,340,310,'#fff','#d9e2ec');text('实物粒子：德布罗意波',622,108,'#102a43','center',16,'700');ctx.fillStyle='#e03131';ctx.beginPath();ctx.arc(560,172,12,0,Math.PI*2);ctx.fill();text('粒子 p',560,198,'#e03131','center',13,'700');wave(500,280,250,24,250/(q.lambda*95),'#7b2cbf');text('λ = h/p = '+fmt(q.lambda,2)+'（相对单位）',625,336,'#7b2cbf','center',14,'700');update(q)}function update(q){document.getElementById('nuText').textContent=fmt(q.nu,1)+'×10¹⁴ Hz';document.getElementById('iText').textContent=['','很弱','弱','中','强','很强'][q.int];document.getElementById('pText').textContent=fmt(q.mom,1)+' h/单位';document.getElementById('readout').innerHTML='光子能量 E=hν=<b>'+fmt(q.E,2)+' eV</b><br>光强等级=<b>'+q.int+'</b><br>德布罗意波长 λ=h/p=<b>'+fmt(q.lambda,2)+'</b>';document.getElementById('status').textContent='频率改变单个光子能量；光强改变光子数量；动量越大，实物粒子波长越短。'}Object.values(els).forEach(el=>el.addEventListener('input',draw));draw();})();
+</script>
+</body>
+</html>

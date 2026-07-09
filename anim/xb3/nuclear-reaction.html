@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>核反应方程配平</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 14px; align-items: stretch; }
+  canvas { width: 100%; height: 430px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  input { width: 100%; }
+  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.8; font-size: 14px; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
+  @media (max-width: 760px) { .stage { grid-template-columns: 1fr; } canvas { height: 360px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="680" height="430" aria-label="核反应方程配平模型"></canvas>
+    <section class="panel">
+      <label for="template">反应模板：<span id="templateVal"></span></label>
+      <input id="template" type="range" min="0" max="2" value="0" step="1">
+      <label for="unknown">未知位置：<span id="unknownVal"></span></label>
+      <input id="unknown" type="range" min="0" max="1" value="1" step="1">
+      <div id="readout" class="readout"></div>
+      <div class="hint">观察任务：每次先配平质量数，再配平电荷数；用两个差值判断未知粒子。</div>
+    </section>
+  </div>
+</div>
+<script>
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const els = {
+  template: document.getElementById('template'),
+  unknown: document.getElementById('unknown'),
+  templateVal: document.getElementById('templateVal'),
+  unknownVal: document.getElementById('unknownVal'),
+  readout: document.getElementById('readout')
+};
+const reactions = [
+  { name: 'α 轰击氮核', left: [{a:14,z:7,s:'N'}, {a:4,z:2,s:'He'}], right: [{a:17,z:8,s:'O'}, {a:1,z:1,s:'H'}], type: '人工核转变' },
+  { name: '氘氚反应', left: [{a:2,z:1,s:'H'}, {a:3,z:1,s:'H'}], right: [{a:4,z:2,s:'He'}, {a:1,z:0,s:'n'}], type: '聚变反应' },
+  { name: '中子轰击铀核', left: [{a:235,z:92,s:'U'}, {a:1,z:0,s:'n'}], right: [{a:141,z:56,s:'Ba'}, {a:92,z:36,s:'Kr'}, {a:3,z:0,s:'n'}], type: '裂变反应示例' }
+];
+function sum(list, key) { return list.reduce((acc, x) => acc + x[key], 0); }
+function particleName(a, z) {
+  if (a === 1 && z === 1) return '质子 ¹₁H';
+  if (a === 1 && z === 0) return '中子 ¹₀n';
+  if (a > 1 && z === 0) return `${a} 个中子`;
+  if (a === 0 && z === -1) return '电子 ⁰₋₁e';
+  if (a === 4 && z === 2) return 'α 粒子 ⁴₂He';
+  return `核素 A=${a}, Z=${z}`;
+}
+function termText(x) { return `${x.a}/${x.z}${x.s}`; }
+function draw() {
+  const r = reactions[Number(els.template.value)];
+  const unknownRight = Number(els.unknown.value) === 1;
+  els.templateVal.textContent = r.name;
+  els.unknownVal.textContent = unknownRight ? '右侧最后一项' : '左侧最后一项';
+  const leftKnown = unknownRight ? r.left : r.left.slice(0, -1);
+  const rightKnown = unknownRight ? r.right.slice(0, -1) : r.right;
+  const unknown = unknownRight ? r.right[r.right.length - 1] : r.left[r.left.length - 1];
+  const leftA = sum(r.left, 'a'), rightA = sum(r.right, 'a');
+  const leftZ = sum(r.left, 'z'), rightZ = sum(r.right, 'z');
+  const needA = unknownRight ? sum(r.left, 'a') - sum(rightKnown, 'a') : sum(r.right, 'a') - sum(leftKnown, 'a');
+  const needZ = unknownRight ? sum(r.left, 'z') - sum(rightKnown, 'z') : sum(r.right, 'z') - sum(leftKnown, 'z');
+
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#f7f9fc';
+  ctx.fillRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 18px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText(r.name + '：' + r.type, 340, 48);
+
+  ctx.font = '700 30px system-ui';
+  const leftText = r.left.map((x, i) => (!unknownRight && i === r.left.length - 1) ? 'x' : termText(x)).join(' + ');
+  const rightText = r.right.map((x, i) => (unknownRight && i === r.right.length - 1) ? 'x' : termText(x)).join(' + ');
+  ctx.fillText(leftText + '  →  ' + rightText, 340, 122);
+
+  ctx.fillStyle = '#eef4ff';
+  ctx.strokeStyle = '#2c7be5';
+  ctx.lineWidth = 2;
+  ctx.fillRect(70, 172, 250, 130);
+  ctx.strokeRect(70, 172, 250, 130);
+  ctx.fillStyle = '#fff7e6';
+  ctx.strokeStyle = '#f0a500';
+  ctx.fillRect(360, 172, 250, 130);
+  ctx.strokeRect(360, 172, 250, 130);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 16px system-ui';
+  ctx.textAlign = 'left';
+  ctx.fillText(`质量数：左 ${leftA}，右 ${rightA}`, 92, 216);
+  ctx.fillText(`电荷数：左 ${leftZ}，右 ${rightZ}`, 92, 252);
+  ctx.fillText(`未知 x：A=${needA}，Z=${needZ}`, 382, 216);
+  ctx.fillText(`判断：${particleName(needA, needZ)}`, 382, 252);
+  ctx.fillStyle = leftA === rightA && leftZ === rightZ ? '#087f5b' : '#b30000';
+  ctx.font = '700 18px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText(leftA === rightA && leftZ === rightZ ? '质量数、电荷数均守恒' : '方程未配平', 340, 356);
+
+  els.readout.innerHTML = [
+    `模板=${r.name}`,
+    `ΣA：左=${leftA}，右=${rightA}`,
+    `ΣZ：左=${leftZ}，右=${rightZ}`,
+    `未知 x 应为 A=${needA}, Z=${needZ}，${particleName(needA, needZ)}`
+  ].join('<br>');
+}
+Object.values(els).forEach(el => {
+  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
+});
+draw();
+</script>
+</body>
+</html>

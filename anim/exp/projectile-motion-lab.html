@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>探究平抛运动特点</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 16px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 286px; gap: 14px; align-items: stretch; }
+  canvas { width: 100%; height: 470px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  input { width: 100%; }
+  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.72; font-size: 14px; }
+  .status { margin-top: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13px; line-height: 1.55; background: #e6fffa; color: #087f5b; font-weight: 700; }
+  .status.bad { background: #fff5f5; color: #c92a2a; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
+  @media (max-width: 780px) { .stage { grid-template-columns: 1fr; } canvas { height: 400px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="700" height="470" aria-label="平抛运动描迹实验"></canvas>
+    <section class="panel">
+      <label for="speed">水平初速度 v0/(m/s)：<span id="speedVal"></span></label>
+      <input id="speed" type="range" min="1" max="8" value="4" step="0.2">
+      <label for="height">桌面高度 h/m：<span id="heightVal"></span></label>
+      <input id="height" type="range" min="0.6" max="2.5" value="1.8" step="0.1">
+      <label for="dt">相邻闪光时间 Δt/s：<span id="dtVal"></span></label>
+      <input id="dt" type="range" min="0.05" max="0.16" value="0.10" step="0.01">
+      <label for="point">观察点 n：<span id="pointVal"></span></label>
+      <input id="point" type="range" min="2" max="8" value="4" step="1">
+      <label for="tilt">发射口调平误差 θ：<span id="tiltVal"></span></label>
+      <input id="tilt" type="range" min="-6" max="6" value="0" step="0.5">
+      <div id="readout" class="readout"></div>
+      <div id="status" class="status"></div>
+      <div class="hint">观察任务：调 θ 到 0，看同一时刻平抛球与自由落体球是否等高；再调大 θ，看竖直规律怎样被破坏。</div>
+    </section>
+  </div>
+</div>
+<script>
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const els = {
+  speed: document.getElementById('speed'),
+  height: document.getElementById('height'),
+  dt: document.getElementById('dt'),
+  point: document.getElementById('point'),
+  tilt: document.getElementById('tilt'),
+  speedVal: document.getElementById('speedVal'),
+  heightVal: document.getElementById('heightVal'),
+  dtVal: document.getElementById('dtVal'),
+  pointVal: document.getElementById('pointVal'),
+  tiltVal: document.getElementById('tiltVal'),
+  readout: document.getElementById('readout'),
+  status: document.getElementById('status')
+};
+const g = 9.8;
+function pointAt(v0, dt, n, deg) {
+  const t = n * dt;
+  const rad = deg * Math.PI / 180;
+  const vx = v0 * Math.cos(rad);
+  const vy0 = v0 * Math.sin(rad);
+  return { t, x: vx * t, y: 0.5 * g * t * t + vy0 * t, vx, vy0 };
+}
+function draw() {
+  const v0 = Number(els.speed.value);
+  const h = Number(els.height.value);
+  const dt = Number(els.dt.value);
+  const n = Number(els.point.value);
+  const deg = Number(els.tilt.value);
+  const p = pointAt(v0, dt, n, deg);
+  const freeY = 0.5 * g * p.t * p.t;
+  const verticalG = 2 * p.y / (p.t * p.t);
+  const valid = p.y < h;
+  const horizontalOk = Math.abs(deg) < 0.6;
+  els.speedVal.textContent = v0.toFixed(1);
+  els.heightVal.textContent = h.toFixed(1);
+  els.dtVal.textContent = dt.toFixed(2);
+  els.pointVal.textContent = n;
+  els.tiltVal.textContent = deg.toFixed(1) + '°';
+
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 18px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('平抛描迹：水平等距，竖直与自由落体同步', 350, 30);
+
+  const ox = 76;
+  const oy = 78;
+  const sx = 92;
+  const sy = 160;
+  ctx.strokeStyle = '#e5ecf3';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 6; i++) {
+    ctx.beginPath();
+    ctx.moveTo(ox + i * sx, oy);
+    ctx.lineTo(ox + i * sx, 420);
+    ctx.stroke();
+  }
+  for (let j = 0; j <= 5; j++) {
+    ctx.beginPath();
+    ctx.moveTo(ox, oy + j * 60);
+    ctx.lineTo(644, oy + j * 60);
+    ctx.stroke();
+  }
+  ctx.strokeStyle = '#334e68';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(ox, oy);
+  ctx.lineTo(ox, 430);
+  ctx.moveTo(ox, oy);
+  ctx.lineTo(655, oy);
+  ctx.stroke();
+  ctx.fillStyle = '#486581';
+  ctx.font = '13px system-ui';
+  ctx.textAlign = 'left';
+  ctx.fillText('x/m', 658, oy + 4);
+  ctx.fillText('y/m', ox - 32, 430);
+  ctx.fillStyle = '#d9e2ec';
+  ctx.fillRect(28, oy - 16, 98, 16);
+  ctx.fillStyle = '#eef4ff';
+  ctx.strokeStyle = '#2c7be5';
+  ctx.lineWidth = 2;
+  ctx.fillRect(32, oy - 50, 88, 34);
+  ctx.strokeRect(32, oy - 50, 88, 34);
+  ctx.fillStyle = '#102a43';
+  ctx.textAlign = 'center';
+  ctx.fillText('水平发射器', 76, oy - 29);
+
+  ctx.strokeStyle = '#f0a500';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([5, 5]);
+  for (let i = 1; i <= 8; i++) {
+    const fp = pointAt(v0, dt, i, deg);
+    const x = ox + fp.x * sx;
+    const y = oy + fp.y * sy;
+    const yFree = oy + 0.5 * g * Math.pow(i * dt, 2) * sy;
+    if (x < 650 && y < 430) {
+      ctx.beginPath();
+      ctx.moveTo(x, oy);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    }
+    if (yFree < 430) {
+      ctx.beginPath();
+      ctx.moveTo(ox - 18, yFree);
+      ctx.lineTo(x, yFree);
+      ctx.stroke();
+    }
+  }
+  ctx.setLineDash([]);
+
+  for (let i = 0; i <= 8; i++) {
+    const fp = pointAt(v0, dt, i, deg);
+    const x = ox + fp.x * sx;
+    const y = oy + fp.y * sy;
+    const yFree = oy + 0.5 * g * Math.pow(i * dt, 2) * sy;
+    if (x < 650 && y < 430) {
+      ctx.fillStyle = i === n ? '#e03131' : '#2c7be5';
+      ctx.beginPath();
+      ctx.arc(x, y, i === n ? 6 : 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    if (yFree < 430) {
+      ctx.fillStyle = '#7b2cbf';
+      ctx.beginPath();
+      ctx.arc(ox - 20, yFree, 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  const px = ox + p.x * sx;
+  const py = oy + p.y * sy;
+  ctx.strokeStyle = '#e03131';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(px, oy);
+  ctx.lineTo(px, py);
+  ctx.lineTo(ox, py);
+  ctx.stroke();
+  ctx.fillStyle = '#e03131';
+  ctx.font = '700 13px system-ui';
+  ctx.fillText('测点 n=' + n, Math.min(630, px + 44), Math.min(418, py - 12));
+  ctx.fillStyle = '#486581';
+  ctx.font = '13px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('蓝点：平抛小球；紫点：同一时刻自由落体小球；橙虚线帮助比较等时位置。', 360, 452);
+
+  els.readout.innerHTML = [
+    `<div id="r1">t=nΔt=${p.t.toFixed(2)}s</div>`,
+    `<div id="r2">x=v0t≈${p.x.toFixed(2)}m，x/t≈${(p.x / p.t).toFixed(2)}m/s</div>`,
+    `<div id="r3">y≈${p.y.toFixed(2)}m，自由落体 y0=1/2gt²≈${freeY.toFixed(2)}m</div>`,
+    `<div id="r4">2y/t²≈${verticalG.toFixed(2)}m/s²</div>`,
+    `<div id="r5">落地前有效：${valid ? '是' : '否'}</div>`
+  ].join('');
+  els.status.className = valid && horizontalOk ? 'status' : 'status bad';
+  els.status.textContent = !valid
+    ? '测点已低于桌面高度：应选更小 n、更小 Δt 或更高桌面。'
+    : horizontalOk
+      ? '通过：水平相邻点近似等距，竖直位置与自由落体同步。'
+      : '不通过：发射口未调平，竖直方向带初速度，不能当标准平抛处理。';
+}
+Object.values(els).forEach(el => {
+  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
+});
+draw();
+</script>
+</body>
+</html>

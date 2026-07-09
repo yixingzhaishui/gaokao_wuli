@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>分子力与分子势能</title>
+<link rel="stylesheet" href="../common/controls.css">
+<style>
+body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#f7f9fc;color:#1f2933}
+.container{padding:12px}
+h2{font-size:16px;margin:0 0 8px;color:#102a43}
+canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid #d9e2ec;border-radius:8px}
+.readouts{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0;font-size:13px}
+.readouts .r{background:#102a43;color:#d9e2ec;padding:6px 10px;border-radius:6px}
+.readouts .r b{color:#f0a500}
+.controls{display:flex;flex-wrap:wrap;gap:14px;margin:10px 0;align-items:center}
+.controls label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:#334e68}
+.controls input[type=range]{width:220px;accent-color:#2c7be5}
+.controls button{font:inherit;padding:6px 14px;border:1px solid #b0bcc9;background:#fff;border-radius:6px;cursor:pointer}
+.controls button:hover{background:#eef2f7}
+.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:8px 12px;border-radius:4px;font-size:13px;color:#486581;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>分子力：引力与斥力并存，r=r₀ 时合力为零</h2>
+  <canvas id="canvas" width="660" height="330"></canvas>
+  <div class="readouts">
+    <span class="r">分子间距 r = <b id="r-v">1.0</b> r₀</span>
+    <span class="r">合力 F = <b id="f-v">—</b></span>
+    <span class="r">状态：<b id="st-v">—</b></span>
+    <span class="r">分子势能 Ep = <b id="ep-v">—</b></span>
+  </div>
+  <div class="controls">
+    <label>分子间距 r = <span id="r-d">1.0</span> r₀
+      <input type="range" id="r" min="0.75" max="2.5" step="0.01" value="1.0"></label>
+    <button id="reset-btn">重置</button>
+  </div>
+  <div class="hint">
+    <p><b>观察任务</b>：左侧两分子距离 r 可调。拖动 r：<b>r&lt;r₀</b>（压得太近）→斥力占主导，合力表现为<b>斥力</b>（推开）；<b>r=r₀</b>（平衡间距）→引力=斥力，<b>合力为零</b>，分子势能<b>最小</b>；<b>r&gt;r₀</b>（拉远）→引力占主导，合力表现为<b>引力</b>（拉回）；r 很大时分子力≈0。右侧 F-r 曲线（红）和 Ep-r 曲线（蓝）上的点随 r 移动。注意：从 r₀ 无论压近还是拉远，分子势能都<b>增大</b>。</p>
+  </div>
+</div>
+<script>
+(function(){
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  let r=1.0;
+  // Lennard-Jones-like: F(x) with x=r/r0. Repulsive - attractive.
+  // Use F = A/x^13 - B/x^7 shape simplified so F(1)=0.
+  function Fof(x){ return (1/Math.pow(x,10) - 1/Math.pow(x,5)); } // zero at x=1, >0 repulsive for x<1
+  function Epof(x){ return (1/Math.pow(x,9)/9 - 1/Math.pow(x,4)/4)*4; } // min near x~1
+  const gx0=340, gTop=30, gBot=250, gW=300, gcy=(gTop+gBot)/2;
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    // two molecules on left
+    const cx=90, cy=150; const px=cx+ r*70;
+    ctx.fillStyle='#2c7be5';ctx.beginPath();ctx.arc(cx,cy,18,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#e8590c';ctx.beginPath();ctx.arc(px,cy,18,0,Math.PI*2);ctx.fill();
+    // distance line
+    ctx.strokeStyle='#829ab1';ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(cx,cy+30);ctx.lineTo(px,cy+30);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#486581';ctx.font='12px sans-serif';ctx.textAlign='center';ctx.fillText('r',( cx+px)/2,cy+44);
+    // force arrows on right molecule
+    const F=Fof(r);
+    ctx.strokeStyle='#c92a2a';ctx.fillStyle='#c92a2a';ctx.lineWidth=3;
+    const fl=Math.max(-60,Math.min(60,F*120));
+    if(Math.abs(fl)>3){
+      // repulsive (F>0): push right molecule further right(+)
+      const dir=fl>0?1:-1;
+      ctx.beginPath();ctx.moveTo(px,cy-30);ctx.lineTo(px+fl,cy-30);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(px+fl,cy-30);ctx.lineTo(px+fl-8*dir,cy-34);ctx.lineTo(px+fl-8*dir,cy-26);ctx.closePath();ctx.fill();
+      ctx.font='11px sans-serif';ctx.fillText(F>0?'斥力(推开)':'引力(拉回)',px+fl/2,cy-40);
+    } else {
+      ctx.fillStyle='#1a7a1a';ctx.font='bold 13px sans-serif';ctx.fillText('合力≈0 (r=r₀)',px,cy-40);
+    }
+    // graph F-r
+    ctx.strokeStyle='#b0bcc9';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(gx0,gTop);ctx.lineTo(gx0,gBot);ctx.lineTo(gx0+gW,gBot);ctx.stroke();
+    ctx.strokeStyle='#dbe4ee';ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(gx0,gcy);ctx.lineTo(gx0+gW,gcy);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#829ab1';ctx.font='11px sans-serif';ctx.textAlign='left';ctx.fillText('F(红) / Ep(蓝)',gx0+6,gTop+12);ctx.fillText('r',gx0+gW-10,gBot+14);
+    // r0 marker at x=1
+    function xToPix(x){return gx0 + (x-0.75)/(2.5-0.75)*gW;}
+    const r0p=xToPix(1);
+    ctx.strokeStyle='#1a7a1a';ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(r0p,gTop);ctx.lineTo(r0p,gBot);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#1a7a1a';ctx.fillText('r₀',r0p-6,gBot+14);
+    // F curve
+    ctx.strokeStyle='#c92a2a';ctx.lineWidth=2;ctx.beginPath();
+    for(let x=0.78;x<=2.5;x+=0.02){const px2=xToPix(x);const yy=gcy - Math.max(-90,Math.min(90,Fof(x)*80));if(x<0.8)ctx.moveTo(px2,yy);else ctx.lineTo(px2,yy);}
+    ctx.stroke();
+    // Ep curve
+    ctx.strokeStyle='#2c7be5';ctx.lineWidth=2;ctx.beginPath();
+    for(let x=0.78;x<=2.5;x+=0.02){const px2=xToPix(x);const yy=gcy - Math.max(-90,Math.min(90,Epof(x)*60));if(x<0.8)ctx.moveTo(px2,yy);else ctx.lineTo(px2,yy);}
+    ctx.stroke();
+    // current point on F
+    const cpx=xToPix(r);
+    ctx.fillStyle='#c92a2a';ctx.beginPath();ctx.arc(cpx,gcy-Math.max(-90,Math.min(90,F*80)),4,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#2c7be5';ctx.beginPath();ctx.arc(cpx,gcy-Math.max(-90,Math.min(90,Epof(r)*60)),4,0,Math.PI*2);ctx.fill();
+    document.getElementById('r-v').textContent=r.toFixed(2);
+    document.getElementById('f-v').textContent=(F>0.02?'斥力':(F<-0.02?'引力':'≈0'));
+    document.getElementById('st-v').textContent= r<0.98?'r<r₀ 斥力主导':(r>1.02?'r>r₀ 引力主导':'r=r₀ 平衡');
+    document.getElementById('ep-v').textContent= (Math.abs(r-1)<0.03?'最小':'较大');
+  }
+  document.getElementById('r').addEventListener('input',e=>{r=parseFloat(e.target.value);document.getElementById('r-d').textContent=r.toFixed(2);draw();});
+  document.getElementById('reset-btn').addEventListener('click',()=>{r=1.0;document.getElementById('r').value=1;document.getElementById('r-d').textContent='1.00';draw();});
+  draw();
+})();
+</script>
+</body>
+</html>

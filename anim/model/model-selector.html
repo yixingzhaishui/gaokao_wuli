@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>高频模型诊断台</title>
+  <style>
+    :root {
+      --ink: #102a43;
+      --muted: #486581;
+      --line: #d9e2ec;
+      --bg: #f7f9fc;
+      --blue: #2c7be5;
+      --red: #e03131;
+      --green: #2f9e44;
+      --orange: #f08c00;
+      --purple: #7048e8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+      background: #fff;
+    }
+    .lab {
+      min-height: 700px;
+      display: grid;
+      grid-template-columns: 250px minmax(420px, 1fr) 290px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .panel {
+      padding: 14px;
+      background: var(--bg);
+      border-right: 1px solid var(--line);
+    }
+    .right {
+      border-right: 0;
+      border-left: 1px solid var(--line);
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      line-height: 1.25;
+    }
+    h2 {
+      margin: 14px 0 8px;
+      font-size: 14px;
+    }
+    .hint {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+    .scenario-list {
+      display: grid;
+      gap: 7px;
+    }
+    button, select {
+      font: inherit;
+    }
+    .scenario {
+      min-height: 42px;
+      padding: 8px 9px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      color: var(--ink);
+      text-align: left;
+      cursor: pointer;
+    }
+    .scenario.active {
+      border-color: var(--blue);
+      background: #e8f1ff;
+      box-shadow: inset 3px 0 0 var(--blue);
+    }
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .tag {
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: #e9ecef;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .stage {
+      display: grid;
+      grid-template-rows: auto minmax(360px, 1fr) auto;
+      min-width: 0;
+      background: #fff;
+    }
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+    }
+    .case-title {
+      font-size: 17px;
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+    .case-text {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .view-note {
+      margin-top: 7px;
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .toolbar {
+      display: flex;
+      gap: 7px;
+      margin-top: 9px;
+    }
+    .tool-btn {
+      min-height: 30px;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .tool-btn.primary {
+      border-color: var(--blue);
+      background: #e8f1ff;
+      color: var(--blue);
+    }
+    .meter {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 6px 8px;
+      align-items: center;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--bg);
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .meter strong {
+      color: var(--ink);
+      font-size: 15px;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: linear-gradient(#ffffff 0%, #ffffff 62%, #f1f3f5 62%, #f8f9fa 100%);
+    }
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      padding: 12px 14px;
+      border-top: 1px solid var(--line);
+      background: var(--bg);
+    }
+    label {
+      display: grid;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--blue);
+    }
+    .value {
+      color: var(--ink);
+      font-weight: 700;
+    }
+    .choice-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+    }
+    .choice {
+      padding: 8px 7px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      text-align: center;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 12px;
+      line-height: 1.25;
+    }
+    .choice.selected {
+      border-color: var(--purple);
+      background: #f3f0ff;
+      box-shadow: inset 0 -3px 0 var(--purple);
+    }
+    .feedback {
+      min-height: 72px;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 7px;
+      background: #fff;
+      border: 1px solid var(--line);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .feedback.good {
+      border-color: #b2f2bb;
+      background: #ebfbee;
+    }
+    .feedback.bad {
+      border-color: #ffc9c9;
+      background: #fff5f5;
+    }
+    .steps {
+      display: grid;
+      gap: 7px;
+      margin-top: 8px;
+    }
+    .step {
+      display: grid;
+      grid-template-columns: 22px 1fr;
+      gap: 7px;
+      align-items: start;
+      padding: 8px;
+      border-radius: 7px;
+      background: #fff;
+      border: 1px solid var(--line);
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+    .num {
+      display: grid;
+      place-items: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--blue);
+      color: #fff;
+      font-weight: 800;
+      font-size: 12px;
+    }
+    .formula {
+      margin-top: 10px;
+      padding: 9px 10px;
+      background: #102a43;
+      color: #f8f9fa;
+      border-radius: 7px;
+      font-size: 12px;
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+    @media (max-width: 900px) {
+      .lab { grid-template-columns: 1fr; }
+      .panel, .right { border: 0; border-bottom: 1px solid var(--line); }
+      .right { border-top: 1px solid var(--line); }
+      .stage { min-height: 620px; }
+      .controls { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="lab">
+    <aside class="panel">
+      <h1>高频模型诊断台</h1>
+      <p class="hint">先看题目信号，再判断模型。点不同题型，看图像、第一步和判据怎样变。</p>
+      <div class="scenario-list" id="scenarioList"></div>
+      <h2>观察任务</h2>
+      <p class="hint" id="watchTask"></p>
+    </aside>
+
+    <main class="stage">
+      <div class="topbar">
+        <div>
+          <div class="case-title" id="caseTitle"></div>
+          <div class="case-text" id="caseText"></div>
+          <div class="view-note">多视角实验台：实物场景 + 侧视/俯视 + 图像记录。可直接拖动画面里的蓝色物体或探针。</div>
+          <div class="toolbar">
+            <button class="tool-btn primary play-btn" id="playBtn">▶ 播放</button>
+            <button class="tool-btn" id="resetBtn">重置</button>
+          </div>
+          <div class="tag-row" id="tags"></div>
+        </div>
+        <div class="meter">
+          <span>当前判据</span><strong id="criterion"></strong>
+          <span>状态反馈</span><strong id="stateText"></strong>
+          <span>第一公式</span><strong id="firstFormula"></strong>
+        </div>
+      </div>
+      <canvas id="canvas" width="920" height="430"></canvas>
+      <div class="controls">
+        <label><span id="labelA"></span><input id="ctrlA" type="range"><span class="value" id="valueA"></span></label>
+        <label><span id="labelB"></span><input id="ctrlB" type="range"><span class="value" id="valueB"></span></label>
+        <label><span id="labelC"></span><input id="ctrlC" type="range"><span class="value" id="valueC"></span></label>
+      </div>
+    </main>
+
+    <aside class="panel right">
+      <h2>选择模型</h2>
+      <div class="choice-grid" id="choiceGrid"></div>
+      <div class="feedback" id="feedback">先选择一个题目信号，再点你认为应该使用的模型。</div>
+      <h2>第一步流程</h2>
+      <div class="steps" id="steps"></div>
+      <div class="formula" id="formulaBox"></div>
+    </aside>
+  </div>
+
+  <script>
+    const cases = [
+      {
+        key: 'connecting',
+        title: '两个物块被轻绳拉着一起走',
+        text: '题目问共同加速度和绳中张力。先把两物体看成整体求 a，再隔离一端求 T。',
+        tags: ['轻绳', '共同加速度', '张力'],
+        answer: '连接体',
+        watch: '拖动外力和质量，看整体加速度先变，绳中张力再由隔离物体决定。',
+        sliders: [
+          ['外力 F', 4, 30, 14, 'N'],
+          ['m1', 1, 8, 2, 'kg'],
+          ['m2', 1, 10, 4, 'kg']
+        ],
+        formulas: ['a=F/(m1+m2)', 'T=m1a'],
+        steps: ['确认两物体是否共同运动', '对整体列外力方程求 a', '隔离其中一个物体求内力'],
+        draw: drawConnecting
+      },
+      {
+        key: 'plank',
+        title: '物块在长木板上，被水平力拉动',
+        text: '题目问是否相对滑动。先假设共同运动，算所需静摩擦，再与最大静摩擦比较。',
+        tags: ['相对滑动', '静摩擦临界', '板块'],
+        answer: '板块',
+        watch: '拖动 F 或 μ，看状态从“共同运动”跳到“相对滑动”的临界点。',
+        sliders: [
+          ['外力 F', 2, 30, 12, 'N'],
+          ['摩擦因数 μ', 0.05, 0.8, 0.30, ''],
+          ['木板质量 M', 1, 10, 4, 'kg']
+        ],
+        formulas: ['a=F/(m+M)', 'f需=Ma', 'fmax=μmg'],
+        steps: ['假设物块和木板共同运动', '隔离木板求 f需', '比较 f需 与 fmax'],
+        draw: drawPlank
+      },
+      {
+        key: 'belt',
+        title: '物块放上传送带，速度不同',
+        text: '题目问共速时间、划痕或热量。第一步永远是比较 v物 与 v带，摩擦阻碍相对运动。',
+        tags: ['共速', '相对位移', '摩擦生热'],
+        answer: '传送带',
+        watch: '拖动物块初速度，看摩擦方向如何随 v物-v带 改变。',
+        sliders: [
+          ['传送带速度 v带', 1, 9, 5, 'm/s'],
+          ['物块初速度 v0', 0, 10, 0, 'm/s'],
+          ['摩擦因数 μ', 0.05, 0.6, 0.25, '']
+        ],
+        formulas: ['a=μg', 't共=|v带-v0|/μg', '划痕=|x带-x物|'],
+        steps: ['比较 v物 和 v带', '判断摩擦方向和加减速', '先算共速，再判断是否离开'],
+        draw: drawBelt
+      },
+      {
+        key: 'spring',
+        title: '剪断轻绳后的一瞬间',
+        text: '题目问 t=0+ 的加速度。弹簧力由形变量决定，瞬间不能突变；绳力可以立刻变为 0。',
+        tags: ['瞬时', '弹簧不突变', '绳力突变'],
+        answer: '弹簧瞬时',
+        watch: '拖动剪断前绳拉力，看 t=0+ 合力和瞬时加速度如何同步变。',
+        sliders: [
+          ['质量 m', 1, 8, 2, 'kg'],
+          ['剪断前 T0', 0, 40, 12, 'N'],
+          ['劲度系数 k', 80, 400, 160, 'N/m']
+        ],
+        formulas: ['t=0-: F弹=mg+T0', 't=0+: T=0, F弹不变', 'a=T0/m'],
+        steps: ['先用剪断前平衡求弹簧力', '删掉已断的绳力', '保留弹簧力并重画受力图'],
+        draw: drawSpring
+      },
+      {
+        key: 'rail',
+        title: '金属棒切割磁感线，导轨上灯泡发光',
+        text: '题目问感应电动势、电流、安培阻力或能量转化。先确定 B、L、v，再用右手定则和 E=BLv。',
+        tags: ['切割磁感线', '感应电流', '安培阻力'],
+        answer: '导轨',
+        watch: '拖动速度和磁感应强度，看电动势、电流、阻力、功率同时增大。',
+        sliders: [
+          ['磁感应强度 B', 0.2, 1.2, 0.6, 'T'],
+          ['棒长 L', 0.3, 1.2, 0.8, 'm'],
+          ['速度 v', 0.5, 8, 3, 'm/s']
+        ],
+        formulas: ['E=BLv', 'I=E/R', 'F安=BIL'],
+        steps: ['判断切割速度是否垂直磁场', '用右手定则判电流方向', '用能量守恒检查机械功率去向'],
+        draw: drawRail
+      },
+      {
+        key: 'collision',
+        title: '两物体短时间碰撞或爆炸',
+        text: '题目出现碰撞、反冲、爆炸。先判断系统外力冲量能否忽略，优先写动量守恒。',
+        tags: ['短时间', '内力很大', '动量守恒'],
+        answer: '碰撞',
+        watch: '拖动恢复系数，看动量总量守恒而机械能是否损失。',
+        sliders: [
+          ['m1', 1, 8, 2, 'kg'],
+          ['m2', 1, 8, 3, 'kg'],
+          ['恢复系数 e', 0, 1, 0.7, '']
+        ],
+        formulas: ['m1v1+m2v2=m1v1′+m2v2′', 'e=(v2′-v1′)/(v1-v2)'],
+        steps: ['圈定系统并判断外力冲量', '先列动量守恒', '再按弹性/非弹性补充条件'],
+        draw: drawCollision
+      }
+    ];
+    const choices = ['连接体', '板块', '传送带', '弹簧瞬时', '平抛/类平抛', '圆周临界', '天体', '机车启动', '功能关系', '碰撞', '导轨', '交流电', '复合场粒子', '气体状态', '核反应'];
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let active = 0;
+    let selected = '';
+    let t = 0;
+    let running = true;
+    let dragTarget = null;
+    const history = [];
+    const controls = [
+      document.getElementById('ctrlA'),
+      document.getElementById('ctrlB'),
+      document.getElementById('ctrlC')
+    ];
+
+    function fmt(v) {
+      return Math.abs(v) >= 10 ? v.toFixed(0) : v.toFixed(2).replace(/0$/, '').replace(/\.0$/, '');
+    }
+    function values() {
+      return controls.map(c => Number(c.value));
+    }
+    function setup() {
+      const list = document.getElementById('scenarioList');
+      list.innerHTML = cases.map((c, i) => `<button class="scenario" data-i="${i}">${c.title}</button>`).join('');
+      list.addEventListener('click', e => {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        active = Number(btn.dataset.i);
+        selected = '';
+        renderStatic();
+      });
+      const grid = document.getElementById('choiceGrid');
+      grid.innerHTML = choices.map(c => `<button class="choice" data-choice="${c}">${c}</button>`).join('');
+      grid.addEventListener('click', e => {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        selected = btn.dataset.choice;
+        renderStatic();
+      });
+      document.getElementById('playBtn').addEventListener('click', () => {
+        running = !running;
+        document.getElementById('playBtn').textContent = running ? '暂停' : '▶ 播放';
+        renderStatic();
+      });
+      document.getElementById('resetBtn').addEventListener('click', () => {
+        running = true;
+        history.length = 0;
+        controls.forEach(c => { c.dataset.case = ''; });
+        renderStatic();
+      });
+      canvas.addEventListener('pointerdown', onPointerDown);
+      canvas.addEventListener('pointermove', onPointerMove);
+      canvas.addEventListener('pointerup', e => { dragTarget = null; canvas.releasePointerCapture?.(e.pointerId); });
+      canvas.addEventListener('pointercancel', () => { dragTarget = null; });
+      controls.forEach(c => c.addEventListener('input', renderStatic));
+      renderStatic();
+      requestAnimationFrame(loop);
+    }
+    function renderStatic() {
+      const c = cases[active];
+      document.querySelectorAll('.scenario').forEach((b, i) => b.classList.toggle('active', i === active));
+      document.querySelectorAll('.choice').forEach(b => b.classList.toggle('selected', b.dataset.choice === selected));
+      document.getElementById('caseTitle').textContent = c.title;
+      document.getElementById('caseText').textContent = c.text;
+      document.getElementById('watchTask').textContent = c.watch;
+      document.getElementById('tags').innerHTML = c.tags.map(x => `<span class="tag">${x}</span>`).join('');
+      c.sliders.forEach((s, i) => {
+        controls[i].min = s[1];
+        controls[i].max = s[2];
+        controls[i].step = s[2] - s[1] > 20 ? 1 : 0.01;
+        if (!controls[i].dataset.case || controls[i].dataset.case !== c.key) controls[i].value = s[3];
+        controls[i].dataset.case = c.key;
+        document.getElementById('label' + 'ABC'[i]).textContent = s[0];
+        document.getElementById('value' + 'ABC'[i]).textContent = fmt(Number(controls[i].value)) + (s[4] ? ' ' + s[4] : '');
+      });
+      const feedback = document.getElementById('feedback');
+      if (!selected) {
+        feedback.className = 'feedback';
+        feedback.textContent = '先看题目信号和动态图，再选择模型。';
+      } else if (selected === c.answer) {
+        feedback.className = 'feedback good';
+        feedback.textContent = '判断正确：这题的第一反应就是“' + c.answer + '模型”。现在看下面第一步流程。';
+      } else {
+        feedback.className = 'feedback bad';
+        feedback.textContent = '还不对。抓关键词：' + c.tags.join('、') + '。先不要代公式，先判断模型。';
+      }
+      document.getElementById('steps').innerHTML = c.steps.map((s, i) => `<div class="step"><span class="num">${i + 1}</span><span>${s}</span></div>`).join('');
+      document.getElementById('formulaBox').textContent = c.formulas.join('\n');
+      draw();
+    }
+    function loop(ts) {
+      if (running) t = ts / 1000;
+      draw();
+      requestAnimationFrame(loop);
+    }
+    function pointerPos(e) {
+      const r = canvas.getBoundingClientRect();
+      return {
+        x: (e.clientX - r.left) * canvas.width / r.width,
+        y: (e.clientY - r.top) * canvas.height / r.height
+      };
+    }
+    function onPointerDown(e) {
+      const p = pointerPos(e);
+      dragTarget = hitDragHandle(p);
+      if (dragTarget) {
+        canvas.setPointerCapture?.(e.pointerId);
+        onPointerMove(e);
+      }
+    }
+    function onPointerMove(e) {
+      if (!dragTarget) return;
+      const p = pointerPos(e);
+      const c = cases[active];
+      const map = dragTarget.map;
+      const next = Math.max(map.min, Math.min(map.max, map.fn(p)));
+      controls[map.index].value = next;
+      renderStatic();
+    }
+    function hitDragHandle(p) {
+      const candidates = dragHandles();
+      return candidates.find(h => Math.hypot(p.x - h.x, p.y - h.y) < h.r);
+    }
+    function dragHandles() {
+      const [a, b, c] = values();
+      if (cases[active].key === 'connecting') {
+        return [{ x: 550 + a * 8, y: 249, r: 34, map: { index: 0, min: 4, max: 30, fn: p => (p.x - 550) / 8 } }];
+      }
+      if (cases[active].key === 'plank') {
+        return [{ x: 420 + a * 7, y: 192, r: 34, map: { index: 0, min: 2, max: 30, fn: p => (p.x - 420) / 7 } }];
+      }
+      if (cases[active].key === 'belt') {
+        return [{ x: 430, y: 325, r: 36, map: { index: 0, min: 1, max: 9, fn: p => (p.x - 260) / 34 } }];
+      }
+      if (cases[active].key === 'spring') {
+        return [{ x: 308, y: 305 + ((b + a * 10) / c) * 80, r: 34, map: { index: 1, min: 0, max: 40, fn: p => (p.y - 305) * c / 80 - a * 10 } }];
+      }
+      if (cases[active].key === 'rail') {
+        return [{ x: 425, y: 240, r: 36, map: { index: 2, min: 0.5, max: 8, fn: p => (p.x - 330) / 12 } }];
+      }
+      return [{ x: 360, y: 190, r: 36, map: { index: 2, min: 0, max: 1, fn: p => (p.x - 260) / 180 } }];
+    }
+    function drawHandle(x, y, label) {
+      ctx.save();
+      ctx.fillStyle = '#fff';
+      ctx.strokeStyle = '#2c7be5';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(x, y, 12, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      text(label, x, y - 26, '#2c7be5', 12, 'center', true);
+      ctx.restore();
+    }
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      grid();
+      cases[active].draw(values());
+    }
+    function grid() {
+      ctx.strokeStyle = '#eef2f7';
+      ctx.lineWidth = 1;
+      for (let x = 40; x < canvas.width; x += 40) line(x, 0, x, canvas.height);
+      for (let y = 40; y < canvas.height; y += 40) line(0, y, canvas.width, y);
+      text('侧视实物场景', 82, 32, '#486581', 13, 'left', true);
+      text('右下角：俯视/图像记录', 690, 32, '#486581', 13, 'left', true);
+    }
+    function line(x1, y1, x2, y2) {
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+    }
+    function arrow(x1, y1, x2, y2, color, label) {
+      ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 4;
+      line(x1, y1, x2, y2);
+      const a = Math.atan2(y2 - y1, x2 - x1);
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2 - 12 * Math.cos(a - 0.45), y2 - 12 * Math.sin(a - 0.45));
+      ctx.lineTo(x2 - 12 * Math.cos(a + 0.45), y2 - 12 * Math.sin(a + 0.45));
+      ctx.closePath(); ctx.fill();
+      if (label) text(label, (x1 + x2) / 2, (y1 + y2) / 2 - 10, color, 15, 'center', true);
+    }
+    function text(s, x, y, color = '#102a43', size = 14, align = 'left', bold = false) {
+      ctx.fillStyle = color;
+      ctx.font = `${bold ? 800 : 500} ${size}px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif`;
+      ctx.textAlign = align;
+      ctx.textBaseline = 'middle';
+      ctx.fillText(s, x, y);
+    }
+    function block(x, y, w, h, color, label) {
+      ctx.fillStyle = color;
+      roundRect(x, y, w, h, 8);
+      ctx.fill();
+      text(label, x + w / 2, y + h / 2, '#fff', 18, 'center', true);
+    }
+    function roundRect(x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    }
+    function setReadouts(criterion, state, first) {
+      document.getElementById('criterion').textContent = criterion;
+      document.getElementById('stateText').textContent = state;
+      document.getElementById('firstFormula').textContent = first;
+    }
+    function drawConnecting([F, m1, m2]) {
+      const a = F / (m1 + m2);
+      const T = m1 * a;
+      setReadouts(`a=${fmt(a)} m/s²`, `T=${fmt(T)} N`, '整体法');
+      block(240, 220, 95, 58, '#2c7be5', 'm1');
+      block(430, 220, 120, 58, '#38b2ac', 'm2');
+      ctx.strokeStyle = '#334e68'; ctx.lineWidth = 5; line(335, 249, 430, 249);
+      arrow(550, 249, 550 + F * 8, 249, '#e03131', 'F');
+      drawHandle(550 + F * 8, 249, '拖 F');
+      arrow(270, 190, 520, 190, '#7048e8', '共同 a');
+      arrow(335, 218, 390, 218, '#f08c00', 'T');
+      graphBox([a, T, F / 8], ['a', 'T', 'F']);
+      text(`整体只看外力：F=(${fmt(m1)}+${fmt(m2)})a`, 460, 86, '#102a43', 19, 'center', true);
+      text(`隔离 m1：T=m1a=${fmt(T)} N`, 460, 122, '#486581', 16, 'center');
+    }
+    function drawPlank([F, mu, M]) {
+      const m = 1.5, g = 10;
+      const a = F / (m + M);
+      const need = M * a;
+      const max = mu * m * g;
+      const slip = need > max;
+      setReadouts(`f需 ${fmt(need)} / fmax ${fmt(max)}`, slip ? '相对滑动' : '共同运动', '先假设');
+      block(310 + Math.sin(t * 2) * (slip ? 18 : 4), 165, 110, 55, '#2c7be5', 'm');
+      block(240, 220, 310, 42, '#829ab1', 'M');
+      arrow(420, 192, 420 + F * 7, 192, '#e03131', 'F');
+      drawHandle(420 + F * 7, 192, '拖 F');
+      arrow(305, 222, 245, 222, '#f08c00', 'f');
+      arrow(345, 242, 420, 242, '#f08c00', 'f');
+      graphBox([need, max, F / 3], ['f需', 'fmax', 'F']);
+      text(slip ? '静摩擦不够：改用滑动摩擦，分别列方程' : '静摩擦够：两者可看成整体', 460, 92, slip ? '#e03131' : '#2f9e44', 19, 'center', true);
+      text(`判据：f需=Ma=${fmt(need)} N，fmax=μmg=${fmt(max)} N`, 460, 126, '#486581', 16, 'center');
+    }
+    function drawBelt([vb, v0, mu]) {
+      const dv = vb - v0;
+      const dir = Math.abs(dv) < 0.08 ? 0 : Math.sign(dv);
+      const tc = Math.abs(dv) / (mu * 10);
+      setReadouts(`v物-v带=${fmt(v0 - vb)}`, dir === 0 ? '已共速' : (dir > 0 ? '摩擦向右' : '摩擦向左'), '先比速度');
+      ctx.strokeStyle = '#829ab1'; ctx.lineWidth = 7;
+      line(180, 250, 740, 250); line(180, 300, 740, 300);
+      ctx.fillStyle = '#f8f9fa'; ctx.beginPath(); ctx.ellipse(180, 275, 38, 28, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(740, 275, 38, 28, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      const x = 310 + ((t * 45) % 80);
+      block(x, 190, 80, 60, '#2c7be5', 'm');
+      arrow(260, 325, 430, 325, '#7048e8', 'v带');
+      drawHandle(430, 325, '拖 v带');
+      if (dir) arrow(x + 40, 180, x + 40 + dir * 105, 180, '#e03131', '摩擦');
+      graphBox([vb, v0, tc], ['v带', 'v物', 't共']);
+      text(dir === 0 ? '共速后通常无滑动摩擦' : `共速时间 t=${fmt(tc)} s`, 460, 92, dir === 0 ? '#2f9e44' : '#102a43', 19, 'center', true);
+      text('摩擦阻碍的是相对传送带的滑动，不是简单阻碍对地运动', 460, 126, '#486581', 16, 'center');
+    }
+    function drawSpring([m, T0, k]) {
+      const g = 10;
+      const a = T0 / m;
+      const x = (m * g + T0) / k;
+      setReadouts(`F弹=${fmt(m * g + T0)} N`, `a=${fmt(a)} m/s²`, '重画 t=0+');
+      ctx.strokeStyle = '#334e68'; ctx.lineWidth = 5; line(250, 70, 390, 70); line(560, 70, 700, 70);
+      spring(320, 70, 320, 190 + x * 80); spring(630, 70, 630, 190 + x * 80);
+      block(280, 190 + x * 80, 80, 58, '#2c7be5', '0-');
+      block(590, 190 + x * 80 + Math.sin(t * 3) * Math.min(a * 2, 18), 80, 58, '#38b2ac', '0+');
+      arrow(320, 190 + x * 80, 320, 125, '#e03131', 'F弹');
+      arrow(308, 248 + x * 80, 308, 305 + x * 80, '#e03131', 'T0');
+      drawHandle(308, 305 + x * 80, '拖 T0');
+      arrow(630, 190 + x * 80, 630, 125, '#e03131', 'F弹不变');
+      arrow(705, 245 + x * 80, 705, 205 + x * 80, '#7048e8', 'a');
+      graphBox([m * g + T0, T0, a], ['F弹', 'T0', 'a']);
+      text('剪断后：绳力消失，弹簧力保持剪断前读数', 460, 98, '#102a43', 19, 'center', true);
+    }
+    function spring(x1, y1, x2, y2) {
+      ctx.strokeStyle = '#334e68'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(x1, y1);
+      const n = 8;
+      for (let i = 1; i <= n; i++) {
+        const y = y1 + (y2 - y1) * i / n;
+        const x = x1 + (i % 2 ? -18 : 18);
+        ctx.lineTo(x, y);
+      }
+      ctx.lineTo(x2, y2); ctx.stroke();
+    }
+    function drawRail([B, L, v]) {
+      const E = B * L * v, I = E / 2, F = B * I * L;
+      setReadouts(`E=${fmt(E)} V`, `F安=${fmt(F)} N`, 'E=BLv');
+      ctx.strokeStyle = '#334e68'; ctx.lineWidth = 5;
+      line(210, 170, 710, 170); line(210, 310, 710, 310);
+      const x = 330 + ((t * v * 18) % 260);
+      ctx.strokeStyle = '#2c7be5'; ctx.lineWidth = 10; line(x, 160, x, 320);
+      for (let i = 250; i < 700; i += 52) {
+        text('×', i, 110, '#7048e8', 28, 'center', true);
+        text('×', i, 370, '#7048e8', 28, 'center', true);
+      }
+      arrow(x, 240, x + 95, 240, '#e03131', 'v');
+      drawHandle(x + 95, 240, '拖 v');
+      arrow(x - 10, 255, x - 85, 255, '#f08c00', 'F安');
+      ctx.strokeStyle = '#f08c00'; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(210, 240, 45, -Math.PI / 2, Math.PI / 2); ctx.stroke();
+      text('灯泡', 155, 240, '#f08c00', 15, 'center', true);
+      graphBox([E, I, F], ['E', 'I', 'F安']);
+      text(`电动势 E=BLv=${fmt(E)} V，机械功率转化为电能和热`, 460, 92, '#102a43', 18, 'center', true);
+    }
+    function drawCollision([m1, m2, e]) {
+      const v1 = 5, v2 = 0;
+      const v1p = (m1 * v1 + m2 * v2 - m2 * e * (v1 - v2)) / (m1 + m2);
+      const v2p = v1p + e * (v1 - v2);
+      setReadouts('外力冲量≈0', `e=${fmt(e)}`, '动量守恒');
+      const gap = Math.max(0, 120 - ((t * 90) % 170));
+      block(250 + Math.min(80, 120 - gap), 220, 90, 58, '#2c7be5', 'm1');
+      block(470 + Math.max(0, 80 - gap), 220, 110, 58, '#38b2ac', 'm2');
+      arrow(260, 190, 360, 190, '#7048e8', 'v1');
+      drawHandle(360, 190, '拖 e');
+      arrow(500, 315, 500 + v2p * 24, 315, '#2f9e44', 'v2′');
+      arrow(315, 315, 315 + v1p * 24, 315, '#2c7be5', 'v1′');
+      graphBox([m1 * v1, m1 * v1p, m2 * v2p], ['p前', 'p1′', 'p2′']);
+      text('碰撞瞬间：先守恒动量，再补充碰撞类型条件', 460, 92, '#102a43', 19, 'center', true);
+      text(`碰后 v1′=${fmt(v1p)} m/s，v2′=${fmt(v2p)} m/s`, 460, 126, '#486581', 16, 'center');
+    }
+    function graphBox(vals, labels) {
+      const x = 690, y = 248, w = 190, h = 130;
+      ctx.fillStyle = 'rgba(255,255,255,.92)';
+      ctx.strokeStyle = '#d9e2ec';
+      ctx.lineWidth = 1.5;
+      roundRect(x, y, w, h, 8);
+      ctx.fill(); ctx.stroke();
+      text('图像记录 / 俯视读数', x + 12, y + 18, '#102a43', 13, 'left', true);
+      const max = Math.max(...vals.map(v => Math.abs(v)), 1);
+      vals.forEach((v, i) => {
+        const bh = 66 * Math.abs(v) / max;
+        const bx = x + 28 + i * 48;
+        ctx.fillStyle = ['#2c7be5', '#f08c00', '#7048e8'][i % 3];
+        ctx.fillRect(bx, y + 100 - bh, 24, bh);
+        text(labels[i], bx + 12, y + 113, '#486581', 11, 'center');
+      });
+    }
+    setup();
+  </script>
+</body>
+</html>

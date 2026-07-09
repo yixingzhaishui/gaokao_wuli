@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>弹性势能实验台：形变量、图像与弹力做功</title>
+<link rel="icon" href="data:,">
+<style>
+  :root {
+    --ink: #102a43;
+    --muted: #486581;
+    --line: #d9e2ec;
+    --blue: #2c7be5;
+    --green: #087f5b;
+    --purple: #7b2cbf;
+    --orange: #f08c00;
+    --red: #c92a2a;
+    --paper: #f7f9fc;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  }
+  .lab {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 12px;
+    padding: 12px;
+    min-height: 540px;
+  }
+  .stage, .card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+  }
+  .stage { overflow: hidden; position: relative; }
+  canvas { display: block; width: 100%; height: auto; touch-action: none; cursor: crosshair; }
+  .hint {
+    position: absolute;
+    left: 12px;
+    bottom: 10px;
+    color: var(--muted);
+    background: rgba(255,255,255,.88);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+  .panel { display: flex; flex-direction: column; gap: 10px; }
+  .card { padding: 10px; }
+  .task {
+    background: #fff7e6;
+    border-left: 3px solid var(--orange);
+    color: var(--muted);
+    line-height: 1.5;
+    font-size: 13px;
+  }
+  .title { font-weight: 700; margin-bottom: 7px; }
+  .param { display: grid; gap: 3px; margin: 9px 0; font-size: 13px; }
+  .param span { display: flex; justify-content: space-between; gap: 10px; color: var(--muted); }
+  .param b { color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  input[type=range] { width: 100%; accent-color: var(--blue); }
+  .buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+  button {
+    border: 1px solid #b0bcc9;
+    background: #fff;
+    border-radius: 6px;
+    padding: 7px 8px;
+    cursor: pointer;
+    color: var(--ink);
+    font-size: 13px;
+  }
+  button:hover { background: #eef2f7; }
+  button.primary { background: #e8f2ff; border-color: #8bbcff; color: #174ea6; font-weight: 700; }
+  .readout {
+    background: var(--ink);
+    color: #d9e2ec;
+    border-radius: 8px;
+    padding: 10px;
+    line-height: 1.75;
+    font-size: 13px;
+  }
+  .readout b { color: #ffd166; font-variant-numeric: tabular-nums; }
+  .formula { font-size: 13px; line-height: 1.55; color: #334e68; }
+  .status {
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 6px;
+    padding: 8px;
+    border: 1px solid #38b2ac;
+    background: #e6fffa;
+    color: var(--green);
+  }
+  @media (max-width: 780px) {
+    .lab { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="lab">
+  <div class="stage">
+    <canvas id="canvas" width="920" height="540" aria-label="弹性势能实验台"></canvas>
+    <div class="hint">可直接拖动滑块、x1点、x2点；图像点和弹簧同步变化</div>
+  </div>
+  <div class="panel">
+    <div class="card task">
+      <b>观察任务：</b>拖动滑块远离或靠近原长，看弹力箭头、Ep-x 抛物线点和能量账本怎样同时变化。
+    </div>
+    <div class="card">
+      <div class="title">实验控制</div>
+      <label class="param"><span>劲度系数 k <b id="kText">200 N/m</b></span><input id="k" type="range" min="50" max="800" step="10" value="200"></label>
+      <label class="param"><span>初形变量 x1 <b id="x1Text">0.40 m</b></span><input id="x1" type="range" min="-0.8" max="0.8" step="0.01" value="0.40"></label>
+      <label class="param"><span>末形变量 x2 <b id="x2Text">0.10 m</b></span><input id="x2" type="range" min="-0.8" max="0.8" step="0.01" value="0.10"></label>
+      <label class="param"><span>过程游标 <b id="tText">0%</b></span><input id="t" type="range" min="0" max="1" step="0.01" value="0"></label>
+      <div class="buttons">
+        <button class="primary" id="play">播放</button>
+        <button id="reset">重置</button>
+        <button data-case="near">拉回原长</button>
+        <button data-case="far">远离原长</button>
+        <button data-case="mirror">压缩对称</button>
+        <button data-case="same">同势能</button>
+      </div>
+    </div>
+    <div class="readout">
+      Ep1=<b id="ep1Text">16.0 J</b>　Ep2=<b id="ep2Text">1.0 J</b><br>
+      ΔEp=<b id="depText">-15.0 J</b>　W弹=<b id="workText">15.0 J</b><br>
+      当前 x=<b id="xText">0.40 m</b>　F弹=<b id="forceText">-80 N</b>
+    </div>
+    <div class="card formula">
+      <div class="title">公式对照</div>
+      <div>x = 现长 - 原长，对应蓝色尺子读数。</div>
+      <div>F弹 = -kx，对应红色箭头，永远指向原长。</div>
+      <div>Ep = 1/2 kx²，对应抛物线高度和能量柱。</div>
+      <div>W弹 = Ep1 - Ep2 = -ΔEp，对应底部账本。</div>
+    </div>
+    <div class="status" id="status">靠近原长：弹力做正功，弹性势能减少。</div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const root = document.defaultView || globalThis;
+  const els = {
+    k: document.getElementById('k'),
+    x1: document.getElementById('x1'),
+    x2: document.getElementById('x2'),
+    t: document.getElementById('t')
+  };
+  const ui = {
+    kText: document.getElementById('kText'),
+    x1Text: document.getElementById('x1Text'),
+    x2Text: document.getElementById('x2Text'),
+    tText: document.getElementById('tText'),
+    ep1Text: document.getElementById('ep1Text'),
+    ep2Text: document.getElementById('ep2Text'),
+    depText: document.getElementById('depText'),
+    workText: document.getElementById('workText'),
+    xText: document.getElementById('xText'),
+    forceText: document.getElementById('forceText'),
+    status: document.getElementById('status'),
+    play: document.getElementById('play')
+  };
+  const state = {
+    running: false,
+    drag: null,
+    hot: {},
+    lastTime: 0
+  };
+
+  function clamp(v, min, max) {
+    return Math.max(min, Math.min(max, v));
+  }
+
+  function fmt(n, d) {
+    const v = Math.abs(n) < 0.0005 ? 0 : n;
+    return v.toFixed(d == null ? 1 : d);
+  }
+
+  function p() {
+    return {
+      k: Number(els.k.value),
+      x1: Number(els.x1.value),
+      x2: Number(els.x2.value),
+      t: Number(els.t.value)
+    };
+  }
+
+  function calc(q) {
+    const x = q.x1 + (q.x2 - q.x1) * q.t;
+    const ep1 = 0.5 * q.k * q.x1 * q.x1;
+    const ep2 = 0.5 * q.k * q.x2 * q.x2;
+    const ep = 0.5 * q.k * x * x;
+    const dep = ep2 - ep1;
+    const work = -dep;
+    const force = -q.k * x;
+    return { x, ep1, ep2, ep, dep, work, force };
+  }
+
+  function setValue(name, value) {
+    const el = els[name];
+    el.value = String(clamp(value, Number(el.min), Number(el.max)));
+  }
+
+  function stopRun() {
+    state.running = false;
+    ui.play.textContent = '播放';
+  }
+
+  function text(s, x, y, color, align, size, weight) {
+    ctx.fillStyle = color || '#102a43';
+    ctx.font = (weight ? weight + ' ' : '') + (size || 13) + 'px -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif';
+    ctx.textAlign = align || 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(s, x, y);
+  }
+
+  function box(x, y, w, h, fill, stroke) {
+    ctx.save();
+    ctx.fillStyle = fill || '#fff';
+    ctx.strokeStyle = stroke || '#d9e2ec';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, 8);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function line(x1, y1, x2, y2, color, width, dash) {
+    ctx.save();
+    ctx.strokeStyle = color || '#486581';
+    ctx.lineWidth = width || 1;
+    ctx.setLineDash(dash || []);
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function arrow(x1, y1, x2, y2, color, width) {
+    const a = Math.atan2(y2 - y1, x2 - x1);
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = width || 2;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - 10 * Math.cos(a - 0.45), y2 - 10 * Math.sin(a - 0.45));
+    ctx.lineTo(x2 - 10 * Math.cos(a + 0.45), y2 - 10 * Math.sin(a + 0.45));
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function dot(x, y, color, label) {
+    ctx.save();
+    ctx.fillStyle = '#fff';
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(x, y, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    if (label) text(label, x, y - 20, color, 'center', 12, '700');
+    ctx.restore();
+  }
+
+  function spring(x0, y, x1) {
+    const turns = 10;
+    const amp = 13;
+    const len = Math.max(38, x1 - x0);
+    ctx.save();
+    ctx.strokeStyle = '#334e68';
+    ctx.lineWidth = 2.4;
+    ctx.beginPath();
+    ctx.moveTo(x0, y);
+    for (let i = 1; i < turns * 2; i++) {
+      const x = x0 + len * i / (turns * 2);
+      const yy = y + (i % 2 ? amp : -amp);
+      ctx.lineTo(x, yy);
+    }
+    ctx.lineTo(x0 + len, y);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawSpringView(q, r) {
+    const wallX = 90;
+    const y = 174;
+    const L0 = 240;
+    const scale = 165;
+    const naturalX = wallX + L0;
+    const endX = naturalX + r.x * scale;
+    const blockW = 64;
+    state.hot.block = { x: endX, y: y - 34, w: blockW, h: 68, naturalX, scale };
+
+    box(24, 48, 536, 250, '#fff', '#d9e2ec');
+    text('实物过程：拖动滑块改变形变量 x', 292, 74, '#102a43', 'center', 16, '700');
+    line(58, 228, 522, 228, '#d9e2ec', 2);
+    ctx.fillStyle = '#334e68';
+    ctx.fillRect(wallX - 15, 108, 15, 132);
+    for (let yy = 112; yy < 240; yy += 18) line(wallX - 15, yy, wallX - 34, yy + 12, '#9fb3c8', 1);
+    spring(wallX, y, endX);
+    box(endX, y - 34, blockW, 68, '#d9e2ec', '#334e68');
+    text('滑块', endX + blockW / 2, y, '#102a43', 'center', 13, '700');
+
+    line(naturalX, 104, naturalX, 262, '#f08c00', 2, [6, 5]);
+    text('原长', naturalX, 94, '#b36b00', 'center', 12, '700');
+    arrow(naturalX, 260, endX, 260, '#2c7be5', 2.5);
+    text('x = ' + fmt(r.x, 2) + ' m', (naturalX + endX) / 2, 280, '#2c7be5', 'center', 13, '700');
+
+    const fLen = Math.min(132, 24 + Math.abs(r.force) / 4);
+    const fEnd = endX + blockW / 2 + (r.force >= 0 ? fLen : -fLen);
+    arrow(endX + blockW / 2, y - 56, fEnd, y - 56, '#c92a2a', 3);
+    text('F弹=' + fmt(r.force, 0) + ' N', endX + blockW / 2, y - 78, '#c92a2a', 'center', 12, '700');
+
+    const traceY = 112;
+    [q.x1, q.x2, r.x].forEach((xv, i) => {
+      const px = naturalX + xv * scale + blockW / 2;
+      line(px, traceY, px, traceY + 24, i === 0 ? '#087f5b' : (i === 1 ? '#7b2cbf' : '#f08c00'), 2);
+      text(i === 0 ? 'x1' : (i === 1 ? 'x2' : '当前'), px, traceY - 10, i === 0 ? '#087f5b' : (i === 1 ? '#7b2cbf' : '#f08c00'), 'center', 11, '700');
+    });
+
+    let note = '原长处 x=0，弹力和弹性势能都为 0。';
+    if (Math.abs(r.x) > 0.01) note = r.x > 0 ? '拉伸时弹力向左，指向原长。' : '压缩时弹力向右，仍指向原长。';
+    text(note, 292, 34, '#486581', 'center', 13);
+  }
+
+  function graphMap(x, ep) {
+    const gx = 638, gy = 68, gw = 240, gh = 230;
+    const midX = gx + gw / 2;
+    const baseY = gy + gh - 44;
+    const topY = gy + 40;
+    const px = midX + x / 0.8 * (gw / 2 - 24);
+    const py = baseY - Math.min(1, ep / 260) * (baseY - topY);
+    return { px, py, gx, gy, gw, gh, midX, baseY, topY };
+  }
+
+  function drawGraph(q, r) {
+    const g0 = graphMap(0, 0);
+    state.hot.graph = g0;
+    box(594, 48, 302, 250, '#fff', '#d9e2ec');
+    text('图像读数：拖动 x1/x2 点', 745, 74, '#102a43', 'center', 16, '700');
+    line(g0.gx + 28, g0.baseY, g0.gx + g0.gw - 20, g0.baseY, '#486581', 1.6);
+    line(g0.midX, g0.baseY + 16, g0.midX, g0.topY - 8, '#486581', 1.6);
+    text('x/m', g0.gx + g0.gw - 26, g0.baseY + 18, '#486581', 'center', 12);
+    text('Ep/J', g0.midX - 28, g0.topY - 12, '#486581', 'center', 12);
+    [-0.8, -0.4, 0, 0.4, 0.8].forEach(v => {
+      const pnt = graphMap(v, 0);
+      line(pnt.px, g0.baseY - 4, pnt.px, g0.baseY + 4, '#9fb3c8', 1);
+      text(String(v), pnt.px, g0.baseY + 17, '#486581', 'center', 10);
+    });
+
+    ctx.save();
+    ctx.strokeStyle = '#2c7be5';
+    ctx.lineWidth = 2.6;
+    ctx.beginPath();
+    for (let i = 0; i <= 160; i++) {
+      const x = -0.8 + 1.6 * i / 160;
+      const ep = 0.5 * q.k * x * x;
+      const pnt = graphMap(x, ep);
+      if (i === 0) ctx.moveTo(pnt.px, pnt.py);
+      else ctx.lineTo(pnt.px, pnt.py);
+    }
+    ctx.stroke();
+    ctx.restore();
+
+    const p1 = graphMap(q.x1, r.ep1);
+    const p2 = graphMap(q.x2, r.ep2);
+    const pc = graphMap(r.x, r.ep);
+    state.hot.x1Point = { x: p1.px, y: p1.py };
+    state.hot.x2Point = { x: p2.px, y: p2.py };
+    line(p1.px, p1.py, p1.px, g0.baseY, '#087f5b', 1, [4, 4]);
+    line(p2.px, p2.py, p2.px, g0.baseY, '#7b2cbf', 1, [4, 4]);
+    dot(p1.px, p1.py, '#087f5b', 'x1');
+    dot(p2.px, p2.py, '#7b2cbf', 'x2');
+    ctx.fillStyle = '#f08c00';
+    ctx.beginPath();
+    ctx.arc(pc.px, pc.py, 5, 0, Math.PI * 2);
+    ctx.fill();
+    text('当前 Ep=' + fmt(r.ep, 1) + 'J', 745, 288, '#2c7be5', 'center', 13, '700');
+  }
+
+  function drawLedger(q, r) {
+    box(24, 322, 872, 174, '#fff', '#d9e2ec');
+    text('能量账本：W弹 = Ep1 - Ep2 = -ΔEp', 460, 348, '#102a43', 'center', 16, '700');
+    const items = [
+      { key: 'Ep1', value: r.ep1, color: '#087f5b' },
+      { key: 'Ep2', value: r.ep2, color: '#7b2cbf' },
+      { key: 'ΔEp', value: r.dep, color: '#f08c00' },
+      { key: 'W弹', value: r.work, color: '#2c7be5' }
+    ];
+    const base = 430;
+    const maxAbs = Math.max(12, ...items.map(item => Math.abs(item.value)));
+    line(130, base, 800, base, '#486581', 1.6);
+    items.forEach((item, i) => {
+      const x = 180 + i * 170;
+      const h = Math.abs(item.value) / maxAbs * 56;
+      const y = item.value >= 0 ? base - h : base;
+      const color = item.value >= 0 ? item.color : '#c92a2a';
+      ctx.fillStyle = color;
+      ctx.fillRect(x, y, 58, Math.max(2, h));
+      ctx.strokeStyle = '#102a43';
+      ctx.strokeRect(x, y, 58, Math.max(2, h));
+      text(item.key, x + 29, 474, '#334e68', 'center', 13, '700');
+      text(fmt(item.value, 1) + 'J', x + 29, item.value >= 0 ? y - 12 : y + h + 13, item.value >= 0 ? color : '#c92a2a', 'center', 12, '700');
+    });
+    const compare = Math.abs(q.x2) < Math.abs(q.x1)
+      ? '靠近原长：势能减少，弹力做正功。'
+      : (Math.abs(q.x2) > Math.abs(q.x1) ? '远离原长：势能增加，弹力做负功。' : '初末离原长一样远：势能不变，弹力总功为 0。');
+    text(compare, 460, 310, '#486581', 'center', 13);
+  }
+
+  function updatePanel(q, r) {
+    ui.kText.textContent = fmt(q.k, 0) + ' N/m';
+    ui.x1Text.textContent = fmt(q.x1, 2) + ' m';
+    ui.x2Text.textContent = fmt(q.x2, 2) + ' m';
+    ui.tText.textContent = Math.round(q.t * 100) + '%';
+    ui.ep1Text.textContent = fmt(r.ep1, 1) + ' J';
+    ui.ep2Text.textContent = fmt(r.ep2, 1) + ' J';
+    ui.depText.textContent = fmt(r.dep, 1) + ' J';
+    ui.workText.textContent = fmt(r.work, 1) + ' J';
+    ui.xText.textContent = fmt(r.x, 2) + ' m';
+    ui.forceText.textContent = fmt(r.force, 0) + ' N';
+    if (Math.abs(q.x2) < Math.abs(q.x1)) {
+      ui.status.textContent = '靠近原长：弹力做正功，弹性势能减少。';
+      ui.status.style.background = '#e6fffa';
+      ui.status.style.color = '#087f5b';
+      ui.status.style.borderColor = '#38b2ac';
+    } else if (Math.abs(q.x2) > Math.abs(q.x1)) {
+      ui.status.textContent = '远离原长：弹力做负功，弹性势能增加。';
+      ui.status.style.background = '#fff0f0';
+      ui.status.style.color = '#c92a2a';
+      ui.status.style.borderColor = '#ff6b6b';
+    } else {
+      ui.status.textContent = '同势能：初末 |x| 相同，ΔEp 与 W弹 都为 0。';
+      ui.status.style.background = '#fff7e6';
+      ui.status.style.color = '#9a6700';
+      ui.status.style.borderColor = '#f0a500';
+    }
+  }
+
+  function draw() {
+    const q = p();
+    const r = calc(q);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#f7f9fc';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    drawSpringView(q, r);
+    drawGraph(q, r);
+    drawLedger(q, r);
+    updatePanel(q, r);
+  }
+
+  function eventPos(ev) {
+    const src = ev.touches && ev.touches.length ? ev.touches[0] : (ev.changedTouches && ev.changedTouches.length ? ev.changedTouches[0] : ev);
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: (src.clientX - rect.left) * canvas.width / rect.width,
+      y: (src.clientY - rect.top) * canvas.height / rect.height
+    };
+  }
+
+  function dist(a, x, y) {
+    return Math.hypot(a.x - x, a.y - y);
+  }
+
+  function valueFromSpring(px) {
+    const h = state.hot.block;
+    return clamp((px - h.naturalX) / h.scale, -0.8, 0.8);
+  }
+
+  function valueFromGraph(px) {
+    const g = state.hot.graph;
+    return clamp((px - g.midX) / (g.gw / 2 - 24) * 0.8, -0.8, 0.8);
+  }
+
+  root.__elasticPotentialLabTest = {
+    dragGraphPoint(name, px) {
+      if (name === 'x1') setValue('x1', valueFromGraph(px));
+      if (name === 'x2') setValue('x2', valueFromGraph(px));
+      draw();
+    },
+    dragBlock(px) {
+      const v = valueFromSpring(px);
+      const q = p();
+      if (q.t < 0.5) setValue('x1', v);
+      else setValue('x2', v);
+      draw();
+    },
+    snapshot() {
+      return {
+        k: els.k.value,
+        x1: els.x1.value,
+        x2: els.x2.value,
+        t: els.t.value,
+        ep1: ui.ep1Text.textContent,
+        ep2: ui.ep2Text.textContent,
+        dep: ui.depText.textContent,
+        work: ui.workText.textContent,
+        x: ui.xText.textContent,
+        force: ui.forceText.textContent,
+        status: ui.status.textContent
+      };
+    }
+  };
+
+  function startDrag(ev) {
+    const pos = eventPos(ev);
+    draw();
+    if (state.hot.x1Point && dist(state.hot.x1Point, pos.x, pos.y) < 18) {
+      state.drag = 'x1Point';
+    } else if (state.hot.x2Point && dist(state.hot.x2Point, pos.x, pos.y) < 18) {
+      state.drag = 'x2Point';
+    } else if (state.hot.block && pos.x >= state.hot.block.x - 12 && pos.x <= state.hot.block.x + state.hot.block.w + 12 && pos.y >= state.hot.block.y - 14 && pos.y <= state.hot.block.y + state.hot.block.h + 14) {
+      state.drag = 'block';
+    }
+    if (state.drag) {
+      stopRun();
+      if (ev.pointerId != null && canvas.setPointerCapture) canvas.setPointerCapture(ev.pointerId);
+      ev.preventDefault();
+    }
+  }
+
+  function moveDrag(ev) {
+    if (!state.drag) return;
+    const pos = eventPos(ev);
+    if (state.drag === 'block') {
+      const v = valueFromSpring(pos.x);
+      const q = p();
+      if (q.t < 0.5) setValue('x1', v);
+      else setValue('x2', v);
+    } else if (state.drag === 'x1Point') {
+      setValue('x1', valueFromGraph(pos.x));
+    } else if (state.drag === 'x2Point') {
+      setValue('x2', valueFromGraph(pos.x));
+    }
+    draw();
+    ev.preventDefault();
+  }
+
+  function endDrag(ev) {
+    if (state.drag && ev.pointerId != null && canvas.hasPointerCapture && canvas.hasPointerCapture(ev.pointerId)) {
+      canvas.releasePointerCapture(ev.pointerId);
+    }
+    state.drag = null;
+  }
+
+  if (root.PointerEvent) {
+    canvas.addEventListener('pointerdown', startDrag);
+    canvas.addEventListener('pointermove', moveDrag);
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(type => canvas.addEventListener(type, endDrag));
+  } else {
+    canvas.addEventListener('mousedown', startDrag);
+    root.addEventListener('mousemove', moveDrag);
+    root.addEventListener('mouseup', endDrag);
+    canvas.addEventListener('touchstart', startDrag, { passive: false });
+    root.addEventListener('touchmove', moveDrag, { passive: false });
+    root.addEventListener('touchend', endDrag);
+    root.addEventListener('touchcancel', endDrag);
+  }
+
+  Object.values(els).forEach(el => {
+    el.addEventListener('input', () => {
+      stopRun();
+      draw();
+    });
+  });
+
+  ui.play.addEventListener('click', () => {
+    state.running = !state.running;
+    ui.play.textContent = state.running ? '暂停' : '播放';
+    state.lastTime = performance.now();
+  });
+
+  document.getElementById('reset').addEventListener('click', () => {
+    setValue('k', 200);
+    setValue('x1', 0.40);
+    setValue('x2', 0.10);
+    setValue('t', 0);
+    stopRun();
+    draw();
+  });
+
+  document.querySelectorAll('button[data-case]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const name = btn.dataset.case;
+      if (name === 'near') {
+        setValue('k', 200); setValue('x1', 0.55); setValue('x2', 0.05); setValue('t', 0);
+      } else if (name === 'far') {
+        setValue('k', 200); setValue('x1', 0.10); setValue('x2', 0.55); setValue('t', 0);
+      } else if (name === 'mirror') {
+        setValue('k', 300); setValue('x1', -0.50); setValue('x2', 0.50); setValue('t', 0);
+      } else {
+        setValue('k', 240); setValue('x1', 0.40); setValue('x2', -0.40); setValue('t', 0);
+      }
+      stopRun();
+      draw();
+    });
+  });
+
+  function tick(now) {
+    if (state.running) {
+      const dt = Math.min(0.035, (now - state.lastTime) / 1000 || 0.016);
+      state.lastTime = now;
+      let next = Number(els.t.value) + dt * 0.55;
+      if (next > 1) next = 0;
+      els.t.value = String(next);
+    }
+    draw();
+    requestAnimationFrame(tick);
+  }
+
+  draw();
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

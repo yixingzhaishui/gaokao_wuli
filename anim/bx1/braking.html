@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>B1-11 刹车问题实验台</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#f4f7fb;color:#243b53;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+  .wrap{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px}
+  .stage{position:relative;background:#fff;border:1px solid #d9e2ec;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;aspect-ratio:940/560;touch-action:none}
+  .hint{position:absolute;left:14px;bottom:12px;background:#243b53;color:white;border-radius:6px;padding:7px 10px;font-size:12px}
+  .panel{display:flex;flex-direction:column;gap:8px}
+  .box{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:9px}
+  .task{background:#fff8e6;border-color:#f0a202;font-size:13px;line-height:1.5}
+  .buttons{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #bcccdc;background:white;color:#243b53;border-radius:6px;padding:8px 6px;font-weight:700;cursor:pointer}
+  button.active{background:#2f80ed;color:white;border-color:#2f80ed}
+  .readout{background:#102a43;color:white;border-radius:7px;padding:10px;font-size:13px;line-height:1.65;font-weight:700}
+  .readout b{color:#ffd166}
+  .formula{font-size:13px;line-height:1.55}
+  .warn{border-color:#f0a202;color:#7c4d00;background:#fff8e6;font-size:13px;line-height:1.5;font-weight:700}
+  @media (max-width:850px){.wrap{grid-template-columns:1fr}.panel{grid-row:2}.hint{position:static;border-radius:0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="canvas" width="940" height="560" aria-label="刹车问题交互实验台"></canvas>
+    <div class="hint">可拖动 v0 点、停车点 t停 和橙色观察时间；红色虚线是错误的继续代入</div>
+  </div>
+  <div class="panel">
+    <div class="box task"><b>观察任务：</b>拖橙色时间游标越过 t停，看蓝车是否继续动；比较蓝色真实位置和红色错误外推位置，体会为什么不能再代 t。</div>
+    <div class="box">
+      <b>情境</b>
+      <div class="buttons" style="margin-top:7px">
+        <button id="mOver" class="active">超时错误区</button><button id="mExact">恰好停下</button>
+        <button id="mFast">高速刹车</button><button id="mSoft">减速较小</button>
+      </div>
+    </div>
+    <div class="box"><button id="play" style="width:100%">▶ 播放运动</button></div>
+    <div class="readout" id="readout"></div>
+    <div class="box formula">
+      <b>公式边界</b><br>
+      t停=v0/|a|。<br>
+      t<=t停：x=v0t-1/2|a|t²。<br>
+      t>t停：x=x停=v0²/(2|a|)。
+    </div>
+    <div class="box warn" id="status"></div>
+  </div>
+</div>
+<script>
+(() => {
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const readout=document.getElementById('readout');
+  const status=document.getElementById('status');
+  const buttons={
+    over:document.getElementById('mOver'),
+    exact:document.getElementById('mExact'),
+    fast:document.getElementById('mFast'),
+    soft:document.getElementById('mSoft')
+  };
+  const state={v0:20,a:5,t:6,mode:'over'};
+  const g={ox:82,oy:380,w:520,h:260,tMax:10,vMin:-16,vMax:42};
+  const gx={ox:82,oy:500,w:520,h:86,tMax:10};
+  const track={x:82,y:110,w:720};
+  let drag=null, layout={};
+  function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
+  function tStop(){return state.v0/state.a;}
+  function xStop(){return state.v0*state.v0/(2*state.a);}
+  function vWrong(t){return state.v0-state.a*t;}
+  function xWrong(t){return state.v0*t-0.5*state.a*t*t;}
+  function stopped(){return state.t>tStop();}
+  function vReal(t){return t>tStop()?0:vWrong(t);}
+  function xReal(t){return t>tStop()?xStop():xWrong(t);}
+  function gxv(t){return g.ox+t/g.tMax*g.w;}
+  function gyv(v){return g.oy-(v-g.vMin)/(g.vMax-g.vMin)*g.h;}
+  function tFromGraph(x){return clamp((x-g.ox)/g.w*g.tMax,0,g.tMax);}
+  function vFromGraph(y){return clamp(g.vMin+(g.oy-y)/g.h*(g.vMax-g.vMin),5,38);}
+  function xDomain(){return Math.max(60,xStop()*1.35,Math.abs(xWrong(state.t))*1.1);}
+  function pxOf(x){const m=xDomain();return track.x+x/m*track.w;}
+  function xGraphY(x){const max=xDomain();return gx.oy-x/max*gx.h;}
+  function setMode(mode){
+    state.mode=mode;
+    if(mode==='over'){state.v0=20;state.a=5;state.t=6;}
+    if(mode==='exact'){state.v0=20;state.a=5;state.t=4;}
+    if(mode==='fast'){state.v0=30;state.a=6;state.t=7;}
+    if(mode==='soft'){state.v0=18;state.a=2;state.t=8;}
+    Object.entries(buttons).forEach(([k,b])=>b.classList.toggle('active',k===mode));
+    draw();
+  }
+  Object.entries(buttons).forEach(([k,b])=>b.addEventListener('click',()=>setMode(k)));
+  function line(x1,y1,x2,y2,color,width=1,dash=[]){ctx.save();ctx.setLineDash(dash);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();}
+  function text(s,x,y,color='#243b53',size=13,align='left',weight='600'){ctx.fillStyle=color;ctx.font=`${weight} ${size}px system-ui`;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(s,x,y);}
+  function arrow(x1,y1,x2,y2,color,width=3){
+    line(x1,y1,x2,y2,color,width);
+    const a=Math.atan2(y2-y1,x2-x1),l=10;
+    ctx.beginPath();ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-l*Math.cos(a-0.55),y2-l*Math.sin(a-0.55));
+    ctx.lineTo(x2-l*Math.cos(a+0.55),y2-l*Math.sin(a+0.55));
+    ctx.closePath();ctx.fillStyle=color;ctx.fill();
+  }
+  function handle(x,y,label,color){
+    ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();
+    ctx.strokeStyle='white';ctx.lineWidth=3;ctx.stroke();
+    text(label,x+14,y-15,color,13);
+  }
+  function card(x,y,w,h){ctx.fillStyle='#f7fbff';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();}
+  function drawTrack(){
+    card(50,36,835,140);
+    line(track.x,track.y,track.x+track.w,track.y,'#9fb3c8',4);
+    const xd=xDomain();
+    for(let m=0;m<=xd;m+=Math.max(10,Math.ceil(xd/8/10)*10)){const px=pxOf(m);line(px,track.y-8,px,track.y+8,'#bcccdc');text(String(m),px,track.y+25,'#7b8794',10,'center','500');}
+    const stopPx=pxOf(xStop()), realPx=clamp(pxOf(xReal(state.t)),track.x,track.x+track.w), wrongPx=clamp(pxOf(xWrong(state.t)),track.x,track.x+track.w);
+    line(stopPx,track.y-58,stopPx,track.y+14,'#e03131',2,[6,5]); text(`停车点 x停=${xStop().toFixed(1)} m`,stopPx+8,track.y-50,'#e03131',12);
+    if(stopped()){
+      ctx.fillStyle='rgba(224,49,49,0.18)';ctx.beginPath();ctx.roundRect(wrongPx-22,track.y-72,44,22,6);ctx.fill();
+      text('错误外推',wrongPx,track.y-86,'#e03131',12,'center','800');
+    }
+    ctx.fillStyle=stopped()?'#8aa3b8':'#2f80ed';ctx.beginPath();ctx.roundRect(realPx-24,track.y-46,48,26,6);ctx.fill();
+    ctx.fillStyle='#243b53';ctx.beginPath();ctx.arc(realPx-15,track.y-18,5,0,Math.PI*2);ctx.arc(realPx+15,track.y-18,5,0,Math.PI*2);ctx.fill();
+    if(!stopped()){
+      arrow(realPx,track.y-60,realPx+clamp(vReal(state.t)*3,22,90),track.y-60,'#2f80ed',4);
+      arrow(realPx,track.y-78,realPx-clamp(state.a*8,20,80),track.y-78,'#7b2cbf',4);
+    }else{
+      text('v=0，车已停住',realPx,track.y-62,'#0b7285',13,'center','800');
+    }
+    text('真实刹车：到 v=0 后位置锁定；红色虚线是把公式错误延长',468,58,'#334e68',14,'center','800');
+    text(`t=${state.t.toFixed(1)} s，真实 x=${xReal(state.t).toFixed(1)} m，错误外推 x=${xWrong(state.t).toFixed(1)} m`,468,86,'#0b7285',14,'center','800');
+  }
+  function drawAxes(){
+    card(50,198,835,310);
+    line(g.ox,g.oy,g.ox+g.w+28,g.oy,'#334e68',2);
+    line(g.ox,g.oy,g.ox,g.oy-g.h-20,'#334e68',2);
+    text('t/s',g.ox+g.w+38,g.oy+5,'#334e68',13); text('v/(m/s)',g.ox-42,g.oy-g.h-22,'#334e68',13);
+    for(let t=0;t<=10;t+=2){const x=gxv(t);line(x,g.oy-5,x,g.oy+5,'#9fb3c8');text(String(t),x,g.oy+20,'#627d98',11,'center','500');}
+    for(let v=-10;v<=40;v+=10){const y=gyv(v);line(g.ox-5,y,g.ox+g.w,y,v===0?'#7b8794':'#d9e2ec',v===0?1.8:1);text(String(v),g.ox-14,y,'#627d98',11,'right','500');}
+    line(gx.ox,gx.oy,gx.ox+gx.w+28,gx.oy,'#334e68',2);
+    line(gx.ox,gx.oy,gx.ox,gx.oy-gx.h-12,'#334e68',2);
+    text('x-t',gx.ox-8,gx.oy-gx.h-18,'#334e68',12,'right');
+  }
+  function drawArea(){
+    const zero=gyv(0), tEnd=Math.min(state.t,tStop()), steps=120;
+    for(let i=0;i<steps;i++){
+      const t1=tEnd*i/steps,t2=tEnd*(i+1)/steps,v1=vWrong(t1),v2=vWrong(t2),x1=gxv(t1),x2=gxv(t2),y1=gyv(v1),y2=gyv(v2);
+      ctx.beginPath();ctx.moveTo(x1,zero);ctx.lineTo(x1,y1);ctx.lineTo(x2,y2);ctx.lineTo(x2,zero);ctx.closePath();
+      ctx.fillStyle='rgba(240,140,0,0.24)';ctx.fill();
+    }
+  }
+  function drawGraphs(){
+    const ts=tStop(), v0p={x:gxv(0),y:gyv(state.v0)}, stopP={x:gxv(ts),y:gyv(0)}, cur={x:gxv(state.t),y:gyv(vReal(state.t))};
+    drawArea();
+    line(gxv(0),gyv(state.v0),gxv(ts),gyv(0),'#2f80ed',3);
+    line(gxv(ts),gyv(0),gxv(g.tMax),gyv(0),'#2f80ed',3);
+    line(gxv(ts),gyv(0),gxv(g.tMax),gyv(vWrong(g.tMax)),'#e03131',2,[7,5]);
+    line(stopP.x,g.oy,stopP.x,g.oy-g.h,'#e03131',2,[6,5]); text(`t停=${ts.toFixed(2)} s`,stopP.x+8,g.oy+34,'#e03131',12);
+    line(cur.x,g.oy,cur.x,cur.y,'#f08c00',2);
+    handle(v0p.x,v0p.y,'v0','#2f80ed');
+    handle(stopP.x,stopP.y,'t停','#e03131');
+    handle(cur.x,cur.y,'t','#f08c00');
+    layout={v0:v0p,stop:stopP,time:cur};
+    ctx.beginPath();
+    for(let i=0;i<=100;i++){const t=g.tMax*i/100,x=xReal(t),sx=gx.ox+t/gx.tMax*gx.w,sy=xGraphY(x);if(i===0)ctx.moveTo(sx,sy);else ctx.lineTo(sx,sy);}
+    ctx.strokeStyle='#2f80ed';ctx.lineWidth=2.5;ctx.stroke();
+    ctx.beginPath();
+    for(let i=0;i<=100;i++){const t=g.tMax*i/100,x=xWrong(t),sx=gx.ox+t/gx.tMax*gx.w,sy=xGraphY(x);if(i===0)ctx.moveTo(sx,sy);else ctx.lineTo(sx,sy);}
+    ctx.strokeStyle='#e03131';ctx.lineWidth=1.8;ctx.setLineDash([6,5]);ctx.stroke();ctx.setLineDash([]);
+    line(gx.ox+state.t/gx.tMax*gx.w,gx.oy,gx.ox+state.t/gx.tMax*gx.w,xGraphY(xReal(state.t)),'#f08c00',2);
+    text('蓝：真实 x-t 在 t停 后水平；红：错误外推会回退',360,475,'#334e68',12,'center','700');
+  }
+  function drawFormulaPanel(){
+    const x=660,y=235,w=180,h=162,ts=tStop(),xs=xStop(),xr=xReal(state.t),xw=xWrong(state.t);
+    ctx.fillStyle='rgba(16,42,67,0.94)';ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();
+    text('先判时间',x+90,y+24,'#fff',14,'center','800');
+    text(`t停 = v0/|a| = ${ts.toFixed(2)} s`,x+16,y+58,'#ffd166',12);
+    text(`x停 = v0²/(2|a|)`,x+16,y+85,'#dbeafe',12);
+    text(`x停 = ${xs.toFixed(2)} m`,x+16,y+106,'#ffd166',12);
+    text(`真实 x = ${xr.toFixed(2)} m`,x+16,y+135,'#9ff3d4',12);
+    text(`错误 x = ${xw.toFixed(2)} m`,x+16,y+154,'#ffb3b3',12);
+  }
+  function draw(){
+    var _bg=ctx.createLinearGradient(0,0,0,560);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,940,560);
+    drawTrack();drawAxes();drawGraphs();drawFormulaPanel();
+    const ts=tStop(),xs=xStop(),vr=vReal(state.t),xr=xReal(state.t),xw=xWrong(state.t);
+    readout.innerHTML=`v0=<b>${state.v0.toFixed(1)}</b> m/s<br>|a|=<b>${state.a.toFixed(2)}</b> m/s²<br>t=<b>${state.t.toFixed(2)}</b> s<br>t停=<b>${ts.toFixed(2)}</b> s<br>v=<b>${vr.toFixed(2)}</b> m/s<br>真实 x=<b>${xr.toFixed(2)}</b> m<br>错误代入 x=<b>${xw.toFixed(2)}</b> m<br>x停=<b>${xs.toFixed(2)}</b> m`;
+    if(stopped()) status.textContent='t 已超过 t停：真实车停在 x停，红色错误外推会让位移变小甚至倒退。';
+    else if(Math.abs(state.t-ts)<0.06) status.textContent='临界点：t=t停，v 刚好为 0，刹车距离就是 v0²/(2|a|)。';
+    else status.textContent='还没停：可以用 v=v0-|a|t 和 x=v0t-1/2|a|t²；但仍要先算 t停。';
+  }
+  function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
+  canvas.addEventListener('pointerdown',e=>{
+    const p=pointer(e);
+    for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30){drag=k;canvas.setPointerCapture(e.pointerId);break;}}
+  });
+  canvas.addEventListener('pointermove',e=>{
+    const p=pointer(e);
+    if(drag==='v0') state.v0=Math.round(vFromGraph(p.y)*10)/10;
+    if(drag==='stop'){const ts=clamp(tFromGraph(p.x),0.8,9.5);state.a=Math.round((state.v0/ts)*100)/100;}
+    if(drag==='time') state.t=Math.round(tFromGraph(p.x)*20)/20;
+    if(drag){draw();return;}
+    let hit=false;for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30)hit=true;}
+    canvas.style.cursor=hit?'grab':'default';
+  });
+  window.addEventListener('pointerup',()=>{drag=null;canvas.style.cursor='default';});
+  draw();
+const playBtn=document.getElementById("play");let __run=false,__last=performance.now();playBtn.addEventListener("click",()=>{const cap=(tStop());if(state.t>=cap)state.t=0;__run=!__run;playBtn.textContent=__run?"⏸ 暂停":"▶ 播放运动";});canvas.addEventListener("pointerdown",()=>{if(__run){__run=false;playBtn.textContent="▶ 播放运动";}});function __loop(now){const dt=Math.min((now-__last)/1000,.05);__last=now;const cap=(tStop());if(__run){state.t=Math.min(cap,state.t+dt);if(state.t>=cap){__run=false;playBtn.textContent="▶ 重新播放";}draw();}requestAnimationFrame(__loop);}requestAnimationFrame(__loop);
+})();
+</script>
+</body>
+</html>

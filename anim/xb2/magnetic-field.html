@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>磁场与磁感线</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#eef3f8;color:#102a43}
+.container{padding:12px}
+h2{font-size:16px;margin:0 0 8px;color:#102a43}
+canvas{display:block;width:100%;max-width:780px;background:#f8fbff;border:1px solid #cad7e3;border-radius:8px;touch-action:none;cursor:grab}
+.readouts{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;font-size:13px}
+.r{background:#102a43;color:#e8f1fb;padding:6px 10px;border-radius:6px}
+.r b{color:#ffd166}
+.controls{display:flex;flex-wrap:wrap;gap:12px;margin:10px 0;align-items:center}
+.controls label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:#334e68}
+.controls input[type=range]{width:130px;accent-color:#2c7be5}
+button{font:inherit;padding:6px 12px;border:1px solid #b6c5d4;background:#fff;border-radius:6px;cursor:pointer}
+button.on{background:#2c7be5;color:#fff;border-color:#2c7be5}
+.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:9px 12px;border-radius:4px;font-size:13px;color:#486581;line-height:1.55;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>磁场与磁感线：3D实验台 + 俯视磁针 + 侧视截面</h2>
+  <canvas id="canvas" width="780" height="500"></canvas>
+  <div class="readouts">
+    <span class="r">场源：<b id="mode-v">条形磁体</b></span>
+    <span class="r">强度 = <b id="s-v">6</b></span>
+    <span class="r">探针 |B| = <b id="b-v">—</b></span>
+    <span class="r">方向角 = <b id="ang-v">—</b></span>
+    <span class="r">判定：<b id="state-v">—</b></span>
+  </div>
+  <div class="controls">
+    <button id="magnet-btn" class="on">条形磁体</button>
+    <button id="wire-btn">通电直导线</button>
+    <button id="dir-btn">切换 N-S / 电流方向</button>
+    <button id="play-btn">暂停</button>
+    <button id="reset-btn">重置</button>
+    <label>场源强度 / 电流 I = <span id="s-d">6</span>
+      <input type="range" id="strength" min="1" max="10" step="1" value="6"></label>
+  </div>
+  <div class="hint">
+    <b>观察任务</b>：拖动画面里的白色探针，不要只看滑块。看左侧<b>3D实验台</b>中探针位置、右上<b>俯视小磁针</b>方向、右中<b>侧视截面</b>和右下<b>磁场强度表/轨迹记录</b>怎样一起变化。磁感线的切线方向就是该点 B 方向，疏密/表盘读数表示强弱；直导线模式用右手螺旋定则判断 ⊙/⊗ 时方向如何反转。
+  </div>
+</div>
+<script>
+(function(){
+const canvas=document.getElementById('canvas');
+const ctx=canvas.getContext('2d');
+const W=canvas.width,H=canvas.height;
+let mode='magnet',strength=6,normal=true,running=true,t=0;
+let probe={x:260,y:245},drag=false,trail=[];
+const lab={x:18,y:42,w:480,h:390}, side={x:520,y:42,w:230,h:390};
+const center={x:250,y:245};
+
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function mag(v){return Math.hypot(v.x,v.y)}
+function norm(v){const m=mag(v)||1;return{x:v.x/m,y:v.y/m}}
+function fieldAt(x,y){
+  if(mode==='wire'){
+    const dx=x-center.x,dy=y-center.y,r=Math.max(24,Math.hypot(dx,dy));
+    const sign=normal?1:-1;
+    return{x:sign*(-dy/r)*strength*70/r,y:sign*(dx/r)*strength*70/r};
+  }
+  const sign=normal?1:-1;
+  const dx=(x-center.x)/75,dy=(y-center.y)/75;
+  const r2=dx*dx+dy*dy+0.18;
+  const r=Math.sqrt(r2);
+  const mdotr=sign*dx;
+  return {
+    x:strength*(3*dx*mdotr/(r2*r2*r)-sign/(r2*r))*0.92,
+    y:strength*(3*dy*mdotr/(r2*r2*r))*0.92
+  };
+}
+function roundedRect(x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+}
+function arrow(x1,y1,x2,y2,color,lw=2){
+  const a=Math.atan2(y2-y1,x2-x1);
+  ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=lw;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-8*Math.cos(a-0.45),y2-8*Math.sin(a-0.45));ctx.lineTo(x2-8*Math.cos(a+0.45),y2-8*Math.sin(a+0.45));ctx.closePath();ctx.fill();
+}
+function drawPanel(x,y,w,h,title){
+  ctx.save();
+  ctx.fillStyle='#ffffff';ctx.strokeStyle='#d7e2ec';ctx.lineWidth=1;
+  roundedRect(x,y,w,h,8);ctx.fill();ctx.stroke();
+  ctx.fillStyle='#334e68';ctx.font='bold 12px system-ui';ctx.textAlign='left';ctx.fillText(title,x+10,y+18);
+  ctx.restore();
+}
+function drawTable(){
+  const g=ctx.createLinearGradient(lab.x,lab.y,lab.x,lab.y+lab.h);
+  g.addColorStop(0,'#ffffff');g.addColorStop(1,'#e9f1f8');
+  ctx.fillStyle=g;ctx.strokeStyle='#cbd8e4';ctx.lineWidth=1.2;
+  roundedRect(lab.x,lab.y,lab.w,lab.h,8);ctx.fill();ctx.stroke();
+  ctx.save();
+  ctx.strokeStyle='rgba(82,112,140,0.18)';ctx.lineWidth=1;
+  for(let x=lab.x+20;x<lab.x+lab.w;x+=28){ctx.beginPath();ctx.moveTo(x,lab.y+28);ctx.lineTo(x+58,lab.y+lab.h-24);ctx.stroke();}
+  for(let y=lab.y+50;y<lab.y+lab.h;y+=28){ctx.beginPath();ctx.moveTo(lab.x+18,y);ctx.lineTo(lab.x+lab.w-24,y-26);ctx.stroke();}
+  ctx.restore();
+  ctx.fillStyle='#5b7083';ctx.font='12px system-ui';ctx.fillText('3D透视实验台：拖动白色探针测 B',lab.x+16,lab.y+24);
+}
+function drawMagnet3D(){
+  const x=center.x-105,y=center.y-28,w=210,h=58,d=18;
+  ctx.save();
+  ctx.shadowColor='rgba(16,42,67,0.18)';ctx.shadowBlur=12;ctx.shadowOffsetY=8;
+  ctx.fillStyle='#d9e2ec';roundedRect(x+10,y+18,w,h,8);ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.fillStyle=normal?'#d64545':'#2c7be5';roundedRect(x,y,w/2,h,8);ctx.fill();
+  ctx.fillStyle=normal?'#2c7be5':'#d64545';roundedRect(x+w/2,y,w/2,h,8);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.22)';ctx.beginPath();ctx.moveTo(x+8,y);ctx.lineTo(x+w+8,y);ctx.lineTo(x+w+d,y-d);ctx.lineTo(x+d,y-d);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#fff';ctx.font='bold 18px system-ui';ctx.textAlign='center';
+  ctx.fillText(normal?'N':'S',x+w*0.25,y+36);ctx.fillText(normal?'S':'N',x+w*0.75,y+36);
+  ctx.restore();
+}
+function drawWire3D(){
+  const x=center.x,y=center.y;
+  ctx.save();
+  const glow=ctx.createRadialGradient(x,y,6,x,y,116);
+  glow.addColorStop(0,'rgba(44,123,229,0.30)');glow.addColorStop(1,'rgba(44,123,229,0)');
+  ctx.fillStyle=glow;ctx.beginPath();ctx.arc(x,y,116,0,7);ctx.fill();
+  ctx.fillStyle='#1f2933';ctx.beginPath();ctx.ellipse(x,y,20,20,0,0,7);ctx.fill();
+  ctx.fillStyle='#334e68';ctx.fillRect(x-20,lab.y+58,40,y-lab.y-58);
+  ctx.strokeStyle='#fff';ctx.lineWidth=2.2;
+  if(normal){ctx.beginPath();ctx.arc(x,y,7,0,7);ctx.stroke();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x,y,2.5,0,7);ctx.fill();}
+  else{ctx.beginPath();ctx.moveTo(x-8,y-8);ctx.lineTo(x+8,y+8);ctx.moveTo(x+8,y-8);ctx.lineTo(x-8,y+8);ctx.stroke();}
+  ctx.fillStyle='#102a43';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText(normal?'电流 I 流出屏幕 ⊙':'电流 I 流入屏幕 ⊗',x,y+40);
+  ctx.restore();
+}
+function drawFieldLines(){
+  ctx.save();ctx.lineWidth=1.5;
+  if(mode==='wire'){
+    for(let r=42;r<190;r+=30){
+      const alpha=clamp(0.72-r/260+strength*0.03,0.16,0.82);
+      ctx.strokeStyle='rgba(44,123,229,'+alpha+')';
+      ctx.beginPath();ctx.arc(center.x,center.y,r,0,7);ctx.stroke();
+      for(let k=0;k<4;k++){
+        const th=k*Math.PI/2+(normal?-t:t);
+        const p={x:center.x+r*Math.cos(th),y:center.y+r*Math.sin(th)};
+        const tangent=normal?th+Math.PI/2:th-Math.PI/2;
+        arrow(p.x-8*Math.cos(tangent),p.y-8*Math.sin(tangent),p.x+8*Math.cos(tangent),p.y+8*Math.sin(tangent),'rgba(44,123,229,'+alpha+')',1.4);
+      }
+    }
+  }else{
+    const ys=[-96,-66,-38,38,66,96];
+    ys.forEach((off,i)=>{
+      const top=off<0?-1:1;
+      const alpha=0.68-Math.abs(off)/220+strength*0.015;
+      ctx.strokeStyle='rgba(44,123,229,'+alpha+')';
+      ctx.beginPath();
+      const sx=center.x+(normal?80:-80), ex=center.x+(normal?-80:80);
+      ctx.moveTo(sx,center.y+off*0.28);
+      ctx.bezierCurveTo(center.x+130*(normal?1:-1),center.y+off*1.15,center.x-130*(normal?1:-1),center.y+off*1.15,ex,center.y+off*0.28);
+      ctx.stroke();
+      const ax=center.x+(normal?0:-0), ay=center.y+off*1.02;
+      arrow(ax-14*(normal?1:-1),ay,ax+14*(normal?1:-1),ay,'rgba(44,123,229,'+alpha+')',1.3);
+    });
+    ctx.strokeStyle='rgba(44,123,229,0.48)';
+    ctx.setLineDash([4,5]);
+    ctx.beginPath();ctx.moveTo(center.x-85,center.y);ctx.lineTo(center.x+85,center.y);ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  ctx.restore();
+}
+function drawCompass(x,y,scale=1,label=''){
+  const B=fieldAt(probe.x,probe.y),n=norm(B),len=26*scale;
+  ctx.save();
+  ctx.fillStyle='#fff';ctx.strokeStyle='#9fb3c8';ctx.lineWidth=1.4;
+  ctx.beginPath();ctx.arc(x,y,22*scale,0,7);ctx.fill();ctx.stroke();
+  arrow(x,y,x+n.x*len,y+n.y*len,'#d64545',3*scale);
+  arrow(x,y,x-n.x*len*0.72,y-n.y*len*0.72,'#2c7be5',2*scale);
+  ctx.fillStyle='#102a43';ctx.font=(11*scale)+'px system-ui';ctx.textAlign='center';ctx.fillText('N',x+n.x*(len+8),y+n.y*(len+8));
+  if(label)ctx.fillText(label,x,y+36*scale);
+  ctx.restore();
+}
+function drawProbe(){
+  trail.push({x:probe.x,y:probe.y,b:mag(fieldAt(probe.x,probe.y))});
+  if(trail.length>120)trail.shift();
+  ctx.save();
+  ctx.strokeStyle='rgba(214,69,69,0.25)';ctx.lineWidth=2;
+  ctx.beginPath();
+  trail.forEach((p,i)=>{if(i)ctx.lineTo(p.x,p.y);else ctx.moveTo(p.x,p.y)});
+  ctx.stroke();
+  ctx.fillStyle='#fff';ctx.strokeStyle='#d64545';ctx.lineWidth=2;
+  ctx.beginPath();ctx.arc(probe.x,probe.y,8,0,7);ctx.fill();ctx.stroke();
+  drawCompass(probe.x,probe.y,0.62,'');
+  const B=fieldAt(probe.x,probe.y),n=norm(B),L=clamp(mag(B)*18,18,64);
+  arrow(probe.x,probe.y,probe.x+n.x*L,probe.y+n.y*L,'#c92a2a',2.5);
+  ctx.fillStyle='#c92a2a';ctx.font='12px system-ui';ctx.fillText('探针 B',probe.x+12,probe.y-12);
+  ctx.restore();
+}
+function drawTopView(){
+  drawPanel(side.x,side.y,side.w,116,'俯视：小磁针沿 B 的切线方向');
+  const ox=side.x+72,oy=side.y+70;
+  ctx.save();ctx.translate(ox,oy);
+  ctx.strokeStyle='rgba(44,123,229,0.35)';ctx.lineWidth=1.2;
+  if(mode==='wire'){
+    for(let r=20;r<60;r+=18){ctx.beginPath();ctx.arc(0,0,r,0,7);ctx.stroke();}
+    ctx.fillStyle='#102a43';ctx.beginPath();ctx.arc(0,0,8,0,7);ctx.fill();
+  }else{
+    ctx.fillStyle=normal?'#d64545':'#2c7be5';ctx.fillRect(-44,-12,44,24);
+    ctx.fillStyle=normal?'#2c7be5':'#d64545';ctx.fillRect(0,-12,44,24);
+  }
+  ctx.restore();
+  drawCompass(side.x+168,side.y+70,0.9,'磁针');
+}
+function drawSideView(){
+  drawPanel(side.x,side.y+128,side.w,116,'侧视截面：方向符号不是装饰');
+  ctx.save();
+  const x=side.x+62,y=side.y+196;
+  ctx.strokeStyle='#cbd8e4';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(side.x+18,y+38);ctx.lineTo(side.x+side.w-18,y+38);ctx.stroke();
+  if(mode==='wire'){
+    ctx.fillStyle='#102a43';ctx.beginPath();ctx.arc(x,y,14,0,7);ctx.fill();
+    ctx.strokeStyle='#fff';ctx.lineWidth=2;
+    if(normal){ctx.beginPath();ctx.arc(x,y,5,0,7);ctx.stroke();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x,y,2,0,7);ctx.fill();}
+    else{ctx.beginPath();ctx.moveTo(x-6,y-6);ctx.lineTo(x+6,y+6);ctx.moveTo(x+6,y-6);ctx.lineTo(x-6,y+6);ctx.stroke();}
+    ctx.fillStyle='#334e68';ctx.font='12px system-ui';ctx.fillText(normal?'⊙ 纸外':'⊗ 纸内',x+28,y+4);
+  }else{
+    ctx.fillStyle='#d64545';ctx.fillRect(x-28,y-10,34,20);
+    ctx.fillStyle='#2c7be5';ctx.fillRect(x+6,y-10,34,20);
+    ctx.fillStyle='#334e68';ctx.font='12px system-ui';ctx.fillText('磁体外部 N → S，内部闭合',x-30,y+35);
+  }
+  ctx.restore();
+}
+function drawMeter(){
+  drawPanel(side.x,side.y+256,side.w,176,'电表/图像：读数和拖动轨迹');
+  const B=fieldAt(probe.x,probe.y),b=mag(B);
+  const mx=side.x+70,my=side.y+342;
+  ctx.save();
+  ctx.strokeStyle='#9fb3c8';ctx.lineWidth=8;ctx.beginPath();ctx.arc(mx,my,42,Math.PI,0);ctx.stroke();
+  ctx.strokeStyle='#2c7be5';ctx.beginPath();ctx.arc(mx,my,42,Math.PI,Math.PI+clamp(b/6,0,1)*Math.PI);ctx.stroke();
+  const a=Math.PI+clamp(b/6,0,1)*Math.PI;
+  arrow(mx,my,mx+38*Math.cos(a),my+38*Math.sin(a),'#c92a2a',2);
+  ctx.fillStyle='#102a43';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText('|B| 强度表',mx,my+24);
+  const gx=side.x+130,gy=side.y+296,gw=82,gh=92;
+  ctx.strokeStyle='#d7e2ec';ctx.lineWidth=1;ctx.strokeRect(gx,gy,gw,gh);
+  ctx.fillStyle='#5b7083';ctx.font='11px system-ui';ctx.textAlign='left';ctx.fillText('轨迹记录',gx,gy-6);
+  ctx.strokeStyle='#d64545';ctx.lineWidth=1.6;ctx.beginPath();
+  trail.slice(-70).forEach((p,i)=>{
+    const x=gx+i/69*gw,y=gy+gh-clamp(p.b/6,0,1)*gh;
+    if(i)ctx.lineTo(x,y);else ctx.moveTo(x,y);
+  });
+  ctx.stroke();
+  ctx.restore();
+}
+function updateReadouts(){
+  const B=fieldAt(probe.x,probe.y),b=mag(B),ang=Math.atan2(B.y,B.x)*180/Math.PI;
+  document.getElementById('mode-v').textContent=mode==='magnet'?'条形磁体':'通电直导线';
+  document.getElementById('s-v').textContent=strength;
+  document.getElementById('b-v').textContent=b.toFixed(2);
+  document.getElementById('ang-v').textContent=(ang<0?ang+360:ang).toFixed(0)+'°';
+  document.getElementById('state-v').textContent=b>4?'强场区':'弱场区/远离场源';
+  document.getElementById('s-d').textContent=strength;
+}
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  drawTable();
+  drawFieldLines();
+  if(mode==='magnet')drawMagnet3D();else drawWire3D();
+  drawProbe();
+  drawTopView();
+  drawSideView();
+  drawMeter();
+  ctx.fillStyle='#243b53';ctx.font='13px system-ui';ctx.textAlign='left';
+  ctx.fillText(mode==='wire'?'直导线：B ∝ I/r，右手螺旋定则定方向':'磁感线：外部 N→S、内部 S→N，闭合且不相交',30,H-20);
+  ctx.fillText('多视角：3D实验台 + 俯视 + 侧视 + 电表/轨迹记录',340,H-20);
+  updateReadouts();
+}
+function pos(e){
+  const r=canvas.getBoundingClientRect(),sx=canvas.width/r.width,sy=canvas.height/r.height;
+  return{x:(e.clientX-r.left)*sx,y:(e.clientY-r.top)*sy};
+}
+canvas.addEventListener('pointerdown',e=>{
+  const p=pos(e);
+  if(Math.hypot(p.x-probe.x,p.y-probe.y)<28){drag=true;canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing';}
+});
+canvas.addEventListener('pointermove',e=>{
+  if(!drag)return;
+  const p=pos(e);
+  probe.x=clamp(p.x,lab.x+35,lab.x+lab.w-35);
+  probe.y=clamp(p.y,lab.y+42,lab.y+lab.h-35);
+  draw();
+});
+window.addEventListener('pointerup',()=>{drag=false;canvas.style.cursor='grab'});
+document.getElementById('strength').addEventListener('input',e=>{strength=parseInt(e.target.value);draw()});
+document.getElementById('magnet-btn').onclick=()=>{mode='magnet';trail=[];document.getElementById('magnet-btn').classList.add('on');document.getElementById('wire-btn').classList.remove('on');draw()};
+document.getElementById('wire-btn').onclick=()=>{mode='wire';trail=[];document.getElementById('wire-btn').classList.add('on');document.getElementById('magnet-btn').classList.remove('on');draw()};
+document.getElementById('dir-btn').onclick=()=>{normal=!normal;trail=[];draw()};
+document.getElementById('play-btn').onclick=()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';draw()};
+document.getElementById('reset-btn').onclick=()=>{mode='magnet';strength=6;normal=true;probe={x:260,y:245};trail=[];document.getElementById('strength').value=6;document.getElementById('magnet-btn').classList.add('on');document.getElementById('wire-btn').classList.remove('on');draw()};
+let last=performance.now();
+function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;if(running)t+=dt;draw();requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

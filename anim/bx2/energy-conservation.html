@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>能量守恒实验台：机械能减少，总能量不减少</title>
+<link rel="icon" href="data:,">
+<style>
+  :root { --ink:#102a43; --muted:#486581; --line:#d9e2ec; --blue:#2c7be5; --purple:#7b2cbf; --green:#087f5b; --orange:#f08c00; --red:#c92a2a; --paper:#f7f9fc; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif; }
+  .lab { display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:12px; padding:12px; min-height:540px; }
+  .stage,.card { background:#fff; border:1px solid var(--line); border-radius:8px; }
+  .stage { overflow:hidden; position:relative; }
+  canvas { display:block; width:100%; height:auto; touch-action:none; cursor:crosshair; }
+  .hint { position:absolute; left:12px; bottom:10px; color:var(--muted); background:rgba(255,255,255,.9); border:1px solid var(--line); border-radius:6px; padding:5px 8px; font-size:12px; }
+  .panel { display:flex; flex-direction:column; gap:10px; }
+  .card { padding:10px; }
+  .task { background:#fff7e6; border-left:3px solid var(--orange); color:var(--muted); line-height:1.5; font-size:13px; }
+  .title { font-weight:700; margin-bottom:7px; }
+  .param { display:grid; gap:3px; margin:9px 0; font-size:13px; }
+  .param span { display:flex; justify-content:space-between; gap:10px; color:var(--muted); }
+  .param b { color:var(--ink); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  input[type=range] { width:100%; accent-color:var(--blue); }
+  .buttons { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+  button { border:1px solid #b0bcc9; background:#fff; border-radius:6px; padding:7px 8px; cursor:pointer; color:var(--ink); font-size:13px; }
+  button:hover { background:#eef2f7; }
+  button.primary { background:#e8f2ff; border-color:#8bbcff; color:#174ea6; font-weight:700; }
+  .readout { background:var(--ink); color:#d9e2ec; border-radius:8px; padding:10px; line-height:1.75; font-size:13px; }
+  .readout b { color:#ffd166; font-variant-numeric:tabular-nums; }
+  .formula { font-size:13px; line-height:1.55; color:#334e68; }
+  .status { font-size:13px; font-weight:700; border-radius:6px; padding:8px; border:1px solid #38b2ac; background:#e6fffa; color:var(--green); }
+  @media (max-width:780px){ .lab{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<div class="lab">
+  <div class="stage">
+    <canvas id="canvas" width="920" height="540" aria-label="能量守恒实验台"></canvas>
+    <div class="hint">可直接拖动滑块改变位置，拖动橙色高度手柄改变初始能量</div>
+  </div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>拖动滑块时盯住橙色总能量柱：机械能可以变少，但 `Ep+Ek+E内` 必须始终等于初始 `mgh`。</div>
+    <div class="card">
+      <div class="title">实验控制</div>
+      <label class="param"><span>质量 m <b id="mText">2.0 kg</b></span><input id="m" type="range" min="0.5" max="8" step="0.1" value="2"></label>
+      <label class="param"><span>初始高度 h <b id="hText">5.0 m</b></span><input id="h" type="range" min="1" max="8" step="0.1" value="5"></label>
+      <label class="param"><span>摩擦因数 μ <b id="muText">0.20</b></span><input id="mu" type="range" min="0" max="0.45" step="0.01" value="0.2"></label>
+      <label class="param"><span>过程位置 <b id="uText">65%</b></span><input id="u" type="range" min="0" max="1" step="0.01" value="0.65"></label>
+      <div class="buttons">
+        <button class="primary" id="play">播放</button>
+        <button id="reset">重置</button>
+        <button data-case="smooth">无摩擦</button>
+        <button data-case="rough">有摩擦</button>
+        <button data-case="heat">多生热</button>
+        <button data-case="high">增高</button>
+      </div>
+    </div>
+    <div class="readout">
+      Ep=<b id="epText">35.0 J</b>　Ek=<b id="ekText">41.0 J</b><br>
+      E内=<b id="eintText">24.0 J</b>　E机=<b id="emText">76.0 J</b><br>
+      E总=<b id="etotText">100.0 J</b>　E0=<b id="e0Text">100.0 J</b>
+    </div>
+    <div class="card formula">
+      <div class="title">公式对照</div>
+      <div>E0 = mgh，对应橙色高度尺。</div>
+      <div>E机 = Ep + Ek，对应紫/蓝/绿能量柱。</div>
+      <div>E内 = -Wf，对应摩擦生热红色柱。</div>
+      <div>E总 = Ep + Ek + E内 = E0。</div>
+    </div>
+    <div class="status" id="status">有摩擦：机械能减少，但减少量进入内能，总能量守恒。</div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const root = document.defaultView || globalThis;
+  const g = 10;
+  const theta = 32 * Math.PI / 180;
+  const els = { m: document.getElementById('m'), h: document.getElementById('h'), mu: document.getElementById('mu'), u: document.getElementById('u') };
+  const ui = {
+    mText: document.getElementById('mText'), hText: document.getElementById('hText'), muText: document.getElementById('muText'), uText: document.getElementById('uText'),
+    epText: document.getElementById('epText'), ekText: document.getElementById('ekText'), eintText: document.getElementById('eintText'), emText: document.getElementById('emText'), etotText: document.getElementById('etotText'), e0Text: document.getElementById('e0Text'),
+    status: document.getElementById('status'), play: document.getElementById('play')
+  };
+  const state = { running:false, drag:null, hot:{}, lastTime:0 };
+
+  function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+  function fmt(n,d){ const v = Math.abs(n) < 0.0005 ? 0 : n; return v.toFixed(d == null ? 1 : d); }
+  function p(){ return { m:Number(els.m.value), h:Number(els.h.value), mu:Number(els.mu.value), u:Number(els.u.value) }; }
+  function setValue(name,value){ const el = els[name]; el.value = String(clamp(value, Number(el.min), Number(el.max))); }
+  function stopRun(){ state.running = false; ui.play.textContent = '播放'; }
+
+  function calc(q){
+    const path = q.h / Math.sin(theta);
+    const hNow = q.h * (1 - q.u);
+    const e0 = q.m * g * q.h;
+    const ep = q.m * g * hNow;
+    const eint = q.mu * q.m * g * Math.cos(theta) * path * q.u;
+    const ek = Math.max(0, e0 - ep - eint);
+    const em = ep + ek;
+    const etot = ep + ek + eint;
+    const v = Math.sqrt(Math.max(0, 2 * ek / q.m));
+    return { path, hNow, e0, ep, ek, eint, em, etot, v };
+  }
+
+  function text(s,x,y,color,align,size,weight){
+    ctx.fillStyle = color || '#102a43';
+    ctx.font = (weight ? weight + ' ' : '') + (size || 13) + 'px -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif';
+    ctx.textAlign = align || 'center'; ctx.textBaseline = 'middle'; ctx.fillText(s,x,y);
+  }
+  function box(x,y,w,h,fill,stroke){ ctx.save(); ctx.fillStyle=fill||'#fff'; ctx.strokeStyle=stroke||'#d9e2ec'; ctx.beginPath(); ctx.roundRect(x,y,w,h,8); ctx.fill(); ctx.stroke(); ctx.restore(); }
+  function line(x1,y1,x2,y2,color,width,dash){ ctx.save(); ctx.strokeStyle=color||'#486581'; ctx.lineWidth=width||1; ctx.setLineDash(dash||[]); ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); ctx.restore(); }
+  function arrow(x1,y1,x2,y2,color,width){
+    const a = Math.atan2(y2-y1,x2-x1);
+    ctx.save(); ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=width||2; ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x2,y2); ctx.lineTo(x2-10*Math.cos(a-.45), y2-10*Math.sin(a-.45)); ctx.lineTo(x2-10*Math.cos(a+.45), y2-10*Math.sin(a+.45)); ctx.closePath(); ctx.fill(); ctx.restore();
+  }
+
+  function trackGeometry(q){
+    const bottom = { x:88, y:276 };
+    const scaleY = 26;
+    const hPx = q.h * scaleY;
+    const pathPx = hPx / Math.sin(theta);
+    const top = { x:bottom.x + pathPx * Math.cos(theta), y:bottom.y - hPx };
+    const block = { x:top.x + (bottom.x - top.x) * q.u, y:top.y + (bottom.y - top.y) * q.u };
+    return { bottom, top, block, hPx, pathPx, scaleY };
+  }
+
+  function drawScene(q,r){
+    const geo = trackGeometry(q);
+    state.hot.block = { x:geo.block.x, y:geo.block.y - 16, radius:24, geo };
+    state.hot.height = { x:geo.top.x + 36, y:geo.top.y, geo };
+    box(24,48,536,250,'#fff','#d9e2ec');
+    text('实物过程：机械能去哪了？',292,74,'#102a43','center',16,'700');
+    line(54,geo.bottom.y,520,geo.bottom.y,'#d9e2ec',2);
+    line(geo.bottom.x,geo.bottom.y,geo.top.x,geo.top.y,'#334e68',4);
+    line(geo.bottom.x,geo.bottom.y,geo.bottom.x,geo.top.y,'#f08c00',2.2,[6,5]);
+    line(geo.top.x,geo.top.y,geo.bottom.x,geo.top.y,'#9fb3c8',1.2,[5,4]);
+    text('h=' + fmt(q.h,1) + 'm', geo.bottom.x-38, (geo.bottom.y+geo.top.y)/2, '#f08c00', 'center', 13, '700');
+    ctx.fillStyle = '#fff7e6'; ctx.strokeStyle = '#f08c00'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(geo.top.x+36, geo.top.y, 8, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+    text('拖 h', geo.top.x+36, geo.top.y-18, '#b36b00', 'center', 11, '700');
+    if(q.mu > .005){ line(geo.bottom.x+28,geo.bottom.y-2,geo.bottom.x+118,geo.bottom.y-70,'#c92a2a',5); text('粗糙段', geo.bottom.x+108, geo.bottom.y-86, '#c92a2a', 'center', 12, '700'); }
+    box(geo.block.x-18, geo.block.y-34, 36, 36, '#d9e2ec', '#334e68');
+    text('滑块', geo.block.x, geo.block.y-50, '#174ea6', 'center', 12, '700');
+    arrow(geo.block.x, geo.block.y-14, geo.block.x, geo.block.y+42, '#7b2cbf', 2.4);
+    text('Ep=' + fmt(r.ep,1), geo.block.x+44, geo.block.y+30, '#7b2cbf', 'left', 12, '700');
+    if(r.v > .05){ arrow(geo.block.x+20, geo.block.y-16, geo.block.x+20+Math.min(76,r.v*9)*Math.cos(theta), geo.block.y-16+Math.min(76,r.v*9)*Math.sin(theta), '#2c7be5', 2.5); text('Ek', geo.block.x+78, geo.block.y+6, '#2c7be5', 'center', 12, '700'); }
+    if(q.mu > .005){ text('E内来自摩擦生热', 292, 34, '#c92a2a', 'center', 13, '700'); }
+    else text('无摩擦：机械能也是守恒的', 292, 34, '#087f5b', 'center', 13, '700');
+  }
+
+  function drawFlow(q,r){
+    box(594,48,302,250,'#fff','#d9e2ec');
+    text('能量去向：总量不丢',745,74,'#102a43','center',16,'700');
+    box(626,118,76,42,'#eef2ff','#9fb3c8'); text('Ep',664,139,'#7b2cbf','center',14,'700');
+    box(724,118,76,42,'#e8f2ff','#8bbcff'); text('Ek',762,139,'#2c7be5','center',14,'700');
+    box(724,198,76,42,'#fff0f0','#ff6b6b'); text('E内',762,219,'#c92a2a','center',14,'700');
+    arrow(702,139,724,139,'#087f5b',2);
+    arrow(762,160,762,198,'#f08c00',2);
+    text('机械能减少的部分',745,178,'#486581','center',12);
+    text('会转到内能等形式',745,258,'#486581','center',12);
+  }
+
+  function drawBars(q,r){
+    box(24,322,872,174,'#fff','#d9e2ec');
+    text('总能量账本：Ep + Ek + E内 = E0',460,348,'#102a43','center',16,'700');
+    const items = [
+      { key:'Ep', value:r.ep, color:'#7b2cbf' },
+      { key:'Ek', value:r.ek, color:'#2c7be5' },
+      { key:'E内', value:r.eint, color:'#c92a2a' },
+      { key:'E机', value:r.em, color:'#087f5b' },
+      { key:'E总', value:r.etot, color:'#f08c00' }
+    ];
+    const base=430, maxE=Math.max(1,r.e0);
+    line(110,base,830,base,'#486581',1.5);
+    items.forEach((item,i)=>{
+      const x=150+i*135; const h=Math.max(2,item.value/maxE*62);
+      ctx.fillStyle=item.color; ctx.fillRect(x,base-h,54,h); ctx.strokeStyle='#102a43'; ctx.strokeRect(x,base-62,54,62);
+      text(item.key,x+27,474,'#334e68','center',13,'700'); text(fmt(item.value,1),x+27,base-h-12,item.color,'center',12,'700');
+    });
+    text('橙色 E总 应始终等于初始 E0=' + fmt(r.e0,1) + 'J', 460, 310, '#f08c00', 'center', 13, '700');
+  }
+
+  function updatePanel(q,r){
+    ui.mText.textContent=fmt(q.m,1)+' kg'; ui.hText.textContent=fmt(q.h,1)+' m'; ui.muText.textContent=fmt(q.mu,2); ui.uText.textContent=Math.round(q.u*100)+'%';
+    ui.epText.textContent=fmt(r.ep,1)+' J'; ui.ekText.textContent=fmt(r.ek,1)+' J'; ui.eintText.textContent=fmt(r.eint,1)+' J'; ui.emText.textContent=fmt(r.em,1)+' J'; ui.etotText.textContent=fmt(r.etot,1)+' J'; ui.e0Text.textContent=fmt(r.e0,1)+' J';
+    if(q.mu < .005){ ui.status.textContent='无摩擦：机械能守恒，总能量也守恒。'; ui.status.style.background='#e6fffa'; ui.status.style.color='#087f5b'; ui.status.style.borderColor='#38b2ac'; }
+    else { ui.status.textContent='有摩擦：机械能减少，但减少量进入内能，总能量守恒。'; ui.status.style.background='#fff7e6'; ui.status.style.color='#9a6700'; ui.status.style.borderColor='#f0a500'; }
+  }
+
+  function draw(){ const q=p(); const r=calc(q); ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle='#f7f9fc'; ctx.fillRect(0,0,canvas.width,canvas.height); drawScene(q,r); drawFlow(q,r); drawBars(q,r); updatePanel(q,r); }
+  function eventPos(ev){ const src=ev.touches&&ev.touches.length?ev.touches[0]:(ev.changedTouches&&ev.changedTouches.length?ev.changedTouches[0]:ev); const rect=canvas.getBoundingClientRect(); return { x:(src.clientX-rect.left)*canvas.width/rect.width, y:(src.clientY-rect.top)*canvas.height/rect.height }; }
+  function dist(a,x,y){ return Math.hypot(a.x-x,a.y-y); }
+  function setProgressFromPoint(pos){ const geo=state.hot.block.geo; const vx=geo.bottom.x-geo.top.x, vy=geo.bottom.y-geo.top.y; const wx=pos.x-geo.top.x, wy=pos.y-geo.top.y; setValue('u',(wx*vx+wy*vy)/(vx*vx+vy*vy)); }
+  function setHeightFromPoint(pos){ const geo=state.hot.height.geo; setValue('h',(geo.bottom.y-pos.y)/geo.scaleY); }
+  function startDrag(ev){ const pos=eventPos(ev); draw(); if(state.hot.block&&dist(state.hot.block,pos.x,pos.y)<30) state.drag='block'; else if(state.hot.height&&dist(state.hot.height,pos.x,pos.y)<24) state.drag='height'; if(state.drag){ stopRun(); if(ev.pointerId!=null&&canvas.setPointerCapture) canvas.setPointerCapture(ev.pointerId); ev.preventDefault(); } }
+  function moveDrag(ev){ if(!state.drag) return; const pos=eventPos(ev); if(state.drag==='block') setProgressFromPoint(pos); if(state.drag==='height') setHeightFromPoint(pos); draw(); ev.preventDefault(); }
+  function endDrag(ev){ if(state.drag&&ev.pointerId!=null&&canvas.hasPointerCapture&&canvas.hasPointerCapture(ev.pointerId)) canvas.releasePointerCapture(ev.pointerId); state.drag=null; }
+  if(root.PointerEvent){ canvas.addEventListener('pointerdown',startDrag); canvas.addEventListener('pointermove',moveDrag); ['pointerup','pointercancel','pointerleave'].forEach(type=>canvas.addEventListener(type,endDrag)); }
+  else { canvas.addEventListener('mousedown',startDrag); root.addEventListener('mousemove',moveDrag); root.addEventListener('mouseup',endDrag); canvas.addEventListener('touchstart',startDrag,{passive:false}); root.addEventListener('touchmove',moveDrag,{passive:false}); root.addEventListener('touchend',endDrag); root.addEventListener('touchcancel',endDrag); }
+  Object.values(els).forEach(el=>el.addEventListener('input',()=>{ stopRun(); draw(); }));
+  ui.play.addEventListener('click',()=>{ state.running=!state.running; ui.play.textContent=state.running?'暂停':'播放'; state.lastTime=performance.now(); });
+  document.getElementById('reset').addEventListener('click',()=>{ setValue('m',2); setValue('h',5); setValue('mu',0.2); setValue('u',0.65); stopRun(); draw(); });
+  document.querySelectorAll('button[data-case]').forEach(btn=>btn.addEventListener('click',()=>{ const name=btn.dataset.case; if(name==='smooth'){ setValue('m',2); setValue('h',5); setValue('mu',0); setValue('u',0.75); } else if(name==='rough'){ setValue('m',2); setValue('h',5); setValue('mu',0.2); setValue('u',0.75); } else if(name==='heat'){ setValue('m',2); setValue('h',5); setValue('mu',0.4); setValue('u',0.85); } else { setValue('m',2); setValue('h',7); setValue('mu',0.2); setValue('u',0.65); } stopRun(); draw(); }));
+  function tick(now){ if(state.running){ const dt=Math.min(.035,(now-state.lastTime)/1000||.016); state.lastTime=now; let next=Number(els.u.value)+dt*.35; if(next>1) next=0; els.u.value=String(next); } draw(); requestAnimationFrame(tick); }
+  draw(); requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

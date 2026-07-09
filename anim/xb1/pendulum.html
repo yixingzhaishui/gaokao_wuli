@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>单摆</title>
+<link rel="stylesheet" href="../common/controls.css">
+<style>
+body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#f7f9fc;color:#1f2933}
+.container{padding:12px}
+h2{font-size:16px;margin:0 0 8px;color:#102a43}
+canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid #d9e2ec;border-radius:8px}
+.readouts{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0;font-size:13px}
+.readouts .r{background:#102a43;color:#d9e2ec;padding:6px 10px;border-radius:6px}
+.readouts .r b{color:#f0a500}
+.controls{display:flex;flex-wrap:wrap;gap:14px;margin:10px 0;align-items:center}
+.controls label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:#334e68}
+.controls input[type=range]{width:120px;accent-color:#2c7be5}
+.controls button{font:inherit;padding:6px 14px;border:1px solid #b0bcc9;background:#fff;border-radius:6px;cursor:pointer}
+.controls button:hover{background:#eef2f7}
+.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:8px 12px;border-radius:4px;font-size:13px;color:#486581;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>单摆：T = 2π√(L/g)</h2>
+  <canvas id="canvas" width="660" height="360"></canvas>
+  <div class="readouts">
+    <span class="r">摆长 L = <b id="l-v">1.0</b> m</span>
+    <span class="r">周期 T = <b id="t-v">2.01</b> s</span>
+    <span class="r">摆角 θ = <b id="th-v">0</b>°</span>
+    <span class="r" id="iso">等时性：与振幅、质量无关</span>
+  </div>
+  <div class="controls">
+    <label>摆长 L = <span id="l-d">1.0</span> m
+      <input type="range" id="l" min="0.4" max="2.5" step="0.1" value="1"></label>
+    <label>初始摆角 θ₀ = <span id="th-d">10</span>°
+      <input type="range" id="th" min="3" max="15" step="1" value="10"></label>
+    <label>重力 g = <span id="g-d">9.8</span>
+      <input type="range" id="g" min="1.6" max="9.8" step="0.1" value="9.8"></label>
+    <button id="play-btn">暂停</button>
+    <button id="reset-btn">重置</button>
+  </div>
+  <div class="hint">
+    <p><b>观察任务</b>：直接拖左侧摆球改变摆长 L 和初始摆角 θ₀，看周期 T 如何随 √L 变化；小角度内改变 θ₀，周期几乎不变——这就是单摆的<b>等时性</b>；把 g 拖到 1.6（月球），看周期变长。</p>
+  </div>
+</div>
+<script>
+(function(){
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  let L=1,th0=10*Math.PI/180,g=9.8,drag=false;
+  let t=0,running=true;
+  const pivotX=200,pivotY=40, pxPerM=110;
+
+  function period(){return 2*Math.PI*Math.sqrt(L/g);}
+  function angle(tt){return th0*Math.cos(2*Math.PI*tt/period());}
+
+  function drawPendulum(px,phase,color,amp){
+    const th=amp*Math.cos(2*Math.PI*t/period()+phase);
+    const len=L*pxPerM;
+    const bx=px+len*Math.sin(th), by=pivotY+len*Math.cos(th);
+    ctx.strokeStyle='#829ab1';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(px,pivotY);ctx.lineTo(bx,by);ctx.stroke();
+    const glow=ctx.createRadialGradient(bx,by,2,bx,by,26);glow.addColorStop(0,color);glow.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.globalAlpha=0.4;ctx.fillStyle=glow;ctx.beginPath();ctx.arc(bx,by,26,0,7);ctx.fill();ctx.globalAlpha=1;
+    ctx.fillStyle=color;ctx.strokeStyle='#243b53';ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(bx,by,13,0,Math.PI*2);ctx.fill();ctx.stroke();
+    return {bx,by,th};
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    // ceiling
+    ctx.fillStyle='#b0bcc9';ctx.fillRect(120,pivotY-8,360,8);
+    // reference vertical
+    ctx.strokeStyle='#dbe4ee';ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(pivotX,pivotY);ctx.lineTo(pivotX,pivotY+L*pxPerM+30);ctx.stroke();ctx.setLineDash([]);
+    // main pendulum (amplitude th0)
+    const p=drawPendulum(pivotX,0,'#2c7be5',th0);
+    // second pendulum, larger amplitude same length -> shows isochronism (synchronized)
+    const p2=drawPendulum(pivotX+230,0,'#e8590c',th0*1.4);
+    ctx.fillStyle='#829ab1';ctx.font='11px sans-serif';ctx.textAlign='center';
+    ctx.fillText('小振幅',pivotX,pivotY+L*pxPerM+50);
+    ctx.fillText('大振幅（同步！）',pivotX+230,pivotY+L*pxPerM+50);
+    // angle arc + restoring component
+    const th=p.th;
+    ctx.strokeStyle='#c92a2a';ctx.lineWidth=1.5;
+    // gravity component tangential ~ -mg sinθ shown as small arrow at bob
+    const tanDir=Math.cos(th); // rough
+    // formula
+    ctx.fillStyle='#243b53';ctx.font='13px sans-serif';ctx.textAlign='left';
+    ctx.fillText('T = 2π√(L/g) = 2π√('+L.toFixed(1)+'/'+g.toFixed(1)+') = '+period().toFixed(2)+' s',20,H-16);
+    // readouts
+    document.getElementById('l-v').textContent=L.toFixed(1);
+    document.getElementById('t-v').textContent=period().toFixed(2);
+    document.getElementById('th-v').textContent=(th*180/Math.PI).toFixed(0);
+    document.getElementById('iso').textContent=Math.abs(th0*180/Math.PI)<=10?'状态：小角度等时性成立（与振幅、质量无关）':'状态：角度偏大，周期公式只近似适用';
+  }
+
+  function bind(id,cb){document.getElementById(id).addEventListener('input',e=>{cb(parseFloat(e.target.value));draw();});}
+  bind('l',v=>{L=v;document.getElementById('l-d').textContent=v.toFixed(1);});
+  bind('th',v=>{th0=v*Math.PI/180;document.getElementById('th-d').textContent=v;});
+  bind('g',v=>{g=v;document.getElementById('g-d').textContent=v.toFixed(1);});
+  document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
+  document.getElementById('reset-btn').addEventListener('click',()=>{t=0;draw();});
+  function pointerPos(e){const r=canvas.getBoundingClientRect(),s=canvas.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s};}
+  canvas.addEventListener('pointerdown',e=>{
+    const p=pointerPos(e),th=angle(t),len=L*pxPerM,bx=pivotX+len*Math.sin(th),by=pivotY+len*Math.cos(th);
+    if(Math.hypot(p.x-bx,p.y-by)<28){
+      drag=true;running=false;t=0;document.getElementById('play-btn').textContent='播放';canvas.style.cursor='grabbing';
+    }
+  });
+  canvas.addEventListener('pointermove',e=>{
+    if(!drag)return;
+    const p=pointerPos(e),dx=p.x-pivotX,dy=Math.max(20,p.y-pivotY),len=Math.hypot(dx,dy);
+    L=Math.max(.4,Math.min(2.5,len/pxPerM));
+    th0=Math.max(-15*Math.PI/180,Math.min(15*Math.PI/180,Math.atan2(dx,dy)));
+    if(Math.abs(th0)<3*Math.PI/180)th0=(th0<0?-1:1)*3*Math.PI/180;
+    document.getElementById('l').value=L;document.getElementById('l-d').textContent=L.toFixed(1);
+    document.getElementById('th').value=Math.abs(th0*180/Math.PI);document.getElementById('th-d').textContent=Math.abs(th0*180/Math.PI).toFixed(0);
+    draw();
+  });
+  window.addEventListener('pointerup',()=>{drag=false;canvas.style.cursor='grab';});
+
+  let last=performance.now();
+  function loop(now){const dt=Math.min((now-last)/1000,0.03);last=now;if(running){t+=dt;}draw();requestAnimationFrame(loop);}
+  draw();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

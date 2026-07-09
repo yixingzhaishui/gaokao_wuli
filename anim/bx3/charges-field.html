@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>电荷与电场</title>
+<style>
+:root{--ink:#102a43;--line:#d9e2ec;--accent:#2c7be5}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#eef2f7;color:var(--ink)}
+.wrap{padding:12px}
+h2{font-size:16px;margin:0 0 8px}
+.stage-wrap{position:relative;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(16,42,67,.12)}
+canvas{display:block;width:100%;max-width:720px;background:#0d1b2a;touch-action:none;cursor:grab}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;align-items:center}
+.btn{font:inherit;font-size:13px;padding:7px 12px;border:1px solid var(--line);background:#fff;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:#f0f4f9}
+.btn.pos{border-color:#e8593a;color:#c0392b}
+.btn.neg{border-color:#2f6fd0;color:#2c5fb0}
+.btn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.dot{width:14px;height:14px;border-radius:50%;display:inline-block}
+.readouts{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.chip{background:#102a43;color:#e6eef7;padding:6px 11px;border-radius:8px;font-size:13px}
+.chip b{color:#ffd166}
+.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:9px 12px;border-radius:6px;font-size:13px;color:#5a6b7b;line-height:1.5;margin-top:8px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:#fff;padding:7px 12px;font:inherit;font-size:13px;cursor:pointer}
+.seg button.on{background:var(--accent);color:#fff}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2>电荷与电场：拖动电荷，看整片电场怎么变（E = kQ/r²，矢量叠加）</h2>
+  <div class="stage-wrap"><canvas id="cv" width="720" height="440"></canvas></div>
+  <div class="readouts">
+    <span class="chip">测试点场强 E = <b id="ev">0</b> （相对）</span>
+    <span class="chip">试探电荷 q = <b id="qtv">+q</b></span>
+    <span class="chip">受力 F = qE = <b id="fv">0</b>，方向 <b id="fd">—</b></span>
+    <span class="chip">电荷数 <b id="nc">2</b></span>
+    <span class="chip">场强状态：<b id="trendv">—</b></span>
+  </div>
+  <div class="toolbar">
+    <button class="btn pos" id="addP"><span class="dot" style="background:#ff5b47"></span>加正电荷 +</button>
+    <button class="btn neg" id="addN"><span class="dot" style="background:#4d9bff"></span>加负电荷 −</button>
+    <button class="btn" id="clear">清空</button>
+    <button class="btn on" data-testq="1">试探 +q</button>
+    <button class="btn" data-testq="-1">试探 −q</button>
+    <button class="btn" data-testq="2">试探 2q</button>
+    <span style="font-size:13px;color:#5a6b7b">显示：</span>
+    <div class="seg" id="mode">
+      <button data-m="vectors" class="on">场矢量</button>
+      <button data-m="lines">电场线</button>
+    </div>
+    <button class="btn" id="playBtn">▶ 播放：试探电荷自动巡游</button>
+  </div>
+  <div class="hint"><b>怎么玩</b>：直接<b>拖动</b>画面里的圆形电荷（红=正、蓝=负），整片电场的箭头会<b>实时重排</b>——箭头方向是该点场强方向、颜色越暖(红)表示场越强。拖动黄色<b>试探电荷</b>，绿色箭头读 <b>E</b>，黄色箭头读 <b>F=qE</b>；换成负试探电荷时，F 反向而 E 不变。点"加电荷"可放更多电荷，观察<b>矢量叠加</b>：某点总场强 = 各电荷单独在此产生场强的矢量和。切到"电场线"看由正到负的连续曲线。</div>
+</div>
+<script>
+(function(){
+const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+const W=cv.width, H=cv.height;
+let charges=[{x:250,y:220,q:1},{x:470,y:220,q:-1}];
+let test={x:360,y:120,q:1};
+let mode=new URLSearchParams(location.search).get('mode')==='lines'?'lines':'vectors';
+let drag=null, dragTest=false, playing=false, playT=0, lastMag=0;
+const k=6000; // visual constant
+
+function field(x,y){ // returns {ex,ey,mag}
+  let ex=0,ey=0;
+  for(const c of charges){
+    const dx=x-c.x, dy=y-c.y; let r2=dx*dx+dy*dy; if(r2<200)r2=200;
+    const r=Math.sqrt(r2); const e=k*c.q/r2;
+    ex+=e*dx/r; ey+=e*dy/r;
+  }
+  return {ex,ey,mag:Math.hypot(ex,ey)};
+}
+function heat(t){ // 0..1 -> blue->cyan->green->yellow->red
+  t=Math.max(0,Math.min(1,t));
+  const stops=[[40,90,200],[40,170,180],[90,190,90],[240,200,70],[233,89,58]];
+  const seg=t*4, i=Math.min(3,Math.floor(seg)), f=seg-i;
+  const a=stops[i], b=stops[i+1];
+  return `rgb(${a[0]+(b[0]-a[0])*f|0},${a[1]+(b[1]-a[1])*f|0},${a[2]+(b[2]-a[2])*f|0})`;
+}
+function drawArrow(x,y,ang,len,color,w){
+  ctx.save();ctx.translate(x,y);ctx.rotate(ang);
+  ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=w||1.6;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(-len/2,0);ctx.lineTo(len/2,0);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(len/2,0);ctx.lineTo(len/2-5,-3.2);ctx.lineTo(len/2-5,3.2);ctx.closePath();ctx.fill();
+  ctx.restore();
+}
+function drawCharge(c){
+  const r=Math.abs(c.q)*10+16;
+  const col=c.q>0?['#ff8a76','#e8342a']:['#7bb6ff','#2f6fd0'];
+  const g=ctx.createRadialGradient(c.x-r*0.3,c.y-r*0.3,2,c.x,c.y,r);
+  g.addColorStop(0,col[0]);g.addColorStop(1,col[1]);
+  ctx.save();
+  ctx.shadowColor=c.q>0?'rgba(232,52,42,.6)':'rgba(47,111,208,.6)';ctx.shadowBlur=18;
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(c.x,c.y,r,0,7);ctx.fill();
+  ctx.restore();
+  ctx.strokeStyle='rgba(255,255,255,.55)';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(c.x,c.y,r,0,7);ctx.stroke();
+  ctx.fillStyle='#fff';ctx.font='bold 20px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(c.q>0?'+':'−',c.x,c.y+1);
+}
+function fieldLineFrom(c,angle){
+  // trace a field line starting near charge c along angle
+  let x=c.x+Math.cos(angle)*(Math.abs(c.q)*10+18), y=c.y+Math.sin(angle)*(Math.abs(c.q)*10+18);
+  ctx.beginPath();ctx.moveTo(x,y);
+  const dir=c.q>0?1:-1;
+  for(let i=0;i<420;i++){
+    const f=field(x,y); if(f.mag<1e-3)break;
+    const ux=dir*f.ex/f.mag, uy=dir*f.ey/f.mag;
+    x+=ux*4; y+=uy*4;
+    if(x<0||x>W||y<0||y>H)break;
+    ctx.lineTo(x,y);
+    // stop if reached a negative charge
+    let hit=false; for(const o of charges){if(o.q<0&&Math.hypot(x-o.x,y-o.y)<Math.abs(o.q)*10+18){hit=true;break;}}
+    if(hit)break;
+  }
+  ctx.stroke();
+}
+function render(){
+  // background subtle grid
+  ctx.clearRect(0,0,W,H);
+  const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#12233a');bg.addColorStop(1,'#0a1622');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(255,255,255,.05)';ctx.lineWidth=1;
+  for(let x=0;x<W;x+=36){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=36){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+  if(mode==='vectors'){
+    const step=30;
+    for(let y=step/2;y<H;y+=step)for(let x=step/2;x<W;x+=step){
+      let near=false;for(const c of charges)if(Math.hypot(x-c.x,y-c.y)<24){near=true;break;}
+      if(near)continue;
+      const f=field(x,y); const m=f.mag;
+      const t=Math.min(1,Math.log(1+m*0.06)/2.6);
+      const len=8+t*18;
+      drawArrow(x,y,Math.atan2(f.ey,f.ex),len,heat(t),1.4+t*1.4);
+    }
+  } else {
+    ctx.strokeStyle='rgba(255,220,150,.75)';ctx.lineWidth=1.6;
+    for(const c of charges){ if(c.q<=0) continue;
+      const n=Math.round(8*Math.abs(c.q));
+      for(let i=0;i<n;i++) fieldLineFrom(c,i/n*2*Math.PI);
+    }
+  }
+  // charges
+  for(const c of charges) drawCharge(c);
+  // test charge + force
+  const f=field(test.x,test.y);
+  ctx.save();ctx.shadowColor='rgba(255,209,102,.8)';ctx.shadowBlur=14;
+  ctx.fillStyle=test.q>0?'#ffd166':'#7bb6ff';ctx.beginPath();ctx.arc(test.x,test.y,9,0,7);ctx.fill();ctx.restore();
+  ctx.strokeStyle='#8a5a00';ctx.lineWidth=1.4;ctx.beginPath();ctx.arc(test.x,test.y,9,0,7);ctx.stroke();
+  ctx.fillStyle='#5a3d00';ctx.font='bold 11px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(test.q>0?(test.q===2?'2q':'+q'):'−q',test.x,test.y+1);
+  if(f.mag>1e-3){
+    const eAng=Math.atan2(f.ey,f.ex);
+    const eLen=Math.min(76,16+Math.log(1+f.mag*0.06)*24);
+    drawArrow(test.x+Math.cos(eAng)*14, test.y+Math.sin(eAng)*14, eAng, eLen, '#2ecc71', 2.4);
+    ctx.fillStyle='#2ecc71';ctx.font='12px system-ui';ctx.textAlign='left';
+    ctx.fillText('E', test.x+Math.cos(eAng)*(18+eLen)+4, test.y+Math.sin(eAng)*(18+eLen));
+    const fAng=test.q>0?eAng:eAng+Math.PI;
+    const flen=Math.min(95,eLen*Math.abs(test.q));
+    drawArrow(test.x+Math.cos(fAng)*14, test.y+Math.sin(fAng)*14, fAng, flen, '#ffd166', 3.2);
+    ctx.fillStyle='#ffd166';ctx.font='12px system-ui';ctx.textAlign='left';
+    ctx.fillText('F=qE', test.x+Math.cos(fAng)*(18+flen)+4, test.y+Math.sin(fAng)*(18+flen));
+  }
+  // readouts
+  document.getElementById('ev').textContent=(f.mag).toFixed(2);
+  document.getElementById('qtv').textContent=test.q>0?(test.q===2?'+2q':'+q'):'−q';
+  document.getElementById('fv').textContent=(Math.abs(test.q)*f.mag).toFixed(2);
+  document.getElementById('fd').textContent=(f.mag<1e-3?'—':(test.q>0?'沿 E 方向':'反 E 方向'));
+  document.getElementById('nc').textContent=charges.length;
+  const trend=f.mag>lastMag+0.05?'增强中':(f.mag<lastMag-0.05?'减弱中':(playing?'巡游中，持续变化':'静止'));
+  document.getElementById('trendv').textContent=trend;
+  lastMag=f.mag;
+}
+function pos(e){const r=cv.getBoundingClientRect();const s=cv.width/r.width;const X=e.touches?e.touches[0].clientX:e.clientX,Y=e.touches?e.touches[0].clientY:e.clientY;return{x:(X-r.left)*s,y:(Y-r.top)*s};}
+cv.addEventListener('pointerdown',e=>{const p=pos(e);
+  if(Math.hypot(p.x-test.x,p.y-test.y)<18){dragTest=true;cv.style.cursor='grabbing';return;}
+  for(let i=charges.length-1;i>=0;i--){const c=charges[i];if(Math.hypot(p.x-c.x,p.y-c.y)<Math.abs(c.q)*10+18){drag=i;cv.style.cursor='grabbing';return;}}
+});
+cv.addEventListener('pointermove',e=>{if(drag===null&&!dragTest)return;const p=pos(e);
+  p.x=Math.max(20,Math.min(W-20,p.x));p.y=Math.max(20,Math.min(H-20,p.y));
+  if(dragTest){test.x=p.x;test.y=p.y;}else{charges[drag].x=p.x;charges[drag].y=p.y;}render();});
+window.addEventListener('pointerup',()=>{drag=null;dragTest=false;cv.style.cursor='grab';});
+document.getElementById('addP').onclick=()=>{charges.push({x:120+Math.random()*480,y:80+Math.random()*280,q:1});render();};
+document.getElementById('addN').onclick=()=>{charges.push({x:120+Math.random()*480,y:80+Math.random()*280,q:-1});render();};
+document.getElementById('clear').onclick=()=>{charges=[];render();};
+document.querySelectorAll('[data-testq]').forEach(b=>b.onclick=()=>{test.q=Number(b.dataset.testq);document.querySelectorAll('[data-testq]').forEach(x=>x.classList.toggle('on',x===b));render();});
+document.querySelectorAll('#mode button').forEach(b=>b.onclick=()=>{mode=b.dataset.m;document.querySelectorAll('#mode button').forEach(x=>x.classList.toggle('on',x===b));render();});
+document.querySelectorAll('#mode button').forEach(x=>x.classList.toggle('on',x.dataset.m===mode));
+function stopPlay(){playing=false;document.getElementById('playBtn').textContent='▶ 播放：试探电荷自动巡游'}
+function animate(){
+  if(!playing)return;
+  playT+=0.02;
+  const cx=W/2,cy=H/2;
+  test.x=cx+Math.cos(playT)*170;
+  test.y=cy+Math.sin(playT)*130;
+  render();
+  requestAnimationFrame(animate);
+}
+document.getElementById('playBtn').onclick=()=>{
+  playing=!playing;
+  document.getElementById('playBtn').textContent=playing?'⏸ 暂停巡游':'▶ 播放：试探电荷自动巡游';
+  if(playing)animate();else render();
+};
+cv.addEventListener('pointerdown',stopPlay);
+render();
+})();
+</script>
+</body>
+</html>

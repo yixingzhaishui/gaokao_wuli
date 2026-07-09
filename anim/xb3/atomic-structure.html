@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>原子结构：α 粒子散射</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 14px; align-items: stretch; }
+  canvas { width: 100%; height: 430px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  input { width: 100%; }
+  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.8; font-size: 14px; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
+  @media (max-width: 760px) { .stage { grid-template-columns: 1fr; } canvas { height: 360px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="680" height="430" aria-label="α 粒子散射模型"></canvas>
+    <section class="panel">
+      <label for="b">碰撞参数 b：<span id="bVal"></span></label>
+      <input id="b" type="range" min="10" max="145" value="72" step="1">
+      <label for="z">核电荷等级 Z：<span id="zVal"></span></label>
+      <input id="z" type="range" min="1" max="8" value="4" step="1">
+      <label for="cloud">电子云半径：<span id="cloudVal"></span></label>
+      <input id="cloud" type="range" min="70" max="150" value="118" step="1">
+      <div id="readout" class="readout"></div>
+      <div class="hint">观察任务：先把 b 调大看直穿，再把 b 调小看大偏转；保持 b 不变时提高 Z，看核电荷越大偏转越明显。</div>
+    </section>
+  </div>
+</div>
+<script>
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const els = {
+  b: document.getElementById('b'),
+  z: document.getElementById('z'),
+  cloud: document.getElementById('cloud'),
+  bVal: document.getElementById('bVal'),
+  zVal: document.getElementById('zVal'),
+  cloudVal: document.getElementById('cloudVal'),
+  readout: document.getElementById('readout')
+};
+
+function state() {
+  return {
+    b: Number(els.b.value),
+    z: Number(els.z.value),
+    cloud: Number(els.cloud.value)
+  };
+}
+
+function classify(angle) {
+  if (angle < 10) return '几乎直穿';
+  if (angle < 75) return '明显偏转';
+  return '大角反弹';
+}
+
+function draw() {
+  const s = state();
+  els.bVal.textContent = s.b;
+  els.zVal.textContent = s.z;
+  els.cloudVal.textContent = s.cloud;
+  ctx.clearRect(0, 0, c.width, c.height);
+
+  const nx = 350;
+  const ny = 215;
+  const y0 = ny - s.b;
+  const forceIndex = s.z * 900 / (s.b * s.b);
+  const angle = Math.min(140, forceIndex * 35);
+  const label = classify(angle);
+
+  ctx.fillStyle = '#f7f9fc';
+  ctx.fillRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#fff7e6';
+  ctx.strokeStyle = '#f0a500';
+  ctx.lineWidth = 2;
+  ctx.fillRect(70, 60, 52, 300);
+  ctx.strokeRect(70, 60, 52, 300);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 16px system-ui';
+  ctx.fillText('薄金箔', 68, 44);
+
+  ctx.strokeStyle = '#829ab1';
+  ctx.setLineDash([8, 6]);
+  ctx.beginPath();
+  ctx.arc(nx, ny, s.cloud, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = 'rgba(44,123,229,0.18)';
+  for (let i = 0; i < 12; i++) {
+    const a = i * Math.PI * 2 / 12;
+    ctx.beginPath();
+    ctx.arc(nx + Math.cos(a) * s.cloud * 0.82, ny + Math.sin(a) * s.cloud * 0.55, 5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.fillStyle = '#e03131';
+  ctx.beginPath();
+  ctx.arc(nx, ny, 13, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = '700 14px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('+', nx, ny + 5);
+
+  ctx.strokeStyle = '#2c7be5';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(18, y0);
+  ctx.lineTo(180, y0);
+  const bendX = 315;
+  const bendY = y0 + (angle > 75 ? 40 : 0);
+  const outX = angle > 75 ? 95 : 640;
+  const outY = angle > 75 ? y0 + 130 : y0 - angle * 1.5;
+  ctx.quadraticCurveTo(bendX, bendY, outX, outY);
+  ctx.stroke();
+
+  ctx.fillStyle = '#2c7be5';
+  for (let x = 32; x < 165; x += 32) {
+    ctx.beginPath();
+    ctx.arc(x, y0, 7, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.strokeStyle = '#e03131';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([5, 4]);
+  ctx.beginPath();
+  ctx.moveTo(nx, ny);
+  ctx.lineTo(210, y0);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#e03131';
+  ctx.font = '13px system-ui';
+  ctx.textAlign = 'left';
+  ctx.fillText('r 越小，F 越大', 218, (ny + y0) / 2 - 8);
+
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 16px system-ui';
+  ctx.textAlign = 'left';
+  ctx.fillText(`轨迹判断：${label}`, 36, 390);
+  ctx.fillStyle = '#486581';
+  ctx.font = '14px system-ui';
+  ctx.fillText('多数直穿说明空间空旷；少数大偏转说明正电荷集中在极小原子核内。', 36, 414);
+
+  els.readout.innerHTML = [
+    `最近距离指标 b=${s.b}`,
+    `库仑斥力强度 F∝Z/b²=${forceIndex.toFixed(2)}`,
+    `偏转角约 ${angle.toFixed(0)}°，判断：${label}`,
+    `原子半径显示为核半径的约 ${(s.cloud / 13).toFixed(1)} 倍`
+  ].join('<br>');
+  requestAnimationFrame(draw);
+}
+
+Object.values(els).forEach(el => {
+  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
+});
+draw();
+</script>
+</body>
+</html>

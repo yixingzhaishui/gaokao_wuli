@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>打点计时器测速度</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 14px; align-items: stretch; }
+  canvas { width: 100%; height: 430px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  input { width: 100%; }
+  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.8; font-size: 14px; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
+  @media (max-width: 760px) { .stage { grid-template-columns: 1fr; } canvas { height: 360px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="680" height="430" aria-label="纸带测速度虚拟实验"></canvas>
+    <section class="panel">
+      <label for="period">打点周期 T/s：<span id="periodVal"></span></label>
+      <input id="period" type="range" min="0.02" max="0.06" value="0.02" step="0.01">
+      <label for="v0">初速度 v0/(m/s)：<span id="v0Val"></span></label>
+      <input id="v0" type="range" min="0.2" max="2.0" value="0.8" step="0.1">
+      <label for="acc">加速度 a/(m/s²)：<span id="accVal"></span></label>
+      <input id="acc" type="range" min="0" max="4" value="1.2" step="0.2">
+      <label for="index">测量点 i：<span id="indexVal"></span></label>
+      <input id="index" type="range" min="1" max="10" value="5" step="1">
+      <div id="readout" class="readout"></div>
+      <div class="hint">观察任务：点距由运动决定，时间间隔由打点周期决定；求某点速度用前后两点夹住它。</div>
+    </section>
+  </div>
+</div>
+<script>
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const els = {
+  period: document.getElementById('period'),
+  v0: document.getElementById('v0'),
+  acc: document.getElementById('acc'),
+  index: document.getElementById('index'),
+  periodVal: document.getElementById('periodVal'),
+  v0Val: document.getElementById('v0Val'),
+  accVal: document.getElementById('accVal'),
+  indexVal: document.getElementById('indexVal'),
+  readout: document.getElementById('readout')
+};
+function pos(v0, a, t) { return v0 * t + 0.5 * a * t * t; }
+function draw() {
+  const T = Number(els.period.value);
+  const v0 = Number(els.v0.value);
+  const a = Number(els.acc.value);
+  const i = Number(els.index.value);
+  els.periodVal.textContent = T.toFixed(2);
+  els.v0Val.textContent = v0.toFixed(1);
+  els.accVal.textContent = a.toFixed(1);
+  els.indexVal.textContent = i;
+  const xs = [];
+  for (let k = 0; k <= 12; k++) xs.push(pos(v0, a, k * T));
+  const scale = 480 / Math.max(xs[12], 0.1);
+  const xPrev = xs[i - 1], xNext = xs[i + 1];
+  const vi = (xNext - xPrev) / (2 * T);
+  const avg = (xs[10] - xs[2]) / (8 * T);
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#f7f9fc';
+  ctx.fillRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#eef4ff';
+  ctx.strokeStyle = '#2c7be5';
+  ctx.lineWidth = 2;
+  ctx.fillRect(48, 70, 140, 86);
+  ctx.strokeRect(48, 70, 140, 86);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 16px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('打点计时器', 118, 108);
+  ctx.fillStyle = '#fff7e6';
+  ctx.strokeStyle = '#f0a500';
+  ctx.fillRect(190, 108, 430, 32);
+  ctx.strokeRect(190, 108, 430, 32);
+  for (let k = 0; k <= 12; k++) {
+    const x = 210 + xs[k] * scale;
+    ctx.fillStyle = k === i ? '#e03131' : k === i - 1 || k === i + 1 ? '#2c7be5' : '#102a43';
+    ctx.beginPath();
+    ctx.arc(x, 124, k === i ? 6 : 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#486581';
+    ctx.font = '11px system-ui';
+    ctx.fillText(String(k), x, 158);
+  }
+  const xp = 210 + xPrev * scale;
+  const xn = 210 + xNext * scale;
+  ctx.strokeStyle = '#e03131';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(xp, 188);
+  ctx.lineTo(xn, 188);
+  ctx.stroke();
+  ctx.fillStyle = '#e03131';
+  ctx.font = '13px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('用于估计 vi 的前后两点距离', (xp + xn) / 2, 210);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 16px system-ui';
+  ctx.fillText(`vi≈(x${i+1}-x${i-1})/(2T)=${vi.toFixed(2)} m/s`, 340, 282);
+  ctx.fillStyle = '#486581';
+  ctx.font = '14px system-ui';
+  ctx.fillText(`点 2 到点 10 的平均速度约 ${avg.toFixed(2)} m/s`, 340, 318);
+  ctx.fillText('点距逐渐变大，说明相同时间内位移变大，速度变大。', 340, 374);
+  els.readout.innerHTML = [
+    `T=${T.toFixed(2)}s，v0=${v0.toFixed(1)}m/s，a=${a.toFixed(1)}m/s²`,
+    `选中点 i=${i}，x${i-1}=${xPrev.toFixed(3)}m，x${i+1}=${xNext.toFixed(3)}m`,
+    `vi≈(x${i+1}-x${i-1})/(2T)=${vi.toFixed(2)}m/s`,
+    `点2到点10平均速度≈${avg.toFixed(2)}m/s`
+  ].join('<br>');
+}
+Object.values(els).forEach(el => {
+  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
+});
+draw();
+</script>
+</body>
+</html>

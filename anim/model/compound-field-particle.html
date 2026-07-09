@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>复合场中的带电粒子</title>
+<style>
+  *{box-sizing:border-box}body{margin:0;background:#f7f9fc;color:#102a43;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}.wrap{max-width:1000px;margin:0 auto;padding:16px}.stage{display:grid;grid-template-columns:minmax(0,1fr)286px;gap:14px}canvas{width:100%;height:470px;background:#fff;border:1px solid #d9e2ec;border-radius:8px;display:block}.panel{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:14px}label{display:block;font-size:14px;font-weight:700;margin-top:12px}input,select{width:100%}.readout{margin-top:14px;padding:12px;background:#eef4ff;border-radius:8px;line-height:1.72;font-size:14px}.status{margin-top:10px;padding:9px 10px;border-radius:8px;font-size:13px;line-height:1.55;background:#e6fffa;color:#087f5b;font-weight:700}.status.bad{background:#fff5f5;color:#c92a2a}.hint{margin-top:10px;color:#486581;font-size:13px;line-height:1.6}@media(max-width:780px){.stage{grid-template-columns:1fr}canvas{height:400px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="700" height="470" aria-label="复合场带电粒子速度选择器"></canvas>
+    <section class="panel">
+      <label for="charge">电荷性质：<span id="chargeVal"></span></label>
+      <select id="charge"><option value="1">正电荷</option><option value="-1">负电荷</option></select>
+      <label for="electric">电场强度 E/(10³V/m)：<span id="electricVal"></span></label>
+      <input id="electric" type="range" min="1" max="8" value="4" step="0.5">
+      <label for="magnetic">磁感应强度 B/T：<span id="magneticVal"></span></label>
+      <input id="magnetic" type="range" min="0.2" max="1.5" value="0.8" step="0.1">
+      <label for="speed">入射速度 v/(10³m/s)：<span id="speedVal"></span></label>
+      <input id="speed" type="range" min="1" max="10" value="5" step="0.2">
+      <label for="mass">质量 m/(10⁻¹⁵kg)：<span id="massVal"></span></label>
+      <input id="mass" type="range" min="1" max="6" value="2" step="0.5">
+      <div id="readout" class="readout"></div>
+      <div id="status" class="status"></div>
+      <div class="hint">观察任务：拖动 v，看电场力 qE 与磁场力 qvB 何时等大反向；直线通过条件是 v=E/B。</div>
+    </section>
+  </div>
+</div>
+<script>
+const c=document.getElementById('c'),ctx=c.getContext('2d');
+const els={charge:document.getElementById('charge'),electric:document.getElementById('electric'),magnetic:document.getElementById('magnetic'),speed:document.getElementById('speed'),mass:document.getElementById('mass'),chargeVal:document.getElementById('chargeVal'),electricVal:document.getElementById('electricVal'),magneticVal:document.getElementById('magneticVal'),speedVal:document.getElementById('speedVal'),massVal:document.getElementById('massVal'),readout:document.getElementById('readout'),status:document.getElementById('status')};
+function arrow(x1,y1,x2,y2,color,w){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=w||3;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.45),y2-10*Math.sin(a-.45));ctx.lineTo(x2-10*Math.cos(a+.45),y2-10*Math.sin(a+.45));ctx.closePath();ctx.fill()}
+function draw(){
+  const s=+els.charge.value,E=+els.electric.value*1000,B=+els.magnetic.value,v=+els.speed.value*1000,m=+els.mass.value*1e-15;
+  const q=1e-12*s,Fe=q*E,Fm=q*v*B,net=Fe-Fm,asel=net/m,vsel=E/B;
+  els.chargeVal.textContent=s>0?'正电荷':'负电荷';els.electricVal.textContent=(E/1000).toFixed(1);els.magneticVal.textContent=B.toFixed(1);els.speedVal.textContent=(v/1000).toFixed(1);els.massVal.textContent=(m/1e-15).toFixed(1);
+  ctx.clearRect(0,0,c.width,c.height);ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);
+  ctx.fillStyle='#102a43';ctx.font='700 18px system-ui';ctx.textAlign='center';ctx.fillText('复合场速度选择器：qE 与 qvB 平衡时直线通过',350,30);
+  ctx.fillStyle='#eef4ff';ctx.strokeStyle='#2c7be5';ctx.lineWidth=3;ctx.fillRect(70,76,500,300);ctx.strokeRect(70,76,500,300);
+  for(let x=100;x<550;x+=45){ctx.fillStyle='#486581';ctx.font='18px system-ui';ctx.fillText('⊗',x,128);ctx.fillText('⊗',x,204);ctx.fillText('⊗',x,280);ctx.fillText('⊗',x,346)}
+  ctx.strokeStyle='#f0a500';ctx.lineWidth=2;for(let y=106;y<360;y+=42){arrow(92,y,92,y+26,'#f0a500',2)}
+  ctx.fillStyle='#f0a500';ctx.font='700 13px system-ui';ctx.fillText('E向下',126,82);ctx.fillStyle='#486581';ctx.fillText('B向里',540,82);
+  const x0=110,y0=226,scale=0.000018;
+  ctx.strokeStyle='#2c7be5';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(x0,y0);
+  for(let i=0;i<=90;i++){const t=i/90*0.08,x=x0+520*t/0.08,y=y0+0.5*asel*t*t*scale;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}
+  ctx.stroke();
+  const px=300,py=y0+0.5*asel*0.03*0.03*scale;ctx.fillStyle=s>0?'#e03131':'#7b2cbf';ctx.beginPath();ctx.arc(px,py,12,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.font='700 14px system-ui';ctx.fillText(s>0?'+':'-',px,py+1);
+  arrow(px,py,px+76,py,'#2c7be5',4);ctx.fillStyle='#2c7be5';ctx.fillText('v',px+88,py+4);
+  const eDir=s>0?1:-1,mDir=s>0?-1:1,feLen=Math.min(90,Math.abs(Fe)*2.2e10),fmLen=Math.min(90,Math.abs(Fm)*2.2e10);
+  arrow(px-20,py,px-20,py+eDir*feLen,'#e03131',4);ctx.fillStyle='#e03131';ctx.fillText('qE',px-42,py+eDir*feLen/2);
+  arrow(px+22,py,px+22,py+mDir*fmLen,'#7b2cbf',4);ctx.fillStyle='#7b2cbf';ctx.fillText('qvB',px+48,py+mDir*fmLen/2);
+  ctx.fillStyle='#102a43';ctx.font='700 14px system-ui';ctx.fillText('选择速度 v0=E/B='+(vsel/1000).toFixed(2)+'×10³m/s',350,416);
+  ctx.fillStyle='#486581';ctx.font='13px system-ui';ctx.fillText('若 v=v0，两力等大反向；若不等，粒子向电场力或磁场力较大一侧偏转。',350,446);
+  const rel=Math.abs(v-vsel)/vsel*100;
+  els.readout.innerHTML=[
+    `<div id="r1">电场力 |qE|≈${Math.abs(Fe).toExponential(2)}N</div>`,
+    `<div id="r2">磁场力 |qvB|≈${Math.abs(Fm).toExponential(2)}N</div>`,
+    `<div id="r3">选择速度 v0=E/B≈${(vsel/1000).toFixed(2)}×10³m/s</div>`,
+    `<div id="r4">当前 v=${(v/1000).toFixed(2)}×10³m/s，相对偏差≈${rel.toFixed(1)}%</div>`,
+    `<div id="r5">进入纯磁场后半径 R=mv/(|q|B)≈${(m*v/(Math.abs(q)*B)).toFixed(2)}m</div>`
+  ].join('');
+  const ok=rel<4;els.status.className=ok?'status':'status bad';
+  els.status.textContent=ok?'通过：qE 与 qvB 近似等大反向，粒子可直线通过速度选择器。':(v>vsel?'不通过：速度偏大，磁场力较大，粒子向磁场力一侧偏转。':'不通过：速度偏小，电场力较大，粒子向电场力一侧偏转。');
+}
+Object.values(els).forEach(el=>el.addEventListener('input',draw));draw();
+</script>
+</body>
+</html>

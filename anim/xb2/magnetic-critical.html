@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>磁场圆周临界</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#eef2f7;color:#102a43}
+.wrap{padding:12px}
+h2{font-size:16px;margin:0 0 8px}
+canvas{display:block;width:100%;max-width:700px;background:#fff;border-radius:12px;border:1px solid #d9e2ec;touch-action:none;cursor:grab}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.chip{background:#102a43;color:#e6eef7;padding:6px 11px;border-radius:8px;font-size:13px}
+.chip b{color:#ffd166}
+.ctrls{display:flex;flex-wrap:wrap;gap:12px;margin:8px 0;align-items:center}
+.ctrls label{display:flex;flex-direction:column;gap:2px;font-size:12px;color:#334e68}
+.ctrls input[type=range]{width:130px;accent-color:#2c7be5}
+.btn{font:inherit;font-size:13px;padding:6px 12px;border:1px solid #b0bcc9;background:#fff;border-radius:8px;cursor:pointer}
+.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:9px 12px;border-radius:6px;font-size:13px;color:#5a6b7b;line-height:1.5;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2>有界磁场临界：垂直射入时，能穿出 ⇔ R ≥ L</h2>
+  <canvas id="cv" width="700" height="420"></canvas>
+  <div class="chips">
+    <span class="chip">轨道半径 R = <b id="rv">9.0</b> cm</span>
+    <span class="chip">磁场宽度 L = <b id="lv">9.0</b> cm</span>
+    <span class="chip">圆心角 θ = <b id="angv">90</b>°</span>
+    <span class="chip">状态：<b id="statev">临界</b></span>
+  </div>
+  <div class="ctrls">
+    <button class="btn" id="play">⏸ 暂停</button>
+    <button class="btn" id="reset">重置</button>
+    <label>半径 R（由 v/B 决定）= <span id="rl">9.0</span> cm<input id="rr" type="range" min="4" max="16" step="0.5" value="9"></label>
+    <label>磁场宽度 L = <span id="ll">9.0</span> cm<input id="lr" type="range" min="4" max="16" step="0.5" value="9"></label>
+    <span style="font-size:13px;color:#5a6b7b">或拖轨道 / 右边界</span>
+  </div>
+  <div class="hint"><b>观察任务</b>：粒子从左边界垂直射入有界磁场。拖<b>虚线轨道</b>改 R（等价改 v 或 B），拖<b>右边界</b>改 L：当 R&lt;L 时圆还没到右边界就被掰回，不能穿出；R=L 是<b>恰好</b>临界；R&gt;L 能从右边界射出。时间由圆心角决定：t=(θ/360°)T。</div>
+</div>
+<script>
+(function(){
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+let R=9,L=9,drag='',t=0,running=true;
+const x0=170,y0=300,scale=18;
+function pxR(){return R*scale}
+function pxL(){return L*scale}
+function sync(){document.getElementById('rr').value=R;document.getElementById('lr').value=L;document.getElementById('rl').textContent=R.toFixed(1);document.getElementById('ll').textContent=L.toFixed(1);}
+function state(){
+  if(Math.abs(R-L)<0.25)return '临界：恰好到右边界';
+  return R>L?'能穿出':'不能穿出，返回左侧';
+}
+function thetaDeg(){return R>=L?Math.asin(Math.min(1,L/R))*180/Math.PI:90}
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  const r=pxR(),w=pxL(),cx=x0,cy=y0-r;
+  ctx.fillStyle='#edf2ff';ctx.fillRect(x0,50,w,320);
+  ctx.strokeStyle='#5c7cfa';ctx.lineWidth=2;ctx.strokeRect(x0,50,w,320);
+  ctx.fillStyle='#5c7cfa';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText('有界匀强磁场 B（×）',x0+w/2,36);
+  for(let x=x0+20;x<x0+w-8;x+=36)for(let y=75;y<350;y+=34){ctx.fillText('×',x,y)}
+  ctx.strokeStyle='#ff922b';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(40,y0);ctx.lineTo(x0,y0);ctx.stroke();
+  ctx.fillStyle='#ff922b';ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x0-12,y0-6);ctx.lineTo(x0-12,y0+6);ctx.closePath();ctx.fill();ctx.fillText('入射 v',92,y0-12);
+  ctx.strokeStyle='#adb5bd';ctx.setLineDash([6,4]);ctx.lineWidth=1.6;ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='#334e68';ctx.beginPath();ctx.arc(cx,cy,3,0,7);ctx.fill();ctx.fillText('圆心',cx,cy-12);
+  ctx.strokeStyle='#486581';ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(x0,y0);ctx.stroke();ctx.setLineDash([]);ctx.fillText('R',cx-16,(cy+y0)/2);
+  let endX,endY,color;
+  if(R>=L){const dy=Math.sqrt(Math.max(0,r*r-w*w));endX=x0+w;endY=cy+dy;color=Math.abs(R-L)<0.25?'#f08c00':'#2b8a3e';}
+  else{endX=x0+r;endY=cy;color='#c92a2a';}
+  const endAng=Math.atan2(endY-cy,endX-cx);
+  ctx.strokeStyle=color;ctx.lineWidth=4;ctx.beginPath();ctx.arc(cx,cy,r,Math.PI/2,endAng,true);ctx.stroke();
+  ctx.fillStyle=color;ctx.beginPath();ctx.arc(endX,endY,8,0,7);ctx.fill();
+  // 沿轨迹运动的粒子（随时间演化）+ 辉光真实感
+  const phase=(t*0.45)%1;const aNow=Math.PI/2-(Math.PI/2-endAng)*phase;
+  const px=cx+r*Math.cos(aNow),py=cy+r*Math.sin(aNow);
+  const gg=ctx.createRadialGradient(px,py,1,px,py,20);gg.addColorStop(0,'rgba(255,146,43,0.7)');gg.addColorStop(1,'rgba(255,146,43,0)');
+  ctx.fillStyle=gg;ctx.beginPath();ctx.arc(px,py,20,0,7);ctx.fill();
+  ctx.fillStyle='#ff922b';ctx.beginPath();ctx.arc(px,py,6,0,7);ctx.fill();
+  ctx.strokeStyle='#c92a2a';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x0+w,50);ctx.lineTo(x0+w,370);ctx.stroke();ctx.fillStyle='#c92a2a';ctx.fillText('右边界 L',x0+w,386);
+  ctx.fillStyle=color;ctx.font='bold 15px system-ui';ctx.textAlign='left';ctx.fillText(state(),24,28);
+  ctx.fillStyle='#243b53';ctx.font='13px system-ui';ctx.fillText('临界条件：R=L；若 R≥L 可穿出，若 R<L 从原边界返回',24,H-18);
+  document.getElementById('rv').textContent=R.toFixed(1);document.getElementById('lv').textContent=L.toFixed(1);
+  document.getElementById('angv').textContent=thetaDeg().toFixed(0);document.getElementById('statev').textContent=state();
+}
+function pos(e){const r=cv.getBoundingClientRect(),s=cv.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s}}
+cv.addEventListener('pointerdown',e=>{const p=pos(e);if(Math.abs(p.x-(x0+pxL()))<18){drag='L';cv.setPointerCapture(e.pointerId)}else if(Math.abs(Math.hypot(p.x-x0,p.y-(y0-pxR()))-pxR())<24){drag='R';cv.setPointerCapture(e.pointerId)}});
+cv.addEventListener('pointermove',e=>{if(!drag)return;const p=pos(e);if(drag==='L'){L=Math.max(4,Math.min(16,Math.round((p.x-x0)/scale*2)/2));}else{R=Math.max(4,Math.min(16,Math.round(Math.hypot(p.x-x0,p.y-(y0-pxR()))/scale*2)/2));}sync();draw();});
+cv.addEventListener('pointerup',()=>drag='');cv.addEventListener('pointercancel',()=>drag='');
+document.getElementById('rr').addEventListener('input',e=>{R=parseFloat(e.target.value);sync();draw()});
+document.getElementById('lr').addEventListener('input',e=>{L=parseFloat(e.target.value);sync();draw()});
+document.getElementById('play').onclick=function(){running=!running;this.textContent=running?'⏸ 暂停':'▶ 播放';};
+document.getElementById('reset').onclick=()=>{R=9;L=9;t=0;sync();draw()};
+let last=performance.now();
+function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;if(running)t+=dt;draw();requestAnimationFrame(loop);}
+sync();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

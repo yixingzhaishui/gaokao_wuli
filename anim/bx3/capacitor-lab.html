@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>电容器充放电实验台</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#eef2f7;color:#102a43}
+.wrap{padding:12px}
+h2{font-size:16px;margin:0 0 8px}
+canvas{display:block;width:100%;max-width:720px;background:#0e1a2b;border-radius:12px;box-shadow:0 2px 10px rgba(16,42,67,.12)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.chip{background:#102a43;color:#e6eef7;padding:6px 11px;border-radius:8px;font-size:13px}
+.chip b{color:#ffd166}
+.ctrls{display:flex;flex-wrap:wrap;gap:14px;margin:8px 0;align-items:center}
+.ctrls label{display:flex;flex-direction:column;gap:2px;font-size:12px;color:#334e68}
+.ctrls input[type=range]{width:130px;accent-color:#2c7be5}
+.btn{font:inherit;font-size:13px;padding:6px 12px;border:1px solid #b0bcc9;background:#fff;border-radius:8px;cursor:pointer}
+.btn:hover{background:#eef2f7}
+.btn.on{background:#2c7be5;color:#fff;border-color:#2c7be5}
+.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:9px 12px;border-radius:6px;font-size:13px;color:#5a6b7b;line-height:1.5;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2>电容器充放电：看电荷积累、电压上升、充电电流衰减（Q=CU，q=CE(1−e^(−t/RC))）</h2>
+  <canvas id="cv" width="720" height="430"></canvas>
+  <div class="chips">
+    <span class="chip">电容器电压 U_C = <b id="uc">0</b> V</span>
+    <span class="chip">电荷量 Q = CU = <b id="q">0</b> μC</span>
+    <span class="chip">充电电流 i = <b id="i">0</b> mA</span>
+    <span class="chip">储能 ½CU² = <b id="w">0</b> μJ</span>
+    <span class="chip">充放电状态：<b id="statev">断开</b></span>
+    <span class="chip">拖动曲线探针读数：t=<b id="probeT">—</b> s，U=<b id="probeU">—</b> V</span>
+  </div>
+  <div class="ctrls">
+    <button class="btn on" id="charge">▶ 充电</button>
+    <button class="btn" id="discharge">▶ 放电</button>
+    <button class="btn" id="open">断开</button>
+    <label>电源 E = <span id="El">6</span> V<input type="range" id="E" min="2" max="10" step="1" value="6"></label>
+    <label>电阻 R = <span id="Rl">10</span> kΩ<input type="range" id="R" min="2" max="30" step="1" value="10"></label>
+    <label>电容 C = <span id="Cl">100</span> μF<input type="range" id="C" min="20" max="200" step="10" value="100"></label>
+  </div>
+  <div class="hint"><b>怎么玩</b>：点<b>充电</b>——看电荷（+在上板、−在下板）逐个<b>积累</b>到极板上，两板间<b>电场线</b>随之变密，电压 U_C 沿曲线<b>上升</b>逼近电源电压 E，而充电电流从最大<b>逐渐衰减到零</b>（充满就不再有电流）。点<b>放电</b>看电荷反向流走、U_C 衰减到零。拖<b>R</b> 变大或 <b>C</b> 变大 → 时间常数 τ=RC 变大 → 充/放电变<b>慢</b>。始终满足 Q=CU。右侧小图是 U_C 随时间的实时曲线，可直接<b>拖动曲线区域</b>用探针读某一时刻的电压。</div>
+</div>
+<script>
+(function(){
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+let E=6,R=10,C=100,mode='charge',Uc=0,t=0,hist=[],dragProbe=false,probeFrac=null;
+// geometry
+const capX=250,capTopY=120,capBotY=250,plateW=150; // plates
+const gx=470,gy=70,gw=220,gh=170; // graph
+function step(dt){
+  const RC=R*1000*C*1e-6; // seconds
+  let target = mode==='charge'?E:(mode==='discharge'?0:Uc);
+  if(mode!=='open'){ Uc += (target-Uc)*(1-Math.exp(-dt/RC)); }
+  t+=dt; hist.push({t:t,u:Uc}); if(hist.length>240)hist.shift();
+}
+function draw(){
+  const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#12233a');bg.addColorStop(1,'#0a1522');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  const q=C*Uc; // μC (C in μF, Uc in V)
+  const RC=R*1000*C*1e-6;
+  const i = mode==='charge'? (E-Uc)/(R*1000)*1e6 : (mode==='discharge'? -Uc/(R*1000)*1e6 : 0); // mA*... -> compute in mA
+  const iMA = mode==='charge'? (E-Uc)/R : (mode==='discharge'? -Uc/R : 0); // since R in kΩ, V/kΩ = mA
+  // battery + wires
+  ctx.strokeStyle='#5b7089';ctx.lineWidth=5;ctx.beginPath();
+  ctx.moveTo(60,H-70);ctx.lineTo(60,capTopY-20);ctx.lineTo(capX-plateW/2,capTopY-20);ctx.lineTo(capX-plateW/2,capTopY);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(60,H-70);ctx.lineTo(60,H-40);ctx.lineTo(capX,H-40);ctx.lineTo(capX,capBotY);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(capX,capTopY+130);ctx.lineTo(capX,capBotY);ctx.stroke();
+  // battery symbol
+  ctx.strokeStyle='#e6eef7';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(48,H-120);ctx.lineTo(72,H-120);ctx.stroke();ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(52,H-108);ctx.lineTo(68,H-108);ctx.stroke();
+  ctx.fillStyle='#9fb3c8';ctx.font='12px system-ui';ctx.textAlign='left';ctx.fillText('E='+E+'V',78,H-114);
+  // resistor on top wire
+  const rx=(60+capX-plateW/2)/2;ctx.strokeStyle='#0e1a2b';ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(rx-30,capTopY-20);ctx.lineTo(rx+30,capTopY-20);ctx.stroke();
+  ctx.strokeStyle='#ffd166';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(rx-30,capTopY-20);for(let j=0;j<=6;j++)ctx.lineTo(rx-30+j*10,capTopY-20+(j%2?6:-6));ctx.lineTo(rx+30,capTopY-20);ctx.stroke();
+  ctx.fillStyle='#ffd166';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText('R='+R+'kΩ',rx,capTopY-32);
+  // plates
+  const frac=Uc/Math.max(E,0.001);
+  ctx.strokeStyle='#e6eef7';ctx.lineWidth=6;
+  ctx.beginPath();ctx.moveTo(capX-plateW/2,capTopY);ctx.lineTo(capX+plateW/2,capTopY);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(capX-plateW/2,capBotY);ctx.lineTo(capX+plateW/2,capBotY);ctx.stroke();
+  // charges on plates ∝ Uc
+  const nq=Math.round(Math.abs(frac)*10);
+  ctx.font='bold 13px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
+  for(let j=0;j<nq;j++){const px=capX-plateW/2+12+j*(plateW-24)/9;
+    ctx.fillStyle='#ff8a76';ctx.fillText('+',px,capTopY-10);
+    ctx.fillStyle='#7bb6ff';ctx.fillText('−',px,capBotY+10);}
+  // field lines between plates (density ∝ charge)
+  const nl=Math.round(Math.abs(frac)*8);
+  ctx.strokeStyle='rgba(255,220,150,.6)';ctx.fillStyle='rgba(255,220,150,.7)';ctx.lineWidth=1.4;
+  for(let j=0;j<nl;j++){const px=capX-plateW/2+16+j*(plateW-32)/Math.max(1,nl-1);
+    ctx.beginPath();ctx.moveTo(px,capTopY+4);ctx.lineTo(px,capBotY-4);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(px,(capTopY+capBotY)/2);ctx.lineTo(px-3,(capTopY+capBotY)/2-6);ctx.lineTo(px+3,(capTopY+capBotY)/2-6);ctx.closePath();ctx.fill();}
+  ctx.fillStyle='#9fb3c8';ctx.font='12px system-ui';ctx.textAlign='left';ctx.fillText('C='+C+'μF',capX+plateW/2+8,(capTopY+capBotY)/2);
+  // moving charges on wire (speed ∝ |i|)
+  if(Math.abs(iMA)>0.01){const dir=iMA>0?1:-1;const off=(t*iMA*40)%24;
+    ctx.fillStyle='#ffd166';for(let s=0;s<10;s++){const yy=capTopY-20;const xx=60+((s*24+off*dir)%(capX-plateW/2-60));if(xx>60&&xx<capX-plateW/2)ctx.beginPath(),ctx.arc(xx,yy,3,0,7),ctx.fill();}}
+  // U-t graph
+  ctx.fillStyle='#0b1728';ctx.fillRect(gx,gy,gw,gh);ctx.strokeStyle='#2b3f57';ctx.strokeRect(gx,gy,gw,gh);
+  ctx.strokeStyle='#3b5878';ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(gx,gy+gh-(E/10)*gh);ctx.lineTo(gx+gw,gy+gh-(E/10)*gh);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='#7fa8d8';ctx.font='11px system-ui';ctx.textAlign='left';ctx.fillText('U_C',gx+4,gy+12);ctx.fillText('E',gx+gw-14,gy+gh-(E/10)*gh-4);ctx.fillText('t',gx+gw-10,gy+gh-6);
+  let t0=0,tspan=2,probeVal=null;
+  if(hist.length>1){ctx.strokeStyle='#2ecc71';ctx.lineWidth=2;ctx.beginPath();t0=hist[0].t;tspan=Math.max(2,t-t0);hist.forEach((p,idx)=>{const X=gx+((p.t-t0)/tspan)*gw,Y=gy+gh-(p.u/10)*gh;idx?ctx.lineTo(X,Y):ctx.moveTo(X,Y);});ctx.stroke();
+    if(probeFrac!=null){
+      const px=gx+probeFrac*gw,pt=t0+probeFrac*tspan;
+      let nearest=hist[0];for(const p of hist)if(Math.abs(p.t-pt)<Math.abs(nearest.t-pt))nearest=p;
+      probeVal=nearest;
+      ctx.strokeStyle='#ffd166';ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(px,gy);ctx.lineTo(px,gy+gh);ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle='#ffd166';ctx.beginPath();ctx.arc(gx+((nearest.t-t0)/tspan)*gw,gy+gh-(nearest.u/10)*gh,4,0,7);ctx.fill();
+    }
+  }
+  // readouts
+  ctx.fillStyle='#e6eef7';ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillText('τ = RC = '+(RC*1000).toFixed(0)+' ms　Q = CU',24,H-14);
+  document.getElementById('uc').textContent=Uc.toFixed(2);
+  document.getElementById('q').textContent=q.toFixed(0);
+  document.getElementById('i').textContent=iMA.toFixed(2);
+  document.getElementById('w').textContent=(0.5*C*Uc*Uc).toFixed(0);
+  document.getElementById('statev').textContent=mode==='charge'?'正在充电':(mode==='discharge'?'正在放电':'断开（临界：电荷保持不变）');
+  document.getElementById('probeT').textContent=probeVal?probeVal.t.toFixed(2):'—';
+  document.getElementById('probeU').textContent=probeVal?probeVal.u.toFixed(2):'—';
+}
+function setMode(m,btn){mode=m;t=0;hist=[];document.querySelectorAll('.btn').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');}
+document.getElementById('charge').onclick=function(){setMode('charge',this);};
+document.getElementById('discharge').onclick=function(){setMode('discharge',this);};
+document.getElementById('open').onclick=function(){setMode('open',this);};
+function bind(id,cb,lab){document.getElementById(id).addEventListener('input',e=>{cb(parseFloat(e.target.value));document.getElementById(lab).textContent=e.target.value;});}
+bind('E',v=>E=v,'El');bind('R',v=>R=v,'Rl');bind('C',v=>C=v,'Cl');
+function pos(e){const rc=cv.getBoundingClientRect(),s=cv.width/rc.width;return{x:(e.clientX-rc.left)*s,y:(e.clientY-rc.top)*s};}
+cv.addEventListener('pointerdown',e=>{const p=pos(e);if(p.x>=gx&&p.x<=gx+gw&&p.y>=gy&&p.y<=gy+gh){dragProbe=true;probeFrac=Math.max(0,Math.min(1,(p.x-gx)/gw));}});
+cv.addEventListener('pointermove',e=>{if(!dragProbe)return;const p=pos(e);probeFrac=Math.max(0,Math.min(1,(p.x-gx)/gw));draw();});
+window.addEventListener('pointerup',()=>dragProbe=false);
+let last=performance.now();
+function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;step(dt);draw();requestAnimationFrame(loop);}
+draw();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

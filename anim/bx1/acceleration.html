@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>加速度实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#f7f9fc;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px;min-height:540px}
+  .stage{position:relative;background:#fff;border:1px solid #d9e2ec;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;aspect-ratio:940/560;touch-action:none}
+  .tip{position:absolute;left:14px;bottom:12px;background:rgba(16,42,67,.88);color:#d9e2ec;border-radius:7px;padding:6px 9px;font-size:12px;pointer-events:none}
+  .panel{display:flex;flex-direction:column;gap:6px}
+  .card{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:7px}
+  .task{background:#fff7e6;border-left:3px solid #f0a500;color:#486581;font-size:12px;line-height:1.35}
+  .title{font-weight:700;margin-bottom:4px}
+  .controls{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #b0bcc9;background:#fff;border-radius:6px;padding:5px 8px;cursor:pointer;font:inherit;font-size:12px}
+  button:hover{background:#eef2f7}
+  .readout{background:#102a43;color:#d9e2ec;border-radius:8px;padding:8px;line-height:1.45;font-size:13px}
+  .readout b{color:#f0a500;font-variant-numeric:tabular-nums}
+  .formula{font-size:12px;line-height:1.35;color:#334e68}
+  .status{font-size:12px;font-weight:700;border-radius:6px;padding:7px;border:1px solid #38b2ac;background:#e6fffa;color:#087f5b;line-height:1.35}
+  .status.warn{border-color:#f0a500;background:#fff7e6;color:#9a6700}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.panel{display:grid;grid-template-columns:1fr 1fr}.task,.readout,.formula,.status{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage">
+    <canvas id="canvas" width="940" height="560" aria-label="加速度交互实验台"></canvas>
+    <div class="tip">可拖动 v1、v2 两个速度端点和 Δt 时间手柄</div>
+  </div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>拖两根蓝色速度箭头，先看紫色 Δv；再拖 Δt 手柄，看同样 Δv 用时越短，加速度越大。</div>
+    <div class="card">
+      <div class="title">典型场景</div>
+      <div class="controls"><button id="speedUpBtn">同向加速</button><button id="brakeBtn">刹车减速</button><button id="reverseBtn">反向加速</button><button id="zeroBtn">v=0,a≠0</button></div>
+    </div>
+    <div class="card">
+      <div class="controls"><button id="playBtn">▶ 播放：按 a 匀变速运动</button><button id="resetBtn">重置播放</button></div>
+    </div>
+    <div class="readout" id="readout"></div>
+    <div class="card formula">
+      <div class="title">公式绑定</div>
+      <div>`Δv = v2 - v1`：紫色速度变化箭头。</div>
+      <div>`a = Δv / Δt`：v-t 图绿色斜率。</div>
+      <div>加速/减速看 `a` 与当前 `v` 是否同向。</div>
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  let v1=4,v2=10,dt=3,drag=null,layout={},playing=false,playT=0;
+  const axis={ox:582,oy:394,w:260,h:250};
+  function clamp(x,a,b){return Math.max(a,Math.min(b,x));}
+  function snap(x,step){return Math.round(x/step)*step;}
+  function text(s,x,y,c,a,size,w){
+    ctx.fillStyle=c||'#102a43';
+    ctx.font=(w?w+' ':'')+(size||13)+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';
+    ctx.textAlign=a||'center';ctx.textBaseline='middle';ctx.fillText(s,x,y);
+  }
+  function line(x1,y1,x2,y2,c,w,dash){
+    ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w||2;ctx.setLineDash(dash||[]);
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();
+  }
+  function arrow(x1,y1,x2,y2,c,label,w){
+    const a=Math.atan2(y2-y1,x2-x1);
+    ctx.save();ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w||3;
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    if(Math.hypot(x2-x1,y2-y1)>8){
+      ctx.beginPath();ctx.moveTo(x2,y2);
+      ctx.lineTo(x2-11*Math.cos(a-.45),y2-11*Math.sin(a-.45));
+      ctx.lineTo(x2-11*Math.cos(a+.45),y2-11*Math.sin(a+.45));
+      ctx.closePath();ctx.fill();
+    }
+    if(label) text(label,(x1+x2)/2+8,(y1+y2)/2-12,c,'left',12,'700');
+    ctx.restore();
+  }
+  function box(x,y,w,h,fill,stroke,r){
+    ctx.save();ctx.fillStyle=fill;ctx.strokeStyle=stroke||'#d9e2ec';ctx.lineWidth=1.4;
+    ctx.beginPath();ctx.roundRect(x,y,w,h,r==null?8:r);ctx.fill();ctx.stroke();ctx.restore();
+  }
+  function handle(x,y,label,c){
+    ctx.save();ctx.fillStyle=c;ctx.strokeStyle='#102a43';ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(x,y,9,0,Math.PI*2);ctx.fill();ctx.stroke();
+    text(label,x,y-22,c,'center',12,'700');ctx.restore();
+  }
+  function scaleV(v){return v*12;}
+  function sy(v){return axis.oy-(v+12)/24*axis.h;}
+  function sx(t){return axis.ox+t/6*axis.w;}
+  function drawCar(x,y,label,color){
+    ctx.save();ctx.shadowColor='rgba(16,42,67,.35)';ctx.shadowBlur=8;
+    box(x-24,y-14,48,24,color,'#334e68',5);
+    ctx.restore();
+    ctx.fillStyle='#334e68';ctx.beginPath();ctx.arc(x-14,y+12,5,0,Math.PI*2);ctx.arc(x+14,y+12,5,0,Math.PI*2);ctx.fill();
+    text(label,x,y,'#fff','center',12,'700');
+  }
+  function draw(){
+    dt=clamp(dt,0.5,6);
+    layout={};
+    const dv=v2-v1,a=dv/dt;
+    ctx.clearRect(0,0,940,560);
+    text('加速度实验台：加速度描述“速度变化得多快”',470,32,'#102a43','center',18,'700');
+
+    box(44,58,500,250,'#f8fbff','#d9e2ec');
+    text('两次速度测量：拖速度端点，先看 Δv 是怎样来的',294,84,'#334e68','center',14,'700');
+    const baseX=170,y1=146,y2=230;
+    drawCar(106,y1,'1','#2c7be5');drawCar(106,y2,'2','#2c7be5');
+    line(80,y1+32,500,y1+32,'#aab8c2',3);line(80,y2+32,500,y2+32,'#aab8c2',3);
+    arrow(baseX,y1,baseX+scaleV(v1),y1,'#2c7be5','v1='+v1.toFixed(1));
+    arrow(baseX,y2,baseX+scaleV(v2),y2,'#2c7be5','v2='+v2.toFixed(1));
+    handle(baseX+scaleV(v1),y1,'拖 v1','#f0a500');
+    handle(baseX+scaleV(v2),y2,'拖 v2','#f0a500');
+    layout.v1={x:baseX+scaleV(v1),y:y1,baseX};layout.v2={x:baseX+scaleV(v2),y:y2,baseX};
+    const dvStart=baseX+scaleV(v1),dvEnd=baseX+scaleV(v2);
+    arrow(dvStart,290,dvEnd,290,'#7b2cbf','Δv=v2-v1='+dv.toFixed(1)+' m/s',3.5);
+    text('紫色箭头只表示速度变化量，不是位移。',294,276,'#486581','center',12,'700');
+
+    box(44,330,500,112,'#fff','#d9e2ec');
+    text('时间测量：同样的 Δv，用时越短，a 越大',294,356,'#334e68','center',14,'700');
+    line(132,396,456,396,'#334e68',2);
+    for(let i=0;i<=6;i++){const x=132+i*54;line(x,390,x,402,'#829ab1',1.5);text(String(i),x,418,'#486581','center',11);}
+    line(132,374,132+dt*54,374,'#f0a500',8);
+    handle(132+dt*54,374,'拖 Δt','#f0a500');
+    layout.dt={x:132+dt*54,y:374,baseX:132};
+    text('Δt='+dt.toFixed(1)+' s',294,374,'#9a6700','center',13,'700');
+
+    box(566,58,326,384,'#fff','#d9e2ec');
+    text('v-t 图：斜率就是加速度',729,84,'#334e68','center',14,'700');
+    line(axis.ox,axis.oy,axis.ox+axis.w+20,axis.oy,'#334e68',2);
+    line(axis.ox,axis.oy,axis.ox,axis.oy-axis.h-20,'#334e68',2);
+    text('t/s',axis.ox+axis.w+38,axis.oy,'#486581','center',12,'700');
+    text('v',axis.ox-22,axis.oy-axis.h-26,'#486581','center',12,'700');
+    for(let i=0;i<=6;i++){line(sx(i),axis.oy-5,sx(i),axis.oy+5,'#829ab1',1.2);text(String(i),sx(i),axis.oy+20,'#486581','center',11);}
+    [-10,-5,0,5,10].forEach(v=>{line(axis.ox-5,sy(v),axis.ox+5,sy(v),'#829ab1',1.2);text(String(v),axis.ox-18,sy(v),'#486581','right',10);});
+    line(axis.ox,sy(0),axis.ox+axis.w,sy(0),'#d9e2ec',1.5,[5,4]);
+    line(sx(0),sy(v1),sx(dt),sy(v2),'#1a7a1a',3);
+    handle(sx(0),sy(v1),'v1','#2c7be5');handle(sx(dt),sy(v2),'v2','#2c7be5');
+    if(playing){
+      const tt=playT%dt,vNow=v1+a*tt;
+      ctx.save();ctx.shadowColor='rgba(240,165,0,.9)';ctx.shadowBlur=12;
+      ctx.fillStyle='#f0a500';ctx.beginPath();ctx.arc(sx(tt),sy(vNow),7,0,Math.PI*2);ctx.fill();
+      ctx.restore();
+      text('当前 t='+tt.toFixed(1)+'s，v='+vNow.toFixed(1)+'m/s',728,100,'#9a6700','center',12,'700');
+      document.getElementById('liveV').textContent=vNow.toFixed(1);
+    }
+    text('斜率 a=Δv/Δt='+a.toFixed(2)+' m/s²',728,118,'#1a7a1a','center',13,'700');
+    if(v1*v2<0) text('中途穿过 v=0：速度方向发生反转',728,430,'#9a6700','center',12,'700');
+
+    box(130,466,680,52,Math.abs(v2)<.05&&Math.abs(a)>.05?'#fff7e6':'#e6fffa',Math.abs(v2)<.05&&Math.abs(a)>.05?'#f0a500':'#38b2ac');
+    text('a = (v2 - v1) / Δt = ('+v2.toFixed(1)+' - '+v1.toFixed(1)+') / '+dt.toFixed(1)+' = '+a.toFixed(2)+' m/s²',470,488,'#334e68','center',16,'700');
+    text('判断加速/减速看 a 与当前速度方向是否同向，不看 a 的正负。',470,512,'#486581','center',13);
+    update(dv,a);
+  }
+  function update(dv,a){
+    document.getElementById('readout').innerHTML='v1=<b>'+v1.toFixed(1)+' m/s</b><br>v2=<b>'+v2.toFixed(1)+' m/s</b><br>Δv=v2-v1=<b>'+dv.toFixed(1)+' m/s</b><br>Δt=<b>'+dt.toFixed(1)+' s</b><br>a=Δv/Δt=<b>'+a.toFixed(2)+' m/s²</b><br>播放中瞬时速度 v=<b id="liveV">'+(playing?(v1+a*(playT%dt)).toFixed(1):'—')+'</b> m/s';
+    const st=document.getElementById('status');
+    let msg;
+    if(Math.abs(v2)<0.05&&Math.abs(a)>0.05) msg='关键易错点：这一刻 v=0，但 a 不为 0，速度正准备改变方向。';
+    else if(v2*a>0) msg='当前时刻 a 与 v2 同向：速率正在增大，是加速。';
+    else if(v2*a<0) msg='当前时刻 a 与 v2 反向：速率正在减小，是减速。';
+    else msg='a=0 或 v=0 的临界状态：不要把速度大小和加速度混为一谈。';
+    st.classList.toggle('warn',Math.abs(v2)<0.05&&Math.abs(a)>0.05);
+    st.textContent=msg;
+  }
+  function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
+  canvas.addEventListener('pointerdown',e=>{
+    const p=pointer(e);
+    for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30){drag=k;canvas.setPointerCapture(e.pointerId);break;}}
+  });
+  canvas.addEventListener('pointermove',e=>{
+    const p=pointer(e);
+    if(drag){
+      if(drag==='v1') v1=snap(clamp((p.x-layout.v1.baseX)/12,-10,12),0.5);
+      if(drag==='v2') v2=snap(clamp((p.x-layout.v2.baseX)/12,-10,12),0.5);
+      if(drag==='dt') dt=snap(clamp((p.x-layout.dt.baseX)/54,0.5,6),0.5);
+      draw();return;
+    }
+    let hit=false;for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30)hit=true;}
+    canvas.style.cursor=hit?'grab':'default';
+  });
+  window.addEventListener('pointerup',()=>{drag=null;canvas.style.cursor='default';});
+  document.getElementById('speedUpBtn').onclick=()=>{v1=3;v2=10;dt=3;draw();};
+  document.getElementById('brakeBtn').onclick=()=>{v1=10;v2=2;dt=4;draw();};
+  document.getElementById('reverseBtn').onclick=()=>{v1=-8;v2=-2;dt=3;draw();};
+  document.getElementById('zeroBtn').onclick=()=>{v1=6;v2=0;dt=2;draw();};
+  function animate(){
+    if(!playing)return;
+    playT+=0.03;
+    draw();
+    requestAnimationFrame(animate);
+  }
+  document.getElementById('playBtn').onclick=()=>{
+    playing=!playing;
+    document.getElementById('playBtn').textContent=playing?'⏸ 暂停':'▶ 播放：按 a 匀变速运动';
+    if(playing){playT=0;animate();}else draw();
+  };
+  document.getElementById('resetBtn').onclick=()=>{playing=false;playT=0;document.getElementById('playBtn').textContent='▶ 播放：按 a 匀变速运动';draw();};
+  draw();
+})();
+</script>
+</body>
+</html>

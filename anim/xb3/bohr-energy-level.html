@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>玻尔模型与能级跃迁</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 14px; align-items: stretch; }
+  canvas { width: 100%; height: 440px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  input { width: 100%; }
+  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.8; font-size: 14px; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
+  @media (max-width: 760px) { .stage { grid-template-columns: 1fr; } canvas { height: 360px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="680" height="440" aria-label="玻尔能级跃迁模型"></canvas>
+    <section class="panel">
+      <label for="ni">初态能级 ni：<span id="niVal"></span></label>
+      <input id="ni" type="range" min="1" max="6" value="3" step="1">
+      <label for="nf">末态能级 nf：<span id="nfVal"></span></label>
+      <input id="nf" type="range" min="1" max="6" value="2" step="1">
+      <div id="readout" class="readout"></div>
+      <div class="hint">观察任务：让 ni 大于 nf 看发射，让 ni 小于 nf 看吸收；比较能级差变大时光子能量和频率如何变化。</div>
+    </section>
+  </div>
+</div>
+<script>
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const els = {
+  ni: document.getElementById('ni'),
+  nf: document.getElementById('nf'),
+  niVal: document.getElementById('niVal'),
+  nfVal: document.getElementById('nfVal'),
+  readout: document.getElementById('readout')
+};
+function energy(n) { return -13.6 / (n * n); }
+function yFor(n) {
+  const e = energy(n);
+  return 370 - (e + 13.6) / 13.6 * 260;
+}
+function drawArrow(x1, y1, x2, y2, color) {
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+  const ang = Math.atan2(y2 - y1, x2 - x1);
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - 12 * Math.cos(ang - 0.45), y2 - 12 * Math.sin(ang - 0.45));
+  ctx.lineTo(x2 - 12 * Math.cos(ang + 0.45), y2 - 12 * Math.sin(ang + 0.45));
+  ctx.closePath();
+  ctx.fill();
+}
+function draw() {
+  const ni = Number(els.ni.value);
+  const nf = Number(els.nf.value);
+  els.niVal.textContent = ni;
+  els.nfVal.textContent = nf;
+  const ei = energy(ni);
+  const ef = energy(nf);
+  const dE = ef - ei;
+  const photon = Math.abs(dE);
+  const freq = photon / 4.136e-15;
+  const action = dE > 0 ? '吸收光子' : dE < 0 ? '发射光子' : '没有跃迁';
+
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#f7f9fc';
+  ctx.fillRect(0, 0, c.width, c.height);
+
+  ctx.fillStyle = '#e03131';
+  ctx.beginPath();
+  ctx.arc(145, 220, 14, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = '700 14px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('核', 145, 225);
+  for (let n = 1; n <= 4; n++) {
+    ctx.strokeStyle = n === ni ? '#2c7be5' : n === nf ? '#e03131' : '#829ab1';
+    ctx.lineWidth = n === ni || n === nf ? 3 : 2;
+    ctx.beginPath();
+    ctx.arc(145, 220, 28 + n * 24, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.fillStyle = '#486581';
+    ctx.font = '12px system-ui';
+    ctx.fillText('n=' + n, 145 + 32 + n * 24, 222);
+  }
+  const ri = 28 + ni * 24;
+  const rf = 28 + nf * 24;
+  ctx.fillStyle = '#2c7be5';
+  ctx.beginPath();
+  ctx.arc(145 + ri, 220, 6, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#e03131';
+  ctx.beginPath();
+  ctx.arc(145 + rf * 0.7, 220 - rf * 0.7, 6, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = '#334e68';
+  ctx.lineWidth = 2;
+  ctx.fillStyle = '#102a43';
+  ctx.font = '13px system-ui';
+  ctx.textAlign = 'left';
+  for (let n = 1; n <= 6; n++) {
+    const y = yFor(n);
+    ctx.strokeStyle = n === ni ? '#2c7be5' : n === nf ? '#e03131' : '#334e68';
+    ctx.lineWidth = n === ni || n === nf ? 4 : 2;
+    ctx.beginPath();
+    ctx.moveTo(360, y);
+    ctx.lineTo(600, y);
+    ctx.stroke();
+    ctx.fillStyle = '#486581';
+    ctx.fillText(`n=${n}, E=${energy(n).toFixed(2)} eV`, 608, y + 4);
+  }
+  if (ni !== nf) {
+    const yi = yFor(ni);
+    const yf = yFor(nf);
+    drawArrow(470, yi, 470, yf, dE > 0 ? '#2c7be5' : '#e03131');
+    ctx.fillStyle = dE > 0 ? '#2c7be5' : '#e03131';
+    ctx.font = '700 15px system-ui';
+    ctx.fillText(action, 390, Math.min(yi, yf) - 14);
+    const waveY = dE > 0 ? Math.min(yi, yf) - 44 : Math.max(yi, yf) + 36;
+    ctx.strokeStyle = '#f0a500';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    for (let x = 390; x <= 560; x += 4) {
+      const y = waveY + Math.sin((x - 390) / 8) * 10;
+      if (x === 390) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.fillStyle = '#f0a500';
+    ctx.fillText('光子 hν', 570, waveY + 4);
+  }
+
+  els.readout.innerHTML = [
+    `Ei=E${ni}=${ei.toFixed(2)} eV`,
+    `Ef=E${nf}=${ef.toFixed(2)} eV`,
+    `ΔE=Ef-Ei=${dE.toFixed(2)} eV，判断：${action}`,
+    ni === nf ? 'hν=0：没有能级跃迁' : `hν=|ΔE|=${photon.toFixed(2)} eV，ν≈${freq.toExponential(2)} Hz`
+  ].join('<br>');
+  requestAnimationFrame(draw);
+}
+Object.values(els).forEach(el => {
+  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
+});
+draw();
+</script>
+</body>
+</html>

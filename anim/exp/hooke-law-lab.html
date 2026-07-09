@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>探究弹簧弹力与形变量关系</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 16px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 14px; align-items: stretch; }
+  canvas { width: 100%; height: 460px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  input { width: 100%; }
+  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.75; font-size: 14px; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
+  @media (max-width: 780px) { .stage { grid-template-columns: 1fr; } canvas { height: 390px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="700" height="460" aria-label="胡克定律虚拟实验"></canvas>
+    <section class="panel">
+      <label for="k">劲度系数 k/(N/m)：<span id="kVal"></span></label>
+      <input id="k" type="range" min="10" max="80" value="30" step="5">
+      <label for="mass">单个钩码质量/g：<span id="massVal"></span></label>
+      <input id="mass" type="range" min="20" max="100" value="50" step="10">
+      <label for="count">钩码个数：<span id="countVal"></span></label>
+      <input id="count" type="range" min="1" max="8" value="4" step="1">
+      <label for="limit">弹性限度 x/cm：<span id="limitVal"></span></label>
+      <input id="limit" type="range" min="4" max="20" value="14" step="1">
+      <div id="readout" class="readout"></div>
+      <div class="hint">观察任务：只用线性段求斜率；超过弹性限度后，图像会偏离直线。</div>
+    </section>
+  </div>
+</div>
+<script>
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const els = {
+  k: document.getElementById('k'),
+  mass: document.getElementById('mass'),
+  count: document.getElementById('count'),
+  limit: document.getElementById('limit'),
+  kVal: document.getElementById('kVal'),
+  massVal: document.getElementById('massVal'),
+  countVal: document.getElementById('countVal'),
+  limitVal: document.getElementById('limitVal'),
+  readout: document.getElementById('readout')
+};
+function spring(x, y1, y2) {
+  ctx.strokeStyle = '#2c7be5';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(x, y1);
+  const turns = 9;
+  for (let i = 1; i <= turns * 2; i++) {
+    const yy = y1 + (y2 - y1) * i / (turns * 2);
+    const xx = x + (i % 2 ? -18 : 18);
+    ctx.lineTo(xx, yy);
+  }
+  ctx.lineTo(x, y2);
+  ctx.stroke();
+}
+function draw() {
+  const k = Number(els.k.value);
+  const m = Number(els.mass.value) / 1000;
+  const count = Number(els.count.value);
+  const limit = Number(els.limit.value) / 100;
+  const g = 9.8;
+  const F = m * count * g;
+  let x = F / k;
+  const beyond = x > limit;
+  const shownX = beyond ? limit + (x - limit) * 0.35 : x;
+  els.kVal.textContent = k;
+  els.massVal.textContent = Math.round(m * 1000);
+  els.countVal.textContent = count;
+  els.limitVal.textContent = Math.round(limit * 100);
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#f7f9fc';
+  ctx.fillRect(0, 0, c.width, c.height);
+
+  ctx.strokeStyle = '#334e68';
+  ctx.lineWidth = 6;
+  ctx.beginPath();
+  ctx.moveTo(70, 52);
+  ctx.lineTo(270, 52);
+  ctx.stroke();
+  const yTop = 52;
+  const y0 = 150;
+  const yEnd = y0 + shownX * 900;
+  spring(170, yTop, yEnd);
+  ctx.strokeStyle = '#829ab1';
+  ctx.setLineDash([6, 5]);
+  ctx.beginPath();
+  ctx.moveTo(108, y0);
+  ctx.lineTo(236, y0);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#486581';
+  ctx.font = '12px system-ui';
+  ctx.textAlign = 'right';
+  ctx.fillText('原长位置', 104, y0 + 4);
+  for (let i = 0; i < count; i++) {
+    ctx.fillStyle = '#fff7e6';
+    ctx.strokeStyle = '#f0a500';
+    ctx.fillRect(138, yEnd + i * 16, 64, 14);
+    ctx.strokeRect(138, yEnd + i * 16, 64, 14);
+  }
+  ctx.fillStyle = beyond ? '#b30000' : '#087f5b';
+  ctx.font = '700 15px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText(beyond ? '超过弹性限度：数据偏离直线' : '弹性限度内：F 与 x 成正比', 170, 408);
+
+  const ox = 380, oy = 382, gw = 250, gh = 250;
+  ctx.strokeStyle = '#334e68';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(ox, oy);
+  ctx.lineTo(ox + gw, oy);
+  ctx.moveTo(ox, oy);
+  ctx.lineTo(ox, oy - gh);
+  ctx.stroke();
+  ctx.fillStyle = '#486581';
+  ctx.font = '12px system-ui';
+  ctx.fillText('x/m', ox + gw + 24, oy + 4);
+  ctx.fillText('F/N', ox - 10, oy - gh - 8);
+  const maxX = 0.25, maxF = 8;
+  ctx.strokeStyle = '#e03131';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(ox, oy);
+  ctx.lineTo(ox + Math.min(gw, limit / maxX * gw), oy - Math.min(gh, (k * limit) / maxF * gh));
+  ctx.stroke();
+  for (let n = 1; n <= 8; n++) {
+    const ff = m * n * g;
+    const idealX = ff / k;
+    const actualX = idealX > limit ? limit + (idealX - limit) * 0.35 : idealX;
+    const px = ox + Math.min(gw, actualX / maxX * gw);
+    const py = oy - Math.min(gh, ff / maxF * gh);
+    ctx.fillStyle = n === count ? '#e03131' : '#2c7be5';
+    ctx.beginPath();
+    ctx.arc(px, py, n === count ? 6 : 4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 15px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText(`F=${F.toFixed(2)}N，x=${shownX.toFixed(3)}m`, 505, 64);
+  ctx.fillText(`线性段斜率 k≈${k}N/m`, 505, 92);
+
+  els.readout.innerHTML = [
+    `F=mg=${(m*1000).toFixed(0)}g×${count}×9.8≈${F.toFixed(2)}N`,
+    `弹性限度内 x=F/k≈${x.toFixed(3)}m`,
+    `显示伸长量=${shownX.toFixed(3)}m，弹性限度=${limit.toFixed(2)}m`,
+    beyond ? '状态：超过弹性限度，不能用该点求 k' : `状态：线性段，k=F/x≈${(F/shownX).toFixed(1)}N/m`
+  ].join('<br>');
+}
+Object.values(els).forEach(el => {
+  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
+});
+draw();
+</script>
+</body>
+</html>

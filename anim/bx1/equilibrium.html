@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>共点力平衡实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 306px;gap:10px;padding:10px;min-height:540px}
+  .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;touch-action:none}
+  .panel{display:flex;flex-direction:column;gap:8px}
+  .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
+  .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.45}
+  .title{font-weight:800;margin-bottom:5px;color:#0f172a}
+  .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:30px;cursor:pointer;color:#102a43}
+  button.active{background:#e0f2fe;border-color:#0284c7;color:#075985;font-weight:800}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:48px}
+  .meter span{display:block;font-size:11px;color:#b6c5d8}
+  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:16px;font-variant-numeric:tabular-nums}
+  .formula{display:grid;gap:5px;font-size:13px;color:#334155}
+  .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
+  .formula div:last-child{border-bottom:0;padding-bottom:0}
+  .formula b{white-space:nowrap;color:#0f172a}
+  .small{font-size:12px;line-height:1.5;color:#475569}
+  .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="920" height="520" aria-label="共点力平衡交互实验台"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>拖动左右绳端改变角度，再拖动重物改变 G；看 T1、T2、力三角形和 ΣFx/ΣFy 是否始终同时闭合为零。</div>
+    <div class="card">
+      <div class="title">快速情境</div>
+      <div class="chips">
+        <button data-preset="sym45" class="active">对称 45°</button>
+        <button data-preset="flat">绳更平</button>
+        <button data-preset="leftFlat">左侧更平</button>
+        <button data-preset="heavy">重物加重</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="title">实时读数</div>
+      <div class="readout">
+        <div class="meter"><span>左绳 T1</span><b id="t1Text">14.1 N</b></div>
+        <div class="meter"><span>右绳 T2</span><b id="t2Text">14.1 N</b></div>
+        <div class="meter"><span>水平合力 ΣFx</span><b id="fxText">0.0 N</b></div>
+        <div class="meter"><span>竖直合力 ΣFy</span><b id="fyText">0.0 N</b></div>
+      </div>
+    </div>
+    <div class="card formula">
+      <div><span>平衡条件</span><b>ΣF=0</b></div>
+      <div><span>水平方向</span><b>T2cosβ=T1cosα</b></div>
+      <div><span>竖直方向</span><b>T1sinα+T2sinβ=G</b></div>
+    </div>
+    <div class="card small"><b>可直接操作：</b>抓两个蓝色绳端改变 α、β；抓红色重物上下拖动改变 G。右侧三力首尾相接后回到起点，表示共点力平衡。</div>
+    <div class="chips"><button id="playBtn">▶ 播放：α β 同步放平</button><button id="resetBtn">重置</button></div>
+    <div class="status" id="status">左右对称：T1=T2，水平分量相互抵消。</div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const state={alpha:45,beta:45,G:20,drag:null,playing:false,playDir:-1};
+  const els={
+    t1:document.getElementById('t1Text'),
+    t2:document.getElementById('t2Text'),
+    fx:document.getElementById('fxText'),
+    fy:document.getElementById('fyText'),
+    status:document.getElementById('status')
+  };
+  const colors={blue:'#2563eb',red:'#dc2626',ink:'#102a43',muted:'#64748b',line:'#94a3b8',green:'#0f766e'};
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  const fmt=(v,d=1)=>v.toFixed(d);
+  function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){
+    ctx.fillStyle=c;
+    ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;
+    ctx.textAlign=a;
+    ctx.textBaseline='middle';
+    ctx.fillText(s,x,y);
+  }
+  function line(x1,y1,x2,y2,c=colors.line,w=2,dash){
+    ctx.save();
+    ctx.strokeStyle=c;ctx.lineWidth=w;
+    if(dash)ctx.setLineDash(dash);
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    ctx.restore();
+  }
+  function arrow(x1,y1,x2,y2,c,w=3){
+    const a=Math.atan2(y2-y1,x2-x1);
+    line(x1,y1,x2,y2,c,w);
+    ctx.save();
+    ctx.fillStyle=c;
+    ctx.beginPath();
+    ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));
+    ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+  function roundRect(x,y,w,h,r,fill,stroke){
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(x,y,w,h,r);
+    ctx.fillStyle=fill;ctx.fill();
+    if(stroke){ctx.strokeStyle=stroke;ctx.stroke();}
+    ctx.restore();
+  }
+  function geom(){
+    const O={x:275,y:210};
+    const len=185;
+    const a=state.alpha*Math.PI/180,b=state.beta*Math.PI/180;
+    const L={x:O.x-len*Math.cos(a),y:O.y-len*Math.sin(a)};
+    const R={x:O.x+len*Math.cos(b),y:O.y-len*Math.sin(b)};
+    const weightY=326+(state.G-5)/(60-5)*86;
+    return{O,len,a,b,L,R,weight:{x:O.x,y:weightY}};
+  }
+  function values(){
+    const a=state.alpha*Math.PI/180,b=state.beta*Math.PI/180;
+    const denom=Math.sin(a+b);
+    const T1=state.G*Math.cos(b)/denom;
+    const T2=state.G*Math.cos(a)/denom;
+    const fx=-T1*Math.cos(a)+T2*Math.cos(b);
+    const fy=T1*Math.sin(a)+T2*Math.sin(b)-state.G;
+    return{T1,T2,fx,fy};
+  }
+  function drawHandle(x,y,label,active=false,c=colors.blue){
+    ctx.save();
+    ctx.fillStyle=active?'#fde68a':'#fff';
+    ctx.strokeStyle=active?'#d97706':c;
+    ctx.lineWidth=3;
+    ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();
+    text(label,x,y-22,active?'#92400e':c,'center',12,'900');
+    ctx.restore();
+  }
+  function drawAngle(O,side,deg){
+    const r=52;
+    ctx.save();
+    ctx.strokeStyle='#64748b';ctx.lineWidth=2;
+    ctx.beginPath();
+    if(side==='left')ctx.arc(O.x,O.y,r,Math.PI,Math.PI+deg*Math.PI/180);
+    else ctx.arc(O.x,O.y,r,-deg*Math.PI/180,0);
+    ctx.stroke();
+    ctx.restore();
+  }
+  function drawScene(g,v){
+    roundRect(42,56,500,384,8,'#fff','#d7dee8');
+    line(70,58,520,58,'#cbd5e1',3);
+    line(g.L.x,g.L.y,g.O.x,g.O.y,'#334155',5);
+    line(g.O.x,g.O.y,g.R.x,g.R.y,'#334155',5);
+    line(g.O.x,g.O.y,g.weight.x,g.weight.y-28,'#64748b',3);
+    roundRect(g.weight.x-37,g.weight.y-28,74,56,8,'#fee2e2','#dc2626');
+    text(`${fmt(state.G)} N`,g.weight.x,g.weight.y,'#991b1b','center',15,'900');
+    ctx.fillStyle='#0f172a';ctx.beginPath();ctx.arc(g.O.x,g.O.y,7,0,Math.PI*2);ctx.fill();
+    drawHandle(g.L.x,g.L.y,'拖 α',state.drag==='alpha');
+    drawHandle(g.R.x,g.R.y,'拖 β',state.drag==='beta');
+    drawHandle(g.weight.x,g.weight.y+35,'拖 G',state.drag==='G',colors.red);
+    drawAngle(g.O,'left',state.alpha);
+    drawAngle(g.O,'right',state.beta);
+    text(`α=${fmt(state.alpha,0)}°`,g.O.x-78,g.O.y+23,'#475569','center',12,'800');
+    text(`β=${fmt(state.beta,0)}°`,g.O.x+78,g.O.y+23,'#475569','center',12,'800');
+    const scale=Math.min(5.2,138/Math.max(v.T1,v.T2,state.G));
+    arrow(g.O.x,g.O.y,g.O.x-v.T1*Math.cos(g.a)*scale,g.O.y-v.T1*Math.sin(g.a)*scale,colors.blue,4);
+    arrow(g.O.x,g.O.y,g.O.x+v.T2*Math.cos(g.b)*scale,g.O.y-v.T2*Math.sin(g.b)*scale,colors.blue,4);
+    arrow(g.O.x,g.O.y,g.O.x,g.O.y+state.G*scale,colors.red,4);
+    text(`T1=${fmt(v.T1)}N`,g.O.x-132,g.O.y-76,colors.blue,'center',13,'900');
+    text(`T2=${fmt(v.T2)}N`,g.O.x+132,g.O.y-76,colors.blue,'center',13,'900');
+    text('G',g.O.x+18,g.O.y+state.G*scale*.62,colors.red,'left',14,'900');
+  }
+  function drawTriangle(v){
+    roundRect(565,56,310,268,8,'#f8fafc','#d7dee8');
+    text('力三角形闭合检验',720,82,'#0f172a','center',16,'900');
+    const s=Math.min(4.8,120/Math.max(v.T1,v.T2,state.G));
+    const p0={x:720,y:238};
+    const a=state.alpha*Math.PI/180,b=state.beta*Math.PI/180;
+    const p1={x:p0.x-v.T1*Math.cos(a)*s,y:p0.y-v.T1*Math.sin(a)*s};
+    const p2={x:p1.x+v.T2*Math.cos(b)*s,y:p1.y-v.T2*Math.sin(b)*s};
+    arrow(p0.x,p0.y,p1.x,p1.y,colors.blue,4);
+    arrow(p1.x,p1.y,p2.x,p2.y,colors.blue,4);
+    arrow(p2.x,p2.y,p0.x,p0.y,colors.red,4);
+    ctx.fillStyle=colors.green;
+    ctx.beginPath();ctx.arc(p0.x,p0.y,5,0,Math.PI*2);ctx.fill();
+    text('起点=终点',p0.x+50,p0.y+2,colors.green,'left',12,'900');
+    text('T1',p1.x-15,p1.y-8,colors.blue,'right',12,'900');
+    text('T2',p2.x+16,p2.y-8,colors.blue,'left',12,'900');
+    text('G',p0.x+16,(p0.y+p2.y)/2,colors.red,'left',12,'900');
+    roundRect(596,280,248,28,7,'#ecfdf5','#14b8a6');
+    text('闭合表示合力为零',720,294,colors.green,'center',13,'900');
+  }
+  function drawBars(v){
+    roundRect(565,340,310,86,8,'#fff','#d7dee8');
+    text('分方向读数',600,362,'#0f172a','left',14,'900');
+    const fx=Math.abs(v.fx),fy=Math.abs(v.fy);
+    line(620,386,820,386,'#e2e8f0',7);
+    line(620,414,820,414,'#e2e8f0',7);
+    line(720,378,720,422,'#94a3b8',1,[4,4]);
+    line(720,386,720+clamp(v.fx*8,-95,95),386,colors.blue,7);
+    line(720,414,720+clamp(v.fy*8,-95,95),414,colors.red,7);
+    text(`ΣFx=${fmt(v.fx,2)}N`,595,386,'#334155','left',12,'800');
+    text(`ΣFy=${fmt(v.fy,2)}N`,595,414,'#334155','left',12,'800');
+    text(fx<.05&&fy<.05?'两个方向都为 0':'未平衡',818,362,fx<.05&&fy<.05?colors.green:colors.red,'right',12,'900');
+  }
+  function update(v){
+    els.t1.textContent=`${fmt(v.T1)} N`;
+    els.t2.textContent=`${fmt(v.T2)} N`;
+    els.fx.textContent=`${fmt(v.fx,2)} N`;
+    els.fy.textContent=`${fmt(v.fy,2)} N`;
+    document.querySelectorAll('[data-preset]').forEach(btn=>{
+      const p=btn.dataset.preset;
+      const active=(p==='sym45'&&state.alpha===45&&state.beta===45&&state.G===20)
+        ||(p==='flat'&&state.alpha===22&&state.beta===22)
+        ||(p==='leftFlat'&&state.alpha===22&&state.beta===58)
+        ||(p==='heavy'&&state.G===45);
+      btn.classList.toggle('active',active);
+    });
+    if(Math.abs(state.alpha-state.beta)<.5){
+      els.status.textContent='左右对称：T1=T2；若两边一起变平，T 会明显变大。';
+    }else if(state.alpha<state.beta){
+      els.status.textContent='左绳更平：张力大小由水平和竖直两个方程共同决定，不能只凭一边角度判断。';
+    }else{
+      els.status.textContent='右绳更平：张力大小由水平和竖直两个方程共同决定，不能只凭一边角度判断。';
+    }
+    if(state.playing)els.status.textContent+='（播放中：角度正在自动变化）';
+  }
+  function draw(){
+    const g=geom(),v=values();
+    ctx.clearRect(0,0,920,520);
+    var _bg=ctx.createLinearGradient(0,0,0,520);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,520);
+    text('共点力平衡实验台：静止不是无力，而是所有力的矢量和为零',460,30,'#0f172a','center',19,'900');
+    drawScene(g,v);
+    drawTriangle(v);
+    drawBars(v);
+    update(v);
+  }
+  function pos(evt){
+    const r=canvas.getBoundingClientRect();
+    return{x:(evt.clientX-r.left)*canvas.width/r.width,y:(evt.clientY-r.top)*canvas.height/r.height};
+  }
+  function near(a,b,rad=24){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+  function pointerDown(evt){
+    if(state.playing){state.playing=false;document.getElementById('playBtn').textContent='▶ 播放：α β 同步放平'}
+    const p=pos(evt),g=geom();
+    if(near(p,g.L,28))state.drag='alpha';
+    else if(near(p,g.R,28))state.drag='beta';
+    else if(near(p,{x:g.weight.x,y:g.weight.y+35},34))state.drag='G';
+    else state.drag=null;
+    if(state.drag){canvas.setPointerCapture(evt.pointerId);pointerMove(evt);}
+  }
+  function pointerMove(evt){
+    if(!state.drag)return;
+    const p=pos(evt),g=geom();
+    if(state.drag==='alpha'){
+      state.alpha=clamp(Math.atan2(g.O.y-p.y,g.O.x-p.x)*180/Math.PI,15,80);
+    }else if(state.drag==='beta'){
+      state.beta=clamp(Math.atan2(g.O.y-p.y,p.x-g.O.x)*180/Math.PI,15,80);
+    }else if(state.drag==='G'){
+      state.G=clamp(5+((p.y-35)-326)/86*(60-5),5,60);
+    }
+    draw();
+  }
+  function pointerUp(evt){
+    if(state.drag){
+      state.drag=null;
+      try{canvas.releasePointerCapture(evt.pointerId);}catch(e){}
+      draw();
+    }
+  }
+  canvas.addEventListener('pointerdown',pointerDown);
+  canvas.addEventListener('pointermove',pointerMove);
+  canvas.addEventListener('pointerup',pointerUp);
+  canvas.addEventListener('pointercancel',pointerUp);
+  document.querySelectorAll('[data-preset]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      if(btn.dataset.preset==='sym45'){state.alpha=45;state.beta=45;state.G=20;}
+      if(btn.dataset.preset==='flat'){state.alpha=22;state.beta=22;}
+      if(btn.dataset.preset==='leftFlat'){state.alpha=22;state.beta=58;}
+      if(btn.dataset.preset==='heavy'){state.G=45;}
+      draw();
+    });
+  });
+  const playBtn=document.getElementById('playBtn');
+  function animate(){
+    if(!state.playing)return;
+    state.alpha+=state.playDir*0.4;state.beta+=state.playDir*0.4;
+    if(state.alpha<=16){state.alpha=16;state.beta=16;state.playDir=1;}
+    if(state.alpha>=79){state.alpha=79;state.beta=79;state.playDir=-1;}
+    draw();
+    requestAnimationFrame(animate);
+  }
+  playBtn.addEventListener('click',()=>{
+    state.playing=!state.playing;
+    playBtn.textContent=state.playing?'⏸ 暂停':'▶ 播放：α β 同步放平';
+    if(state.playing){state.playDir=-1;animate();}else draw();
+  });
+  document.getElementById('resetBtn').addEventListener('click',()=>{state.playing=false;state.alpha=45;state.beta=45;playBtn.textContent='▶ 播放：α β 同步放平';draw();});
+  draw();
+})();
+</script>
+</body>
+</html>

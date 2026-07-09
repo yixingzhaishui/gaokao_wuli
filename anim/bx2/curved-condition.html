@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>曲线运动条件实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#edf3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px;min-height:560px}
+  .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;touch-action:none}
+  .panel{display:flex;flex-direction:column;gap:8px}
+  .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
+  .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.45}
+  .title{font-weight:800;margin-bottom:5px;color:#0f172a}
+  .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:31px;cursor:pointer;color:#102a43}
+  .primary{background:#2563eb;color:#fff;border-color:#2563eb}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:48px}
+  .meter span{display:block;font-size:11px;color:#b6c5d8}
+  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:16px;font-variant-numeric:tabular-nums}
+  .formula{display:grid;gap:5px;font-size:13px;color:#334155}
+  .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
+  .formula div:last-child{border-bottom:0;padding-bottom:0}
+  .formula b{white-space:nowrap;color:#0f172a}
+  .small{font-size:12px;line-height:1.5;color:#475569}
+  .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
+  .status.warn{border-color:#f59e0b;background:#fff7ed;color:#b45309}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="曲线运动条件交互实验台"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>抓住红色合力箭头端点拖动。只要红箭头不和蓝色速度箭头共线，就会出现紫色 F⊥，轨迹立刻弯曲。</div>
+    <button id="playBtn" class="primary">播放</button>
+    <div class="card">
+      <div class="title">快速情境</div>
+      <div class="chips">
+        <button data-case="straight">直线加速</button>
+        <button data-case="turn">只拐弯</button>
+        <button data-case="brake">直线减速</button>
+        <button data-case="zero">无合力</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="title">实时读数</div>
+      <div class="readout">
+        <div class="meter"><span>沿速度分量 F∥</span><b id="fpText">15.0 N</b></div>
+        <div class="meter"><span>垂直分量 F⊥</span><b id="fnText">26.0 N</b></div>
+        <div class="meter"><span>夹角 α</span><b id="angleText">60°</b></div>
+        <div class="meter"><span>运动判断</span><b id="typeText">曲线</b></div>
+      </div>
+    </div>
+    <div class="card formula">
+      <div><span>沿速度</span><b>F∥=Fcosα</b></div>
+      <div><span>垂直速度</span><b>F⊥=Fsinα</b></div>
+      <div><span>曲线条件</span><b>F⊥≠0</b></div>
+    </div>
+    <div class="card small"><b>可直接操作：</b>抓红色合力箭头端点，或拖底部 F、v、α 三个手柄。蓝箭头始终是速度切线方向。</div>
+    <div class="status" id="status">合力与速度不共线：速度方向改变，轨迹弯向 F⊥ 一侧。</div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const state={F:30,v:8,angle:60,phase:.48,running:false,drag:null};
+  const els={fp:document.getElementById('fpText'),fn:document.getElementById('fnText'),angle:document.getElementById('angleText'),type:document.getElementById('typeText'),status:document.getElementById('status'),play:document.getElementById('playBtn')};
+  const colors={red:'#dc2626',blue:'#2563eb',purple:'#7c3aed',green:'#0f766e',orange:'#f59e0b',ink:'#102a43'};
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  const fmt=(v,d=1)=>Math.abs(v)<1e-6?(0).toFixed(d):v.toFixed(d);
+  function values(){const rad=state.angle*Math.PI/180,Fp=state.F*Math.cos(rad),Fn=state.F*Math.sin(rad);return{rad,Fp,Fn,curve:Math.abs(Fn)>.25}}
+  function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){ctx.fillStyle=c;ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+  function line(x1,y1,x2,y2,c='#94a3b8',w=2,dash){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
+  function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore()}
+  function roundRect(x,y,w,h,r,fill,stroke){ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}ctx.restore()}
+  function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-36,c,'center',12,'900')}
+  function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-20,active?'#92400e':c,'center',12,'900');ctx.restore()}
+  function geom(){return{F:{x:112+state.F/60*170,y:494},v:{x:350+(state.v-2)/14*170,y:494},angle:{x:620+state.angle/180*210,y:494}}}
+  function pointAt(t,v){const x=96+t*415,y=360-v.Fn/30*t*t*185;return{x,y}}
+  function tangentAt(t,v){const slope=-v.Fn/30*370*t/415;const norm=Math.hypot(1,slope);return{x:1/norm,y:slope/norm}}
+  function forceEnd(p,v){const len=38+state.F*1.8;return{x:p.x+len*Math.cos(v.rad),y:p.y-len*Math.sin(v.rad)}}
+  function drawGrid(){roundRect(42,58,540,382,8,'#fff','#d7dee8');ctx.save();ctx.strokeStyle='#e2e8f0';ctx.lineWidth=1;for(let x=78;x<552;x+=34){ctx.beginPath();ctx.moveTo(x,88);ctx.lineTo(x,414);ctx.stroke()}for(let y=92;y<414;y+=34){ctx.beginPath();ctx.moveTo(78,y);ctx.lineTo(552,y);ctx.stroke()}ctx.restore()}
+  function drawMotion(v){
+    drawGrid();
+    ctx.save();ctx.strokeStyle='#334155';ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=120;i++){const p=pointAt(i/120,v);if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y)}ctx.stroke();ctx.restore();
+    const t=state.running?state.phase:.48,p=pointAt(t,v),tan=tangentAt(t,v),e=forceEnd(p,v);
+    ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(p.x,p.y,13,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();
+    arrow(p.x,p.y,p.x+tan.x*(55+state.v*4),p.y+tan.y*(55+state.v*4),colors.blue,3);text('v 切线',p.x+tan.x*92,p.y+tan.y*92,colors.blue,'center',13,'900');
+    arrow(p.x,p.y,e.x,e.y,colors.red,4);text('F合',e.x+12,e.y-10,colors.red,'left',13,'900');
+    ctx.save();ctx.fillStyle=state.drag==='forceVector'?'#fde68a':'#fff';ctx.strokeStyle=state.drag==='forceVector'?'#d97706':colors.red;ctx.lineWidth=3;ctx.beginPath();ctx.arc(e.x,e.y,9,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();
+    if(Math.abs(v.Fp)>.25)arrow(p.x,p.y,p.x+Math.sign(v.Fp)*Math.min(96,Math.abs(v.Fp)*3),p.y,colors.green,3);
+    if(Math.abs(v.Fn)>.25)arrow(p.x,p.y,p.x,p.y-Math.min(118,Math.abs(v.Fn)*3),colors.purple,3);
+    text('F∥ 改速率',p.x+v.Fp*1.5,p.y+26,colors.green,'center',12,'900');
+    text('F⊥ 改方向',p.x-58,p.y-Math.min(76,Math.abs(v.Fn)*1.8),colors.purple,'center',12,'900');
+    text(v.curve?'轨迹弯向 F⊥ 一侧':'F⊥=0，轨迹仍是直线',312,426,v.curve?colors.purple:colors.orange,'center',14,'900');
+  }
+  function drawCases(v){
+    roundRect(612,70,250,158,8,'#f8fafc','#d7dee8');
+    text('共线 vs 不共线',737,96,'#0f172a','center',15,'900');
+    const rows=[['α=0°','直线加速'],['α=90°','只改变方向'],['α=180°','直线减速']];
+    rows.forEach((r,i)=>{const y=128+i*32;text(r[0],670,y,colors.ink,'center',12,'900');text(r[1],760,y,'#475569','center',12,'700')});
+    roundRect(612,256,250,108,8,'#fff','#d7dee8');
+    text('当前判定',737,284,'#0f172a','center',15,'900');
+    text(v.curve?'曲线运动':'直线运动',737,318,v.curve?colors.purple:colors.orange,'center',18,'900');
+    text(v.curve?'因为 F⊥ 不为 0':'因为 F⊥=0 或 F=0',737,346,'#475569','center',12,'700');
+  }
+  function update(v){els.fp.textContent=`${fmt(v.Fp)} N`;els.fn.textContent=`${fmt(v.Fn)} N`;els.angle.textContent=`${fmt(state.angle,0)}°`;els.type.textContent=v.curve?'曲线':'直线';els.status.className='status'+(v.curve?'':' warn');if(state.F===0)els.status.textContent='合力为 0：速度大小和方向都不变，物体做匀速直线运动。';else if(v.curve)els.status.textContent='合力与速度不共线：速度方向改变，轨迹弯向 F⊥ 一侧。';else els.status.textContent='合力与速度共线：只改变速度大小，轨迹仍为直线。';els.play.textContent=state.running?'暂停':'播放'}
+  function draw(){const v=values(),g0=geom();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('曲线运动条件实验台：看合力有没有垂直速度的分量',460,30,'#0f172a','center',19,'900');drawMotion(v);drawCases(v);roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(112,494,282,'F',colors.red);handle(g0.F.x,g0.F.y,`F=${fmt(state.F,0)}N`,state.drag==='F',colors.red);ruler(350,494,520,'v',colors.blue);handle(g0.v.x,g0.v.y,`v=${fmt(state.v)}`,state.drag==='v',colors.blue);ruler(620,494,830,'α',colors.purple);handle(g0.angle.x,g0.angle.y,`α=${fmt(state.angle,0)}°`,state.drag==='angle',colors.purple);update(v)}
+  function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+  function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+  function down(e){const p=pos(e),v=values(),obj=pointAt(state.running?state.phase:.48,v),fEnd=forceEnd(obj,v),g0=geom();if(near(p,fEnd,30))state.drag='forceVector';else if(near(p,g0.F,26))state.drag='F';else if(near(p,g0.v,26))state.drag='v';else if(near(p,g0.angle,26))state.drag='angle';else state.drag=null;if(state.drag){state.running=false;canvas.setPointerCapture(e.pointerId);move(e)}}
+  function move(e){if(!state.drag)return;const p=pos(e);if(state.drag==='F')state.F=clamp((p.x-112)/170*60,0,60);if(state.drag==='v')state.v=clamp(2+(p.x-350)/170*14,2,16);if(state.drag==='angle')state.angle=clamp((p.x-620)/210*180,0,180);if(state.drag==='forceVector'){const obj=pointAt(.48,values()),dx=p.x-obj.x,dy=obj.y-p.y,len=Math.hypot(dx,dy);state.F=clamp((len-38)/1.8,0,60);state.angle=clamp(Math.atan2(dy,dx)*180/Math.PI,0,180)}draw()}
+  function up(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
+  canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
+  els.play.addEventListener('click',()=>{state.running=!state.running;draw()});
+  document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='straight'){state.F=32;state.angle=0}if(c==='turn'){state.F=32;state.angle=90}if(c==='brake'){state.F=32;state.angle=180}if(c==='zero'){state.F=0;state.angle=60}draw()}));
+  function tick(){if(state.running){state.phase+=.004+state.v*.0007;if(state.phase>1)state.phase=0}draw();requestAnimationFrame(tick)}
+  draw();requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

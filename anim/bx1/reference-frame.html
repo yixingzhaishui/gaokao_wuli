@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>参考系实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#f7f9fc;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px;min-height:540px}
+  .stage{position:relative;background:#fff;border:1px solid #d9e2ec;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;aspect-ratio:940/560;touch-action:none}
+  .tip{position:absolute;left:14px;bottom:12px;background:rgba(16,42,67,.88);color:#d9e2ec;border-radius:7px;padding:6px 9px;font-size:12px;pointer-events:none}
+  .panel{display:flex;flex-direction:column;gap:6px}
+  .card{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:7px}
+  .task{background:#fff7e6;border-left:3px solid #f0a500;color:#486581;font-size:12px;line-height:1.35}
+  .title{font-weight:700;margin-bottom:4px}
+  .seg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}
+  .tabs{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+  button{border:1px solid #b0bcc9;background:#fff;border-radius:6px;padding:5px 7px;cursor:pointer;font:inherit;font-size:12px}
+  button:hover{background:#eef2f7}
+  button.active{background:#2c7be5;border-color:#2c7be5;color:#fff;font-weight:700}
+  .param{display:grid;gap:2px;margin:6px 0;font-size:13px}
+  .param span{display:flex;justify-content:space-between;color:#486581}
+  .param b{color:#102a43;font-variant-numeric:tabular-nums}
+  input[type=range]{width:100%;accent-color:#2c7be5}
+  .readout{background:#102a43;color:#d9e2ec;border-radius:8px;padding:8px;line-height:1.45;font-size:13px}
+  .readout b{color:#f0a500;font-variant-numeric:tabular-nums}
+  .formula{font-size:12px;line-height:1.35;color:#334e68}
+  .status{font-size:12px;font-weight:700;border-radius:6px;padding:7px;border:1px solid #38b2ac;background:#e6fffa;color:#087f5b;line-height:1.35}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.panel{display:grid;grid-template-columns:1fr 1fr}.task,.readout,.formula,.status{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage">
+    <canvas id="canvas" width="940" height="560" aria-label="参考系与相对速度交互实验台"></canvas>
+    <div class="tip">可拖动画面中的橙色速度端点，改变 vA、vB 或雨/人速度</div>
+  </div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>拖速度箭头，再切换参考系；看“对地速度”减去“参考系速度”后，绿色相对速度怎样改变。</div>
+    <div class="card">
+      <div class="title">实验类型</div>
+      <div class="tabs"><button id="tabLine" class="active">两车一维</button><button id="tabRain">雨中人二维</button></div>
+    </div>
+    <div class="card" id="controlCard"></div>
+    <div class="readout" id="readout"></div>
+    <div class="card formula" id="formula"></div>
+    <div class="status" id="status"></div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  let mode='line';
+  let frame='ground';
+  let vA=20, vB=8, t=0, running=true;
+  let vRain=4, vMan=3;
+  let drag=null, layout={};
+  const scale=5;
+
+  function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
+  function text(s,x,y,c,a,size,w){
+    ctx.fillStyle=c||'#102a43';
+    ctx.font=(w?w+' ':'')+(size||13)+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';
+    ctx.textAlign=a||'center';ctx.textBaseline='middle';ctx.fillText(s,x,y);
+  }
+  function line(x1,y1,x2,y2,c,w,dash){
+    ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w||2;ctx.setLineDash(dash||[]);
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();
+  }
+  function arrow(x1,y1,x2,y2,c,label,w){
+    const a=Math.atan2(y2-y1,x2-x1);
+    ctx.save();ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w||3;
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    if(Math.hypot(x2-x1,y2-y1)>6){
+      ctx.beginPath();ctx.moveTo(x2,y2);
+      ctx.lineTo(x2-11*Math.cos(a-.45),y2-11*Math.sin(a-.45));
+      ctx.lineTo(x2-11*Math.cos(a+.45),y2-11*Math.sin(a+.45));
+      ctx.closePath();ctx.fill();
+    }
+    if(label) text(label,(x1+x2)/2+8,(y1+y2)/2-12,c,'left',12,'700');
+    ctx.restore();
+  }
+  function box(x,y,w,h,fill,stroke,r){
+    ctx.save();ctx.fillStyle=fill;ctx.strokeStyle=stroke||'#d9e2ec';ctx.lineWidth=1.4;
+    ctx.beginPath();ctx.roundRect(x,y,w,h,r==null?8:r);ctx.fill();ctx.stroke();ctx.restore();
+  }
+  function handle(x,y,label){
+    ctx.save();ctx.fillStyle='#f0a500';ctx.strokeStyle='#7c5700';ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(x,y,9,0,Math.PI*2);ctx.fill();ctx.stroke();
+    text(label,x,y-20,'#7c5700','center',12,'700');ctx.restore();
+  }
+  function car(x,y,color,name){
+    box(x-28,y-16,56,28,color,'#334e68',5);
+    ctx.fillStyle='#334e68';
+    ctx.beginPath();ctx.arc(x-16,y+17,6,0,Math.PI*2);ctx.arc(x+16,y+17,6,0,Math.PI*2);ctx.fill();
+    text(name,x,y-1,'#fff','center',12,'700');
+  }
+  function frameV(){return frame==='ground'?0:(frame==='A'?vA:vB);}
+  function frameName(){return frame==='ground'?'地面':(frame==='A'?'车A':'车B');}
+  function worldX(v,base,span){return base+(((v*t*12)%span)+span)%span;}
+  function drawLineMode(){
+    const vf=frameV();
+    const relA=vA-vf, relB=vB-vf, relGround=0-vf;
+    ctx.clearRect(0,0,940,560);
+    text('参考系实验台：同一运动，换“观察者站在哪里”，速度读数就改变',470,30,'#102a43','center',18,'700');
+
+    box(42,58,856,180,'#f8fbff','#d9e2ec');
+    text('地面实验台：先测两个对象对地速度，橙色端点可拖动',470,82,'#334e68','center',14,'700');
+    const ox=190, yA=126, yB=184;
+    line(ox-35,yA,ox+260,yA,'#d9e2ec',2);line(ox-35,yB,ox+260,yB,'#d9e2ec',2);
+    car(ox-70,yA,'#2c7be5','A');car(ox-70,yB,'#e8590c','B');
+    arrow(ox,yA,ox+vA*scale,yA,'#2c7be5','vA/地='+vA+' m/s');
+    arrow(ox,yB,ox+vB*scale,yB,'#e8590c','vB/地='+vB+' m/s');
+    handle(ox+vA*scale,yA,'拖 vA');handle(ox+vB*scale,yB,'拖 vB');
+    layout.vA={x:ox+vA*scale,y:yA,ox,y:yA};
+    layout.vB={x:ox+vB*scale,y:yB,ox,y:yB};
+    const roadY=216;
+    line(560,roadY,860,roadY,'#aab8c2',4);
+    for(let i=0;i<7;i++) line(560+i*50,roadY-6,560+i*50,roadY+6,'#829ab1',1.5);
+    text('地面看到：A、B 按各自对地速度运动',710,105,'#486581','center',12,'700');
+    car(worldX(vA,560,270),roadY-36,'#2c7be5','A');
+    car(worldX(vB,560,270),roadY-76,'#e8590c','B');
+
+    box(42,258,856,178,'#fff','#d9e2ec');
+    text('所选参考系视图：站在 '+frameName()+' 上看，所有速度都要减去 v参/地='+vf+' m/s',470,282,'#334e68','center',14,'700');
+    const rows=[
+      ['A',vA,relA,324,'#2c7be5'],
+      ['B',vB,relB,374,'#e8590c'],
+      ['地面',0,relGround,424,'#7b8794']
+    ];
+    rows.forEach(r=>{
+      const name=r[0], vg=r[1], vr=r[2], y=r[3], color=r[4];
+      text(name,84,y,'#334e68','left',13,'700');
+      arrow(170,y-12,170+vg*scale,y-12,'rgba(90,107,123,.62)','对地 '+vg,2.4);
+      if(vf!==0) arrow(170+vg*scale,y-12,170+(vg-vf)*scale,y-12,'#c92a2a','减 v参',2.4);
+      arrow(170,y+15,170+vr*scale,y+15,'#1a7a1a','相对 '+vr,3);
+      text(vg+' - ('+vf+') = '+vr+' m/s',730,y,'#1a7a1a','center',13,'700');
+      if(name===frameName()) text('自己看自己：0',612,y,'#087f5b','center',12,'700');
+    });
+
+    box(168,462,604,48,'#e6fffa','#38b2ac');
+    text('公式绑定：v物/参 = v物/地 - v参/地。当前：vA/'+frameName()+' = '+vA+' - ('+vf+') = '+relA+' m/s',470,484,'#087f5b','center',14,'700');
+    setReadout([
+      ['参考系',frameName()],
+      ['vA/参',relA+' m/s'],
+      ['vB/参',relB+' m/s'],
+      ['地面/参',relGround+' m/s']
+    ]);
+    setFormula('灰箭头表示物体对地速度，红箭头表示要减掉的参考系速度，绿色箭头才是站在该参考系上看到的速度。');
+    setStatus(frame==='ground'?'以地面为参考系时，读数就是对地速度。':'参考系不是“真的不动”，而是被选作静止；其他物体速度都整体减去 '+vf+' m/s。');
+  }
+  function drawRainMode(){
+    ctx.clearRect(0,0,940,560);
+    const mag=Math.hypot(vMan,vRain);
+    const ang=Math.atan2(vMan,vRain)*180/Math.PI;
+    text('雨中人实验台：相对速度公式在二维中仍然是矢量相减',470,30,'#102a43','center',18,'700');
+    box(42,58,856,208,'#f8fbff','#d9e2ec');
+    line(80,222,420,222,'#aab8c2',3);
+    const px=210, py=222;
+    ctx.strokeStyle='#102a43';ctx.lineWidth=3;
+    ctx.beginPath();ctx.arc(px,py-56,9,0,Math.PI*2);ctx.moveTo(px,py-47);ctx.lineTo(px,py-18);ctx.moveTo(px,py-36);ctx.lineTo(px-14,py-26);ctx.moveTo(px,py-36);ctx.lineTo(px+16,py-28);ctx.moveTo(px,py-18);ctx.lineTo(px-10,py);ctx.moveTo(px,py-18);ctx.lineTo(px+13,py);ctx.stroke();
+    arrow(px,py-66,px+vMan*28,py-66,'#e8590c','v人/地='+vMan);
+    handle(px+vMan*28,py-66,'拖 v人');
+    layout.vMan={x:px+vMan*28,y:py-66,ox:px,y:py-66};
+    ctx.strokeStyle='rgba(44,123,229,.45)';ctx.lineWidth=2;
+    for(let i=0;i<7;i++){const rx=96+i*46;line(rx,82,rx,82+vRain*18,'rgba(44,123,229,.45)',2);}
+    handle(380,84+vRain*18,'拖 v雨');
+    arrow(380,84,380,84+vRain*18,'#2c7be5','v雨/地='+vRain);
+    layout.vRain={x:380,y:84+vRain*18,ox:380,y0:84};
+    ctx.strokeStyle='#1a7a1a';ctx.lineWidth=2.4;
+    for(let i=0;i<5;i++) line(px-52+i*24+vMan*8,py-120,px-52+i*24,py-120+vRain*22,'#1a7a1a',2.2);
+    text('人看到的雨是斜的',px,py-128,'#1a7a1a','center',12,'700');
+
+    box(500,78,336,168,'#fff','#d9e2ec');
+    text('矢量减法仪',668,102,'#334e68','center',14,'700');
+    const ox=670, oy=130;
+    arrow(ox,oy,ox,oy+vRain*24,'rgba(90,107,123,.68)','v雨/地');
+    arrow(ox,oy+vRain*24,ox-vMan*24,oy+vRain*24,'#c92a2a','-v人/地');
+    arrow(ox,oy,ox-vMan*24,oy+vRain*24,'#1a7a1a','v雨/人',3.5);
+    text('|v雨/人| = '+mag.toFixed(2)+' m/s',668,226,'#1a7a1a','center',13,'700');
+
+    box(96,300,748,76,'#fff7e6','#f0a500');
+    text('公式绑定：v雨/人 = v雨/地 - v人/地 = (0,-'+vRain+') - ('+vMan+',0) = (-'+vMan+',-'+vRain+')',470,326,'#9a6700','center',14,'700');
+    text('绿色箭头越斜，说明人在自己参考系中看到雨越“迎面”打来，伞要向前倾。',470,354,'#486581','center',13);
+    box(168,420,604,56,'#e6fffa','#38b2ac');
+    text('大小 = '+mag.toFixed(2)+' m/s，偏离竖直角 θ = '+ang.toFixed(1)+'°',470,448,'#087f5b','center',16,'700');
+    setReadout([
+      ['v雨/地',vRain+' m/s 向下'],
+      ['v人/地',vMan+' m/s 向东'],
+      ['|v雨/人|',mag.toFixed(2)+' m/s'],
+      ['偏离竖直',ang.toFixed(1)+'°']
+    ]);
+    setFormula('二维相对速度仍用同一个公式，只是速度是矢量。先分解成水平、竖直分量，再分别相减。');
+    setStatus('拖 v人 会看到绿色箭头更斜：不是雨变斜了，而是参考系换到奔跑的人身上。');
+  }
+  function setReadout(rows){
+    document.getElementById('readout').innerHTML=rows.map(r=>r[0]+'=<b>'+r[1]+'</b>').join('<br>');
+  }
+  function setFormula(s){document.getElementById('formula').innerHTML='<div class="title">公式和画面绑定</div><div>'+s+'</div>';}
+  function setStatus(s){document.getElementById('status').textContent=s;}
+  function draw(){layout={}; if(mode==='line') drawLineMode(); else drawRainMode();}
+  function controls(){
+    const el=document.getElementById('controlCard');
+    if(mode==='line'){
+      el.innerHTML='<div class="title">参考系</div><div class="seg"><button id="fGround">地面</button><button id="fA">车A</button><button id="fB">车B</button></div><div class="title" style="margin-top:8px">播放</div><button id="playBtn">'+(running?'暂停':'播放')+'</button>';
+      [['fGround','ground'],['fA','A'],['fB','B']].forEach(pair=>{
+        const b=document.getElementById(pair[0]);
+        b.classList.toggle('active',frame===pair[1]);
+        b.onclick=()=>{frame=pair[1];controls();draw();};
+      });
+      document.getElementById('playBtn').onclick=()=>{running=!running;controls();};
+    }else{
+      el.innerHTML='<div class="title">二维参数</div><label class="param"><span>雨速 v雨 <b id="rainText">'+vRain+' m/s</b></span><input id="rainSlider" type="range" min="1" max="8" step="0.5" value="'+vRain+'"></label><label class="param"><span>人速 v人 <b id="manText">'+vMan+' m/s</b></span><input id="manSlider" type="range" min="0" max="8" step="0.5" value="'+vMan+'"></label>';
+      document.getElementById('rainSlider').oninput=e=>{vRain=+e.target.value;controls();draw();};
+      document.getElementById('manSlider').oninput=e=>{vMan=+e.target.value;controls();draw();};
+    }
+  }
+  function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
+  canvas.addEventListener('pointerdown',e=>{
+    const p=pointer(e);
+    for(const k of Object.keys(layout)){
+      const h=layout[k];
+      if(Math.hypot(p.x-h.x,p.y-h.y)<28){drag=k;canvas.setPointerCapture(e.pointerId);break;}
+    }
+  });
+  canvas.addEventListener('pointermove',e=>{
+    const p=pointer(e);
+    if(drag){
+      if(drag==='vA') vA=Math.round(clamp((p.x-layout.vA.ox)/scale,-20,30));
+      if(drag==='vB') vB=Math.round(clamp((p.x-layout.vB.ox)/scale,-20,30));
+      if(drag==='vMan') vMan=Math.round(clamp((p.x-layout.vMan.ox)/28,0,8)*2)/2;
+      if(drag==='vRain') vRain=Math.round(clamp((p.y-layout.vRain.y0)/18,1,8)*2)/2;
+      controls();draw();return;
+    }
+    let hit=false;
+    for(const k of Object.keys(layout)){const h=layout[k]; if(Math.hypot(p.x-h.x,p.y-h.y)<28) hit=true;}
+    canvas.style.cursor=hit?'grab':'default';
+  });
+  window.addEventListener('pointerup',()=>{drag=null;canvas.style.cursor='default';});
+  document.getElementById('tabLine').onclick=()=>{mode='line';document.getElementById('tabLine').classList.add('active');document.getElementById('tabRain').classList.remove('active');controls();draw();};
+  document.getElementById('tabRain').onclick=()=>{mode='rain';document.getElementById('tabRain').classList.add('active');document.getElementById('tabLine').classList.remove('active');controls();draw();};
+  let last=performance.now();
+  function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(running&&mode==='line'){t+=dt;draw();}requestAnimationFrame(loop);}
+  controls();draw();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>原子核结构：Z、N、A</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 14px; align-items: stretch; }
+  canvas { width: 100%; height: 430px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  input { width: 100%; }
+  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.8; font-size: 14px; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
+  @media (max-width: 760px) { .stage { grid-template-columns: 1fr; } canvas { height: 360px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="680" height="430" aria-label="原子核结构模型"></canvas>
+    <section class="panel">
+      <label for="z">质子数 Z：<span id="zVal"></span></label>
+      <input id="z" type="range" min="1" max="10" value="6" step="1">
+      <label for="n">中子数 N：<span id="nVal"></span></label>
+      <input id="n" type="range" min="0" max="12" value="8" step="1">
+      <label for="ion">电离状态：<span id="ionVal"></span></label>
+      <input id="ion" type="range" min="-2" max="3" value="0" step="1">
+      <div id="readout" class="readout"></div>
+      <div class="hint">观察任务：固定 Z 改 N 看同位素；改变 Z 看元素改变；改变电离状态看电子数改变但原子核不变。</div>
+    </section>
+  </div>
+</div>
+<script>
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const els = {
+  z: document.getElementById('z'),
+  n: document.getElementById('n'),
+  ion: document.getElementById('ion'),
+  zVal: document.getElementById('zVal'),
+  nVal: document.getElementById('nVal'),
+  ionVal: document.getElementById('ionVal'),
+  readout: document.getElementById('readout')
+};
+const symbols = ['', 'H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne'];
+const names = ['', '氢', '氦', '锂', '铍', '硼', '碳', '氮', '氧', '氟', '氖'];
+function drawParticle(x, y, label, color) {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(x, y, 13, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = '700 12px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText(label, x, y + 4);
+}
+function draw() {
+  const z = Number(els.z.value);
+  const n = Number(els.n.value);
+  const ion = Number(els.ion.value);
+  const a = z + n;
+  const electrons = Math.max(0, z - ion);
+  const ionText = ion === 0 ? '中性' : ion > 0 ? ion + '+' : Math.abs(ion) + '-';
+  els.zVal.textContent = z;
+  els.nVal.textContent = n;
+  els.ionVal.textContent = ionText;
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#f7f9fc';
+  ctx.fillRect(0, 0, c.width, c.height);
+
+  ctx.fillStyle = '#fff7e6';
+  ctx.strokeStyle = '#f0a500';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(180, 205, 112, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  const total = z + n;
+  for (let i = 0; i < total; i++) {
+    const ring = Math.floor(i / 8);
+    const k = i % 8;
+    const radius = ring * 26;
+    const angle = k * Math.PI * 2 / Math.min(8, total);
+    const x = 180 + Math.cos(angle) * radius + (ring === 0 ? 0 : 0);
+    const y = 205 + Math.sin(angle) * radius;
+    if (i < z) drawParticle(x, y, 'p', '#e03131');
+    else drawParticle(x, y, 'n', '#2c7be5');
+  }
+  ctx.strokeStyle = '#829ab1';
+  ctx.setLineDash([6, 5]);
+  ctx.beginPath();
+  ctx.arc(180, 205, 150, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#2c7be5';
+  for (let i = 0; i < Math.min(electrons, 10); i++) {
+    const angle = i * Math.PI * 2 / Math.max(1, Math.min(electrons, 10));
+    ctx.beginPath();
+    ctx.arc(180 + Math.cos(angle) * 150, 205 + Math.sin(angle) * 150, 5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.fillStyle = '#486581';
+  ctx.font = '13px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('蓝点为核外电子；红 p 为质子，蓝 n 为中子', 180, 392);
+
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 34px system-ui';
+  ctx.textAlign = 'left';
+  ctx.fillText(a, 430, 132);
+  ctx.fillText(z, 430, 214);
+  ctx.font = '700 66px system-ui';
+  ctx.fillText(symbols[z], 486, 184);
+  ctx.font = '16px system-ui';
+  ctx.fillStyle = '#486581';
+  ctx.fillText(`元素：${names[z]}，核素：${names[z]}-${a}`, 430, 256);
+  ctx.fillText(`A=Z+N=${z}+${n}=${a}`, 430, 286);
+  ctx.fillText(`中性原子电子数=Z；当前电子数=${electrons}`, 430, 316);
+  ctx.fillText(`净电荷=${ionText}`, 430, 346);
+
+  els.readout.innerHTML = [
+    `Z=${z}：质子数，也是核电荷数，决定元素=${names[z]}`,
+    `N=${n}：中子数；A=Z+N=${a}`,
+    `核素符号：${a}/${z}${symbols[z]}，写作左上 A、左下 Z`,
+    `当前为${ionText}，电子数=${electrons}`
+  ].join('<br>');
+}
+Object.values(els).forEach(el => {
+  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
+});
+draw();
+</script>
+</body>
+</html>

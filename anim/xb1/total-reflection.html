@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>全反射</title>
+<link rel="stylesheet" href="../common/controls.css">
+<style>
+body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#f7f9fc;color:#1f2933}
+.container{padding:12px}
+h2{font-size:16px;margin:0 0 8px;color:#102a43}
+canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid #d9e2ec;border-radius:8px;touch-action:none;cursor:grab}
+.readouts{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0;font-size:13px}
+.readouts .r{background:#102a43;color:#d9e2ec;padding:6px 10px;border-radius:6px}
+.readouts .r b{color:#f0a500}
+.controls{display:flex;flex-wrap:wrap;gap:14px;margin:10px 0;align-items:center}
+.controls label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:#334e68}
+.controls input[type=range]{width:120px;accent-color:#2c7be5}
+.controls button{font:inherit;padding:6px 14px;border:1px solid #b0bcc9;background:#fff;border-radius:6px;cursor:pointer}
+.controls button:hover{background:#eef2f7}
+.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:8px 12px;border-radius:4px;font-size:13px;color:#486581;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>全反射：从光密到光疏，θ₁ ≥ C 时 sinC = 1/n</h2>
+  <canvas id="canvas" width="660" height="360"></canvas>
+  <div class="readouts">
+    <span class="r">入射角 θ₁ = <b id="i-v">30</b>°</span>
+    <span class="r">折射率 n = <b id="n-v">1.50</b></span>
+    <span class="r">临界角 C = <b id="c-v">—</b>°</span>
+    <span class="r">折射角 θ₂ = <b id="r-v">—</b></span>
+    <span class="r">状态：<b id="st-v">—</b></span>
+  </div>
+  <div class="controls">
+    <button id="play-btn">⏸ 暂停</button>
+    <label>入射角 θ₁ = <span id="i-d">30</span>°
+      <input type="range" id="i" min="0" max="89" step="1" value="30"></label>
+    <label>玻璃折射率 n = <span id="n-d">1.50</span>
+      <input type="range" id="n" min="1.1" max="2.4" step="0.05" value="1.5"></label>
+    <button id="reset-btn">重置</button>
+    <span style="font-size:13px;color:#486581">或直接拖橙色入射光线</span>
+  </div>
+  <div class="hint">
+    <p><b>观察任务</b>：光从玻璃（下，光密）射向空气（上，光疏）。直接拖<b>橙色入射光线</b>从小角度转到大角度：折射角 θ₂ 增长得更快，先冲到 90°。当 θ₁ 达到<b>临界角 C</b>（sinC=1/n）时折射光贴着界面；再大一点，蓝色折射光消失，光点被<b>全部反射</b>回玻璃——全反射。拖<b>n</b>变大，临界角 C 变小（更容易全反射，这正是光纤的原理）。</p>
+  </div>
+</div>
+<script>
+(function(){
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  let i=30,n=1.5,t=0,playing=true,dragRay=false;
+  const ix=W/2, iy=H/2, L=175;
+  const D=Math.PI/180;
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#eef5ff';ctx.fillRect(0,0,W,iy);       // air (top, sparse)
+    ctx.fillStyle='#d7e6f5';ctx.fillRect(0,iy,W,H-iy);    // glass (bottom, dense)
+    ctx.fillStyle='#5a7a99';ctx.font='12px sans-serif';ctx.textAlign='left';
+    ctx.fillText('空气 n=1（光疏）',12,20);ctx.fillText('玻璃 n（光密）',12,H-14);
+    ctx.strokeStyle='#334e68';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,iy);ctx.lineTo(W,iy);ctx.stroke();
+    // normal
+    ctx.strokeStyle='#98a8b8';ctx.setLineDash([6,4]);ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(ix,iy-150);ctx.lineTo(ix,iy+150);ctx.stroke();ctx.setLineDash([]);
+    const ir=i*D;
+    function arrow(x1,y1,x2,y2,col){ctx.strokeStyle=col;ctx.fillStyle=col;const a=Math.atan2(y2-y1,x2-x1);const mx=(x1+x2)/2,my=(y1+y2)/2;
+      ctx.beginPath();ctx.moveTo(mx,my);ctx.lineTo(mx-10*Math.cos(a-0.4),my-10*Math.sin(a-0.4));ctx.lineTo(mx-10*Math.cos(a+0.4),my-10*Math.sin(a+0.4));ctx.closePath();ctx.fill();}
+    // 入射点 O 辉光真实感
+    const glow=ctx.createRadialGradient(ix,iy,1,ix,iy,55);glow.addColorStop(0,'rgba(255,209,102,0.55)');glow.addColorStop(1,'rgba(255,209,102,0)');
+    ctx.fillStyle=glow;ctx.beginPath();ctx.arc(ix,iy,55,0,7);ctx.fill();
+    // incident from lower-left in glass
+    const sx=ix - L*Math.sin(ir), sy=iy + L*Math.cos(ir);
+    ctx.strokeStyle='#e8590c';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(ix,iy);ctx.stroke();arrow(sx,sy,ix,iy,'#e8590c');
+    // critical angle
+    const C=Math.asin(1/n);
+    const nearCritical=Math.abs(ir-C)<0.8*D;
+    const total = ir>C+0.2*D;
+    const sinr=n*Math.sin(ir);
+    const r2=Math.asin(Math.min(1,sinr));
+    // reflected ray (always present; strong if total)
+    const rx=ix + L*Math.sin(ir), ry=iy + L*Math.cos(ir);
+    ctx.strokeStyle= total?'#e8590c':'rgba(232,89,12,0.4)';ctx.lineWidth= total?3:1.5;
+    ctx.beginPath();ctx.moveTo(ix,iy);ctx.lineTo(rx,ry);ctx.stroke();if(total)arrow(ix,iy,rx,ry,'#e8590c');
+    // refracted ray into air if not total
+    if(!total){
+      const ex=ix + L*Math.sin(r2), ey=iy - L*Math.cos(r2);
+      ctx.strokeStyle=nearCritical?'#1971c2':'#1971c2';ctx.lineWidth=nearCritical?4:3;ctx.beginPath();ctx.moveTo(ix,iy);ctx.lineTo(ex,ey);ctx.stroke();arrow(ix,iy,ex,ey,'#1971c2');
+      ctx.fillStyle='#1971c2';ctx.font='12px sans-serif';ctx.fillText('θ₂='+(r2/D).toFixed(0)+'°',ex+4,ey);
+    } else {
+      ctx.fillStyle='#c92a2a';ctx.font='bold 14px sans-serif';ctx.textAlign='center';
+      ctx.fillText('全反射！无折射光',ix,iy-60);ctx.textAlign='left';
+    }
+    // critical angle guide line
+    ctx.strokeStyle='rgba(21,113,194,0.5)';ctx.setLineDash([3,3]);ctx.lineWidth=1.5;
+    const gx=ix - L*Math.sin(C), gy=iy + L*Math.cos(C);
+    ctx.beginPath();ctx.moveTo(ix,iy);ctx.lineTo(gx,gy);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#1971c2';ctx.font='11px sans-serif';ctx.fillText('C',gx-14,gy);
+    // moving light pulses make the process visible, not just the final ray diagram.
+    if(playing){
+      const phase=(t*0.55)%1;
+      function dotOn(x1,y1,x2,y2,f,col,rad){ctx.fillStyle=col;ctx.beginPath();ctx.arc(x1+(x2-x1)*f,y1+(y2-y1)*f,rad,0,Math.PI*2);ctx.fill();}
+      dotOn(sx,sy,ix,iy,phase,'#ffd166',4.2);
+      if(phase>0.45){
+        const f=(phase-0.45)/0.55;
+        if(total){
+          dotOn(ix,iy,rx,ry,f,'#ff922b',4.5);
+        }else{
+          const ex=ix + L*Math.sin(r2), ey=iy - L*Math.cos(r2);
+          dotOn(ix,iy,ex,ey,f,'#74c0fc',4.2);
+          dotOn(ix,iy,rx,ry,f,'rgba(255,146,43,.45)',3.2);
+        }
+      }
+    }
+    // formula
+    ctx.fillStyle='#243b53';ctx.font='13px sans-serif';ctx.textAlign='left';
+    ctx.fillText('sinC = 1/n = '+(1/n).toFixed(3)+'  → C = '+(C/D).toFixed(1)+'°；θ₁'+(total?'≥':'<')+'C',18,H-14);
+    document.getElementById('i-v').textContent=i;
+    document.getElementById('n-v').textContent=n.toFixed(2);
+    document.getElementById('c-v').textContent=(C/D).toFixed(1);
+    document.getElementById('r-v').textContent=total?'无折射':(nearCritical?'90.0°':(r2/D).toFixed(1)+'°');
+    document.getElementById('st-v').textContent= total?'全反射':(nearCritical?'临界：折射光贴界面':'折射+部分反射');
+  }
+  function sync(){document.getElementById('i').value=i;document.getElementById('n').value=n;document.getElementById('i-d').textContent=i;document.getElementById('n-d').textContent=n.toFixed(2);}
+  function pos(e){const r=canvas.getBoundingClientRect(),s=canvas.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s};}
+  canvas.addEventListener('pointerdown',e=>{const p=pos(e);if(p.y>iy&&Math.hypot(p.x-ix,p.y-iy)>28){dragRay=true;canvas.setPointerCapture(e.pointerId);}});
+  canvas.addEventListener('pointermove',e=>{if(!dragRay)return;const p=pos(e);const ang=Math.atan2(ix-p.x,p.y-iy);i=Math.max(0,Math.min(89,Math.round(ang/D)));sync();draw();});
+  canvas.addEventListener('pointerup',()=>{dragRay=false;});
+  canvas.addEventListener('pointercancel',()=>{dragRay=false;});
+  function bind(id,cb){document.getElementById(id).addEventListener('input',e=>{cb(parseFloat(e.target.value));draw();});}
+  bind('i',v=>{i=v;document.getElementById('i-d').textContent=v;});
+  bind('n',v=>{n=v;document.getElementById('n-d').textContent=v.toFixed(2);});
+  document.getElementById('play-btn').addEventListener('click',e=>{playing=!playing;e.currentTarget.textContent=playing?'⏸ 暂停':'▶ 播放';draw();});
+  document.getElementById('reset-btn').addEventListener('click',()=>{i=30;n=1.5;t=0;sync();draw();});
+  let last=performance.now();
+  function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;if(playing)t+=dt;draw();requestAnimationFrame(loop);}
+  sync();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

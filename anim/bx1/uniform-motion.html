@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>B1-09 匀速直线运动实验台</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#f4f7fb;color:#243b53;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+  .wrap{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px}
+  .stage{position:relative;background:#fff;border:1px solid #d9e2ec;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;aspect-ratio:940/560;touch-action:none}
+  .hint{position:absolute;left:14px;bottom:12px;background:#243b53;color:white;border-radius:6px;padding:7px 10px;font-size:12px}
+  .panel{display:flex;flex-direction:column;gap:8px}
+  .box{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:9px}
+  .task{background:#fff8e6;border-color:#f0a202;font-size:13px;line-height:1.5}
+  .buttons{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #bcccdc;background:white;color:#243b53;border-radius:6px;padding:8px 6px;font-weight:700;cursor:pointer}
+  button.active{background:#2f80ed;color:white;border-color:#2f80ed}
+  .readout{background:#102a43;color:white;border-radius:7px;padding:10px;font-size:13px;line-height:1.65;font-weight:700}
+  .readout b{color:#ffd166}
+  .formula{font-size:13px;line-height:1.55}
+  .warn{border-color:#f0a202;color:#7c4d00;background:#fff8e6;font-size:13px;line-height:1.5;font-weight:700}
+  @media (max-width:850px){.wrap{grid-template-columns:1fr}.panel{grid-row:2}.hint{position:static;border-radius:0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="canvas" width="940" height="560" aria-label="匀速直线运动交互实验台"></canvas>
+    <div class="hint">可拖动起点旗、小车和 x-t 图上的橙色时间游标</div>
+  </div>
+  <div class="panel">
+    <div class="box task"><b>观察任务：</b>拖小车改变速度，看频闪点是否仍等间距；拖时间游标，看小车沿同一条直线匀速推进；打开对比，比较橙色匀加速点的间距变化。</div>
+    <div class="box">
+      <b>情境</b>
+      <div class="buttons" style="margin-top:7px">
+        <button id="mForward" class="active">正向匀速</button><button id="mBackward">负向匀速</button>
+        <button id="mStill">静止</button><button id="mCompare">对比匀加速</button>
+      </div>
+    </div>
+    <div class="box"><button id="play" style="width:100%">▶ 播放运动</button></div>
+    <div class="readout" id="readout"></div>
+    <div class="box formula">
+      <b>公式绑定</b><br>
+      位置：x=x0+vt。<br>
+      位移：Δx=vt。<br>
+      x-t 图斜率=v；v-t 图水平线高度=v，斜率 a=0。
+    </div>
+    <div class="box warn" id="status"></div>
+  </div>
+</div>
+<script>
+(() => {
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const readout=document.getElementById('readout');
+  const status=document.getElementById('status');
+  const buttons={
+    forward:document.getElementById('mForward'),
+    backward:document.getElementById('mBackward'),
+    still:document.getElementById('mStill'),
+    compare:document.getElementById('mCompare')
+  };
+  const state={x0:-8,v:4,t:4,compare:false,mode:'forward'};
+  const track={x:82,y:128,w:730,min:-30,max:45};
+  const gx={ox:82,oy:430,w:360,h:230,tMax:8,xMin:-35,xMax:50};
+  const gv={ox:520,oy:430,w:300,h:160,tMax:8,vMin:-8,vMax:10};
+  let drag=null, layout={};
+
+  function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
+  function xNow(){return state.x0+state.v*state.t;}
+  function pxOf(x){return track.x+(x-track.min)/(track.max-track.min)*track.w;}
+  function xOfPx(px){return clamp(track.min+(px-track.x)/track.w*(track.max-track.min),track.min,track.max);}
+  function gxX(t){return gx.ox+t/gx.tMax*gx.w;}
+  function gxY(x){return gx.oy-(x-gx.xMin)/(gx.xMax-gx.xMin)*gx.h;}
+  function gvX(t){return gv.ox+t/gv.tMax*gv.w;}
+  function gvY(v){return gv.oy-(v-gv.vMin)/(gv.vMax-gv.vMin)*gv.h;}
+  function tFromGx(px){return clamp((px-gx.ox)/gx.w*gx.tMax,0.5,gx.tMax);}
+  function setMode(mode){
+    if(mode==='compare'){
+      state.compare=!state.compare;
+      buttons.compare.classList.toggle('active',state.compare);
+      draw(); return;
+    }
+    state.mode=mode; state.compare=false;
+    if(mode==='forward'){state.x0=-8;state.v=4;state.t=4;}
+    if(mode==='backward'){state.x0=20;state.v=-3;state.t=4;}
+    if(mode==='still'){state.x0=6;state.v=0;state.t=4;}
+    Object.entries(buttons).forEach(([k,b])=>b.classList.toggle('active',k===mode));
+    draw();
+  }
+  Object.entries(buttons).forEach(([k,b])=>b.addEventListener('click',()=>setMode(k)));
+
+  function line(x1,y1,x2,y2,color,width=1){
+    ctx.strokeStyle=color;ctx.lineWidth=width;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  }
+  function text(s,x,y,color='#243b53',size=13,align='left',weight='600'){
+    ctx.fillStyle=color;ctx.font=`${weight} ${size}px system-ui`;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(s,x,y);
+  }
+  function arrow(x1,y1,x2,y2,color,width=3){
+    line(x1,y1,x2,y2,color,width);
+    const a=Math.atan2(y2-y1,x2-x1),l=10;
+    ctx.beginPath();ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-l*Math.cos(a-0.55),y2-l*Math.sin(a-0.55));
+    ctx.lineTo(x2-l*Math.cos(a+0.55),y2-l*Math.sin(a+0.55));
+    ctx.closePath();ctx.fillStyle=color;ctx.fill();
+  }
+  function handle(x,y,label,color){
+    ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();
+    ctx.strokeStyle='white';ctx.lineWidth=3;ctx.stroke();
+    text(label,x+14,y-15,color,13);
+  }
+  function drawCard(x,y,w,h){
+    ctx.fillStyle='#f7fbff';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1;
+    ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();
+  }
+  function drawTrack(){
+    drawCard(50,36,835,150);
+    line(track.x,track.y,track.x+track.w,track.y,'#9fb3c8',4);
+    for(let m=-30;m<=45;m+=5){
+      const px=pxOf(m); line(px,track.y-9,px,track.y+9,'#bcccdc');
+      if(m%10===0) text(String(m),px,track.y+27,'#7b8794',11,'center','500');
+    }
+    const p0=pxOf(state.x0), p=pxOf(xNow());
+    line(p0,track.y-42,p0,track.y+18,'#12b886',2);
+    ctx.fillStyle='#12b886';ctx.beginPath();ctx.moveTo(p0,track.y-42);ctx.lineTo(p0+28,track.y-33);ctx.lineTo(p0,track.y-24);ctx.closePath();ctx.fill();
+    text('x0',p0+32,track.y-32,'#0b7285',13);
+    const strobeDt=0.5, n=Math.floor(state.t/strobeDt);
+    for(let i=0;i<=n;i++){
+      const tt=i*strobeDt, px=pxOf(state.x0+state.v*tt);
+      if(px>=track.x&&px<=track.x+track.w){ctx.fillStyle='#2f80ed';ctx.beginPath();ctx.arc(px,track.y-10,4.5,0,Math.PI*2);ctx.fill();}
+    }
+    if(state.compare&&Math.abs(state.v)>0.1){
+      const dx=state.v*state.t, a=2*dx/(state.t*state.t);
+      for(let i=0;i<=n;i++){
+        const tt=i*strobeDt, px=pxOf(state.x0+0.5*a*tt*tt);
+        if(px>=track.x&&px<=track.x+track.w){ctx.fillStyle='#f08c00';ctx.beginPath();ctx.arc(px,track.y-31,4.5,0,Math.PI*2);ctx.fill();}
+      }
+      text('橙=匀加速：相同 Δt 内间距逐渐变大',470,59,'#e8590c',13,'center','800');
+    }else{
+      text('蓝=匀速频闪：相同 Δt 内 Δx 完全相等',470,59,'#2f80ed',13,'center','800');
+    }
+    ctx.fillStyle='#2f80ed';ctx.beginPath();ctx.roundRect(p-24,track.y-47,48,26,6);ctx.fill();
+    ctx.fillStyle='#243b53';ctx.beginPath();ctx.arc(p-15,track.y-19,5,0,Math.PI*2);ctx.arc(p+15,track.y-19,5,0,Math.PI*2);ctx.fill();
+    if(Math.abs(state.v)>0.05) arrow(p,track.y-58,p+Math.sign(state.v)*clamp(Math.abs(state.v)*14,22,96),track.y-58,'#e8590c',4);
+    text(`x=${xNow().toFixed(1)} m，Δx=${(state.v*state.t).toFixed(1)} m，v=${state.v.toFixed(1)} m/s`,470,88,'#0b7285',14,'center','800');
+    handle(p0,track.y+54,'起点','#12b886');
+    handle(p,track.y+54,'小车','#2f80ed');
+    layout.x0={x:p0,y:track.y+54}; layout.car={x:p,y:track.y+54};
+  }
+  function drawAxesBox(){
+    drawCard(50,210,400,288);
+    drawCard(488,210,360,288);
+    line(gx.ox,gx.oy,gx.ox+gx.w+22,gx.oy,'#334e68',2);
+    line(gx.ox,gx.oy,gx.ox,gx.oy-gx.h-18,'#334e68',2);
+    text('t/s',gx.ox+gx.w+34,gx.oy+5,'#334e68',12); text('x/m',gx.ox-32,gx.oy-gx.h-20,'#334e68',12);
+    for(let t=0;t<=8;t+=2){const x=gxX(t);line(x,gx.oy-5,x,gx.oy+5,'#9fb3c8');text(String(t),x,gx.oy+18,'#627d98',11,'center','500');}
+    for(let x=-20;x<=40;x+=20){const y=gxY(x);line(gx.ox-5,y,gx.ox+gx.w,y,x===0?'#7b8794':'#d9e2ec',x===0?1.7:1);text(String(x),gx.ox-13,y,'#627d98',11,'right','500');}
+    line(gv.ox,gv.oy,gv.ox+gv.w+22,gv.oy,'#334e68',2);
+    line(gv.ox,gv.oy,gv.ox,gv.oy-gv.h-18,'#334e68',2);
+    text('t/s',gv.ox+gv.w+34,gv.oy+5,'#334e68',12); text('v/(m/s)',gv.ox-42,gv.oy-gv.h-20,'#334e68',12);
+    for(let t=0;t<=8;t+=2){const x=gvX(t);line(x,gv.oy-5,x,gv.oy+5,'#9fb3c8');text(String(t),x,gv.oy+18,'#627d98',11,'center','500');}
+    for(let v=-6;v<=8;v+=2){const y=gvY(v);line(gv.ox-5,y,gv.ox+gv.w,y,v===0?'#7b8794':'#d9e2ec',v===0?1.7:1);if(v%4===0)text(String(v),gv.ox-13,y,'#627d98',11,'right','500');}
+  }
+  function drawGraphs(){
+    const p0={x:gxX(0),y:gxY(state.x0)}, p={x:gxX(state.t),y:gxY(xNow())};
+    line(p0.x,p0.y,gxX(8),gxY(state.x0+state.v*8),'#2f80ed',3);
+    line(p.x,gx.oy,p.x,p.y,'#f08c00',2);
+    line(gx.ox,p.y,p.x,p.y,'#8ab4ff',1.5);
+    handle(p.x,p.y,'t','#f08c00'); layout.time={x:p.x,y:p.y};
+    text(`x-t 斜率 v=${state.v.toFixed(1)} m/s`,gx.ox+92,gx.oy-gx.h-2,'#2f80ed',13,'center','800');
+    if(state.compare&&Math.abs(state.v)>0.1){
+      const dx=state.v*state.t, a=2*dx/(state.t*state.t);
+      ctx.beginPath();
+      for(let i=0;i<=80;i++){const tt=8*i/80, xx=state.x0+0.5*a*tt*tt, sx=gxX(tt), sy=gxY(xx); if(i===0)ctx.moveTo(sx,sy); else ctx.lineTo(sx,sy);}
+      ctx.strokeStyle='#f08c00';ctx.lineWidth=2;ctx.stroke();
+      text('橙曲线：非匀速',gx.ox+225,gx.oy-gx.h+23,'#e8590c',12,'center','700');
+    }
+    const vy=gvY(state.v);
+    ctx.fillStyle=state.v>=0?'rgba(240,140,0,0.22)':'rgba(44,123,229,0.20)';
+    ctx.beginPath();ctx.rect(gv.ox,Math.min(vy,gvY(0)),gvX(state.t)-gv.ox,Math.abs(gvY(0)-vy));ctx.fill();
+    line(gv.ox,vy,gv.ox+gv.w,vy,'#2f80ed',3);
+    line(gvX(state.t),gvY(0),gvX(state.t),vy,'#f08c00',2);
+    handle(gvX(state.t),vy,'面积','#f08c00');
+    text('v-t 水平线：a=0',gv.ox+115,gv.oy-gv.h-2,'#2f80ed',13,'center','800');
+    text(`面积=Δx=${(state.v*state.t).toFixed(1)} m`,gv.ox+120,gv.oy+48,'#f08c00',13,'center','800');
+  }
+  function draw(){
+    var _bg=ctx.createLinearGradient(0,0,0,560);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,940,560); layout={};
+    drawTrack(); drawAxesBox(); drawGraphs();
+    const gap=state.v*0.5;
+    readout.innerHTML=`x0=<b>${state.x0.toFixed(1)}</b> m<br>t=<b>${state.t.toFixed(2)}</b> s<br>x=<b>${xNow().toFixed(2)}</b> m<br>v=<b>${state.v.toFixed(2)}</b> m/s<br>a=<b>0.00</b> m/s²<br>每 0.5 s 间距=<b>${gap.toFixed(2)}</b> m`;
+    if(Math.abs(state.v)<0.03) status.textContent='v=0：频闪点重合，x-t 图是水平线，这叫静止，不是“有速度的匀速”。';
+    else if(state.v<0) status.textContent='v<0：小车沿负方向匀速，频闪仍等间距；x-t 斜率和 v-t 高度都为负。';
+    else if(state.compare) status.textContent='对比模式：蓝点等间距、橙点间距变大；同样是直线轨道，速度规律完全不同。';
+    else status.textContent='判断匀速看“相同时间内位移相同”：频闪等间距、x-t 直线、v-t 水平线三者一致。';
+  }
+  function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
+  canvas.addEventListener('pointerdown',e=>{
+    const p=pointer(e);
+    for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30){drag=k;canvas.setPointerCapture(e.pointerId);break;}}
+  });
+  canvas.addEventListener('pointermove',e=>{
+    const p=pointer(e);
+    if(drag==='x0'){state.x0=Math.round(xOfPx(p.x)*10)/10;}
+    if(drag==='car'){state.v=Math.round(((xOfPx(p.x)-state.x0)/state.t)*10)/10;}
+    if(drag==='time'){state.t=Math.round(tFromGx(p.x)*20)/20;}
+    if(drag){draw();return;}
+    let hit=false;for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30)hit=true;}
+    canvas.style.cursor=hit?'grab':'default';
+  });
+  window.addEventListener('pointerup',()=>{drag=null;canvas.style.cursor='default';});
+  const playBtn=document.getElementById('play');let running=false,last=performance.now();
+  playBtn.addEventListener('click',()=>{if(state.t>=8)state.t=0;running=!running;playBtn.textContent=running?'⏸ 暂停':'▶ 播放运动';});
+  canvas.addEventListener('pointerdown',()=>{if(running){running=false;playBtn.textContent='▶ 播放运动';}});
+  function loop(now){const dt=Math.min((now-last)/1000,.05);last=now;if(running){state.t=Math.min(8,state.t+dt);if(state.t>=8){running=false;playBtn.textContent='▶ 重新播放';}draw();}requestAnimationFrame(loop);}
+  draw();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>竖直圆周临界实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#edf3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px;min-height:560px}
+  .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;touch-action:none}
+  .panel{display:flex;flex-direction:column;gap:8px}
+  .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
+  .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.45}
+  .title{font-weight:800;margin-bottom:5px;color:#0f172a}
+  .chips,.mode{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:31px;cursor:pointer;color:#102a43}
+  button.active,.primary{background:#2563eb;color:#fff;border-color:#2563eb;font-weight:800}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:48px}
+  .meter span{display:block;font-size:11px;color:#b6c5d8}
+  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:16px;font-variant-numeric:tabular-nums}
+  .formula{display:grid;gap:5px;font-size:13px;color:#334155}
+  .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
+  .formula div:last-child{border-bottom:0;padding-bottom:0}
+  .formula b{white-space:nowrap;color:#0f172a}
+  .small{font-size:12px;line-height:1.5;color:#475569}
+  .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
+  .status.warn{border-color:#f59e0b;background:#fff7ed;color:#b45309}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="竖直圆周临界交互实验台"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>抓最高点蓝色 v_top 箭头向左/右拖，看绳模型何时松弛；切到杆模型，看低速时杆如何向上托。</div>
+    <button id="playBtn" class="primary">播放</button>
+    <div class="card">
+      <div class="title">模型与情境</div>
+      <div class="mode"><button id="ropeBtn" class="active">绳模型</button><button id="rodBtn">杆模型</button></div>
+      <div class="chips" style="margin-top:6px">
+        <button data-case="critical">恰好临界</button>
+        <button data-case="fast">速度更大</button>
+        <button data-case="slow">低速</button>
+        <button data-case="largeR">大半径</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="title">实时读数</div>
+      <div class="readout">
+        <div class="meter"><span>临界速度 √gr</span><b id="critText">3.13 m/s</b></div>
+        <div class="meter"><span>约束力</span><b id="forceText">0.2 N</b></div>
+        <div class="meter"><span>底端速度</span><b id="bottomVText">7.06 m/s</b></div>
+        <div class="meter"><span>底端拉力</span><b id="bottomFText">29.8 N</b></div>
+      </div>
+    </div>
+    <div class="card formula">
+      <div><span>最高点</span><b>mg+N=mv²/r</b></div>
+      <div><span>绳临界</span><b>N=0, v=√gr</b></div>
+      <div><span>底端能量</span><b>v底²=v顶²+4gr</b></div>
+    </div>
+    <div class="card small"><b>可直接操作：</b>抓顶端蓝色速度箭头、橙色半径手柄，或拖底部 m、r、v_top、位置手柄。多视角：左侧是侧视圆周轨道，右侧是最高点受力图像记录和临界读数。</div>
+    <div class="status" id="status">最高点向心方向向下，先看约束力能不能取到。</div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'),G=9.8;
+  const state={m:.5,r:1,v:3.2,mode:'rope',phase:-Math.PI/2,running:false,drag:null};
+  const els={crit:document.getElementById('critText'),force:document.getElementById('forceText'),bottomV:document.getElementById('bottomVText'),bottomF:document.getElementById('bottomFText'),status:document.getElementById('status'),play:document.getElementById('playBtn'),rope:document.getElementById('ropeBtn'),rod:document.getElementById('rodBtn')};
+  const colors={red:'#dc2626',blue:'#2563eb',purple:'#7c3aed',green:'#0f766e',orange:'#f59e0b',ink:'#102a43'};
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  const fmt=(v,d=2)=>Math.abs(v)<1e-6?(0).toFixed(d):v.toFixed(d);
+  function values(){const crit=Math.sqrt(G*state.r),N=state.m*(state.v*state.v/state.r-G),canPass=state.mode==='rod'||N>=-1e-9,bottomV=Math.sqrt(state.v*state.v+4*G*state.r),bottomF=state.m*(G+bottomV*bottomV/state.r);return{crit,N,canPass,bottomV,bottomF}}
+  function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){ctx.fillStyle=c;ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+  function line(x1,y1,x2,y2,c='#94a3b8',w=2,dash){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
+  function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore()}
+  function roundRect(x,y,w,h,r,fill,stroke){ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}ctx.restore()}
+  function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-36,c,'center',12,'900')}
+  function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-20,active?'#92400e':c,'center',12,'900');ctx.restore()}
+  function geom(){return{m:{x:94+(state.m-.2)/1.8*145,y:494},r:{x:292+(state.r-.3)/1.7*145,y:494},v:{x:494+state.v/8*160,y:494},phase:{x:740+(state.phase+Math.PI)/(Math.PI*2)*110,y:494}}}
+  function circleGeom(){const O={x:298,y:260},R=clamp(state.r*118,56,188);return{O,R,top:{x:O.x,y:O.y-R},right:{x:O.x+R,y:O.y}}}
+  function drawTrack(vs){
+    roundRect(42,58,560,382,8,'#fff','#d7dee8');
+    const g=circleGeom(),O=g.O,R=g.R;
+    ctx.save();ctx.strokeStyle=state.mode==='rope'?'#94a3b8':'#334155';ctx.lineWidth=state.mode==='rope'?2:5;if(state.mode==='rope')ctx.setLineDash([7,5]);ctx.beginPath();ctx.arc(O.x,O.y,R,0,Math.PI*2);ctx.stroke();ctx.restore();
+    const a=vs.canPass?state.phase:-Math.PI/2,bx=O.x+R*Math.cos(a),by=O.y+R*Math.sin(a),tx=-Math.sin(a),ty=Math.cos(a);
+    line(O.x,O.y,bx,by,'#d7dee8',2);
+    arrow(bx,by,bx+tx*64,by+ty*64,colors.green,3);text('v',bx+tx*78,by+ty*78,colors.green,'center',13,'900');
+    arrow(bx,by,bx,by+58,colors.red,3);text('mg',bx+22,by+46,colors.red,'left',13,'900');
+    ctx.fillStyle=vs.canPass?colors.blue:colors.orange;ctx.beginPath();ctx.arc(bx,by,12,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();
+    const top=g.top,vEnd={x:top.x+48+state.v*14,y:top.y};
+    arrow(top.x,top.y,vEnd.x,vEnd.y,colors.blue,4);text(`v_top=${fmt(state.v,1)}`,vEnd.x+10,vEnd.y-12,colors.blue,'left',13,'900');
+    ctx.save();ctx.fillStyle=state.drag==='vTop'?'#fde68a':'#fff';ctx.strokeStyle=state.drag==='vTop'?'#d97706':colors.blue;ctx.lineWidth=3;ctx.beginPath();ctx.arc(vEnd.x,vEnd.y,8,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();
+    line(O.x,O.y,g.right.x,g.right.y,colors.orange,3);handle(g.right.x,g.right.y,'r',state.drag==='radiusDirect',colors.orange);
+    text(state.mode==='rope'?'绳：约束力不能为负':'杆/管：约束力可向下拉，也可向上托',298,424,vs.canPass?'#475569':'#b45309','center',13,'900');
+  }
+  function drawTopForce(vs){
+    roundRect(636,76,228,132,8,'#f8fafc','#d7dee8');text('最高点判定',750,104,'#0f172a','center',15,'900');
+    const x=750,y=142;ctx.fillStyle=vs.canPass?colors.blue:colors.orange;ctx.beginPath();ctx.arc(x,y,11,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();
+    arrow(x,y,x,y+42,colors.red,3);text('mg',x+22,y+35,colors.red,'left',12,'900');
+    if(state.mode==='rope'){
+      if(vs.N>=0){arrow(x-25,y,x-25,y+Math.min(56,24+vs.N*7),colors.purple,3);text('T向下',x-58,y+48,colors.purple,'center',12,'900')}
+      else{text('绳松弛',x,y+72,colors.orange,'center',15,'900')}
+    }else if(vs.N>=0){arrow(x-25,y,x-25,y+Math.min(56,24+vs.N*7),colors.purple,3);text('N向下',x-58,y+48,colors.purple,'center',12,'900')}
+    else{arrow(x-25,y,x-25,y-Math.min(56,24+Math.abs(vs.N)*7),colors.orange,3);text('N向上托',x-62,y-48,colors.orange,'center',12,'900')}
+    roundRect(636,266,228,108,8,'#fff','#d7dee8');text('关键比较',750,294,'#0f172a','center',15,'900');text(`v_top ${state.v>=vs.crit?'≥':'<'} √gr`,750,330,state.v>=vs.crit?colors.green:colors.orange,'center',18,'900');text(`√gr=${fmt(vs.crit)}m/s`,750,356,'#475569','center',12,'700');
+  }
+  function update(vs){els.crit.textContent=`${fmt(vs.crit)} m/s`;els.force.textContent=`${fmt(vs.N,1)} N`;els.bottomV.textContent=`${fmt(vs.bottomV)} m/s`;els.bottomF.textContent=`${fmt(vs.bottomF,1)} N`;els.rope.classList.toggle('active',state.mode==='rope');els.rod.classList.toggle('active',state.mode==='rod');els.status.className='status'+(state.mode==='rope'&&!vs.canPass?' warn':'');els.status.textContent=state.mode==='rope'&&!vs.canPass?'绳模型不能完整过顶：T 不能为负，绳会松弛。':state.mode==='rod'&&vs.N<0?'杆模型可低速过顶：最高点杆对球向上托。':'最高点向心条件满足，可以完成竖直圆周。';els.play.textContent=state.running?'暂停':'播放'}
+  function draw(){const vs=values(),g0=geom();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('竖直圆周临界实验台：最高点先判约束力能否存在',460,30,'#0f172a','center',19,'900');drawTrack(vs);drawTopForce(vs);roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(94,494,239,'m',colors.purple);handle(g0.m.x,g0.m.y,`m=${fmt(state.m,1)}`,state.drag==='m',colors.purple);ruler(292,494,437,'r',colors.orange);handle(g0.r.x,g0.r.y,`r=${fmt(state.r,1)}`,state.drag==='r',colors.orange);ruler(494,494,654,'v顶',colors.blue);handle(g0.v.x,g0.v.y,`v=${fmt(state.v,1)}`,state.drag==='v',colors.blue);ruler(740,494,850,'位置',colors.green);handle(g0.phase.x,g0.phase.y,'位置',state.drag==='phase',colors.green);update(vs)}
+  function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+  function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+  function directPoints(){const g=circleGeom(),top=g.top;return{radius:g.right,vTop:{x:top.x+48+state.v*14,y:top.y}}}
+  function down(e){const p=pos(e),g0=geom(),d=directPoints();if(near(p,d.vTop,28))state.drag='vTop';else if(near(p,d.radius,28))state.drag='radiusDirect';else if(near(p,g0.m,26))state.drag='m';else if(near(p,g0.r,26))state.drag='r';else if(near(p,g0.v,26))state.drag='v';else if(near(p,g0.phase,26))state.drag='phase';else state.drag=null;if(state.drag){state.running=false;canvas.setPointerCapture(e.pointerId);move(e)}}
+  function move(e){if(!state.drag)return;const p=pos(e),g=circleGeom();if(state.drag==='m')state.m=clamp(.2+(p.x-94)/145*1.8,.2,2);if(state.drag==='r')state.r=clamp(.3+(p.x-292)/145*1.7,.3,2);if(state.drag==='v')state.v=clamp((p.x-494)/160*8,0,8);if(state.drag==='phase')state.phase=clamp((p.x-740)/110*Math.PI*2-Math.PI,-Math.PI,Math.PI);if(state.drag==='vTop')state.v=clamp((p.x-g.top.x-48)/14,0,8);if(state.drag==='radiusDirect')state.r=clamp((p.x-g.O.x)/118,.3,2);draw()}
+  function up(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
+  canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
+  els.rope.addEventListener('click',()=>{state.mode='rope';draw()});els.rod.addEventListener('click',()=>{state.mode='rod';draw()});els.play.addEventListener('click',()=>{state.running=!state.running;draw()});
+  document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='critical'){state.r=1;state.v=Math.sqrt(G);state.mode='rope'}if(c==='fast'){state.r=1;state.v=4.6;state.mode='rope'}if(c==='slow'){state.r=1;state.v=2.1}if(c==='largeR'){state.r=1.8;state.v=3.2;state.mode='rope'}draw()}));
+  function tick(){const vs=values();if(state.running&&vs.canPass){state.phase=(state.phase+Math.max(.4,state.v/state.r)*.016)%(Math.PI*2)}draw();requestAnimationFrame(tick)}
+  draw();requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

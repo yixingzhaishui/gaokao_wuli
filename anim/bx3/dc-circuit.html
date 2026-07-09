@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>闭合电路仿真</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#eef2f7;color:#102a43}
+.wrap{padding:12px}
+h2{font-size:16px;margin:0 0 8px}
+canvas{display:block;width:100%;max-width:720px;background:#0e1a2b;border-radius:12px;box-shadow:0 2px 10px rgba(16,42,67,.12)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.chip{background:#102a43;color:#e6eef7;padding:6px 11px;border-radius:8px;font-size:13px}
+.chip b{color:#ffd166}
+.ctrls{display:flex;flex-wrap:wrap;gap:16px;margin:8px 0;align-items:center}
+.ctrls label{display:flex;flex-direction:column;gap:2px;font-size:12px;color:#334e68}
+.ctrls input[type=range]{width:150px;accent-color:#2c7be5}
+.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:9px 12px;border-radius:6px;font-size:13px;color:#5a6b7b;line-height:1.5;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2>闭合电路：拖动滑块，看电流"流"起来、灯泡亮起来（E=I(R+r)，U=IR）</h2>
+  <canvas id="cv" width="720" height="420"></canvas>
+  <div class="chips">
+    <span class="chip">电流 I = E/(R+r) = <b id="cI">0</b> A</span>
+    <span class="chip">路端电压 U = IR = <b id="cU">0</b> V</span>
+    <span class="chip">灯泡功率 P = UI = <b id="cP">0</b> W</span>
+    <span class="chip">内阻分压 U内 = Ir = <b id="cUr">0</b> V</span>
+    <span class="chip">电路状态：<b id="cState">闭合</b></span>
+  </div>
+  <div class="ctrls">
+    <label>电动势 E = <span id="eLab">6.0</span> V<input type="range" id="E" min="1" max="12" step="0.5" value="6"></label>
+    <label>外电阻 R = <span id="rLab">5.0</span> Ω<input type="range" id="R" min="0.5" max="20" step="0.5" value="5"></label>
+    <label>内阻 r = <span id="riLab">0.5</span> Ω<input type="range" id="ri" min="0" max="3" step="0.1" value="0.5"></label>
+    <button class="hint" id="playBtn" style="cursor:pointer;border:1px solid #f0a500">⏸ 暂停电荷流动画</button>
+  </div>
+  <div class="hint"><b>怎么玩</b>：黄色小球是电路里定向移动的电荷，它们的<b>流速随电流大小实时变化</b>——电流越大流得越快、灯泡越亮。拖<b>R</b> 变大 → 电流变小、灯变暗、路端电压 U=IR 变大；拖<b>E</b> 变大 → 电流变大、灯变亮；拖<b>内阻 r</b> 变大 → 内部分压 Ir 增大、路端电压变小（这就是"电池用旧了灯变暗"）。安培表 A 读电流、电压表 V 读灯泡两端电压，和上面的读数一致。直接<b>拖动画面里右下角的开关</b>把电路断开，看电流立刻变为 0、灯熄灭（断路临界状态）。</div>
+</div>
+<script>
+(function(){
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+let E=6,R=5,r=0.5,t=0,switchOpen=false,switchDrag=false,playing=true;
+// rectangular loop corners (conventional current path, clockwise from battery +)
+const L=90,Rt=630,T=110,B=330;
+const pts=[{x:L,y:B},{x:L,y:T},{x:Rt,y:T},{x:Rt,y:B}]; // battery(left) up, top=R, right=bulb down, bottom=ammeter
+const swX=(L+Rt)/2+90,swY=B; // switch lever pivot on bottom wire
+function seg(i){const a=pts[i],b=pts[(i+1)%4];return{a,b,len:Math.hypot(b.x-a.x,b.y-a.y)};}
+const perim=[0,1,2,3].reduce((s,i)=>s+seg(i).len,0);
+let phase=0;
+function ptAt(d){ // distance along loop -> point (clockwise)
+  d=((d%perim)+perim)%perim;
+  for(let i=0;i<4;i++){const s=seg(i);if(d<=s.len){const f=d/s.len;return{x:s.a.x+(s.b.x-s.a.x)*f,y:s.a.y+(s.b.y-s.a.y)*f};}d-=s.len;}
+  return pts[0];
+}
+function wire(){ctx.strokeStyle='#5b7089';ctx.lineWidth=6;ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);for(let i=1;i<4;i++)ctx.lineTo(pts[i].x,pts[i].y);ctx.closePath();ctx.stroke();}
+function battery(){const cx=L,cy=(T+B)/2;
+  // gap in wire
+  ctx.strokeStyle='#0e1a2b';ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(cx,cy-26);ctx.lineTo(cx,cy+26);ctx.stroke();
+  ctx.strokeStyle='#e6eef7';ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(cx-11,cy-8);ctx.lineTo(cx+11,cy-8);ctx.stroke(); // long plate +
+  ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(cx-7,cy+8);ctx.lineTo(cx+7,cy+8);ctx.stroke(); // short plate −
+  ctx.fillStyle='#e6eef7';ctx.font='13px system-ui';ctx.textAlign='right';ctx.textBaseline='middle';
+  ctx.fillText('+',cx-16,cy-8);ctx.fillText('−',cx-16,cy+9);
+  ctx.textAlign='left';ctx.fillStyle='#9fb3c8';ctx.fillText('E='+E.toFixed(1)+'V, r='+r.toFixed(1)+'Ω',cx+14,cy);}
+function resistor(){const cx=(L+Rt)/2,cy=T; // zigzag on top wire
+  ctx.strokeStyle='#0e1a2b';ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(cx-46,cy);ctx.lineTo(cx+46,cy);ctx.stroke();
+  ctx.strokeStyle='#ffd166';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(cx-46,cy);
+  for(let i=0;i<=8;i++){ctx.lineTo(cx-46+i*11.5,cy+(i%2?8:-8));}ctx.lineTo(cx+46,cy);ctx.stroke();
+  ctx.fillStyle='#ffd166';ctx.font='13px system-ui';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('R='+R.toFixed(1)+'Ω',cx,cy-14);}
+function bulb(I){const cx=Rt,cy=(T+B)/2,P=I*I*R; // power in bulb (use I²R)
+  const glow=Math.min(1,P/12);
+  ctx.strokeStyle='#0e1a2b';ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(cx,cy-26);ctx.lineTo(cx,cy+26);ctx.stroke();
+  if(glow>0.02){const g=ctx.createRadialGradient(cx,cy,2,cx,cy,46);g.addColorStop(0,'rgba(255,240,170,'+glow+')');g.addColorStop(1,'rgba(255,220,120,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,46,0,7);ctx.fill();}
+  ctx.strokeStyle='#cdd8e6';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(cx,cy,17,0,7);ctx.stroke();
+  ctx.strokeStyle='rgba(255,'+(180+70*glow|0)+',80,'+(0.5+0.5*glow)+')';ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.moveTo(cx,cy-15);ctx.lineTo(cx-5,cy-4);ctx.lineTo(cx+5,cy+4);ctx.lineTo(cx,cy+15);ctx.stroke();
+  ctx.fillStyle='#cdd8e6';ctx.font='12px system-ui';ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText('灯泡',cx+26,cy);}
+function meter(x,y,letter,val,unit,col){ctx.fillStyle='#152a44';ctx.strokeStyle=col;ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,22,0,7);ctx.fill();ctx.stroke();
+  ctx.fillStyle=col;ctx.font='bold 14px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(letter,x,y-6);
+  ctx.fillStyle='#e6eef7';ctx.font='11px system-ui';ctx.fillText(val,x,y+8);}
+function switchLever(){
+  ctx.strokeStyle='#5b7089';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(swX-20,swY);ctx.lineTo(swX,swY);ctx.stroke();
+  ctx.fillStyle='#cdd8e6';ctx.beginPath();ctx.arc(swX,swY,5,0,7);ctx.fill();
+  const ang=switchOpen?-0.7:0;
+  const ex=swX+Math.cos(Math.PI+ang)*30,ey=swY+Math.sin(Math.PI+ang)*30;
+  ctx.strokeStyle=switchOpen?'#e8342a':'#2ecc71';ctx.lineWidth=5;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(swX,swY);ctx.lineTo(ex,ey);ctx.stroke();
+  if(!switchOpen){ctx.strokeStyle='#5b7089';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(swX-30,swY);ctx.lineTo(swX-20,swY);ctx.stroke();}
+  ctx.fillStyle='#9fb3c8';ctx.font='11px system-ui';ctx.textAlign='center';ctx.fillText('拖开关',swX-15,swY+22);
+}
+function draw(){
+  ctx.clearRect(0,0,cv.width,cv.height);
+  const bg=ctx.createLinearGradient(0,0,0,cv.height);bg.addColorStop(0,'#12233a');bg.addColorStop(1,'#0a1522');ctx.fillStyle=bg;ctx.fillRect(0,0,cv.width,cv.height);
+  const I=switchOpen?0:E/(R+r), U=I*R, Ur=I*r, P=U*I;
+  wire();
+  // conventional current arrows
+  ctx.fillStyle='#7fa8d8';ctx.font='12px system-ui';
+  // moving charge dots, speed ∝ I
+  if(!switchOpen){
+    const n=Math.round(perim/40);
+    for(let i=0;i<n;i++){const d=(phase+ i*perim/n)%perim;const p=ptAt(d);
+      ctx.fillStyle='#ffd166';ctx.beginPath();ctx.arc(p.x,p.y,3.6,0,7);ctx.fill();}
+  }
+  resistor();battery();bulb(I);switchLever();
+  // ammeter on bottom wire, voltmeter across bulb (right)
+  meter((L+Rt)/2,B,'A',I.toFixed(2)+'A','A','#4d9bff');
+  meter(Rt+64,(T+B)/2,'V',U.toFixed(2)+'V','V','#2ecc71');
+  ctx.strokeStyle='rgba(46,204,113,.5)';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
+  ctx.beginPath();ctx.moveTo(Rt,T+30);ctx.lineTo(Rt+64,T+30);ctx.lineTo(Rt+64,(T+B)/2-22);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(Rt,B-30);ctx.lineTo(Rt+64,B-30);ctx.lineTo(Rt+64,(T+B)/2+22);ctx.stroke();ctx.setLineDash([]);
+  // formula
+  ctx.fillStyle='#e6eef7';ctx.font='13px system-ui';ctx.textAlign='left';ctx.textBaseline='alphabetic';
+  ctx.fillText('E = I(R+r) = '+I.toFixed(2)+'×('+R.toFixed(1)+'+'+r.toFixed(1)+') = '+E.toFixed(1)+' V　|　U = E−Ir = '+U.toFixed(2)+' V',24,cv.height-16);
+  document.getElementById('cI').textContent=I.toFixed(2);
+  document.getElementById('cU').textContent=U.toFixed(2);
+  document.getElementById('cP').textContent=P.toFixed(2);
+  document.getElementById('cUr').textContent=Ur.toFixed(2);
+  document.getElementById('cState').textContent=switchOpen?'断开（临界断路，I=0）':(playing?'闭合，电流流动':'闭合，画面暂停');
+}
+function bind(id,cb,lab,dec){document.getElementById(id).addEventListener('input',e=>{cb(parseFloat(e.target.value));if(lab)document.getElementById(lab).textContent=parseFloat(e.target.value).toFixed(dec);draw();});}
+bind('E',v=>E=v,'eLab',1);bind('R',v=>R=v,'rLab',1);bind('ri',v=>r=v,'riLab',1);
+function pos(e){const rc=cv.getBoundingClientRect(),s=cv.width/rc.width;return{x:(e.clientX-rc.left)*s,y:(e.clientY-rc.top)*s};}
+cv.addEventListener('pointerdown',e=>{const p=pos(e);if(Math.hypot(p.x-swX,p.y-swY)<34)switchDrag=true;});
+cv.addEventListener('pointermove',e=>{if(!switchDrag)return;const p=pos(e);switchOpen=p.y<swY-8;draw();});
+window.addEventListener('pointerup',()=>{if(switchDrag){switchDrag=false;draw();}});
+document.getElementById('playBtn').onclick=()=>{playing=!playing;document.getElementById('playBtn').textContent=playing?'⏸ 暂停电荷流动画':'▶ 播放电荷流动画';draw();};
+let last=performance.now();
+function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;if(playing&&!switchOpen){const I=E/(R+r);phase+=I*36*dt;}draw();requestAnimationFrame(loop);}
+draw();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

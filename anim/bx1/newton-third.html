@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>牛顿第三定律实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 306px;gap:10px;padding:10px;min-height:540px}
+  .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;touch-action:none}
+  .panel{display:flex;flex-direction:column;gap:8px}
+  .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
+  .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.45}
+  .title{font-weight:800;margin-bottom:5px;color:#0f172a}
+  .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:30px;cursor:pointer;color:#102a43}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:48px}
+  .meter span{display:block;font-size:11px;color:#b6c5d8}
+  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:16px;font-variant-numeric:tabular-nums}
+  .formula{display:grid;gap:5px;font-size:13px;color:#334155}
+  .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
+  .formula div:last-child{border-bottom:0;padding-bottom:0}
+  .formula b{white-space:nowrap;color:#0f172a}
+  .small{font-size:12px;line-height:1.5;color:#475569}
+  .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="920" height="520" aria-label="牛顿第三定律交互实验台"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>拖动中间红色压缩手柄改变相互作用力；再拖两把质量尺。看红蓝力箭头是否永远等长反向，以及两车加速度为什么可以不同。</div>
+    <div class="card">
+      <div class="title">快速情境</div>
+      <div class="chips">
+        <button data-case="same">同质量</button>
+        <button data-case="leftLight">左轻右重</button>
+        <button data-case="rightLight">左重右轻</button>
+        <button data-case="strong">更大推力</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="title">实时读数</div>
+      <div class="readout">
+        <div class="meter"><span>左对右 F12</span><b id="f12Text">12.0 N</b></div>
+        <div class="meter"><span>右对左 F21</span><b id="f21Text">12.0 N</b></div>
+        <div class="meter"><span>左车 a1</span><b id="a1Text">6.0 m/s²</b></div>
+        <div class="meter"><span>右车 a2</span><b id="a2Text">3.0 m/s²</b></div>
+      </div>
+    </div>
+    <div class="card formula">
+      <div><span>相互作用力</span><b>F12=-F21</b></div>
+      <div><span>运动效果</span><b>a=F/m</b></div>
+      <div><span>不能抵消</span><b>作用在不同物体</b></div>
+    </div>
+    <div class="card small"><b>可直接操作：</b>抓接触处手柄改 F；抓底部蓝/红质量尺改 m1、m2。右侧对照图专门区分“相互作用力”和“平衡力”。</div>
+    <div class="chips"><button id="playBtn">▶ 播放：两车分开加速</button><button id="resetBtn">重置</button></div>
+    <div class="status" id="status">力一定等大反向；加速度是否相同，要看各自质量。</div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const state={m1:2,m2:4,F:12,drag:null,playing:false,playT:0};
+  const els={
+    f12:document.getElementById('f12Text'),
+    f21:document.getElementById('f21Text'),
+    a1:document.getElementById('a1Text'),
+    a2:document.getElementById('a2Text'),
+    status:document.getElementById('status')
+  };
+  const colors={red:'#dc2626',blue:'#2563eb',purple:'#7c3aed',ink:'#102a43',muted:'#64748b',green:'#0f766e',orange:'#f59e0b'};
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  const fmt=(v,d=1)=>v.toFixed(d);
+  function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){
+    ctx.fillStyle=c;ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y);
+  }
+  function line(x1,y1,x2,y2,c='#94a3b8',w=2,dash){
+    ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();
+  }
+  function arrow(x1,y1,x2,y2,c,w=3){
+    const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore();
+  }
+  function roundRect(x,y,w,h,r,fill,stroke){
+    ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}ctx.restore();
+  }
+  function values(){return{a1:state.F/state.m1,a2:state.F/state.m2};}
+  function geom(){
+    const forceHandle={x:250+state.F/30*210,y:118};
+    const m1Handle={x:116+(state.m1-1)/7*250,y:448};
+    const m2Handle={x:510+(state.m2-1)/7*250,y:448};
+    return{forceHandle,m1Handle,m2Handle};
+  }
+  function handle(x,y,label,active,c){
+    ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-22,active?'#92400e':c,'center',12,'900');ctx.restore();
+  }
+  function ruler(x1,y,x2,label,c){
+    line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-18,c,'center',12,'900');
+  }
+  function drawCar(x,y,w,h,fill,label){
+    roundRect(x,y,w,h,7,fill,'#334155');
+    ctx.fillStyle='#0f172a';
+    ctx.beginPath();ctx.arc(x+18,y+h+6,6,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(x+w-18,y+h+6,6,0,Math.PI*2);ctx.fill();
+    text(label,x+w/2,y+h/2,'#0f172a','center',13,'900');
+  }
+  function drawScene(v,g0){
+    roundRect(42,58,500,320,8,'#fff','#d7dee8');
+    const off1=state.playing?Math.min(70,0.5*v.a1*state.playT*state.playT*14):0;
+    const off2=state.playing?Math.min(70,0.5*v.a2*state.playT*state.playT*14):0;
+    const ground=310,left={x:210-off1,y:248,w:94,h:48},right={x:430+off2,y:248,w:94,h:48};
+    line(84,ground,520,ground,'#334155',5);
+    drawCar(left.x,left.y,left.w,left.h,'#dbeafe',`m1=${fmt(state.m1)}kg`);
+    drawCar(right.x,right.y,right.w,right.h,'#fee2e2',`m2=${fmt(state.m2)}kg`);
+    const midX=(left.x+left.w+right.x)/2;
+    line(left.x+left.w,left.y+25,right.x,left.y+25,'#64748b',4,[8,6]);
+    line(250,118,460,118,'#0f172a',2);
+    for(let i=0;i<=10;i++){const x=250+i/10*210;line(x,113,x,123,'#0f172a',1)}
+    handle(g0.forceHandle.x,g0.forceHandle.y,`F=${fmt(state.F)}N`,state.drag==='F',colors.red);
+    text('拖动推力手柄',355,94,colors.red,'center',12,'900');
+    const forceLen=Math.min(115,state.F*4);
+    arrow(left.x+left.w,left.y+24,left.x+left.w+forceLen,left.y+24,colors.red,4);
+    arrow(right.x,right.y+24,right.x-forceLen,right.y+24,colors.blue,4);
+    text('左车对右车 F12',438,right.y-10,colors.red,'center',12,'900');
+    text('右车对左车 F21',370,left.y-58,colors.blue,'center',12,'900');
+    arrow(left.x+left.w/2,left.y-12,left.x+left.w/2-Math.min(85,v.a1*14),left.y-12,colors.purple,3);
+    arrow(right.x+right.w/2,right.y-12,right.x+right.w/2+Math.min(85,v.a2*14),right.y-12,colors.purple,3);
+    text(`a1=${fmt(v.a1)}m/s²`,178,left.y-34,colors.purple,'left',12,'900');
+    text(`a2=${fmt(v.a2)}m/s²`,454,right.y-48,colors.purple,'left',12,'900');
+    roundRect(135,342,330,26,7,'#f8fafc','#cbd5e1');
+    text('力永远等长反向；运动效果由各自质量决定。',300,355,'#334155','center',13,'900');
+  }
+  function drawCompare(){
+    roundRect(560,58,300,320,8,'#f8fafc','#d7dee8');
+    text('相互作用力 vs 平衡力',710,86,'#0f172a','center',16,'900');
+    roundRect(590,112,240,88,7,'#fff','#cbd5e1');
+    text('相互作用力',710,132,'#0f172a','center',13,'900');
+    arrow(656,162,730,162,colors.red,4);
+    arrow(766,162,692,162,colors.blue,4);
+    text('不同物体：不能抵消',710,186,colors.green,'center',12,'900');
+    roundRect(590,224,240,104,7,'#fff','#cbd5e1');
+    text('平衡力',710,244,'#0f172a','center',13,'900');
+    const block={x:684,y:264,w:52,h:34};
+    roundRect(block.x,block.y,block.w,block.h,5,'#e2e8f0','#334155');
+    arrow(block.x+block.w/2,block.y,block.x+block.w/2,block.y-42,colors.red,3);
+    arrow(block.x+block.w/2,block.y+block.h,block.x+block.w/2,block.y+block.h+42,colors.blue,3);
+    text('同一物体：可抵消',710,316,colors.orange,'center',12,'900');
+    roundRect(594,342,232,24,6,'#ecfdf5','#14b8a6');
+    text('第三定律不是平衡条件',710,354,colors.green,'center',12,'900');
+  }
+  function drawBars(v){
+    roundRect(560,390,300,90,8,'#fff','#d7dee8');
+    text('加速度对比',602,414,'#0f172a','left',14,'900');
+    const max=Math.max(v.a1,v.a2,1);
+    line(644,440,644+v.a1/max*170,440,colors.blue,9);
+    line(644,466,644+v.a2/max*170,466,colors.red,9);
+    text(`a1=${fmt(v.a1)}`,594,440,colors.blue,'left',12,'900');
+    text(`a2=${fmt(v.a2)}`,594,466,colors.red,'left',12,'900');
+  }
+  function update(v){
+    els.f12.textContent=`${fmt(state.F)} N`;
+    els.f21.textContent=`${fmt(state.F)} N`;
+    els.a1.textContent=`${fmt(v.a1)} m/s²`;
+    els.a2.textContent=`${fmt(v.a2)} m/s²`;
+    els.status.textContent=(Math.abs(v.a1-v.a2)<.05?'同质量时加速度也相同；这不是因为力不同，而是质量相同。':'力相等但加速度不同，因为 a=F/m，质量不同。')+(state.playing?'（播放中：两车正按各自 a 分开）':'');
+  }
+  function draw(){
+    const v=values(),g0=geom();
+    ctx.clearRect(0,0,920,520);var _bg=ctx.createLinearGradient(0,0,0,520);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,520);
+    text('牛顿第三定律实验台：一对相互作用力等大反向，但作用在不同物体上',460,30,'#0f172a','center',19,'900');
+    drawScene(v,g0);drawCompare();drawBars(v);
+    roundRect(42,404,816,76,8,'#fff','#d7dee8');
+    ruler(116,448,366,'拖 m1：轻 → 重',colors.blue);handle(g0.m1Handle.x,g0.m1Handle.y,`m1=${fmt(state.m1)}`,state.drag==='m1',colors.blue);
+    ruler(510,448,760,'拖 m2：轻 → 重',colors.red);handle(g0.m2Handle.x,g0.m2Handle.y,`m2=${fmt(state.m2)}`,state.drag==='m2',colors.red);
+    update(v);
+  }
+  function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+  function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+  function down(e){if(state.playing){state.playing=false;document.getElementById('playBtn').textContent='▶ 播放：两车分开加速'}const p=pos(e),g0=geom();if(near(p,g0.forceHandle,30))state.drag='F';else if(near(p,g0.m1Handle,28))state.drag='m1';else if(near(p,g0.m2Handle,28))state.drag='m2';else state.drag=null;if(state.drag){canvas.setPointerCapture(e.pointerId);move(e)}}
+  function move(e){if(!state.drag)return;const p=pos(e);if(state.drag==='F')state.F=clamp((p.x-250)/210*30,2,30);if(state.drag==='m1')state.m1=clamp(1+(p.x-116)/250*7,1,8);if(state.drag==='m2')state.m2=clamp(1+(p.x-510)/250*7,1,8);draw()}
+  function up(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
+  canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
+  document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='same'){state.m1=3;state.m2=3}if(c==='leftLight'){state.m1=1.5;state.m2=6}if(c==='rightLight'){state.m1=6;state.m2=1.5}if(c==='strong')state.F=26;draw()}));
+  const playBtn=document.getElementById('playBtn');
+  function animate(){if(!state.playing)return;state.playT+=0.03;draw();if(state.playT>2.2){state.playing=false;playBtn.textContent='▶ 播放：两车分开加速';draw();return}requestAnimationFrame(animate)}
+  playBtn.addEventListener('click',()=>{state.playing=!state.playing;playBtn.textContent=state.playing?'⏸ 暂停':'▶ 播放：两车分开加速';if(state.playing){state.playT=0;animate()}else draw()});
+  document.getElementById('resetBtn').addEventListener('click',()=>{state.playing=false;state.playT=0;playBtn.textContent='▶ 播放：两车分开加速';draw()});
+  draw();
+})();
+</script>
+</body>
+</html>

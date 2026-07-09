@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>向心加速度与向心力实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#edf3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px;min-height:560px}
+  .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;touch-action:none}
+  .panel{display:flex;flex-direction:column;gap:8px}
+  .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
+  .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.45}
+  .title{font-weight:800;margin-bottom:5px;color:#0f172a}
+  .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:31px;cursor:pointer;color:#102a43}
+  .primary{background:#2563eb;color:#fff;border-color:#2563eb}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:48px}
+  .meter span{display:block;font-size:11px;color:#b6c5d8}
+  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:16px;font-variant-numeric:tabular-nums}
+  .formula{display:grid;gap:5px;font-size:13px;color:#334155}
+  .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
+  .formula div:last-child{border-bottom:0;padding-bottom:0}
+  .formula b{white-space:nowrap;color:#0f172a}
+  .small{font-size:12px;line-height:1.5;color:#475569}
+  .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="向心加速度与向心力交互实验台"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>抓蓝色速度箭头端点把 v 调大，看 F向 是否按 v² 增大；再把小球向外拖，看 r 变大时 F向 变小。</div>
+    <button id="playBtn" class="primary">播放</button>
+    <div class="card">
+      <div class="title">快速情境</div>
+      <div class="chips">
+        <button data-case="base">基础</button>
+        <button data-case="fast">速度加倍</button>
+        <button data-case="outer">半径变大</button>
+        <button data-case="heavy">质量变大</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="title">实时读数</div>
+      <div class="readout">
+        <div class="meter"><span>向心加速度 a</span><b id="aText">10.0 m/s²</b></div>
+        <div class="meter"><span>向心力 F向</span><b id="fText">5.0 N</b></div>
+        <div class="meter"><span>角速度 ω</span><b id="wText">5.0 rad/s</b></div>
+        <div class="meter"><span>周期 T</span><b id="tText">1.26 s</b></div>
+      </div>
+    </div>
+    <div class="card formula">
+      <div><span>向心加速度</span><b>a=v²/r=ω²r</b></div>
+      <div><span>向心力</span><b>F向=ma=mv²/r</b></div>
+      <div><span>周期</span><b>T=2πr/v</b></div>
+    </div>
+    <div class="card small"><b>可直接操作：</b>抓小球改半径，抓蓝色 v 箭头端点改速度，或拖底部 m、v、r、角位置四个手柄。</div>
+    <div class="status" id="status">向心力不是新性质的力，是指向圆心的合力效果。</div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+  const state={m:.5,v:2,r:.4,angle:0,running:false,drag:null};
+  const els={a:document.getElementById('aText'),f:document.getElementById('fText'),w:document.getElementById('wText'),t:document.getElementById('tText'),status:document.getElementById('status'),play:document.getElementById('playBtn')};
+  const colors={red:'#dc2626',blue:'#2563eb',purple:'#7c3aed',green:'#0f766e',orange:'#f59e0b',ink:'#102a43'};
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  const fmt=(v,d=1)=>Math.abs(v)<1e-6?(0).toFixed(d):v.toFixed(d);
+  function values(){const a=state.v*state.v/state.r,F=state.m*a,w=state.v/state.r,T=2*Math.PI/w;return{a,F,w,T}}
+  function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){ctx.fillStyle=c;ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+  function line(x1,y1,x2,y2,c='#94a3b8',w=2,dash){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
+  function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore()}
+  function roundRect(x,y,w,h,r,fill,stroke){ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}ctx.restore()}
+  function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-36,c,'center',12,'900')}
+  function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-20,active?'#92400e':c,'center',12,'900');ctx.restore()}
+  function geom(){return{m:{x:100+(state.m-.1)/4.9*150,y:494},v:{x:306+(state.v-.5)/9.5*150,y:494},r:{x:516+(state.r-.1)/1.9*150,y:494},angle:{x:728+(state.angle%(Math.PI*2))/(Math.PI*2)*120,y:494}}}
+  function bodyPoint(){const cx=316,cy=252,R=state.r*138;return{cx,cy,R,x:cx+R*Math.cos(state.angle),y:cy+R*Math.sin(state.angle)}}
+  function vectorEnds(p){const tx=-Math.sin(state.angle),ty=Math.cos(state.angle),radx=-Math.cos(state.angle),rady=-Math.sin(state.angle),vLen=40+state.v*12,F=values().F,Flen=clamp(F*8,24,Math.max(28,p.R-12));return{v:{x:p.x+tx*vLen,y:p.y+ty*vLen},f:{x:p.x+radx*Flen,y:p.y+rady*Flen}}}
+  function drawScene(){
+    roundRect(42,58,560,382,8,'#fff','#d7dee8');
+    const p=bodyPoint(),e=vectorEnds(p);
+    ctx.save();ctx.strokeStyle='#94a3b8';ctx.setLineDash([6,4]);ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.cx,p.cy,p.R,0,Math.PI*2);ctx.stroke();ctx.restore();
+    line(p.cx,p.cy,p.x,p.y,'#475569',3);text(`r=${fmt(state.r,2)}m`,(p.cx+p.x)/2+16,(p.cy+p.y)/2,'#475569','left',12,'900');
+    ctx.fillStyle='#0f172a';ctx.beginPath();ctx.arc(p.cx,p.cy,4,0,Math.PI*2);ctx.fill();text('圆心',p.cx,p.cy+20,'#475569','center',12,'900');
+    ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(p.x,p.y,12,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();
+    ctx.save();ctx.fillStyle=state.drag==='ball'?'#fde68a':'#fff';ctx.strokeStyle=state.drag==='ball'?'#d97706':colors.blue;ctx.lineWidth=3;ctx.beginPath();ctx.arc(p.x,p.y,7,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();
+    arrow(p.x,p.y,e.v.x,e.v.y,colors.blue,4);text(`v=${fmt(state.v)}m/s`,e.v.x+12,e.v.y,colors.blue,'left',13,'900');
+    ctx.save();ctx.fillStyle=state.drag==='vVector'?'#fde68a':'#fff';ctx.strokeStyle=state.drag==='vVector'?'#d97706':colors.blue;ctx.lineWidth=3;ctx.beginPath();ctx.arc(e.v.x,e.v.y,8,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();
+    arrow(p.x,p.y,e.f.x,e.f.y,colors.red,4);text('F向 / a向',e.f.x-12,e.f.y-14,colors.red,'right',13,'900');
+    text('v 永远沿切线；F向 与 a向 永远指向圆心。',316,426,'#475569','center',13,'900');
+  }
+  function drawCompare(){
+    const v=values();
+    roundRect(636,86,222,118,8,'#f8fafc','#d7dee8');text('平方关系',747,114,'#0f172a','center',15,'900');text(`v=${fmt(state.v)} 时 F=${fmt(v.F)}N`,747,148,colors.red,'center',13,'900');text('v 加倍，F 约变 4 倍',747,176,'#475569','center',12,'700');
+    roundRect(636,258,222,112,8,'#fff','#d7dee8');text('谁提供向心力？',747,286,'#0f172a','center',15,'900');text('绳拉力/摩擦/重力分力',747,320,colors.green,'center',13,'900');text('都可能是“向心力来源”',747,346,'#475569','center',12,'700');
+  }
+  function update(){const v=values();els.a.textContent=`${fmt(v.a)} m/s²`;els.f.textContent=`${fmt(v.F)} N`;els.w.textContent=`${fmt(v.w)} rad/s`;els.t.textContent=`${fmt(v.T,2)} s`;els.status.textContent='向心力是指向圆心的合力效果；它改变速度方向，不改变速率。';els.play.textContent=state.running?'暂停':'播放'}
+  function draw(){const g0=geom();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('向心加速度与向心力实验台：速度切线，合力指圆心',460,30,'#0f172a','center',19,'900');drawScene();drawCompare();roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(100,494,250,'m',colors.purple);handle(g0.m.x,g0.m.y,`m=${fmt(state.m)}kg`,state.drag==='m',colors.purple);ruler(306,494,456,'v',colors.blue);handle(g0.v.x,g0.v.y,`v=${fmt(state.v)}`,state.drag==='v',colors.blue);ruler(516,494,666,'r',colors.orange);handle(g0.r.x,g0.r.y,`r=${fmt(state.r,2)}`,state.drag==='r',colors.orange);ruler(728,494,848,'位置',colors.green);handle(g0.angle.x,g0.angle.y,'拖位置',state.drag==='angle',colors.green);update()}
+  function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+  function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+  function down(e){const p=pos(e),bp=bodyPoint(),ve=vectorEnds(bp),g0=geom();if(near(p,ve.v,28))state.drag='vVector';else if(near(p,bp,30))state.drag='ball';else if(near(p,g0.m,26))state.drag='m';else if(near(p,g0.v,26))state.drag='v';else if(near(p,g0.r,26))state.drag='r';else if(near(p,g0.angle,26))state.drag='angle';else state.drag=null;if(state.drag){state.running=false;canvas.setPointerCapture(e.pointerId);move(e)}}
+  function move(e){if(!state.drag)return;const p=pos(e);if(state.drag==='m')state.m=clamp(.1+(p.x-100)/150*4.9,.1,5);if(state.drag==='v')state.v=clamp(.5+(p.x-306)/150*9.5,.5,10);if(state.drag==='r')state.r=clamp(.1+(p.x-516)/150*1.9,.1,2);if(state.drag==='angle')state.angle=clamp((p.x-728)/120*Math.PI*2,0,Math.PI*2);if(state.drag==='ball'){const dx=p.x-316,dy=p.y-252;state.r=clamp(Math.hypot(dx,dy)/138,.1,2);state.angle=Math.atan2(dy,dx)}if(state.drag==='vVector'){const bp=bodyPoint(),tx=-Math.sin(state.angle),ty=Math.cos(state.angle),proj=(p.x-bp.x)*tx+(p.y-bp.y)*ty;state.v=clamp((proj-40)/12,.5,10)}draw()}
+  function up(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
+  canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
+  els.play.addEventListener('click',()=>{state.running=!state.running;draw()});
+  document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='base'){state.m=.5;state.v=2;state.r=.4}if(c==='fast'){state.m=.5;state.v=4;state.r=.4}if(c==='outer'){state.m=.5;state.v=2;state.r=1.2}if(c==='heavy'){state.m=2;state.v=2;state.r=.4}draw()}));
+  function tick(){if(state.running){state.angle+=values().w*.016;if(state.angle>Math.PI*2)state.angle-=Math.PI*2}draw();requestAnimationFrame(tick)}
+  draw();requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

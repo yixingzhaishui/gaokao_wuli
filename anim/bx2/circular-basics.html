@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>圆周运动基本量实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#edf3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px;min-height:560px}
+  .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;touch-action:none}
+  .panel{display:flex;flex-direction:column;gap:8px}
+  .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
+  .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.45}
+  .title{font-weight:800;margin-bottom:5px;color:#0f172a}
+  .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:31px;cursor:pointer;color:#102a43}
+  .primary{background:#2563eb;color:#fff;border-color:#2563eb}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:48px}
+  .meter span{display:block;font-size:11px;color:#b6c5d8}
+  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:16px;font-variant-numeric:tabular-nums}
+  .formula{display:grid;gap:5px;font-size:13px;color:#334155}
+  .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
+  .formula div:last-child{border-bottom:0;padding-bottom:0}
+  .formula b{white-space:nowrap;color:#0f172a}
+  .small{font-size:12px;line-height:1.5;color:#475569}
+  .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
+  @media(max-width:760px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="圆周运动基本量交互实验台"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>抓蓝点向外拖，看 ω 不变时 v=ωr 变大；沿圆周拖蓝点，看 θ 和弧长 s 同步变化。</div>
+    <button id="playBtn" class="primary">播放</button>
+    <div class="card">
+      <div class="title">快速情境</div>
+      <div class="chips">
+        <button data-case="base">基础</button>
+        <button data-case="outer">外圈点</button>
+        <button data-case="fast">转得快</button>
+        <button data-case="half">半圈</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="title">实时读数</div>
+      <div class="readout">
+        <div class="meter"><span>频率 f</span><b id="fText">0.25 Hz</b></div>
+        <div class="meter"><span>角速度 ω</span><b id="wText">1.57 rad/s</b></div>
+        <div class="meter"><span>线速度 v</span><b id="vText">3.14 m/s</b></div>
+        <div class="meter"><span>弧长 s</span><b id="sText">4.19 m</b></div>
+      </div>
+    </div>
+    <div class="card formula">
+      <div><span>频率</span><b>f=1/T</b></div>
+      <div><span>角速度</span><b>ω=2π/T</b></div>
+      <div><span>线速度/弧长</span><b>v=ωr, s=rθ</b></div>
+    </div>
+    <div class="card small"><b>可直接操作：</b>抓蓝点改半径和转角，或拖底部 r、T、θ 三个手柄。绿色速度箭头始终沿切线。</div>
+    <div class="status" id="status">角量描述转动快慢，线量描述圆周上走得快慢。</div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+  const state={r:2,T:4,theta:120,running:false,spin:120,drag:null};
+  const els={f:document.getElementById('fText'),w:document.getElementById('wText'),v:document.getElementById('vText'),s:document.getElementById('sText'),status:document.getElementById('status'),play:document.getElementById('playBtn')};
+  const colors={red:'#dc2626',blue:'#2563eb',purple:'#7c3aed',green:'#0f766e',orange:'#f59e0b',ink:'#102a43'};
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  const fmt=(v,d=2)=>Math.abs(v)<1e-6?(0).toFixed(d):v.toFixed(d);
+  function values(){const f=1/state.T,w=2*Math.PI/state.T,rad=(state.running?state.spin:state.theta)*Math.PI/180,s=state.r*(state.theta*Math.PI/180),v=w*state.r;return{f,w,rad,s,v,deg:state.running?state.spin:state.theta}}
+  function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){ctx.fillStyle=c;ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+  function line(x1,y1,x2,y2,c='#94a3b8',w=2,dash){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
+  function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore()}
+  function roundRect(x,y,w,h,r,fill,stroke){ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}ctx.restore()}
+  function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-36,c,'center',12,'900')}
+  function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-20,active?'#92400e':c,'center',12,'900');ctx.restore()}
+  function geom(){return{r:{x:122+(state.r-.5)/4.5*180,y:494},T:{x:390+(state.T-1)/9*180,y:494},theta:{x:668+state.theta/360*180,y:494}}}
+  function point(v){const cx=306,cy=255,R=state.r*42;return{cx,cy,R,x:cx+R*Math.cos(-v.rad),y:cy+R*Math.sin(-v.rad)}}
+  function drawScene(v){
+    roundRect(42,58,560,382,8,'#fff','#d7dee8');
+    const p=point(v);line(p.cx,p.cy,p.x,p.y,'#475569',3);text(`r=${fmt(state.r,1)}m`,(p.cx+p.x)/2+16,(p.cy+p.y)/2,'#475569','left',12,'900');
+    ctx.save();ctx.strokeStyle='#94a3b8';ctx.setLineDash([6,4]);ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.cx,p.cy,p.R,0,Math.PI*2);ctx.stroke();ctx.restore();
+    ctx.save();ctx.strokeStyle=colors.orange;ctx.lineWidth=5;ctx.beginPath();ctx.arc(p.cx,p.cy,p.R,0,-state.theta*Math.PI/180,true);ctx.stroke();ctx.restore();
+    ctx.save();ctx.strokeStyle=colors.purple;ctx.lineWidth=3;ctx.beginPath();ctx.arc(p.cx,p.cy,48,0,-state.theta*Math.PI/180,true);ctx.stroke();ctx.restore();
+    ctx.fillStyle='#0f172a';ctx.beginPath();ctx.arc(p.cx,p.cy,4,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(p.x,p.y,12,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();
+    ctx.save();ctx.fillStyle=state.drag==='point'?'#fde68a':'#fff';ctx.strokeStyle=state.drag==='point'?'#d97706':colors.blue;ctx.lineWidth=3;ctx.beginPath();ctx.arc(p.x,p.y,8,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();
+    const tx=Math.sin(-v.rad),ty=Math.cos(-v.rad);arrow(p.x,p.y,p.x+tx*76,p.y+ty*76,colors.green,4);text('v 沿切线',p.x+tx*90,p.y+ty*90,colors.green,'center',13,'900');
+    text(`θ=${fmt(state.theta,0)}°`,p.cx+74,p.cy-36,colors.purple,'left',13,'900');text(`s=${fmt(v.s)}m`,p.cx,p.cy-p.R-24,colors.orange,'center',13,'900');
+    text('同一周期 T 下，外圈点角速度相同，但线速度更大。',306,426,'#475569','center',13,'900');
+  }
+  function drawExplain(v){roundRect(632,90,230,118,8,'#f8fafc','#d7dee8');text('角量',747,118,'#0f172a','center',15,'900');text(`T=${fmt(state.T,1)}s, f=${fmt(v.f)}Hz`,747,152,colors.purple,'center',13,'900');text(`ω=${fmt(v.w)}rad/s`,747,180,colors.purple,'center',13,'900');roundRect(632,256,230,116,8,'#fff','#d7dee8');text('线量',747,284,'#0f172a','center',15,'900');text(`v=ωr=${fmt(v.v)}m/s`,747,318,colors.green,'center',15,'900');text(`s=rθ=${fmt(v.s)}m`,747,346,colors.orange,'center',13,'900')}
+  function update(v){els.f.textContent=`${fmt(v.f)} Hz`;els.w.textContent=`${fmt(v.w)} rad/s`;els.v.textContent=`${fmt(v.v)} m/s`;els.s.textContent=`${fmt(v.s)} m`;els.status.textContent='同一转盘上 ω 相同；r 越大，v=ωr 越大。弧长由 s=rθ 决定。';els.play.textContent=state.running?'暂停':'播放'}
+  function draw(){const v=values(),g0=geom();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('圆周运动基本量实验台：角量与线量如何相连',460,30,'#0f172a','center',19,'900');drawScene(v);drawExplain(v);roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(122,494,302,'r',colors.blue);handle(g0.r.x,g0.r.y,`r=${fmt(state.r,1)}`,state.drag==='r',colors.blue);ruler(390,494,570,'T',colors.purple);handle(g0.T.x,g0.T.y,`T=${fmt(state.T,1)}`,state.drag==='T',colors.purple);ruler(668,494,848,'θ',colors.orange);handle(g0.theta.x,g0.theta.y,`θ=${fmt(state.theta,0)}°`,state.drag==='theta',colors.orange);update(v)}
+  function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+  function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+  function down(e){const p=pos(e),v=values(),pt=point(v),g0=geom();if(near(p,pt,30))state.drag='point';else if(near(p,g0.r,26))state.drag='r';else if(near(p,g0.T,26))state.drag='T';else if(near(p,g0.theta,26))state.drag='theta';else state.drag=null;if(state.drag){state.running=false;canvas.setPointerCapture(e.pointerId);move(e)}}
+  function move(e){if(!state.drag)return;const p=pos(e);if(state.drag==='r')state.r=clamp(.5+(p.x-122)/180*4.5,.5,5);if(state.drag==='T')state.T=clamp(1+(p.x-390)/180*9,1,10);if(state.drag==='theta')state.theta=clamp((p.x-668)/180*360,0,360);if(state.drag==='point'){const dx=p.x-306,dy=p.y-255,ang=Math.atan2(-dy,dx)*180/Math.PI;state.r=clamp(Math.hypot(dx,dy)/42,.5,5);state.theta=clamp(ang<0?ang+360:ang,0,360)}draw()}
+  function up(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
+  canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
+  els.play.addEventListener('click',()=>{state.running=!state.running;draw()});
+  document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='base'){state.r=2;state.T=4;state.theta=120}if(c==='outer'){state.r=4;state.T=4;state.theta=120}if(c==='fast'){state.r=2;state.T=2;state.theta=120}if(c==='half'){state.r=2;state.T=4;state.theta=180}state.spin=state.theta;draw()}));
+  function tick(){if(state.running){state.spin+=360/60/state.T;if(state.spin>360)state.spin-=360}draw();requestAnimationFrame(tick)}
+  draw();requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
