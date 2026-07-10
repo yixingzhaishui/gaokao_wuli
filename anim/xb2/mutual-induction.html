@@ -1,97 +1,131 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>互感</title>
+<title>互感：双线圈因果链</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#eef2f7;color:#102a43}
-.wrap{padding:12px}
-h2{font-size:16px;margin:0 0 8px}
-canvas{display:block;width:100%;max-width:700px;background:#fff;border:1px solid #d9e2ec;border-radius:12px;touch-action:none;cursor:grab}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
-.chip{background:#102a43;color:#e6eef7;padding:6px 11px;border-radius:8px;font-size:13px}
-.chip b{color:#ffd166}
-.ctrls{display:flex;flex-wrap:wrap;gap:12px;margin:8px 0;align-items:center}
-.ctrls label{display:flex;flex-direction:column;gap:2px;font-size:12px;color:#334e68}
-.ctrls input[type=range]{width:130px;accent-color:#2c7be5}
-.btn{font:inherit;font-size:13px;padding:6px 12px;border:1px solid #b0bcc9;background:#fff;border-radius:8px;cursor:pointer}
-.btn.on{background:#2c7be5;color:#fff;border-color:#2c7be5}
-.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:9px 12px;border-radius:6px;font-size:13px;color:#5a6b7b;line-height:1.5;margin-top:8px}
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:10px;padding:10px;max-width:1280px;margin:auto}
+  .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:640px;touch-action:none}
+  .panel{display:flex;flex-direction:column;gap:8px}
+  .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
+  .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.5}
+  .toolbar,.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  button{min-height:32px;padding:4px 6px;border:1px solid #94a3b8;border-radius:7px;background:#fff;color:#102a43;cursor:pointer;font:inherit;font-size:12px}
+  button:hover{background:#f1f5f9}
+  button.active,button.primary{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:800}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .meter{background:#0f172a;border-radius:7px;padding:7px;min-height:52px;color:#dbeafe}
+  .meter span{display:block;font-size:11px;color:#b6c5d8}
+  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:14px;font-variant-numeric:tabular-nums}
+  .formula{display:grid;gap:6px;font-size:13px;color:#334155}
+  .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
+  .formula div:last-child{border-bottom:0;padding-bottom:0}
+  .formula b{white-space:nowrap;color:#0f172a}
+  .control{display:flex;align-items:center;gap:7px;font-size:12px;color:#334e68}
+  .control input{flex:1;accent-color:#2563eb}
+  .control output{width:42px;text-align:right;color:#0f766e;font-weight:800}
+  .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;line-height:1.5;font-weight:800}
+  .status.warn{border-color:#f59e0b;background:#fff7ed;color:#92400e}
+  .small{font-size:12px;line-height:1.5;color:#475569}
+  @media(max-width:760px){.root{grid-template-columns:1fr;padding:6px}.panel{gap:6px}canvas{height:640px}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h2>互感：一个线圈电流变化 → 另一个线圈磁通量变化</h2>
-  <div class="ctrls">
-    <button class="btn on" id="ac">交流变化</button>
-    <button class="btn" id="dc">直流稳定</button>
-    <button class="btn" id="pulse">通断瞬间</button>
-    <label>频率 f = <span id="fl">1.0</span> Hz<input id="fr" type="range" min="0.2" max="2.5" step="0.1" value="1"></label>
-    <button class="btn" id="play-btn">暂停</button>
-    <button class="btn" id="reset-btn">重置</button>
-    <span style="font-size:13px;color:#5a6b7b">或拖蓝色副线圈远近</span>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="960" height="640" aria-label="互感实验台：原线圈电流、铁芯磁场、副线圈磁通量和感应电压的因果链"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>只追一条链：</b><br>原线圈 I₁ 变化 → 铁芯中的 B 变化 → 副线圈 Φ₂ 变化 → 副线圈 E₂/电流计响应。<br><b>恒定电流只会留下磁场，不会持续产生副线圈电压。</b></div>
+    <div class="toolbar"><button id="playBtn" class="primary">暂停</button><button id="stepBtn">单步</button><button id="resetBtn">重置</button></div>
+    <div class="card modes"><button id="acBtn" class="active">交流：持续变化</button><button id="dcBtn">直流：稳定</button><button id="pulseBtn">通断瞬间</button></div>
+    <div class="card readout">
+      <div class="meter"><span>原线圈 I₁</span><b id="i1Text">0.00 A</b></div>
+      <div class="meter"><span>dI₁/dt</span><b id="diText">0.00 A/s</b></div>
+      <div class="meter"><span>副线圈 Φ₂</span><b id="phiText">0.00</b></div>
+      <div class="meter"><span>副线圈 E₂</span><b id="e2Text">0.00 V</b></div>
+    </div>
+    <div class="card formula">
+      <div><span>磁通量</span><b>Φ₂ ∝ kI₁</b></div>
+      <div><span>互感电动势</span><b>E₂=−N₂ΔΦ₂/Δt</b></div>
+      <div><span>互感形式</span><b>E₂=−M·dI₁/dt</b></div>
+    </div>
+    <div class="card">
+      <label class="control"><span>交流频率 f</span><input id="freqInput" type="range" min="0.2" max="2.5" step="0.1" value="1"><output id="freqOut">1.0 Hz</output></label>
+      <div class="small" style="margin-top:6px"><b>直接操作：</b>拖蓝色副线圈远近，观察耦合 k 和 E₂ 如何变化。</div>
+    </div>
+    <div class="status" id="status">I₁ 正在变化，所以磁场和 Φ₂ 也在变化，副线圈有感应电压。</div>
   </div>
-  <canvas id="cv" width="700" height="400" aria-label="互感实验台：双线圈侧视装置、磁通图像和数据记录"></canvas>
-  <div class="chips">
-    <span class="chip">原线圈电流 I₁ = <b id="i1v">0.00</b> A</span>
-    <span class="chip">变化率 dI₁/dt = <b id="dv">0.00</b></span>
-    <span class="chip">耦合 k = <b id="kv">0.70</b></span>
-    <span class="chip">副线圈 E₂ ∝ <b id="e2v">0.00</b></span>
-    <span class="chip">状态：<b id="statev">交流持续互感</b></span>
-  </div>
-  <div class="hint"><b>观察任务</b>：看副线圈电流计。对照双线圈侧视装置、磁通图像和数据记录，交流时 I₁ 一直变化，副线圈持续有感应；直流稳定后 dI₁/dt=0，副线圈无感应。</div>
 </div>
 <script>
 (function(){
-const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
-let mode='ac',f=1,t=0,secX=470,drag=false,pulseT=-1,lastI=0,running=true;
-function coupling(){return Math.max(0.12,Math.min(1,1-(secX-350)/260))}
-function current(){if(mode==='ac')return Math.sin(2*Math.PI*f*t);if(mode==='dc')return 1;if(mode==='pulse')return pulseT>=0&&t-pulseT<0.7?1:0;return 0}
-function drawCoil(x,y,col,label,currentSign){
-  ctx.strokeStyle=col;ctx.lineWidth=4;ctx.beginPath();
-  for(let k=0;k<7;k++)ctx.arc(x+k*14,y,9,Math.PI,0,false);
-  ctx.stroke();ctx.fillStyle=col;ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText(label,x+42,y+36);
-  if(Math.abs(currentSign)>0.05){ctx.fillStyle=col;ctx.globalAlpha=.18;ctx.fillRect(x-14,y-34,120,26);ctx.globalAlpha=1}
-}
-function galvanometer(x,y,val){
-  ctx.fillStyle='#102a43';ctx.strokeStyle='#2c7be5';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,34,0,7);ctx.fill();ctx.stroke();
-  const a=Math.max(-1,Math.min(1,val))*0.9;ctx.strokeStyle='#ffd166';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x,y+5);ctx.lineTo(x+Math.sin(a)*26,y-Math.cos(a)*26);ctx.stroke();
-  ctx.fillStyle='#e6eef7';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText('G',x,y+24);
-}
-function draw(i,di,e2){
-  ctx.clearRect(0,0,W,H);
-  const glow=ctx.createRadialGradient(350,150,20,350,150,230);glow.addColorStop(0,'rgba(138,63,251,.16)');glow.addColorStop(1,'rgba(138,63,251,0)');
-  ctx.fillStyle=glow;ctx.fillRect(70,60,560,205);
-  drawCoil(130,150,'#e8590c','原线圈 1',i);
-  drawCoil(secX,150,'#1971c2','副线圈 2',e2);
-  // coupling field lines
-  ctx.strokeStyle='rgba(138,63,251,.45)';ctx.lineWidth=2;ctx.setLineDash([6,4]);
-  for(let k=-2;k<=2;k++){ctx.beginPath();ctx.moveTo(235,150+k*14);ctx.bezierCurveTo(305,90+k*10,secX-40,90+k*10,secX,150+k*14);ctx.stroke()}
-  ctx.setLineDash([]);ctx.fillStyle='#8a3ffb';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText('变化磁场耦合 k',350,92);
-  galvanometer(secX+54,260,e2);
-  // I-t / E2 trace
-  ctx.strokeStyle='#e8590c';ctx.lineWidth=2;ctx.beginPath();for(let x=0;x<180;x++){const tt=t-(180-x)/60,yy=320-35*Math.sin(2*Math.PI*f*tt);if(x)ctx.lineTo(70+x,yy);else ctx.moveTo(70+x,yy)}ctx.stroke();
-  ctx.strokeStyle='#1971c2';ctx.beginPath();for(let x=0;x<180;x++){const tt=t-(180-x)/60,yy=365-30*Math.cos(2*Math.PI*f*tt)*coupling();if(x)ctx.lineTo(70+x,yy);else ctx.moveTo(70+x,yy)}ctx.stroke();
-  ctx.fillStyle='#486581';ctx.font='11px system-ui';ctx.textAlign='left';ctx.fillText('橙：I₁(t)；蓝：E₂∝-k·dI₁/dt',70,388);
-  ctx.fillStyle='#243b53';ctx.font='13px system-ui';ctx.fillText('互感链条：I₁变化 → B变化 → Φ₂变化 → E₂。直流稳定：I₁≠0 但 dI₁/dt=0，所以 E₂=0。',24,32);
-  document.getElementById('i1v').textContent=i.toFixed(2);document.getElementById('dv').textContent=di.toFixed(2);
-  document.getElementById('kv').textContent=coupling().toFixed(2);document.getElementById('e2v').textContent=e2.toFixed(2);
-  document.getElementById('statev').textContent=!running?'暂停观察':(mode==='ac'?'交流持续互感':(mode==='dc'?'直流稳定无互感':'通断瞬间互感'));
-}
-function setMode(m){mode=m;document.getElementById('ac').classList.toggle('on',m==='ac');document.getElementById('dc').classList.toggle('on',m==='dc');document.getElementById('pulse').classList.toggle('on',m==='pulse');if(m==='pulse')pulseT=t}
-function pos(e){const r=cv.getBoundingClientRect(),s=cv.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s}}
-cv.addEventListener('pointerdown',e=>{const p=pos(e);if(Math.abs(p.x-(secX+42))<80&&p.y>95&&p.y<210){drag=true;cv.setPointerCapture(e.pointerId)}});
-cv.addEventListener('pointermove',e=>{if(!drag)return;const p=pos(e);secX=Math.max(360,Math.min(610,p.x-42))});
-cv.addEventListener('pointerup',()=>drag=false);cv.addEventListener('pointercancel',()=>drag=false);
-document.getElementById('ac').onclick=()=>setMode('ac');document.getElementById('dc').onclick=()=>setMode('dc');document.getElementById('pulse').onclick=()=>setMode('pulse');
-document.getElementById('fr').oninput=e=>{f=parseFloat(e.target.value);document.getElementById('fl').textContent=f.toFixed(1)};
-document.getElementById('play-btn').onclick=()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放'};
-document.getElementById('reset-btn').onclick=()=>{mode='ac';f=1;t=0;secX=470;pulseT=-1;lastI=0;running=true;document.getElementById('fr').value=f;document.getElementById('fl').textContent=f.toFixed(1);document.getElementById('play-btn').textContent='暂停';setMode('ac')};
-let last=performance.now();
-function loop(now){const dt=Math.min((now-last)/1000,0.04);last=now;if(running)t+=dt;const i=current(),di=running?(i-lastI)/Math.max(dt,0.01):0;lastI=i;const e2=-coupling()*di*0.35;draw(i,di,e2);requestAnimationFrame(loop)}
-requestAnimationFrame(loop);
+  'use strict';
+  const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+  const el={play:document.getElementById('playBtn'),i1:document.getElementById('i1Text'),di:document.getElementById('diText'),phi:document.getElementById('phiText'),e2:document.getElementById('e2Text'),status:document.getElementById('status'),freq:document.getElementById('freqInput'),freqOut:document.getElementById('freqOut')};
+  const defaults={mode:'ac',freq:1,phase:0,running:true,pulseStart:0,secondary:0.7,drag:false};
+  const state={...defaults};
+  const pulseDuration=Math.PI*0.8;
+  const C={ink:'#102a43',muted:'#64748b',orange:'#e8590c',purple:'#7c3aed',green:'#0f766e',blue:'#2563eb',red:'#dc2626',gold:'#d97706',core:'#b8c4d1'};
+  let W=960,H=640,dpr=1,last=performance.now();
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  const fmt=(v,d=2)=>Number.isFinite(v)?v.toFixed(d):'—';
+  function layout(){
+    if(W<640){const w=W-24, apparatus={x:12,y:44,w,h:350}, graph={x:12,y:406,w,h:178};return {apparatus,graph}}
+    return {apparatus:{x:18,y:48,w:W-36,h:340},graph:{x:18,y:410,w:W-36,h:195}};
+  }
+  function coupling(){return clamp(1.05-state.secondary*.65,.22,1)}
+  function signal(){
+    const omega=2*Math.PI*state.freq;
+    if(state.mode==='ac'){const i=Math.sin(state.phase),di=omega*Math.cos(state.phase);return {i,di}}
+    if(state.mode==='dc')return {i:1,di:0};
+    const u=state.phase-state.pulseStart;
+    if(u<0)return {i:0,di:0};
+    if(u<pulseDuration){const x=u/pulseDuration;return {i:x*x*(3-2*x),di:omega*4*x*(1-x)}}
+    return {i:1,di:0};
+  }
+  function values(){const s=signal(),k=coupling(),phi=k*s.i,e2=-k*s.di*.38;return {...s,k,phi,e2}}
+  function text(s,x,y,color=C.ink,align='center',size=13,weight='700'){ctx.fillStyle=color;ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+  function line(x1,y1,x2,y2,color=C.muted,width=2,dash){ctx.save();ctx.strokeStyle=color;ctx.lineWidth=width;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
+  function arrow(x1,y1,x2,y2,color=C.blue,width=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,color,width);ctx.save();ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-11*Math.cos(a-.45),y2-11*Math.sin(a-.45));ctx.lineTo(x2-11*Math.cos(a+.45),y2-11*Math.sin(a+.45));ctx.closePath();ctx.fill();ctx.restore()}
+  function box(x,y,w,h,fill='#fff',stroke='#d7dee8'){ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=stroke;ctx.stroke();ctx.restore()}
+  function drawCoil(x,y,color,label,active,dragHandle){
+    ctx.save();ctx.strokeStyle=color;ctx.lineWidth=3.5;for(let i=0;i<5;i++){ctx.beginPath();ctx.ellipse(x,y+i*22,22,13,0,0,Math.PI*2);ctx.stroke()}ctx.restore();
+    text(label,x,y+137,color,'center',12,'800');if(dragHandle){ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y-24,10,0,Math.PI*2);ctx.fill();text('拖动',x,y-43,color,'center',10,'800')}
+    if(Math.abs(active)>.02){ctx.save();ctx.globalAlpha=.14+Math.min(.22,Math.abs(active)*.15);ctx.fillStyle=color;ctx.fillRect(x-34,y-40,68,150);ctx.restore()}
+  }
+  function drawMeter(x,y,label,value,color,needle){box(x,y,94,70,'#0f172a','#334155');text(label,x+47,y+16,'#b6c5d8','center',11,'700');text(value,x+47,y+38,'#fbbf24','center',13,'800');line(x+18,y+55,x+76,y+55,'#475569',2);const n=clamp(needle,-1,1);line(x+47,y+55,x+47+n*25,y+45,color,3)}
+  function drawChain(v,L){
+    const a=L.apparatus,x1=a.x+a.w*.28,x2=a.x+a.w*(.58+state.secondary*.18),y=a.y+72;
+    const active=Math.abs(v.di)>.08, boxes=[{x:a.x+16,w:(a.w-56)/4,label:'1  I₁变化',sub:active?'电流在变':'电流恒定',color:C.orange,hot:active},{x:a.x+24+(a.w-56)/4,w:(a.w-56)/4,label:'2  B变化',sub:active?'铁芯磁场在变':'磁场恒定',color:C.purple,hot:active},{x:a.x+32+2*(a.w-56)/4,w:(a.w-56)/4,label:'3  Φ₂变化',sub:active?'副线圈磁通在变':'磁通恒定',color:C.green,hot:active},{x:a.x+40+3*(a.w-56)/4,w:(a.w-56)/4,label:'4  E₂',sub:active?'电流计偏转':'E₂=0',color:C.blue,hot:Math.abs(v.e2)>.04}];
+    boxes.forEach((b,i)=>{box(b.x,a.y+10,b.w,44,b.hot?'#eff6ff':'#f8fafc',b.hot?b.color:'#cbd5e1');text(b.label,b.x+b.w/2,a.y+25,b.hot?b.color:C.muted,'center',Math.max(10,Math.min(13,b.w/14)),'800');text(b.sub,b.x+b.w/2,a.y+43,C.ink,'center',Math.max(9,Math.min(11,b.w/17)),'700');if(i<3)arrow(b.x+b.w+2,a.y+32,b.x+b.w+13,a.y+32,b.hot?C.gold:C.muted,2)});
+    text('同一根铁芯把变化的磁场传到副线圈',a.x+a.w/2,a.y+72,C.muted,'center',12,'700');
+    const coreX=a.x+a.w*.34,coreW=a.w*.32,coreY=a.y+135;ctx.save();ctx.strokeStyle=C.core;ctx.lineWidth=18;ctx.beginPath();ctx.roundRect(coreX,coreY,coreW,96,18);ctx.stroke();ctx.restore();text('软铁芯：让磁通集中',a.x+a.w/2,coreY+52,C.ink,'center',11,'700');
+    drawCoil(x1,coreY-6,C.orange,'原线圈 1',v.i,false);drawCoil(x2,coreY-6,C.blue,'副线圈 2',v.e2,true);
+    arrow(x1-72,coreY+46,x1-30,coreY+46,C.orange,3);text('电源 / I₁',x1-72,coreY+22,C.orange,'center',11,'800');arrow(x2+30,coreY+46,x2+75,coreY+46,C.blue,3);text('G / E₂',x2+74,coreY+22,C.blue,'center',11,'800');
+    ctx.save();ctx.globalAlpha=.18+Math.min(.55,Math.abs(v.i)*.35);ctx.strokeStyle=v.i>=0?C.purple:C.red;ctx.lineWidth=2;for(let j=-2;j<=2;j++){ctx.beginPath();ctx.moveTo(x1+26,coreY+46+j*16);ctx.bezierCurveTo(a.x+a.w*.44,coreY-10+j*8,a.x+a.w*.56,coreY-10+j*8,x2-26,coreY+46+j*16);ctx.stroke()}ctx.restore();
+    text(v.i>=0?'B→':'B←',a.x+a.w/2,coreY-18,v.i>=0?C.purple:C.red,'center',13,'900');text(active?'磁场线正在变粗/变细':'磁场线保持不变',a.x+a.w/2,coreY+120,active?C.purple:C.muted,'center',11,'800');
+    drawMeter(a.x+18,a.y+a.h-82,'原线圈 I₁',fmt(v.i,2)+' A',C.orange,v.i);drawMeter(a.x+a.w-112,a.y+a.h-82,'副线圈 E₂',fmt(v.e2,2)+' V',C.blue,v.e2*2);
+  }
+  function drawGraph(v,L){
+    const g=L.graph,left=g.x+42,right=g.x+g.w-16,top=g.y+30,bottom=g.y+g.h-28;box(g.x,g.y,g.w,g.h,'#fff','#d7dee8');text('同一时间轴：橙 I₁ → 绿 Φ₂ → 蓝 E₂（蓝线在 I₁变化最快处响应）',g.x+g.w/2,g.y+16,C.ink,'center',Math.max(11,Math.min(15,g.w/54)),'800');line(left,bottom,right,bottom,C.muted,1);line(left,top,left,bottom,C.muted,1);for(let j=0;j<3;j++)line(left,top+j*(bottom-top)/2,right,top+j*(bottom-top)/2,'#e2e8f0',1);const span=right-left;ctx.save();ctx.beginPath();for(let i=0;i<=150;i++){const u=i/150*2*Math.PI*2,ii=Math.sin(u),x=left+span*i/150,y=bottom-((ii+1)/2)*(bottom-top)*.72;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.strokeStyle=C.orange;ctx.lineWidth=2;ctx.stroke();ctx.beginPath();for(let i=0;i<=150;i++){const u=i/150*2*Math.PI*2,pp=coupling()*Math.sin(u),x=left+span*i/150,y=bottom-((pp+1)/2)*(bottom-top)*.72;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.strokeStyle=C.green;ctx.stroke();ctx.beginPath();for(let i=0;i<=150;i++){const u=i/150*2*Math.PI*2,ee=-coupling()*.38*(2*Math.PI*state.freq)*Math.cos(u),x=left+span*i/150,y=bottom-clamp((ee+1)/2,0,1)*(bottom-top)*.72;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.strokeStyle=C.blue;ctx.stroke();ctx.restore();const cursor=left+((state.phase%(2*Math.PI*2))/(Math.PI*2*2))*span;line(cursor,top,cursor,bottom,C.gold,2,[4,3]);text('现在',cursor,top-11,C.gold,'center',10,'800');text('t',right+6,bottom,C.muted,'left',11,'700');text('I₁',left+18,top+10,C.orange,'left',11,'800');text('Φ₂',left+42,top+10,C.green,'left',11,'800');text('E₂',left+70,top+10,C.blue,'left',11,'800');
+  }
+  function update(v){el.i1.textContent=fmt(v.i,2)+' A';el.di.textContent=fmt(v.di,2)+' A/s';el.phi.textContent=fmt(v.phi,2);el.e2.textContent=fmt(v.e2,2)+' V';el.freqOut.textContent=fmt(state.freq,1)+' Hz';const changed=Math.abs(v.di)>.08,pulseWaiting=state.mode==='pulse'&&state.phase-state.pulseStart<=.001;el.status.classList.toggle('warn',!changed&&!pulseWaiting);el.status.textContent=pulseWaiting?'通断瞬间已暂停：点“单步”或“播放”，观察 I₁ 上升时副线圈如何响应。':changed?`I₁ 正在变化 → B 正在变化 → Φ₂ 正在变化 → E₂=${fmt(v.e2,2)} V，副线圈电流计偏转。`:'I₁ 已经恒定 → B 恒定 → Φ₂ 恒定 → E₂=0，副线圈没有持续感应。'}
+  function draw(){const L=layout(),v=values();ctx.clearRect(0,0,W,H);const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#fbfdff');bg.addColorStop(1,'#eaf0f7');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);text('互感实验台：只要原线圈电流变化，副线圈才会响应',W/2,20,C.ink,'center',Math.max(15,Math.min(20,W/46)),'900');drawChain(v,L);drawGraph(v,L);update(v);window.__ANIM_TEST_STATE__={mode:state.mode,secondary:state.secondary,values:v}}
+  function resize(){const r=canvas.getBoundingClientRect();W=Math.max(320,Math.min(960,r.width||960));H=W<640?584:640;dpr=Math.min(window.devicePixelRatio||1,2);canvas.style.height=H+'px';canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);draw()}
+  function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}}
+  function setMode(mode){state.mode=mode;document.getElementById('acBtn').classList.toggle('active',mode==='ac');document.getElementById('dcBtn').classList.toggle('active',mode==='dc');document.getElementById('pulseBtn').classList.toggle('active',mode==='pulse');if(mode==='pulse'){state.pulseStart=state.phase;state.running=false;el.play.textContent='播放'}draw()}
+  canvas.addEventListener('pointerdown',e=>{const p=pos(e),L=layout(),a=L.apparatus,x2=a.x+a.w*(.58+state.secondary*.18),y=a.y+210;if(Math.hypot(p.x-x2,p.y-y)<70){state.drag=true;canvas.setPointerCapture(e.pointerId)}});
+  canvas.addEventListener('pointermove',e=>{if(!state.drag)return;const p=pos(e),a=layout().apparatus;state.secondary=clamp((p.x/a.w-a.x/a.w-.58)/.18,.1,1);draw()});
+  canvas.addEventListener('pointerup',e=>{state.drag=false;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}});canvas.addEventListener('pointercancel',()=>state.drag=false);
+  el.play.onclick=()=>{state.running=!state.running;el.play.textContent=state.running?'暂停':'播放';draw()};
+  document.getElementById('stepBtn').onclick=()=>{state.running=false;el.play.textContent='播放';state.phase+=.28;draw()};
+  document.getElementById('resetBtn').onclick=()=>{Object.assign(state,defaults);el.freq.value=1;el.play.textContent='暂停';setMode('ac');draw()};
+  document.getElementById('acBtn').onclick=()=>setMode('ac');document.getElementById('dcBtn').onclick=()=>setMode('dc');document.getElementById('pulseBtn').onclick=()=>setMode('pulse');
+  el.freq.oninput=e=>{state.freq=Number(e.target.value);draw()};
+  function loop(now){const dt=Math.min((now-last)/1000,.04);last=now;if(state.running)state.phase+=dt*2*Math.PI*state.freq;draw();requestAnimationFrame(loop)}
+  if(window.ResizeObserver)new ResizeObserver(resize).observe(canvas);requestAnimationFrame(resize);requestAnimationFrame(loop);
 })();
 </script>
 </body>
