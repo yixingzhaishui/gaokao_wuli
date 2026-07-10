@@ -3,7 +3,7 @@
 > **模块状态：进行中（P0-1 MVP）**
 > 学生必须从"运动如何描述"进入"力如何改变运动"。页面要让学生看见：位置变化、速度变化、受力变化、加速度变化之间的因果关系。
 
-## 1.1 运动的描述 `<h3 id="motion-description"></h3>`
+## 1.1 运动的描述 <h3 id="motion-description"></h3>
 
 <h4 id="particle">B1-01 质点模型 <span class="status done">done</span></h4>
 
@@ -973,7 +973,7 @@ A 错：高速匀速 a=0。B 错：上抛最高点 v=0、a=g。C 对：减速时
 
 ---
 
-## 1.2 运动图像与规律 `<h3 id="motion-graphs"></h3>`
+## 1.2 运动图像与规律 <h3 id="motion-graphs"></h3>
 
 <h4 id="xt-graph">B1-07 x-t 图像 <span class="status done">done</span></h4>
 
@@ -2234,7 +2234,7 @@ h = v0t - ½gt² → -20 = 4t - 5t² → 5t² - 4t - 20 = 0 → t = (4+√(16+40
 
 ---
 
-## 1.3 相互作用 `<h3 id="interaction"></h3>`
+## 1.3 相互作用 <h3 id="interaction"></h3>
 
 <h4 id="gravity">B1-15 重力 <span class="status done">done</span></h4>
 
@@ -3629,7 +3629,7 @@ T = G/(2sinθ)
 
 ---
 
-## 1.4 牛顿运动定律 `<h3 id="newton-laws"></h3>`
+## 1.4 牛顿运动定律 <h3 id="newton-laws"></h3>
 
 <h4 id="newton-first">B1-23 牛顿第一定律 <span class="status done">done</span></h4>
 
@@ -4266,7 +4266,7 @@ N = m(g-a)
 
 ---
 
-## 1.5 综合模型 `<h3 id="dynamics-models"></h3>`
+## 1.5 综合模型 <h3 id="dynamics-models"></h3>
 
 <h4 id="connecting-body">B1-27 连接体模型 <span class="status done">done</span></h4>
 
