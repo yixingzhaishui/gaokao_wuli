@@ -62,7 +62,7 @@
       <div class="title">实时读数</div>
       <div class="readout">
         <div class="meter"><span>F弹=kx</span><b id="fText">30.0 N</b></div>
-        <div class="meter"><span>平衡前 ΣF</span><b id="eqText">0.0 N</b></div>
+        <div class="meter"><span>ΣF(0-) / N支撑</span><b id="eqText">0.0 N</b></div>
         <div class="meter"><span>a1 / a2</span><b id="aText">5.0 / -10.0</b></div>
         <div class="meter"><span>事件</span><b id="targetText">剪下绳</b></div>
       </div>
@@ -100,7 +100,9 @@
     const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore();
   }
   function box(x,y,w,h,r,fill,stroke='#cbd5e1'){
-    ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.5;ctx.stroke()}ctx.restore();
+    ctx.save();ctx.beginPath();
+    if(typeof ctx.roundRect==='function')ctx.roundRect(x,y,w,h,r);else ctx.rect(x,y,w,h);
+    ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.5;ctx.stroke()}ctx.restore();
   }
   function spring(cx,top,len,flip){
     ctx.save();ctx.strokeStyle='#334155';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(cx,top);
@@ -110,7 +112,7 @@
   }
   function values(){
     const F=state.k*state.x, w1=state.m1*state.g, w2=state.m2*state.g, total=(state.m1+state.m2)*state.g;
-    const eqForce=state.target==='support'?F-total:F-total;
+    const eqForce=state.target==='support'?(F<=total+.01?0:F-total):F-total;
     let a1=0,a2=0,label='剪下绳',afterSpring=F,afterRope=0,afterSupport=0;
     if(state.target==='rope'){
       a1=(F-w1)/state.m1;
@@ -128,12 +130,21 @@
       label='撤支撑';
     }
     const xEq=state.target==='support'?total/state.k:total/state.k;
-    return{F,w1,w2,total,eqForce,a1,a2,label,afterSpring,afterRope,afterSupport,xEq};
+    const supportN=Math.max(0,total-F);
+    return{F,w1,w2,total,eqForce,supportN,a1,a2,label,afterSpring,afterRope,afterSupport,xEq};
   }
   function setBalanced(){state.x=clamp(values().xEq,.05,.7);state.playT=0;draw()}
+  function prepareEvent(target){
+    state.target=target;
+    if(target==='support'){
+      const q=values();
+      state.x=clamp(q.xEq*.55,.05,.7);
+    }else state.x=clamp((state.m1+state.m2)*state.g/state.k,.05,.7);
+    state.playT=0;
+  }
   function scaleForce(F){return clamp(Math.abs(F)*3.2,24,120)}
   function drawHanging(cx,title,after,q){
-    box(cx-145,56,290,394,8,'#fff','#d7dee8');
+    box(cx-145,56,290,490,8,'#fff','#d7dee8');
     text(title,cx,82,'#0f172a','center',16,'900');
     text(after?'瞬时受力图':'侧视实物装置',cx,104,after?colors.purple:colors.green,'center',12,'900');
     const top=114,stretch=76+clamp(state.x*.78,0,160),baseAY=top+stretch,baseBY=baseAY+104;
@@ -159,40 +170,44 @@
     arrow(cx-26,bY+22,cx-26,bY+22+scaleForce(q.w2),colors.red,4);text(`m2g=${fmt(q.w2)}N`,cx-36,bY+70,colors.red,'right',12,'900');
     if(!after){
       arrow(cx+28,aY+44,cx+28,aY+44+scaleForce(q.w2),colors.orange,4);text(`T=m2g`,cx+40,aY+94,colors.orange,'left',12,'900');
-      text('t=0-：F弹=(m1+m2)g 时平衡',cx,422,Math.abs(q.eqForce)<.25?colors.green:colors.orange,'center',12,'900');
+      text(Math.abs(q.eqForce)<.25?'t=0-：F弹=(m1+m2)g，系统平衡':`t=0-：ΣF=${fmt(q.eqForce)}N，先令 x=平衡值`,cx,528,Math.abs(q.eqForce)<.25?colors.green:colors.orange,'center',12,'900');
     }else{
       arrow(cx+96,aY+28,cx+96,aY+28-clamp(q.a1*10,-110,110),colors.purple,4);
       arrow(cx+96,bY+24,cx+96,bY+24-clamp(q.a2*10,-110,110),colors.purple,4);
-      text(`a1=${fmt(q.a1)}m/s²`,cx+108,aY+16,colors.purple,'left',12,'900');
-      text(`a2=${fmt(q.a2)}m/s²`,cx+108,bY+18,colors.purple,'left',12,'900');
-      text(state.target==='spring'?'t=0+：被剪弹簧力消失':'t=0+：T=0，A/B 立即按各自加速度分离',cx,422,colors.green,'center',12,'900');
+      text(`a1=${fmt(q.a1)}m/s²`,cx+140,aY+16,colors.purple,'right',11,'900');
+      text(`a2=${fmt(q.a2)}m/s²`,cx+140,bY+18,colors.purple,'right',11,'900');
+      text(state.target==='spring'?'t=0+：被剪弹簧力消失':'t=0+：T=0，A/B 立即按各自加速度分离',cx,528,colors.green,'center',12,'900');
     }
-    text(`x=${fmt(state.x,3)}m`,cx,392,'#475569','center',12,'900');
+    text(`x=${fmt(state.x,3)}m`,cx,500,'#475569','center',12,'900');
   }
   function drawSupport(cx,title,after,q){
-    box(cx-145,56,290,394,8,'#fff','#d7dee8');text(title,cx,82,'#0f172a','center',16,'900');text(after?'瞬时受力图':'侧视实物装置',cx,104,after?colors.purple:colors.green,'center',12,'900');
-    const floor=362,len=64+clamp(state.x*.72,0,150),top=floor-len,aY=top-88,bY=aY+44;
+    box(cx-145,56,290,490,8,'#fff','#d7dee8');text(title,cx,82,'#0f172a','center',16,'900');text(after?'瞬时受力图':'侧视实物装置',cx,104,after?colors.purple:colors.green,'center',12,'900');
+    const floor=362,initialLen=64+clamp(state.x*.72,0,150),initialTop=floor-initialLen;
+    const tau=after?Math.min(state.playT,1.45):0;
+    const shift=after?clamp(-0.5*q.a1*tau*tau*12,-34,82):0;
+    const aY=initialTop-88+shift,bY=aY+44;
+    const springLen=Math.max(24,floor-(bY+42));
     line(cx-120,floor,cx+120,floor,'#334155',5);
-    spring(cx,floor,-len,true);
+    spring(cx,floor,springLen,true);
     box(cx-38,bY,76,42,6,colors.cyan,'#0e7490');text('B m2',cx,bY+21,'#ecfeff','center',13,'900');
     box(cx-38,aY,76,42,6,colors.blue,'#102a43');text('A m1',cx,aY+21,'#fff','center',13,'900');
-    if(!after){line(cx-86,bY+54,cx+86,bY+54,'#f59e0b',8);text('下支撑 N',cx+96,bY+54,colors.orange,'left',12,'900')}
-    else{line(cx-86,bY+54,cx+86,bY+54,'#b0bcc9',5,[7,5]);text('N=0',cx+96,bY+54,colors.muted,'left',12,'900')}
-    arrow(cx,bY+42,cx,bY+42-scaleForce(after?q.afterSpring:q.F),colors.red,4);text(`F弹=${fmt(after?q.afterSpring:q.F)}N`,cx+12,bY+6,colors.red,'left',12,'900');
+    if(!after){line(cx-86,bY+54,cx+86,bY+54,'#f59e0b',8);text(`下支撑 N=${fmt(q.supportN)}N`,cx+140,bY+54,colors.orange,'right',11,'900')}
+    else{line(cx-86,bY+54,cx+86,bY+54,'#b0bcc9',5,[7,5]);text('N=0',cx+140,bY+54,colors.muted,'right',11,'900')}
+    arrow(cx,bY+42,cx,bY+42-scaleForce(after?q.afterSpring:q.F),colors.red,4);text(`F弹=${fmt(after?q.afterSpring:q.F)}N`,cx+140,bY+6,colors.red,'right',11,'900');
     arrow(cx-34,aY+21,cx-34,aY+21+scaleForce(q.w1),colors.red,4);text('m1g',cx-44,aY+70,colors.red,'right',12,'900');
     arrow(cx-34,bY+21,cx-34,bY+21+scaleForce(q.w2),colors.red,4);text('m2g',cx-44,bY+70,colors.red,'right',12,'900');
-    if(after){arrow(cx+108,bY,cx+108,bY-clamp(q.a1*10,-110,110),colors.purple,4);text(`a=${fmt(q.a1)}m/s²`,cx+120,bY-8,colors.purple,'left',12,'900')}
-    text(!after?'t=0-：支撑可提供差额 N':'t=0+：支撑撤去，按新合力加速',cx,422,after?colors.green:colors.orange,'center',12,'900');
-    text(`x=${fmt(state.x,3)}m`,cx,392,'#475569','center',12,'900');
+    if(after){arrow(cx+108,bY,cx+108,bY-clamp(q.a1*10,-110,110),colors.purple,4);text(`a=${fmt(q.a1)}m/s²`,cx+140,bY-8,colors.purple,'right',11,'900')}
+    text(!after?`t=0-：支撑提供 N=${fmt(q.supportN)}N`:'t=0+：N=0，物块按新合力运动',cx,528,after?colors.green:colors.orange,'center',12,'900');
+    text(`x=${fmt(state.x,3)}m`,cx,500,'#475569','center',12,'900');
   }
   function drawFormulaPanel(q){
     box(680,260,240,150,8,'#fff','#d7dee8');
     text('受力方程绑定',800,282,'#0f172a','center',14,'900');
     const rows=state.target==='support'
-      ?[`F弹=kx=${fmt(q.F)}N`,`t=0-: F弹+N=(m1+m2)g`,`t=0+: N=0, ΣF=F弹-(m1+m2)g`,`a=ΣF/(m1+m2)=${fmt(q.a1)}m/s²`]
+      ?[`F弹=kx=${fmt(q.F)}N`,`t=0-: N=(m1+m2)g-F弹=${fmt(q.supportN)}N`,`t=0+: N=0, ΣF=F弹-(m1+m2)g`,`a=ΣF/(m1+m2)=${fmt(q.a1)}m/s²`]
       :state.target==='spring'
-        ?[`F弹=kx=${fmt(q.F)}N`,`t=0-: F弹=(m1+m2)g`,`t=0+: 被剪弹簧 F弹'=0`,`A、B 瞬时均自由下落 a=-g`]
-        :[`F弹=kx=${fmt(q.F)}N`,`t=0-: F弹=m1g+T, T=m2g`,`t=0+: T=0, A 保留 F弹`,`a1=(F弹-m1g)/m1=${fmt(q.a1)}m/s²`];
+        ?[`F弹=kx=${fmt(q.F)}N`,Math.abs(q.eqForce)<.25?'t=0-: F弹=(m1+m2)g':`t=0-: ΣF=${fmt(q.eqForce)}N，非平衡`,`t=0+: 被剪弹簧 F弹'=0`,`A、B 瞬时均自由下落 a=-g`]
+        :[`F弹=kx=${fmt(q.F)}N`,Math.abs(q.eqForce)<.25?'t=0-: F弹=m1g+T, T=m2g':`t=0-: ΣF=${fmt(q.eqForce)}N，非平衡`,`t=0+: T=0, A 保留 F弹`,`a1=(F弹-m1g)/m1=${fmt(q.a1)}m/s²`];
     rows.forEach((r,i)=>text(r,696,312+i*22,i===0?colors.red:(i===2?colors.orange:colors.ink),'left',11,'800'));
   }
   function ruler(x1,y,x2,label,c,hx,txt,active){
@@ -233,12 +248,13 @@
   }
   function update(q){
     els.f.textContent=`${fmt(q.F)} N`;
-    els.eq.textContent=`${fmt(q.eqForce)} N`;
+    els.eq.textContent=state.target==='support'?`${fmt(q.eqForce)} / ${fmt(q.supportN)}`:`${fmt(q.eqForce)} N`;
     els.a.textContent=`${fmt(q.a1)} / ${fmt(q.a2)}`;
     els.target.textContent=q.label;
-    const off=Math.abs(q.eqForce),warn=off>.3;
+    const off=Math.abs(q.eqForce),invalidSupport=state.target==='support'&&q.F>q.total+.01,warn=off>.3||invalidSupport;
     els.status.className='status'+(warn?' warn':'');
-    els.status.textContent=(warn?`当前 x 不是平衡形变量，ΣF=${fmt(q.eqForce)}N；可点“令 x=平衡值”。`:`平衡前 ΣF≈0。`)+` ${q.label} 后按 t=0+ 新受力图列 ΣF=ma，未剪断弹簧保持 F弹=${fmt(q.F)}N。`;
+    if(state.target==='support')els.status.textContent=invalidSupport?`当前 F弹=${fmt(q.F)}N 大于总重，支撑不能“向下拉”；请减小 x 或重置。`:`撤支撑前 N=${fmt(q.supportN)}N，撤去后 N=0，物块按 a=${fmt(q.a1)}m/s² 运动。`;
+    else els.status.textContent=(warn?`当前 x 不是平衡形变量，ΣF=${fmt(q.eqForce)}N；可点“令 x=平衡值”。`:`平衡前 ΣF≈0。`)+` ${q.label} 后按 t=0+ 新受力图列 ΣF=ma，未剪断弹簧保持 F弹=${fmt(q.F)}N。`;
   }
   function draw(){
     const q=values(),g=geometry();
@@ -275,7 +291,7 @@
     state.playing=false;
     state.playT=0;
     refreshTargetButtons();
-    setBalanced();
+    prepareEvent(target);
     state.playing=true;
     playBtn.textContent='暂停';
     animate(++animSeq);
@@ -288,13 +304,15 @@
     if(c==='heavyB'){Object.assign(state,{target:'rope',m1:1.5,m2:3,k:120,g:10})}
     if(c==='soft'){Object.assign(state,{target:'rope',m1:2,m2:2,k:65,g:10})}
     if(c==='support'){Object.assign(state,{target:'support',m1:1.5,m2:1.5,k:120,g:10})}
-    refreshTargetButtons();setBalanced();
+    refreshTargetButtons();
+    if(c==='support'){prepareEvent('support');draw();}else setBalanced();
   }));
+  const nextFrame=typeof requestAnimationFrame==='function'?requestAnimationFrame:(fn)=>setTimeout(()=>fn(Date.now()),16);
   function animate(seq){
     if(!state.playing||seq!==animSeq)return;
     state.playT=Math.min(2.2,state.playT+.035);draw();
     if(state.playT>=2.2){state.playing=false;playBtn.textContent='播放 0+ 短过程';draw();return}
-    requestAnimationFrame(()=>animate(seq));
+    nextFrame(()=>animate(seq));
   }
   playBtn.addEventListener('click',()=>{state.playing=!state.playing;playBtn.textContent=state.playing?'暂停':'播放 0+ 短过程';if(state.playing){state.playT=0;animate(++animSeq)}else{animSeq++;draw()}});
   document.getElementById('resetBtn').addEventListener('click',()=>{animSeq++;Object.assign(state,{m1:2,m2:1,k:100,x:.30,g:10,target:'rope',playing:false,playT:0});playBtn.textContent='播放 0+ 短过程';refreshTargetButtons();draw()});
