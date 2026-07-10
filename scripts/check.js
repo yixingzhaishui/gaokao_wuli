@@ -160,6 +160,7 @@ let link;
 while ((link = linkRe.exec(sidebar)) !== null) {
   const raw = link[1];
   if (/^(?:https?:)?\/\//.test(raw)) continue;
+  if (raw === '#' || raw === '#/') continue;
   const [rawFile, rawQuery] = raw.split('?');
   if (rawFile === '/') continue;
   const file = rawFile.replace(/^\//, '').replace(/\.md$/, '') + '.md';
