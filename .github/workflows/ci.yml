@@ -1,0 +1,27 @@
+name: Repository checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Verify generated data is current
+        run: node scripts/gen-data.js --check
+      - name: Verify progress reports are current
+        run: node scripts/update-progress-report.js --check
+      - name: Run strict repository checks
+        run: node scripts/check.js --strict
+      - name: Audit animations
+        run: node scripts/anim-audit.js
