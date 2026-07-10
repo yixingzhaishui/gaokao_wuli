@@ -421,7 +421,11 @@
     function setupMobileSidebar() {
       const button = document.getElementById('mobile-sidebar-toggle');
       const backdrop = document.getElementById('mobile-sidebar-backdrop');
+      const main = document.querySelector('main');
       if (!button) return;
+      if (main && backdrop && backdrop.parentElement !== main) {
+        main.appendChild(backdrop);
+      }
       if (button.dataset.bound !== '1') {
         button.dataset.bound = '1';
         button.addEventListener('click', function() {
@@ -433,19 +437,6 @@
       if (backdrop && backdrop.dataset.bound !== '1') {
         backdrop.dataset.bound = '1';
         backdrop.addEventListener('click', closeMobileSidebar);
-      }
-      if (button.dataset.navBound !== '1') {
-        button.dataset.navBound = '1';
-        document.addEventListener('click', function(event) {
-          const target = event.target && typeof event.target.closest === 'function' ? event.target : null;
-          const link = target && target.closest('.sidebar-nav a');
-          const href = link && link.getAttribute('href');
-          if (!href || !href.startsWith('#/')) return;
-          closeMobileSidebar();
-          window.setTimeout(function() {
-            if (location.hash !== href) location.hash = href;
-          }, 0);
-        }, true);
       }
       if (button.dataset.hashBound !== '1') {
         button.dataset.hashBound = '1';
