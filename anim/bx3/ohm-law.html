@@ -23,6 +23,7 @@ button.on{background:#2c7be5;color:#fff}
 .chip b{color:#ffd166}
 .hint{margin-top:10px;background:#fff7e6;border-left:3px solid var(--gold);border-radius:6px;padding:9px 11px;font-size:13px;color:#5a6b7b;line-height:1.55}
 .formula{margin-top:10px;border-top:1px solid var(--line);padding-top:10px;font-size:13px;color:#334e68;line-height:1.7}
+.slider{display:grid;gap:4px;margin:8px 0;font-size:13px;color:#486581}.slider span{display:flex;justify-content:space-between}.slider input{width:100%;accent-color:var(--blue)}
 @media(max-width:820px){.lab{grid-template-columns:1fr}}
 </style>
 </head>
@@ -36,6 +37,8 @@ button.on{background:#2c7be5;color:#fff}
         <button class="on" data-mode="linear">线性电阻</button>
         <button data-mode="lamp">灯泡非线性</button>
       </div>
+      <label class="slider"><span>电压 U（看电池高度、伏特表和工作点）<b id="uslider">6.0 V</b></span><input id="u" type="range" min="0" max="12" step="0.1" value="6"></label>
+      <label class="slider"><span>电阻 R（看电阻长度、安培表和直线斜率）<b id="rslider">10.0 Ω</b></span><input id="r" type="range" min="2" max="30" step="0.1" value="10"></label>
       <div class="read">
         <div class="chip">电压 U = <b id="uv">6.0</b> V</div>
         <div class="chip">电阻 R = <b id="rv">10.0</b> Ω</div>
@@ -52,7 +55,7 @@ button.on{background:#2c7be5;color:#fff}
 (function(){
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 let U=6,R=10,mode='linear',drag=null,phase=0,last=performance.now();
-const els={uv:id('uv'),rv:id('rv'),iv:id('iv'),kv:id('kv'),judge:id('judge')};
+const els={uv:id('uv'),rv:id('rv'),iv:id('iv'),kv:id('kv'),judge:id('judge'),u:id('u'),r:id('r'),uslider:id('uslider'),rslider:id('rslider')};
 function id(s){return document.getElementById(s)}
 function clamp(x,a,b){return Math.max(a,Math.min(b,x))}
 function current(){return mode==='linear'?U/R:0.22*Math.pow(U,0.72)}
@@ -79,6 +82,8 @@ function drawCircuit(){
   ctx.fillStyle='rgba(255,210,80,'+(0.15+glow*.35)+')';ctx.beginPath();ctx.arc(x0+w,y0+h/2,35,0,7);ctx.fill();
   ctx.strokeStyle='#334e68';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x0+w,y0+h/2,18,0,7);ctx.stroke();
   ctx.fillStyle='#102a43';ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillText('A 表 '+I.toFixed(2)+'A',x0+98,y0+h+35);
+  ctx.fillStyle='#fff';ctx.strokeStyle='#e03131';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x0+112,y0+42,23,0,7);ctx.fill();ctx.stroke();ctx.fillStyle='#e03131';ctx.font='bold 11px system-ui';ctx.textAlign='center';ctx.fillText('V 表',x0+112,y0+38);ctx.fillText(U.toFixed(2)+' V',x0+112,y0+51);
+  ctx.fillStyle='#f0a500';ctx.font='bold 12px system-ui';ctx.fillText('元件两端 U='+U.toFixed(2)+'V',rx,ry-30);
 }
 function drawGraph(){
   const gx=430,gy=342,gw=245,gh=245,I=current();
@@ -96,6 +101,7 @@ function update(){
   const I=current(),k=U>0?I/U:1/R;
   els.uv.textContent=U.toFixed(1);els.rv.textContent=(mode==='linear'?R:effR()).toFixed(1);els.iv.textContent=I.toFixed(2);els.kv.textContent=k.toFixed(3);
   els.judge.textContent=mode==='linear'?'I=U/R 成立':'非线性：R 随工作点变';
+  els.u.value=U;els.r.value=R;els.uslider.textContent=U.toFixed(1)+' V';els.rslider.textContent=(mode==='linear'?R:effR()).toFixed(1)+' Ω';
 }
 function draw(){
   ctx.clearRect(0,0,cv.width,cv.height);
@@ -122,6 +128,7 @@ cv.addEventListener('pointermove',e=>{
 });
 window.addEventListener('pointerup',()=>{drag=null});
 document.querySelectorAll('#mode button').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;document.querySelectorAll('#mode button').forEach(x=>x.classList.toggle('on',x===b));draw()});
+els.u.oninput=e=>{U=+e.target.value;draw()};els.r.oninput=e=>{R=+e.target.value;draw()};
 function loop(now){if(window.__paused){requestAnimationFrame(loop);return;}const dt=Math.min((now-last)/1000,.05);last=now;phase+=current()*75*dt;draw();requestAnimationFrame(loop)}
 draw();requestAnimationFrame(loop);
 var _pb=document.getElementById("play-btn");if(_pb)_pb.onclick=function(){window.__paused=!window.__paused;this.textContent=window.__paused?"▶ 播放":"⏸ 暂停";var st=document.getElementById("run-st");if(st)st.textContent=window.__paused?"已暂停":"运行中";};

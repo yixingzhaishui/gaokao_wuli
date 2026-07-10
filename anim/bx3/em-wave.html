@@ -36,6 +36,8 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
     <span class="r">频率 f = <b id="f-val">2.0</b> GHz</span>
     <span class="r">波长 λ = <b id="lam-val">150</b> mm</span>
     <span class="r">周期 T = <b id="t-val">0.50</b> ns</span>
+    <span class="r">相对光强 ∝ E₀² = <b id="intensity-val">1600</b></span>
+    <span class="r">波前位置 x/λ = <b id="front-val">0.00</b></span>
     <span class="r">播放状态：<b id="state-val">播放中</b></span>
   </div>
   <div class="hint">
@@ -57,6 +59,8 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
     document.getElementById('f-val').textContent=freq.toFixed(1);
     document.getElementById('lam-val').textContent=lambda.toFixed(0);
     document.getElementById('t-val').textContent=T.toFixed(2);
+    document.getElementById('intensity-val').textContent=(amp*amp).toFixed(0);
+    document.getElementById('front-val').textContent=((t*freq)%1).toFixed(2);
     document.getElementById('state-val').textContent=running?'播放中：E、B 同频同相振动':'已暂停';
   }
 
@@ -113,38 +117,17 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
         ctx.closePath();ctx.fill();
       }
     }
-    // B field (horizontal/depth, blue) — shown as sine wave below axis (represents B perpendicular to E and k)
-    ctx.strokeStyle='#2c7be5';ctx.lineWidth=2;
-    ctx.beginPath();
-    for(let i=0;i<=len;i++){
-      const x=cx+i;
-      const y=cy+amp*0.7*Math.sin(2*Math.PI*i/screenLambda+phase);
-      if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
-    }
-    ctx.stroke();
-    // B field arrows
+    // B 不再被误画成纸面内第二条波线：用 ⊙/⊗ 表示它垂直屏幕。
     for(let i=0;i<len;i+=20){
       const x=cx+i;
-      const y=cy+amp*0.7*Math.sin(2*Math.PI*i/screenLambda+phase);
-      const dy=y-cy;
-      if(Math.abs(dy)>5){
-        ctx.strokeStyle='#2c7be5';ctx.fillStyle='#2c7be5';ctx.lineWidth=1.5;
-        ctx.beginPath();
-        ctx.moveTo(x,cy);ctx.lineTo(x,y);
-        ctx.stroke();
-        const sign=dy>0?1:-1;
-        ctx.beginPath();
-        ctx.moveTo(x,y);
-        ctx.lineTo(x-3,y-6*sign);
-        ctx.lineTo(x+3,y-6*sign);
-        ctx.closePath();ctx.fill();
-      }
+      const b=Math.sin(2*Math.PI*i/screenLambda+phase);
+      if(Math.abs(b)>.18){ctx.strokeStyle='#2c7be5';ctx.fillStyle='#2c7be5';ctx.lineWidth=1.7;ctx.beginPath();ctx.arc(x,cy,6,0,Math.PI*2);ctx.stroke();if(b>0){ctx.beginPath();ctx.arc(x,cy,2.4,0,Math.PI*2);ctx.fill();}else{ctx.beginPath();ctx.moveTo(x-3,cy-3);ctx.lineTo(x+3,cy+3);ctx.moveTo(x+3,cy-3);ctx.lineTo(x-3,cy+3);ctx.stroke();}}
     }
     // labels
     ctx.fillStyle='#e03131';ctx.font='13px sans-serif';ctx.textAlign='left';
     ctx.fillText('E（电场，竖直）',cx,cy-amp-15);
     ctx.fillStyle='#2c7be5';
-    ctx.fillText('B（磁场，垂直于E和k）',cx,cy+amp*0.7+20);
+    ctx.fillText('B（⊙ 出纸面 / ⊗ 入纸面，垂直于E和k）',cx,cy+amp+20);
     // wavelength bracket
     const lamX1=cx+20;
     const lamX2=cx+20+screenLambda;
@@ -178,7 +161,7 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
   document.getElementById('freq').addEventListener('input',e=>{freq=parseFloat(e.target.value);document.getElementById('f-display').textContent=freq.toFixed(1);updateReadouts();});
   document.getElementById('amp').addEventListener('input',e=>{amp=parseFloat(e.target.value);document.getElementById('a-display').textContent=amp.toFixed(0);});
   document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';updateReadouts();});
-  document.getElementById('reset-btn').addEventListener('click',()=>{t=0;draw();});
+  document.getElementById('reset-btn').addEventListener('click',()=>{t=0;freq=2;amp=40;running=false;document.getElementById('freq').value=2;document.getElementById('amp').value=40;document.getElementById('f-display').textContent='2.0';document.getElementById('a-display').textContent='40';document.getElementById('play-btn').textContent='播放';updateReadouts();draw();});
 
   updateReadouts();requestAnimationFrame(loop);
   function pointerPos(e){const r=canvas.getBoundingClientRect();const s=canvas.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s};}
