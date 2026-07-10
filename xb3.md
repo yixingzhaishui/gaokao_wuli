@@ -5776,13 +5776,13 @@ r 越小，|h| 越大
 同一杯气体里，分子并不是都以同一速率运动，而是有快有慢。温度升高后，不是每个分子速率都同样增加，而是高速分子比例增大、分布范围变宽；因为总分子数不变，分布曲线下的总面积仍表示 100% 的分子。
 
 #### 3. 交互动画
-<iframe src="anim/xb3/molecular-speed-distribution.html" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb3/molecular-speed-distribution.html" width="100%" height="820" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 #### 4. 观察任务
-- 拖动温度 `T`：看容器中红色快分子比例如何变化。
-- 看直方图：温度升高后高速率段分子数增多。
-- 看分布曲线：峰值降低、峰位右移、曲线变宽。
-- 对照面积读数：理解总面积不变表示总分子比例不变。
+- 拖动画布底部的温度探针或右侧温度 `T`：看容器中箭头长短和红色快分子比例怎样变化。
+- 看直方图：温度升高后高速率段的柱子整体向右展开，不是所有分子都变成同一个速率。
+- 看分布曲线：当前红线与低温/高温虚线对照，核对峰值降低、峰位右移、分布变宽。
+- 对照右侧的数值积分面积：它由当前曲线计算，接近 `1` 才能说明归一化后的总分子比例不变。
 
 #### 5. 核心规律
 
