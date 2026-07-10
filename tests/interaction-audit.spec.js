@@ -78,6 +78,54 @@ async function probeCanvasDrag(page) {
   return { tested: true, affected_result: false };
 }
 
+async function auditSpringInstantSemantics(page, record) {
+  const targetCases = [
+    { value: 'rope', label: '剪下绳', force: '30.0 N', balance: '0.0 N', acceleration: '5.0 / -10.0' },
+    { value: 'spring', label: '剪弹簧', force: '30.0 N', balance: '0.0 N', acceleration: '-10.0 / -10.0' },
+    { value: 'support', label: '撤支撑', force: '16.5 N', balance: '0.0 / 13.5', acceleration: '-4.5 / -4.5' }
+  ];
+  const quickCases = [
+    { value: 'equal', label: '剪下绳', force: '30.0 N', balance: '0.0 N', acceleration: '5.0 / -10.0' },
+    { value: 'heavyB', label: '剪下绳', force: '45.0 N', balance: '0.0 N', acceleration: '20.0 / -10.0' },
+    { value: 'soft', label: '剪下绳', force: '40.0 N', balance: '0.0 N', acceleration: '10.0 / -10.0' },
+    { value: 'support', label: '撤支撑', force: '16.5 N', balance: '0.0 / 13.5', acceleration: '-4.5 / -4.5' }
+  ];
+  const readout = () => page.evaluate(() => ({
+    label: document.querySelector('#targetText')?.textContent.trim(),
+    force: document.querySelector('#fText')?.textContent.trim(),
+    balance: document.querySelector('#eqText')?.textContent.trim(),
+    acceleration: document.querySelector('#aText')?.textContent.trim()
+  }));
+  const check = (kind, expected, actual) => {
+    const fields = ['label', 'force', 'balance', 'acceleration'];
+    const mismatches = fields.filter(field => actual[field] !== expected[field]);
+    const item = { kind, option: expected.value, expected, actual, pass: mismatches.length === 0 };
+    record.semantic_checks.push(item);
+    if (mismatches.length) {
+      record.hard_failures.push({
+        code: 'H5',
+        description: `${kind} ${expected.value} 的语义结果错误：${mismatches.map(field => `${field}=${actual[field]}（应为 ${expected[field]}）`).join('；')}`
+      });
+    }
+  };
+
+  for (const expected of targetCases) {
+    await page.locator('#resetBtn').click();
+    await page.waitForTimeout(90);
+    await page.locator(`[data-target="${expected.value}"]`).click();
+    await page.waitForTimeout(120);
+    check('cut_target', expected, await readout());
+  }
+  for (const expected of quickCases) {
+    await page.locator('#resetBtn').click();
+    await page.waitForTimeout(90);
+    await page.locator(`[data-case="${expected.value}"]`).click();
+    await page.waitForTimeout(120);
+    check('快速情境', expected, await readout());
+  }
+  await page.locator('#resetBtn').click();
+}
+
 for (const file of files) {
   test(`${moduleName}/${file} 真实交互审核`, async ({ page }) => {
     const consoleErrors = [];
@@ -96,6 +144,7 @@ for (const file of files) {
       reset_button_found: false,
       reset_worked: null,
       controls: [],
+      semantic_checks: [],
       direct_canvas_drag: null,
       reentry_passed: false,
       mobile_passed: false,
@@ -196,6 +245,8 @@ for (const file of files) {
       }
 
       record.direct_canvas_drag = await probeCanvasDrag(page);
+
+      if (file === 'spring-instant.html') await auditSpringInstantSemantics(page, record);
 
       await page.goto('about:blank');
       await page.goBack({ waitUntil: 'load' });
