@@ -1,14 +1,16 @@
-/* scripts/check.js - strict site consistency checks
- * Run from website/: node scripts/check.js
+/* scripts/check.js - repository consistency checks
+ * Run from the repository root: node scripts/check.js [--strict]
  */
 'use strict';
 
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 
 const root = path.resolve(__dirname, '..');
+const strict = process.argv.slice(2).includes('--strict');
+const unknownArgs = process.argv.slice(2).filter(arg => arg !== '--strict');
 const errors = [];
 const warns = [];
 
@@ -28,13 +30,14 @@ function lineOf(text, index) {
   return text.slice(0, index).split('\n').length;
 }
 
-function esc(text) {
-  return String(text).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+function esc(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function walk(dir, filter = () => true) {
   const out = [];
   for (const name of fs.readdirSync(dir)) {
+    if (name === '.git') continue;
     const fp = path.join(dir, name);
     const st = fs.statSync(fp);
     if (st.isDirectory()) out.push(...walk(fp, filter));
@@ -43,14 +46,31 @@ function walk(dir, filter = () => true) {
   return out;
 }
 
-function hasProblemGraphic(problem) {
-  if (problem.diagram) return true;
-  if (problem.image || problem.img || problem.figure || problem.svg) return true;
-  return false;
+function idsIn(text) {
+  return text.match(/\b(?:B[1-3]|X[1-3])-\d{2}\b|\b[GEM]-\d{2}\b/g) || [];
 }
 
-function hasPageGraphic(block) {
-  return /<svg\b|!\[[^\]]*\]\([^)]+\)|<img\b|<figure\b|diagram|image|svg/i.test(block);
+function duplicates(values) {
+  const counts = new Map();
+  values.forEach(value => counts.set(value, (counts.get(value) || 0) + 1));
+  return [...counts.entries()].filter(([, count]) => count > 1).map(([value, count]) => `${value} (${count})`);
+}
+
+function formatIds(ids) {
+  return ids.length ? ids.join(', ') : '无';
+}
+
+function compareCollections(name, actualIds, expectedIds) {
+  const actual = new Set(actualIds);
+  const expected = new Set(expectedIds);
+  const missing = [...expected].filter(id => !actual.has(id));
+  const extra = [...actual].filter(id => !expected.has(id));
+  if (missing.length) errors.push(`${name} 缺少编号: ${formatIds(missing)}`);
+  if (extra.length) errors.push(`${name} 存在未知编号: ${formatIds(extra)}`);
+}
+
+function hasProblemGraphic(problem) {
+  return Boolean(problem.diagram || problem.image || problem.img || problem.figure || problem.svg);
 }
 
 const idMap = json('data/id-map.json');
@@ -59,81 +79,113 @@ const graph = json('data/graph.json');
 const problemsData = json('data/problems.json');
 const pageExamplesData = json('data/page-examples.json');
 const specExamplesData = json('data/spec-supplement-examples.json');
-const coreProblems = problemsData.problems || problemsData;
+const coreProblems = Array.isArray(problemsData) ? problemsData : (problemsData.problems || []);
 const pageExamples = pageExamplesData.examples || [];
 const specExamples = specExamplesData.examples || [];
 const problems = coreProblems.concat(pageExamples, specExamples);
 const sidebar = read('_sidebar.md');
-const allIds = Object.keys(idMap);
-const validIds = new Set(allIds);
-const modelIds = new Set(allIds.filter(id => idMap[id].level === 'model' || id.startsWith('M-')));
+const idMapIds = Object.keys(idMap);
+const progressIds = Object.keys(progress);
+const graphNodes = graph.nodes || [];
+const graphIds = graphNodes.map(node => node.id);
+const sidebarIds = idsIn(sidebar);
+const validIds = new Set(idMapIds);
+const modelIds = new Set(idMapIds.filter(id => idMap[id].level === 'model' || id.startsWith('M-')));
+const validStatuses = new Set(['pending', 'draft', 'partial', 'review', 'done']);
 
-// 1. id-map files and slugs must point at real h4 anchors.
+if (unknownArgs.length) errors.push(`不支持的参数: ${unknownArgs.join(', ')}`);
+
+// 1. Every id-map entry must have a complete, unique, real page mapping.
+const slugOwners = new Map();
 for (const [id, meta] of Object.entries(idMap)) {
-  if (!meta.file || !meta.slug || !meta.title) {
+  if (!meta || !meta.file || !meta.slug || !meta.title || !meta.level) {
     errors.push(`id-map 条目字段不完整: ${id}`);
     continue;
   }
+  const slugKey = `${meta.file}#${meta.slug}`;
+  if (!slugOwners.has(slugKey)) slugOwners.set(slugKey, []);
+  slugOwners.get(slugKey).push(id);
   const rel = `${meta.file}.md`;
   if (!exists(rel)) {
     errors.push(`id-map 文件不存在: ${id} -> ${rel}`);
     continue;
   }
   const text = read(rel);
-  const slugRe = new RegExp(`<h4[^>]*\\bid="${esc(meta.slug)}"`);
-  if (!slugRe.test(text)) {
+  if (!new RegExp(`<h[1-6][^>]*\\bid="${esc(meta.slug)}"`).test(text)) {
     errors.push(`id-map slug 不存在: ${id} ${rel}#${meta.slug}`);
   }
+  const expectedFile = {
+    B1: 'bx1', B2: 'bx2', B3: 'bx3',
+    X1: 'xb1', X2: 'xb2', X3: 'xb3',
+    G: 'gaokao-skills', E: 'experiments', M: 'models'
+  }[id.split('-')[0]];
+  if (expectedFile && meta.file !== expectedFile) {
+    errors.push(`编号前缀与所属模块不匹配: ${id} -> ${meta.file}，应为 ${expectedFile}`);
+  }
+}
+for (const [slugKey, ids] of slugOwners) {
+  if (ids.length > 1) errors.push(`重复 slug: ${slugKey} -> ${ids.join(', ')}`);
 }
 
-// 2. progress must match id-map coverage.
-for (const id of allIds) {
-  if (!progress[id]) errors.push(`progress.json 缺少编号: ${id}`);
+// 2. Compare every available numbered collection in both directions.
+for (const [name, values] of [['id-map', idMapIds], ['progress', progressIds], ['graph', graphIds], ['sidebar', sidebarIds]]) {
+  const dupes = duplicates(values);
+  if (dupes.length) errors.push(`${name} 重复编号: ${formatIds(dupes)}`);
 }
-for (const id of Object.keys(progress)) {
-  if (!validIds.has(id)) errors.push(`progress.json 多余编号: ${id}`);
+compareCollections('progress.json 相对 id-map.json', progressIds, idMapIds);
+compareCollections('graph.json 相对 id-map.json', graphIds, idMapIds);
+compareCollections('sidebar 相对 id-map.json', sidebarIds, idMapIds);
+if (exists('data/catalog.json')) {
+  const catalog = json('data/catalog.json');
+  const catalogIds = Array.isArray(catalog) ? catalog.map(item => item.id) : Object.keys(catalog);
+  const dupes = duplicates(catalogIds);
+  if (dupes.length) errors.push(`catalog 重复编号: ${formatIds(dupes)}`);
+  compareCollections('catalog.json 相对 id-map.json', catalogIds, idMapIds);
+  compareCollections('id-map.json 相对 catalog.json', idMapIds, catalogIds);
+} else {
+  console.log('目录权威源: data/id-map.json（仓库未设置重复的 data/catalog.json）');
 }
 
-// 3. sidebar links must point to real files/anchors and cover every id-map entry.
+// 3. Progress must preserve a valid state and cover all ids.
+for (const [id, meta] of Object.entries(idMap)) {
+  const item = progress[id];
+  if (!item) continue;
+  if (!validStatuses.has(item.status)) errors.push(`progress 非法状态值: ${id} -> ${item.status}`);
+}
+
+// 4. Sidebar links must point to real files/anchors and cover every id-map entry.
 const sidebarAnchorKeys = new Set();
-const linkRe = /\]\(([^)#?]+)(?:[?#]([^)]+))?\)/g;
+const linkRe = /\]\(([^)\s]+)\)/g;
 let link;
 while ((link = linkRe.exec(sidebar)) !== null) {
-  let file = link[1];
-  let anchor = link[2] || '';
-  if (anchor.startsWith('id=')) anchor = anchor.slice(3);
-  if (file === '/') continue;
-  if (!file.endsWith('.md')) file = `${file}.md`;
+  const raw = link[1];
+  if (/^(?:https?:)?\/\//.test(raw)) continue;
+  const [rawFile, rawQuery] = raw.split('?');
+  if (rawFile === '/') continue;
+  const file = rawFile.replace(/^\//, '').replace(/\.md$/, '') + '.md';
   const rel = file;
   if (!exists(rel)) {
     errors.push(`sidebar 链接文件不存在: ${rel}`);
     continue;
   }
+  const anchorMatch = (rawQuery || '').match(/(?:^|&)id=([^&]+)/);
+  const anchor = anchorMatch ? decodeURIComponent(anchorMatch[1]) : '';
   if (anchor) {
     const text = read(rel);
-    const idRe = new RegExp(`\\bid="${esc(anchor)}"`);
-    if (!idRe.test(text)) errors.push(`sidebar 锚点不存在: ${rel}#${anchor}`);
+    if (!new RegExp(`\\bid="${esc(anchor)}"`).test(text)) errors.push(`sidebar 锚点不存在: ${rel}#${anchor}`);
     sidebarAnchorKeys.add(`${file.replace(/\.md$/, '')}#${anchor}`);
   }
 }
 for (const [id, meta] of Object.entries(idMap)) {
   const key = `${meta.file}#${meta.slug}`;
-  if (!sidebarAnchorKeys.has(key)) {
-    errors.push(`sidebar 缺入口: ${id} ${meta.title} -> ${meta.file}?id=${meta.slug}`);
-  }
+  if (!sidebarAnchorKeys.has(key)) errors.push(`sidebar 缺入口: ${id} ${meta.title} -> ${meta.file}?id=${meta.slug}`);
 }
 
-// 4. graph must cover all ids and status must agree with progress.
-const graphNodes = graph.nodes || [];
-const graphIds = new Set(graphNodes.map(n => n.id));
-for (const id of allIds) {
-  if (!graphIds.has(id)) errors.push(`graph.json 缺节点: ${id}`);
-}
+// 5. Graph nodes, statuses, and edges must be internally consistent.
 for (const node of graphNodes) {
   if (!validIds.has(node.id)) errors.push(`graph.json 多余节点: ${node.id}`);
-  const p = progress[node.id];
-  if (p && node.status !== p.status) {
-    errors.push(`graph/progress 状态不一致: ${node.id} graph=${node.status} progress=${p.status}`);
+  if (node.id && progress[node.id] && node.status !== progress[node.id].status) {
+    errors.push(`graph/progress 状态不一致: ${node.id} graph=${node.status} progress=${progress[node.id].status}`);
   }
 }
 for (const edge of graph.edges || []) {
@@ -142,70 +194,58 @@ for (const edge of graph.edges || []) {
   }
 }
 
-// 5. iframe animation files must exist.
+// 6. Embedded animation files must exist.
 for (const md of walk(root, (fp, name) => name.endsWith('.md'))) {
   const text = fs.readFileSync(md, 'utf8');
   const ifRe = /<iframe[^>]+src="([^"]+)"/g;
-  let m;
-  while ((m = ifRe.exec(text)) !== null) {
-    const target = path.resolve(path.dirname(md), m[1]);
-    if (!fs.existsSync(target)) {
-      errors.push(`iframe 动画不存在: ${path.basename(md)} -> ${m[1]}`);
-    }
+  let match;
+  while ((match = ifRe.exec(text)) !== null) {
+    const target = path.resolve(path.dirname(md), match[1]);
+    if (!fs.existsSync(target)) errors.push(`iframe 动画不存在: ${path.relative(root, md)} -> ${match[1]}`);
   }
 }
 
-// 6. problem references and strict problem metadata.
+// 7. Problem references and strict problem metadata.
 const figureRe = /(如图|下图|图示|所示|图中|右图|左图)/;
 const sourceDetailRe = /(真题|适应性|模拟)/;
-for (const p of problems) {
-  for (const id of p.knowledge_ids || []) {
-    if (!validIds.has(id)) errors.push(`problems.json knowledge_ids 无效: ${id} (题 ${p.id})`);
+for (const problem of problems) {
+  for (const id of problem.knowledge_ids || []) {
+    if (!validIds.has(id)) errors.push(`题目 knowledge_ids 无效: ${id} (题 ${problem.id})`);
   }
-  for (const id of p.model_ids || []) {
-    if (id && !modelIds.has(id)) errors.push(`problems.json model_ids 无效: ${id} (题 ${p.id})`);
+  for (const id of problem.model_ids || []) {
+    if (id && !modelIds.has(id)) errors.push(`题目 model_ids 无效: ${id} (题 ${problem.id})`);
   }
-  if (figureRe.test(p.stem || '') && !hasProblemGraphic(p)) {
-    errors.push(`图题缺图: ${p.id} 题干含图示词但无 diagram/image/svg`);
+  if (figureRe.test(problem.stem || '') && !hasProblemGraphic(problem)) {
+    errors.push(`图题缺图: ${problem.id} 题干含图示词但无 diagram/image/svg`);
   }
-  if (p.diagram_required && !hasProblemGraphic(p)) {
-    errors.push(`diagram_required=true 但无图: ${p.id}`);
+  if (problem.diagram_required && !hasProblemGraphic(problem)) errors.push(`diagram_required=true 但无图: ${problem.id}`);
+  if (sourceDetailRe.test(problem.source || '') && !problem.source_detail && problem.source_verified !== false) {
+    errors.push(`来源缺 source_detail 或未标 source_verified=false: ${problem.id}`);
   }
-  if (sourceDetailRe.test(p.source || '') && !p.source_detail && p.source_verified !== false) {
-    errors.push(`来源缺 source_detail 或未标 source_verified=false: ${p.id}`);
-  }
-  if (/上题/.test(p.stem || '') && !p.group_id && !p.parent_id && !p.shared_context) {
-    errors.push(`题干含“上题”但无组题上下文: ${p.id}`);
+  if (/上题/.test(problem.stem || '') && !problem.group_id && !problem.parent_id && !problem.shared_context) {
+    errors.push(`题干含“上题”但无组题上下文: ${problem.id}`);
   }
 }
 
-// 6.1 example-system quantitative gates.
-const coverage = {};
-for (const id of allIds) coverage[id] = 0;
-for (const p of problems) {
-  for (const id of (p.knowledge_ids || []).concat(p.model_ids || [])) {
-    if (id in coverage) coverage[id] += 1;
+// 8. Training coverage gates.
+const coverage = Object.fromEntries(idMapIds.map(id => [id, 0]));
+for (const problem of problems) {
+  for (const id of (problem.knowledge_ids || []).concat(problem.model_ids || [])) {
+    if (id in coverage) coverage[id]++;
   }
 }
 for (const [id, meta] of Object.entries(idMap)) {
   const count = coverage[id] || 0;
-  if (meta.level === 'A' && count < 5) {
-    errors.push(`例题数量不足: A档 ${id} ${meta.title} 当前 ${count}/5`);
-  }
-  if (id.startsWith('E-') && count < 5) {
-    errors.push(`实验训练不足: ${id} ${meta.title} 当前 ${count}/5`);
-  }
-  if (id.startsWith('M-') && count < 7) {
-    errors.push(`模型训练不足: ${id} ${meta.title} 当前 ${count}/7`);
-  }
+  if (meta.level === 'A' && count < 5) errors.push(`例题数量不足: A档 ${id} ${meta.title} 当前 ${count}/5`);
+  if (id.startsWith('E-') && count < 5) errors.push(`实验训练不足: ${id} ${meta.title} 当前 ${count}/5`);
+  if (id.startsWith('M-') && count < 7) errors.push(`模型训练不足: ${id} ${meta.title} 当前 ${count}/7`);
 }
 
-// 7. Markdown hygiene, exposed source, and page figure wording.
+// 9. Markdown hygiene and A-level learning-loop warnings.
 for (const md of walk(root, (fp, name) => name.endsWith('.md'))) {
   const text = fs.readFileSync(md, 'utf8');
-  const file = path.basename(md);
-  const fences = (text.match(/```/g) || []).length;
-  if (fences % 2 !== 0) errors.push(`Markdown 代码块未闭合: ${file}`);
+  const file = path.relative(root, md);
+  if ((text.match(/```/g) || []).length % 2 !== 0) errors.push(`Markdown 代码块未闭合: ${file}`);
   [
     { re: /`<svg\b/g, msg: 'SVG 被反引号包住，会在网页露成源码' },
     { re: /<\/svg>`/g, msg: 'SVG 结束标签被反引号包住，会在网页露成源码' },
@@ -213,17 +253,11 @@ for (const md of walk(root, (fp, name) => name.endsWith('.md'))) {
     { re: /```(?:svg|html)\b/g, msg: 'HTML/SVG 被放进代码块，会在网页露成源码' },
     { re: /^\* [0-9]+\. /gm, msg: '小节标题写成了普通列表' }
   ].forEach(rule => {
-    let m;
-    while ((m = rule.re.exec(text)) !== null) {
-      errors.push(`${file}:${lineOf(text, m.index)} ${rule.msg}`);
-    }
+    let match;
+    while ((match = rule.re.exec(text)) !== null) warns.push(`${file}:${lineOf(text, match.index)} ${rule.msg}`);
   });
-
-  // Page examples are checked through data/page-examples.json after extraction.
-  // Avoid broad paragraph scanning here; it creates noise for phrases like “图中读数”.
 }
 
-// 8. A-level done knowledge points should keep the required learning sections.
 const aSectionRules = [
   { name: '现象引入', test: block => /先看现象|现象|实验情境/.test(block) },
   { name: '动画或交互实验', test: block => /<iframe\b|示意动画|交互动画|互动实验|动画/.test(block) },
@@ -233,35 +267,32 @@ const aSectionRules = [
   { name: '例题', test: block => /\*\*例题|####\s*\d+\.\s*例题/.test(block) }
 ];
 for (const [id, meta] of Object.entries(idMap)) {
-  const p = progress[id];
-  if (!p || p.status !== 'done' || p.level !== 'A') continue;
-  if (!meta.file || ['experiments', 'models', 'gaokao-skills'].includes(meta.file)) continue;
+  if (!progress[id] || progress[id].status !== 'done' || meta.level !== 'A') continue;
+  if (['experiments', 'models', 'gaokao-skills'].includes(meta.file)) continue;
   const text = read(`${meta.file}.md`);
   const start = text.search(new RegExp(`<h4[^>]*\\bid="${esc(meta.slug)}"`));
-  if (start === -1) continue;
+  if (start < 0) continue;
   const rest = text.slice(start);
   const next = rest.slice(1).search(/<h4[^>]*\bid="/);
-  const block = next === -1 ? rest : rest.slice(0, next + 1);
-  for (const rule of aSectionRules) {
-    if (!rule.test(block)) warns.push(`A档 ${id} 缺少学习闭环元素: ${rule.name}`);
-  }
+  const block = next < 0 ? rest : rest.slice(0, next + 1);
+  for (const rule of aSectionRules) if (!rule.test(block)) warns.push(`A档 ${id} 缺少学习闭环元素: ${rule.name}`);
 }
 
-// 9. Animation HTML inline JavaScript syntax.
+// 10. Inline animation JavaScript syntax.
 const animRoot = path.join(root, 'anim');
 if (fs.existsSync(animRoot)) {
   for (const html of walk(animRoot, (fp, name) => name.endsWith('.html'))) {
     const text = fs.readFileSync(html, 'utf8');
     const scriptRe = /<script(?![^>]*src=)[^>]*>([\s\S]*?)<\/script>/g;
-    let m;
-    while ((m = scriptRe.exec(text)) !== null) {
-      if (!m[1].trim()) continue;
-      const tmp = path.join(os.tmpdir(), `anim-check-${process.pid}-${Date.now()}.js`);
-      fs.writeFileSync(tmp, m[1]);
+    let match;
+    while ((match = scriptRe.exec(text)) !== null) {
+      if (!match[1].trim()) continue;
+      const tmp = path.join(os.tmpdir(), `anim-check-${process.pid}-${Date.now()}-${Math.random().toString(16).slice(2)}.js`);
+      fs.writeFileSync(tmp, match[1]);
       try {
-        execSync(`node --check ${JSON.stringify(tmp)}`, { stdio: 'pipe' });
-      } catch (e) {
-        errors.push(`动画 JS 语法错误: ${path.relative(root, html)} - ${(e.stderr || e.message).toString().split('\n')[0]}`);
+        execFileSync(process.execPath, ['--check', tmp], { stdio: 'pipe' });
+      } catch (error) {
+        errors.push(`动画 JS 语法错误: ${path.relative(root, html)} - ${(error.stderr || error.message).toString().split('\n')[0]}`);
       } finally {
         fs.rmSync(tmp, { force: true });
       }
@@ -269,27 +300,38 @@ if (fs.existsSync(animRoot)) {
   }
 }
 
-// 10. Hidden system files must not be shipped.
-for (const fp of walk(root)) {
-  const name = path.basename(fp);
-  if (name === '.DS_Store' || name.startsWith('.fuse_hidden')) {
-    errors.push(`仓库包含系统隐藏文件: ${path.relative(root, fp)}`);
-  }
+// 11. System files must not be shipped. Check the Git index so a local Finder
+// artifact cannot make a clean checkout fail before it is committed.
+let trackedFiles = [];
+try {
+  trackedFiles = execFileSync('git', ['ls-files'], { cwd: root, encoding: 'utf8' }).split('\n').filter(Boolean);
+} catch {
+  trackedFiles = walk(root).map(fp => path.relative(root, fp));
+}
+for (const rel of trackedFiles) {
+  const name = path.basename(rel);
+  if (name === '.DS_Store' || name.startsWith('.fuse_hidden')) errors.push(`仓库包含系统隐藏文件: ${rel}`);
 }
 
-console.log('=== check.js strict 自动化检查 ===');
-console.log('知识点/实验/模型总数:', allIds.length);
+console.log(`=== repository consistency check${strict ? ' (strict)' : ''} ===`);
+console.log('知识点/实验/模型总数:', idMapIds.length);
 console.log('知识图谱节点数:', graphNodes.length);
 console.log('题库题数:', coreProblems.length);
 console.log('页面例题数:', pageExamples.length);
 console.log('规范补充训练题数:', specExamples.length);
 if (warns.length) {
   console.log(`\n⚠ 警告 (${warns.length}):`);
-  warns.forEach(w => console.log(`  - ${w}`));
+  warns.forEach(warn => console.log(`  - ${warn}`));
 }
-if (errors.length) {
-  console.log(`\n✗ 错误 (${errors.length}):`);
-  errors.forEach(e => console.log(`  - ${e}`));
-  process.exit(1);
+if (errors.length || (strict && warns.length)) {
+  if (strict && warns.length && !errors.length) {
+    console.log('\n✗ 严格模式将警告视为错误');
+  }
+  if (errors.length) {
+    console.log(`\n✗ 错误 (${errors.length}):`);
+    errors.forEach(error => console.log(`  - ${error}`));
+  }
+  process.exitCode = 1;
+} else {
+  console.log('\n✓ 全部通过');
 }
-console.log('\n✓ 全部通过');
