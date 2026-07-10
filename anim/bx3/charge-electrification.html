@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>电荷与起电实验台：电子转移与电荷守恒</title>
+<title>电荷与起电实验台</title>
 <link rel="icon" href="data:,">
 <style>
   :root { --ink:#102a43; --muted:#486581; --line:#d9e2ec; --blue:#2c7be5; --red:#c92a2a; --green:#087f5b; --orange:#f08c00; --paper:#f7f9fc; }
   * { box-sizing:border-box; }
   body { margin:0; background:var(--paper); color:var(--ink); font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif; }
-  .lab { display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:12px; padding:12px; min-height:540px; }
+  .lab { display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:12px; padding:12px; }
   .stage,.card { background:#fff; border:1px solid var(--line); border-radius:8px; }
   .stage { overflow:hidden; position:relative; }
-  canvas { display:block; width:100%; height:auto; touch-action:none; cursor:crosshair; }
-  .hint { position:absolute; left:12px; bottom:10px; color:var(--muted); background:rgba(255,255,255,.9); border:1px solid var(--line); border-radius:6px; padding:5px 8px; font-size:12px; }
+  canvas { display:block; width:100%; touch-action:none; }
+  .hint { position:absolute; left:12px; bottom:10px; color:var(--muted); background:rgba(255,255,255,.92); border:1px solid var(--line); border-radius:6px; padding:5px 8px; font-size:12px; }
   .panel { display:flex; flex-direction:column; gap:10px; }
   .card { padding:10px; }
   .task { background:#fff7e6; border-left:3px solid var(--orange); color:var(--muted); line-height:1.5; font-size:13px; }
@@ -30,46 +30,43 @@
   .readout b { color:#ffd166; font-variant-numeric:tabular-nums; }
   .formula { font-size:13px; line-height:1.55; color:#334e68; }
   .status { font-size:13px; font-weight:700; border-radius:6px; padding:8px; border:1px solid #38b2ac; background:#e6fffa; color:var(--green); }
-  @media (max-width:780px){ .lab{ grid-template-columns:1fr; } }
+  @media (max-width:780px){ .lab{ grid-template-columns:1fr; padding:8px; } .panel{ gap:8px; } .hint{ left:8px; bottom:8px; font-size:11px; } }
 </style>
 </head>
 <body>
 <div class="lab">
   <div class="stage">
-    <canvas id="canvas" width="920" height="540" aria-label="电荷与起电实验台：电子转移装置、电荷读数图像和数据记录"></canvas>
-    <div class="hint">可直接拖动中间电子手柄，改变转移的电子个数</div>
+    <canvas id="canvas" aria-label="电荷与起电实验台：电子转移、金属球接触和静电感应"></canvas>
+    <div class="hint">拖动黄色手柄；每个模式都把读数和画面同步显示</div>
   </div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>拖动电子手柄，对照电子转移装置、电荷读数图像和数据记录，看电子从哪边转到哪边；总电荷是否始终守恒。</div>
-    <button id="playBtn" style="width:100%">▶ 播放电子转移动画</button>
+    <div class="card task"><b>观察任务：</b>拖动手柄，先看电子从哪里到哪里，再看 qA、qB 和 q总如何变化。切换到感应模式后，按顺序操作“接地”“移开带电体”。</div>
+    <button id="playBtn" style="width:100%">▶ 播放过程</button>
     <div class="card">
-      <div class="title">实验控制</div>
+      <div class="title">选择起电过程</div>
       <div class="buttons">
         <button class="on" data-mode="friction">摩擦起电</button>
         <button data-mode="contact">接触起电</button>
-        <button data-mode="induction">感应起电</button>
-        <button data-mode="quantum">元电荷</button>
+        <button data-mode="induction">静电感应</button>
+        <button data-mode="quantum">元电荷检查</button>
       </div>
-      <label class="param"><span>电子转移数 n <b id="nText">6 个</b></span><input id="n" type="range" min="-12" max="12" step="1" value="6"></label>
+      <label class="param"><span id="nLabel">电子转移数 n <b id="nText">+6 个</b></span><input id="n" type="range" min="-12" max="12" step="1" value="6"></label>
       <div class="buttons">
         <button data-case="glass">玻璃棒失电子</button>
         <button data-case="rubber">橡胶棒得电子</button>
         <button data-case="share">接触平分</button>
         <button data-case="invalid">非整数尝试</button>
       </div>
+      <button id="inductionStep" style="display:none;width:100%;margin-top:8px">接地</button>
     </div>
-    <div class="readout">
-      qA=<b id="qaText">+6e</b>　qB=<b id="qbText">-6e</b><br>
-      q总=<b id="sumText">0e</b>　n=<b id="nRead">6</b><br>
-      量子化检查：<b id="validText">通过</b>
-    </div>
+    <div class="readout" id="readout"></div>
     <div class="card formula">
-      <div class="title">公式对照</div>
-      <div>电子转移：失去电子带正电，得到电子带负电。</div>
-      <div>电荷守恒：qA + qB 不会凭空改变。</div>
-      <div>元电荷：q = ne，n 必须是整数。</div>
+      <div class="title">公式与画面</div>
+      <div><b>q=ne：</b>手柄给出 n，元电荷检查只接受整数 n。</div>
+      <div><b>电荷守恒：</b>电子只转移或重新分布，不凭空产生。</div>
+      <div><b>接触平分：</b>相同金属球接触后，电势相同，电荷平均分配。</div>
     </div>
-    <div class="status" id="status">摩擦起电不是创造电荷，而是电子从一个物体转移到另一个物体。</div>
+    <div class="status" id="status"></div>
   </div>
 </div>
 <script>
@@ -78,138 +75,75 @@
   const canvas = document.getElementById('canvas');
   const ctx = canvas.getContext('2d');
   const root = document.defaultView || globalThis;
-  const els = { n: document.getElementById('n') };
-  const ui = {
-    nText: document.getElementById('nText'), qaText: document.getElementById('qaText'), qbText: document.getElementById('qbText'),
-    sumText: document.getElementById('sumText'), nRead: document.getElementById('nRead'), validText: document.getElementById('validText'), status: document.getElementById('status')
-  };
-  const state = { mode:'friction', drag:false, hot:{}, playing:false, playT:0 };
+  const els = { n: document.getElementById('n'), nLabel: document.getElementById('nLabel'), nText: document.getElementById('nText'), readout: document.getElementById('readout'), status: document.getElementById('status'), play: document.getElementById('playBtn'), inductionStep: document.getElementById('inductionStep') };
+  const state = { mode:'friction', drag:false, hot:{}, invalid:false, inductionStage:0, playing:false, progress:0, raf:0, W:920, H:540, dpr:1 };
 
   function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
   function n(){ return Number(els.n.value); }
-  function fmtCharge(v){ return (v>0?'+':'') + v + 'e'; }
-  function setN(v){ els.n.value = String(Math.round(clamp(v, -12, 12))); }
-
-  function charges(){
-    const k = n();
-    if(state.mode === 'contact') return { a:2, b:2, sum:4, note:'相同金属球接触后，总电荷守恒并平均分配。', valid:true };
-    if(state.mode === 'induction') return { a:0, b:0, left:-Math.abs(k), right:Math.abs(k), sum:0, note:'感应起电先是电荷重新分布；导体总电荷仍可为 0。', valid:true };
-    if(state.mode === 'quantum') {
-      const invalid = document.body.dataset.invalid === '1';
-      return { a: invalid ? 1.5 : k, b:0, sum: invalid ? 1.5 : k, note:invalid ? '1.5e 不是整数倍电荷量，孤立带电体不可能这样带电。' : 'q=ne，n 为整数，电荷量子化检查通过。', valid:!invalid };
+  function signCharge(v){ return v > 0 ? '+' : ''; }
+  function fmt(v){ const rounded = Math.round(v*10)/10; return (rounded > 0 ? '+' : '') + rounded + 'e'; }
+  function formulaFmt(v){ const rounded=Math.round(v*10)/10; return rounded>0?'+'+rounded+'e':rounded<0?'−'+Math.abs(rounded)+'e':'0e'; }
+  function setN(v){ els.n.value = String(Math.round(clamp(v,-12,12))); state.invalid=false; }
+  function modeData(){
+    const k=n();
+    if(state.mode==='contact'){
+      const initialB=-2, total=k+initialB, each=total/2;
+      return { initialA:k, initialB, total, a:each, b:each, valid:true, note:'相同金属球：先守恒相加，再把总电荷平均分给两球。' };
     }
-    return { a:k, b:-k, sum:0, note:'摩擦起电不是创造电荷，而是电子从一个物体转移到另一个物体。', valid:true };
+    if(state.mode==='induction'){
+      const ext=k, amount=Math.abs(k), dir=ext===0?1:Math.sign(ext);
+      const near=-dir*amount, far=dir*amount;
+      const final=-dir*amount;
+      return { ext, amount, near, far, final, valid:true, note: state.inductionStage===0 ? '只靠近、不接触：自由电子重新分布，导体总电荷仍为 0。' : state.inductionStage===1 ? '接地后电子从地面流入或流出；带电体仍未接触导体。' : '移开带电体后，导体保留与外部带电体相反的电荷。' };
+    }
+    if(state.mode==='quantum'){
+      return { a:state.invalid?1.5:k, b:0, sum:state.invalid?1.5:k, valid:!state.invalid, note:state.invalid?'1.5e 不是元电荷 e 的整数倍，孤立带电体不能带这种电荷。':'n 是整数，q=ne 检查通过。' };
+    }
+    return { a:k, b:-k, sum:0, valid:true, note:'摩擦起电不是创造电荷，而是电子从一个物体转移到另一个物体。' };
   }
-
-  function text(s,x,y,color,align,size,weight){
-    ctx.fillStyle=color||'#102a43';
-    ctx.font=(weight?weight+' ':'')+(size||13)+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';
-    ctx.textAlign=align||'center'; ctx.textBaseline='middle'; ctx.fillText(s,x,y);
-  }
+  function text(s,x,y,color,align,size,weight){ ctx.fillStyle=color||'#102a43'; ctx.font=(weight?weight+' ':'')+(size||13)+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif'; ctx.textAlign=align||'center'; ctx.textBaseline='middle'; ctx.fillText(s,x,y); }
   function box(x,y,w,h,fill,stroke){ ctx.save(); ctx.fillStyle=fill; ctx.strokeStyle=stroke||'#d9e2ec'; ctx.beginPath(); ctx.roundRect(x,y,w,h,8); ctx.fill(); ctx.stroke(); ctx.restore(); }
   function arrow(x1,y1,x2,y2,color){ const a=Math.atan2(y2-y1,x2-x1); ctx.save(); ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=2.5; ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x2,y2); ctx.lineTo(x2-10*Math.cos(a-.45),y2-10*Math.sin(a-.45)); ctx.lineTo(x2-10*Math.cos(a+.45),y2-10*Math.sin(a+.45)); ctx.closePath(); ctx.fill(); ctx.restore(); }
-  function drawChargeLabel(x,y,q,label){
-    const color = q >= 0 ? '#c92a2a' : '#2c7be5';
-    const g=ctx.createRadialGradient(x-9,y-9,4,x,y,30); g.addColorStop(0, q>=0?'#ff8a76':'#7bb6ff'); g.addColorStop(1,color);
-    ctx.save(); ctx.shadowColor=color; ctx.shadowBlur=14;
-    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,28,0,Math.PI*2); ctx.fill();
-    ctx.restore();
-    text(q > 0 ? '+' : (q < 0 ? '-' : '0'), x, y-2, '#fff', 'center', 24, '700');
-    text(label, x, y+48, '#102a43', 'center', 13, '700');
-    text(fmtCharge(q), x, y+68, color, 'center', 13, '700');
-  }
-
-  function drawElectrons(count, x1, x2, y){
-    const total = Math.min(12, Math.abs(count));
-    for(let i=0;i<total;i++){
-      const t = total === 1 ? .5 : i/(total-1);
-      const x = x1 + (x2-x1)*t;
-      ctx.fillStyle='#2c7be5'; ctx.beginPath(); ctx.arc(x,y + (i%2 ? 10 : -10),8,0,Math.PI*2); ctx.fill();
-      text('e-', x, y + (i%2 ? 10 : -10), '#fff', 'center', 8, '700');
-    }
-  }
-
+  function chargeColor(q){ return q>=0?'#c92a2a':'#2c7be5'; }
+  function drawCharge(x,y,q,label,sub){ const color=chargeColor(q); ctx.save(); const g=ctx.createRadialGradient(x-9,y-9,4,x,y,30); g.addColorStop(0,q>=0?'#ff8a76':'#7bb6ff'); g.addColorStop(1,color); ctx.shadowColor=color; ctx.shadowBlur=14; ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,28,0,Math.PI*2); ctx.fill(); ctx.restore(); text(q>0?'+':q<0?'-':'0',x,y-2,'#fff','center',24,'700'); text(label,x,y+46,'#102a43','center',13,'700'); if(sub) text(sub,x,y+65,color,'center',12,'700'); else text(fmt(q),x,y+65,color,'center',12,'700'); }
+  function drawElectrons(count,x1,x2,y){ const total=Math.min(12,Math.abs(Math.round(count))); for(let i=0;i<total;i++){ const t=total===1?.5:i/(total-1); const x=x1+(x2-x1)*t; ctx.fillStyle='#2c7be5'; ctx.beginPath(); ctx.arc(x,y+(i%2?10:-10),8,0,Math.PI*2); ctx.fill(); text('e−',x,y+(i%2?10:-10),'#fff','center',8,'700'); } }
+  function responsive(){ const width=clamp(canvas.parentElement.getBoundingClientRect().width,320,920); state.W=width; state.H=width<600?620:540; state.dpr=Math.min(2,root.devicePixelRatio||1); canvas.width=Math.round(width*state.dpr); canvas.height=Math.round(state.H*state.dpr); canvas.style.height=state.H+'px'; ctx.setTransform(state.dpr,0,0,state.dpr,0,0); draw(); }
   function draw(){
-    const c = charges();
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle='#f7f9fc'; ctx.fillRect(0,0,canvas.width,canvas.height);
-    box(28,48,864,250,'#fff','#d9e2ec');
-    text('起电本质：电子转移或重新分布，电荷总量守恒',460,76,'#102a43','center',18,'700');
-    const ax=210, bx=710, y=180;
-    if(state.mode === 'induction'){
-      drawChargeLabel(ax,y,0,'导体整体');
-      box(420,130,160,100,'#eef2ff','#9fb3c8');
-      text('导体内部',500,154,'#102a43','center',13,'700');
-      text('- - -',462,194,'#2c7be5','center',20,'700');
-      text('+ + +',538,194,'#c92a2a','center',20,'700');
-      drawChargeLabel(bx,y,-Math.abs(n()),'靠近的带电体');
-      text('左负右正只是分布改变，总电荷仍为 0。',460,276,'#486581','center',13);
+    const W=state.W,H=state.H,d=modeData(), mobile=W<600; ctx.clearRect(0,0,W,H); ctx.fillStyle='#f7f9fc'; ctx.fillRect(0,0,W,H); box(12,16,W-24,mobile?330:270,'#fff','#d9e2ec'); text(state.mode==='friction'?'电子从一个物体转移到另一个物体':state.mode==='contact'?'相同金属球接触，电荷平均分配':state.mode==='induction'?'靠近 → 接地 → 移开：静电感应全过程':'电荷量子化：q=ne',W/2,42,'#102a43','center',mobile?16:18,'700');
+    const ax=W*.28,bx=W*.72,y=mobile?170:160;
+    if(state.mode==='friction'){
+      drawCharge(ax,y,d.a,'物体 A',fmt(d.a)); drawCharge(bx,y,d.b,'物体 B',fmt(d.b)); const dir=n()>=0?1:-1; arrow(dir>0?ax+48:bx-48,y,dir>0?bx-48:ax+48,y,'#2c7be5'); text(dir>0?'电子 A → B':'电子 B → A',W/2,y-36,'#2c7be5','center',13,'700'); drawElectrons(n(),ax+82,bx-82,y+40); if(state.playing){ const from=dir>0?ax+58:bx-58,to=dir>0?bx-58:ax+58,x=from+(to-from)*state.progress; ctx.fillStyle='#ffd166'; ctx.strokeStyle='#8a5a00'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(x,y,10,0,Math.PI*2); ctx.fill(); ctx.stroke(); text('e−',x,y,'#5a3d00','center',9,'700'); }
+    } else if(state.mode==='contact'){
+      drawCharge(ax,y,d.initialA,'A 接触前',fmt(d.initialA)); drawCharge(bx,y,d.initialB,'B 接触前',fmt(d.initialB)); arrow(ax+50,y,bx-50,y,'#087f5b'); text('金属球接触',W/2,y-36,'#087f5b','center',13,'700'); const p=state.playing?state.progress:1; const qa=d.initialA+(d.a-d.initialA)*p,qb=d.initialB+(d.b-d.initialB)*p; box(W*.16,mobile?250:238,W*.68,42,'#edf9f3','#74c69d'); text('接触后：qA=qB=('+fmt(d.total)+')/2='+fmt(d.a),W/2,mobile?271:259,'#087f5b','center',mobile?12:13,'700'); text('释放后',W/2,mobile?309:297,'#486581','center',12); drawCharge(W*.42,mobile?305:293,qa,'A',fmt(qa)); drawCharge(W*.58,mobile?305:293,qb,'B',fmt(qb));
+    } else if(state.mode==='induction'){
+      const ext=d.ext, bodyX=W*.48, bodyY=y+4; if(state.inductionStage<2) drawCharge(W*.82,y,ext,'外部带电体',fmt(ext)); else text('外部带电体已移开',W*.72,y,'#486581','center',13,'700'); box(W*.31,y-48,W*.34,104,'#eef2ff','#9fb3c8'); text('金属导体',bodyX,y-28,'#102a43','center',13,'700'); if(state.inductionStage===0){ text(d.near+'e',bodyX-W*.115,y+14,'#2c7be5','center',16,'700'); text(d.far+'e',bodyX+W*.115,y+14,'#c92a2a','center',16,'700'); text('近侧',bodyX-W*.115,y+38,'#486581','center',11); text('远侧',bodyX+W*.115,y+38,'#486581','center',11); text('q导体总=0e',bodyX,y+82,'#087f5b','center',13,'700'); } else if(state.inductionStage===1){ text('电子 ↔ 地面',bodyX,y+10,'#2c7be5','center',15,'700'); arrow(bodyX,y+54,bodyX,y+82,'#2c7be5'); text('接地中',bodyX,y+94,'#2c7be5','center',12,'700'); } else { text(fmt(d.final),bodyX,y+10,chargeColor(d.final),'center',20,'700'); text('导体保留电荷',bodyX,y+40,'#087f5b','center',12,'700'); } if(state.inductionStage<2){ text('未接触导体：先观察电荷重新分布',W/2,mobile?266:254,'#486581','center',12); }
     } else {
-      drawChargeLabel(ax,y,c.a,'物体 A');
-      drawChargeLabel(bx,y,c.b,'物体 B');
-      if(state.mode === 'friction'){
-        const dir = n() >= 0 ? 1 : -1;
-        arrow(dir > 0 ? ax+48 : bx-48, y, dir > 0 ? bx-48 : ax+48, y, '#2c7be5');
-        text('电子转移',460,y-28,'#2c7be5','center',13,'700');
-        drawElectrons(n(), ax+98, bx-98, y+42);
-        if(state.playing){
-          const from = dir>0 ? bx-52 : ax+52, to = dir>0 ? ax+52 : bx-52;
-          const f = (Math.sin(state.playT)+1)/2, ex = from+(to-from)*f;
-          ctx.fillStyle='#ffd166'; ctx.beginPath(); ctx.arc(ex,y,10,0,Math.PI*2); ctx.fill();
-          ctx.strokeStyle='#8a5a00'; ctx.lineWidth=2; ctx.stroke();
-          text('e-',ex,y,'#5a3d00','center',9,'700');
-        }
-      } else if(state.mode === 'contact'){
-        arrow(ax+52,y,bx-52,y,'#087f5b');
-        text('接触后电荷共享：(+6e-2e)/2=+2e',460,y-28,'#087f5b','center',13,'700');
-      } else {
-        text(c.valid ? 'q=ne，n 是整数。' : '1.5e 不是整数倍。',460,y-28,c.valid?'#087f5b':'#c92a2a','center',15,'700');
-      }
+      drawCharge(W/2,y,d.a,'带电体',fmt(d.a)); text(d.valid?'q=ne，n 为整数':'q=+1.5e，n 不是整数',W/2,y-46,d.valid?'#087f5b':'#c92a2a','center',15,'700'); text(d.valid?'每拖一格就是一个元电荷':'这个电荷量不能单独存在',W/2,y+84,d.valid?'#486581':'#c92a2a','center',13,'700');
     }
-    const left=190, right=730, trackY=350;
-    box(88,314,744,142,'#fff','#d9e2ec');
-    text('直接拖动电子手柄',460,338,'#102a43','center',14,'700');
-    ctx.strokeStyle='#9fb3c8'; ctx.lineWidth=4; ctx.beginPath(); ctx.moveTo(left,trackY); ctx.lineTo(right,trackY); ctx.stroke();
-    const knobX = left + (n()+12)/24*(right-left);
-    state.hot.knob={x:knobX,y:trackY,left,right};
-    ctx.fillStyle='#ffd166'; ctx.strokeStyle='#8a5a00'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(knobX,trackY,14,0,Math.PI*2); ctx.fill(); ctx.stroke();
-    text(n()+' 个电子',knobX,trackY+34,'#8a5a00','center',12,'700');
-    text('向左：B 失电子　向右：A 失电子',460,420,'#486581','center',13);
-    updatePanel(c);
+    const trackY=mobile?470:355,left=W*.16,right=W*.84; box(W*.08,trackY-38,W*.84,150,'#fff','#d9e2ec'); text(state.mode==='contact'?'改变 A 接触前电荷':state.mode==='induction'?'改变外部带电体电荷':state.mode==='quantum'?'改变整数 n':'拖动电子手柄',W/2,trackY-14,'#102a43','center',14,'700'); ctx.strokeStyle='#9fb3c8'; ctx.lineWidth=4; ctx.beginPath(); ctx.moveTo(left,trackY+18); ctx.lineTo(right,trackY+18); ctx.stroke(); const knobX=left+(n()+12)/24*(right-left); state.hot.knob={x:knobX,y:trackY+18,left,right}; ctx.fillStyle='#ffd166'; ctx.strokeStyle='#8a5a00'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(knobX,trackY+18,14,0,Math.PI*2); ctx.fill(); ctx.stroke(); text(signCharge(n())+n()+' 个',knobX,trackY+52,'#8a5a00','center',12,'700'); text('−12',left,trackY+76,'#486581','center',11); text('0',W/2,trackY+76,'#486581','center',11); text('+12',right,trackY+76,'#486581','center',11); text(state.mode==='friction'?'向右：电子 A→B；向左：B→A':'拖动后看上方画面和右侧读数同步变化',W/2,trackY+106,'#486581','center',mobile?11:13);
+    updatePanel(d);
   }
-
-  function updatePanel(c){
-    ui.nText.textContent = n() + ' 个';
-    ui.qaText.textContent = fmtCharge(c.a);
-    ui.qbText.textContent = fmtCharge(c.b);
-    ui.sumText.textContent = (c.sum > 0 ? '+' : '') + c.sum + 'e';
-    ui.nRead.textContent = String(n());
-    ui.validText.textContent = c.valid ? '通过' : '不可能';
-    ui.validText.style.color = c.valid ? '#ffd166' : '#ff9b9b';
-    ui.status.textContent = c.note;
-    ui.status.style.background = c.valid ? '#e6fffa' : '#fff0f0';
-    ui.status.style.color = c.valid ? '#087f5b' : '#c92a2a';
-    ui.status.style.borderColor = c.valid ? '#38b2ac' : '#ff6b6b';
+  function updatePanel(d){
+    const k=n(); els.nText.textContent=(k>0?'+':'')+k+(state.mode==='friction'?' 个':' e'); els.nLabel.firstChild.textContent=state.mode==='contact'?'A 初始电荷 qA0/e ':state.mode==='induction'?'外部带电体 q/e ':state.mode==='quantum'?'整数 n ':'电子转移数 n ';
+    let html=''; if(state.mode==='induction'){ const stage=['靠近（未接触）','接地','移开后'][state.inductionStage]; html='<div>步骤：<b>'+stage+'</b></div><div>外部带电体 q=<b>'+fmt(d.ext)+'</b></div><div>导体 q总=<b>'+fmt(state.inductionStage===0?0:d.final)+'</b></div>'+(state.inductionStage<2?'<div>近侧/远侧：<b>'+fmt(d.near)+'</b> / <b>'+fmt(d.far)+'</b></div>':'<div>最终结果：<b>外部带电体已移开，导体保留 '+fmt(d.final)+'</b></div>')+'<div>物理检查：<b>不接触导体</b></div>'; els.inductionStep.style.display='block'; els.inductionStep.textContent=state.inductionStage===0?'接地':state.inductionStage===1?'移开带电体':'重置感应'; }
+    else if(state.mode==='contact'){ html='<div>接触前：qA=<b>'+fmt(d.initialA)+'</b>，qB=<b>'+fmt(d.initialB)+'</b></div><div>接触前总电荷：<b>'+fmt(d.total)+'</b></div><div>接触后：qA=qB=<b>'+fmt(d.a)+'</b></div><div>q总（两球）：<b>'+fmt(d.total)+'</b></div><div>公式：<b>('+formulaFmt(d.initialA)+' '+formulaFmt(d.initialB)+')/2='+fmt(d.a)+'</b></div>'; els.inductionStep.style.display='none'; }
+    else { html='<div>qA=<b>'+fmt(d.a)+'</b>　qB=<b>'+fmt(d.b)+'</b></div><div>q总=<b>'+fmt(d.sum)+'</b>　n=<b>'+k+'</b></div><div>量子化检查：<b style="color:'+(d.valid?'#ffd166':'#ff9b9b')+'">'+(d.valid?'通过':'不可能')+'</b></div>'; els.inductionStep.style.display='none'; }
+    els.readout.innerHTML=html; els.status.textContent=d.note; els.status.style.background=d.valid?'#e6fffa':'#fff0f0'; els.status.style.color=d.valid?'#087f5b':'#c92a2a'; els.status.style.borderColor=d.valid?'#38b2ac':'#ff6b6b';
   }
-
-  function eventPos(ev){ const src=ev.touches&&ev.touches.length?ev.touches[0]:(ev.changedTouches&&ev.changedTouches.length?ev.changedTouches[0]:ev); const r=canvas.getBoundingClientRect(); return {x:(src.clientX-r.left)*canvas.width/r.width,y:(src.clientY-r.top)*canvas.height/r.height}; }
+  function eventPos(ev){ const src=ev.touches&&ev.touches.length?ev.touches[0]:(ev.changedTouches&&ev.changedTouches.length?ev.changedTouches[0]:ev); const r=canvas.getBoundingClientRect(); return {x:(src.clientX-r.left)*state.W/r.width,y:(src.clientY-r.top)*state.H/r.height}; }
   function setFromX(x){ const h=state.hot.knob; setN((x-h.left)/(h.right-h.left)*24-12); }
-  function start(ev){ const p=eventPos(ev); const h=state.hot.knob; if(Math.hypot(p.x-h.x,p.y-h.y)<24){ state.drag=true; setFromX(p.x); draw(); ev.preventDefault(); } }
-  function move(ev){ if(!state.drag)return; setFromX(eventPos(ev).x); document.body.dataset.invalid='0'; draw(); ev.preventDefault(); }
+  function start(ev){ const p=eventPos(ev),h=state.hot.knob; if(Math.hypot(p.x-h.x,p.y-h.y)<28){ state.drag=true; setFromX(p.x); draw(); ev.preventDefault(); } }
+  function move(ev){ if(!state.drag)return; setFromX(eventPos(ev).x); draw(); ev.preventDefault(); }
   function end(){ state.drag=false; }
-  if(root.PointerEvent){ canvas.addEventListener('pointerdown',start); canvas.addEventListener('pointermove',move); ['pointerup','pointercancel','pointerleave'].forEach(t=>canvas.addEventListener(t,end)); }
-  else { canvas.addEventListener('mousedown',start); root.addEventListener('mousemove',move); root.addEventListener('mouseup',end); canvas.addEventListener('touchstart',start,{passive:false}); root.addEventListener('touchmove',move,{passive:false}); root.addEventListener('touchend',end); root.addEventListener('touchcancel',end); }
-  els.n.addEventListener('input',()=>{ document.body.dataset.invalid='0'; draw(); });
-  const playBtn = document.getElementById('playBtn');
-  function animate(){ if(!state.playing)return; state.playT+=0.08; draw(); root.requestAnimationFrame(animate); }
-  playBtn.addEventListener('click',()=>{
-    state.playing = !state.playing;
-    playBtn.textContent = state.playing ? '⏸ 暂停动画' : '▶ 播放电子转移动画';
-    if(state.playing) animate(); else draw();
-  });
-  document.querySelectorAll('button[data-mode]').forEach(btn=>btn.addEventListener('click',()=>{ state.mode=btn.dataset.mode; document.body.dataset.invalid='0'; document.querySelectorAll('button[data-mode]').forEach(b=>b.classList.toggle('on',b===btn)); draw(); }));
-  document.querySelectorAll('button[data-case]').forEach(btn=>btn.addEventListener('click',()=>{ const id=btn.dataset.case; document.body.dataset.invalid='0'; if(id==='glass'){ state.mode='friction'; setN(6); } if(id==='rubber'){ state.mode='friction'; setN(-6); } if(id==='share'){ state.mode='contact'; setN(4); } if(id==='invalid'){ state.mode='quantum'; setN(2); document.body.dataset.invalid='1'; } document.querySelectorAll('button[data-mode]').forEach(b=>b.classList.toggle('on',b.dataset.mode===state.mode)); draw(); }));
-  draw();
+  if(root.PointerEvent){ canvas.addEventListener('pointerdown',start); canvas.addEventListener('pointermove',move); ['pointerup','pointercancel','pointerleave'].forEach(t=>canvas.addEventListener(t,end)); } else { canvas.addEventListener('mousedown',start); root.addEventListener('mousemove',move); root.addEventListener('mouseup',end); canvas.addEventListener('touchstart',start,{passive:false}); root.addEventListener('touchmove',move,{passive:false}); root.addEventListener('touchend',end); }
+  els.n.addEventListener('input',()=>{ state.invalid=false; draw(); });
+  function playFrame(now){ if(!state.playing)return; if(!state.started)state.started=now; state.progress=clamp((now-state.started)/1400,0,1); draw(); if(state.progress<1)state.raf=root.requestAnimationFrame(playFrame); else { state.playing=false; els.play.textContent='▶ 重播过程'; draw(); } }
+  els.play.addEventListener('click',()=>{ if(state.playing){ state.playing=false; els.play.textContent='▶ 继续播放'; if(state.raf)root.cancelAnimationFrame(state.raf); draw(); return; } state.playing=true; state.started=0; state.progress=0; els.play.textContent='⏸ 暂停动画'; state.raf=root.requestAnimationFrame(playFrame); });
+  document.querySelectorAll('button[data-mode]').forEach(btn=>btn.addEventListener('click',()=>{ state.mode=btn.dataset.mode; state.invalid=false; state.inductionStage=0; document.querySelectorAll('button[data-mode]').forEach(b=>b.classList.toggle('on',b===btn)); draw(); }));
+  document.querySelectorAll('button[data-case]').forEach(btn=>btn.addEventListener('click',()=>{ const id=btn.dataset.case; if(id==='glass'){state.mode='friction';setN(6);} if(id==='rubber'){state.mode='friction';setN(-6);} if(id==='share'){state.mode='contact';setN(6);} if(id==='invalid'){state.mode='quantum';setN(2);state.invalid=true;} document.querySelectorAll('button[data-mode]').forEach(b=>b.classList.toggle('on',b.dataset.mode===state.mode)); state.inductionStage=0; draw(); }));
+  els.inductionStep.addEventListener('click',()=>{ if(state.mode!=='induction')return; state.inductionStage=state.inductionStage===2?0:state.inductionStage+1; draw(); });
+  if(root.ResizeObserver){ new ResizeObserver(responsive).observe(canvas.parentElement); } else root.addEventListener('resize',responsive); responsive();
+  root.__ANIM_TEST_STATE__={get:()=>({mode:state.mode,n:n(),inductionStage:state.inductionStage,invalid:state.invalid,readout:els.readout.textContent.trim()})};
 })();
 </script>
 </body>
