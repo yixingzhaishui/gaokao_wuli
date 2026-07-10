@@ -284,7 +284,7 @@
     playBtn.textContent=state.playing?'⏸ 暂停':'▶ 播放：小车随时间运动';
     if(state.playing){if(state.t>=8)state.t=0;animate();}else draw();
   });
-  document.getElementById('resetBtn').addEventListener('click',()=>{state.playing=false;state.t=0;playBtn.textContent='▶ 播放：小车随时间运动';draw();});
+    document.getElementById('resetBtn').addEventListener('click',()=>{state.v0=6;state.mu=.2;state.t=2;state.drag=null;state.playing=false;document.querySelectorAll('[data-mu]').forEach(btn=>btn.classList.toggle('active',Math.abs(+btn.dataset.mu-state.mu)<.005));playBtn.textContent='▶ 播放：小车随时间运动';draw();});
   draw();
 })();
 </script>

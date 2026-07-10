@@ -1,0 +1,12 @@
+{
+  "name": "gaokao-wuli-audit",
+  "private": true,
+  "scripts": {
+    "check": "node scripts/check.js --strict",
+    "audit:static": "node scripts/check.js --audit-write && node scripts/anim-audit.js",
+    "audit:interaction": "playwright test tests/interaction-audit.spec.js --workers=1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.61.1"
+  }
+}

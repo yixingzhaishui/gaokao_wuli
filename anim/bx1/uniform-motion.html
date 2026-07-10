@@ -39,7 +39,7 @@
         <button id="mStill">静止</button><button id="mCompare">对比匀加速</button>
       </div>
     </div>
-    <div class="box"><button id="play" style="width:100%">▶ 播放运动</button></div>
+    <div class="box"><div class="buttons"><button id="play">▶ 播放运动</button><button id="resetBtn">重置</button></div></div>
     <div class="readout" id="readout"></div>
     <div class="box formula">
       <b>公式绑定</b><br>
@@ -190,7 +190,7 @@
     var _bg=ctx.createLinearGradient(0,0,0,560);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,940,560); layout={};
     drawTrack(); drawAxesBox(); drawGraphs();
     const gap=state.v*0.5;
-    readout.innerHTML=`x0=<b>${state.x0.toFixed(1)}</b> m<br>t=<b>${state.t.toFixed(2)}</b> s<br>x=<b>${xNow().toFixed(2)}</b> m<br>v=<b>${state.v.toFixed(2)}</b> m/s<br>a=<b>0.00</b> m/s²<br>每 0.5 s 间距=<b>${gap.toFixed(2)}</b> m`;
+    readout.innerHTML=`模式=<b>${state.compare?'对比匀加速':state.mode}</b><br>x0=<b>${state.x0.toFixed(1)}</b> m<br>t=<b>${state.t.toFixed(2)}</b> s<br>x=<b>${xNow().toFixed(2)}</b> m<br>v=<b>${state.v.toFixed(2)}</b> m/s<br>a=<b>0.00</b> m/s²<br>每 0.5 s 间距=<b>${gap.toFixed(2)}</b> m`;
     if(Math.abs(state.v)<0.03) status.textContent='v=0：频闪点重合，x-t 图是水平线，这叫静止，不是“有速度的匀速”。';
     else if(state.v<0) status.textContent='v<0：小车沿负方向匀速，频闪仍等间距；x-t 斜率和 v-t 高度都为负。';
     else if(state.compare) status.textContent='对比模式：蓝点等间距、橙点间距变大；同样是直线轨道，速度规律完全不同。';
@@ -211,8 +211,9 @@
     canvas.style.cursor=hit?'grab':'default';
   });
   window.addEventListener('pointerup',()=>{drag=null;canvas.style.cursor='default';});
-  const playBtn=document.getElementById('play');let running=false,last=performance.now();
+  const playBtn=document.getElementById('play'),resetBtn=document.getElementById('resetBtn');let running=false,last=performance.now();
   playBtn.addEventListener('click',()=>{if(state.t>=8)state.t=0;running=!running;playBtn.textContent=running?'⏸ 暂停':'▶ 播放运动';});
+  resetBtn.addEventListener('click',()=>{running=false;playBtn.textContent='▶ 播放运动';setMode('forward');});
   canvas.addEventListener('pointerdown',()=>{if(running){running=false;playBtn.textContent='▶ 播放运动';}});
   function loop(now){const dt=Math.min((now-last)/1000,.05);last=now;if(running){state.t=Math.min(8,state.t+dt);if(state.t>=8){running=false;playBtn.textContent='▶ 重新播放';}draw();}requestAnimationFrame(loop);}
   draw();requestAnimationFrame(loop);

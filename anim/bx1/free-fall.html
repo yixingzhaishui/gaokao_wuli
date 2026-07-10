@@ -20,7 +20,7 @@
   <div class="panel">
     <div class="box task"><b>观察任务：</b>拖质量旋钮，对照落体侧视装置、v-t 图像和数据记录，看它只改变球大小，不会改变同一高度的落地时间。</div>
     <div class="box"><b>环境</b><div class="buttons" style="margin-top:7px"><button id="mEarth" class="active">地球</button><button id="mMoon">月球</button><button id="mJupiter">木星</button><button id="mLow">低重力</button></div></div>
-    <div class="box"><button id="play" style="width:100%">▶ 播放下落</button></div>
+  <div class="box"><div class="buttons"><button id="play">▶ 播放下落</button><button id="resetBtn">重置</button></div></div>
     <div class="readout" id="readout"></div>
     <div class="box formula"><b>公式绑定</b><br>v=gt：v-t 纵坐标。<br>h=1/2gt²：v-t 面积。<br>v²=2gH：落地速度。<br>公式里没有 m。</div>
     <div class="box warn" id="status"></div>
@@ -46,8 +46,9 @@
   function draw(){var _bg=ctx.createLinearGradient(0,0,0,560);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,940,560);layout={};drawScene();drawGraph();const te=tEff(),tl=tLand(),vl=vLand();readout.innerHTML=`H=<b>${s.H.toFixed(1)}</b> m<br>g=<b>${s.g.toFixed(2)}</b> m/s²<br>m=<b>${s.m.toFixed(1)}</b> kg<br>t=<b>${te.toFixed(2)}</b> s<br>已下落=<b>${fallen(te).toFixed(2)}</b> m<br>当前 v=<b>${(s.g*te).toFixed(2)}</b> m/s<br>t落=<b>${tl.toFixed(2)}</b> s<br>v落=<b>${vl.toFixed(2)}</b> m/s`;status.textContent=s.t>=tl?'已落地：v²=2gH，质量 m 仍不出现在公式中。':(s.g<2?'月球 g 小：斜率小、落地慢；质量仍无关。':'自由落体只由 H 和 g 决定；质量只改变画面大小。')}
   function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}} canvas.addEventListener('pointerdown',e=>{const p=pointer(e);for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30){drag=k;canvas.setPointerCapture(e.pointerId);break}}});
   canvas.addEventListener('pointermove',e=>{const p=pointer(e);if(drag==='H')s.H=Math.round(hFromY(p.y));if(drag==='m')s.m=Math.round(clamp(.1+(p.x-(scene.x+40))/220*(10-.1),.1,10)*10)/10;if(drag==='t')s.t=Math.round(tFromX(p.x)*20)/20;if(drag==='g')s.g=Math.round(clamp((gv.oy-p.y)/gv.h*gv.vMax/3,1,24)*10)/10;if(drag){draw();return}let hit=false;for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30)hit=true}canvas.style.cursor=hit?'grab':'default'});window.addEventListener('pointerup',()=>{drag=null;canvas.style.cursor='default'});draw();
-  const playBtn=document.getElementById('play');let running=false,last=performance.now();
+  const playBtn=document.getElementById('play'),resetBtn=document.getElementById('resetBtn');let running=false,last=performance.now();
   playBtn.addEventListener('click',()=>{if(s.t>=tLand())s.t=0;running=!running;playBtn.textContent=running?'⏸ 暂停':'▶ 播放下落';});
+  resetBtn.addEventListener('click',()=>{running=false;Object.assign(s,{H:45,g:9.8,t:2,m:4,mode:'earth'});Object.entries(buttons).forEach(([k,b])=>b.classList.toggle('active',k==='earth'));playBtn.textContent='▶ 播放下落';draw();});
   function loop(now){const dt=Math.min((now-last)/1000,.05);last=now;if(running){s.t=Math.min(tLand(),s.t+dt);if(s.t>=tLand()){running=false;playBtn.textContent='▶ 重新下落';}draw();}requestAnimationFrame(loop);}
   requestAnimationFrame(loop);
 })();

@@ -10,9 +10,16 @@ const { execFileSync } = require('child_process');
 
 const root = path.resolve(__dirname, '..');
 const strict = process.argv.slice(2).includes('--strict');
-const unknownArgs = process.argv.slice(2).filter(arg => arg !== '--strict');
+const auditWrite = process.argv.slice(2).includes('--audit-write');
+const unknownArgs = process.argv.slice(2).filter(arg => !['--strict', '--audit-write'].includes(arg));
 const errors = [];
 const warns = [];
+const audit = {
+  formula_candidates: [],
+  missing_diagrams: [],
+  missing_graphic_resources: [],
+  problem_completeness_candidates: []
+};
 
 function read(rel) {
   return fs.readFileSync(path.join(root, rel), 'utf8');
@@ -69,8 +76,22 @@ function compareCollections(name, actualIds, expectedIds) {
   if (extra.length) errors.push(`${name} 存在未知编号: ${formatIds(extra)}`);
 }
 
+const graphicFields = ['diagram', 'image', 'img', 'figure', 'svg', 'shared_diagram', 'group_diagram'];
+
+function problemGraphics(problem) {
+  return graphicFields.flatMap(field => {
+    const value = problem[field];
+    if (Array.isArray(value)) return value.map(item => ({ field, value: item }));
+    return value ? [{ field, value }] : [];
+  });
+}
+
 function hasProblemGraphic(problem) {
-  return Boolean(problem.diagram || problem.image || problem.img || problem.figure || problem.svg);
+  return problemGraphics(problem).length > 0;
+}
+
+function auditLocation(file, line, type, description, excerpt = '') {
+  return { file, line, type, description, excerpt: excerpt.trim().slice(0, 220) };
 }
 
 const idMap = json('data/id-map.json');
@@ -207,7 +228,7 @@ for (const md of walk(root, (fp, name) => name.endsWith('.md'))) {
 }
 
 // 7. Problem references and strict problem metadata.
-const figureRe = /(如图|下图|图示|所示|图中|右图|左图)/;
+const figureRe = /(如图所示|装置如图|电路如图|光路如图|受力如图|图像如图|由图可知|如图|图中|下图|上图(?!样)|左图|右图)/;
 const sourceDetailRe = /(真题|适应性|模拟)/;
 for (const problem of problems) {
   for (const id of problem.knowledge_ids || []) {
@@ -218,8 +239,40 @@ for (const problem of problems) {
   }
   if (figureRe.test(problem.stem || '') && !hasProblemGraphic(problem)) {
     errors.push(`图题缺图: ${problem.id} 题干含图示词但无 diagram/image/svg`);
+    audit.missing_diagrams.push({
+      id: problem.id,
+      severity: 'P1',
+      hard_failure: 'H3',
+      trigger: (problem.stem || '').match(figureRe)?.[0] || '',
+      stem: problem.stem || '',
+      required_fix: '补充与题干一致的必要图示，并验证资源可加载。'
+    });
   }
-  if (problem.diagram_required && !hasProblemGraphic(problem)) errors.push(`diagram_required=true 但无图: ${problem.id}`);
+  if (problem.diagram_required && !hasProblemGraphic(problem)) {
+    errors.push(`diagram_required=true 但无图: ${problem.id}`);
+    if (!audit.missing_diagrams.some(item => item.id === problem.id)) {
+      audit.missing_diagrams.push({ id: problem.id, severity: 'P1', hard_failure: 'H3', trigger: 'diagram_required', stem: problem.stem || '', required_fix: '补充必要图示。' });
+    }
+  }
+  for (const graphic of problemGraphics(problem)) {
+    if (typeof graphic.value !== 'string') continue;
+    const value = graphic.value.trim();
+    if (!value || /^<svg\b/i.test(value) || /^(?:data:|https?:\/\/)/i.test(value)) continue;
+    if (!/\.(?:svg|png|jpe?g|gif|webp)(?:[?#].*)?$/i.test(value)) continue;
+    const clean = value.replace(/[?#].*$/, '').replace(/^\//, '');
+    const candidates = [path.join(root, clean), path.join(root, 'data', clean), path.join(root, 'img', clean), path.join(root, 'image', clean)];
+    if (!candidates.some(fp => fs.existsSync(fp))) {
+      errors.push(`题目图示资源不存在: ${problem.id} ${graphic.field}=${value}`);
+      audit.missing_graphic_resources.push({ id: problem.id, field: graphic.field, value, severity: 'P1', hard_failure: 'H3' });
+    }
+  }
+  const missingFields = [];
+  if (!problem.answer) missingFields.push('answer');
+  if (!(problem.solution || problem.analysis)) missingFields.push('solution_or_analysis');
+  if (!Array.isArray(problem.model_ids)) missingFields.push('model_ids');
+  if ((!Array.isArray(problem.knowledge_ids) || !problem.knowledge_ids.length) && (!Array.isArray(problem.model_ids) || !problem.model_ids.length)) missingFields.push('knowledge_or_model_ids');
+  if (!problem.source) missingFields.push('source');
+  if (missingFields.length) audit.problem_completeness_candidates.push({ id: problem.id, missing_fields: missingFields });
   if (sourceDetailRe.test(problem.source || '') && !problem.source_detail && problem.source_verified !== false) {
     errors.push(`来源缺 source_detail 或未标 source_verified=false: ${problem.id}`);
   }
@@ -257,6 +310,52 @@ for (const md of walk(root, (fp, name) => name.endsWith('.md'))) {
     let match;
     while ((match = rule.re.exec(text)) !== null) warns.push(`${file}:${lineOf(text, match.index)} ${rule.msg}`);
   });
+
+  let inFence = false;
+  let blockDelimiterCount = 0;
+  const lines = text.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const rawLine = lines[i];
+    if (/^\s*```/.test(rawLine)) {
+      inFence = !inFence;
+      continue;
+    }
+    if (inFence) continue;
+    for (const match of rawLine.matchAll(/`([^`\n]+)`/g)) {
+      const value = match[1];
+      if (/\\(?:frac|vec|sqrt)\b|(?:^|\s)[A-Za-z][A-Za-z0-9_]*\s*=|[²³⁴⁵⁶⁷⁸⁹₀₁₂₃₄₅₆₇₈₉]|[ΔΣ∑√≈≤≥]/.test(value)) {
+        audit.formula_candidates.push(auditLocation(file, i + 1, 'formula_in_backticks', '公式候选被反引号包裹，无法由 KaTeX 渲染。', value));
+      }
+    }
+    const noInlineCode = rawLine.replace(/`[^`]*`/g, '');
+    blockDelimiterCount += (noInlineCode.match(/\$\$/g) || []).length;
+    const withoutBlocks = noInlineCode.replace(/\$\$/g, '');
+    const inlineDollarCount = (withoutBlocks.match(/(^|[^\\])\$/g) || []).length;
+    if (inlineDollarCount % 2 !== 0) {
+      audit.formula_candidates.push(auditLocation(file, i + 1, 'unpaired_inline_dollar', '行内公式 $ 未配对。', rawLine));
+    }
+    const withoutMath = withoutBlocks.replace(/\$[^$]*\$/g, '');
+    if (/\\(?:frac|vec|sqrt)\b/.test(withoutMath)) {
+      audit.formula_candidates.push(auditLocation(file, i + 1, 'bare_latex_command', 'LaTeX 命令出现在数学定界符之外。', rawLine));
+    }
+    const htmlDrawingLine = /<(?:svg|path|line|text|rect|circle|marker|defs|g)\b/i.test(withoutMath);
+    const plainFormula = withoutMath.match(/(?:^|[\s（(：:|])(?:[A-Za-z][A-Za-z0-9_′'₀-₉]*|[ΔΣ∑][A-Za-z]?|[A-Za-z]̄)\s*(?:=|≈|≤|≥|∝)\s*[^|，。；;]{1,120}/);
+    if (!htmlDrawingLine && plainFormula) {
+      audit.formula_candidates.push(auditLocation(file, i + 1, 'plain_formula_outside_math', '公式以普通文本/Unicode 出现，未使用 KaTeX 数学定界符。', plainFormula[0]));
+    }
+    if (/\$[^$]*[²³⁴⁵⁶⁷⁸⁹₀₁₂₃₄₅₆₇₈₉][^$]*\$/.test(noInlineCode)) {
+      audit.formula_candidates.push(auditLocation(file, i + 1, 'unicode_latex_mixed', '同一公式混用 Unicode 上下标与 LaTeX。', rawLine));
+    }
+  }
+  if (blockDelimiterCount % 2 !== 0) {
+    audit.formula_candidates.push(auditLocation(file, 1, 'unpaired_block_dollar', '块公式 $$ 未配对。'));
+  }
+  for (const match of text.matchAll(/\$\$([\s\S]*?)\$\$/g)) {
+    const compact = match[1].replace(/\s+/g, ' ').trim();
+    if (compact.length > 140) {
+      audit.formula_candidates.push(auditLocation(file, lineOf(text, match.index), 'long_block_formula', '块公式较长，需检查 390px 裁切和横向滚动。', compact));
+    }
+  }
 }
 
 const aSectionRules = [
@@ -314,12 +413,30 @@ for (const rel of trackedFiles) {
   if (name === '.DS_Store' || name.startsWith('.fuse_hidden')) errors.push(`仓库包含系统隐藏文件: ${rel}`);
 }
 
+if (auditWrite) {
+  const resultsDir = path.join(root, 'audit', 'results');
+  fs.mkdirSync(resultsDir, { recursive: true });
+  let commit = '';
+  try { commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim(); } catch {}
+  const generatedAt = new Date().toISOString();
+  fs.writeFileSync(path.join(resultsDir, 'formula-audit.json'), JSON.stringify({ score_version: '3.0', generated_at: generatedAt, commit, candidates: audit.formula_candidates }, null, 2) + '\n');
+  fs.writeFileSync(path.join(resultsDir, 'missing-diagrams.json'), JSON.stringify({
+    score_version: '3.0', generated_at: generatedAt, commit,
+    missing_diagrams: audit.missing_diagrams,
+    missing_graphic_resources: audit.missing_graphic_resources,
+    problem_completeness_candidates: audit.problem_completeness_candidates
+  }, null, 2) + '\n');
+  console.log(`审核结果已写入 audit/results（公式候选 ${audit.formula_candidates.length}，缺图 ${audit.missing_diagrams.length}，资源缺失 ${audit.missing_graphic_resources.length}）`);
+}
+
 console.log(`=== repository consistency check${strict ? ' (strict)' : ''} ===`);
 console.log('知识点/实验/模型总数:', idMapIds.length);
 console.log('知识图谱节点数:', graphNodes.length);
 console.log('题库题数:', coreProblems.length);
 console.log('页面例题数:', pageExamples.length);
 console.log('规范补充训练题数:', specExamples.length);
+console.log('V3 公式格式候选:', audit.formula_candidates.length);
+console.log('V3 缺图/图资源问题:', audit.missing_diagrams.length + audit.missing_graphic_resources.length);
 if (warns.length) {
   console.log(`\n⚠ 警告 (${warns.length}):`);
   warns.forEach(warn => console.log(`  - ${warn}`));
