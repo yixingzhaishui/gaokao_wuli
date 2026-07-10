@@ -14,7 +14,7 @@
   <div class="panel">
     <div class="box task"><b>观察任务：</b>把形变拖到 0，对照弹簧侧视装置、F-x 图像和数据记录，看弹力是否消失；再增大形变，看箭头和读数变大。</div>
     <div class="box"><b>场景</b><div class="buttons" style="margin-top:7px"><button id="mSupport" class="active">支持力</button><button id="mRope">绳拉力</button><button id="mSpring">弹簧</button></div></div>
-    <div class="box"><button id="play" style="width:100%">▶ 释放回弹</button></div>
+  <div class="box"><div class="buttons"><button id="play">▶ 释放回弹</button><button id="resetBtn">重置</button></div></div>
     <div class="readout" id="readout"></div>
     <div class="box formula"><b>判据</b><br>弹力产生：接触/连接 + 弹性形变。<br>方向：指向恢复原状。<br>本节看条件和方向，精确定量到胡克定律。</div>
     <div class="box warn" id="status"></div>
@@ -28,8 +28,9 @@ function drawSpring(){const wall=150,y=270,origin=505,end=origin+s.x*22;line(105
 function drawKnob(){line(290,505,650,505,'#bcccdc',3);const x=290+(s.k-1)/9*360;handle(x,505,'k','#12b886');layout.k={x,y:505};text(`材料硬度 k=${s.k.toFixed(1)} N/cm`,470,482,'#0b7285',13,'center','800')}
 function draw(){var _bg=ctx.createLinearGradient(0,0,0,560);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,940,560);layout={};card(50,36,835,440);if(s.mode==='support')drawSupport();if(s.mode==='rope')drawRope();if(s.mode==='spring')drawSpring();card(190,400,560,42);text('形变量越大、材料越硬，弹力越明显；没有弹性形变时弹力为 0。',470,421,'#102a43',14,'center','800');drawKnob();const names={support:'桌面支持力',rope:'绳的拉力',spring:'弹簧弹力'},dirs={support:'垂直接触面向上',rope:'沿绳指向绳收缩方向',spring:s.x>=0?'沿弹簧拉回':'沿弹簧推开'};readout.innerHTML=`场景=<b>${names[s.mode]}</b><br>形变量 x=<b>${s.x.toFixed(1)}</b> cm<br>材料硬度 k=<b>${s.k.toFixed(1)}</b> N/cm<br>弹力示意 F∝kx=<b>${F().toFixed(1)}</b><br>方向=<b>${dirs[s.mode]}</b>`;status.textContent=Math.abs(s.x)<0.1?'没有弹性形变：这一场景下弹力为 0。':'有弹性形变：弹力指向恢复原状方向，不是固定向上或固定向右。'}
 function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}canvas.addEventListener('pointerdown',e=>{const p=pointer(e);for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<32){drag=k;canvas.setPointerCapture(e.pointerId);break}}});canvas.addEventListener('pointermove',e=>{const p=pointer(e);if(drag==='k')s.k=Math.round(clamp(1+(p.x-290)/360*9,1,10)*10)/10;if(drag==='x'&&s.mode==='support')s.x=Math.round(clamp((p.y-238)/4,0,10)*10)/10;if(drag==='x'&&s.mode==='rope')s.x=Math.round(clamp((p.x-513)/18,0,10)*10)/10;if(drag==='x'&&s.mode==='spring')s.x=Math.round(clamp((p.x-548)/22,-6,10)*10)/10;if(drag){draw();return}let hit=false;for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<32)hit=true}canvas.style.cursor=hit?'grab':'default'});window.addEventListener('pointerup',()=>{drag=null;canvas.style.cursor='default'});draw();
-const playBtn=document.getElementById('play');let running=false,amp=4,ph=0,last=performance.now();
+const playBtn=document.getElementById('play');const resetBtn=document.getElementById('resetBtn');let running=false,amp=4,ph=0,last=performance.now();
 playBtn.addEventListener('click',()=>{running=!running;if(running){amp=Math.max(2,Math.abs(s.x)||4);ph=0;}playBtn.textContent=running?'⏸ 暂停':'▶ 释放回弹';});
+resetBtn.addEventListener('click',()=>{running=false;amp=4;ph=0;s.mode='support';s.x=4;s.k=6;Object.entries(btn).forEach(([k,b])=>b.classList.toggle('active',k==='support'));playBtn.textContent='▶ 释放回弹';draw();});
 canvas.addEventListener('pointerdown',()=>{if(running){running=false;playBtn.textContent='▶ 释放回弹';}});
 function loop(now){const dt=Math.min((now-last)/1000,.05);last=now;if(running){ph+=dt;const w=Math.sqrt(s.k)*1.0;s.x=Math.round(amp*(0.5-0.5*Math.cos(w*ph))*10)/10;draw();}requestAnimationFrame(loop);}
 requestAnimationFrame(loop);

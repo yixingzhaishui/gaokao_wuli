@@ -40,7 +40,7 @@
   </div>
   <div class="panel">
     <div class="card task"><b>观察任务：</b>拖速度箭头，再切换参考系；对照道路侧视装置、速度图像和数据记录，看绿色相对速度怎样改变。</div>
-    <button id="playBtn">暂停</button>
+    <div class="buttons"><button id="playBtn">播放</button><button id="resetBtn">重置</button></div>
     <div class="card">
       <div class="title">实验类型</div>
       <div class="tabs"><button id="tabLine" class="active">两车一维</button><button id="tabRain">雨中人二维</button></div>
@@ -58,7 +58,7 @@
   const ctx=canvas.getContext('2d');
   let mode='line';
   let frame='ground';
-  let vA=20, vB=8, t=0, running=true;
+  let vA=20, vB=8, t=0, running=false;
   let vRain=4, vMan=3;
   let drag=null, layout={};
   const scale=5;
@@ -245,6 +245,7 @@
   });
   window.addEventListener('pointerup',()=>{drag=null;canvas.style.cursor='default';});
   document.getElementById('playBtn').onclick=()=>{running=!running;syncPlayButton();};
+  document.getElementById('resetBtn').onclick=()=>{mode='line';frame='ground';vA=20;vB=8;t=0;running=false;document.getElementById('tabLine').classList.add('active');document.getElementById('tabRain').classList.remove('active');controls();draw();};
   document.getElementById('tabLine').onclick=()=>{mode='line';document.getElementById('tabLine').classList.add('active');document.getElementById('tabRain').classList.remove('active');controls();draw();};
   document.getElementById('tabRain').onclick=()=>{mode='rain';document.getElementById('tabRain').classList.add('active');document.getElementById('tabLine').classList.remove('active');controls();draw();};
   let last=performance.now();

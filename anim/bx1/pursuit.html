@@ -39,7 +39,7 @@
         <button id="mSlow">加速度较小</button><button id="mEqual">临界共速</button>
       </div>
     </div>
-    <div class="box"><button id="play" style="width:100%">▶ 播放运动</button></div>
+    <div class="box"><div class="buttons"><button id="play">▶ 播放运动</button><button id="resetBtn">重置</button></div></div>
     <div class="readout" id="readout"></div>
     <div class="box formula">
       <b>公式绑定</b><br>
@@ -179,7 +179,7 @@
   });
   window.addEventListener('pointerup',()=>{drag=null;canvas.style.cursor='default';});
   draw();
-const playBtn=document.getElementById("play");let __run=false,__last=performance.now();playBtn.addEventListener("click",()=>{const cap=(Math.min(15,tEq()+2));if(state.t>=cap)state.t=0;__run=!__run;playBtn.textContent=__run?"⏸ 暂停":"▶ 播放运动";});canvas.addEventListener("pointerdown",()=>{if(__run){__run=false;playBtn.textContent="▶ 播放运动";}});function __loop(now){const dt=Math.min((now-__last)/1000,.05);__last=now;const cap=(Math.min(15,tEq()+2));if(__run){state.t=Math.min(cap,state.t+dt);if(state.t>=cap){__run=false;playBtn.textContent="▶ 重新播放";}draw();}requestAnimationFrame(__loop);}requestAnimationFrame(__loop);
+const playBtn=document.getElementById("play"),resetBtn=document.getElementById("resetBtn");let __run=false,__last=performance.now();playBtn.addEventListener("click",()=>{const cap=(Math.min(15,tEq()+2));if(state.t>=cap)state.t=0;__run=!__run;playBtn.textContent=__run?"⏸ 暂停":"▶ 播放运动";});resetBtn.addEventListener("click",()=>{__run=false;playBtn.textContent="▶ 播放运动";setMode('start');});canvas.addEventListener("pointerdown",()=>{if(__run){__run=false;playBtn.textContent="▶ 播放运动";}});function __loop(now){const dt=Math.min((now-__last)/1000,.05);__last=now;const cap=(Math.min(15,tEq()+2));if(__run){state.t=Math.min(cap,state.t+dt);if(state.t>=cap){__run=false;playBtn.textContent="▶ 重新播放";}draw();}requestAnimationFrame(__loop);}requestAnimationFrame(__loop);
 })();
 </script>
 </body>

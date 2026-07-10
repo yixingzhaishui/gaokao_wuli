@@ -1,5 +1,7 @@
 #!/usr/bin/env node
-// 交互动画自动评分 V2：对 anim/**/*.html 打“直观实验台”客观代理分（见 ../动画评分系统.md）
+// 动画静态预筛选 V3：只检查 anim/**/*.html 的静态代理特征。
+// 本分数不能证明动画能运行、控件有效或物理规律正确；最终结论以
+// Playwright 行为证据和人工物理复核为准（见 ../内容审核评分系统V3.md）。
 // 用法: node scripts/anim-audit.js [章节前缀，如 bx3]
 const fs = require('fs');
 const path = require('path');
@@ -101,11 +103,11 @@ for (const f of files) {
   if (srcLen < 1500) score = capScore(score, 70, notes, '脚本过短');
 
   let verdict;
-  if (score >= 96) verdict = '优秀(≥96)';
-  else if (score >= 85) verdict = '可用(需复核)';
-  else if (score >= 70) verdict = '待修';
-  else if (score >= 40) verdict = '草稿/抽象';
-  else verdict = '草稿/玩具';
+  if (score >= 96) verdict = '静态高(待行为复核)';
+  else if (score >= 85) verdict = '静态通过(待行为复核)';
+  else if (score >= 70) verdict = '静态待修';
+  else if (score >= 40) verdict = '静态草稿/抽象';
+  else verdict = '静态草稿/玩具';
   const dims = {
     d1: (scene ? 10 : 0) + Math.min(6, Math.round(srcLen / 900)),
     d2: direct ? 14 : (drag >= 2 ? 10 : (sliders >= 1 ? 5 : 0)),
@@ -121,8 +123,9 @@ for (const f of files) {
 
 rows.sort((a, b) => a.score - b.score);
 const bad = rows.filter(r => r.score < 85).length;
-console.log(`=== 交互动画评分（共 ${rows.length}，其中 <85 需处理 ${bad}）${filter ? ' 过滤:' + filter : ''} ===`);
-console.log('分数  判级        行数  文件  | 扣分点');
+console.log('警告：以下仅为静态预筛选分，不代表动画可以运行，也不代表控件有效或物理正确。');
+console.log(`=== 动画静态预筛选（共 ${rows.length}，其中 <85 需处理 ${bad}）${filter ? ' 过滤:' + filter : ''} ===`);
+console.log('静态分  静态判级        行数  文件  | 静态扣分点');
 const verbose = process.argv.includes('-v');
 for (const r of rows) {
   if (verbose && r.dims) {
@@ -132,3 +135,4 @@ for (const r of rows) {
     console.log(`${String(r.score).padStart(3)}  ${(r.verdict).padEnd(16)} ${String(r.lines).padStart(4)}  ${r.rel}${r.notes ? '  | ' + r.notes : ''}`);
   }
 }
+console.log('结论边界：静态预筛选通过，仍必须通过真实播放、暂停、重置、参数影响、重复进入和 390px 手机行为测试。');
