@@ -37,6 +37,7 @@ canvas{display:block;width:100%;max-width:640px;background:#fff;border:1px solid
     <span class="r">碰后动能 = <b id="ek-after">—</b> J</span>
     <span class="r">碰后 v₁′ = <b id="u1">—</b> m/s</span>
     <span class="r">碰后 v₂′ = <b id="u2">—</b> m/s</span>
+    <span class="r" id="modeReadout">碰撞模式：弹性</span>
   </div>
   <div class="controls">
     <label>m₁ = <span id="m1-d">1.0</span> kg
@@ -174,6 +175,7 @@ canvas{display:block;width:100%;max-width:640px;background:#fff;border:1px solid
     document.getElementById('ek-after').textContent=ekA.toFixed(2);
     document.getElementById('u1').textContent=cur1.toFixed(2);
     document.getElementById('u2').textContent=cur2.toFixed(2);
+    document.getElementById('modeReadout').textContent=elastic?'弹性碰撞：碰后动能守恒':'完全非弹性：碰后两车粘连同速，动能有损失';
   }
 
   function syncControls(){

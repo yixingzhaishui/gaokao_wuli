@@ -30,7 +30,7 @@ canvas{display:block;width:100%;max-width:760px;background:#fff;border:1px solid
     <button data-mode="force">力敏</button>
     <label><span id="inputLabel">光照强度</span> = <span id="inl">0</span><input id="inputr" type="range" min="0" max="100" step="1" value="0"></label>
     <label>触发阈值 = <span id="thl">2.50</span> V<input id="thr" type="range" min="0.5" max="4.5" step="0.05" value="2.5"></label>
-    <button id="play-btn">暂停扫描</button>
+    <button id="play-btn">播放扫描</button>
     <button id="reset-btn">重置</button>
     <span style="font-size:13px;color:#5a6b7b">也可拖左侧场景里的圆点改变输入</span>
   </div>
@@ -49,7 +49,7 @@ canvas{display:block;width:100%;max-width:760px;background:#fff;border:1px solid
 <script>
 (function(){
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
-let mode='light',x=0,th=2.5,drag=false,running=true,t=0,last=performance.now(),history=[];
+let mode='light',x=0,th=2.5,drag=false,running=false,t=0,last=performance.now(),history=[];
 const Vcc=5,R0=5000;
 const modes={
   light:{name:'光敏电阻',input:'光照',unit:'%',sample:'sensor',act:'路灯',low:'天黑',high:'天亮',r:v=>20000/(1+0.20*v)},
@@ -161,7 +161,7 @@ document.querySelectorAll('[data-mode]').forEach(btn=>btn.addEventListener('clic
 inputr.oninput=e=>{x=parseFloat(e.target.value);draw()};
 thr.oninput=e=>{th=parseFloat(e.target.value);draw()};
 document.getElementById('play-btn').onclick=()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停扫描':'播放扫描';draw()};
-document.getElementById('reset-btn').onclick=()=>{mode='light';x=0;th=2.5;t=0;history=[];running=true;inputr.value=x;thr.value=th;document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode==='light'));document.getElementById('play-btn').textContent='暂停扫描';draw()};
+document.getElementById('reset-btn').onclick=()=>{mode='light';x=0;th=2.5;t=0;history=[];running=false;inputr.value=x;thr.value=th;document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode==='light'));document.getElementById('play-btn').textContent='播放扫描';draw()};
 function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;if(running&&!drag){t+=dt;x=50+50*Math.sin(t*.9);inputr.value=x.toFixed(0)}draw();requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
 })();

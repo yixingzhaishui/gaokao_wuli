@@ -43,7 +43,7 @@ button.primary{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:80
   <div class="panel">
     <div class="card task"><b>建模不是套公式：</b>先认出真实对象，再决定保留什么、忽略什么，最后把过程翻译成图像和方程。<b>拖动画面里的汽车或无人机，改变初速度。</b></div>
     <div class="card tabs"><button id="brake" class="active">汽车制动</button><button id="drop">无人机投放</button></div>
-    <div class="toolbar"><button id="play" class="primary">暂停</button><button id="step">单步</button><button id="reset">重置</button></div>
+    <div class="toolbar"><button id="play" class="primary">播放</button><button id="step">单步</button><button id="reset">重置</button></div>
     <div class="card params">
       <label class="param"><span id="vName">初速度 v₀ <b id="vLabel">20.0 m/s</b></span><input id="v" type="range" min="5" max="35" step="0.5" value="20"></label>
       <label class="param"><span id="p1Name">反应时间 tᵣ <b id="p1Label">1.0 s</b></span><input id="p1" type="range" min="0.2" max="3" step="0.1" value="1"></label>
@@ -60,7 +60,7 @@ button.primary{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:80
   const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
   const el={brake:document.getElementById('brake'),drop:document.getElementById('drop'),play:document.getElementById('play'),step:document.getElementById('step'),reset:document.getElementById('reset'),v:document.getElementById('v'),p1:document.getElementById('p1'),p2:document.getElementById('p2'),vName:document.getElementById('vName'),p1Name:document.getElementById('p1Name'),p2Name:document.getElementById('p2Name'),vLabel:document.getElementById('vLabel'),p1Label:document.getElementById('p1Label'),p2Label:document.getElementById('p2Label'),formula1:document.getElementById('formula1'),formula2:document.getElementById('formula2'),formula3:document.getElementById('formula3'),readout:document.getElementById('readout'),status:document.getElementById('status')};
   const C={ink:'#102a43',muted:'#64748b',grid:'#dbe5ef',blue:'#2563eb',orange:'#ea580c',green:'#059669',gold:'#d97706',red:'#dc2626',purple:'#7c3aed',pink:'#db2777'};
-  const S={mode:'brake',running:true,time:0,drag:false,trail:[],lastTrail:-1};
+  const S={mode:'brake',running:false,time:0,drag:false,trail:[],lastTrail:-1};
   const g=9.8;
   let W=960,H=620,dpr=1,last=performance.now();
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));

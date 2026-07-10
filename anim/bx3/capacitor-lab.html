@@ -38,6 +38,7 @@ canvas{display:block;width:100%;max-width:720px;background:#0e1a2b;border-radius
     <button class="btn on" id="charge">▶ 充电</button>
     <button class="btn" id="discharge">▶ 放电</button>
     <button class="btn" id="open">断开</button>
+    <button class="btn" id="playBtn">播放演示</button>
     <label>电源 E = <span id="El">6</span> V<input type="range" id="E" min="2" max="10" step="1" value="6"></label>
     <label>电阻 R = <span id="Rl">10</span> kΩ<input type="range" id="R" min="2" max="30" step="1" value="10"></label>
     <label>电容 C = <span id="Cl">100</span> μF<input type="range" id="C" min="20" max="200" step="10" value="100"></label>
@@ -47,7 +48,7 @@ canvas{display:block;width:100%;max-width:720px;background:#0e1a2b;border-radius
 <script>
 (function(){
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
-let E=6,R=10,C=100,mode='charge',Uc=0,t=0,hist=[],dragProbe=false,probeFrac=null;
+let E=6,R=10,C=100,mode='charge',Uc=0,t=0,hist=[],dragProbe=false,probeFrac=null,running=false;
 // geometry
 const capX=250,capTopY=120,capBotY=250,plateW=150; // plates
 const gx=470,gy=70,gw=220,gh=170; // graph
@@ -131,9 +132,10 @@ cv.addEventListener('pointerdown',e=>{const p=pos(e);if(p.x>=gx&&p.x<=gx+gw&&p.y
 cv.addEventListener('pointermove',e=>{if(!dragProbe)return;const p=pos(e);probeFrac=Math.max(0,Math.min(1,(p.x-gx)/gw));draw();});
 window.addEventListener('pointerup',()=>dragProbe=false);
 let last=performance.now();
-function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;step(dt);draw();requestAnimationFrame(loop);}
+document.getElementById('playBtn').onclick=function(){running=!running;this.textContent=running?'暂停演示':'播放演示';if(running)draw()};
+function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;if(running)step(dt);draw();requestAnimationFrame(loop);}
 draw();requestAnimationFrame(loop);
 })();
 </script>
-</body>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script></body>
 </html>

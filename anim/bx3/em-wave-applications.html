@@ -48,6 +48,7 @@
         <button data-mode="fiber">光纤</button>
       </div>
     </div>
+    <div class="card"><button id="playBtn" type="button">暂停演示</button></div>
     <div class="card">
       <div class="title">调参数</div>
       <label class="param"><span>频率 f <b id="fLabel">100 MHz</b></span><input id="freq" type="range" min="1" max="5" step="0.01" value="2"></label>
@@ -84,7 +85,7 @@
   };
   const buttons = Array.from(document.querySelectorAll('button[data-mode]'));
   const C = 3e8;
-  const state = { mode: 'radio', t: 0, receiverX: 690, probeX: 650, drag: null, records: [] };
+  const state = { mode: 'radio', t: 0, receiverX: 690, probeX: 650, drag: null, records: [], running: true };
   const colors = { ink:'#102a43', muted:'#486581', blue:'#2c7be5', red:'#e03131', green:'#087f5b', gold:'#f0a500', purple:'#7c3aed', sky:'#0ea5e9' };
   const presets = {
     radio: { f: 2, d: 120, b: 8, note: '广播：用调制把声音信息加载到电磁波上，接收机再解调。' },
@@ -244,6 +245,8 @@
     els.freq.value = pre.f; els.dist.value = pre.d; els.band.value = pre.b;
     buttons.forEach(b=>b.classList.toggle('active', b.dataset.mode===mode));
     record();
+    drawScene();
+    updatePanel();
   }
   buttons.forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
   [els.freq, els.amp, els.dist, els.band].forEach(el=>el.addEventListener('input',()=>{ record(); drawScene(); updatePanel(); }));
@@ -265,14 +268,15 @@
     drawScene(); updatePanel();
   });
   canvas.addEventListener('pointerup', e => { state.drag=null; record(); try { canvas.releasePointerCapture(e.pointerId); } catch(_) {} });
+  const playBtn = document.getElementById('playBtn');
+  playBtn.addEventListener('click', () => { state.running = !state.running; playBtn.textContent = state.running ? '暂停演示' : '播放演示'; if (state.running) { drawScene(); updatePanel(); } });
   function loop() {
-    state.t += 0.035;
-    drawScene(); updatePanel();
+    if (state.running) { state.t += 0.035; drawScene(); updatePanel(); }
     requestAnimationFrame(loop);
   }
   setMode('radio');
   loop();
 })();
 </script>
-</body>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script></body>
 </html>

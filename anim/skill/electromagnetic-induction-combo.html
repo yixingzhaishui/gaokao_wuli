@@ -40,7 +40,7 @@ button.primary{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:80
   <div class="stage"><canvas id="canvas" width="960" height="620" aria-label="电磁感应综合实验台：导体棒在磁场中运动，磁通量、感应电流、安培力和能量读数同步变化"></canvas></div>
   <div class="panel">
     <div class="card task"><b>只追一条链：</b>导体棒移动 → 回路面积和磁通量 Φ 改变 → 感应电流 I 出现 → 安培力反向阻碍运动 → 机械功转成电热。<b>拖动橙色导体棒时，观察电流方向如何反转。</b></div>
-    <div class="toolbar"><button id="play" class="primary">暂停</button><button id="step">单步</button><button id="reset">重置</button></div>
+    <div class="toolbar"><button id="play" class="primary">播放</button><button id="step">单步</button><button id="reset">重置</button></div>
     <div class="card params">
       <label class="param"><span>磁感应强度 B <b id="bLabel">0.60 T</b></span><input id="B" type="range" min="0.1" max="1.2" step="0.05" value="0.6"></label>
       <label class="param"><span>导体棒长度 L <b id="lLabel">0.50 m</b></span><input id="L" type="range" min="0.2" max="1" step="0.05" value="0.5"></label>
@@ -58,7 +58,7 @@ button.primary{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:80
   const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
   const el={B:document.getElementById('B'),L:document.getElementById('L'),v:document.getElementById('v'),R:document.getElementById('R'),bLabel:document.getElementById('bLabel'),lLabel:document.getElementById('lLabel'),vLabel:document.getElementById('vLabel'),rLabel:document.getElementById('rLabel'),play:document.getElementById('play'),step:document.getElementById('step'),reset:document.getElementById('reset'),readout:document.getElementById('readout'),status:document.getElementById('status')};
   const C={ink:'#102a43',muted:'#64748b',grid:'#dbe5ef',blue:'#2563eb',orange:'#ea580c',green:'#059669',gold:'#d97706',purple:'#7c3aed',red:'#dc2626',pink:'#db2777'};
-  const S={running:true,position:.28,heading:1,drag:false,manualV:0,lastX:0,history:[],lastHistory:-1};
+  const S={running:false,position:.28,heading:1,drag:false,manualV:0,lastX:0,history:[],lastHistory:-1};
   let W=960,H=620,dpr=1,last=performance.now();
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
   const fmt=(v,d=2)=>Number.isFinite(v)?v.toFixed(d):'—';

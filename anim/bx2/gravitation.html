@@ -45,6 +45,7 @@
         <button data-case="near">距离更近</button>
       </div>
     </div>
+    <div class="card"><button id="playBtn" type="button">暂停演示</button></div>
     <div class="card">
       <div class="title">实时读数</div>
       <div class="readout">
@@ -67,7 +68,7 @@
 (function(){
   'use strict';
   const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'),G=6.67e-11;
-  const state={M:6,m:7.3,r:6.4,drag:null,pulse:0};
+  const state={M:6,m:7.3,r:6.4,drag:null,pulse:0,running:true};
   const els={f:document.getElementById('fText'),f2:document.getElementById('f2Text'),r:document.getElementById('rText'),ratio:document.getElementById('ratioText'),status:document.getElementById('status')};
   const colors={red:'#dc2626',blue:'#2563eb',purple:'#7c3aed',green:'#0f766e',orange:'#f59e0b',ink:'#102a43'};
   const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
@@ -110,9 +111,11 @@
   function up(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
   canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
   document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='base'){state.M=6;state.m=7.3;state.r=6.4}if(c==='doubleR'){state.M=6;state.m=7.3;state.r=12}if(c==='doubleM'){state.M=8;state.m=7.3;state.r=6.4}if(c==='near'){state.M=6;state.m=7.3;state.r=2.8}draw()}));
-  function tick(){state.pulse=(state.pulse+.05)%(Math.PI*2);draw();requestAnimationFrame(tick)}
+  const playBtn=document.getElementById('playBtn');
+  playBtn.addEventListener('click',()=>{state.running=!state.running;playBtn.textContent=state.running?'暂停演示':'播放演示';if(state.running)draw()});
+  function tick(){if(state.running){state.pulse=(state.pulse+.05)%(Math.PI*2);draw()}requestAnimationFrame(tick)}
   draw();requestAnimationFrame(tick);
 })();
 </script>
-</body>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script></body>
 </html>

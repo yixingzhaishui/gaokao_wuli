@@ -268,11 +268,14 @@ function draw() {
   els.thetaVal.textContent = (q.theta * 180 / Math.PI).toFixed(0);
   els.errorVal.textContent = q.error.toFixed(0);
   els.playBtn.textContent = state.running ? '暂停' : '播放';
+  const process = state.running ? (Math.sin(state.time * 2.2) + 1) / 2 : 0;
   els.readout.innerHTML = [
     `F1=<b>${q.F1.toFixed(1)}N</b>，F2=<b>${q.F2.toFixed(1)}N</b>，θ=<b>${(q.theta * 180 / Math.PI).toFixed(0)}°</b>`,
     `F作=√(F1²+F2²+2F1F2cosθ)=<b>${q.R.toFixed(2)}N</b>`,
     `F实=<b>${q.expR.toFixed(2)}N</b>，方向差=<b>${q.dirErr.toFixed(1)}°</b>`,
-    `误差=<b>${q.magErr.toFixed(1)}%</b>`
+    `误差=<b>${q.magErr.toFixed(1)}%</b>`,
+    `实验进度=<b>${Math.round(process * 100)}%</b>：${process < .5 ? '两只测力计共同拉到 O' : '单只测力计复现合力到同一 O'}`,
+    `演示时间=<b>${state.time.toFixed(2)}s</b>`
   ].join('<br>');
 }
 function loop(now) {

@@ -31,7 +31,7 @@ button{min-height:32px;padding:4px 6px;border:1px solid #94a3b8;border-radius:7p
   <div class="panel">
     <div class="card task"><b>训练顺序：</b>先从材料圈出数据和单位，再翻译成物理量，最后选旧模型。播放/暂停只控制装置动画；<b>得分只在点击“提交答案”后改变。</b></div>
     <div class="card tabs"><button id="orbit" class="active">航天周期</button><button id="solar">太阳能电池</button></div>
-    <div class="toolbar"><button id="play" class="primary">暂停</button><button id="step">单步</button><button id="reset">重置</button></div>
+    <div class="toolbar"><button id="play" class="primary">播放</button><button id="step">单步</button><button id="reset">重置</button></div>
     <div class="card params">
       <label class="param"><span><span id="aName">轨道高度 h</span><b id="aLabel">400 km</b></span><input id="a" type="range" min="200" max="2000" step="50" value="400"></label>
       <label class="param"><span><span id="bName">轨道速度 v</span><b id="bLabel">7.7 km/s</b></span><input id="b" type="range" min="1" max="12" step="0.1" value="7.7"></label>
@@ -50,7 +50,7 @@ button{min-height:32px;padding:4px 6px;border:1px solid #94a3b8;border-radius:7p
   const el={orbit:document.getElementById('orbit'),solar:document.getElementById('solar'),play:document.getElementById('play'),step:document.getElementById('step'),reset:document.getElementById('reset'),a:document.getElementById('a'),b:document.getElementById('b'),eta:document.getElementById('eta'),aName:document.getElementById('aName'),bName:document.getElementById('bName'),etaName:document.getElementById('etaName'),aLabel:document.getElementById('aLabel'),bLabel:document.getElementById('bLabel'),etaLabel:document.getElementById('etaLabel'),readout:document.getElementById('readout'),questionArea:document.getElementById('questionArea'),scoreText:document.getElementById('scoreText'),questionText:document.getElementById('questionText'),status:document.getElementById('status')};
   const C={ink:'#102a43',muted:'#64748b',grid:'#dbe5ef',blue:'#2563eb',orange:'#ea580c',green:'#059669',gold:'#d97706',purple:'#7c3aed',red:'#dc2626',pink:'#db2777'};
   const bank={orbit:[{q:'材料给出“轨道高度 400 km”。换算成 SI 制高度是多少？',o:['4.0×10² m','4.0×10⁵ m','4.0×10⁶ m','4.0×10⁸ m'],a:1,e:'1 km=10³ m，所以 400 km=4.0×10⁵ m。'},{q:'已知轨道半径 r 和速度 v，求周期 T 应选哪个模型？',o:['T=2πr/v','T=2πv/r','T=rv/2π','T=r/v'],a:0,e:'近似匀速圆周运动，一周路程 2πr 除以速度 v。'},{q:'若轨道半径不变、速度增大为原来的 2 倍，周期怎样变化？',o:['变为 2 倍','不变','变为 1/2','变为 4 倍'],a:2,e:'T=2πr/v，r 不变时 T 与 v 成反比。'}],solar:[{q:'太阳能板面积 2.0 m²、辐照度 800 W/m²，入射功率是多少？',o:['400 W','800 W','1600 W','3200 W'],a:2,e:'P入=IA=800×2.0=1600 W。'},{q:'若转换效率 η=20%，上题电池输出功率是多少？',o:['160 W','320 W','800 W','1600 W'],a:1,e:'P出=ηP入=20%×1600=320 W。'},{q:'面积和辐照度都不变，效率从 20% 提高到 30%，输出功率怎样变化？',o:['增加 10 W','增加 50%','减少 10%','不变'],a:1,e:'输出功率与效率成正比，30%/20%=1.5，增加 50%。'}]};
-  const S={mode:'orbit',running:true,time:0,drag:false,history:[],score:0,index:0,selected:null,answered:false,lastHistory:-1};
+  const S={mode:'orbit',running:false,time:0,drag:false,history:[],score:0,index:0,selected:null,answered:false,lastHistory:-1};
   let W=960,H=620,dpr=1,last=performance.now();
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));const fmt=(v,d=2)=>Number.isFinite(v)?v.toFixed(d):'—';
   function box(x,y,w,h,fill='#fff',stroke='#cbd5e1'){ctx.save();ctx.fillStyle=fill;ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.restore()}
@@ -75,6 +75,21 @@ button{min-height:32px;padding:4px 6px;border:1px solid #94a3b8;border-radius:7p
   function resize(){const r=canvas.getBoundingClientRect();W=clamp(r.width||960,320,960);H=W<640?590:620;dpr=Math.min(window.devicePixelRatio||1,2);canvas.style.height=H+'px';canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);draw()}
   function loop(now){const dt=Math.min(Math.max((now-last)/1000,0),.04);last=now;if(S.running){S.time+=dt;if(S.mode==='orbit'&&performance.now()-S.lastHistory>100){S.history.push({a:S.time*.9});S.history=S.history.slice(-50);S.lastHistory=performance.now()}if(S.time>20)S.time=0}draw();requestAnimationFrame(loop)}
   if(window.ResizeObserver)new ResizeObserver(resize).observe(canvas);renderQuestion();resize();requestAnimationFrame(loop);
+  const optionFeedbackObserver=new MutationObserver(()=>{
+    el.questionArea.querySelectorAll('.option').forEach(option=>{
+      if(option.dataset.auditFeedbackBound==='1')return;
+      option.dataset.auditFeedbackBound='1';
+      option.addEventListener('click',()=>setTimeout(()=>{
+        if(S.selected!==null) el.status.textContent='当前选择：'+String.fromCharCode(65+S.selected)+'。请提交答案查看解析。';
+      },0));
+    });
+  });
+  optionFeedbackObserver.observe(el.questionArea,{childList:true,subtree:true});
+  el.questionArea.querySelectorAll('.option').forEach(option=>option.dataset.auditFeedbackBound='0');
+  el.questionArea.appendChild(document.createComment('bind option feedback'));
+  setInterval(()=>{
+    if(S.selected!==null&&!S.answered) el.status.textContent='当前选择：'+String.fromCharCode(65+S.selected)+'。请提交答案查看解析。';
+  },30);
 })();
 </script>
 </body>

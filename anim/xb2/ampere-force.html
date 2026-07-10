@@ -39,6 +39,8 @@ button{font:inherit;padding:6px 12px;border:1px solid #b6c5d4;background:#fff;bo
     <span class="r">θ = <b id="th-v">90</b>°</span>
     <span class="r">测力计 F = <b id="f-v">—</b> N</span>
     <span class="r">方向：<b id="dir-v">—</b></span>
+    <span class="r">通过截面的电荷 Q = <b id="q-v">0.00</b> C</span>
+    <span class="r">演示时间：<b id="t-v">0.00</b> s</span>
   </div>
   <div class="hint">
     <b>观察任务</b>：直接拖左侧实验台里的橙色导线端点改变 θ。看 3D 蹄形磁铁中 B 从 N 指向 S，导线电流 I 与 B 的夹角改变时，右侧测力计、俯视夹角图和 F-θ 图像怎样同步变化。θ=0° 时导线与磁场平行，测力计归零；θ=90° 时 F 最大。侧视截面用 ⊗/⊙ 告诉你安培力垂直纸面方向。
@@ -163,6 +165,8 @@ function draw(){
   document.getElementById('th-v').textContent=theta;
   document.getElementById('f-v').textContent=force.toFixed(3);
   document.getElementById('dir-v').textContent=force>0.02?'指向纸内 ⊗':'无方向';
+  document.getElementById('q-v').textContent=(I*t).toFixed(2);
+  document.getElementById('t-v').textContent=t.toFixed(2);
 }
 function sync(){
   document.getElementById('b').value=B;document.getElementById('i').value=I;document.getElementById('l').value=L;document.getElementById('th').value=theta;

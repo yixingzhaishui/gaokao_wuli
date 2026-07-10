@@ -40,7 +40,7 @@ button.primary{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:80
   <div class="stage"><canvas id="canvas" width="960" height="620" aria-label="多过程运动实验台：橙色小车依次加速、匀速、制动，车辆位置、v-t图像游标和分段面积同步变化"></canvas></div>
   <div class="panel">
     <div class="card task"><b>先按播放看全程：</b>同一辆橙色小车会依次经历“加速 → 匀速 → 制动”。观察小车位置、上方阶段条、<b>v-t 图像金色游标</b>是否同步移动；拖动图像中的金色游标可直接跳到任意时刻。</div>
-    <div class="toolbar"><button id="play" class="primary">暂停</button><button id="step">单步</button><button id="reset">重置</button></div>
+    <div class="toolbar"><button id="play" class="primary">播放</button><button id="step">单步</button><button id="reset">重置</button></div>
     <div class="card params">
       <label class="param"><span>加速度 a₁ <b id="a1Label">2.0 m/s²</b></span><input id="a1" type="range" min="0.5" max="4" step="0.1" value="2"></label>
       <label class="param"><span>加速时长 t₁ <b id="t1Label">3.0 s</b></span><input id="t1" type="range" min="1" max="5" step="0.1" value="3"></label>
@@ -62,7 +62,7 @@ button.primary{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:80
     play:document.getElementById('play'),step:document.getElementById('step'),reset:document.getElementById('reset'),readout:document.getElementById('readout'),status:document.getElementById('status')
   };
   const C={ink:'#102a43',muted:'#64748b',grid:'#dbe5ef',blue:'#2563eb',orange:'#ea580c',green:'#059669',gold:'#d97706',red:'#dc2626',purple:'#7c3aed',road:'#64748b'};
-  const S={running:true,time:0,drag:false,trail:[],lastTrail:-1};
+  const S={running:false,time:0,drag:false,trail:[],lastTrail:-1};
   let W=960,H=620,dpr=1,last=performance.now();
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
   const fmt=(v,d=2)=>Number.isFinite(v)?v.toFixed(d):'—';

@@ -38,6 +38,8 @@ canvas{display:block;width:100%;max-width:660px;background:#0b1220;border-radius
     <span class="chip">折射率 n = <b id="n">1.50</b></span>
     <span class="chip">折射角 θ₂ = <b id="r">—</b>°</span>
     <span class="chip">玻璃中光速 v = <b id="sp">—</b>·c</span>
+    <span class="chip">光脉冲位置 s/L = <b id="pulse-v">0.00</b></span>
+    <span class="chip">演示时间 t = <b id="t">0.00</b> s</span>
   </div>
   <div class="hint"><b>怎么玩</b>：黄色<b>光脉冲</b>沿入射光线射到界面 O（播放时在动），在界面处分成<b>折射光</b>（进入玻璃）和微弱的反射光。注意脉冲进入玻璃后<b>走得更慢</b>（v=c/n）——正是"光变慢"让波前偏转、折射光<b>偏向法线</b>。拖<b>入射角 θ₁</b>：折射角 θ₂ 随之变，始终满足 sinθ₁/sinθ₂=n；拖<b>折射率 n</b> 变大 → 折射光弯折更厉害、玻璃中光速更小。可直接拖入射光线改角度。</div>
 </div>
@@ -54,6 +56,7 @@ function geom(){
   return {ir,r2,inc,refr};
 }
 function step(dt){
+  t+=dt;
   emit-=dt; if(emit<=0){emit=0.32;pulses.push({s:0});}
   for(const p of pulses){const vAir=260,vGlass=vAir/n;p.s+=(p.s<L?vAir:vGlass)*dt;}
   pulses=pulses.filter(p=>p.s<2*L);
@@ -95,13 +98,15 @@ function render(){
   ctx.fillText('状态：θ₁>θ₂，光进玻璃变慢、'+(n>1.6?'弯折加强':'弯折减弱')+'（偏向法线）',18,H-50);
   document.getElementById('i').textContent=i;document.getElementById('n').textContent=n.toFixed(2);
   document.getElementById('r').textContent=(g.r2/D).toFixed(1);document.getElementById('sp').textContent=(1/n).toFixed(3);
+  document.getElementById('pulse-v').textContent=((pulses[pulses.length-1]?.s||0)/L).toFixed(2);
+  document.getElementById('t').textContent=t.toFixed(2);
 }
 function pos(e){const r=cv.getBoundingClientRect(),s=cv.width/r.width;return{x:((e.touches?e.touches[0].clientX:e.clientX)-r.left)*s,y:((e.touches?e.touches[0].clientY:e.clientY)-r.top)*s};}
 cv.addEventListener('pointerdown',e=>{const p=pos(e);if(p.y<oy&&Math.hypot(p.x-ox,p.y-oy)>30){dragRay=true;}});
 cv.addEventListener('pointermove',e=>{if(!dragRay)return;const p=pos(e);const ang=Math.atan2(ox-p.x,oy-p.y);i=Math.max(0,Math.min(85,Math.round(ang/D)));document.getElementById('ir').value=i;document.getElementById('il').textContent=i;});
 window.addEventListener('pointerup',()=>dragRay=false);
 document.getElementById('play').onclick=function(){playing=!playing;this.classList.toggle('on',playing);this.textContent=playing?'⏸ 暂停':'▶ 播放';};
-document.getElementById('reset').onclick=function(){i=45;n=1.5;pulses=[];document.getElementById('ir').value=45;document.getElementById('nr').value=1.5;document.getElementById('il').textContent=45;document.getElementById('nl').textContent='1.50';};
+document.getElementById('reset').onclick=function(){i=45;n=1.5;t=0;playing=false;pulses=[];document.getElementById('ir').value=45;document.getElementById('nr').value=1.5;document.getElementById('il').textContent=45;document.getElementById('nl').textContent='1.50';this.textContent='重置';document.getElementById('play').textContent='▶ 播放';render();};
 document.getElementById('ir').addEventListener('input',e=>{i=parseInt(e.target.value);document.getElementById('il').textContent=i;});
 document.getElementById('nr').addEventListener('input',e=>{n=parseFloat(e.target.value);document.getElementById('nl').textContent=n.toFixed(2);});
 let last=performance.now();

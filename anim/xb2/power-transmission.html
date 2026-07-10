@@ -122,7 +122,7 @@ pr.oninput=e=>{P=parseFloat(e.target.value);draw()};
 ur.oninput=e=>{U=parseFloat(e.target.value);draw()};
 rr.oninput=e=>{r=parseFloat(e.target.value);draw()};
 document.getElementById('play-btn').onclick=()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停演示':'播放演示';draw()};
-document.getElementById('reset-btn').onclick=()=>{P=100;U=10;r=10;t=0;running=true;pr.value=P;ur.value=U;rr.value=r;document.getElementById('play-btn').textContent='暂停演示';draw()};
+document.getElementById('reset-btn').onclick=()=>{P=100;U=14;r=10;t=0;running=false;pr.value=P;ur.value=U;rr.value=r;document.getElementById('play-btn').textContent='播放演示';draw()};
 function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;if(running&&!drag){t+=dt;U=1+24*(0.5+0.5*Math.sin(t*.65));ur.value=U.toFixed(1)}draw();requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
 })();

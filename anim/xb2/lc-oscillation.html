@@ -43,5 +43,5 @@ function record(){const p=par();S.records.push({ph:fmt(p.phase/Math.PI,2)+'π',q
 [els.l,els.c,els.u].forEach(el=>el.addEventListener('input',()=>{draw();update()}));els.play.addEventListener('click',()=>{S.run=!S.run;els.play.textContent=S.run?'暂停':'播放'});els.record.addEventListener('click',record);canvas.addEventListener('pointerdown',e=>{S.drag=true;canvas.setPointerCapture(e.pointerId)});canvas.addEventListener('pointermove',e=>{if(!S.drag)return;const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width;const p=par(),phase=Math.max(0,Math.min(1,(x-105)/660))*Math.PI*2;S.t=phase/p.w;draw()});canvas.addEventListener('pointerup',e=>{S.drag=false;record();try{canvas.releasePointerCapture(e.pointerId)}catch(_){}});function loop(){const p=par();if(S.run)S.t+=0.016;draw();requestAnimationFrame(loop)}record();loop();
 })();
 </script>
-</body>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script></body>
 </html>

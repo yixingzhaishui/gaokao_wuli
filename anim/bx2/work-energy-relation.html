@@ -534,6 +534,11 @@
     state.running = !state.running;
     ui.play.textContent = state.running ? '暂停' : '播放';
     state.lastTime = performance.now();
+    // 播放不是计时：从当前位置推进小球，三本能量账同步累积。
+    if (state.running && Number(els.u.value) >= 0.999) els.u.value = '0';
+    if (state.running && Number(els.u.value) === 0) els.u.value = '0.01';
+    state.pulse = state.running ? 1 : state.pulse;
+    draw();
   });
 
   document.getElementById('reset').addEventListener('click', () => {

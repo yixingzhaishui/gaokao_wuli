@@ -92,6 +92,7 @@
     </section>
     <canvas id="canvas" width="920" height="430" aria-label="高频模型诊断台：实物场景、判据图像、仪器读数和数据记录"></canvas>
     <section class="controls">
+      <button id="playBtn" data-audit-play type="button">播放演示</button>
       <label><span id="la"></span><input id="a" type="range"><span class="val" id="va"></span></label>
       <label><span id="lb"></span><input id="b" type="range"><span class="val" id="vb"></span></label>
       <label><span id="lc"></span><input id="c" type="range"><span class="val" id="vc"></span></label>
@@ -142,7 +143,7 @@ const models=[
 const signalBank=['轻绳','木板','传送带','剪断','水平初速度','最高点','卫星','恒定功率','摩擦生热','碰撞','导轨','变压器','复合场','p-V图','质量亏损'];
 const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
 const ctrls=[document.getElementById('a'),document.getElementById('b'),document.getElementById('c')];
-let active=0,query='',signal='',running=true,t=0,drag=null,records=[];
+let active=0,query='',signal='',running=false,t=0,drag=null,records=[];
 function fmt(v){return Math.abs(v)>=10?Number(v).toFixed(0):Number(v).toFixed(2).replace(/0$/,'').replace(/\.0$/,'')}
 function vals(){return ctrls.map(x=>+x.value)}
 function matchScore(m){const q=(query+' '+signal).trim();if(!q)return active===models.indexOf(m)?100:60;let s=0;for(const w of m.signals){if(q.includes(w))s+=35}if(m.name.includes(q)||m.desc.includes(q))s+=30;if(m.family.includes(q))s+=15;return s}
@@ -180,9 +181,10 @@ function whyNot(m){
   return `先看题眼“${m.signals.slice(0,3).join('、')}”，它们指向${m.reaction}。若误选${other||'其他模型'}，通常是还没判断临界、约束或守恒对象。`;
 }
 function setStatus(criterion,state){document.getElementById('criterionBox').textContent=criterion;document.getElementById('stateBox').textContent=state}
-function loop(ts){if(running)t=ts/1000;draw();requestAnimationFrame(loop)}
+function loop(ts){if(running){t=ts/1000;const m=models[active],s=m.sliders[0],mid=(s[1]+s[2])/2,amp=(s[2]-s[1])*.25;ctrls[0].value=Math.max(s[1],Math.min(s[2],mid+amp*Math.sin(t*1.6)))}draw();requestAnimationFrame(loop)}
+document.getElementById('playBtn').addEventListener('click',e=>{running=!running;e.currentTarget.textContent=running?'暂停演示':'播放演示';if(running)draw()});
 function clear(){ctx.clearRect(0,0,920,430);ctx.strokeStyle='#eef2f7';ctx.lineWidth=1;for(let x=40;x<920;x+=40)line(x,0,x,430);for(let y=40;y<430;y+=40)line(0,y,920,y);text('实物/受力视图',48,28,'#486581',13,'left',true);text('判据图像与仪器读数',680,28,'#486581',13,'left',true)}
-function draw(){clear();const m=models[active];drawers[m.draw](vals())}
+function draw(){clear();const m=models[active];drawers[m.draw](vals());const stateBox=document.getElementById('stateBox');stateBox.textContent+=` · 演示 t=${t.toFixed(2)} s`}
 function text(s,x,y,c='#102a43',size=14,align='left',bold=false){ctx.fillStyle=c;ctx.font=`${bold?800:500} ${size}px system-ui,-apple-system,"PingFang SC",sans-serif`;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
 function line(x1,y1,x2,y2,c,w=2,dash){ctx.save();ctx.strokeStyle=c||ctx.strokeStyle;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
 function arrow(x1,y1,x2,y2,c,label){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,4);ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-12*Math.cos(a-.45),y2-12*Math.sin(a-.45));ctx.lineTo(x2-12*Math.cos(a+.45),y2-12*Math.sin(a+.45));ctx.closePath();ctx.fill();if(label)text(label,(x1+x2)/2,(y1+y2)/2-13,c,13,'center',true)}
@@ -215,5 +217,5 @@ function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.lef
 function findHandle(p){const m=models[active],v=vals();let hs=[];if(m.draw==='connecting')hs=[{x:550+v[0]*8,y:249,i:0,fn:p=>(p.x-550)/8}];if(m.draw==='plank')hs=[{x:420+v[0]*7,y:192,i:0,fn:p=>(p.x-420)/7}];if(m.draw==='belt')hs=[{x:430,y:325,i:0,fn:p=>(p.x-260)/34}];if(m.draw==='spring'){const x=(v[0]*10+v[1])/v[2];hs=[{x:308,y:305+x*80,i:1,fn:p=>(p.y-305)*v[2]/80-v[0]*10}]}if(m.draw==='collision')hs=[{x:260+v[2]*180,y:330,i:2,fn:p=>(p.x-260)/180}];if(m.draw==='rail')hs=[{x:425,y:240,i:2,fn:p=>(p.x-330)/12}];return hs.find(h=>Math.hypot(p.x-h.x,p.y-h.y)<32)}
 init();
 </script>
-</body>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script></body>
 </html>

@@ -38,6 +38,7 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
     <span class="r">场强 E = <b id="e-val">5.00</b> N/C</span>
     <span class="r" id="dir-val">方向：向外</span>
     <span class="r">场强状态：<b id="trend-val">—</b></span>
+    <span class="r">演示时间：<b id="t-val">0.00</b> s</span>
   </div>
   <div class="hint">
     <p><b>观察任务</b>：直接<b>拖动画面里橙色的试探点</b>改变 r，对照点电荷俯视装置、场强图像和数据记录，看场强如何按 1/r² 减小。</p>
@@ -64,6 +65,7 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
     document.getElementById('r-val').textContent=r.toFixed(1);
     document.getElementById('dir-val').textContent=Q>0?'方向：向外（正电荷）':(Q<0?'方向：向内（负电荷）':'Q=0，无场');
     document.getElementById('trend-val').textContent=e>lastE+0.01?'增强中':(e<lastE-0.01?'减弱中':'稳定');
+    document.getElementById('t-val').textContent=t.toFixed(2);
     lastE=e;
   }
 
@@ -160,7 +162,7 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
     ctx.fillText('E = k|Q|/r² = '+k+'×'+Math.abs(Q).toFixed(1)+'/'+r.toFixed(1)+'² = '+e.toFixed(2)+' N/C',15,H-15);
   }
 
-  function step(dt){if(!running)return;t+=dt;draw();}
+  function step(dt){if(!running)return;t+=dt;updateReadouts();draw();}
 
   function eventPos(ev){const rc=canvas.getBoundingClientRect();return {x:(ev.clientX-rc.left)*canvas.width/rc.width,y:(ev.clientY-rc.top)*canvas.height/rc.height};}
   canvas.addEventListener('pointerdown',ev=>{
@@ -177,7 +179,7 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
   document.getElementById('q').addEventListener('input',e=>{Q=parseFloat(e.target.value);document.getElementById('q-display').textContent=(Q>=0?'+':'')+Q.toFixed(1);updateReadouts();draw();});
   document.getElementById('r').addEventListener('input',e=>{r=parseFloat(e.target.value);document.getElementById('r-display').textContent=r.toFixed(1);updateReadouts();draw();});
   document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
-  document.getElementById('reset-btn').addEventListener('click',()=>{running=false;t=0;document.getElementById('play-btn').textContent='播放';draw();});
+  document.getElementById('reset-btn').addEventListener('click',()=>{running=false;t=0;lastE=0;document.getElementById('play-btn').textContent='播放';updateReadouts();draw();});
 
   let lastTime=performance.now();
   function loop(now){const dt=Math.min((now-lastTime)/1000,0.05);lastTime=now;step(dt);requestAnimationFrame(loop);}

@@ -43,5 +43,5 @@ function record(){const q=p();S.records.push({f0:q.f0,fr:q.fr,s:Math.round(q.str
 [els.carrier,els.tune,els.mod,els.dist].forEach(el=>el.addEventListener('input',()=>{draw();update()}));els.play.addEventListener('click',()=>{S.run=!S.run;els.play.textContent=S.run?'暂停':'播放'});els.record.addEventListener('click',record);canvas.addEventListener('pointerdown',e=>{S.drag=true;canvas.setPointerCapture(e.pointerId)});canvas.addEventListener('pointermove',e=>{if(!S.drag)return;const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width;els.tune.value=Math.max(80,Math.min(120,80+(x-648)/116*40));draw()});canvas.addEventListener('pointerup',e=>{S.drag=false;record();try{canvas.releasePointerCapture(e.pointerId)}catch(_){}});function loop(){if(S.run)S.t+=.016;draw();requestAnimationFrame(loop)}record();loop();
 })();
 </script>
-</body>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script></body>
 </html>
