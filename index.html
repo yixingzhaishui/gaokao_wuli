@@ -342,6 +342,7 @@
   <script>
     window.$docsify = {
       name: '四川高考物理',
+      nameLink: '#/',
       loadSidebar: true,
       // 使用 _sidebar.md 作为唯一学习路径。不能让 Docsify 自动把每个
       // “9. 公式绑定 / 10. 适用条件”抽成目录，否则学生会跳到没上下文的位置。
@@ -398,7 +399,23 @@
           button.setAttribute('aria-label', open ? '关闭目录' : '打开目录');
         });
       }
-      if (backdrop) backdrop.addEventListener('click', closeMobileSidebar);
+      if (backdrop && backdrop.dataset.bound !== '1') {
+        backdrop.dataset.bound = '1';
+        backdrop.addEventListener('click', closeMobileSidebar);
+      }
+      if (button.dataset.navBound !== '1') {
+        button.dataset.navBound = '1';
+        document.addEventListener('click', function(event) {
+          const target = event.target && typeof event.target.closest === 'function' ? event.target : null;
+          const link = target && target.closest('.sidebar-nav a');
+          const href = link && link.getAttribute('href');
+          if (!href || !href.startsWith('#/')) return;
+          closeMobileSidebar();
+          window.setTimeout(function() {
+            if (location.hash !== href) location.hash = href;
+          }, 0);
+        }, true);
+      }
       if (button.dataset.hashBound !== '1') {
         button.dataset.hashBound = '1';
         window.addEventListener('hashchange', closeMobileSidebar);

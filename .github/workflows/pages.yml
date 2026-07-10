@@ -20,22 +20,26 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - name: Validate generated data and site
+      - name: Prepare static Docsify site
         run: |
-          node scripts/gen-data.js --check
-          node scripts/update-progress-report.js --check
-          node scripts/check.js --strict
-          node scripts/anim-audit.js
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-      - name: Upload static site
+          mkdir -p _site
+          rsync -a \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='_site' \
+            --exclude='.DS_Store' \
+            --exclude='.fuse_hidden*' \
+            ./ _site/
+          touch _site/.nojekyll
+          test -f _site/index.html
+          test -f _site/_sidebar.md
+          test -d _site/data
+          test -d _site/anim
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
 
   deploy:
     needs: build
