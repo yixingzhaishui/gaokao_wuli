@@ -24,14 +24,6 @@ canvas{display:block;width:100%;max-width:700px;background:#fff;border:1px solid
 <body>
 <div class="wrap">
   <h2>互感：一个线圈电流变化 → 另一个线圈磁通量变化</h2>
-  <canvas id="cv" width="700" height="400"></canvas>
-  <div class="chips">
-    <span class="chip">原线圈电流 I₁ = <b id="i1v">0.00</b> A</span>
-    <span class="chip">变化率 dI₁/dt = <b id="dv">0.00</b></span>
-    <span class="chip">耦合 k = <b id="kv">0.70</b></span>
-    <span class="chip">副线圈 E₂ ∝ <b id="e2v">0.00</b></span>
-    <span class="chip">状态：<b id="statev">交流持续互感</b></span>
-  </div>
   <div class="ctrls">
     <button class="btn on" id="ac">交流变化</button>
     <button class="btn" id="dc">直流稳定</button>
@@ -41,7 +33,15 @@ canvas{display:block;width:100%;max-width:700px;background:#fff;border:1px solid
     <button class="btn" id="reset-btn">重置</button>
     <span style="font-size:13px;color:#5a6b7b">或拖蓝色副线圈远近</span>
   </div>
-  <div class="hint"><b>观察任务</b>：看副线圈电流计。交流时 I₁ 一直变化，副线圈持续有感应；直流稳定后 I₁ 虽然不为零，但 dI₁/dt=0，副线圈无感应；点“通断瞬间”只在电流突变时偏一下。拖副线圈远离，耦合 k 变小，E₂ 变弱。</div>
+  <canvas id="cv" width="700" height="400" aria-label="互感实验台：双线圈侧视装置、磁通图像和数据记录"></canvas>
+  <div class="chips">
+    <span class="chip">原线圈电流 I₁ = <b id="i1v">0.00</b> A</span>
+    <span class="chip">变化率 dI₁/dt = <b id="dv">0.00</b></span>
+    <span class="chip">耦合 k = <b id="kv">0.70</b></span>
+    <span class="chip">副线圈 E₂ ∝ <b id="e2v">0.00</b></span>
+    <span class="chip">状态：<b id="statev">交流持续互感</b></span>
+  </div>
+  <div class="hint"><b>观察任务</b>：看副线圈电流计。对照双线圈侧视装置、磁通图像和数据记录，交流时 I₁ 一直变化，副线圈持续有感应；直流稳定后 dI₁/dt=0，副线圈无感应。</div>
 </div>
 <script>
 (function(){

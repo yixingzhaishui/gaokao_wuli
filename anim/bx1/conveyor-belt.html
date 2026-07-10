@@ -38,41 +38,49 @@
 <div class="root">
   <div class="stage"><canvas id="canvas" width="960" height="760" aria-label="传送带模型交互实验台"></canvas></div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>先比 v物 和 v带，看红色摩擦箭头方向；再拖时间游标，看是否共速、划痕 Δx 和摩擦生热 Q 怎样积累。</div>
+    <div class="card task"><b>观察任务：</b>先比较 v物 与 v带 的大小和方向；再拖 `g`、`μ`、`L`，看红色摩擦箭头、共速点、划痕 Δx 和生热 Q 如何同步改变。</div>
+    <div class="chips"><button id="playBtn">播放过程</button><button id="resetBtn">重置时间</button></div>
     <div class="card">
       <div class="title">实验模式</div>
       <div class="chips">
         <button id="horizontalMode" class="active">水平传送带</button>
-        <button id="inclineMode">倾斜向上输送</button>
+        <button id="inclineMode">倾斜传送带</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="title">direction 传送方向</div>
+      <div class="chips">
+        <button id="dirForward" class="active">向右 / 向上</button>
+        <button id="dirBackward">向左 / 向下</button>
       </div>
     </div>
     <div class="card">
       <div class="title">快速情境</div>
       <div class="chips">
         <button data-case="slow">轻放加速</button>
-        <button data-case="fast">初速更快</button>
+        <button data-case="fast">同向初速更快</button>
+        <button data-case="reverse">反向初速度</button>
         <button data-case="short">短带未共速</button>
-        <button data-case="incline">斜面下滑</button>
       </div>
     </div>
     <div class="card">
       <div class="title">实时读数</div>
       <div class="readout">
-        <div class="meter"><span>当前 v物</span><b id="vText">0.0 m/s</b></div>
+        <div class="meter"><span>v_belt / v物</span><b id="vText">4.0 / 0.0 m/s</b></div>
         <div class="meter"><span>阶段</span><b id="phaseText">滑动</b></div>
-        <div class="meter"><span>共速位移/带长</span><b id="syncText">4.0 / 10 m</b></div>
+        <div class="meter"><span>t共 / s物</span><b id="syncText">2.00 s / 4.0 m</b></div>
         <div class="meter"><span>划痕 / 生热</span><b id="heatText">4.0 m / 8 J</b></div>
       </div>
     </div>
     <div class="card formula">
       <div><span>先比速度</span><b>v相=v物-v带</b></div>
-      <div><span>水平滑动</span><b>a=±μg</b></div>
-      <div><span>倾斜输送</span><b>a=f/m-gsinθ</b></div>
-      <div><span>热量</span><b>Q=μmgcosθ·Δx</b></div>
+      <div><span>水平滑动</span><b>a=μg</b></div>
+      <div><span>共速时间</span><b>t共=|v带-v0|/(μg)</b></div>
+      <div><span>物块位移</span><b>s物=v0t+1/2at²</b></div>
+      <div><span>摩擦生热</span><b>Q=μmg·s相对</b></div>
     </div>
-    <div class="card small"><b>三视图绑定：</b>左侧是侧视实物过程，底部是俯视划痕尺；右侧 v-t 与 Δx-t 图用同一时间游标取读数。</div>
-    <div class="chips"><button id="playBtn">播放过程</button><button id="resetBtn">重置时间</button></div>
-    <div class="status" id="status">先比较速度：物块比传送带慢，摩擦力向前。</div>
+    <div class="card small"><b>三视图绑定：</b>左侧是侧视过程，底部是物块位移与划痕尺；右侧 v-t、Δx-t 图像用同一时间游标取读数。</div>
+    <div class="status" id="status">先比较速度：物块比传送带慢，摩擦力沿带运动方向。</div>
   </div>
 </div>
 <script>
@@ -80,15 +88,17 @@
   'use strict';
   const canvas=document.getElementById('canvas');
   const ctx=canvas.getContext('2d');
-  const G=10;
-  const state={mode:'horizontal',vb:4,v0:0,mu:.2,L:10,theta:24,t:0,drag:null,playing:false};
+  const state={mode:'horizontal',direction:1,vb:4,v0:0,mu:.2,L:10,g:10,theta:24,t:0,drag:null,playing:false};
   const els={v:document.getElementById('vText'),phase:document.getElementById('phaseText'),sync:document.getElementById('syncText'),heat:document.getElementById('heatText'),status:document.getElementById('status')};
   const horizontalBtn=document.getElementById('horizontalMode');
   const inclineBtn=document.getElementById('inclineMode');
+  const dirForward=document.getElementById('dirForward');
+  const dirBackward=document.getElementById('dirBackward');
   const playBtn=document.getElementById('playBtn');
   const colors={ink:'#102a43',blue:'#2563eb',red:'#dc2626',orange:'#f59e0b',green:'#0f766e',purple:'#7c3aed',muted:'#64748b'};
   const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
   const fmt=(v,d=1)=>Number.isFinite(v)?v.toFixed(d):'--';
+  const sign=v=>v>1e-4?1:(v<-1e-4?-1:0);
   function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){
     ctx.fillStyle=c;ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y);
   }
@@ -98,172 +108,185 @@
   function arrow(x1,y1,x2,y2,c,w=3){
     const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore();
   }
+  function arrowVec(x,y,ux,uy,len,c,w=3){if(Math.abs(len)<1) return;arrow(x,y,x+ux*len,y+uy*len,c,w)}
   function box(x,y,w,h,r,fill,stroke='#cbd5e1'){
     ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.5;ctx.stroke()}ctx.restore();
   }
   function handle(x,y,label,active,c){
     ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#b45309':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-22,active?'#92400e':c,'center',12,'900');ctx.restore();
   }
-  function plotArea(x,y,w,h,title){
-    box(x,y,w,h,8,'#fff','#d7dee8');text(title,x+w/2,y+18,'#0f172a','center',14,'900');
-    line(x+35,y+h-30,x+w-16,y+h-30,'#94a3b8',1.5);line(x+35,y+h-30,x+35,y+34,'#94a3b8',1.5);
+  function beltVelocity(){return state.direction*state.vb}
+  function releasePoint(){return state.direction>0?0:state.L}
+  function canStaticHold(){
+    if(state.mode==='horizontal') return true;
+    const theta=state.theta*Math.PI/180;
+    return state.g*Math.sin(theta)<=state.mu*state.g*Math.cos(theta);
   }
-  function physicsFor(t){
+  function simulateAt(t){
     const theta=(state.mode==='incline'?state.theta:0)*Math.PI/180;
-    const sin=Math.sin(theta),cos=Math.cos(theta);
-    const fMag=state.mu*G*cos;
-    let v=state.v0,x=0,slip=0,phase='相对滑动',fricDir=0,a=0,hitSync=false;
-    const dt=.01,steps=Math.ceil(Math.min(t,10)/dt);
+    const sin=Math.sin(theta),cos=Math.cos(theta),fAcc=state.mu*state.g*cos,gravity=-state.g*sin,vb=beltVelocity();
+    let p=releasePoint(),v=state.v0,slip=0,phase='相对滑动',fricDir=0,a=0,hitSync=false,end=false,disp=0;
+    const dt=.006,steps=Math.ceil(Math.min(t,12)/dt);
     for(let i=0;i<steps;i++){
-      const h=Math.min(dt,t-i*dt);
-      const rel=v-state.vb;
-      if(Math.abs(rel)<.015){
-        const holdNeed=G*sin;
-        if(state.mode==='horizontal'||holdNeed<=fMag){
-          a=0;v=state.vb;fricDir=0;phase='共速';hitSync=true;
-        }else{
-          fricDir=1; a=fMag-G*sin; phase='共速后仍下滑'; v+=a*h; slip+=Math.abs(v-state.vb)*h;
-        }
+      const h=Math.min(dt,t-i*dt),rel=v-vb;
+      if(Math.abs(rel)<.015 && canStaticHold()){
+        v=vb;a=0;fricDir=0;phase='共速随带';hitSync=true;
+        p+=v*h;disp+=v*h;
       }else{
-        fricDir=rel<0?1:-1;
-        a=fricDir*fMag-G*sin;
-        const oldRel=rel;
-        x+=v*h+.5*a*h*h;
-        v+=a*h;
-        const newRel=v-state.vb;
-        slip+=Math.abs(oldRel)*h;
-        if(oldRel*newRel<0){v=state.vb;phase='共速';hitSync=true}
-        else phase=fricDir>0?'摩擦向前':'摩擦向后';
+        if(Math.abs(rel)<.015){
+          fricDir=1;a=fAcc+gravity;phase='共速后仍下滑';
+        }else{
+          fricDir=-sign(rel);a=fricDir*fAcc+gravity;phase=fricDir===state.direction?'摩擦沿带运动方向':'摩擦反向';
+        }
+        const oldRel=v-vb,oldV=v;
+        p+=oldV*h+.5*a*h*h;disp+=oldV*h+.5*a*h*h;v+=a*h;
+        const newRel=v-vb;
+        slip+=(Math.abs(oldRel)+Math.abs(newRel))*.5*h;
+        if(oldRel*newRel<0 && canStaticHold()){v=vb;phase='共速随带';fricDir=0;hitSync=true}
       }
-      if(phase==='共速'){x+=state.vb*h}
-      if(x>=state.L){x=state.L;phase='已到末端';break}
-      if(x<0){x=0;phase='向下滑离';break}
+      if(p>state.L){p=state.L;phase='到右端离开';end=true;break}
+      if(p<0){p=0;phase='到左端离开';end=true;break}
     }
-    const heat=state.mu*G*cos*slip;
-    return{t,v,x,slip,heat,phase,fricDir,a,hitSync,theta,sin,cos,fMag};
+    const heat=state.mu*state.g*cos*slip;
+    return{t,p,v,slip,heat,phase,fricDir,a,hitSync,end,theta,sin,cos,disp,vb};
   }
-  function eventValues(){
-    const theta=(state.mode==='incline'?state.theta:0)*Math.PI/180;
-    const sin=Math.sin(theta),cos=Math.cos(theta),fMag=state.mu*G*cos;
-    const dir=state.v0<state.vb?1:(state.v0>state.vb?-1:0);
-    const aSlide=dir*fMag-G*sin;
-    const canCatch=dir!==0 && ((state.vb-state.v0)/aSlide)>0;
-    const tSync=canCatch?Math.abs((state.vb-state.v0)/aSlide):Infinity;
-    const xSync=canCatch?state.v0*tSync+.5*aSlide*tSync*tSync:(dir===0?0:Infinity);
-    return{tSync,xSync,canCatch,aSlide,fMag};
+  function horizontalFormula(){
+    const vb=beltVelocity(),rel0=state.v0-vb,dir=-sign(rel0),a=dir*state.mu*state.g;
+    if(dir===0)return{tSync:0,sSync:0,canCatch:true,aSlide:0};
+    const tSync=(vb-state.v0)/a;
+    const sSync=state.v0*tSync+.5*a*tSync*tSync;
+    const pSync=releasePoint()+sSync;
+    return{tSync:tSync>0?tSync:Infinity,sSync,pSync,canCatch:tSync>0&&pSync>=0&&pSync<=state.L,aSlide:a};
+  }
+  function endTime(){
+    let last=0;
+    for(let t=.04;t<=12;t+=.04){const r=simulateAt(t);last=t;if(r.end)return t;if(r.hitSync&&state.mode==='horizontal'){const rem=state.direction>0?state.L-r.p:r.p;return t+Math.max(0,rem/Math.max(.1,state.vb))}}
+    return last;
   }
   function values(){
-    const ev=eventValues();
-    let endT=8;
-    if(Number.isFinite(ev.tSync) && ev.xSync>=0 && ev.xSync<state.L) endT=Math.min(8,ev.tSync+(state.L-ev.xSync)/Math.max(state.vb,.1));
-    const v=physicsFor(clamp(state.t,0,endT));
-    return Object.assign(v,ev,{endT,reachesBeforeSync:!(Number.isFinite(ev.xSync)&&ev.xSync<state.L)});
+    const endT=endTime();
+    state.t=clamp(state.t,0,endT);
+    const v=simulateAt(state.t),f=horizontalFormula();
+    return Object.assign(v,f,{endT,reachesBeforeSync:!(Number.isFinite(f.pSync)&&f.pSync>=0&&f.pSync<=state.L)});
   }
-  function sampleAt(t){const old=state.t;state.t=t;const v=values();state.t=old;return v}
   function geometry(){
     const v=values();
     return{
-      time:{x:78+(state.t/Math.max(.2,v.endT))*330,y:704},
-      vb:{x:70+(state.vb-1)/7*170,y:662},
-      v0:{x:270+state.v0/8*170,y:662},
-      mu:{x:470+(state.mu-.08)/.52*170,y:662},
-      L:{x:670+(state.L-4)/12*170,y:662},
-      theta:{x:670+(state.theta)/37*170,y:624}
+      time:{x:78+(state.t/Math.max(.2,v.endT))*330,y:722},
+      vb:{x:60+(state.vb-1)/7*150,y:646},
+      v0:{x:240+(state.v0+8)/16*150,y:646},
+      mu:{x:420+(state.mu-.08)/.52*150,y:646},
+      L:{x:600+(state.L-4)/12*150,y:646},
+      g:{x:780+(state.g-2)/10*150,y:646},
+      theta:{x:600+(state.theta)/37*150,y:688}
     };
   }
   function drawBelt(v){
     box(34,56,522,398,8,'#fbfdff','#d7dee8');
-    text(state.mode==='horizontal'?'侧视实物：水平传送带，先比 v物 与 v带':'侧视实物：倾斜向上输送，还要看重力分量',295,82,'#0f172a','center',17,'900');
-    const baseX=110,baseY=300,lenPx=330,ang=state.mode==='incline'?-state.theta*Math.PI/180:0;
-    const ux=Math.cos(ang),uy=Math.sin(ang),nx=-uy,ny=ux;
+    text(state.mode==='horizontal'?'侧视实物：水平传送带，先比 v物 与 v带':'侧视实物：倾斜传送带，还要比较 μgcosθ 与 gsinθ',295,82,'#0f172a','center',17,'900');
+    const baseX=110,baseY=304,lenPx=330,ang=state.mode==='incline'?-state.theta*Math.PI/180:0;
+    const ux=Math.cos(ang),uy=Math.sin(ang),nx=-uy,ny=ux,dir=state.direction;
     const x0=baseX,y0=baseY,x1=baseX+lenPx*ux,y1=baseY+lenPx*uy;
     line(x0,y0,x1,y1,'#334155',26);
     line(x0+nx*16,y0+ny*16,x1+nx*16,y1+ny*16,'#94a3b8',5);
     for(let i=0;i<=8;i++){
       const s=i/8,px=x0+lenPx*s*ux,py=y0+lenPx*s*uy;
-      arrow(px+nx*26,py+ny*26,ux*26,uy*26,colors.purple,2);
+      arrowVec(px+nx*26,py+ny*26,ux,uy,dir*30,colors.purple,2);
     }
-    const ratio=clamp(v.x/state.L,0,1),bx=x0+lenPx*ratio*ux+nx*-28,by=y0+lenPx*ratio*uy+ny*-28;
+    const ratio=clamp(v.p/state.L,0,1),bx=x0+lenPx*ratio*ux+nx*-28,by=y0+lenPx*ratio*uy+ny*-28;
     box(bx-28,by-20,56,40,6,colors.blue,'#102a43');
     text('物块',bx,by,'#fff','center',13,'900');
-    arrow(bx,by-48,bx+ux*Math.min(95,Math.max(-95,v.v*18)),by-48+uy*Math.min(95,Math.max(-95,v.v*18)),colors.blue,3);
-    text(`v物=${fmt(v.v,2)}`,bx+86,by-54,colors.blue,'center',12,'900');
-    if(v.fricDir!==0) arrow(bx,by+30,bx+ux*v.fricDir*70,by+30+uy*v.fricDir*70,colors.red,3);
-    else text('f=0',bx,by+32,colors.green,'center',12,'900');
+    arrowVec(bx,by-48,ux,uy,clamp(v.v*17,-100,100),colors.blue,3);
+    text(`v物=${fmt(v.v,2)}`,bx+88,by-54,colors.blue,'center',12,'900');
+    if(v.fricDir!==0) arrowVec(bx,by+30,ux,uy,v.fricDir*72,colors.red,3);
+    else text(state.mode==='horizontal'?'f=0':'静摩擦可平衡',bx,by+32,colors.green,'center',12,'900');
     if(state.mode==='incline'){
       arrow(bx+45,by,bx+45,by+58,colors.orange,3);
-      text('mg sinθ 向下',bx+95,by+35,colors.orange,'center',12,'900');
+      text('mg sinθ 向下',bx+96,by+35,colors.orange,'center',12,'900');
     }
-    arrow(x0+40,y0+80,x0+40+state.vb*20,y0+80,colors.purple,3);
-    text(`v带=${fmt(state.vb)}m/s`,x0+122,y0+80,colors.purple,'center',12,'900');
+    arrowVec(x0+dir*20+(dir>0?40:290),y0+82,ux,uy,dir*state.vb*20,colors.purple,3);
+    text(`v带=${fmt(v.vb)}m/s`,x0+168,y0+82,colors.purple,'center',12,'900');
     line(x0,y0+118,x0+lenPx,y0+118,'#cbd5e1',8);
-    line(x0,y0+118,x0+Math.min(1,v.x/state.L)*lenPx,y0+118,colors.blue,8);
-    line(x0,y0+138,x0+Math.min(1,v.slip/Math.max(state.L,.1))*lenPx,y0+138,colors.red,5);
-    text(`x物=${fmt(v.x,2)}m`,x0+85,y0+106,colors.blue,'center',12,'900');
-    text(`俯视划痕 Δx=${fmt(v.slip,2)}m`,x0+130,y0+158,colors.red,'center',13,'900');
-    box(196,348,224,42,7,v.phase.includes('末端')||v.phase.includes('滑离')?'#fef2f2':(v.phase==='共速'?'#ecfdf5':'#fff7ed'),v.phase==='共速'?'#14b8a6':'#f59e0b');
-    text(v.phase,308,369,v.phase==='共速'?colors.green:(v.phase.includes('末端')||v.phase.includes('滑离')?colors.red:'#b45309'),'center',16,'900');
+    const pLine=x0+lenPx*ratio;
+    line(x0,y0+118,pLine,y0+118,colors.blue,8);
+    line(x0,y0+140,x0+Math.min(1,v.slip/Math.max(state.L,.1))*lenPx,y0+140,colors.red,5);
+    text(`位置=${fmt(v.p,2)}m`,x0+80,y0+106,colors.blue,'center',12,'900');
+    text(`俯视划痕 s相对=${fmt(v.slip,2)}m`,x0+145,y0+160,colors.red,'center',13,'900');
+    box(188,350,238,42,7,v.phase.includes('离开')?'#fef2f2':(v.phase.includes('共速')?'#ecfdf5':'#fff7ed'),v.phase.includes('共速')?'#14b8a6':'#f59e0b');
+    text(v.phase,307,371,v.phase.includes('共速')?colors.green:(v.phase.includes('离开')?colors.red:'#b45309'),'center',16,'900');
   }
   function drawJudgement(v){
     box(580,56,330,154,8,'#f8fafc','#d7dee8');
-    text('共速/末端判定',745,82,'#0f172a','center',15,'900');
-    text(`x共=${Number.isFinite(v.xSync)?fmt(v.xSync,2):'不能共速'} m`,745,124,colors.blue,'center',13,'900');
-    text(`L=${fmt(state.L,1)} m`,745,154,colors.purple,'center',13,'900');
-    text(v.reachesBeforeSync?'共速前到末端/滑离':'能先达到共速',745,184,v.reachesBeforeSync?colors.red:colors.green,'center',13,'900');
+    text('共速/短带判定',745,82,'#0f172a','center',15,'900');
+    text(`t共=${Number.isFinite(v.tSync)?fmt(v.tSync,2):'不能共速'} s`,745,118,colors.blue,'center',13,'900');
+    text(`s物=${Number.isFinite(v.sSync)?fmt(v.sSync,2):'--'} m，L=${fmt(state.L,1)} m`,745,150,colors.purple,'center',13,'900');
+    const ok=Number.isFinite(v.pSync)&&v.pSync>=0&&v.pSync<=state.L;
+    text(ok?'先共速，再分段':'共速前离开/反向滑离',745,184,ok?colors.green:colors.red,'center',13,'900');
   }
   function drawGraphs(v){
-    const gx=615,gw=260;
-    plotArea(580,230,330,154,'v-t 图：两线相交是共速');
-    const gy=354,gh=88,end=Math.max(.2,v.endT),maxV=Math.max(8,state.vb,state.v0,Math.abs(v.v),1);
-    line(gx,gy-state.vb/maxV*gh,gx+gw,gy-state.vb/maxV*gh,colors.purple,2,[5,5]);
+    const gx=615,gw=260,end=Math.max(.2,v.endT),maxV=Math.max(8,Math.abs(state.v0),state.vb,Math.abs(v.v),1);
+    box(580,230,330,154,8,'#fff','#d7dee8');text('v-t 图：相交处是共速',745,248,'#0f172a','center',14,'900');
+    const gy=354,gh=82,zero=gy-gh/2;
+    line(gx,zero,gx+gw,zero,'#cbd5e1',1);
+    line(gx,gy,gx+gw,gy,'#94a3b8',1.5);line(gx,gy,gx,gy-gh,'#94a3b8',1.5);
+    const mapV=vv=>zero-vv/maxV*(gh/2);
+    line(gx,mapV(v.vb),gx+gw,mapV(v.vb),colors.purple,2,[5,5]);
     ctx.beginPath();
-    for(let i=0;i<=80;i++){const tt=end*i/80,r=sampleAt(tt);const x=gx+gw*i/80,y=gy-r.v/maxV*gh;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}
+    for(let i=0;i<=90;i++){const tt=end*i/90,r=simulateAt(tt);const x=gx+gw*i/90,y=mapV(r.v);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}
     ctx.strokeStyle=colors.blue;ctx.lineWidth=3;ctx.stroke();
     const tx=gx+gw*v.t/end;line(tx,gy,tx,gy-gh-8,colors.orange,2,[4,4]);text(`t=${fmt(v.t,2)}s`,tx,gy+16,colors.orange,'center',12,'900');
-    plotArea(580,402,330,176,'Δx-t 图：面积差形成划痕');
+    box(580,402,330,176,8,'#fff','#d7dee8');text('Δx-t 图：相对位移形成划痕',745,420,'#0f172a','center',14,'900');
     const sy=548,sh=108,maxS=Math.max(state.L,v.slip,1);
+    line(gx,sy,gx+gw,sy,'#94a3b8',1.5);line(gx,sy,gx,sy-sh,'#94a3b8',1.5);
     ctx.beginPath();
-    for(let i=0;i<=80;i++){const tt=end*i/80,r=sampleAt(tt);const x=gx+gw*i/80,y=sy-Math.min(1,r.slip/maxS)*sh;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}
+    for(let i=0;i<=90;i++){const tt=end*i/90,r=simulateAt(tt);const x=gx+gw*i/90,y=sy-Math.min(1,r.slip/maxS)*sh;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}
     ctx.strokeStyle=colors.red;ctx.lineWidth=3;ctx.stroke();
     const tx2=gx+gw*v.t/end;line(tx2,sy,tx2,sy-sh-8,colors.orange,2,[4,4]);
-    text('v物',865,250,colors.blue,'right',12,'900');text('v带',865,270,colors.purple,'right',12,'900');text('Δx',865,426,colors.red,'right',12,'900');
+    text('v物',865,270,colors.blue,'right',12,'900');text('v带',865,290,colors.purple,'right',12,'900');text('Δx',865,442,colors.red,'right',12,'900');
   }
   function ruler(x1,y,x2,label,c,hx,txt,active){
-    line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-18,c,'center',12,'900');handle(hx,y,txt,active,c);
+    line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=5;i++){const x=x1+(x2-x1)*i/5;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-18,c,'center',12,'900');handle(hx,y,txt,active,c);
   }
   function drawControls(v,g){
-    box(34,610,876,108,8,'#fff','#d7dee8');
-    text('拖时间游标，看摩擦方向、共速判定、划痕和图像记录同步变化',242,628,colors.orange,'center',12,'900');
-    line(78,704,408,704,'#0f172a',2);for(let i=0;i<=10;i++)line(78+i*33,699,78+i*33,709,'#0f172a',1);
+    box(34,610,876,126,8,'#fff','#d7dee8');
+    text('拖参数：v_belt、v0、mu、L、g、direction；同一时间游标同步读图像和公式',340,628,colors.orange,'center',12,'900');
+    ruler(60,646,210,'v_belt',colors.purple,g.vb,`${fmt(state.vb)}m/s`,state.drag==='vb');
+    ruler(240,646,390,'v0',colors.blue,g.v0,`${fmt(state.v0)}m/s`,state.drag==='v0');
+    ruler(420,646,570,'mu',colors.red,g.mu,`${fmt(state.mu,2)}`,state.drag==='mu');
+    ruler(600,646,750,'L',colors.green,g.L,`${fmt(state.L)}m`,state.drag==='L');
+    ruler(780,646,930,'g',colors.orange,g.g,`${fmt(state.g)}m/s²`,state.drag==='g');
+    if(state.mode==='incline') ruler(600,688,750,'θ',colors.orange,g.theta,`${fmt(state.theta,0)}°`,state.drag==='theta');
+    line(78,722,408,722,'#0f172a',2);for(let i=0;i<=10;i++)line(78+i*33,717,78+i*33,727,'#0f172a',1);
     handle(g.time.x,g.time.y,`t=${fmt(v.t,2)}s`,state.drag==='time',colors.orange);
-    ruler(70,662,240,'v带',colors.purple,g.vb,`v带=${fmt(state.vb)}`,state.drag==='vb');
-    ruler(270,662,440,'v0',colors.blue,g.v0,`v0=${fmt(state.v0)}`,state.drag==='v0');
-    ruler(470,662,640,'μ',colors.red,g.mu,`μ=${fmt(state.mu,2)}`,state.drag==='mu');
-    ruler(670,662,840,'L',colors.green,g.L,`L=${fmt(state.L)}m`,state.drag==='L');
-    if(state.mode==='incline') ruler(670,624,840,'θ',colors.orange,g.theta,`θ=${fmt(state.theta,0)}°`,state.drag==='theta');
   }
   function update(v){
-    els.v.textContent=`${fmt(v.v,2)} m/s`;
+    els.v.textContent=`${fmt(v.vb,1)} / ${fmt(v.v,2)} m/s`;
     els.phase.textContent=v.phase;
-    els.sync.textContent=`${Number.isFinite(v.xSync)?fmt(v.xSync,2):'--'} / ${fmt(state.L,1)} m`;
+    els.sync.textContent=`${Number.isFinite(v.tSync)?fmt(v.tSync,2):'--'} s / ${Number.isFinite(v.sSync)?fmt(v.sSync,2):'--'} m`;
     els.heat.textContent=`${fmt(v.slip,2)} m / ${fmt(v.heat,2)} J`;
-    const bad=v.phase.includes('滑离')||v.phase.includes('末端'),warn=v.reachesBeforeSync||state.mode==='incline';
+    const bad=v.phase.includes('离开'),warn=v.reachesBeforeSync||state.mode==='incline';
     els.status.className='status'+(bad?' bad':warn?' warn':'');
-    els.status.textContent=(state.mode==='horizontal'?'水平带：摩擦只看相对速度，共速后通常为 0。':'倾斜带：除相对速度外，还要比较 μmgcosθ 与 mgsinθ。')+` 当前：${v.phase}，Q=μmgcosθ·Δx=${fmt(v.heat,2)} J。`;
+    const rel=v.v-v.vb;
+    const dirText=Math.abs(rel)<.04?'已经共速':(rel<0?'物块相对带向反方向滑，摩擦沿带方向':'物块相对带向带前方滑，摩擦反向');
+    els.status.textContent=`${dirText}。Q=μmgcosθ·s相对=${fmt(v.heat,2)} J；短带先比较 s物 与 L。`;
   }
   function draw(){
     const v=values(),g=geometry();
     ctx.clearRect(0,0,960,760);
     const bg=ctx.createLinearGradient(0,0,0,760);bg.addColorStop(0,'#fbfdff');bg.addColorStop(1,'#eaf0f7');ctx.fillStyle=bg;ctx.fillRect(0,0,960,760);
-    text('传送带模型实验台：相对滑动决定摩擦方向，划痕决定生热',480,28,'#0f172a','center',20,'900');
+    text('传送带模型实验台：相对滑动定摩擦方向，短带先判共速',480,28,'#0f172a','center',20,'900');
     drawBelt(v);drawJudgement(v);drawGraphs(v);drawControls(v,g);update(v);
   }
   function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
-  function near(p,h,rad=26){return Math.hypot(p.x-h.x,p.y-h.y)<=rad}
-  function setMode(mode){
-    state.mode=mode;state.t=0;state.playing=false;playBtn.textContent='播放过程';
-    horizontalBtn.classList.toggle('active',mode==='horizontal');inclineBtn.classList.toggle('active',mode==='incline');draw();
+  function near(p,h,rad=25){return Math.hypot(p.x-h.x,p.y-h.y)<=rad}
+  function refreshButtons(){
+    horizontalBtn.classList.toggle('active',state.mode==='horizontal');
+    inclineBtn.classList.toggle('active',state.mode==='incline');
+    dirForward.classList.toggle('active',state.direction===1);
+    dirBackward.classList.toggle('active',state.direction===-1);
   }
+  function setMode(mode){state.mode=mode;state.t=0;state.playing=false;playBtn.textContent='播放过程';refreshButtons();draw()}
+  function setDirection(direction){state.direction=direction;state.t=0;state.playing=false;playBtn.textContent='播放过程';refreshButtons();draw()}
   function down(e){
     state.playing=false;playBtn.textContent='播放过程';
     const p=pos(e),g=geometry();state.drag=null;
@@ -272,6 +295,7 @@
     else if(near(p,g.v0,24))state.drag='v0';
     else if(near(p,g.mu,24))state.drag='mu';
     else if(near(p,g.L,24))state.drag='L';
+    else if(near(p,g.g,24))state.drag='g';
     else if(state.mode==='incline'&&near(p,g.theta,24))state.drag='theta';
     if(state.drag){canvas.setPointerCapture(e.pointerId);move(e)}
   }
@@ -279,24 +303,27 @@
     if(!state.drag)return;
     const p=pos(e),v=values();
     if(state.drag==='time')state.t=clamp((p.x-78)/330*Math.max(.2,v.endT),0,v.endT);
-    if(state.drag==='vb')state.vb=clamp(1+(p.x-70)/170*7,1,8);
-    if(state.drag==='v0')state.v0=clamp((p.x-270)/170*8,0,8);
-    if(state.drag==='mu')state.mu=clamp(.08+(p.x-470)/170*.52,.08,.6);
-    if(state.drag==='L')state.L=clamp(4+(p.x-670)/170*12,4,16);
-    if(state.drag==='theta')state.theta=clamp((p.x-670)/170*37,0,37);
+    if(state.drag==='vb')state.vb=clamp(1+(p.x-60)/150*7,1,8);
+    if(state.drag==='v0')state.v0=clamp(-8+(p.x-240)/150*16,-8,8);
+    if(state.drag==='mu')state.mu=clamp(.08+(p.x-420)/150*.52,.08,.6);
+    if(state.drag==='L')state.L=clamp(4+(p.x-600)/150*12,4,16);
+    if(state.drag==='g')state.g=clamp(2+(p.x-780)/150*10,2,12);
+    if(state.drag==='theta')state.theta=clamp((p.x-600)/150*37,0,37);
     state.t=clamp(state.t,0,values().endT);draw();
   }
   function up(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
   canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
   horizontalBtn.addEventListener('click',()=>setMode('horizontal'));
   inclineBtn.addEventListener('click',()=>setMode('incline'));
+  dirForward.addEventListener('click',()=>setDirection(1));
+  dirBackward.addEventListener('click',()=>setDirection(-1));
   document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{
     const c=btn.dataset.case;state.playing=false;playBtn.textContent='播放过程';
-    if(c==='slow'){state.mode='horizontal';state.v0=0;state.vb=4;state.mu=.2;state.L=10;state.t=0}
-    if(c==='fast'){state.mode='horizontal';state.v0=7;state.vb=3;state.mu=.2;state.L=10;state.t=0}
-    if(c==='short'){state.mode='horizontal';state.v0=0;state.vb=6;state.mu=.12;state.L=4;state.t=0}
-    if(c==='incline'){state.mode='incline';state.v0=0;state.vb=2;state.mu=.35;state.theta=37;state.L=10;state.t=0}
-    setMode(state.mode);
+    if(c==='slow'){Object.assign(state,{mode:'horizontal',direction:1,v0:0,vb:4,mu:.2,L:10,g:10,t:0})}
+    if(c==='fast'){Object.assign(state,{mode:'horizontal',direction:1,v0:7,vb:3,mu:.2,L:10,g:10,t:0})}
+    if(c==='reverse'){Object.assign(state,{mode:'horizontal',direction:1,v0:-3,vb:4,mu:.25,L:12,g:10,t:0})}
+    if(c==='short'){Object.assign(state,{mode:'horizontal',direction:1,v0:0,vb:6,mu:.12,L:4,g:10,t:0})}
+    refreshButtons();draw();
   }));
   playBtn.addEventListener('click',()=>{
     state.playing=!state.playing;playBtn.textContent=state.playing?'暂停':'播放过程';
@@ -311,7 +338,7 @@
     if(state.playing)requestAnimationFrame(step);else draw();
   });
   document.getElementById('resetBtn').addEventListener('click',()=>{state.playing=false;state.t=0;playBtn.textContent='播放过程';draw()});
-  draw();
+  refreshButtons();draw();
 })();
 </script>
 </body>

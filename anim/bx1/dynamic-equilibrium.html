@@ -34,9 +34,10 @@
 </head>
 <body>
 <div class="root">
-  <div class="stage"><canvas id="canvas" width="920" height="520" aria-label="动态平衡交互实验台"></canvas></div>
+  <div class="stage"><canvas id="canvas" width="920" height="520" aria-label="动态平衡交互实验台：绳结侧视装置、T-θ图像和数据记录"></canvas></div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>抓住任意蓝色绳端，把两根绳对称拉平；看 G 不变时 T 为什么会变大，并观察右侧红点在 T-θ 曲线上怎样爬升。</div>
+    <div class="card task"><b>观察任务：</b>抓住任意蓝色绳端，对照绳结侧视装置、T-θ 图像和数据记录，把两根绳对称拉平；看 G 不变时 T 为什么会变大。</div>
+    <div class="chips"><button id="playBtn">▶ 播放：θ 自动放平</button><button id="resetBtn">重置</button></div>
     <div class="card">
       <div class="title">快速情境</div>
       <div class="chips">
@@ -61,7 +62,6 @@
       <div><span>危险趋势</span><b>θ 越小，T 越大</b></div>
     </div>
     <div class="card small"><b>可直接操作：</b>抓任意蓝色绳端改变 θ，另一侧自动对称；抓红色重物上下拖动改变 G。曲线红点记录当前拉力。</div>
-    <div class="chips"><button id="playBtn">▶ 播放：θ 自动放平</button><button id="resetBtn">重置</button></div>
     <div class="status" id="status">平衡仍成立：两根绳的竖直分量之和等于重力。</div>
   </div>
 </div>

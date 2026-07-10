@@ -23,7 +23,14 @@ canvas{display:block;width:100%;max-width:700px;background:#fff;border:1px solid
 <body>
 <div class="wrap">
   <h2>交流电四值：瞬时值、峰值、有效值、平均值各管各的</h2>
-  <canvas id="cv" width="700" height="420"></canvas>
+  <div class="ctrls">
+    <label>峰值 Uₘ = <span id="uml">311</span> V<input id="umr" type="range" min="50" max="400" step="1" value="311"></label>
+    <label>电阻 R = <span id="rl">10</span> Ω<input id="rr" type="range" min="5" max="100" step="5" value="10"></label>
+    <button id="play-btn">暂停</button>
+    <button id="reset-btn">重置</button>
+    <span style="font-size:13px;color:#5a6b7b">或拖红点读瞬时值</span>
+  </div>
+  <canvas id="cv" width="700" height="420" aria-label="交流电有效值实验台：正弦图像侧视投影、热效应表盘和数据记录"></canvas>
   <div class="chips">
     <span class="chip">峰值 Uₘ = <b id="umv">311</b> V</span>
     <span class="chip">有效值 U = <b id="uv">220</b> V</span>
@@ -32,14 +39,7 @@ canvas{display:block;width:100%;max-width:700px;background:#fff;border:1px solid
     <span class="chip">功率 P = <b id="pv">4840</b> W</span>
     <span class="chip">状态：<b id="statev">自动扫相位</b></span>
   </div>
-  <div class="ctrls">
-    <label>峰值 Uₘ = <span id="uml">311</span> V<input id="umr" type="range" min="50" max="400" step="1" value="311"></label>
-    <label>电阻 R = <span id="rl">10</span> Ω<input id="rr" type="range" min="5" max="100" step="5" value="10"></label>
-    <button id="play-btn">暂停</button>
-    <button id="reset-btn">重置</button>
-    <span style="font-size:13px;color:#5a6b7b">或拖红点读瞬时值</span>
-  </div>
-  <div class="hint"><b>观察任务</b>：拖红点沿正弦曲线移动，看瞬时值 u 变正、变负、过零；拖峰值 Uₘ，看有效值始终是 Uₘ/√2。右侧热量柱用有效值算 P=U²/R，而不是用峰值。半周期平均值用于电磁感应电荷量，不用于功率热量。</div>
+  <div class="hint"><b>观察任务</b>：拖红点沿正弦图像侧视投影移动，对照热效应表盘和数据记录，看瞬时值 u 变正、变负、过零；拖峰值 Uₘ，看有效值始终是 Uₘ/√2。</div>
 </div>
 <script>
 (function(){

@@ -1,128 +1,211 @@
-/* scripts/check.js — 自动化检查脚本
- * 规格：V1.2.2 §4.5
- * 运行: node scripts/check.js
- * 检查：
- *   1. _sidebar.md 中所有链接目标是否存在
- *   2. 每个知识点编号是否出现在 id-map.json
- *   3. 每个 iframe 动画文件是否存在
- *   4. progress.json 是否覆盖全部知识点/实验/模型
- *   5. problems.json 中 knowledge_ids 是否有效
- *   6. Markdown 文件未闭合代码块
- *   7. Markdown 页面不允许把 SVG/HTML 源码露成正文
- *   8. 每个 A 档知识点是否包含 14 个规定小节
- *   9. 动画 .html 中 JavaScript 语法检查（node --check 提取）
+/* scripts/check.js - strict site consistency checks
+ * Run from website/: node scripts/check.js
  */
 'use strict';
+
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const { execSync } = require('child_process');
 
 const root = path.resolve(__dirname, '..');
-const data = dir => JSON.parse(fs.readFileSync(path.join(root, 'data', dir), 'utf8'));
+const errors = [];
+const warns = [];
 
-let errors = [], warns = [];
-
-function exists(p) { try { fs.accessSync(p); return true; } catch { return false; } }
-function lineOf(txt, index) {
-  return txt.slice(0, index).split('\n').length;
+function read(rel) {
+  return fs.readFileSync(path.join(root, rel), 'utf8');
 }
 
-// 1. sidebar 链接
-const sidebar = fs.readFileSync(path.join(root, '_sidebar.md'), 'utf8');
-const linkRe = /\]\(([^)#?]+)(?:[?#]([^)]+))?\)/g;
-let m;
-const mdFiles = new Set(fs.readdirSync(root).filter(f => f.endsWith('.md')));
-while ((m = linkRe.exec(sidebar)) !== null) {
-  let file = m[1];
-  let anchor = m[2];
-  // Docsify ?id=xxx 语法
-  if (anchor && anchor.indexOf('id=') === 0) anchor = anchor.slice(3);
-  if (file === '/') continue;
-  // Docsify 链接形如 bx1?id=xxx，无 .md 扩展
-  if (!file.endsWith('.md')) file = file + '.md';
-  const fp = path.join(root, file);
-  if (!exists(fp)) errors.push('sidebar 链接文件不存在: ' + file);
-  else if (anchor) {
-    const content = fs.readFileSync(fp, 'utf8');
-    const idRe = new RegExp('id="' + anchor.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '"');
-    if (!idRe.test(content)) warns.push('sidebar 锚点在 ' + file + ' 中未找到: ' + anchor);
-  }
+function json(rel) {
+  return JSON.parse(read(rel));
 }
 
-// 2 & 4. id-map 与 progress 覆盖
-const idMap = data('id-map.json');
-const progress = data('progress.json');
-const allIds = Object.keys(idMap);
-allIds.forEach(id => {
-  if (!(id in progress)) errors.push('progress.json 缺少编号: ' + id);
-});
-Object.keys(progress).forEach(id => {
-  if (!(id in idMap)) errors.push('progress.json 多余编号（id-map 无）: ' + id);
-});
+function exists(rel) {
+  return fs.existsSync(path.join(root, rel));
+}
 
-// 2.1 页面状态徽标与 progress.json 一致性
-allIds.forEach(id => {
-  const meta = idMap[id];
-  const fp = path.join(root, (meta.file || '') + '.md');
-  if (!exists(fp)) return;
-  const content = fs.readFileSync(fp, 'utf8');
-  const slug = (meta.slug || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const headRe = new RegExp('<h[34][^>]*id="' + slug + '"[\\s\\S]*?<span class="status ([^"]+)">([^<]+)<\\/span>[\\s\\S]*?<\\/h[34]>');
-  const hm = content.match(headRe);
-  if (!hm) return;
-  const pageStatus = hm[2].trim();
-  const dataStatus = progress[id] && progress[id].status;
-  if (dataStatus && pageStatus !== dataStatus) {
-    errors.push('页面状态与 progress.json 不一致: ' + id + ' 页面=' + pageStatus + ' progress=' + dataStatus);
+function lineOf(text, index) {
+  return text.slice(0, index).split('\n').length;
+}
+
+function esc(text) {
+  return String(text).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function walk(dir, filter = () => true) {
+  const out = [];
+  for (const name of fs.readdirSync(dir)) {
+    const fp = path.join(dir, name);
+    const st = fs.statSync(fp);
+    if (st.isDirectory()) out.push(...walk(fp, filter));
+    else if (filter(fp, name)) out.push(fp);
   }
-});
-
-// 3. iframe 动画文件存在
-const animDir = path.join(root, 'anim');
-function walkMd(dir) {
-  let out = [];
-  fs.readdirSync(dir).forEach(f => {
-    const fp = path.join(dir, f);
-    if (f.endsWith('.md')) out.push(fp);
-  });
   return out;
 }
-walkMd(root).forEach(md => {
-  const txt = fs.readFileSync(md, 'utf8');
-  const ifRe = /<iframe[^>]+src="([^"]+)"/g;
-  let im;
-  while ((im = ifRe.exec(txt)) !== null) {
-    const src = im[1];
-    const ap = path.resolve(path.dirname(md), src);
-    if (!exists(ap)) errors.push('iframe 动画不存在: ' + src + ' (在 ' + path.basename(md) + ')');
-  }
-});
 
-// 5. problems knowledge_ids 有效
-const problems = data('problems.json');
-const probList = problems.problems || problems;
+function hasProblemGraphic(problem) {
+  if (problem.diagram) return true;
+  if (problem.image || problem.img || problem.figure || problem.svg) return true;
+  return false;
+}
+
+function hasPageGraphic(block) {
+  return /<svg\b|!\[[^\]]*\]\([^)]+\)|<img\b|<figure\b|diagram|image|svg/i.test(block);
+}
+
+const idMap = json('data/id-map.json');
+const progress = json('data/progress.json');
+const graph = json('data/graph.json');
+const problemsData = json('data/problems.json');
+const pageExamplesData = json('data/page-examples.json');
+const specExamplesData = json('data/spec-supplement-examples.json');
+const coreProblems = problemsData.problems || problemsData;
+const pageExamples = pageExamplesData.examples || [];
+const specExamples = specExamplesData.examples || [];
+const problems = coreProblems.concat(pageExamples, specExamples);
+const sidebar = read('_sidebar.md');
+const allIds = Object.keys(idMap);
 const validIds = new Set(allIds);
-const modelIds = new Set(Object.keys(idMap).filter(id => idMap[id].level === 'model'));
-(probList).forEach(p => {
-  (p.knowledge_ids || []).forEach(id => {
-    if (!validIds.has(id)) errors.push('problems.json knowledge_ids 无效: ' + id + ' (题 ' + p.id + ')');
-  });
-  (p.model_ids || []).forEach(id => {
-    if (id && !modelIds.has(id)) errors.push('problems.json model_ids 无效: ' + id + ' (题 ' + p.id + ')');
-  });
-});
+const modelIds = new Set(allIds.filter(id => idMap[id].level === 'model' || id.startsWith('M-')));
 
-// 6. Markdown 未闭合代码块
-walkMd(root).forEach(md => {
-  const txt = fs.readFileSync(md, 'utf8');
-  const fences = (txt.match(/```/g) || []).length;
-  if (fences % 2 !== 0) errors.push('Markdown 代码块未闭合: ' + path.basename(md));
-});
+// 1. id-map files and slugs must point at real h4 anchors.
+for (const [id, meta] of Object.entries(idMap)) {
+  if (!meta.file || !meta.slug || !meta.title) {
+    errors.push(`id-map 条目字段不完整: ${id}`);
+    continue;
+  }
+  const rel = `${meta.file}.md`;
+  if (!exists(rel)) {
+    errors.push(`id-map 文件不存在: ${id} -> ${rel}`);
+    continue;
+  }
+  const text = read(rel);
+  const slugRe = new RegExp(`<h4[^>]*\\bid="${esc(meta.slug)}"`);
+  if (!slugRe.test(text)) {
+    errors.push(`id-map slug 不存在: ${id} ${rel}#${meta.slug}`);
+  }
+}
 
-// 7. Markdown 可视化源码外露检查
-walkMd(root).forEach(md => {
-  const txt = fs.readFileSync(md, 'utf8');
+// 2. progress must match id-map coverage.
+for (const id of allIds) {
+  if (!progress[id]) errors.push(`progress.json 缺少编号: ${id}`);
+}
+for (const id of Object.keys(progress)) {
+  if (!validIds.has(id)) errors.push(`progress.json 多余编号: ${id}`);
+}
+
+// 3. sidebar links must point to real files/anchors and cover every id-map entry.
+const sidebarAnchorKeys = new Set();
+const linkRe = /\]\(([^)#?]+)(?:[?#]([^)]+))?\)/g;
+let link;
+while ((link = linkRe.exec(sidebar)) !== null) {
+  let file = link[1];
+  let anchor = link[2] || '';
+  if (anchor.startsWith('id=')) anchor = anchor.slice(3);
+  if (file === '/') continue;
+  if (!file.endsWith('.md')) file = `${file}.md`;
+  const rel = file;
+  if (!exists(rel)) {
+    errors.push(`sidebar 链接文件不存在: ${rel}`);
+    continue;
+  }
+  if (anchor) {
+    const text = read(rel);
+    const idRe = new RegExp(`\\bid="${esc(anchor)}"`);
+    if (!idRe.test(text)) errors.push(`sidebar 锚点不存在: ${rel}#${anchor}`);
+    sidebarAnchorKeys.add(`${file.replace(/\.md$/, '')}#${anchor}`);
+  }
+}
+for (const [id, meta] of Object.entries(idMap)) {
+  const key = `${meta.file}#${meta.slug}`;
+  if (!sidebarAnchorKeys.has(key)) {
+    errors.push(`sidebar 缺入口: ${id} ${meta.title} -> ${meta.file}?id=${meta.slug}`);
+  }
+}
+
+// 4. graph must cover all ids and status must agree with progress.
+const graphNodes = graph.nodes || [];
+const graphIds = new Set(graphNodes.map(n => n.id));
+for (const id of allIds) {
+  if (!graphIds.has(id)) errors.push(`graph.json 缺节点: ${id}`);
+}
+for (const node of graphNodes) {
+  if (!validIds.has(node.id)) errors.push(`graph.json 多余节点: ${node.id}`);
+  const p = progress[node.id];
+  if (p && node.status !== p.status) {
+    errors.push(`graph/progress 状态不一致: ${node.id} graph=${node.status} progress=${p.status}`);
+  }
+}
+for (const edge of graph.edges || []) {
+  if (!validIds.has(edge.from) || !validIds.has(edge.to)) {
+    errors.push(`graph.json 边引用无效节点: ${edge.from} -> ${edge.to}`);
+  }
+}
+
+// 5. iframe animation files must exist.
+for (const md of walk(root, (fp, name) => name.endsWith('.md'))) {
+  const text = fs.readFileSync(md, 'utf8');
+  const ifRe = /<iframe[^>]+src="([^"]+)"/g;
+  let m;
+  while ((m = ifRe.exec(text)) !== null) {
+    const target = path.resolve(path.dirname(md), m[1]);
+    if (!fs.existsSync(target)) {
+      errors.push(`iframe 动画不存在: ${path.basename(md)} -> ${m[1]}`);
+    }
+  }
+}
+
+// 6. problem references and strict problem metadata.
+const figureRe = /(如图|下图|图示|所示|图中|右图|左图)/;
+const sourceDetailRe = /(真题|适应性|模拟)/;
+for (const p of problems) {
+  for (const id of p.knowledge_ids || []) {
+    if (!validIds.has(id)) errors.push(`problems.json knowledge_ids 无效: ${id} (题 ${p.id})`);
+  }
+  for (const id of p.model_ids || []) {
+    if (id && !modelIds.has(id)) errors.push(`problems.json model_ids 无效: ${id} (题 ${p.id})`);
+  }
+  if (figureRe.test(p.stem || '') && !hasProblemGraphic(p)) {
+    errors.push(`图题缺图: ${p.id} 题干含图示词但无 diagram/image/svg`);
+  }
+  if (p.diagram_required && !hasProblemGraphic(p)) {
+    errors.push(`diagram_required=true 但无图: ${p.id}`);
+  }
+  if (sourceDetailRe.test(p.source || '') && !p.source_detail && p.source_verified !== false) {
+    errors.push(`来源缺 source_detail 或未标 source_verified=false: ${p.id}`);
+  }
+  if (/上题/.test(p.stem || '') && !p.group_id && !p.parent_id && !p.shared_context) {
+    errors.push(`题干含“上题”但无组题上下文: ${p.id}`);
+  }
+}
+
+// 6.1 example-system quantitative gates.
+const coverage = {};
+for (const id of allIds) coverage[id] = 0;
+for (const p of problems) {
+  for (const id of (p.knowledge_ids || []).concat(p.model_ids || [])) {
+    if (id in coverage) coverage[id] += 1;
+  }
+}
+for (const [id, meta] of Object.entries(idMap)) {
+  const count = coverage[id] || 0;
+  if (meta.level === 'A' && count < 5) {
+    errors.push(`例题数量不足: A档 ${id} ${meta.title} 当前 ${count}/5`);
+  }
+  if (id.startsWith('E-') && count < 5) {
+    errors.push(`实验训练不足: ${id} ${meta.title} 当前 ${count}/5`);
+  }
+  if (id.startsWith('M-') && count < 7) {
+    errors.push(`模型训练不足: ${id} ${meta.title} 当前 ${count}/7`);
+  }
+}
+
+// 7. Markdown hygiene, exposed source, and page figure wording.
+for (const md of walk(root, (fp, name) => name.endsWith('.md'))) {
+  const text = fs.readFileSync(md, 'utf8');
   const file = path.basename(md);
+  const fences = (text.match(/```/g) || []).length;
+  if (fences % 2 !== 0) errors.push(`Markdown 代码块未闭合: ${file}`);
   [
     { re: /`<svg\b/g, msg: 'SVG 被反引号包住，会在网页露成源码' },
     { re: /<\/svg>`/g, msg: 'SVG 结束标签被反引号包住，会在网页露成源码' },
@@ -130,81 +213,83 @@ walkMd(root).forEach(md => {
     { re: /```(?:svg|html)\b/g, msg: 'HTML/SVG 被放进代码块，会在网页露成源码' },
     { re: /^\* [0-9]+\. /gm, msg: '小节标题写成了普通列表' }
   ].forEach(rule => {
-    let mm;
-    while ((mm = rule.re.exec(txt)) !== null) {
-      errors.push(file + ':' + lineOf(txt, mm.index) + ' ' + rule.msg);
+    let m;
+    while ((m = rule.re.exec(text)) !== null) {
+      errors.push(`${file}:${lineOf(text, m.index)} ${rule.msg}`);
     }
   });
-});
 
-// 8. A 档知识点 14 节检查（仅对 bx1.md 中 done 的 A 档）
-const progressById = progress;
-const aSections = ['官方归属','先看现象','示意图','示意动画','交互动画','观察任务','规律由来','概念理解','公式绑定','适用条件','应用题型','解题思路','易错点','例题'];
-function checkASections(file) {
-  const fp = path.join(root, file);
-  if (!exists(fp)) return;
-  const txt = fs.readFileSync(fp, 'utf8');
-  // 按 h3 id 切分
-  const parts = txt.split(/<h3 id="[^"]+">/);
-  parts.forEach((part, i) => {
-    if (i === 0) return;
-    // 取该节到下一个 h3 的内容
-    const head = part.split('</h3>')[0] || '';
-    // 找编号
-    const idMatch = part.match(/编号[：:]\s*([A-Z]\d-\d+)/);
-    if (!idMatch) return;
-    const id = idMatch[1];
-    if (progressById[id] && progressById[id].status === 'done' && progressById[id].level === 'A') {
-      const body = part;
-      aSections.forEach(sec => {
-        if (body.indexOf(sec) === -1) {
-          warns.push('A档 ' + id + ' 缺少小节: ' + sec);
-        }
-      });
-    }
-  });
+  // Page examples are checked through data/page-examples.json after extraction.
+  // Avoid broad paragraph scanning here; it creates noise for phrases like “图中读数”.
 }
-checkASections('bx1.md');
 
-// 9. 动画 HTML JS 语法检查
-function checkAnimHtml(dir) {
-  if (!fs.existsSync(dir)) return;
-  fs.readdirSync(dir).forEach(f => {
-    const fp = path.join(dir, f);
-    if (f.endsWith('.html')) {
-      const txt = fs.readFileSync(fp, 'utf8');
-      // 提取 <script> 内联块（不含 src）
-      const re = /<script(?![^>]*src=)[^>]*>([\s\S]*?)<\/script>/g;
-      let sm;
-      while ((sm = re.exec(txt)) !== null) {
-        const code = sm[1];
-        if (!code.trim()) continue;
-        const tmp = path.join(require('os').tmpdir(), 'anim-check-' + Date.now() + '.js');
-        fs.writeFileSync(tmp, code);
-        try { execSync('node --check ' + JSON.stringify(tmp), { stdio: 'pipe' }); }
-        catch (e) { errors.push('动画 JS 语法错误: ' + f + ' — ' + (e.stderr || e.message).toString().split('\n')[0]); }
-        finally { try { fs.unlinkSync(tmp); } catch {} }
+// 8. A-level done knowledge points should keep the required learning sections.
+const aSectionRules = [
+  { name: '现象引入', test: block => /先看现象|现象|实验情境/.test(block) },
+  { name: '动画或交互实验', test: block => /<iframe\b|示意动画|交互动画|互动实验|动画/.test(block) },
+  { name: '观察任务', test: block => /观察任务/.test(block) },
+  { name: '公式绑定', test: block => /公式绑定/.test(block) },
+  { name: '易错点', test: block => /易错点/.test(block) },
+  { name: '例题', test: block => /\*\*例题|####\s*\d+\.\s*例题/.test(block) }
+];
+for (const [id, meta] of Object.entries(idMap)) {
+  const p = progress[id];
+  if (!p || p.status !== 'done' || p.level !== 'A') continue;
+  if (!meta.file || ['experiments', 'models', 'gaokao-skills'].includes(meta.file)) continue;
+  const text = read(`${meta.file}.md`);
+  const start = text.search(new RegExp(`<h4[^>]*\\bid="${esc(meta.slug)}"`));
+  if (start === -1) continue;
+  const rest = text.slice(start);
+  const next = rest.slice(1).search(/<h4[^>]*\bid="/);
+  const block = next === -1 ? rest : rest.slice(0, next + 1);
+  for (const rule of aSectionRules) {
+    if (!rule.test(block)) warns.push(`A档 ${id} 缺少学习闭环元素: ${rule.name}`);
+  }
+}
+
+// 9. Animation HTML inline JavaScript syntax.
+const animRoot = path.join(root, 'anim');
+if (fs.existsSync(animRoot)) {
+  for (const html of walk(animRoot, (fp, name) => name.endsWith('.html'))) {
+    const text = fs.readFileSync(html, 'utf8');
+    const scriptRe = /<script(?![^>]*src=)[^>]*>([\s\S]*?)<\/script>/g;
+    let m;
+    while ((m = scriptRe.exec(text)) !== null) {
+      if (!m[1].trim()) continue;
+      const tmp = path.join(os.tmpdir(), `anim-check-${process.pid}-${Date.now()}.js`);
+      fs.writeFileSync(tmp, m[1]);
+      try {
+        execSync(`node --check ${JSON.stringify(tmp)}`, { stdio: 'pipe' });
+      } catch (e) {
+        errors.push(`动画 JS 语法错误: ${path.relative(root, html)} - ${(e.stderr || e.message).toString().split('\n')[0]}`);
+      } finally {
+        fs.rmSync(tmp, { force: true });
       }
-    } else if (fs.statSync(fp).isDirectory()) {
-      checkAnimHtml(fp);
     }
-  });
+  }
 }
-checkAnimHtml(animDir);
 
-// 报告
-console.log('=== check.js 自动化检查 ===');
+// 10. Hidden system files must not be shipped.
+for (const fp of walk(root)) {
+  const name = path.basename(fp);
+  if (name === '.DS_Store' || name.startsWith('.fuse_hidden')) {
+    errors.push(`仓库包含系统隐藏文件: ${path.relative(root, fp)}`);
+  }
+}
+
+console.log('=== check.js strict 自动化检查 ===');
 console.log('知识点/实验/模型总数:', allIds.length);
-console.log('题库题数:', probList.length);
+console.log('知识图谱节点数:', graphNodes.length);
+console.log('题库题数:', coreProblems.length);
+console.log('页面例题数:', pageExamples.length);
+console.log('规范补充训练题数:', specExamples.length);
 if (warns.length) {
-  console.log('\n⚠ 警告 (' + warns.length + '):');
-  warns.forEach(w => console.log('  - ' + w));
+  console.log(`\n⚠ 警告 (${warns.length}):`);
+  warns.forEach(w => console.log(`  - ${w}`));
 }
 if (errors.length) {
-  console.log('\n✗ 错误 (' + errors.length + '):');
-  errors.forEach(e => console.log('  - ' + e));
+  console.log(`\n✗ 错误 (${errors.length}):`);
+  errors.forEach(e => console.log(`  - ${e}`));
   process.exit(1);
-} else {
-  console.log('\n✓ 全部通过');
-  process.exit(0);
 }
+console.log('\n✓ 全部通过');

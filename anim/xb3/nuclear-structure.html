@@ -3,136 +3,54 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>原子核结构：Z、N、A</title>
+<title>原子核结构实验台</title>
 <style>
-  * { box-sizing: border-box; }
-  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
-  .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
-  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 14px; align-items: stretch; }
-  canvas { width: 100%; height: 430px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
-  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
-  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
-  input { width: 100%; }
-  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.8; font-size: 14px; }
-  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
-  @media (max-width: 760px) { .stage { grid-template-columns: 1fr; } canvas { height: 360px; } }
+  *{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#102a43;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:14px}.stage{display:grid;grid-template-columns:minmax(0,1fr)310px;gap:12px;align-items:start}
+  canvas{width:100%;height:640px;background:#fff;border:1px solid #d9e2ec;border-radius:8px;display:block;touch-action:none}
+  .panel{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:12px}.row{display:flex;gap:8px;margin-bottom:10px}
+  button{flex:1;border:0;border-radius:6px;background:#2c7be5;color:#fff;font-weight:700;padding:9px 10px;cursor:pointer}.secondary{background:#e6edf7;color:#102a43}
+  label{display:block;font-size:13px;font-weight:700;margin-top:10px}input{width:100%;accent-color:#2c7be5}
+  .readout{margin-top:12px;padding:10px;background:#eef4ff;border-radius:8px;line-height:1.65;font-size:13px}.status{margin-top:10px;padding:9px 10px;border-radius:8px;font-size:13px;line-height:1.5;background:#e6fffa;color:#087f5b;font-weight:700}
+  .hint{margin-top:10px;color:#486581;font-size:13px;line-height:1.55}table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px}th,td{border-bottom:1px solid #d9e2ec;padding:5px 4px;text-align:right}th:first-child,td:first-child{text-align:left}
+  @media(max-width:860px){.stage{grid-template-columns:1fr}canvas{height:560px}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="stage">
-    <canvas id="c" width="680" height="430" aria-label="原子核结构模型"></canvas>
-    <section class="panel">
-      <label for="z">质子数 Z：<span id="zVal"></span></label>
-      <input id="z" type="range" min="1" max="10" value="6" step="1">
-      <label for="n">中子数 N：<span id="nVal"></span></label>
-      <input id="n" type="range" min="0" max="12" value="8" step="1">
-      <label for="ion">电离状态：<span id="ionVal"></span></label>
-      <input id="ion" type="range" min="-2" max="3" value="0" step="1">
-      <div id="readout" class="readout"></div>
-      <div class="hint">观察任务：固定 Z 改 N 看同位素；改变 Z 看元素改变；改变电离状态看电子数改变但原子核不变。</div>
-    </section>
-  </div>
-</div>
+<div class="wrap"><div class="stage">
+  <canvas id="c" width="940" height="640" aria-label="原子核结构实验台：核子、核素符号、电子轨道、同位素记录"></canvas>
+  <section class="panel">
+    <div class="row"><button id="playBtn" class="play-btn">播放</button><button id="resetBtn" class="secondary">重置</button><button id="recordBtn" class="secondary">记录</button></div>
+    <label for="z">质子数 Z：<span id="zVal"></span></label><input id="z" type="range" min="1" max="10" value="6" step="1">
+    <label for="n">中子数 N：<span id="nVal"></span></label><input id="n" type="range" min="0" max="12" value="8" step="1">
+    <label for="ion">电离状态：<span id="ionVal"></span></label><input id="ion" type="range" min="-2" max="3" value="0" step="1">
+    <div id="readout" class="readout"></div><div id="status" class="status"></div>
+    <div class="hint">观察任务：拖动画面里的质子/中子卡片进核，固定 Z 改 N 看同位素；改变电离状态只改电子数，不改原子核。</div>
+    <table><thead><tr><th>记录</th><th>核素</th><th>Z</th><th>N</th></tr></thead><tbody id="recordBody"><tr><td colspan="4">点击“记录”保存一个核素</td></tr></tbody></table>
+  </section>
+</div></div>
 <script>
-const c = document.getElementById('c');
-const ctx = c.getContext('2d');
-const els = {
-  z: document.getElementById('z'),
-  n: document.getElementById('n'),
-  ion: document.getElementById('ion'),
-  zVal: document.getElementById('zVal'),
-  nVal: document.getElementById('nVal'),
-  ionVal: document.getElementById('ionVal'),
-  readout: document.getElementById('readout')
-};
-const symbols = ['', 'H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne'];
-const names = ['', '氢', '氦', '锂', '铍', '硼', '碳', '氮', '氧', '氟', '氖'];
-function drawParticle(x, y, label, color) {
-  ctx.fillStyle = color;
-  ctx.beginPath();
-  ctx.arc(x, y, 13, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = '#fff';
-  ctx.font = '700 12px system-ui';
-  ctx.textAlign = 'center';
-  ctx.fillText(label, x, y + 4);
-}
-function draw() {
-  const z = Number(els.z.value);
-  const n = Number(els.n.value);
-  const ion = Number(els.ion.value);
-  const a = z + n;
-  const electrons = Math.max(0, z - ion);
-  const ionText = ion === 0 ? '中性' : ion > 0 ? ion + '+' : Math.abs(ion) + '-';
-  els.zVal.textContent = z;
-  els.nVal.textContent = n;
-  els.ionVal.textContent = ionText;
-  ctx.clearRect(0, 0, c.width, c.height);
-  ctx.fillStyle = '#f7f9fc';
-  ctx.fillRect(0, 0, c.width, c.height);
-
-  ctx.fillStyle = '#fff7e6';
-  ctx.strokeStyle = '#f0a500';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.arc(180, 205, 112, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.stroke();
-  const total = z + n;
-  for (let i = 0; i < total; i++) {
-    const ring = Math.floor(i / 8);
-    const k = i % 8;
-    const radius = ring * 26;
-    const angle = k * Math.PI * 2 / Math.min(8, total);
-    const x = 180 + Math.cos(angle) * radius + (ring === 0 ? 0 : 0);
-    const y = 205 + Math.sin(angle) * radius;
-    if (i < z) drawParticle(x, y, 'p', '#e03131');
-    else drawParticle(x, y, 'n', '#2c7be5');
-  }
-  ctx.strokeStyle = '#829ab1';
-  ctx.setLineDash([6, 5]);
-  ctx.beginPath();
-  ctx.arc(180, 205, 150, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.fillStyle = '#2c7be5';
-  for (let i = 0; i < Math.min(electrons, 10); i++) {
-    const angle = i * Math.PI * 2 / Math.max(1, Math.min(electrons, 10));
-    ctx.beginPath();
-    ctx.arc(180 + Math.cos(angle) * 150, 205 + Math.sin(angle) * 150, 5, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.fillStyle = '#486581';
-  ctx.font = '13px system-ui';
-  ctx.textAlign = 'center';
-  ctx.fillText('蓝点为核外电子；红 p 为质子，蓝 n 为中子', 180, 392);
-
-  ctx.fillStyle = '#102a43';
-  ctx.font = '700 34px system-ui';
-  ctx.textAlign = 'left';
-  ctx.fillText(a, 430, 132);
-  ctx.fillText(z, 430, 214);
-  ctx.font = '700 66px system-ui';
-  ctx.fillText(symbols[z], 486, 184);
-  ctx.font = '16px system-ui';
-  ctx.fillStyle = '#486581';
-  ctx.fillText(`元素：${names[z]}，核素：${names[z]}-${a}`, 430, 256);
-  ctx.fillText(`A=Z+N=${z}+${n}=${a}`, 430, 286);
-  ctx.fillText(`中性原子电子数=Z；当前电子数=${electrons}`, 430, 316);
-  ctx.fillText(`净电荷=${ionText}`, 430, 346);
-
-  els.readout.innerHTML = [
-    `Z=${z}：质子数，也是核电荷数，决定元素=${names[z]}`,
-    `N=${n}：中子数；A=Z+N=${a}`,
-    `核素符号：${a}/${z}${symbols[z]}，写作左上 A、左下 Z`,
-    `当前为${ionText}，电子数=${electrons}`
-  ].join('<br>');
-}
-Object.values(els).forEach(el => {
-  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
-});
-draw();
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+const els={z:by('z'),n:by('n'),ion:by('ion'),zVal:by('zVal'),nVal:by('nVal'),ionVal:by('ionVal'),readout:by('readout'),status:by('status'),playBtn:by('playBtn'),resetBtn:by('resetBtn'),recordBtn:by('recordBtn'),recordBody:by('recordBody')};
+function by(id){return document.getElementById(id)}
+const symbols=['','H','He','Li','Be','B','C','N','O','F','Ne'],names=['','氢','氦','锂','铍','硼','碳','氮','氧','氟','氖'];
+let playing=false,t=0,last=0,dragMode='',records=[];
+function params(){const Z=+els.z.value,N=+els.n.value,ion=+els.ion.value,A=Z+N,e=Math.max(0,Z-ion);const ionText=ion===0?'中性':ion>0?ion+'+':Math.abs(ion)+'-';return{Z,N,A,ion,e,ionText,sym:symbols[Z],name:names[Z]}}
+function label(s,x,y,c='#102a43',size=13,align='center',w='700'){ctx.fillStyle=c;ctx.font=`${w} ${size}px system-ui`;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.48),y2-10*Math.sin(a-.48));ctx.lineTo(x2-10*Math.cos(a+.48),y2-10*Math.sin(a+.48));ctx.closePath();ctx.fill()}
+function drawScene(p){ctx.fillStyle='#fff';ctx.fillRect(0,0,940,640);label('原子核结构实验台：Z 决定元素，N 改变同位素',470,28,'#102a43',19);label('三视图联动：核子模型、核素符号、电子轨道、仪表读数和同位素记录',470,52,'#486581',13,'center','600');drawNucleus(p);drawSymbol(p);drawMeters(p);drawHandles(p)}
+function drawNucleus(p){ctx.fillStyle='#f2f7ff';ctx.strokeStyle='#2c7be5';ctx.lineWidth=2;ctx.fillRect(54,82,510,326);ctx.strokeRect(54,82,510,326);label('核子装置：红 p 为质子，蓝 n 为中子',309,106,'#2c7be5',14);ctx.strokeStyle='#829ab1';ctx.setLineDash([6,5]);ctx.beginPath();ctx.arc(260,246,148,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#fff7e6';ctx.strokeStyle='#f0a500';ctx.lineWidth=2;ctx.beginPath();ctx.arc(260,246,92,0,Math.PI*2);ctx.fill();ctx.stroke();const total=p.A;for(let i=0;i<total;i++){const a=i*2.399+(playing?t*.4:0),r=10+Math.sqrt(i)*10;const x=260+Math.cos(a)*r,y=246+Math.sin(a)*r;drawParticle(x,y,i<p.Z?'p':'n',i<p.Z?'#e03131':'#2c7be5')}for(let i=0;i<Math.min(p.e,12);i++){const a=i*Math.PI*2/Math.max(1,Math.min(p.e,12))+(playing?t*.8:0);ctx.fillStyle='#38b2ac';ctx.beginPath();ctx.arc(260+Math.cos(a)*148,246+Math.sin(a)*148,5,0,Math.PI*2);ctx.fill()}label(`核外电子数=${p.e}`,260,396,'#38b2ac',12)}
+function drawParticle(x,y,s,c){ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,13,0,Math.PI*2);ctx.fill();label(s,x,y,'#fff',12)}
+function drawSymbol(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1;ctx.fillRect(610,82,270,236);ctx.strokeRect(610,82,270,236);label('核素符号仪表',745,106,'#102a43',14);label(String(p.A),704,158,'#102a43',34,'center');label(String(p.Z),704,236,'#102a43',34,'center');label(p.sym,760,198,'#102a43',68,'center');label(`${p.name}-${p.A}`,745,278,'#486581',15);label('左上 A，左下 Z',745,302,'#486581',12)}
+function drawMeters(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(610,348,270,168);ctx.strokeRect(610,348,270,168);label('公式绑定/读数',745,372,'#102a43',14);label(`A=Z+N=${p.Z}+${p.N}=${p.A}`,745,414,'#2c7be5',18);label(`N=A-Z=${p.A}-${p.Z}=${p.N}`,745,452,'#2c7be5',16);label(`电离 ${p.ionText}：电子数=${p.e}，原子核不变`,745,492,'#486581',12)}
+function drawHandles(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(70,454,500,124);ctx.strokeRect(70,454,500,124);label('画面内可拖动核子卡片',320,478,'#102a43',14);card(150,526,'质子 p','#e03131',dragMode==='proton');card(312,526,'中子 n','#2c7be5',dragMode==='neutron');arrow(390,526,494,526,'#f0a500',3);label('拖入原子核',452,500,'#f0a500',12)}
+function card(x,y,name,c,active){ctx.fillStyle='#fff';ctx.strokeStyle=active?'#e03131':c;ctx.lineWidth=3;ctx.fillRect(x-54,y-32,108,64);ctx.strokeRect(x-54,y-32,108,64);label(name,x,y,c,15)}
+function update(p){els.zVal.textContent=p.Z;els.nVal.textContent=p.N;els.ionVal.textContent=p.ionText;els.readout.innerHTML=[`Z=${p.Z}：质子数，决定元素=${p.name}`,`N=${p.N}：中子数；A=Z+N=${p.A}`,`核素符号：${p.A}/${p.Z}${p.sym}`,`当前 ${p.ionText}，电子数=${p.e}`].join('<br>');els.status.textContent=`判定：${p.name}-${p.A}；同位素比较时固定 Z，看 N 是否不同。`}
+function render(){const p=params();drawScene(p);update(p)}
+function animate(now){if(!last)last=now;const dt=Math.min(.04,(now-last)/1000);last=now;if(playing)t+=dt;render();requestAnimationFrame(animate)}
+function setFromPointer(e){const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.height;if(x>165&&x<360&&y>160&&y<340){if(dragMode==='proton')els.z.value=String(Math.min(10,+els.z.value+1));if(dragMode==='neutron')els.n.value=String(Math.min(12,+els.n.value+1));dragMode=''}render()}
+canvas.addEventListener('pointerdown',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.height;dragMode='';if(Math.abs(x-150)<65&&Math.abs(y-526)<42)dragMode='proton';else if(Math.abs(x-312)<65&&Math.abs(y-526)<42)dragMode='neutron';if(dragMode){canvas.setPointerCapture(e.pointerId);setFromPointer(e)}});canvas.addEventListener('pointermove',e=>{if(dragMode)render()});canvas.addEventListener('pointerup',e=>{setFromPointer(e);try{canvas.releasePointerCapture(e.pointerId)}catch{}});canvas.addEventListener('pointercancel',()=>dragMode='');
+els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textContent=playing?'暂停':'播放'});els.resetBtn.addEventListener('click',()=>{playing=false;t=0;els.z.value=6;els.n.value=8;els.ion.value=0;els.playBtn.textContent='播放';render()});els.recordBtn.addEventListener('click',()=>{const p=params();records.unshift({name:`${p.name}-${p.A}`,Z:p.Z,N:p.N});records=records.slice(0,5);els.recordBody.innerHTML=records.map((r,i)=>`<tr><td>${i+1}</td><td>${r.name}</td><td>${r.Z}</td><td>${r.N}</td></tr>`).join('')});[els.z,els.n,els.ion].forEach(el=>el.addEventListener('input',render));render();requestAnimationFrame(animate);
 </script>
 </body>
 </html>

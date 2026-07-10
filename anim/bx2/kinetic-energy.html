@@ -34,9 +34,9 @@
 </head>
 <body>
 <div class="root">
-  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="动能定理交互实验台"></canvas></div>
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="动能定理交互实验台：斜面侧视装置、功-能账本图像和数据记录"></canvas></div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>抓斜面顶点 A 改高度和角度，看重力做功与摩擦负功如何进入账本；拖滑块看过程位置，但最终只比较 A、B 两个状态。</div>
+    <div class="card task"><b>观察任务：</b>抓斜面顶点 A 改高度和角度，对照斜面侧视装置、功-能账本图像和数据记录，看重力做功与摩擦负功如何进入账本。</div>
     <button id="playBtn" class="primary">播放</button>
     <div class="card">
       <div class="title">快速情境</div>
@@ -108,7 +108,7 @@
   }
   function bottom(){const h=handles();roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(76,494,196,'m',colors.green);handle(h.m.x,h.m.y,`m=${fmt(state.m)}`,state.drag==='m',colors.green);ruler(236,494,356,'v1',colors.blue);handle(h.v1.x,h.v1.y,`v1=${fmt(state.v1)}`,state.drag==='v1',colors.blue);ruler(396,494,516,'h',colors.orange);handle(h.h.x,h.h.y,`h=${fmt(state.h)}`,state.drag==='h',colors.orange);ruler(556,494,676,'μ',colors.red);handle(h.mu.x,h.mu.y,`μ=${fmt(state.mu,2)}`,state.drag==='mu',colors.red);ruler(736,494,856,'θ',colors.purple);handle(h.theta.x,h.theta.y,`${fmt(state.theta,0)}°`,state.drag==='theta',colors.purple)}
   function update(r){els.wg.textContent=`${fmt(r.WG)} J`;els.wf.textContent=`${fmt(r.Wf)} J`;els.wt.textContent=`${fmt(r.Wt)} J`;els.de.textContent=`${fmt(r.dEk)} J`;els.v2.textContent=`${fmt(r.v2)} m/s`;els.path.textContent=`${fmt(r.s)} m`;els.play.textContent=state.running?'暂停':'播放';els.status.classList.toggle('warn',!r.reaches);els.status.textContent=r.reaches?'通过：W合 = ΔEk，做功账本和动能变化对上了。':'到不了底端：摩擦负功太大，按能量账本算到底端前动能已耗尽。'}
-  function draw(){const r=calc();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('动能定理实验台：外力总功等于动能变化',460,30,'#0f172a','center',19,'900');drawSlope(r);drawLedger(r);bottom();update(r)}
+  function draw(){const r=calc();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('动能定理实验台：斜面侧视装置 + 功-能图像 + 数据记录',460,30,'#0f172a','center',19,'900');drawSlope(r);drawLedger(r);bottom();update(r)}
   function pos(e){const b=canvas.getBoundingClientRect();return{x:(e.clientX-b.left)*canvas.width/b.width,y:(e.clientY-b.top)*canvas.height/b.height}}
   function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
   function pointerDown(e){const p=pos(e),g0=geom(),h=handles();if(near(p,g0.A,30))state.drag='A';else if(near(p,{x:g0.block.x,y:g0.block.y-12},30))state.drag='block';else if(near(p,h.m,26))state.drag='m';else if(near(p,h.v1,26))state.drag='v1';else if(near(p,h.h,26))state.drag='h';else if(near(p,h.mu,26))state.drag='mu';else if(near(p,h.theta,26))state.drag='theta';else state.drag=null;if(state.drag){state.running=false;canvas.setPointerCapture(e.pointerId);pointerMove(e)}}

@@ -9,7 +9,8 @@
   body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
   .wrap { max-width: 1000px; margin: 0 auto; padding: 16px; }
   .stage { display: grid; grid-template-columns: minmax(0, 1fr) 286px; gap: 14px; align-items: stretch; }
-  canvas { width: 100%; height: 470px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  canvas { width: 100%; height: 470px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; touch-action: none; cursor: grab; }
+  canvas:active { cursor: grabbing; }
   .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
   label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
   input { width: 100%; }
@@ -17,14 +18,16 @@
   .status { margin-top: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13px; line-height: 1.55; background: #e6fffa; color: #087f5b; font-weight: 700; }
   .status.bad { background: #fff5f5; color: #c92a2a; }
   .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
+  .panel button { width: 100%; min-height: 36px; border: 1px solid #b0bcc9; background: #fff; border-radius: 8px; cursor: pointer; font: inherit; font-weight: 700; color: #102a43; }
   @media (max-width: 780px) { .stage { grid-template-columns: 1fr; } canvas { height: 400px; } }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="stage">
-    <canvas id="c" width="700" height="470" aria-label="验证机械能守恒实验"></canvas>
+    <canvas id="c" width="700" height="470" aria-label="验证机械能守恒实验台：侧视纸带、能量柱、ΔEk-ΔEp图像和数据记录"></canvas>
     <section class="panel">
+      <button id="playBtn">▶ 自动扫描测量点</button>
       <label for="height">释放高度 h/m：<span id="heightVal"></span></label>
       <input id="height" type="range" min="0.5" max="1.8" value="1.2" step="0.1">
       <label for="mass">重物质量 m/kg：<span id="massVal"></span></label>
@@ -52,10 +55,15 @@ const els = {
   pointVal: document.getElementById('pointVal'),
   lossVal: document.getElementById('lossVal'),
   readout: document.getElementById('readout'),
-  status: document.getElementById('status')
+  status: document.getElementById('status'),
+  play: document.getElementById('playBtn')
 };
 const g = 9.8;
 const T = 0.04;
+let autoScan = false;
+let autoDir = 1;
+let lastScan = 0;
+let drag = null;
 function yAt(n, loss) {
   return 0.5 * g * Math.pow(n * T, 2) * (1 - loss);
 }
@@ -131,7 +139,7 @@ function draw() {
   ctx.fillStyle = '#102a43';
   ctx.font = '700 18px system-ui';
   ctx.textAlign = 'center';
-  ctx.fillText('重物下落：用纸带速度验证 mgh 是否转化为 1/2mv²', 350, 30);
+  ctx.fillText('机械能守恒实验台：侧视纸带 + 能量柱 + ΔEk-ΔEp图像 + 数据记录', 350, 30);
 
   ctx.strokeStyle = '#334e68';
   ctx.lineWidth = 4;
@@ -197,6 +205,9 @@ function draw() {
   ctx.font = '13px system-ui';
   ctx.textAlign = 'center';
   ctx.fillText('灰线表示 ΔEk=ΔEp；红点越贴近灰线，实验越支持守恒。', 515, 320);
+  ctx.fillStyle = '#102a43';
+  ctx.textAlign = 'left';
+  ctx.fillText('直接拖动红色测量点/重物手柄，改变纸带测点 n', 58, 452);
 
   els.readout.innerHTML = [
     `<div id="r1">纸带周期 T=${T.toFixed(2)}s，测点 n=${n}</div>`,
@@ -212,9 +223,67 @@ function draw() {
       ? '通过：ΔEk 与 ΔEp 接近，说明阻力较小时机械能近似守恒。'
       : '不通过：ΔEk 明显小于 ΔEp，阻力或纸带摩擦造成机械能损失。';
 }
+function stopAuto() {
+  autoScan = false;
+  els.play.textContent = '▶ 自动扫描测量点';
+}
+function setPointFromPointer(ev) {
+  const rect = c.getBoundingClientRect();
+  const y = (ev.clientY - rect.top) * c.height / rect.height;
+  const h = Number(els.height.value);
+  const loss = Number(els.loss.value) / 100;
+  const scale = 250 / h;
+  let best = Number(els.point.value);
+  let bestDist = Infinity;
+  for (let i = 5; i <= 13; i++) {
+    const yy = 118 + yAt(i, loss) * scale;
+    const d = Math.abs(y - yy);
+    if (d < bestDist) {
+      best = i;
+      bestDist = d;
+    }
+  }
+  els.point.value = String(best);
+  draw();
+}
+function scan(now) {
+  if (!autoScan) return;
+  if (!lastScan || now - lastScan > 520) {
+    const next = Number(els.point.value) + autoDir;
+    if (next >= 13 || next <= 5) autoDir *= -1;
+    els.point.value = Math.max(5, Math.min(13, next));
+    draw();
+    lastScan = now;
+  }
+  requestAnimationFrame(scan);
+}
 Object.values(els).forEach(el => {
-  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
+  if (el && el.tagName === 'INPUT') el.addEventListener('input', () => {
+    stopAuto();
+    draw();
+  });
 });
+els.play.addEventListener('click', () => {
+  autoScan = !autoScan;
+  els.play.textContent = autoScan ? '⏸ 暂停扫描测量点' : '▶ 自动扫描测量点';
+  if (autoScan) {
+    lastScan = 0;
+    requestAnimationFrame(scan);
+  }
+});
+c.addEventListener('pointerdown', ev => {
+  drag = 'measurement-handle';
+  stopAuto();
+  setPointFromPointer(ev);
+  ev.preventDefault();
+});
+c.addEventListener('pointermove', ev => {
+  if (!drag) return;
+  setPointFromPointer(ev);
+  ev.preventDefault();
+});
+c.addEventListener('pointerup', () => { drag = null; });
+c.addEventListener('pointerleave', () => { drag = null; });
 draw();
 </script>
 </body>

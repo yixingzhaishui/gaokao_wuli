@@ -24,16 +24,6 @@ canvas{display:block;width:100%;max-width:760px;background:#fff;border:1px solid
 <body>
 <div class="wrap">
   <h2>传感器：3D实物输入 + 电路剖面/俯视 + 电压表与阈值图像记录</h2>
-  <canvas id="cv" width="760" height="430"></canvas>
-  <div class="chips">
-    <span class="chip">类型 = <b id="typev">光敏电阻</b></span>
-    <span class="chip"><span id="inputName">光照</span> = <b id="inputv">0</b></span>
-    <span class="chip">敏感电阻 Rₛ = <b id="rsv">20000</b> Ω</span>
-    <span class="chip">输出电压 Uout = <b id="uv">4.00</b> V</span>
-    <span class="chip">阈值 = <b id="thv">2.50</b> V</span>
-    <span class="chip">执行器 = <b id="statev">触发</b></span>
-    <span class="chip">状态：<b id="statusv">自动扫描输入量</b></span>
-  </div>
   <div class="ctrls">
     <button data-mode="light" class="active">光敏</button>
     <button data-mode="temp">热敏</button>
@@ -43,6 +33,16 @@ canvas{display:block;width:100%;max-width:760px;background:#fff;border:1px solid
     <button id="play-btn">暂停扫描</button>
     <button id="reset-btn">重置</button>
     <span style="font-size:13px;color:#5a6b7b">也可拖左侧场景里的圆点改变输入</span>
+  </div>
+  <canvas id="cv" width="760" height="430"></canvas>
+  <div class="chips">
+    <span class="chip">类型 = <b id="typev">光敏电阻</b></span>
+    <span class="chip"><span id="inputName">光照</span> = <b id="inputv">0</b></span>
+    <span class="chip">敏感电阻 Rₛ = <b id="rsv">20000</b> Ω</span>
+    <span class="chip">输出电压 Uout = <b id="uv">4.00</b> V</span>
+    <span class="chip">阈值 = <b id="thv">2.50</b> V</span>
+    <span class="chip">执行器 = <b id="statev">触发</b></span>
+    <span class="chip">状态：<b id="statusv">自动扫描输入量</b></span>
   </div>
   <div class="hint"><b>观察任务</b>：切到光敏，拖暗/亮输入，看光照增强时 Rₛ 变小，取 Rₛ 两端电压会下降，路灯熄灭；切到热敏，温度升高时 Rₛ 变小，但从定值电阻 R₀ 取压，报警电压反而升高。</div>
 </div>

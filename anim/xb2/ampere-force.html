@@ -23,6 +23,14 @@ button{font:inherit;padding:6px 12px;border:1px solid #b6c5d4;background:#fff;bo
 <body>
 <div class="container">
   <h2>安培力：3D蹄形磁铁实验台 + 俯视夹角 + 侧视力方向</h2>
+  <div class="controls">
+    <label>B 强度 = <span id="b-d">0.50</span> T<input type="range" id="b" min="0" max="1" step="0.05" value="0.5"></label>
+    <label>电流 I = <span id="i-d">4.0</span> A<input type="range" id="i" min="0" max="10" step="0.5" value="4"></label>
+    <label>导线长 L = <span id="l-d">0.5</span> m<input type="range" id="l" min="0.1" max="1" step="0.1" value="0.5"></label>
+    <label>夹角 θ = <span id="th-d">90</span>°<input type="range" id="th" min="0" max="90" step="5" value="90"></label>
+    <button id="play-btn">暂停电流</button>
+    <button id="reset-btn">重置</button>
+  </div>
   <canvas id="canvas" width="780" height="500"></canvas>
   <div class="readouts">
     <span class="r">B = <b id="b-v">0.50</b> T</span>
@@ -31,14 +39,6 @@ button{font:inherit;padding:6px 12px;border:1px solid #b6c5d4;background:#fff;bo
     <span class="r">θ = <b id="th-v">90</b>°</span>
     <span class="r">测力计 F = <b id="f-v">—</b> N</span>
     <span class="r">方向：<b id="dir-v">—</b></span>
-  </div>
-  <div class="controls">
-    <label>B 强度 = <span id="b-d">0.50</span> T<input type="range" id="b" min="0" max="1" step="0.05" value="0.5"></label>
-    <label>电流 I = <span id="i-d">4.0</span> A<input type="range" id="i" min="0" max="10" step="0.5" value="4"></label>
-    <label>导线长 L = <span id="l-d">0.5</span> m<input type="range" id="l" min="0.1" max="1" step="0.1" value="0.5"></label>
-    <label>夹角 θ = <span id="th-d">90</span>°<input type="range" id="th" min="0" max="90" step="5" value="90"></label>
-    <button id="play-btn">暂停电流</button>
-    <button id="reset-btn">重置</button>
   </div>
   <div class="hint">
     <b>观察任务</b>：直接拖左侧实验台里的橙色导线端点改变 θ。看 3D 蹄形磁铁中 B 从 N 指向 S，导线电流 I 与 B 的夹角改变时，右侧测力计、俯视夹角图和 F-θ 图像怎样同步变化。θ=0° 时导线与磁场平行，测力计归零；θ=90° 时 F 最大。侧视截面用 ⊗/⊙ 告诉你安培力垂直纸面方向。

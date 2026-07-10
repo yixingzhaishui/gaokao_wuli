@@ -24,9 +24,9 @@ canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab;backgr
 </head>
 <body>
 <div class="wrap">
-  <h2>能源结构：拖用电量、化石占比、效率，看可用能和排放</h2>
+  <h2>能源结构实验台：能源流侧视装置 + 排放图像 + 数据记录</h2>
   <div class="lab">
-    <div class="stage"><canvas id="cv" width="720" height="450"></canvas></div>
+    <div class="stage"><canvas id="cv" width="720" height="450" aria-label="能源与可持续发展实验台：能源流侧视装置、排放图像和数据记录"></canvas></div>
     <section class="panel">
       <div class="read">
         <div class="chip">用电量 E用 = <b id="usev">100</b> kWh</div>
@@ -36,7 +36,7 @@ canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab;backgr
         <div class="chip">废热/低品质能 = <b id="wastev">150</b> kWh</div>
         <div class="chip">碳排估算 = <b id="co2v">56</b> kg CO₂</div>
       </div>
-      <div class="hint"><b>观察任务</b>：拖化石占比，看同样用电量下碳排如何变化；拖效率，看总能量守恒但废热如何减少；拖用电量，看能源需求和排放同步放大；也可点“自动演示”看能源转型（化石占比下降、效率上升）过程中排放的变化趋势。</div>
+      <div class="hint"><b>观察任务</b>：拖化石占比，对照能源流侧视装置、排放图像和数据记录，看同样用电量下碳排如何变化；拖效率，看总能量守恒但废热如何减少。</div>
       <div class="hint" style="margin-top:8px"><button id="playBtn" style="font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;width:100%">▶ 自动演示（能源转型第 <b id="yearv">0</b> 年）</button></div>
       <div class="formula"><b>公式绑定</b><br>输入 = 有用电能 ÷ 效率；废热 = 输入 − 有用电能。能量总量守恒（输入=电能+废热），但废热更难再利用，体现能量品质降低；排放 ≈ 用电量×化石占比×排放系数。</div>
     </section>

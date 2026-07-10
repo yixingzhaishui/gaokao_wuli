@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>长度测量与工具选用实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #f5f7fb; color: #102a43; font-family: -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; }
+  .root { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 12px; padding: 12px; min-height: 690px; }
+  .stage { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; overflow: hidden; }
+  canvas { display: block; width: 100%; height: auto; touch-action: none; cursor: crosshair; }
+  .panel { display: flex; flex-direction: column; gap: 10px; }
+  .card { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 10px; }
+  .task { background: #fff7e6; border-left: 4px solid #f0a500; color: #486581; font-size: 13px; line-height: 1.5; }
+  .title { font-weight: 800; margin-bottom: 7px; color: #102a43; }
+  .buttons { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  button { border: 1px solid #b0bcc9; background: #fff; border-radius: 6px; padding: 7px 8px; cursor: pointer; font: inherit; font-size: 13px; }
+  button.active { background: #2c7be5; border-color: #2c7be5; color: #fff; font-weight: 800; }
+  .param { display: grid; gap: 2px; margin: 8px 0; font-size: 13px; }
+  .param span { display: flex; justify-content: space-between; color: #486581; gap: 8px; }
+  .param b { color: #102a43; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  input[type=range] { width: 100%; accent-color: #2c7be5; }
+  .readout { background: #102a43; color: #d9e2ec; border-radius: 8px; padding: 10px; line-height: 1.65; font-size: 13px; }
+  .readout b { color: #ffd166; font-variant-numeric: tabular-nums; }
+  .status { border: 1px solid #38b2ac; background: #e6fffa; color: #087f5b; border-radius: 8px; padding: 8px; font-size: 13px; font-weight: 800; line-height: 1.45; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th, td { border-bottom: 1px solid #d9e2ec; padding: 4px 3px; text-align: right; font-variant-numeric: tabular-nums; }
+  th:first-child, td:first-child { text-align: left; }
+  .formula { font-size: 13px; color: #334e68; line-height: 1.6; }
+  @media (max-width: 820px) { .root { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="900" height="620" aria-label="长度测量实验台：测量工具侧视装置、刻度读数图像和数据记录"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>切换刻度尺、游标卡尺、螺旋测微器，拖动量爪或旋钮夹住物体；看主尺、游标、旋钮刻度、零误差修正和有效数字怎样进入最终读数。</div>
+    <div class="card">
+      <div class="title">工具选择</div>
+      <div class="buttons">
+        <button data-tool="ruler" class="active">刻度尺</button>
+        <button data-tool="vernier">游标卡尺</button>
+        <button data-tool="micrometer">螺旋测微器</button>
+      </div>
+      <label class="param"><span>被测长度/直径 <b id="lenLabel">32.4 mm</b></span><input id="length" type="range" min="8" max="86" step="0.1" value="32.4"></label>
+      <label class="param"><span>零误差 <b id="zeroLabel">+0.00 mm</b></span><input id="zero" type="range" min="-0.20" max="0.20" step="0.01" value="0"></label>
+      <div class="buttons"><button id="play">播放</button><button id="record">记录</button><button id="reset">重置</button></div>
+    </div>
+    <div class="readout" id="readout"></div>
+    <div class="card">
+      <div class="title">数据记录</div>
+      <table><thead><tr><th>工具</th><th>原读数/mm</th><th>零误差/mm</th><th>修正/mm</th></tr></thead><tbody id="rows"></tbody></table>
+    </div>
+    <div class="card formula">
+      <div class="title">读数公式</div>
+      <div>游标卡尺：L = 主尺读数 + 对齐格数 × 精度 - 零误差</div>
+      <div>螺旋测微器：d = 固定刻度 + 可动刻度 × 0.01 mm - 零误差</div>
+      <div>刻度尺：读到最小分度后一位，注意视线垂直。</div>
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  const els={
+    length:document.getElementById('length'), zero:document.getElementById('zero'),
+    lenLabel:document.getElementById('lenLabel'), zeroLabel:document.getElementById('zeroLabel'),
+    readout:document.getElementById('readout'), rows:document.getElementById('rows'),
+    status:document.getElementById('status'), play:document.getElementById('play')
+  };
+  const state={tool:'ruler',drag:null,running:false,phase:0,records:[]};
+  const colors={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',gold:'#f0a500',green:'#087f5b',purple:'#7c3aed'};
+  function v(){return{L:+els.length.value,z:+els.zero.value};}
+  function fmt(n,d=2){return (Math.abs(n)<1e-9?0:n).toFixed(d);}
+  function text(s,x,y,c=colors.ink,a='center',size=13,w='700'){ctx.fillStyle=c;ctx.font=w+' '+size+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y);}
+  function line(x1,y1,x2,y2,c='#9fb3c8',w=2,dash){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();}
+  function box(x,y,w,h,fill='#fff',stroke='#d9e2ec'){ctx.save();ctx.fillStyle=fill;ctx.strokeStyle=stroke;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.restore();}
+  function handle(x,y,label){ctx.save();ctx.fillStyle='#fff';ctx.strokeStyle=colors.purple;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,11,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-24,colors.purple,'center',12,'900');ctx.restore();}
+  function rulerTicks(x,y,w,scale,limit,major=10){
+    line(x,y,x+w,y,colors.ink,3);
+    for(let mm=0;mm<=limit;mm++){
+      const px=x+mm*scale;
+      const h=mm%major===0?22:(mm%5===0?15:9);
+      line(px,y,px,y-h,colors.ink,1);
+      if(mm%major===0) text(String(mm),px,y+17,colors.muted,'center',11,'700');
+    }
+  }
+  function reading(){
+    const q=v();
+    if(state.tool==='ruler'){
+      const raw=Math.round(q.L*10)/10;
+      return {raw,corrected:raw-q.z,main:Math.floor(raw),sub:Math.round((raw-Math.floor(raw))*10),precision:'1 mm刻度，估读0.1 mm'};
+    }
+    if(state.tool==='vernier'){
+      const raw=Math.round(q.L*20)/20;
+      const main=Math.floor(raw);
+      const sub=Math.round((raw-main)/0.05);
+      return {raw,corrected:raw-q.z,main,sub,precision:'50分度游标，精度0.02~0.05 mm'};
+    }
+    const raw=Math.round(q.L*100)/100;
+    const main=Math.floor(raw/0.5)*0.5;
+    const sub=Math.round((raw-main)/0.01);
+    return {raw,corrected:raw-q.z,main,sub,precision:'螺旋测微器，精度0.01 mm'};
+  }
+  function drawRuler(q,r){
+    box(42,72,810,210,'#fbfdff');
+    text('刻度尺侧视装置 + 刻度读数图像',447,98,colors.ink,'center',16,'900');
+    const x=96,y=224,scale=7.8;
+    rulerTicks(x,y,650,scale,80);
+    const objX=x+40, objW=q.L*scale;
+    box(objX,y-70,objW,36,'#e6fffa','#38b2ac');
+    text('被测物',objX+objW/2,y-52,colors.green,'center',12,'900');
+    line(objX,y-82,objX,y+8,colors.red,2,[5,4]); line(objX+objW,y-82,objX+objW,y+8,colors.red,2,[5,4]);
+    handle(objX+objW,y-70,'拖末端');
+    text('读数：起点对0，末端约 '+fmt(r.raw,1)+' mm',447,280,colors.blue,'center',15,'900');
+  }
+  function drawVernier(q,r){
+    box(42,72,810,250,'#fbfdff');
+    text('游标卡尺侧视装置 + 主尺/游标图像 + 数据记录',447,98,colors.ink,'center',16,'900');
+    const x=110,y=190,scale=6.6;
+    rulerTicks(x,y,610,scale,90);
+    const jawX=x+q.L*scale;
+    box(x-28,y-74,28,86,'#d9e2ec','#334e68'); box(jawX,y-74,28,86,'#e6f0ff','#2c7be5');
+    box(x+5,y-32,q.L*scale-10,40,'#fff7e6','#f0a500');
+    text('圆柱外径',x+q.L*scale/2,y-12,colors.gold,'center',12,'900');
+    line(jawX,y+28,jawX+260,y+28,colors.blue,22);
+    for(let i=0;i<=10;i++){const px=jawX+i*24;line(px,y+42,px,y+20,'#fff',1.5);if(i%5===0)text(String(i),px,y+58,colors.blue,'center',11,'900');}
+    line(jawX+r.sub*24/10,y+15,jawX+r.sub*24/10,y+72,colors.red,2);
+    handle(jawX+28,y-58,'拖量爪');
+    text('主尺 '+r.main+' mm；游标对齐格约 '+r.sub+'；原读数 '+fmt(r.raw,2)+' mm',447,292,colors.blue,'center',14,'900');
+  }
+  function drawMicrometer(q,r){
+    box(42,72,810,250,'#fbfdff');
+    text('螺旋测微器侧视装置 + 旋钮刻度图像 + 数据记录',447,98,colors.ink,'center',16,'900');
+    const x=120,y=210;
+    box(x,y-62,150,52,'#e6fffa','#38b2ac'); text('测砧',x+75,y-36,colors.green,'center',13,'900');
+    line(x+160,y-36,x+250,y-36,colors.ink,4);
+    const gap=Math.min(220,q.L*4.2);
+    box(x+250,y-68,80,64,'#fff7e6','#f0a500'); text('微分筒',x+290,y-36,colors.gold,'center',12,'900');
+    box(x+160,y-48,gap,24,'#eef4ff','#2c7be5'); text('金属丝直径',x+160+gap/2,y-66,colors.blue,'center',12,'900');
+    for(let i=0;i<=50;i+=5){const yy=y-84+i*2.2;line(x+360,yy,x+392,yy,colors.ink,1);if(i%10===0)text(String(i),x+404,yy,colors.muted,'left',11,'700');}
+    const subLine=y-84+(r.sub%50)*2.2;line(x+344,subLine,x+418,subLine,colors.red,2);
+    handle(x+332,y-36,'拖旋钮');
+    text('固定刻度 '+fmt(r.main,2)+' mm；可动刻度 '+r.sub+' 格；原读数 '+fmt(r.raw,2)+' mm',447,292,colors.blue,'center',14,'900');
+  }
+  function drawChoice(q,r){
+    box(42,354,810,190,'#fff');
+    text('工具选用与误差修正',447,380,colors.ink,'center',16,'900');
+    const tools=[
+      ['刻度尺','厘米级物体，精度约0.1 mm',state.tool==='ruler'],
+      ['游标卡尺','外径/内径/深度，精度约0.02~0.05 mm',state.tool==='vernier'],
+      ['螺旋测微器','细丝/薄片，精度0.01 mm',state.tool==='micrometer']
+    ];
+    tools.forEach((it,i)=>{const x=80+i*260;box(x,410,230,68,it[2]?'#e0f2fe':'#f8fafc',it[2]?'#2c7be5':'#d9e2ec');text(it[0],x+115,432,it[2]?colors.blue:colors.ink,'center',14,'900');text(it[1],x+115,458,colors.muted,'center',11,'700');});
+    const raw=r.raw, corrected=r.corrected;
+    text('修正公式：修正读数 = 原读数 - 零误差 = '+fmt(raw,2)+' - ('+fmt(q.z,2)+') = '+fmt(corrected,2)+' mm',447,516,colors.purple,'center',15,'900');
+  }
+  function updatePanel(){
+    const q=v(), r=reading();
+    els.lenLabel.textContent=fmt(q.L,1)+' mm';
+    els.zeroLabel.textContent=(q.z>=0?'+':'')+fmt(q.z,2)+' mm';
+    els.readout.innerHTML='工具：<b>'+({ruler:'刻度尺',vernier:'游标卡尺',micrometer:'螺旋测微器'}[state.tool])+'</b><br>'+
+      '原读数：<b>'+fmt(r.raw,2)+' mm</b><br>'+
+      '零误差：<b>'+(q.z>=0?'+':'')+fmt(q.z,2)+' mm</b><br>'+
+      '修正读数：<b>'+fmt(r.corrected,2)+' mm</b>';
+    els.rows.innerHTML=state.records.slice(-6).map(x=>'<tr><td>'+x.tool+'</td><td>'+fmt(x.raw,2)+'</td><td>'+fmt(x.zero,2)+'</td><td>'+fmt(x.corrected,2)+'</td></tr>').join('')||'<tr><td colspan="4">暂无记录</td></tr>';
+    els.status.textContent = r.precision + '；读数时先读主尺或固定刻度，再读副尺，最后做零误差修正。';
+  }
+  function draw(){
+    const q=v(), r=reading();
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    const bg=ctx.createLinearGradient(0,0,0,canvas.height);bg.addColorStop(0,'#fbfdff');bg.addColorStop(1,'#edf3f8');ctx.fillStyle=bg;ctx.fillRect(0,0,canvas.width,canvas.height);
+    text('E-22 长度测量实验台：工具侧视装置 + 刻度图像 + 数据记录',450,32,colors.ink,'center',18,'900');
+    if(state.tool==='ruler')drawRuler(q,r); else if(state.tool==='vernier')drawVernier(q,r); else drawMicrometer(q,r);
+    drawChoice(q,r); updatePanel();
+  }
+  function pos(e){const rc=canvas.getBoundingClientRect();return{x:(e.clientX-rc.left)*canvas.width/rc.width,y:(e.clientY-rc.top)*canvas.height/rc.height};}
+  canvas.addEventListener('pointerdown',e=>{state.drag='measure';canvas.setPointerCapture(e.pointerId);move(e);});
+  canvas.addEventListener('pointermove',move);
+  function move(e){
+    if(!state.drag)return;
+    const p=pos(e);
+    let L=+els.length.value;
+    if(state.tool==='ruler')L=Math.max(8,Math.min(86,(p.x-96-40)/7.8));
+    else if(state.tool==='vernier')L=Math.max(8,Math.min(86,(p.x-110)/6.6));
+    else L=Math.max(8,Math.min(86,(p.x-280)/4.2));
+    els.length.value=String(Math.round(L*10)/10); draw(); e.preventDefault();
+  }
+  canvas.addEventListener('pointerup',e=>{state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}});
+  canvas.addEventListener('pointercancel',()=>{state.drag=null;});
+  document.querySelectorAll('[data-tool]').forEach(btn=>btn.addEventListener('click',()=>{state.tool=btn.dataset.tool;document.querySelectorAll('[data-tool]').forEach(b=>b.classList.toggle('active',b===btn));draw();}));
+  [els.length,els.zero].forEach(el=>el.addEventListener('input',draw));
+  document.getElementById('record').addEventListener('click',()=>{const q=v(),r=reading();state.records.push({tool:{ruler:'刻度尺',vernier:'游标卡尺',micrometer:'螺旋测微器'}[state.tool],raw:r.raw,zero:q.z,corrected:r.corrected});draw();});
+  document.getElementById('reset').addEventListener('click',()=>{els.length.value='32.4';els.zero.value='0';state.records=[];draw();});
+  els.play.addEventListener('click',()=>{state.running=!state.running;els.play.textContent=state.running?'暂停':'播放';});
+  function loop(){if(state.running){state.phase+=0.03;els.length.value=String((32+18*Math.sin(state.phase)).toFixed(1));}draw();requestAnimationFrame(loop);}
+  draw(); requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

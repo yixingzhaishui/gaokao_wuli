@@ -23,13 +23,6 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
 <body>
 <div class="container">
   <h2>库仑定律：F = k·q₁q₂/r²</h2>
-  <canvas id="canvas" width="600" height="340"></canvas>
-  <div class="readouts">
-    <span class="r">距离 r = <b id="r-val">3.0</b> m</span>
-    <span class="r">力 F = <b id="f-val">2.00</b> N</span>
-    <span class="r">k·q₁q₂ = <b id="kq-val">18.0</b> N·m²</span>
-    <span class="r" id="type-val">斥力（同号）</span>
-  </div>
   <div class="controls">
     <label>q₁ = <span id="q1-display">+3.0</span> μC
       <input type="range" id="q1" min="-10" max="10" step="0.5" value="3"></label>
@@ -42,8 +35,15 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
     <button data-case="double">距离翻倍</button>
     <button data-case="opposite">异号相吸</button>
   </div>
+  <canvas id="canvas" width="600" height="340" aria-label="库仑定律实验台：两电荷俯视装置、F-r图像和数据记录"></canvas>
+  <div class="readouts">
+    <span class="r">距离 r = <b id="r-val">3.0</b> m</span>
+    <span class="r">力 F = <b id="f-val">2.00</b> N</span>
+    <span class="r">k·q₁q₂ = <b id="kq-val">18.0</b> N·m²</span>
+    <span class="r" id="type-val">斥力（同号）</span>
+  </div>
   <div class="hint">
-    <p><b>观察任务</b>：拖动 r 看力如何按平方反比减小；拖动 q₁ 或 q₂ 看力如何正比变化；把 q₁ 拖到负值看力从斥力变引力。</p>
+    <p><b>观察任务</b>：拖动 r，对照两电荷俯视装置、F-r 图像和数据记录，看力如何按平方反比减小；拖动 q₁ 或 q₂ 看力如何正比变化。</p>
   </div>
 </div>
 <script>

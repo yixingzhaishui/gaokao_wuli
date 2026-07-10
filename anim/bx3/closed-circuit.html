@@ -23,13 +23,6 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
 <body>
 <div class="container">
   <h2>闭合电路欧姆定律：I = ε/(R+r)，U = ε - Ir</h2>
-  <canvas id="canvas" width="600" height="400"></canvas>
-  <div class="readouts">
-    <span class="r">电流 I = <b id="i-val">0.50</b> A</span>
-    <span class="r">路端电压 U = <b id="u-val">5.0</b> V</span>
-    <span class="r">内压降 Ir = <b id="ir-val">1.0</b> V</span>
-    <span class="r">电源功率 = <b id="p-val">3.0</b> W</span>
-  </div>
   <div class="controls">
     <label>外阻 R = <span id="r-display">10</span> Ω
       <input type="range" id="r" min="0.5" max="30" step="0.5" value="10"></label>
@@ -40,8 +33,15 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
     <button id="play-btn">播放</button>
     <button id="reset-btn">重置</button>
   </div>
+  <canvas id="canvas" width="600" height="400" aria-label="闭合电路实验台：电路俯视装置、U-I图像和数据记录"></canvas>
+  <div class="readouts">
+    <span class="r">电流 I = <b id="i-val">0.50</b> A</span>
+    <span class="r">路端电压 U = <b id="u-val">5.0</b> V</span>
+    <span class="r">内压降 Ir = <b id="ir-val">1.0</b> V</span>
+    <span class="r">电源功率 = <b id="p-val">3.0</b> W</span>
+  </div>
   <div class="hint">
-    <p><b>观察任务</b>：拖动 R 滑块，或直接<b>拖动右侧 U-I 图像上的红色工作点</b>，看路端电压 U 和电流 I 如何反向变化（R↑→I↓→U↑）；R 减到最小时 U≈0（短路）；R 很大时 U≈ε（断路）。看工作点如何沿直线滑动。</p>
+    <p><b>观察任务</b>：拖动 R 滑块，或直接<b>拖动右侧 U-I 图像上的红色工作点</b>，对照电路俯视装置、U-I 图像和数据记录，看路端电压 U 和电流 I 如何反向变化。</p>
   </div>
 </div>
 <script>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>国际单位制与量纲检查</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:12px;padding:12px;min-height:650px}.stage{background:#fff;border:1px solid #d9e2ec;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab}.panel{display:flex;flex-direction:column;gap:10px}.card{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:10px}
+  .task{background:#fff7e6;border-left:4px solid #f0a500;color:#486581;font-size:13px;line-height:1.5}.title{font-weight:800;margin-bottom:7px}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  button{border:1px solid #b0bcc9;background:#fff;border-radius:6px;padding:7px 8px;cursor:pointer;font:inherit;font-size:13px}button.active{background:#2c7be5;border-color:#2c7be5;color:#fff;font-weight:800}
+  .param{display:grid;gap:2px;margin:8px 0;font-size:13px}.param span{display:flex;justify-content:space-between;color:#486581;gap:8px}.param b{color:#102a43}
+  input[type=range]{width:100%;accent-color:#2c7be5}.readout{background:#102a43;color:#d9e2ec;border-radius:8px;padding:10px;line-height:1.65;font-size:13px}.readout b{color:#ffd166}
+  .status{border:1px solid #38b2ac;background:#e6fffa;color:#087f5b;border-radius:8px;padding:8px;font-size:13px;font-weight:800;line-height:1.45}.formula{font-size:13px;color:#334e68;line-height:1.6}@media(max-width:820px){.root{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="900" height="600" aria-label="量纲检查实验台：单位积木侧视、公式天平、维度图像和检查记录"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>切换公式或拖动右侧指数滑块；看左右单位积木是否平衡，用量纲先发现公式错误。</div>
+    <div class="card">
+      <div class="title">公式检查器</div>
+      <div class="buttons"><button data-case="newton" class="active">F=ma</button><button data-case="power">P=W/t</button><button data-case="gravity">F=Gm1m2/r²</button><button data-case="wrong">错式 v=at²</button></div>
+      <label class="param"><span>右侧长度指数 L <b id="lLab">1</b></span><input id="lExp" type="range" min="-3" max="3" step="1" value="1"></label>
+      <label class="param"><span>右侧时间指数 T <b id="tLab">-2</b></span><input id="tExp" type="range" min="-4" max="2" step="1" value="-2"></label>
+      <label class="param"><span>右侧质量指数 M <b id="mLab">1</b></span><input id="mExp" type="range" min="-2" max="2" step="1" value="1"></label>
+      <div class="buttons"><button id="play">播放</button><button id="reset">重置</button></div>
+    </div>
+    <div class="readout" id="readout"></div>
+    <div class="card formula"><div class="title">公式绑定</div><div>量纲写作 M^a L^b T^c。等式左右量纲必须一致。</div><div>N=kg·m/s²，J=N·m，W=J/s。</div></div>
+    <div class="status" id="status"></div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+  const el={l:id('lExp'),t:id('tExp'),m:id('mExp'),lLab:id('lLab'),tLab:id('tLab'),mLab:id('mLab'),readout:id('readout'),status:id('status'),play:id('play')};
+  const cases={newton:{name:'F=ma',left:{M:1,L:1,T:-2},right:{M:1,L:1,T:-2},note:'牛顿 N = kg·m/s²'},power:{name:'P=W/t',left:{M:1,L:2,T:-3},right:{M:1,L:2,T:-3},note:'瓦特 W = J/s = kg·m²/s³'},gravity:{name:'F=Gm1m2/r²',left:{M:1,L:1,T:-2},right:{M:1,L:1,T:-2},note:'G 的单位补足到 N·m²/kg²'},wrong:{name:'v=at²',left:{M:0,L:1,T:-1},right:{M:0,L:1,T:0},note:'at² 的单位是 m，不是 m/s'}};
+  const colors={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',gold:'#f0a500',green:'#087f5b',purple:'#7c3aed'};
+  const state={key:'newton',playing:false,phase:0,drag:null};
+  function id(s){return document.getElementById(s)}function dim(d){return'M^'+d.M+' L^'+d.L+' T^'+d.T}function eq(a,b){return a.M===b.M&&a.L===b.L&&a.T===b.T}
+  function text(s,x,y,c=colors.ink,a='center',size=13,w='700'){ctx.fillStyle=c;ctx.font=w+' '+size+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+  function line(x1,y1,x2,y2,c='#9fb3c8',w=2,dash){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
+  function box(x,y,w,h,fill='#fff',stroke='#d9e2ec'){ctx.save();ctx.fillStyle=fill;ctx.strokeStyle=stroke;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.restore()}
+  function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.45),y2-10*Math.sin(a-.45));ctx.lineTo(x2-10*Math.cos(a+.45),y2-10*Math.sin(a+.45));ctx.closePath();ctx.fill();ctx.restore()}
+  function vals(){const c=cases[state.key];return{left:c.left,right:{M:+el.m.value,L:+el.l.value,T:+el.t.value},name:c.name,note:c.note}}
+  function drawBlocks(d,x,y,label){text(label,x,y-32,colors.muted,'center',13,'900');[['M',d.M,colors.purple],['L',d.L,colors.blue],['T',d.T,colors.red]].forEach((p,i)=>{box(x-82+i*58,y,48,44,p[2]+'22',p[2]);text(p[0],x-58+i*58,y+14,p[2],'center',16,'900');text(String(p[1]),x-58+i*58,y+33,p[2],'center',13,'900')})}
+  function draw(){const v=vals(),ok=eq(v.left,v.right);ctx.clearRect(0,0,900,600);const bg=ctx.createLinearGradient(0,0,0,600);bg.addColorStop(0,'#fbfdff');bg.addColorStop(1,'#edf3f8');ctx.fillStyle=bg;ctx.fillRect(0,0,900,600);text('B1-31 国际单位制与量纲检查：公式天平侧视 + 单位积木 + 维度图像',450,34,colors.ink,'center',18,'900');box(56,80,788,250,'#fff');text(v.name,450,112,colors.ink,'center',22,'900');line(230,236,670,236,ok?colors.green:colors.red,8);line(450,236,450,300,colors.ink,5);drawBlocks(v.left,240,160,'左边量纲');drawBlocks(v.right,660,160,'右边量纲');text(ok?'量纲平衡：公式可能成立':'量纲不平衡：公式必错',450,284,ok?colors.green:colors.red,'center',17,'900');arrow(365,370,535,370,colors.gold,4);text('检查流程：写基本量纲 → 合并指数 → 比较左右',450,348,colors.gold,'center',14,'900');box(56,400,788,136,'#fff');['M','L','T'].forEach((k,i)=>{const lx=150+i*230,lv=v.left[k],rv=v.right[k];text(k+' 指数',lx,430,colors.ink,'center',14,'900');line(lx-60,490,lx+60,490,colors.muted,2);ctx.fillStyle=colors.blue;ctx.fillRect(lx-38,490-lv*18,28,lv*18);ctx.fillStyle=colors.red;ctx.fillRect(lx+10,490-rv*18,28,rv*18);text('左 '+lv,lx-25,514,colors.blue,'center',12,'900');text('右 '+rv,lx+25,514,colors.red,'center',12,'900')});el.lLab.textContent=el.l.value;el.tLab.textContent=el.t.value;el.mLab.textContent=el.m.value;el.readout.innerHTML='左：<b>'+dim(v.left)+'</b><br>右：<b>'+dim(v.right)+'</b><br>结论：<b>'+(ok?'一致':'不一致')+'</b><br>说明：<b>'+v.note+'</b>';el.status.textContent=ok?'左右单位一致，下一步再看物理条件。':'量纲不一致，公式无需代数计算即可判错。'}
+  document.querySelectorAll('[data-case]').forEach(b=>b.onclick=()=>{state.key=b.dataset.case;document.querySelectorAll('[data-case]').forEach(x=>x.classList.toggle('active',x===b));const r=cases[state.key].right;el.m.value=r.M;el.l.value=r.L;el.t.value=r.T;draw()});[el.l,el.t,el.m].forEach(x=>x.addEventListener('input',draw));
+  canvas.addEventListener('pointerdown',e=>{state.drag='right';canvas.setPointerCapture(e.pointerId);move(e)});canvas.addEventListener('pointermove',move);function move(e){if(!state.drag)return;const r=canvas.getBoundingClientRect();const y=(e.clientY-r.top)*canvas.height/r.height;el.t.value=Math.max(-4,Math.min(2,Math.round((420-y)/28)));draw();e.preventDefault()}canvas.addEventListener('pointerup',e=>{state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}});canvas.addEventListener('pointercancel',()=>state.drag=null);
+  el.play.onclick=()=>{state.playing=!state.playing;el.play.textContent=state.playing?'暂停':'播放'};id('reset').onclick=()=>{const r=cases[state.key].right;el.m.value=r.M;el.l.value=r.L;el.t.value=r.T;draw()};
+  function loop(){if(state.playing){state.phase+=0.04;el.t.value=Math.round(-1+2*Math.sin(state.phase));}draw();requestAnimationFrame(loop)}draw();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

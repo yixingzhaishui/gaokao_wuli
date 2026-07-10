@@ -3,113 +3,166 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>卫星圆轨道实验台</title>
+<title>天体运动模型实验台</title>
 <link rel="icon" href="data:,">
 <style>
   *{box-sizing:border-box}
   body{margin:0;background:#edf3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
-  .root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px;min-height:560px}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 316px;gap:10px;padding:10px;min-height:760px}
   .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
-  canvas{display:block;width:100%;height:auto;touch-action:none}
+  canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab}
+  canvas:active{cursor:grabbing}
   .panel{display:flex;flex-direction:column;gap:8px}
   .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
   .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.45}
   .title{font-weight:800;margin-bottom:5px;color:#0f172a}
   .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:31px;cursor:pointer;color:#102a43}
-  .primary{background:#2563eb;color:#fff;border-color:#2563eb;font-weight:800}
+  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:31px;cursor:pointer;color:#102a43;font-weight:700}
+  button.active{background:#2563eb;color:#fff;border-color:#2563eb}
   .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:48px}
+  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:50px}
   .meter span{display:block;font-size:11px;color:#b6c5d8}
-  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:16px;font-variant-numeric:tabular-nums}
-  .formula{display:grid;gap:5px;font-size:13px;color:#334155}
+  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:15px;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .formula{display:grid;gap:5px;font-size:12px;color:#334155}
   .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
   .formula div:last-child{border-bottom:0;padding-bottom:0}
   .formula b{white-space:nowrap;color:#0f172a}
   .small{font-size:12px;line-height:1.5;color:#475569}
   .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
-  @media(max-width:760px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
+  .status.warn{border-color:#f59e0b;background:#fff7ed;color:#b45309}
+  @media(max-width:820px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
 <div class="root">
-  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="卫星圆轨道交互实验台"></canvas></div>
+  <div class="stage"><canvas id="canvas" width="960" height="760" aria-label="天体运动模型交互实验台"></canvas></div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>抓卫星向外拖，看轨道半径变大时 v 变小、T 变大；再改卫星质量，看 v、T、a 是否改变。</div>
-    <button id="playBtn" class="primary">播放</button>
+    <div class="card task"><b>观察任务：</b>拖卫星改变 `r=R_earth+h`，看高轨速度变小、周期变长；切同步卫星，看为何必须唯一高度。</div>
+    <div class="chips"><button id="playBtn">播放</button><button id="resetBtn">重置</button></div>
     <div class="card">
-      <div class="title">快速情境</div>
+      <div class="title">satellite_type</div>
       <div class="chips">
-        <button data-case="low">近地</button>
-        <button data-case="high">高轨</button>
-        <button data-case="massive">大中心质量</button>
-        <button data-case="heavySat">大卫星质量</button>
+        <button data-type="near" class="active">近地卫星</button>
+        <button data-type="geo">同步卫星</button>
+        <button data-type="high">高轨比较</button>
+        <button data-type="transfer">椭圆变轨</button>
       </div>
     </div>
     <div class="card">
       <div class="title">实时读数</div>
       <div class="readout">
-        <div class="meter"><span>线速度 v</span><b id="vText">7.89 km/s</b></div>
-        <div class="meter"><span>角速度 ω</span><b id="wText">1.23e-3</b></div>
-        <div class="meter"><span>周期 T</span><b id="periodText">84.9 min</b></div>
-        <div class="meter"><span>向心加速度 a</span><b id="aText">9.73 m/s²</b></div>
+        <div class="meter"><span>r / h</span><b id="rText">6.9 / 0.5</b></div>
+        <div class="meter"><span>v</span><b id="vText">7.6 km/s</b></div>
+        <div class="meter"><span>T</span><b id="tText">96 min</b></div>
+        <div class="meter"><span>g'</span><b id="gText">8.7 m/s²</b></div>
       </div>
     </div>
     <div class="card formula">
-      <div><span>速度</span><b>v=√(GM/r)</b></div>
+      <div><span>向心来源</span><b>GMm/r²=mv²/r</b></div>
+      <div><span>圆轨速度</span><b>v=√(GM/r)</b></div>
       <div><span>周期</span><b>T=2π√(r³/GM)</b></div>
-      <div><span>加速度</span><b>a=GM/r²</b></div>
+      <div><span>轨道重力</span><b>g'=GM/r²</b></div>
     </div>
-    <div class="card small"><b>可直接操作：</b>抓卫星改轨道半径，或拖底部 r、中心质量 M、卫星质量 m、位置手柄。多视角：左侧是俯视轨道场景，右侧是速度、周期和向心加速度图像记录。卫星质量不决定圆轨道快慢。</div>
-    <div class="status" id="status">高轨低速长周期；卫星质量 m 在方程中约掉。</div>
+    <div class="card small"><b>三视图：</b>左侧俯视圆轨道；右侧是 v/T/g' 随 r 的图像记录和椭圆变轨示意。底部可拖 `M,r,R_earth,h,G`。</div>
+    <div class="status" id="status">r 是地心到卫星距离，不是离地高度 h。</div>
   </div>
 </div>
 <script>
 (function(){
   'use strict';
   const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
-  const R=6.4e6,GM0=3.986e14;
-  const state={rR:1,M:1,ms:1,angle:0,running:false,drag:null};
-  const els={v:document.getElementById('vText'),w:document.getElementById('wText'),period:document.getElementById('periodText'),a:document.getElementById('aText'),status:document.getElementById('status'),play:document.getElementById('playBtn')};
-  const colors={red:'#dc2626',blue:'#2563eb',purple:'#7c3aed',green:'#0f766e',orange:'#f59e0b',ink:'#102a43'};
+  const state={G:6.67,M:6.0,R:6.4,h:.5,type:'near',angle:.6,running:false,drag:null};
+  const els={r:document.getElementById('rText'),v:document.getElementById('vText'),t:document.getElementById('tText'),g:document.getElementById('gText'),status:document.getElementById('status'),play:document.getElementById('playBtn')};
+  const colors={red:'#dc2626',blue:'#2563eb',purple:'#7c3aed',green:'#0f766e',orange:'#f59e0b',cyan:'#0891b2',ink:'#102a43',muted:'#64748b'};
   const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
-  const fmt=(v,d=2)=>Math.abs(v)<1e-6?(0).toFixed(d):v.toFixed(d);
-  function values(){const GM=GM0*state.M,r=state.rR*R,v=Math.sqrt(GM/r),w=Math.sqrt(GM/(r*r*r)),T=2*Math.PI/w,a=GM/(r*r),F=state.ms*1000*a;return{GM,r,v,w,T,a,F}}
+  const fmt=(v,d=1)=>Number.isFinite(v)?v.toFixed(d):'--';
+  function rVal(){return state.R+state.h}
+  function calc(){
+    const r=rVal(),mu=state.G*state.M;
+    const v=Math.sqrt(mu/r*10);
+    const T=2*Math.PI*Math.sqrt((r*r*r/mu)*1e5)/60;
+    const gp=mu/(r*r)*10;
+    const geoR=Math.cbrt(mu*1e5*Math.pow(24*60*60/(2*Math.PI),2))/100;
+    return{r,mu,v,T,gp,geoR,geoH:geoR-state.R,ratio:r/state.R};
+  }
   function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){ctx.fillStyle=c;ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
   function line(x1,y1,x2,y2,c='#94a3b8',w=2,dash){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
-  function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore()}
-  function roundRect(x,y,w,h,r,fill,stroke){ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}ctx.restore()}
-  function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-36,c,'center',12,'900')}
-  function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-20,active?'#92400e':c,'center',12,'900');ctx.restore()}
-  function geom(){return{r:{x:92+(state.rR-1)/9*170,y:494},M:{x:326+(state.M-.5)/2.5*150,y:494},ms:{x:526+(state.ms-.2)/4.8*150,y:494},angle:{x:746+(state.angle%(Math.PI*2))/(Math.PI*2)*110,y:494}}}
-  function orbitGeom(){const O={x:310,y:252},earth=32,Rpx=earth+(state.rR-1)/9*190,sat={x:O.x+Rpx*Math.cos(state.angle),y:O.y+Rpx*Math.sin(state.angle)};return{O,earth,Rpx,sat}}
+  function arrow(x1,y1,x2,y2,c,w=3){if(Math.hypot(x2-x1,y2-y1)<2)return;const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore()}
+  function box(x,y,w,h,r,fill,stroke='#cbd5e1'){ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.5;ctx.stroke()}ctx.restore()}
+  function orbitGeom(v){
+    const O={x:300,y:292},earth=34+clamp((state.R-5)/3*22,0,30);
+    const maxRatio=8,Rpx=earth+clamp((v.ratio-1)/(maxRatio-1),0,1)*210;
+    const sat={x:O.x+Rpx*Math.cos(state.angle),y:O.y+Rpx*Math.sin(state.angle)};
+    return{O,earth,Rpx,sat};
+  }
   function drawOrbit(v){
-    roundRect(42,58,560,382,8,'#fff','#d7dee8');
-    const g=orbitGeom(),O=g.O,s=g.sat,tx=-Math.sin(state.angle),ty=Math.cos(state.angle);
-    ctx.save();ctx.strokeStyle='#94a3b8';ctx.setLineDash([6,5]);ctx.lineWidth=2;ctx.beginPath();ctx.arc(O.x,O.y,g.Rpx,0,Math.PI*2);ctx.stroke();ctx.restore();
-    ctx.fillStyle='#dbeafe';ctx.beginPath();ctx.arc(O.x,O.y,g.earth*Math.sqrt(state.M),0,Math.PI*2);ctx.fill();ctx.strokeStyle='#334155';ctx.stroke();text('中心天体',O.x,O.y,'#102a43','center',12,'900');
-    line(O.x,O.y,s.x,s.y,'#cbd5e1',2);text(`r=${fmt(state.rR,1)}R`,(O.x+s.x)/2,(O.y+s.y)/2-14,'#475569','center',12,'900');
-    arrow(s.x,s.y,O.x,O.y,colors.red,3);text('F引=F向', (s.x+O.x)/2,(s.y+O.y)/2+18,colors.red,'center',12,'900');
-    arrow(s.x,s.y,s.x+tx*Math.min(96,34+v.v/1000*8),s.y+ty*Math.min(96,34+v.v/1000*8),colors.blue,3);text('v',s.x+tx*84,s.y+ty*84,colors.blue,'center',13,'900');
-    ctx.fillStyle=colors.orange;ctx.beginPath();ctx.arc(s.x,s.y,9+state.ms*1.2,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();
-    ctx.save();ctx.fillStyle=state.drag==='sat'?'#fde68a':'#fff';ctx.strokeStyle=state.drag==='sat'?'#d97706':colors.orange;ctx.lineWidth=3;ctx.beginPath();ctx.arc(s.x,s.y,19,0,Math.PI*2);ctx.stroke();ctx.restore();
-    text('半径越大：v↓、ω↓、a↓、T↑',310,426,'#475569','center',13,'900');
+    box(34,56,552,482,8,'#fff','#d7dee8');text('俯视圆轨道：万有引力提供向心力',310,84,'#0f172a','center',16,'900');
+    const g=orbitGeom(v),O=g.O,s=g.sat,tx=-Math.sin(state.angle),ty=Math.cos(state.angle);
+    const earthGrad=ctx.createRadialGradient(O.x-12,O.y-14,4,O.x,O.y,g.earth);earthGrad.addColorStop(0,'#bfdbfe');earthGrad.addColorStop(1,'#1d4ed8');
+    ctx.fillStyle=earthGrad;ctx.beginPath();ctx.arc(O.x,O.y,g.earth,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();text('中心天体',O.x,O.y,'#fff','center',12,'900');
+    ctx.strokeStyle='#94a3b8';ctx.lineWidth=2;ctx.beginPath();ctx.arc(O.x,O.y,g.Rpx,0,Math.PI*2);ctx.stroke();
+    const geoPx=g.earth+clamp((v.geoR/state.R-1)/7,0,1)*210;ctx.strokeStyle=colors.orange;ctx.setLineDash([6,5]);ctx.beginPath();ctx.arc(O.x,O.y,geoPx,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);text('同步轨道',O.x+geoPx*.72,O.y-geoPx*.72,colors.orange,'center',12,'900');
+    if(state.type==='transfer'){ctx.save();ctx.strokeStyle=colors.purple;ctx.lineWidth=3;ctx.setLineDash([7,4]);ctx.beginPath();ctx.ellipse(O.x,O.y,Math.max(g.Rpx,geoPx),Math.min(g.Rpx,geoPx)*.62,0,0,Math.PI*2);ctx.stroke();ctx.restore();text('椭圆变轨：近地点/远地点同点速度突变',310,510,colors.purple,'center',13,'900')}
+    ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(s.x,s.y,11,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();
+    arrow(s.x,s.y,s.x+tx*70,s.y+ty*70,colors.green,3);text('v',s.x+tx*86,s.y+ty*86,colors.green,'center',12,'900');
+    arrow(s.x,s.y,s.x+(O.x-s.x)*.32,s.y+(O.y-s.y)*.32,colors.red,3);text('F引',s.x+(O.x-s.x)*.38,s.y+(O.y-s.y)*.38,colors.red,'center',12,'900');
+    line(O.x,O.y,s.x,s.y,colors.orange,2,[5,4]);text(`r=R+h=${fmt(v.r,1)}×10⁶m`,310,468,colors.orange,'center',13,'900');
   }
-  function drawCompare(v){
-    roundRect(642,86,214,116,8,'#f8fafc','#d7dee8');text('卫星质量会约掉',749,114,'#0f172a','center',15,'900');text(`m卫=${fmt(state.ms,1)}t`,749,148,colors.purple,'center',13,'900');text(`v、T、a 不随 m卫 变`,749,176,'#475569','center',12,'900');
-    roundRect(642,260,214,104,8,'#fff','#d7dee8');text('当前关系',749,288,'#0f172a','center',15,'900');text(`F引=${fmt(v.F/1000,1)}kN`,749,322,colors.red,'center',13,'900');text('但运动量由 GM/r 决定',749,346,'#475569','center',12,'900');
+  function drawGraphs(v){
+    box(612,72,298,224,8,'#fff','#d7dee8');text('图像记录：r 增大时',761,96,'#0f172a','center',14,'900');
+    const gx=648,gy=250,gw=220,gh=120;line(gx,gy,gx+gw,gy,'#94a3b8',1.5);line(gx,gy,gx,gy-gh,'#94a3b8',1.5);
+    function curve(fn,c){ctx.beginPath();for(let i=0;i<=80;i++){const rr=state.R+(42*i/80),val=fn(rr),x=gx+gw*i/80,y=gy-val*gh;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.strokeStyle=c;ctx.lineWidth=3;ctx.stroke()}
+    const maxV=Math.sqrt(state.G*state.M/state.R*10),maxT=2*Math.PI*Math.sqrt(Math.pow(state.R+42,3)/(state.G*state.M)*1e5)/60,maxA=state.G*state.M/(state.R*state.R)*10;
+    curve(rr=>Math.sqrt(state.G*state.M/rr*10)/maxV,colors.green);
+    curve(rr=>(2*Math.PI*Math.sqrt(Math.pow(rr,3)/(state.G*state.M)*1e5)/60)/maxT,colors.orange);
+    curve(rr=>(state.G*state.M/(rr*rr)*10)/maxA,colors.purple);
+    const px=gx+gw*state.h/42;line(px,gy,px,gy-gh,colors.red,2,[4,4]);
+    text('v降',858,132,colors.green,'right',12,'900');text('T升',858,154,colors.orange,'right',12,'900');text("g'降",858,176,colors.purple,'right',12,'900');
+    box(612,328,298,162,8,'#f8fafc','#d7dee8');text('同步卫星判定',761,352,'#0f172a','center',14,'900');
+    text(`同步半径 r≈${fmt(v.geoR,1)}×10⁶m`,632,386,colors.orange,'left',12,'900');
+    text(`同步高度 h≈${fmt(v.geoH,1)}×10⁶m`,632,414,colors.orange,'left',12,'900');
+    text(Math.abs(v.T-1440)<50?'T≈24h：周期条件满足':'T≠24h：相对地面漂移',632,442,Math.abs(v.T-1440)<50?colors.green:colors.red,'left',12,'900');
+    text('静止还必须：赤道平面 + 同向',632,470,colors.muted,'left',12,'900');
   }
-  function update(v){els.v.textContent=`${fmt(v.v/1000)} km/s`;els.w.textContent=`${fmt(v.w*1000)}e-3`;els.period.textContent=`${fmt(v.T/60,1)} min`;els.a.textContent=`${fmt(v.a)} m/s²`;els.status.textContent='高轨低速长周期；卫星质量 m 在方程中约掉。';els.play.textContent=state.running?'暂停':'播放'}
-  function draw(){const v=values(),g0=geom();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('卫星圆轨道实验台：万有引力提供向心力',460,30,'#0f172a','center',19,'900');drawOrbit(v);drawCompare(v);roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(92,494,262,'r/R',colors.orange);handle(g0.r.x,g0.r.y,`r=${fmt(state.rR,1)}`,state.drag==='r',colors.orange);ruler(326,494,476,'M',colors.green);handle(g0.M.x,g0.M.y,`M=${fmt(state.M,1)}`,state.drag==='M',colors.green);ruler(526,494,676,'m卫',colors.purple);handle(g0.ms.x,g0.ms.y,`m=${fmt(state.ms,1)}t`,state.drag==='ms',colors.purple);ruler(746,494,856,'位置',colors.blue);handle(g0.angle.x,g0.angle.y,'位置',state.drag==='angle',colors.blue);update(v)}
+  function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#b45309':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();text(label,x,y-36,active?'#92400e':c,'center',12,'900')}
+  function ruler(x1,y,x2,label,c,hx,txt,active){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=5;i++){const x=x1+(x2-x1)*i/5;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-18,c,'center',12,'900');handle(hx,y,txt,active,c)}
+  function geometry(v){return{
+    M:{x:58+(state.M-1)/9*132,y:646},
+    R:{x:218+(state.R-5)/3*132,y:646},
+    h:{x:378+state.h/42*132,y:646},
+    r:{x:538+(v.r-5)/45*132,y:646},
+    G:{x:698+(state.G-5)/3*132,y:646}
+  }}
+  function drawControls(v,g){
+    box(34,610,876,104,8,'#fff','#d7dee8');text('拖动 M、r、R_earth、h、G；注意 r 是地心距，h 是离地高度',368,628,colors.orange,'center',12,'900');
+    ruler(58,646,190,'M',colors.green,g.M,`M=${fmt(state.M,1)}`,state.drag==='M');
+    ruler(218,646,350,'R_earth',colors.blue,g.R,`R=${fmt(state.R,1)}`,state.drag==='R');
+    ruler(378,646,510,'h',colors.orange,g.h,`h=${fmt(state.h,1)}`,state.drag==='h');
+    ruler(538,646,670,'r',colors.orange,g.r,`r=${fmt(v.r,1)}`,state.drag==='r');
+    ruler(698,646,830,'G',colors.purple,g.G,`G=${fmt(state.G,2)}`,state.drag==='G');
+  }
+  function update(v){
+    els.r.textContent=`${fmt(v.r,1)} / ${fmt(state.h,1)} ×10⁶m`;
+    els.v.textContent=`${fmt(v.v,2)} km/s`;
+    els.t.textContent=v.T>180?`${fmt(v.T/60,1)} h`:`${fmt(v.T,1)} min`;
+    els.g.textContent=`${fmt(v.gp,2)} m/s²`;
+    document.querySelectorAll('[data-type]').forEach(btn=>btn.classList.toggle('active',btn.dataset.type===state.type));
+    const warn=state.type==='geo'&&Math.abs(v.T-1440)>50;
+    els.status.className='status'+(warn?' warn':'');
+    els.status.textContent=warn?'同步卫星不是任意高度：T 必须等于 24h，且还要赤道同向。':'高轨低速长周期；卫星质量 m 在圆轨方程中约掉。';
+    els.play.textContent=state.running?'暂停':'播放';
+  }
+  function draw(){const v=calc(),g=geometry(v);ctx.clearRect(0,0,960,760);const bg=ctx.createLinearGradient(0,0,0,760);bg.addColorStop(0,'#fbfdff');bg.addColorStop(1,'#eaf0f7');ctx.fillStyle=bg;ctx.fillRect(0,0,960,760);text('天体运动模型实验台：万有引力提供向心力，轨道半径决定快慢',480,28,'#0f172a','center',20,'900');drawOrbit(v);drawGraphs(v);drawControls(v,g);update(v)}
   function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
-  function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
-  function down(e){const p=pos(e),og=orbitGeom(),g0=geom();if(near(p,og.sat,30))state.drag='sat';else if(near(p,g0.r,26))state.drag='r';else if(near(p,g0.M,26))state.drag='M';else if(near(p,g0.ms,26))state.drag='ms';else if(near(p,g0.angle,26))state.drag='angle';else state.drag=null;if(state.drag){state.running=false;canvas.setPointerCapture(e.pointerId);move(e)}}
-  function move(e){if(!state.drag)return;const p=pos(e),O=orbitGeom().O;if(state.drag==='r')state.rR=clamp(1+(p.x-92)/170*9,1,10);if(state.drag==='M')state.M=clamp(.5+(p.x-326)/150*2.5,.5,3);if(state.drag==='ms')state.ms=clamp(.2+(p.x-526)/150*4.8,.2,5);if(state.drag==='angle')state.angle=clamp((p.x-746)/110*Math.PI*2,0,Math.PI*2);if(state.drag==='sat'){const dx=p.x-O.x,dy=p.y-O.y,dist=Math.hypot(dx,dy),earth=32;state.rR=clamp(1+(dist-earth)/190*9,1,10);state.angle=Math.atan2(dy,dx)}draw()}
+  function near(p,h,rad=25){return Math.hypot(p.x-h.x,p.y-h.y)<=rad}
+  function down(e){state.running=false;const p=pos(e),v=calc(),g=geometry(v),og=orbitGeom(v);state.drag=null;if(near(p,og.sat,30))state.drag='sat';else{for(const key of ['M','R','h','r','G']){if(near(p,g[key],24)){state.drag=key;break}}}if(state.drag){canvas.setPointerCapture(e.pointerId);move(e)}}
+  function move(e){if(!state.drag)return;const p=pos(e),v=calc(),og=orbitGeom(v);if(state.drag==='M')state.M=clamp(1+(p.x-58)/132*9,1,10);if(state.drag==='R'){state.R=clamp(5+(p.x-218)/132*3,5,8);state.h=Math.max(0,state.h)}if(state.drag==='h')state.h=clamp((p.x-378)/132*42,0,42);if(state.drag==='r'){const rr=clamp(5+(p.x-538)/132*45,state.R,50);state.h=rr-state.R}if(state.drag==='G')state.G=clamp(5+(p.x-698)/132*3,5,8);if(state.drag==='sat'){const d=Math.hypot(p.x-og.O.x,p.y-og.O.y),earth=og.earth;const ratio=1+clamp((d-earth)/210,0,1)*7;state.h=clamp(state.R*ratio-state.R,0,42);state.angle=Math.atan2(p.y-og.O.y,p.x-og.O.x)}draw()}
   function up(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
   canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
+  document.querySelectorAll('[data-type]').forEach(btn=>btn.addEventListener('click',()=>{state.type=btn.dataset.type;if(state.type==='near')state.h=.3;if(state.type==='high')state.h=20;if(state.type==='geo'){const v=calc();state.h=clamp(v.geoH,0,42)}if(state.type==='transfer')state.h=10;draw()}));
   els.play.addEventListener('click',()=>{state.running=!state.running;draw()});
-  document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='low'){state.rR=1;state.M=1;state.ms=1}if(c==='high'){state.rR=6;state.M=1;state.ms=1}if(c==='massive'){state.rR=1;state.M=2.5;state.ms=1}if(c==='heavySat'){state.rR=1;state.M=1;state.ms=5}draw()}));
-  function tick(){if(state.running){state.angle=(state.angle+values().w*26)%(Math.PI*2)}draw();requestAnimationFrame(tick)}
+  document.getElementById('resetBtn').addEventListener('click',()=>{Object.assign(state,{G:6.67,M:6,R:6.4,h:.5,type:'near',angle:.6,running:false});draw()});
+  function tick(){if(state.running){const v=calc();state.angle=(state.angle+Math.max(.001,2*Math.PI/(v.T*60))*16)%(Math.PI*2)}draw();requestAnimationFrame(tick)}
   draw();requestAnimationFrame(tick);
 })();
 </script>

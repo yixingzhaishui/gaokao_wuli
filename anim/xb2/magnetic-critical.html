@@ -23,13 +23,6 @@ canvas{display:block;width:100%;max-width:700px;background:#fff;border-radius:12
 <body>
 <div class="wrap">
   <h2>有界磁场临界：垂直射入时，能穿出 ⇔ R ≥ L</h2>
-  <canvas id="cv" width="700" height="420"></canvas>
-  <div class="chips">
-    <span class="chip">轨道半径 R = <b id="rv">9.0</b> cm</span>
-    <span class="chip">磁场宽度 L = <b id="lv">9.0</b> cm</span>
-    <span class="chip">圆心角 θ = <b id="angv">90</b>°</span>
-    <span class="chip">状态：<b id="statev">临界</b></span>
-  </div>
   <div class="ctrls">
     <button class="btn" id="play">⏸ 暂停</button>
     <button class="btn" id="reset">重置</button>
@@ -37,7 +30,14 @@ canvas{display:block;width:100%;max-width:700px;background:#fff;border-radius:12
     <label>磁场宽度 L = <span id="ll">9.0</span> cm<input id="lr" type="range" min="4" max="16" step="0.5" value="9"></label>
     <span style="font-size:13px;color:#5a6b7b">或拖轨道 / 右边界</span>
   </div>
-  <div class="hint"><b>观察任务</b>：粒子从左边界垂直射入有界磁场。拖<b>虚线轨道</b>改 R（等价改 v 或 B），拖<b>右边界</b>改 L：当 R&lt;L 时圆还没到右边界就被掰回，不能穿出；R=L 是<b>恰好</b>临界；R&gt;L 能从右边界射出。时间由圆心角决定：t=(θ/360°)T。</div>
+  <canvas id="cv" width="700" height="420" aria-label="有界磁场临界实验台：三维磁场方向俯视装置、轨迹图像和数据记录"></canvas>
+  <div class="chips">
+    <span class="chip">轨道半径 R = <b id="rv">9.0</b> cm</span>
+    <span class="chip">磁场宽度 L = <b id="lv">9.0</b> cm</span>
+    <span class="chip">圆心角 θ = <b id="angv">90</b>°</span>
+    <span class="chip">状态：<b id="statev">临界</b></span>
+  </div>
+  <div class="hint"><b>观察任务</b>：粒子从左边界垂直射入有界磁场。对照三维磁场方向俯视装置、轨迹图像和数据记录，拖<b>虚线轨道</b>改 R，拖<b>右边界</b>改 L：当 R&lt;L 时不能穿出，R=L 是<b>恰好</b>临界。</div>
 </div>
 <script>
 (function(){

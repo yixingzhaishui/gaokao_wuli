@@ -34,9 +34,9 @@
 </head>
 <body>
 <div class="root">
-  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="曲线运动条件交互实验台"></canvas></div>
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="曲线运动条件交互实验台：轨迹俯视装置、分解图像和数据记录"></canvas></div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>抓住红色合力箭头端点拖动。只要红箭头不和蓝色速度箭头共线，就会出现紫色 F⊥，轨迹立刻弯曲。</div>
+    <div class="card task"><b>观察任务：</b>抓住红色合力箭头端点拖动，对照轨迹俯视装置、分解图像和数据记录，看 F⊥ 出现时轨迹怎样弯曲。</div>
     <button id="playBtn" class="primary">播放</button>
     <div class="card">
       <div class="title">快速情境</div>
@@ -112,7 +112,7 @@
     text(v.curve?'因为 F⊥ 不为 0':'因为 F⊥=0 或 F=0',737,346,'#475569','center',12,'700');
   }
   function update(v){els.fp.textContent=`${fmt(v.Fp)} N`;els.fn.textContent=`${fmt(v.Fn)} N`;els.angle.textContent=`${fmt(state.angle,0)}°`;els.type.textContent=v.curve?'曲线':'直线';els.status.className='status'+(v.curve?'':' warn');if(state.F===0)els.status.textContent='合力为 0：速度大小和方向都不变，物体做匀速直线运动。';else if(v.curve)els.status.textContent='合力与速度不共线：速度方向改变，轨迹弯向 F⊥ 一侧。';else els.status.textContent='合力与速度共线：只改变速度大小，轨迹仍为直线。';els.play.textContent=state.running?'暂停':'播放'}
-  function draw(){const v=values(),g0=geom();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('曲线运动条件实验台：看合力有没有垂直速度的分量',460,30,'#0f172a','center',19,'900');drawMotion(v);drawCases(v);roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(112,494,282,'F',colors.red);handle(g0.F.x,g0.F.y,`F=${fmt(state.F,0)}N`,state.drag==='F',colors.red);ruler(350,494,520,'v',colors.blue);handle(g0.v.x,g0.v.y,`v=${fmt(state.v)}`,state.drag==='v',colors.blue);ruler(620,494,830,'α',colors.purple);handle(g0.angle.x,g0.angle.y,`α=${fmt(state.angle,0)}°`,state.drag==='angle',colors.purple);update(v)}
+  function draw(){const v=values(),g0=geom();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('曲线运动条件实验台：轨迹俯视装置 + 分解图像 + 数据记录',460,30,'#0f172a','center',19,'900');drawMotion(v);drawCases(v);roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(112,494,282,'F',colors.red);handle(g0.F.x,g0.F.y,`F=${fmt(state.F,0)}N`,state.drag==='F',colors.red);ruler(350,494,520,'v',colors.blue);handle(g0.v.x,g0.v.y,`v=${fmt(state.v)}`,state.drag==='v',colors.blue);ruler(620,494,830,'α',colors.purple);handle(g0.angle.x,g0.angle.y,`α=${fmt(state.angle,0)}°`,state.drag==='angle',colors.purple);update(v)}
   function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
   function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
   function down(e){const p=pos(e),v=values(),obj=pointAt(state.running?state.phase:.48,v),fEnd=forceEnd(obj,v),g0=geom();if(near(p,fEnd,30))state.drag='forceVector';else if(near(p,g0.F,26))state.drag='F';else if(near(p,g0.v,26))state.drag='v';else if(near(p,g0.angle,26))state.drag='angle';else state.drag=null;if(state.drag){state.running=false;canvas.setPointerCapture(e.pointerId);move(e)}}

@@ -9,10 +9,13 @@
   body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
   .wrap { max-width: 1000px; margin: 0 auto; padding: 16px; }
   .stage { display: grid; grid-template-columns: minmax(0, 1fr) 286px; gap: 14px; align-items: stretch; }
-  canvas { width: 100%; height: 470px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  canvas { width: 100%; height: 470px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; touch-action:none; }
   .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
   label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
   input { width: 100%; }
+  .row { display:flex; gap:8px; margin-bottom:10px; }
+  button { flex:1; border:1px solid #bcccdc; background:#f0f4f8; color:#102a43; border-radius:8px; padding:8px; font-weight:700; cursor:pointer; }
+  button.primary { background:#2c7be5; border-color:#2c7be5; color:#fff; }
   .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.72; font-size: 14px; }
   .status { margin-top: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13px; line-height: 1.55; background: #e6fffa; color: #087f5b; font-weight: 700; }
   .status.bad { background: #fff5f5; color: #c92a2a; }
@@ -25,6 +28,7 @@
   <div class="stage">
     <canvas id="c" width="700" height="470" aria-label="向心力实验"></canvas>
     <section class="panel">
+      <div class="row"><button id="playBtn" class="primary" type="button">播放</button><button id="resetBtn" type="button">重置</button><button id="recordBtn" type="button">记录</button></div>
       <label for="mode">图像横轴：<span id="modeVal"></span></label>
       <input id="mode" type="range" min="0" max="2" value="2" step="1">
       <label for="mass">小球质量 m/kg：<span id="massVal"></span></label>
@@ -36,6 +40,7 @@
       <label for="error">读数误差：<span id="errorVal"></span></label>
       <input id="error" type="range" min="0" max="8" value="2" step="1">
       <div id="readout" class="readout"></div>
+      <table style="width:100%;margin-top:10px;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;border-bottom:1px solid #d9e2ec">记录</th><th style="border-bottom:1px solid #d9e2ec">m</th><th style="border-bottom:1px solid #d9e2ec">r</th><th style="border-bottom:1px solid #d9e2ec">F</th></tr></thead><tbody id="records"></tbody></table>
       <div id="status" class="status"></div>
       <div class="hint">观察任务：固定两个量，只改变一个量，看测力计读数和图像斜率怎样支持 F=mω²r。</div>
     </section>
@@ -56,8 +61,13 @@ const els = {
   omegaVal: document.getElementById('omegaVal'),
   errorVal: document.getElementById('errorVal'),
   readout: document.getElementById('readout'),
-  status: document.getElementById('status')
+  status: document.getElementById('status'),
+  playBtn: document.getElementById('playBtn'),
+  resetBtn: document.getElementById('resetBtn'),
+  recordBtn: document.getElementById('recordBtn'),
+  records: document.getElementById('records')
 };
+const state={running:false,time:0,last:0,drag:null,records:[]};
 function drawGraph(x0, y0, w, h, mode, m, r, omega, err) {
   const labels = ['m', 'r', 'ω²'];
   ctx.strokeStyle = '#334e68';
@@ -117,10 +127,10 @@ function draw() {
   ctx.fillStyle = '#102a43';
   ctx.font = '700 18px system-ui';
   ctx.textAlign = 'center';
-  ctx.fillText('向心力实验：测力计读数随 m、r、ω² 改变', 350, 30);
+  ctx.fillText('向心力实验台：俯视转台 + 测力计读数 + 控制变量图像 + 数据记录', 350, 30);
   const cx = 230, cy = 235;
   const R = r * 360;
-  const angle = -0.75;
+  const angle = state.running ? state.time * omega : -0.75;
   const bx = cx + R * Math.cos(angle);
   const by = cy + R * Math.sin(angle);
   ctx.strokeStyle = '#d9e2ec';
@@ -174,6 +184,9 @@ function draw() {
   ctx.textAlign = 'center';
   ctx.font = '700 13px system-ui';
   ctx.fillText('测力计读数 ' + Fread.toFixed(2) + ' N', 229, 412);
+  ctx.fillStyle = '#0f9f6e'; ctx.beginPath(); ctx.arc(bx, by, 12, 0, Math.PI*2); ctx.fill(); ctx.fillStyle='#fff'; ctx.font='700 10px system-ui'; ctx.fillText('r', bx, by+3);
+  ctx.fillStyle = '#e03131'; ctx.beginPath(); ctx.arc(96 + omega*20, 350, 11, 0, Math.PI*2); ctx.fill(); ctx.fillStyle='#fff'; ctx.fillText('ω', 96+omega*20, 353);
+  ctx.fillStyle = '#7b2cbf'; ctx.beginPath(); ctx.arc(96 + m*700, 322, 11, 0, Math.PI*2); ctx.fill(); ctx.fillStyle='#fff'; ctx.fillText('m', 96+m*700, 325);
   drawGraph(452, 375, 180, 230, mode, m, r, omega, err);
   ctx.fillStyle = '#486581';
   ctx.font = '13px system-ui';
@@ -190,11 +203,20 @@ function draw() {
   els.status.textContent = Fread <= 8
     ? '通过：测力计读数与 m、r、ω² 的乘积同步增大。'
     : '不通过：读数超过量程，应减小质量、半径或角速度。';
+  els.playBtn.textContent = state.running ? '暂停' : '播放';
 }
 Object.values(els).forEach(el => {
   if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
 });
-draw();
+function pos(e){const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height};}
+c.addEventListener('pointerdown',e=>{const p=pos(e),m=Number(els.mass.value),r=Number(els.radius.value),omega=Number(els.omega.value),cx=230,cy=235,R=r*360,angle=state.running?state.time*omega:-.75,bx=cx+R*Math.cos(angle),by=cy+R*Math.sin(angle);if(Math.hypot(p.x-bx,p.y-by)<26){state.drag='r';c.setPointerCapture(e.pointerId);}else if(Math.hypot(p.x-(96+omega*20),p.y-350)<22){state.drag='omega';c.setPointerCapture(e.pointerId);}else if(Math.hypot(p.x-(96+m*700),p.y-322)<22){state.drag='m';c.setPointerCapture(e.pointerId);}});
+c.addEventListener('pointermove',e=>{const p=pos(e);if(!state.drag){c.style.cursor='grab';return;}if(state.drag==='r'){const d=Math.hypot(p.x-230,p.y-235);els.radius.value=Math.max(.1,Math.min(.5,d/360)).toFixed(2);}if(state.drag==='omega'){els.omega.value=Math.max(2,Math.min(10,(p.x-96)/20)).toFixed(1);}if(state.drag==='m'){els.mass.value=Math.max(.05,Math.min(.3,(p.x-96)/700)).toFixed(2);}draw();});
+c.addEventListener('pointerup',e=>{state.drag=null;try{c.releasePointerCapture(e.pointerId)}catch(err){}});c.addEventListener('pointercancel',()=>{state.drag=null;});
+els.playBtn.addEventListener('click',()=>{state.running=!state.running;state.last=0;draw();});
+els.resetBtn.addEventListener('click',()=>{state.running=false;state.time=0;els.mode.value=2;els.mass.value=.1;els.radius.value=.3;els.omega.value=5;els.error.value=2;draw();});
+els.recordBtn.addEventListener('click',()=>{const m=Number(els.mass.value),r=Number(els.radius.value),omega=Number(els.omega.value),err=Number(els.error.value),F=m*omega*omega*r*(1-err/100);state.records.unshift({m,r,F});state.records=state.records.slice(0,4);els.records.innerHTML=state.records.map((q,i)=>`<tr><td style="text-align:left;border-bottom:1px solid #d9e2ec">${i+1}</td><td style="border-bottom:1px solid #d9e2ec">${q.m.toFixed(2)}</td><td style="border-bottom:1px solid #d9e2ec">${q.r.toFixed(2)}</td><td style="border-bottom:1px solid #d9e2ec">${q.F.toFixed(2)}</td></tr>`).join('');});
+function loop(now){if(!state.last)state.last=now;const dt=Math.min(.04,(now-state.last)/1000);state.last=now;if(state.running)state.time+=dt;draw();requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
 </script>
 </body>
 </html>

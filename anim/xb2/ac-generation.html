@@ -24,18 +24,18 @@ canvas{display:block;width:100%;max-width:760px;background:#fff;border:1px solid
 <body>
 <div class="container">
   <h2>交流电的产生：3D发电机 + 侧视法线 + Φ/e 图像记录</h2>
+  <div class="controls">
+    <label>角速度 ω = <span id="w-d">2.0</span> rad/s
+      <input type="range" id="w" min="0.5" max="4" step="0.1" value="2"></label>
+    <button id="play-btn">暂停</button>
+    <button id="reset-btn">重置</button>
+  </div>
   <canvas id="canvas" width="760" height="390"></canvas>
   <div class="readouts">
     <span class="r">角速度 ω = <b id="w-v">2.0</b> rad/s</span>
     <span class="r">法线 n 与 B 夹角 θ = <b id="ph-v">0</b>°</span>
     <span class="r">瞬时电动势 e = <b id="e-v">0.0</b></span>
     <span class="r">峰值 E_m = <b id="em-v">—</b></span>
-  </div>
-  <div class="controls">
-    <label>角速度 ω = <span id="w-d">2.0</span> rad/s
-      <input type="range" id="w" min="0.5" max="4" step="0.1" value="2"></label>
-    <button id="play-btn">暂停</button>
-    <button id="reset-btn">重置</button>
   </div>
   <div class="hint">
     <p><b>观察任务</b>：看左侧 3D 发电机线圈在 N-S 磁极间转动，右下侧视小图显示面积法线 n 与 B 的夹角 θ。θ=0° 时磁通量 Φ 最大，但 e=0；θ=90° 时 Φ=0、变化最快，电动势 e 最大。右侧图像同时记录 Φ-t 和 e-t，二者相差 90° 相位。拖<b>ω</b> 变大→ 转得快，峰值 E_m=nBAω 变大、周期变短。</p>

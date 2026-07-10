@@ -26,7 +26,7 @@ canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab;backgr
 <div class="wrap">
   <h2>闭合电路：拖 R、ε、r 和 U-I 工作点</h2>
   <div class="lab">
-    <div class="stage"><canvas id="cv" width="720" height="450"></canvas><div style="padding:6px 10px;display:flex;gap:12px;align-items:center;font-size:13px;border-top:1px solid #eef2f7"><button id="play-btn" style="font:inherit;border:1px solid #cbd5e1;background:#fff;border-radius:6px;padding:5px 12px;cursor:pointer">⏸ 暂停</button><span>状态：<b id="run-st">运行中</b></span></div></div>
+    <div class="stage"><canvas id="cv" width="720" height="450" aria-label="闭合电路欧姆定律实验台：电路俯视装置、U-I图像和数据记录"></canvas><div style="padding:6px 10px;display:flex;gap:12px;align-items:center;font-size:13px;border-top:1px solid #eef2f7"><button id="play-btn" style="font:inherit;border:1px solid #cbd5e1;background:#fff;border-radius:6px;padding:5px 12px;cursor:pointer">⏸ 暂停</button><span>状态：<b id="run-st">运行中</b></span></div></div>
     <section class="panel">
       <div class="read">
         <div class="chip">电动势 ε = <b id="ev">6.0</b> V</div>
@@ -36,7 +36,7 @@ canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab;backgr
         <div class="chip">路端电压 U = <b id="uv">5.00</b> V</div>
         <div class="chip">内压降 Ir = <b id="irv">1.00</b> V</div>
       </div>
-      <div class="hint"><b>观察任务</b>：拖金色 R 手柄，看 R 增大时 I 变小、U 变大；拖 U-I 图上的蓝色工作点，等价于换外阻；拖 ε 改纵截距，拖 r 改斜率。</div>
+      <div class="hint"><b>观察任务</b>：拖金色 R 手柄，对照电路俯视装置、U-I 图像和数据记录，看 R 增大时 I 变小、U 变大；拖 ε 改纵截距，拖 r 改斜率。</div>
       <div class="formula"><b>画面绑定</b><br>U-I 图直线满足 U=ε-Ir，纵截距是 ε，斜率是 -r。外电路还满足 U=IR，所以工作点由电源直线和外阻关系共同决定。</div>
     </section>
   </div>

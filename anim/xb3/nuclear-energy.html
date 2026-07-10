@@ -3,133 +3,48 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>核能：质量亏损转化为能量</title>
+<title>核能与质能方程实验台</title>
 <style>
-  * { box-sizing: border-box; }
-  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
-  .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
-  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 14px; align-items: stretch; }
-  canvas { width: 100%; height: 430px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
-  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
-  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
-  input { width: 100%; }
-  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.8; font-size: 14px; }
-  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
-  @media (max-width: 760px) { .stage { grid-template-columns: 1fr; } canvas { height: 360px; } }
+  *{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#102a43;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}.wrap{max-width:1180px;margin:0 auto;padding:14px}.stage{display:grid;grid-template-columns:minmax(0,1fr)310px;gap:12px;align-items:start}canvas{width:100%;height:640px;background:#fff;border:1px solid #d9e2ec;border-radius:8px;display:block;touch-action:none}.panel{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:12px}.row{display:flex;gap:8px;margin-bottom:10px}button{flex:1;border:0;border-radius:6px;background:#2c7be5;color:#fff;font-weight:700;padding:9px 10px;cursor:pointer}.secondary{background:#e6edf7;color:#102a43}label{display:block;font-size:13px;font-weight:700;margin-top:10px}input{width:100%;accent-color:#2c7be5}.readout{margin-top:12px;padding:10px;background:#eef4ff;border-radius:8px;line-height:1.65;font-size:13px}.status{margin-top:10px;padding:9px 10px;border-radius:8px;font-size:13px;line-height:1.5;background:#e6fffa;color:#087f5b;font-weight:700}.hint{margin-top:10px;color:#486581;font-size:13px;line-height:1.55}table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px}th,td{border-bottom:1px solid #d9e2ec;padding:5px 4px;text-align:right}th:first-child,td:first-child{text-align:left}@media(max-width:860px){.stage{grid-template-columns:1fr}canvas{height:560px}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="stage">
-    <canvas id="c" width="680" height="430" aria-label="核能质能方程模型"></canvas>
-    <section class="panel">
-      <label for="dm">质量亏损 Δm/u：<span id="dmVal"></span></label>
-      <input id="dm" type="range" min="0" max="0.30" value="0.20" step="0.01">
-      <label for="count">反应次数：<span id="countVal"></span></label>
-      <input id="count" type="range" min="1" max="100" value="20" step="1">
-      <label for="type">反应类型：<span id="typeVal"></span></label>
-      <input id="type" type="range" min="0" max="1" value="0" step="1">
-      <div id="readout" class="readout"></div>
-      <div class="hint">观察任务：改变质量亏损，看单次能量线性变化；改变次数，看总能量累加。</div>
-    </section>
-  </div>
-</div>
+<div class="wrap"><div class="stage">
+  <canvas id="c" width="940" height="640" aria-label="核能质能方程实验台：天平、能量计、图像和数据记录"></canvas>
+  <section class="panel">
+    <div class="row"><button id="playBtn" class="play-btn">播放</button><button id="resetBtn" class="secondary">重置</button><button id="recordBtn" class="secondary">记录</button></div>
+    <label for="dm">质量亏损 Δm/u：<span id="dmVal"></span></label><input id="dm" type="range" min="-0.06" max="0.30" value="0.20" step="0.01">
+    <label for="count">反应次数：<span id="countVal"></span></label><input id="count" type="range" min="1" max="100" value="20" step="1">
+    <label for="type">反应类型：<span id="typeVal"></span></label><input id="type" type="range" min="0" max="1" value="0" step="1">
+    <div id="readout" class="readout"></div><div id="status" class="status"></div>
+    <div class="hint">观察任务：拖动画面中的金色 Δm 砝码，看质量天平、能量计和 E-Δm 图像如何同步变化。Δm 为负时表示吸收能量。</div>
+    <table><thead><tr><th>记录</th><th>Δm/u</th><th>E1/MeV</th><th>状态</th></tr></thead><tbody id="recordBody"><tr><td colspan="4">点击“记录”保存一次测量</td></tr></tbody></table>
+  </section>
+</div></div>
 <script>
-const c = document.getElementById('c');
-const ctx = c.getContext('2d');
-const els = {
-  dm: document.getElementById('dm'),
-  count: document.getElementById('count'),
-  type: document.getElementById('type'),
-  dmVal: document.getElementById('dmVal'),
-  countVal: document.getElementById('countVal'),
-  typeVal: document.getElementById('typeVal'),
-  readout: document.getElementById('readout')
-};
-function draw() {
-  const dm = Number(els.dm.value);
-  const count = Number(els.count.value);
-  const type = Number(els.type.value);
-  const typeName = type === 0 ? '裂变' : '聚变';
-  const e1 = dm * 931.5;
-  const total = e1 * count;
-  els.dmVal.textContent = dm.toFixed(2);
-  els.countVal.textContent = count;
-  els.typeVal.textContent = typeName;
-  ctx.clearRect(0, 0, c.width, c.height);
-  ctx.fillStyle = '#f7f9fc';
-  ctx.fillRect(0, 0, c.width, c.height);
-
-  ctx.fillStyle = '#eef4ff';
-  ctx.strokeStyle = '#2c7be5';
-  ctx.lineWidth = 2;
-  ctx.fillRect(46, 76, 160, 92);
-  ctx.strokeRect(46, 76, 160, 92);
-  ctx.fillStyle = '#102a43';
-  ctx.font = '700 16px system-ui';
-  ctx.textAlign = 'center';
-  ctx.fillText(typeName + '前', 126, 112);
-  ctx.fillText('m前', 126, 142);
-  ctx.strokeStyle = '#e03131';
-  ctx.lineWidth = 4;
-  ctx.beginPath();
-  ctx.moveTo(224, 122);
-  ctx.lineTo(318, 122);
-  ctx.stroke();
-  ctx.fillStyle = '#e03131';
-  ctx.beginPath();
-  ctx.moveTo(318, 122);
-  ctx.lineTo(304, 114);
-  ctx.lineTo(304, 130);
-  ctx.closePath();
-  ctx.fill();
-  ctx.fillStyle = '#fff7e6';
-  ctx.strokeStyle = '#f0a500';
-  ctx.fillRect(338, 76, 160, 92);
-  ctx.strokeRect(338, 76, 160, 92);
-  ctx.fillStyle = '#102a43';
-  ctx.fillText(typeName + '后', 418, 112);
-  ctx.fillText('m后 = m前 - Δm', 418, 142);
-
-  const barMax = 280;
-  const barW = Math.min(barMax, e1 / 280 * barMax);
-  ctx.fillStyle = '#e03131';
-  ctx.fillRect(98, 246, barW, 28);
-  ctx.fillStyle = '#486581';
-  ctx.textAlign = 'left';
-  ctx.font = '14px system-ui';
-  ctx.fillText('单次释放能量 E1', 98, 236);
-  ctx.fillStyle = '#102a43';
-  ctx.font = '700 16px system-ui';
-  ctx.fillText(`${e1.toFixed(1)} MeV`, 390, 268);
-
-  const totalW = Math.min(barMax, total / 10000 * barMax);
-  ctx.fillStyle = '#f0a500';
-  ctx.fillRect(98, 316, totalW, 28);
-  ctx.fillStyle = '#486581';
-  ctx.font = '14px system-ui';
-  ctx.fillText('总释放能量 E总', 98, 306);
-  ctx.fillStyle = '#102a43';
-  ctx.font = '700 16px system-ui';
-  ctx.fillText(`${total.toFixed(1)} MeV`, 390, 338);
-  ctx.textAlign = 'center';
-  ctx.font = '700 18px system-ui';
-  ctx.fillText('E = Δmc²，1u c²≈931.5MeV', 350, 54);
-  ctx.fillStyle = '#486581';
-  ctx.font = '14px system-ui';
-  ctx.fillText('质量亏损越大，释放能量越大；大量反应的能量按次数累加。', 350, 394);
-
-  els.readout.innerHTML = [
-    `反应类型=${typeName}`,
-    `Δm=${dm.toFixed(2)} u`,
-    `单次能量 E1=Δm×931.5≈${e1.toFixed(1)} MeV`,
-    `反应 ${count} 次：E总≈${total.toFixed(1)} MeV`
-  ].join('<br>');
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d'),els={dm:by('dm'),count:by('count'),type:by('type'),dmVal:by('dmVal'),countVal:by('countVal'),typeVal:by('typeVal'),readout:by('readout'),status:by('status'),playBtn:by('playBtn'),resetBtn:by('resetBtn'),recordBtn:by('recordBtn'),recordBody:by('recordBody')};function by(id){return document.getElementById(id)}
+let playing=false,t=0,last=0,dragging=false,records=[];const chip={x:318,y:188};
+function params(){const dm=+els.dm.value,count=+els.count.value,type=+els.type.value,e1=dm*931.5,total=e1*count;return{dm,count,type,typeName:type===0?'裂变':'聚变',e1,total,release:dm>=0}}
+function label(s,x,y,c='#102a43',size=13,align='center',w='700'){ctx.fillStyle=c;ctx.font=`${w} ${size}px system-ui`;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.48),y2-10*Math.sin(a-.48));ctx.lineTo(x2-10*Math.cos(a+.48),y2-10*Math.sin(a+.48));ctx.closePath();ctx.fill()}
+function drawScene(p){ctx.fillStyle='#fff';ctx.fillRect(0,0,940,640);label('核能实验台：质量亏损如何变成能量读数',470,28,'#102a43',19);label('三视图联动：反应装置、质量天平、能量图像和数据记录同时变化',470,52,'#486581',13,'center','600');
+ ctx.fillStyle='#f2f7ff';ctx.strokeStyle='#2c7be5';ctx.lineWidth=2;ctx.fillRect(58,82,500,260);ctx.strokeRect(58,82,500,260);label('反应装置：反应前后精确静止质量不同',308,106,'#2c7be5',14);
+ box(98,146,150,84,'#eef4ff','#2c7be5',`${p.typeName}前`,'m前');arrow(268,188,348,188,'#e03131',4);box(372,146,150,84,'#fff7e6','#f0a500',`${p.typeName}后`,`m后=m前-Δm`);
+ for(let i=0;i<8;i++){const x=318+Math.cos(t*3+i)*36,y=188+Math.sin(t*2+i*1.7)*28;ctx.fillStyle=i%2?'#e03131':'#2c7be5';ctx.globalAlpha=playing?.9:.55;ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1}
+ ctx.fillStyle='#fff7e6';ctx.strokeStyle=dragging?'#e03131':'#f0a500';ctx.lineWidth=3;ctx.fillRect(chip.x-54,chip.y+96,108,54);ctx.strokeRect(chip.x-54,chip.y+96,108,54);label('拖动 Δm',chip.x,chip.y+116,'#f0a500',12);label(`${p.dm.toFixed(2)} u`,chip.x,chip.y+138,'#102a43',18);
+ ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1;ctx.fillRect(610,82,270,180);ctx.strokeRect(610,82,270,180);label('质量天平/仪器读数',745,106,'#102a43',14);arrow(646,200,844,200,'#52606d',3);const tilt=Math.max(-28,Math.min(28,p.dm*110));ctx.strokeStyle=p.release?'#087f5b':'#c92a2a';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(682,168+tilt);ctx.lineTo(808,168-tilt);ctx.stroke();label('m前',682,146+tilt,'#2c7be5',13);label('m后',808,146-tilt,'#f0a500',13);label(p.release?'放能：m前>m后':'吸能：m前<m后',745,232,p.release?'#087f5b':'#c92a2a',15);
+ ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(610,298,270,180);ctx.strokeRect(610,298,270,180);label('图像：E 与 Δm 成正比',745,322,'#102a43',13);axis(642,446,210,96);ctx.strokeStyle='#e03131';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(648,442);ctx.lineTo(850,338);ctx.stroke();const px=648+(p.dm+.06)/.36*202,py=442-(p.e1+55.89)/(0.36*931.5)*104;ctx.fillStyle='#2c7be5';ctx.beginPath();ctx.arc(px,py,7,0,Math.PI*2);ctx.fill();label('E=Δmc²',780,364,'#e03131',13);
+ ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(70,408,490,170);ctx.strokeRect(70,408,490,170);label('能量计与公式绑定',315,432,'#102a43',14);meter(116,482,320,22,Math.min(1,Math.abs(p.e1)/280),p.release?'#e03131':'#7b2cbf');label(`单次 E1=Δm×931.5=${p.e1.toFixed(1)} MeV`,315,522,p.release?'#e03131':'#7b2cbf',16);label(`反应 ${p.count} 次：E总=${p.total.toFixed(1)} MeV`,315,552,'#102a43',15);
 }
-Object.values(els).forEach(el => {
-  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
-});
-draw();
+function box(x,y,w,h,fill,stroke,a,b){ctx.fillStyle=fill;ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.fillRect(x,y,w,h);ctx.strokeRect(x,y,w,h);label(a,x+w/2,y+28,stroke,15);label(b,x+w/2,y+58,'#102a43',14)}
+function meter(x,y,w,h,val,c){ctx.fillStyle='#e9eef5';ctx.fillRect(x,y,w,h);ctx.fillStyle=c;ctx.fillRect(x,y,w*val,h);for(let i=0;i<=5;i++){ctx.strokeStyle='#52606d';ctx.beginPath();ctx.moveTo(x+i*w/5,y-5);ctx.lineTo(x+i*w/5,y+h+5);ctx.stroke()}}
+function axis(x,y,w,h){arrow(x,y,x+w,y,'#52606d',2);arrow(x,y,x,y-h,'#52606d',2);label('Δm',x+w-8,y+18,'#52606d',11);label('E',x-18,y-h+8,'#52606d',11)}
+function update(p){els.dmVal.textContent=p.dm.toFixed(2);els.countVal.textContent=p.count;els.typeVal.textContent=p.typeName;els.readout.innerHTML=[`反应类型=${p.typeName}`,`Δm=${p.dm.toFixed(2)} u`,`单次能量 E1=Δm×931.5=${p.e1.toFixed(1)} MeV`,`总能量 E总=${p.total.toFixed(1)} MeV`].join('<br>');els.status.textContent=p.release?'判定：质量亏损为正，释放能量。':'判定：质量亏损为负，需要吸收能量。'}
+function render(){const p=params();drawScene(p);update(p)}
+function animate(now){if(!last)last=now;const dt=Math.min(.04,(now-last)/1000);last=now;if(playing)t+=dt;render();requestAnimationFrame(animate)}
+function dragChip(clientX){const r=canvas.getBoundingClientRect(),x=(clientX-r.left)*canvas.width/r.width;chip.x=Math.max(120,Math.min(500,x));const dm=-.06+(chip.x-120)/380*.36;els.dm.value=(Math.round(dm*100)/100).toFixed(2);render()}
+canvas.addEventListener('pointerdown',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.height;if(Math.abs(x-chip.x)<70&&y>270&&y<360){dragging=true;canvas.setPointerCapture(e.pointerId);dragChip(e.clientX)}});canvas.addEventListener('pointermove',e=>{if(dragging)dragChip(e.clientX)});canvas.addEventListener('pointerup',e=>{dragging=false;try{canvas.releasePointerCapture(e.pointerId)}catch{}});canvas.addEventListener('pointercancel',()=>dragging=false);
+els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textContent=playing?'暂停':'播放'});els.resetBtn.addEventListener('click',()=>{playing=false;t=0;chip.x=318;els.playBtn.textContent='播放';render()});els.recordBtn.addEventListener('click',()=>{const p=params();records.unshift({dm:p.dm,e:p.e1,release:p.release});records=records.slice(0,5);els.recordBody.innerHTML=records.map((r,i)=>`<tr><td>${i+1}</td><td>${r.dm.toFixed(2)}</td><td>${r.e.toFixed(1)}</td><td>${r.release?'放能':'吸能'}</td></tr>`).join('')});[els.dm,els.count,els.type].forEach(el=>el.addEventListener('input',render));render();requestAnimationFrame(animate);
 </script>
 </body>
 </html>

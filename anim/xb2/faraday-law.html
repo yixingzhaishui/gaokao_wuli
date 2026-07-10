@@ -24,14 +24,6 @@ button.on{background:#2c7be5;color:#fff;border-color:#2c7be5}
 <body>
 <div class="container">
   <h2>法拉第定律：3D线圈实验台 + 侧视法线 + 电压表/Φ-E 图像</h2>
-  <canvas id="canvas" width="780" height="500"></canvas>
-  <div class="readouts">
-    <span class="r">Φ = <b id="phi-val">0.00</b> Wb</span>
-    <span class="r">|ΔΦ/Δt| = <b id="rate-val">0.00</b></span>
-    <span class="r">E = n|ΔΦ/Δt| = <b id="e-val">0.00</b> V</span>
-    <span class="r">n = <b id="n-val">3</b> 匝</span>
-    <span class="r">状态：<b id="state-val">—</b></span>
-  </div>
   <div class="controls">
     <label>磁场 B = <span id="b-d">0.55</span> T<input id="b" type="range" min="-100" max="100" step="1" value="55"></label>
     <label>法线夹角 θ = <span id="angle-d">35</span>°<input id="angle" type="range" min="0" max="180" step="1" value="35"></label>
@@ -42,6 +34,14 @@ button.on{background:#2c7be5;color:#fff;border-color:#2c7be5}
     <button id="play-angle">▶ 自动转动线圈</button>
     <button id="freeze">停住看 E=0</button>
     <button id="reset">重置</button>
+  </div>
+  <canvas id="canvas" width="780" height="500"></canvas>
+  <div class="readouts">
+    <span class="r">Φ = <b id="phi-val">0.00</b> Wb</span>
+    <span class="r">|ΔΦ/Δt| = <b id="rate-val">0.00</b></span>
+    <span class="r">E = n|ΔΦ/Δt| = <b id="e-val">0.00</b> V</span>
+    <span class="r">n = <b id="n-val">3</b> 匝</span>
+    <span class="r">状态：<b id="state-val">—</b></span>
   </div>
   <div class="hint">
     <b>观察任务</b>：拖动画面里的线圈法线或右侧磁场强度条。先看穿过线圈的磁通量 Φ，再看右下图像的斜率：紫色 Φ 曲线越陡，红色 E 越大。磁场 B 很强但不变时，E 仍可为 0；匝数 n 增大时，同样的 Φ 变化会产生更大的电动势。

@@ -30,7 +30,7 @@ button.on{background:#2c7be5;color:#fff}
 <div class="wrap">
   <h2>串并联电路：拖 R1、R2、U，看分压与分流</h2>
   <div class="lab">
-    <div class="stage"><canvas id="cv" width="720" height="450"></canvas><div style="padding:6px 10px;display:flex;gap:12px;align-items:center;font-size:13px;border-top:1px solid #eef2f7"><button id="play-btn" style="font:inherit;border:1px solid #cbd5e1;background:#fff;border-radius:6px;padding:5px 12px;cursor:pointer">⏸ 暂停</button><span>状态：<b id="run-st">运行中</b></span></div></div>
+    <div class="stage"><canvas id="cv" width="720" height="450" aria-label="串并联电路实验台：电路俯视装置、电流图像和数据记录"></canvas><div style="padding:6px 10px;display:flex;gap:12px;align-items:center;font-size:13px;border-top:1px solid #eef2f7"><button id="play-btn" style="font:inherit;border:1px solid #cbd5e1;background:#fff;border-radius:6px;padding:5px 12px;cursor:pointer">⏸ 暂停</button><span>状态：<b id="run-st">运行中</b></span></div></div>
     <section class="panel">
       <div class="seg" id="mode"><button class="on" data-mode="series">串联</button><button data-mode="parallel">并联</button></div>
       <div class="read">
@@ -40,7 +40,7 @@ button.on{background:#2c7be5;color:#fff}
         <div class="chip">总电流 I = <b id="itv">1.33</b> A</div>
         <div class="chip">支路/元件：<b id="detail">U1=4.0V, U2=8.0V</b></div>
       </div>
-      <div class="hint"><b>观察任务</b>：串联时拖 R1/R2，看同一电流下电阻越大分压越多；并联时看两支路电压相同，电阻越小分流越多；比较并联等效电阻是否小于任一支路。</div>
+      <div class="hint"><b>观察任务</b>：串联时拖 R1/R2，对照电路俯视装置、电流图像和数据记录，看同一电流下电阻越大分压越多；并联时看两支路电压相同。</div>
       <div class="formula"><b>画面绑定</b><br>金色手柄读 R1/R2，红色手柄读电源 U。串联：R=R1+R2，I 相同；并联：1/R=1/R1+1/R2，U 相同。</div>
     </section>
   </div>

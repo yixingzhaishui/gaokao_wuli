@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="../common/controls.css">
 <style>
   body { margin: 0; background: #f7f9fc; color: #102a43; font-family: -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; }
-  .root { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 12px; padding: 12px; box-sizing: border-box; min-height: 540px; }
+  .root { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 12px; padding: 12px; box-sizing: border-box; min-height: 620px; }
   .stage { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; overflow: hidden; }
   canvas { display: block; width: 100%; height: auto; touch-action: none; cursor: crosshair; }
   .panel { display: flex; flex-direction: column; gap: 10px; }
@@ -26,22 +26,34 @@
   .readout b { color: #f0a500; font-variant-numeric: tabular-nums; }
   .formula { font-size: 13px; line-height: 1.55; color: #334e68; }
   .status { font-size: 13px; font-weight: 700; border-radius: 6px; padding: 8px; border: 1px solid #38b2ac; background: #e6fffa; color: #087f5b; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th, td { border-bottom: 1px solid #d9e2ec; padding: 4px 3px; text-align: right; font-variant-numeric: tabular-nums; }
+  th:first-child, td:first-child { text-align: left; }
+  .note { color: #486581; font-size: 12px; line-height: 1.45; margin-top: 6px; }
   @media (max-width: 760px) { .root { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 <div class="root">
-  <div class="stage"><canvas id="canvas" width="820" height="520"></canvas></div>
+  <div class="stage"><canvas id="canvas" width="820" height="540" aria-label="相对论实验台：飞船侧视、光钟侧视、γ-β图像和数据记录"></canvas></div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>拖动速度 β=v/c，从 0.1 拖到 0.9：看 γ 如何急剧增大，外部观察者看到的时间变长、运动方向长度变短。</div>
+    <div class="card task"><b>观察任务：</b>拖动速度 β=v/c，从 0.1 拖到 0.9：看实验台侧视图、光钟读数和 γ-β 图像如何一起变化。</div>
     <div class="card">
       <div class="title">参数</div>
       <label class="param"><span>速度 β=v/c <b id="betaText">0.60</b></span><input id="beta" type="range" min="0" max="0.98" step="0.01" value="0.60"></label>
       <label class="param"><span>固有时间 Δt0 <b id="timeText">1.0 s</b></span><input id="time0" type="range" min="0.2" max="5" step="0.1" value="1"></label>
       <label class="param"><span>固有长度 L0 <b id="lengthText">10.0 m</b></span><input id="length0" type="range" min="2" max="30" step="0.5" value="10"></label>
-      <div class="buttons"><button id="play">播放</button><button id="reset">重置</button><button data-case="low">低速</button><button data-case="high">高速</button></div>
+      <div class="buttons"><button id="play">播放</button><button id="record">记录</button><button id="reset">重置</button><button data-case="low">低速</button><button data-case="high">高速</button></div>
     </div>
     <div class="readout" id="readout"></div>
+    <div class="card">
+      <div class="title">数据记录</div>
+      <table>
+        <thead><tr><th>β</th><th>γ</th><th>Δt/s</th><th>L/m</th></tr></thead>
+        <tbody id="recordRows"></tbody>
+      </table>
+      <div class="note">拖动红点后点“记录”，比较同一个实验台中速度、时间读数和长度读数的变化。</div>
+    </div>
     <div class="card formula">
       <div class="title">公式对照</div>
       <div>γ = 1 / √(1-β²)</div>
@@ -57,11 +69,12 @@
   const canvas = document.getElementById('canvas');
   const ctx = canvas.getContext('2d');
   const root = document.defaultView || globalThis;
-  const state = { running: false, phase: 0, drag: null, hot: {} };
+  const state = { running: false, phase: 0, drag: null, hot: {}, records: [] };
   const els = {
     beta: document.getElementById('beta'),
     time0: document.getElementById('time0'),
-    length0: document.getElementById('length0')
+    length0: document.getElementById('length0'),
+    recordRows: document.getElementById('recordRows')
   };
 
   function p() {
@@ -121,8 +134,9 @@
   }
 
   function drawShip(q, r) {
-    text('相对论效应：低速几乎看不见，接近光速才明显', 300, 32, '#102a43', 'center', 18, '700');
+    text('相对论实验台：飞船侧视 + 光钟侧视 + γ-β 图像 + 数据记录', 410, 32, '#102a43', 'center', 18, '700');
     box(52, 70, 500, 190, '#fff', '#d9e2ec');
+    text('飞船侧视实验台', 302, 94, '#102a43', 'center', 14, '700');
     const full = 270;
     const contracted = full / r.gamma;
     const x0 = 142, y = 150;
@@ -145,7 +159,7 @@
 
   function drawClock(q, r) {
     box(584, 70, 184, 190, '#fff', '#d9e2ec');
-    text('光钟时间', 676, 96, '#102a43', 'center', 14, '700');
+    text('光钟侧视读数', 676, 96, '#102a43', 'center', 14, '700');
     const cx = 676, top = 124, bottom = 214;
     ctx.strokeStyle = '#486581';
     ctx.lineWidth = 3;
@@ -166,7 +180,7 @@
 
   function drawGamma(q, r) {
     box(52, 292, 716, 170, '#fff', '#d9e2ec');
-    text('γ 随 β 的变化', 410, 318, '#102a43', 'center', 14, '700');
+    text('γ-β 图像 / 数据记录点', 410, 318, '#102a43', 'center', 14, '700');
     const left = 104, right = 720, bottom = 420, top = 340;
     ctx.strokeStyle = '#486581';
     ctx.beginPath();
@@ -199,6 +213,14 @@
     ctx.fill();
     text('当前 γ=' + fmt(r.gamma, 2), px, py - 16, '#e03131', 'center', 12, '700');
     text('β 很小时 γ≈1；β 接近 1 时 γ 急剧增大。', 410, 448, '#486581', 'center', 13);
+    text('拖动红点改变 β，右侧记录表保留每次读数。', 410, 474, '#486581', 'center', 12);
+  }
+
+  function renderRecords() {
+    const rows = state.records.slice(-5).map(item =>
+      '<tr><td>' + fmt(item.beta, 2) + '</td><td>' + fmt(item.gamma, 3) + '</td><td>' + fmt(item.t, 2) + '</td><td>' + fmt(item.L, 2) + '</td></tr>'
+    );
+    els.recordRows.innerHTML = rows.join('') || '<tr><td colspan="4">暂无记录</td></tr>';
   }
 
   function updatePanel(q, r) {
@@ -206,10 +228,11 @@
     document.getElementById('timeText').textContent = fmt(q.t0, 1) + ' s';
     document.getElementById('lengthText').textContent = fmt(q.L0, 1) + ' m';
     document.getElementById('readout').innerHTML =
-      'γ = <b>' + fmt(r.gamma, 3) + '</b><br>' +
-      'Δt = γΔt0 = <b>' + fmt(r.t, 2) + ' s</b><br>' +
-      'L = L0/γ = <b>' + fmt(r.L, 2) + ' m</b><br>' +
-      '速度：<b>' + fmt(q.beta, 2) + 'c</b>';
+      '速度表读数 β = <b>' + fmt(q.beta, 2) + 'c</b><br>' +
+      'γ 表盘读数 = <b>' + fmt(r.gamma, 3) + '</b><br>' +
+      '光钟时间读数 Δt = <b>' + fmt(r.t, 2) + ' s</b><br>' +
+      '侧视长度读数 L = <b>' + fmt(r.L, 2) + ' m</b>';
+    renderRecords();
     const status = document.getElementById('status');
     if (q.beta < 0.3) {
       status.textContent = '低速：γ 接近 1，相对论效应极小，日常运动可用经典力学。';
@@ -265,10 +288,18 @@
     els.beta.value = 0.6;
     els.time0.value = 1;
     els.length0.value = 10;
+    state.records = [];
     state.running = false;
     state.phase = 0;
     document.getElementById('play').textContent = '播放';
     draw();
+  });
+  document.getElementById('record').addEventListener('click', function(){
+    const qv = p();
+    const r = calc(qv);
+    state.records.push({ beta: qv.beta, gamma: r.gamma, t: r.t, L: r.L });
+    if (state.records.length > 5) state.records.shift();
+    renderRecords();
   });
   document.querySelectorAll('button[data-case]').forEach(btn => {
     btn.addEventListener('click', function(){

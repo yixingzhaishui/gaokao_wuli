@@ -33,9 +33,10 @@
 </head>
 <body>
 <div class="root">
-  <div class="stage"><canvas id="canvas" width="920" height="520" aria-label="共点力平衡交互实验台"></canvas></div>
+  <div class="stage"><canvas id="canvas" width="920" height="520" aria-label="共点力平衡交互实验台：绳结侧视装置、力三角形图像和数据记录"></canvas></div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>拖动左右绳端改变角度，再拖动重物改变 G；看 T1、T2、力三角形和 ΣFx/ΣFy 是否始终同时闭合为零。</div>
+    <div class="card task"><b>观察任务：</b>拖动左右绳端改变角度，对照绳结侧视装置、力三角形图像和数据记录，看 T1、T2 和 ΣFx/ΣFy 是否同时闭合为零。</div>
+    <div class="chips"><button id="playBtn">▶ 播放：α β 同步放平</button><button id="resetBtn">重置</button></div>
     <div class="card">
       <div class="title">快速情境</div>
       <div class="chips">
@@ -60,7 +61,6 @@
       <div><span>竖直方向</span><b>T1sinα+T2sinβ=G</b></div>
     </div>
     <div class="card small"><b>可直接操作：</b>抓两个蓝色绳端改变 α、β；抓红色重物上下拖动改变 G。右侧三力首尾相接后回到起点，表示共点力平衡。</div>
-    <div class="chips"><button id="playBtn">▶ 播放：α β 同步放平</button><button id="resetBtn">重置</button></div>
     <div class="status" id="status">左右对称：T1=T2，水平分量相互抵消。</div>
   </div>
 </div>

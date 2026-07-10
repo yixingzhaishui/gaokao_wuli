@@ -3,133 +3,52 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>半衰期：一半一半减少</title>
+<title>半衰期实验台</title>
 <style>
-  * { box-sizing: border-box; }
-  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
-  .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
-  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 14px; align-items: stretch; }
-  canvas { width: 100%; height: 430px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
-  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
-  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
-  input { width: 100%; }
-  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.8; font-size: 14px; }
-  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
-  @media (max-width: 760px) { .stage { grid-template-columns: 1fr; } canvas { height: 360px; } }
+  *{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#102a43;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:14px}.stage{display:grid;grid-template-columns:minmax(0,1fr)310px;gap:12px;align-items:start}
+  canvas{width:100%;height:640px;background:#fff;border:1px solid #d9e2ec;border-radius:8px;display:block;touch-action:none}
+  .panel{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:12px}.row{display:flex;gap:8px;margin-bottom:10px}
+  button{flex:1;border:0;border-radius:6px;background:#2c7be5;color:#fff;font-weight:700;padding:9px 10px;cursor:pointer}.secondary{background:#e6edf7;color:#102a43}
+  label{display:block;font-size:13px;font-weight:700;margin-top:10px}input{width:100%;accent-color:#2c7be5}
+  .readout{margin-top:12px;padding:10px;background:#eef4ff;border-radius:8px;line-height:1.65;font-size:13px}.status{margin-top:10px;padding:9px 10px;border-radius:8px;font-size:13px;line-height:1.5;background:#e6fffa;color:#087f5b;font-weight:700}
+  .hint{margin-top:10px;color:#486581;font-size:13px;line-height:1.55}table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px}th,td{border-bottom:1px solid #d9e2ec;padding:5px 4px;text-align:right}th:first-child,td:first-child{text-align:left}
+  @media(max-width:860px){.stage{grid-template-columns:1fr}canvas{height:560px}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="stage">
-    <canvas id="c" width="680" height="430" aria-label="半衰期衰减模型"></canvas>
-    <section class="panel">
-      <label for="n0">初始核数 N0：<span id="n0Val"></span></label>
-      <input id="n0" type="range" min="20" max="120" value="80" step="10">
-      <label for="half">半衰期 T：<span id="halfVal"></span></label>
-      <input id="half" type="range" min="1" max="10" value="4" step="1">
-      <label for="time">经过时间 t：<span id="timeVal"></span></label>
-      <input id="time" type="range" min="0" max="30" value="8" step="1">
-      <div id="readout" class="readout"></div>
-      <div class="hint">观察任务：把 t 调到 T、2T、3T，观察剩余比例依次约为 1/2、1/4、1/8。</div>
-    </section>
-  </div>
-</div>
+<div class="wrap"><div class="stage">
+  <canvas id="c" width="940" height="640" aria-label="半衰期实验台：随机核衰变、计数器、指数曲线、数据记录"></canvas>
+  <section class="panel">
+    <div class="row"><button id="playBtn" class="play-btn">播放</button><button id="resetBtn" class="secondary">重置</button><button id="recordBtn" class="secondary">记录</button></div>
+    <label for="n0">初始核数 N0：<span id="n0Val"></span></label><input id="n0" type="range" min="20" max="120" value="80" step="10">
+    <label for="half">半衰期 T：<span id="halfVal"></span></label><input id="half" type="range" min="1" max="10" value="4" step="1">
+    <label for="time">经过时间 t：<span id="timeVal"></span></label><input id="time" type="range" min="0" max="30" value="8" step="1">
+    <div id="readout" class="readout"></div><div id="status" class="status"></div>
+    <div class="hint">观察任务：拖动画面中的时间游标到 T、2T、3T，看剩余比例约为 1/2、1/4、1/8；注意单个核衰变是随机的。</div>
+    <table><thead><tr><th>记录</th><th>t/T</th><th>剩余</th><th>比例</th></tr></thead><tbody id="recordBody"><tr><td colspan="4">点击“记录”保存一次读数</td></tr></tbody></table>
+  </section>
+</div></div>
 <script>
-const c = document.getElementById('c');
-const ctx = c.getContext('2d');
-const els = {
-  n0: document.getElementById('n0'),
-  half: document.getElementById('half'),
-  time: document.getElementById('time'),
-  n0Val: document.getElementById('n0Val'),
-  halfVal: document.getElementById('halfVal'),
-  timeVal: document.getElementById('timeVal'),
-  readout: document.getElementById('readout')
-};
-function draw() {
-  const n0 = Number(els.n0.value);
-  const T = Number(els.half.value);
-  const t = Number(els.time.value);
-  const factor = Math.pow(0.5, t / T);
-  const remain = Math.round(n0 * factor);
-  els.n0Val.textContent = n0;
-  els.halfVal.textContent = T;
-  els.timeVal.textContent = t;
-  ctx.clearRect(0, 0, c.width, c.height);
-  ctx.fillStyle = '#f7f9fc';
-  ctx.fillRect(0, 0, c.width, c.height);
-
-  const cols = 12;
-  const size = 13;
-  for (let i = 0; i < n0; i++) {
-    const x = 36 + (i % cols) * 20;
-    const y = 48 + Math.floor(i / cols) * 20;
-    ctx.fillStyle = i < remain ? '#2c7be5' : '#d9e2ec';
-    ctx.beginPath();
-    ctx.arc(x, y, size / 2, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.fillStyle = '#102a43';
-  ctx.font = '700 15px system-ui';
-  ctx.textAlign = 'left';
-  ctx.fillText('左侧格点：蓝色为未衰变，灰色为已衰变', 28, 252);
-
-  const ox = 330, oy = 340, w = 300, h = 230;
-  ctx.strokeStyle = '#334e68';
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(ox, oy);
-  ctx.lineTo(ox + w, oy);
-  ctx.moveTo(ox, oy);
-  ctx.lineTo(ox, oy - h);
-  ctx.stroke();
-  ctx.fillStyle = '#486581';
-  ctx.font = '12px system-ui';
-  ctx.fillText('t', ox + w + 8, oy + 4);
-  ctx.fillText('N', ox - 18, oy - h - 4);
-  ctx.strokeStyle = '#e03131';
-  ctx.lineWidth = 4;
-  ctx.beginPath();
-  for (let px = 0; px <= w; px += 4) {
-    const tt = px / w * 30;
-    const yy = oy - Math.pow(0.5, tt / T) * h;
-    if (px === 0) ctx.moveTo(ox + px, yy); else ctx.lineTo(ox + px, yy);
-  }
-  ctx.stroke();
-  const dotX = ox + t / 30 * w;
-  const dotY = oy - factor * h;
-  ctx.fillStyle = '#e03131';
-  ctx.beginPath();
-  ctx.arc(dotX, dotY, 7, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = '#829ab1';
-  ctx.setLineDash([5, 5]);
-  ctx.beginPath();
-  ctx.moveTo(dotX, oy);
-  ctx.lineTo(dotX, dotY);
-  ctx.lineTo(ox, dotY);
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  ctx.fillStyle = '#102a43';
-  ctx.font = '700 16px system-ui';
-  ctx.textAlign = 'center';
-  ctx.fillText(`N=N0(1/2)^(t/T)`, 480, 70);
-  ctx.fillStyle = '#486581';
-  ctx.font = '14px system-ui';
-  ctx.fillText(`t/T=${(t/T).toFixed(2)}，剩余比例=${(factor*100).toFixed(1)}%`, 480, 96);
-
-  els.readout.innerHTML = [
-    `N0=${n0}，T=${T}，t=${t}`,
-    `t/T=${(t / T).toFixed(2)} 个半衰期`,
-    `N=N0(1/2)^(t/T)≈${remain}`,
-    `已衰变≈${n0 - remain}，剩余比例≈${(factor * 100).toFixed(1)}%`
-  ].join('<br>');
-}
-Object.values(els).forEach(el => {
-  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
-});
-draw();
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+const els={n0:by('n0'),half:by('half'),time:by('time'),n0Val:by('n0Val'),halfVal:by('halfVal'),timeVal:by('timeVal'),readout:by('readout'),status:by('status'),playBtn:by('playBtn'),resetBtn:by('resetBtn'),recordBtn:by('recordBtn'),recordBody:by('recordBody')};
+function by(id){return document.getElementById(id)}
+let playing=false,last=0,dragging=false,records=[],seeds=[];
+function ensureSeeds(n){while(seeds.length<n)seeds.push((Math.sin(seeds.length*99.17)*10000)%1);seeds=seeds.slice(0,n)}
+function params(){const n0=+els.n0.value,T=+els.half.value,t=+els.time.value;ensureSeeds(n0);const factor=Math.pow(.5,t/T),remain=Math.round(n0*factor);return{n0,T,t,factor,remain,decayed:n0-remain,cycles:t/T}}
+function label(s,x,y,c='#102a43',size=13,align='center',w='700'){ctx.fillStyle=c;ctx.font=`${w} ${size}px system-ui`;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.48),y2-10*Math.sin(a-.48));ctx.lineTo(x2-10*Math.cos(a+.48),y2-10*Math.sin(a+.48));ctx.closePath();ctx.fill()}
+function drawScene(p){ctx.fillStyle='#fff';ctx.fillRect(0,0,940,640);label('半衰期实验台：单个随机，整体按指数规律减半',470,28,'#102a43',19);label('三视图联动：核点阵、计数器、衰减曲线、时间游标和数据记录',470,52,'#486581',13,'center','600');drawGrid(p);drawGraph(p);drawCounters(p);drawHandle(p)}
+function drawGrid(p){ctx.fillStyle='#f2f7ff';ctx.strokeStyle='#2c7be5';ctx.lineWidth=2;ctx.fillRect(54,82,500,302);ctx.strokeRect(54,82,500,302);label('样品计数窗：蓝色未衰变，灰色已衰变',304,106,'#2c7be5',14);const cols=12;for(let i=0;i<p.n0;i++){const x=92+(i%cols)*32,y=142+Math.floor(i/cols)*28;const threshold=1-p.factor;const decayed=seeds[i]<threshold;ctx.fillStyle=decayed?'#d9e2ec':'#2c7be5';ctx.beginPath();ctx.arc(x,y,8,0,Math.PI*2);ctx.fill();if(decayed&&playing){ctx.strokeStyle='#e03131';ctx.beginPath();ctx.moveTo(x-6,y-6);ctx.lineTo(x+6,y+6);ctx.moveTo(x+6,y-6);ctx.lineTo(x-6,y+6);ctx.stroke()}}label(`统计剩余 N≈${p.remain}，已衰变≈${p.decayed}`,304,356,'#102a43',15)}
+function drawGraph(p){const x=610,y=94,w=260,h=230;ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(x,y,w,h);ctx.strokeRect(x,y,w,h);label('图像：N=N0(1/2)^(t/T)',x+w/2,y+22,'#102a43',14);arrow(x+38,y+h-34,x+w-18,y+h-34,'#52606d',2);arrow(x+38,y+h-34,x+38,y+48,'#52606d',2);ctx.strokeStyle='#e03131';ctx.lineWidth=3;ctx.beginPath();for(let px=0;px<=w-68;px+=3){const tt=px/(w-68)*30,yy=y+h-34-Math.pow(.5,tt/p.T)*(h-92);if(px===0)ctx.moveTo(x+38+px,yy);else ctx.lineTo(x+38+px,yy)}ctx.stroke();const dx=x+38+p.t/30*(w-68),dy=y+h-34-p.factor*(h-92);ctx.setLineDash([5,5]);ctx.strokeStyle='#829ab1';ctx.beginPath();ctx.moveTo(dx,y+h-34);ctx.lineTo(dx,dy);ctx.lineTo(x+38,dy);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#e03131';ctx.beginPath();ctx.arc(dx,dy,7,0,Math.PI*2);ctx.fill();label('拖动时间游标',dx,dy-18,'#e03131',11)}
+function drawCounters(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(610,356,260,140);ctx.strokeRect(610,356,260,140);label('仪器读数/公式绑定',740,380,'#102a43',14);label(`t/T=${p.cycles.toFixed(2)}`,740,418,'#2c7be5',17);label(`剩余比例=${(p.factor*100).toFixed(1)}%`,740,454,'#2c7be5',17);label('N=N0(1/2)^(t/T)',740,486,'#486581',13)}
+function drawHandle(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(70,440,500,132);ctx.strokeRect(70,440,500,132);label('画面内可拖动时间尺',320,464,'#102a43',14);ctx.strokeStyle='#d9e2ec';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(118,514);ctx.lineTo(520,514);ctx.stroke();const hx=118+p.t/30*402;ctx.fillStyle=dragging?'#e03131':'#2c7be5';ctx.beginPath();ctx.arc(hx,514,14,0,Math.PI*2);ctx.fill();for(let k=1;k<=3;k++){const x=118+Math.min(30,k*p.T)/30*402;ctx.strokeStyle='#f0a500';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,492);ctx.lineTo(x,536);ctx.stroke();label(`${k}T`,x,550,'#f0a500',11)}}
+function update(p){els.n0Val.textContent=p.n0;els.halfVal.textContent=p.T;els.timeVal.textContent=p.t;els.readout.innerHTML=[`N0=${p.n0}，T=${p.T}，t=${p.t}`,`t/T=${p.cycles.toFixed(2)} 个半衰期`,`N=N0(1/2)^(t/T)≈${p.remain}`,`已衰变≈${p.decayed}，剩余比例≈${(p.factor*100).toFixed(1)}%`].join('<br>');els.status.textContent='判定：半衰期描述大量原子核的统计规律，不预言某一个核何时衰变。'}
+function render(){const p=params();drawScene(p);update(p)}
+function animate(now){if(!last)last=now;const dt=Math.min(.04,(now-last)/1000);last=now;if(playing){els.time.value=String(Math.min(30,+els.time.value+dt*2.5));if(+els.time.value>=30)playing=false}render();requestAnimationFrame(animate)}
+function dragTime(e){const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width;const t=Math.max(0,Math.min(30,(x-118)/402*30));els.time.value=String(Math.round(t));render()}
+canvas.addEventListener('pointerdown',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.height;if(y>490&&y<540&&x>100&&x<540){dragging=true;canvas.setPointerCapture(e.pointerId);dragTime(e)}});canvas.addEventListener('pointermove',e=>{if(dragging)dragTime(e)});canvas.addEventListener('pointerup',e=>{dragging=false;try{canvas.releasePointerCapture(e.pointerId)}catch{}});canvas.addEventListener('pointercancel',()=>dragging=false);
+els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textContent=playing?'暂停':'播放'});els.resetBtn.addEventListener('click',()=>{playing=false;els.time.value=0;els.playBtn.textContent='播放';render()});els.recordBtn.addEventListener('click',()=>{const p=params();records.unshift({cy:p.cycles,rem:p.remain,ratio:p.factor});records=records.slice(0,5);els.recordBody.innerHTML=records.map((r,i)=>`<tr><td>${i+1}</td><td>${r.cy.toFixed(2)}</td><td>${r.rem}</td><td>${(r.ratio*100).toFixed(1)}%</td></tr>`).join('')});[els.n0,els.half,els.time].forEach(el=>el.addEventListener('input',render));render();requestAnimationFrame(animate);
 </script>
 </body>
 </html>

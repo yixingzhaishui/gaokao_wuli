@@ -22,7 +22,13 @@ canvas{display:block;width:100%;max-width:720px;background:#0e1a2b;border-radius
 <body>
 <div class="wrap">
   <h2>闭合电路：拖动滑块，看电流"流"起来、灯泡亮起来（E=I(R+r)，U=IR）</h2>
-  <canvas id="cv" width="720" height="420"></canvas>
+  <div class="ctrls">
+    <label>电动势 E = <span id="eLab">6.0</span> V<input type="range" id="E" min="1" max="12" step="0.5" value="6"></label>
+    <label>外电阻 R = <span id="rLab">5.0</span> Ω<input type="range" id="R" min="0.5" max="20" step="0.5" value="5"></label>
+    <label>内阻 r = <span id="riLab">0.5</span> Ω<input type="range" id="ri" min="0" max="3" step="0.1" value="0.5"></label>
+    <button class="hint" id="playBtn" style="cursor:pointer;border:1px solid #f0a500">⏸ 暂停电荷流动画</button>
+  </div>
+  <canvas id="cv" width="720" height="420" aria-label="直流电路实验台：电路俯视装置、电表图像和数据记录"></canvas>
   <div class="chips">
     <span class="chip">电流 I = E/(R+r) = <b id="cI">0</b> A</span>
     <span class="chip">路端电压 U = IR = <b id="cU">0</b> V</span>
@@ -30,13 +36,7 @@ canvas{display:block;width:100%;max-width:720px;background:#0e1a2b;border-radius
     <span class="chip">内阻分压 U内 = Ir = <b id="cUr">0</b> V</span>
     <span class="chip">电路状态：<b id="cState">闭合</b></span>
   </div>
-  <div class="ctrls">
-    <label>电动势 E = <span id="eLab">6.0</span> V<input type="range" id="E" min="1" max="12" step="0.5" value="6"></label>
-    <label>外电阻 R = <span id="rLab">5.0</span> Ω<input type="range" id="R" min="0.5" max="20" step="0.5" value="5"></label>
-    <label>内阻 r = <span id="riLab">0.5</span> Ω<input type="range" id="ri" min="0" max="3" step="0.1" value="0.5"></label>
-    <button class="hint" id="playBtn" style="cursor:pointer;border:1px solid #f0a500">⏸ 暂停电荷流动画</button>
-  </div>
-  <div class="hint"><b>怎么玩</b>：黄色小球是电路里定向移动的电荷，它们的<b>流速随电流大小实时变化</b>——电流越大流得越快、灯泡越亮。拖<b>R</b> 变大 → 电流变小、灯变暗、路端电压 U=IR 变大；拖<b>E</b> 变大 → 电流变大、灯变亮；拖<b>内阻 r</b> 变大 → 内部分压 Ir 增大、路端电压变小（这就是"电池用旧了灯变暗"）。安培表 A 读电流、电压表 V 读灯泡两端电压，和上面的读数一致。直接<b>拖动画面里右下角的开关</b>把电路断开，看电流立刻变为 0、灯熄灭（断路临界状态）。</div>
+  <div class="hint"><b>怎么玩</b>：黄色小球是电路里定向移动的电荷。对照电路俯视装置、电表图像和数据记录，拖<b>R</b> 变大看电流变小、灯变暗；拖<b>E</b> 变大看电流变大、灯变亮。</div>
 </div>
 <script>
 (function(){

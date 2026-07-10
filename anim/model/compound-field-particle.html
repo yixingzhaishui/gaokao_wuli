@@ -3,69 +3,262 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>复合场中的带电粒子</title>
+<title>复合场中的带电粒子实验台</title>
 <style>
-  *{box-sizing:border-box}body{margin:0;background:#f7f9fc;color:#102a43;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}.wrap{max-width:1000px;margin:0 auto;padding:16px}.stage{display:grid;grid-template-columns:minmax(0,1fr)286px;gap:14px}canvas{width:100%;height:470px;background:#fff;border:1px solid #d9e2ec;border-radius:8px;display:block}.panel{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:14px}label{display:block;font-size:14px;font-weight:700;margin-top:12px}input,select{width:100%}.readout{margin-top:14px;padding:12px;background:#eef4ff;border-radius:8px;line-height:1.72;font-size:14px}.status{margin-top:10px;padding:9px 10px;border-radius:8px;font-size:13px;line-height:1.55;background:#e6fffa;color:#087f5b;font-weight:700}.status.bad{background:#fff5f5;color:#c92a2a}.hint{margin-top:10px;color:#486581;font-size:13px;line-height:1.6}@media(max-width:780px){.stage{grid-template-columns:1fr}canvas{height:400px}}
+  *{box-sizing:border-box}
+  body{margin:0;background:#f5f7fb;color:#102a43;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:14px}
+  .stage{display:grid;grid-template-columns:minmax(0,1fr)310px;gap:12px;align-items:start}
+  canvas{width:100%;height:640px;background:#fff;border:1px solid #d9e2ec;border-radius:8px;display:block;touch-action:none}
+  .panel{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:12px}
+  .row{display:flex;gap:8px;margin:0 0 10px}
+  button{flex:1;border:0;border-radius:6px;background:#2c7be5;color:#fff;font-weight:700;padding:9px 10px;cursor:pointer}
+  button.secondary{background:#e6edf7;color:#102a43}
+  label{display:block;font-size:13px;font-weight:700;margin-top:10px}
+  input,select{width:100%;accent-color:#2c7be5}
+  .readout{margin-top:12px;padding:10px;background:#eef4ff;border-radius:8px;line-height:1.64;font-size:13px}
+  .status{margin-top:10px;padding:9px 10px;border-radius:8px;font-size:13px;line-height:1.5;background:#e6fffa;color:#087f5b;font-weight:700}
+  .status.bad{background:#fff5f5;color:#c92a2a}
+  .hint{margin-top:10px;color:#486581;font-size:13px;line-height:1.55}
+  table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px}
+  th,td{border-bottom:1px solid #d9e2ec;padding:5px 4px;text-align:right}
+  th:first-child,td:first-child{text-align:left}
+  @media(max-width:860px){.stage{grid-template-columns:1fr}canvas{height:560px}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="stage">
-    <canvas id="c" width="700" height="470" aria-label="复合场带电粒子速度选择器"></canvas>
-    <section class="panel">
+    <canvas id="c" width="940" height="640" aria-label="复合场带电粒子速度选择器实验台：俯视、侧视、图像和数据记录"></canvas>
+    <section class="panel" aria-label="实验台控制面板">
+      <div class="row">
+        <button id="playBtn" class="play-btn">播放</button>
+        <button id="resetBtn" class="secondary">重置</button>
+        <button id="recordBtn" class="secondary">记录</button>
+      </div>
       <label for="charge">电荷性质：<span id="chargeVal"></span></label>
       <select id="charge"><option value="1">正电荷</option><option value="-1">负电荷</option></select>
-      <label for="electric">电场强度 E/(10³V/m)：<span id="electricVal"></span></label>
+      <label for="electric">电场强度 E/(10^3 V/m)：<span id="electricVal"></span></label>
       <input id="electric" type="range" min="1" max="8" value="4" step="0.5">
       <label for="magnetic">磁感应强度 B/T：<span id="magneticVal"></span></label>
       <input id="magnetic" type="range" min="0.2" max="1.5" value="0.8" step="0.1">
-      <label for="speed">入射速度 v/(10³m/s)：<span id="speedVal"></span></label>
+      <label for="speed">入射速度 v/(10^3 m/s)：<span id="speedVal"></span></label>
       <input id="speed" type="range" min="1" max="10" value="5" step="0.2">
-      <label for="mass">质量 m/(10⁻¹⁵kg)：<span id="massVal"></span></label>
+      <label for="mass">质量 m/(10^-15 kg)：<span id="massVal"></span></label>
       <input id="mass" type="range" min="1" max="6" value="2" step="0.5">
       <div id="readout" class="readout"></div>
       <div id="status" class="status"></div>
-      <div class="hint">观察任务：拖动 v，看电场力 qE 与磁场力 qvB 何时等大反向；直线通过条件是 v=E/B。</div>
+      <div class="hint">观察任务：拖动画面里的蓝色入射速度手柄，或点“播放”，看轨迹、力表盘、偏差图像和数据记录怎样同步变化。直线通过时应满足 qE=qvB，即 v=E/B。</div>
+      <table aria-label="数据记录表">
+        <thead><tr><th>数据记录</th><th>v</th><th>v0</th><th>偏差</th></tr></thead>
+        <tbody id="recordBody"><tr><td colspan="4">点击“记录”保存一次测量</td></tr></tbody>
+      </table>
     </section>
   </div>
 </div>
 <script>
-const c=document.getElementById('c'),ctx=c.getContext('2d');
-const els={charge:document.getElementById('charge'),electric:document.getElementById('electric'),magnetic:document.getElementById('magnetic'),speed:document.getElementById('speed'),mass:document.getElementById('mass'),chargeVal:document.getElementById('chargeVal'),electricVal:document.getElementById('electricVal'),magneticVal:document.getElementById('magneticVal'),speedVal:document.getElementById('speedVal'),massVal:document.getElementById('massVal'),readout:document.getElementById('readout'),status:document.getElementById('status')};
-function arrow(x1,y1,x2,y2,color,w){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=w||3;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.45),y2-10*Math.sin(a-.45));ctx.lineTo(x2-10*Math.cos(a+.45),y2-10*Math.sin(a+.45));ctx.closePath();ctx.fill()}
-function draw(){
-  const s=+els.charge.value,E=+els.electric.value*1000,B=+els.magnetic.value,v=+els.speed.value*1000,m=+els.mass.value*1e-15;
-  const q=1e-12*s,Fe=q*E,Fm=q*v*B,net=Fe-Fm,asel=net/m,vsel=E/B;
-  els.chargeVal.textContent=s>0?'正电荷':'负电荷';els.electricVal.textContent=(E/1000).toFixed(1);els.magneticVal.textContent=B.toFixed(1);els.speedVal.textContent=(v/1000).toFixed(1);els.massVal.textContent=(m/1e-15).toFixed(1);
-  ctx.clearRect(0,0,c.width,c.height);ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);
-  ctx.fillStyle='#102a43';ctx.font='700 18px system-ui';ctx.textAlign='center';ctx.fillText('复合场速度选择器：qE 与 qvB 平衡时直线通过',350,30);
-  ctx.fillStyle='#eef4ff';ctx.strokeStyle='#2c7be5';ctx.lineWidth=3;ctx.fillRect(70,76,500,300);ctx.strokeRect(70,76,500,300);
-  for(let x=100;x<550;x+=45){ctx.fillStyle='#486581';ctx.font='18px system-ui';ctx.fillText('⊗',x,128);ctx.fillText('⊗',x,204);ctx.fillText('⊗',x,280);ctx.fillText('⊗',x,346)}
-  ctx.strokeStyle='#f0a500';ctx.lineWidth=2;for(let y=106;y<360;y+=42){arrow(92,y,92,y+26,'#f0a500',2)}
-  ctx.fillStyle='#f0a500';ctx.font='700 13px system-ui';ctx.fillText('E向下',126,82);ctx.fillStyle='#486581';ctx.fillText('B向里',540,82);
-  const x0=110,y0=226,scale=0.000018;
-  ctx.strokeStyle='#2c7be5';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(x0,y0);
-  for(let i=0;i<=90;i++){const t=i/90*0.08,x=x0+520*t/0.08,y=y0+0.5*asel*t*t*scale;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}
-  ctx.stroke();
-  const px=300,py=y0+0.5*asel*0.03*0.03*scale;ctx.fillStyle=s>0?'#e03131':'#7b2cbf';ctx.beginPath();ctx.arc(px,py,12,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.font='700 14px system-ui';ctx.fillText(s>0?'+':'-',px,py+1);
-  arrow(px,py,px+76,py,'#2c7be5',4);ctx.fillStyle='#2c7be5';ctx.fillText('v',px+88,py+4);
-  const eDir=s>0?1:-1,mDir=s>0?-1:1,feLen=Math.min(90,Math.abs(Fe)*2.2e10),fmLen=Math.min(90,Math.abs(Fm)*2.2e10);
-  arrow(px-20,py,px-20,py+eDir*feLen,'#e03131',4);ctx.fillStyle='#e03131';ctx.fillText('qE',px-42,py+eDir*feLen/2);
-  arrow(px+22,py,px+22,py+mDir*fmLen,'#7b2cbf',4);ctx.fillStyle='#7b2cbf';ctx.fillText('qvB',px+48,py+mDir*fmLen/2);
-  ctx.fillStyle='#102a43';ctx.font='700 14px system-ui';ctx.fillText('选择速度 v0=E/B='+(vsel/1000).toFixed(2)+'×10³m/s',350,416);
-  ctx.fillStyle='#486581';ctx.font='13px system-ui';ctx.fillText('若 v=v0，两力等大反向；若不等，粒子向电场力或磁场力较大一侧偏转。',350,446);
-  const rel=Math.abs(v-vsel)/vsel*100;
-  els.readout.innerHTML=[
-    `<div id="r1">电场力 |qE|≈${Math.abs(Fe).toExponential(2)}N</div>`,
-    `<div id="r2">磁场力 |qvB|≈${Math.abs(Fm).toExponential(2)}N</div>`,
-    `<div id="r3">选择速度 v0=E/B≈${(vsel/1000).toFixed(2)}×10³m/s</div>`,
-    `<div id="r4">当前 v=${(v/1000).toFixed(2)}×10³m/s，相对偏差≈${rel.toFixed(1)}%</div>`,
-    `<div id="r5">进入纯磁场后半径 R=mv/(|q|B)≈${(m*v/(Math.abs(q)*B)).toFixed(2)}m</div>`
-  ].join('');
-  const ok=rel<4;els.status.className=ok?'status':'status bad';
-  els.status.textContent=ok?'通过：qE 与 qvB 近似等大反向，粒子可直线通过速度选择器。':(v>vsel?'不通过：速度偏大，磁场力较大，粒子向磁场力一侧偏转。':'不通过：速度偏小，电场力较大，粒子向电场力一侧偏转。');
+const canvas=document.getElementById('c');
+const ctx=canvas.getContext('2d');
+const els={
+  charge:document.getElementById('charge'), electric:document.getElementById('electric'),
+  magnetic:document.getElementById('magnetic'), speed:document.getElementById('speed'),
+  mass:document.getElementById('mass'), chargeVal:document.getElementById('chargeVal'),
+  electricVal:document.getElementById('electricVal'), magneticVal:document.getElementById('magneticVal'),
+  speedVal:document.getElementById('speedVal'), massVal:document.getElementById('massVal'),
+  readout:document.getElementById('readout'), status:document.getElementById('status'),
+  playBtn:document.getElementById('playBtn'), resetBtn:document.getElementById('resetBtn'),
+  recordBtn:document.getElementById('recordBtn'), recordBody:document.getElementById('recordBody')
+};
+let playing=false, t=0, last=0, dragging=false, records=[];
+const lab={x:58,y:78,w:520,h:330,exitX:578,entryY:244,graphX:630,graphY:92,graphW:250,graphH:170};
+
+function params(){
+  const sign=Number(els.charge.value);
+  const E=Number(els.electric.value)*1000;
+  const B=Number(els.magnetic.value);
+  const v=Number(els.speed.value)*1000;
+  const m=Number(els.mass.value)*1e-15;
+  const q=sign*1e-12;
+  const Fe=Math.abs(q)*E;
+  const Fm=Math.abs(q)*v*B;
+  const v0=E/B;
+  const netSigned=sign*(E-v*B);
+  const a=netSigned*Math.abs(q)/m;
+  const radius=m*v/(Math.abs(q)*B);
+  const rel=(v-v0)/v0;
+  return {sign,E,B,v,m,q,Fe,Fm,v0,netSigned,a,radius,rel};
 }
-Object.values(els).forEach(el=>el.addEventListener('input',draw));draw();
+function setLabels(p){
+  els.chargeVal.textContent=p.sign>0?'正电荷':'负电荷';
+  els.electricVal.textContent=(p.E/1000).toFixed(1);
+  els.magneticVal.textContent=p.B.toFixed(1);
+  els.speedVal.textContent=(p.v/1000).toFixed(1);
+  els.massVal.textContent=(p.m/1e-15).toFixed(1);
+}
+function arrow(x1,y1,x2,y2,color,w=3){
+  const a=Math.atan2(y2-y1,x2-x1);
+  ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=w;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-11*Math.cos(a-.48),y2-11*Math.sin(a-.48));ctx.lineTo(x2-11*Math.cos(a+.48),y2-11*Math.sin(a+.48));ctx.closePath();ctx.fill();
+}
+function label(text,x,y,color='#102a43',size=13,align='center',weight='700'){
+  ctx.fillStyle=color;ctx.font=`${weight} ${size}px system-ui,-apple-system,"Segoe UI",sans-serif`;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(text,x,y);
+}
+function particleAt(p,time){
+  const passTime=0.09;
+  const x=lab.x+44+(lab.w-86)*Math.min(time,passTime)/passTime;
+  const y=lab.entryY+0.5*p.a*time*time*0.000014;
+  return {x,y};
+}
+function pathPoints(p){
+  const pts=[];
+  for(let i=0;i<=95;i++){pts.push(particleAt(p,i/95*0.09));}
+  return pts;
+}
+function drawScene(p){
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
+  label('复合场粒子实验台：速度选择器 + 纯磁场半径测量',canvas.width/2,28,'#102a43',19);
+  label('拖动蓝色速度手柄可直接改变 v；仪器读数、轨迹、图像和表格同步更新',canvas.width/2,52,'#486581',13,'center','600');
+
+  ctx.fillStyle='#f2f7ff';ctx.strokeStyle='#2c7be5';ctx.lineWidth=2;
+  ctx.fillRect(lab.x,lab.y,lab.w,lab.h);ctx.strokeRect(lab.x,lab.y,lab.w,lab.h);
+  label('俯视实物装置：E 向下，B 向里',lab.x+lab.w/2,lab.y+20,'#2c7be5',14);
+  for(let x=lab.x+42;x<lab.x+lab.w-20;x+=44){
+    for(let y=lab.y+68;y<lab.y+lab.h-32;y+=54){
+      label('⊗',x,y,'#52606d',22,'center','600');
+    }
+  }
+  for(let x=lab.x+28;x<lab.x+lab.w-12;x+=62) arrow(x,lab.y+52,x,lab.y+92,'#f0a500',2);
+  label('电场线',lab.x+64,lab.y+45,'#f0a500',12);
+  ctx.strokeStyle='#d9e2ec';ctx.setLineDash([6,5]);ctx.beginPath();ctx.moveTo(lab.x+36,lab.entryY);ctx.lineTo(lab.x+lab.w-28,lab.entryY);ctx.stroke();ctx.setLineDash([]);
+
+  const pts=pathPoints(p);
+  ctx.strokeStyle='#2c7be5';ctx.lineWidth=4;ctx.beginPath();
+  pts.forEach((pt,i)=>{if(i===0)ctx.moveTo(pt.x,pt.y);else ctx.lineTo(pt.x,pt.y);});
+  ctx.stroke();
+  pts.forEach((pt,i)=>{if(i%15===0){ctx.fillStyle='#74a9ff';ctx.beginPath();ctx.arc(pt.x,pt.y,3,0,Math.PI*2);ctx.fill();}});
+
+  const progress=playing?Math.min(t/0.09,1):0.48;
+  const pt=particleAt(p,Math.min(0.09,playing?t:0.043));
+  ctx.fillStyle=p.sign>0?'#e03131':'#7b2cbf';ctx.beginPath();ctx.arc(pt.x,pt.y,12,0,Math.PI*2);ctx.fill();
+  label(p.sign>0?'+':'-',pt.x,pt.y,'#fff',15);
+  arrow(pt.x,pt.y,pt.x+70,pt.y,'#2c7be5',4);label('v',pt.x+86,pt.y,'#2c7be5',14);
+  const feDir=p.sign>0?1:-1, fmDir=p.sign>0?-1:1;
+  const feLen=Math.min(86,34+p.Fe*1.15e10), fmLen=Math.min(86,34+p.Fm*1.15e10);
+  arrow(pt.x-18,pt.y,pt.x-18,pt.y+feDir*feLen,'#e03131',4);label('qE',pt.x-45,pt.y+feDir*feLen/2,'#e03131',13);
+  arrow(pt.x+20,pt.y,pt.x+20,pt.y+fmDir*fmLen,'#7b2cbf',4);label('qvB',pt.x+50,pt.y+fmDir*fmLen/2,'#7b2cbf',13);
+
+  const handleX=lab.x+62+Math.min(1,(p.v/10000))*270;
+  const handleY=lab.y+lab.h-38;
+  ctx.strokeStyle='#2c7be5';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(lab.x+62,handleY);ctx.lineTo(handleX,handleY);ctx.stroke();
+  ctx.fillStyle='#2c7be5';ctx.beginPath();ctx.arc(handleX,handleY,13,0,Math.PI*2);ctx.fill();
+  label('拖动速度手柄',handleX+78,handleY,'#2c7be5',12,'left');
+
+  drawMeters(p);
+  drawGraph(p);
+  drawSideView(p,progress);
+}
+function drawMeters(p){
+  const x=70,y=452,w=500,h=144;
+  ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1;ctx.fillRect(x,y,w,h);ctx.strokeRect(x,y,w,h);
+  label('仪器读数：力表盘与半径尺',x+w/2,y+18,'#102a43',14);
+  const maxF=Math.max(p.Fe,p.Fm,1e-9);
+  const feW=190*p.Fe/maxF, fmW=190*p.Fm/maxF;
+  label('|qE|',x+56,y+54,'#e03131',13);ctx.fillStyle='#ffe3e3';ctx.fillRect(x+96,y+44,190,20);ctx.fillStyle='#e03131';ctx.fillRect(x+96,y+44,feW,20);
+  label('|qvB|',x+56,y+86,'#7b2cbf',13);ctx.fillStyle='#ede7ff';ctx.fillRect(x+96,y+76,190,20);ctx.fillStyle='#7b2cbf';ctx.fillRect(x+96,y+76,fmW,20);
+  const rScale=Math.min(180,p.radius*8);
+  ctx.strokeStyle='#38b2ac';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x+326,y+108);ctx.lineTo(x+326+rScale,y+108);ctx.stroke();
+  for(let i=0;i<=6;i++){const xx=x+326+i*30;ctx.strokeStyle='#486581';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(xx,y+101);ctx.lineTo(xx,y+115);ctx.stroke();label(String(i*5),xx,y+126,'#486581',10);}
+  label('R 标尺/m',x+410,y+88,'#38b2ac',12);
+}
+function drawGraph(p){
+  const {graphX:x,graphY:y,graphW:w,graphH:h}=lab;
+  ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1;ctx.fillRect(x,y,w,h);ctx.strokeRect(x,y,w,h);
+  label('图像：F 与 v 的关系',x+w/2,y+18,'#102a43',14);
+  arrow(x+38,y+h-34,x+w-18,y+h-34,'#52606d',2);
+  arrow(x+38,y+h-34,x+38,y+42,'#52606d',2);
+  label('v',x+w-12,y+h-18,'#52606d',11);label('F',x+24,y+40,'#52606d',11);
+  const vMax=10000, fMax=Math.max(p.Fe,1e-8);
+  const yE=y+h-34-p.Fe/fMax*88;
+  ctx.strokeStyle='#e03131';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x+42,yE);ctx.lineTo(x+w-25,yE);ctx.stroke();label('qE',x+w-45,yE-12,'#e03131',12);
+  ctx.strokeStyle='#7b2cbf';ctx.beginPath();ctx.moveTo(x+42,y+h-34);ctx.lineTo(x+w-25,y+h-34-(p.Fm/(Math.abs(p.q)*vMax*p.B))*88);ctx.stroke();label('qvB',x+w-52,y+70,'#7b2cbf',12);
+  const vx=x+42+p.v/vMax*(w-70);const vy=y+h-34-p.Fm/fMax*88;
+  ctx.fillStyle='#2c7be5';ctx.beginPath();ctx.arc(vx,vy,6,0,Math.PI*2);ctx.fill();
+  const v0x=x+42+Math.min(1,p.v0/vMax)*(w-70);
+  ctx.setLineDash([4,4]);ctx.strokeStyle='#087f5b';ctx.beginPath();ctx.moveTo(v0x,y+42);ctx.lineTo(v0x,y+h-34);ctx.stroke();ctx.setLineDash([]);
+  label('v0=E/B',v0x,y+34,'#087f5b',11);
+}
+function drawSideView(p,progress){
+  const x=630,y=300,w=250,h=160;
+  ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1;ctx.fillRect(x,y,w,h);ctx.strokeRect(x,y,w,h);
+  label('侧视/空间投影：出场后只受磁场力',x+w/2,y+18,'#102a43',14);
+  ctx.strokeStyle='#38b2ac';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x+120,y+95,Math.min(58,20+p.radius*2.2),-Math.PI*.88,-Math.PI*.2);ctx.stroke();
+  const a=-Math.PI*.88+progress*Math.PI*.68;
+  const rr=Math.min(58,20+p.radius*2.2);
+  const px=x+120+rr*Math.cos(a),py=y+95+rr*Math.sin(a);
+  ctx.fillStyle=p.sign>0?'#e03131':'#7b2cbf';ctx.beginPath();ctx.arc(px,py,8,0,Math.PI*2);ctx.fill();
+  arrow(px,py,px+28*Math.cos(a+Math.PI/2),py+28*Math.sin(a+Math.PI/2),'#2c7be5',3);
+  label('R=mv/(|q|B)',x+w/2,y+138,'#38b2ac',13);
+}
+function updateReadouts(p){
+  setLabels(p);
+  const absRel=Math.abs(p.rel)*100;
+  const direction=p.rel>0?'磁场力较大':'电场力较大';
+  els.readout.innerHTML=[
+    `<div>公式绑定：qE=${p.Fe.toExponential(2)} N，qvB=${p.Fm.toExponential(2)} N</div>`,
+    `<div>选择速度 v0=E/B=${(p.v0/1000).toFixed(2)} x 10^3 m/s</div>`,
+    `<div>当前 v=${(p.v/1000).toFixed(2)} x 10^3 m/s，偏差=${absRel.toFixed(1)}%</div>`,
+    `<div>纯磁场半径 R=mv/(|q|B)=${p.radius.toFixed(2)} m</div>`,
+    `<div>时间演化：轨迹点、力表盘、半径尺、图像游标正在联动</div>`
+  ].join('');
+  const ok=absRel<4;
+  els.status.className=ok?'status':'status bad';
+  els.status.textContent=ok?'判定：接近临界直线通过，qE 与 qvB 等大反向。':`判定：未通过，${direction}，粒子会向合力方向偏转。`;
+}
+function render(){
+  const p=params();
+  drawScene(p);
+  updateReadouts(p);
+}
+function animate(now){
+  if(!last)last=now;
+  const dt=Math.min(0.035,(now-last)/1000);
+  last=now;
+  if(playing){t+=dt*0.32;if(t>0.12)t=0;}
+  render();
+  requestAnimationFrame(animate);
+}
+function reset(){t=0;playing=false;last=0;els.playBtn.textContent='播放';render();}
+function syncSpeedFromHandle(clientX){
+  const rect=canvas.getBoundingClientRect();
+  const x=(clientX-rect.left)*canvas.width/rect.width;
+  const raw=(x-(lab.x+62))/270;
+  const v=Math.max(1,Math.min(10,raw*10));
+  els.speed.value=(Math.round(v*5)/5).toFixed(1);
+  render();
+}
+canvas.addEventListener('pointerdown',ev=>{
+  const rect=canvas.getBoundingClientRect();
+  const x=(ev.clientX-rect.left)*canvas.width/rect.width;
+  const y=(ev.clientY-rect.top)*canvas.height/rect.height;
+  const p=params();
+  const hx=lab.x+62+Math.min(1,(p.v/10000))*270,hy=lab.y+lab.h-38;
+  if(Math.hypot(x-hx,y-hy)<30){dragging=true;canvas.setPointerCapture(ev.pointerId);syncSpeedFromHandle(ev.clientX);}
+});
+canvas.addEventListener('pointermove',ev=>{if(dragging)syncSpeedFromHandle(ev.clientX);});
+canvas.addEventListener('pointerup',ev=>{dragging=false;try{canvas.releasePointerCapture(ev.pointerId);}catch(e){}});
+canvas.addEventListener('pointercancel',()=>{dragging=false;});
+els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textContent=playing?'暂停':'播放';});
+els.resetBtn.addEventListener('click',reset);
+els.recordBtn.addEventListener('click',()=>{
+  const p=params();
+  records.unshift({v:p.v/1000,v0:p.v0/1000,rel:Math.abs(p.rel)*100,ok:Math.abs(p.rel)<0.04});
+  records=records.slice(0,5);
+  els.recordBody.innerHTML=records.map((r,i)=>`<tr><td>${i+1} ${r.ok?'通过':'偏转'}</td><td>${r.v.toFixed(2)}</td><td>${r.v0.toFixed(2)}</td><td>${r.rel.toFixed(1)}%</td></tr>`).join('');
+});
+[els.charge,els.electric,els.magnetic,els.speed,els.mass].forEach(el=>el.addEventListener('input',()=>{t=0;render();}));
+render();
+requestAnimationFrame(animate);
 </script>
 </body>
 </html>

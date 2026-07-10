@@ -24,14 +24,6 @@ button.on{background:#2c7be5;color:#fff;border-color:#2c7be5}
 <body>
 <div class="container">
   <h2>导轨模型 3D 透视实验台：动生电动势 E = BLv</h2>
-  <canvas id="canvas" width="780" height="500"></canvas>
-  <div class="readouts">
-    <span class="r">E = BLv = <b id="e-v">0.00</b> V</span>
-    <span class="r">I = E/R = <b id="i-v">0.00</b> A</span>
-    <span class="r">F安 = BIL = <b id="f-v">0.00</b> N</span>
-    <span class="r">P = I²R = <b id="p-v">0.00</b> W</span>
-    <span class="r">状态：<b id="state-v">—</b></span>
-  </div>
   <div class="controls">
     <label>速度 v = <span id="v-d">5.0</span> m/s<input id="v" type="range" min="-90" max="90" step="1" value="50"></label>
     <label>磁场 B = <span id="b-d">0.60</span> T<input id="b" type="range" min="-100" max="100" step="1" value="60"></label>
@@ -42,6 +34,14 @@ button.on{background:#2c7be5;color:#fff;border-color:#2c7be5}
     <button id="reverse-b">磁场反向</button>
     <button id="reverse-v">速度反向</button>
     <button id="reset-btn">重置</button>
+  </div>
+  <canvas id="canvas" width="780" height="500"></canvas>
+  <div class="readouts">
+    <span class="r">E = BLv = <b id="e-v">0.00</b> V</span>
+    <span class="r">I = E/R = <b id="i-v">0.00</b> A</span>
+    <span class="r">F安 = BIL = <b id="f-v">0.00</b> N</span>
+    <span class="r">P = I²R = <b id="p-v">0.00</b> W</span>
+    <span class="r">状态：<b id="state-v">—</b></span>
   </div>
   <div class="hint">
     <b>观察任务</b>：先在左侧 <b>3D 透视实验台装置</b>分清三条方向：绿色 v 沿导轨方向，蓝色/红色 B 垂直穿过导轨平面，橙色 I 沿闭合回路。再看右上<b>俯视图像</b>确认面积 S=Lx 如何变化，右中放大图看杆内电荷被 qvB 推向两端。反向 v 或 B，电流方向会变，但安培力始终阻碍杆运动。

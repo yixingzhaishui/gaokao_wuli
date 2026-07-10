@@ -35,9 +35,9 @@
 </head>
 <body>
 <div class="root">
-  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="同步卫星交互实验台"></canvas></div>
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="同步卫星交互实验台：地球轨道俯视装置、条件图像和数据记录"></canvas></div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>抓卫星向内外拖，看 T 是否仍为 24h；再把倾角调大，看周期同步时为什么也不能静止在同一点上空。</div>
+    <div class="card task"><b>观察任务：</b>抓卫星向内外拖，对照地球轨道俯视装置、条件图像和数据记录，看 T 是否仍为 24h。</div>
     <button id="playBtn" class="primary">播放</button>
     <div class="card">
       <div class="title">快速情境</div>
@@ -179,7 +179,7 @@
   }
   function draw(){
     const v=values(),h=handles();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);
-    text('同步卫星实验台：不是任意高度都能“静止”',460,30,'#0f172a','center',19,'900');
+    text('同步卫星实验台：轨道俯视装置 + 条件图像 + 数据记录',460,30,'#0f172a','center',19,'900');
     drawOrbit(v);drawCondition(v);
     text('公式：T = 2π√(r³/GM)，同步卫星 T=24h 唯一确定 r≈6.6R（必在赤道上空）',460,448,'#334e68','center',13,'700');
     roundRect(48,458,820,62,8,'#fff','#d7dee8');

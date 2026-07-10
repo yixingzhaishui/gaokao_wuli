@@ -187,11 +187,103 @@
       padding: 24px;
       color: var(--text-muted);
     }
+    .bank-toolbar,
+    .error-toolbar {
+      border: 1px solid #d9e2ec;
+      border-radius: 8px;
+      padding: 14px;
+      margin: 12px 0 18px;
+      display: grid;
+      grid-template-columns: repeat(6, minmax(120px, 1fr));
+      gap: 10px;
+      background: #f7f9fc;
+    }
+    .bank-toolbar input,
+    .bank-toolbar select,
+    .error-toolbar input,
+    .error-toolbar select {
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #bcccdc;
+      border-radius: 6px;
+      padding: 8px 9px;
+      background: #fff;
+      color: var(--text-main);
+      font-size: 14px;
+    }
+    .bank-summary,
+    .error-summary {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin: 8px 0 12px;
+    }
+    .problem-list,
+    .trap-list {
+      display: grid;
+      gap: 14px;
+    }
+    .problem-item,
+    .trap-item {
+      border: 1px solid #d9e2ec;
+      border-radius: 8px;
+      padding: 14px;
+      background: #fff;
+    }
+    .problem-meta,
+    .trap-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .problem-pill,
+    .trap-pill {
+      border: 1px solid #bcccdc;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 12px;
+      color: #334e68;
+      background: #f7f9fc;
+    }
+    .problem-stem {
+      margin: 8px 0 10px;
+      line-height: 1.75;
+    }
+    .problem-options {
+      margin: 6px 0 10px;
+      padding-left: 0;
+      list-style: none;
+    }
+    .problem-options li {
+      margin: 4px 0;
+    }
+    .problem-diagram svg {
+      max-width: 100%;
+      height: auto;
+      border: 1px solid #d9e2ec;
+      border-radius: 8px;
+      margin: 8px 0 10px;
+      background: #fff;
+    }
+    .problem-item details,
+    .trap-item details {
+      border-top: 1px solid #d9e2ec;
+      margin-top: 10px;
+      padding-top: 10px;
+    }
+    .problem-item summary,
+    .trap-item summary {
+      cursor: pointer;
+      color: var(--accent);
+      font-weight: 600;
+    }
     @media (max-width: 760px) {
       :root { --sidebar-width: 270px; }
       .markdown-section { padding: 24px 18px 70px !important; }
       .graph-shell { grid-template-columns: 1fr; }
       .graph-panel { border-left: 0; border-top: 1px solid #d9e2ec; }
+      .bank-toolbar,
+      .error-toolbar { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -222,10 +314,208 @@
             if (location.hash.indexOf('/graph') !== -1) {
               renderKnowledgeGraph();
             }
+            if (location.hash.indexOf('/papers') !== -1) {
+              renderProblemBank();
+            }
+            if (location.hash.indexOf('/errors') !== -1) {
+              renderErrorHub();
+            }
           });
         }
       ]
     };
+
+    function escapeHtml(value) {
+      return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function unique(values) {
+      return Array.from(new Set(values.filter(Boolean))).sort((a, b) => String(a).localeCompare(String(b), 'zh-CN'));
+    }
+
+    function problemList(data) {
+      return Array.isArray(data) ? data : (data.problems || []);
+    }
+
+    function idLabel(id, idMap) {
+      const meta = idMap[id];
+      return meta ? id + ' ' + meta.title : id;
+    }
+
+    function renderProblemCard(p, idMap) {
+      const knowledge = (p.knowledge_ids || []).map(id => '<span class="problem-pill">' + escapeHtml(idLabel(id, idMap)) + '</span>').join('');
+      const models = (p.model_ids || []).map(id => '<span class="problem-pill">' + escapeHtml(idLabel(id, idMap)) + '</span>').join('');
+      const options = (p.options || []).length ? '<ul class="problem-options">' + p.options.map(o => '<li>' + escapeHtml(o) + '</li>').join('') + '</ul>' : '';
+      const diagram = p.diagram && p.diagram.svg ? '<div class="problem-diagram" aria-label="' + escapeHtml(p.diagram.title || '题图') + '">' + p.diagram.svg + '</div>' : '';
+      const source = p.source_verified === false ? p.source + '（未核验原卷图号）' : p.source;
+      return [
+        '<article class="problem-item">',
+        '  <div class="problem-meta">',
+        '    <span class="problem-pill">' + escapeHtml(p.id) + '</span>',
+        '    <span class="problem-pill">' + escapeHtml(source || '') + '</span>',
+        '    <span class="problem-pill">' + escapeHtml(p.year || '') + '</span>',
+        '    <span class="problem-pill">' + escapeHtml(p.type || '') + '</span>',
+        '    <span class="problem-pill">' + escapeHtml(p.difficulty || '') + '</span>',
+             knowledge,
+             models,
+        '  </div>',
+        '  <div class="problem-stem">' + escapeHtml(p.stem || '') + '</div>',
+           diagram,
+           options,
+        '  <details><summary>点击查看答案与解析</summary>',
+        '    <p><b>答案：</b>' + escapeHtml(p.answer || '') + '</p>',
+        '    <p><b>解析：</b>' + escapeHtml(p.solution || '') + '</p>',
+        '    <p><b>方法提炼：</b>' + escapeHtml(p.method || '') + '</p>',
+        (p.traps || []).length ? '    <p><b>易错点：</b>' + p.traps.map(escapeHtml).join('；') + '</p>' : '',
+        '  </details>',
+        '</article>'
+      ].join('');
+    }
+
+    async function renderProblemBank() {
+      const mount = document.getElementById('problem-bank');
+      if (!mount || mount.dataset.rendered === '1') return;
+      mount.dataset.rendered = '1';
+      mount.innerHTML = '<div class="graph-loading">正在加载题库...</div>';
+      try {
+        const [rawProblems, rawPageExamples, rawSpecExamples, idMap] = await Promise.all([
+          fetch('data/problems.json').then(r => r.json()),
+          fetch('data/page-examples.json').then(r => r.json()),
+          fetch('data/spec-supplement-examples.json').then(r => r.json()),
+          fetch('data/id-map.json').then(r => r.json())
+        ]);
+        const problems = problemList(rawProblems)
+          .concat(rawPageExamples.examples || [])
+          .concat(rawSpecExamples.examples || []);
+        const knowledgeIds = unique(problems.flatMap(p => p.knowledge_ids || []));
+        const modelIds = unique(problems.flatMap(p => p.model_ids || []));
+        const difficulties = unique(problems.map(p => p.difficulty));
+        const types = unique(problems.map(p => p.type));
+        const sources = unique(problems.map(p => p.source));
+
+        mount.innerHTML = [
+          '<div class="bank-toolbar">',
+          '  <input id="bank-q" type="search" placeholder="搜索题干 / 编号 / 方法">',
+          '  <select id="bank-knowledge"><option value="">全部知识点</option>' + knowledgeIds.map(id => '<option value="' + escapeHtml(id) + '">' + escapeHtml(idLabel(id, idMap)) + '</option>').join('') + '</select>',
+          '  <select id="bank-model"><option value="">全部模型</option>' + modelIds.map(id => '<option value="' + escapeHtml(id) + '">' + escapeHtml(idLabel(id, idMap)) + '</option>').join('') + '</select>',
+          '  <select id="bank-difficulty"><option value="">全部难度</option>' + difficulties.map(v => '<option value="' + escapeHtml(v) + '">' + escapeHtml(v) + '</option>').join('') + '</select>',
+          '  <select id="bank-type"><option value="">全部题型</option>' + types.map(v => '<option value="' + escapeHtml(v) + '">' + escapeHtml(v) + '</option>').join('') + '</select>',
+          '  <select id="bank-source"><option value="">全部来源</option>' + sources.map(v => '<option value="' + escapeHtml(v) + '">' + escapeHtml(v) + '</option>').join('') + '</select>',
+          '</div>',
+          '<div id="bank-summary" class="bank-summary"></div>',
+          '<div id="bank-list" class="problem-list"></div>'
+        ].join('');
+
+        const controls = ['bank-q', 'bank-knowledge', 'bank-model', 'bank-difficulty', 'bank-type', 'bank-source']
+          .map(id => document.getElementById(id));
+        const listEl = document.getElementById('bank-list');
+        const summaryEl = document.getElementById('bank-summary');
+        function apply() {
+          const q = controls[0].value.trim().toLowerCase();
+          const k = controls[1].value;
+          const m = controls[2].value;
+          const d = controls[3].value;
+          const t = controls[4].value;
+          const s = controls[5].value;
+          const filtered = problems.filter(p => {
+            const hay = [p.id, p.stem, p.answer, p.solution, p.method].join(' ').toLowerCase();
+            return (!q || hay.includes(q))
+              && (!k || (p.knowledge_ids || []).includes(k))
+              && (!m || (p.model_ids || []).includes(m))
+              && (!d || p.difficulty === d)
+              && (!t || p.type === t)
+              && (!s || p.source === s);
+          });
+          summaryEl.textContent = '当前显示 ' + filtered.length + ' / ' + problems.length + ' 题';
+          listEl.innerHTML = filtered.map(p => renderProblemCard(p, idMap)).join('') || '<p>没有符合条件的题。</p>';
+        }
+        controls.forEach(el => el.addEventListener('input', apply));
+        apply();
+      } catch (err) {
+        mount.innerHTML = '<div class="graph-error">题库加载失败：' + err.message + '</div>';
+      }
+    }
+
+    async function renderErrorHub() {
+      const mount = document.getElementById('error-hub');
+      if (!mount || mount.dataset.rendered === '1') return;
+      mount.dataset.rendered = '1';
+      mount.innerHTML = '<div class="graph-loading">正在加载易错点...</div>';
+      try {
+        const [rawProblems, rawPageExamples, rawSpecExamples, idMap] = await Promise.all([
+          fetch('data/problems.json').then(r => r.json()),
+          fetch('data/page-examples.json').then(r => r.json()),
+          fetch('data/spec-supplement-examples.json').then(r => r.json()),
+          fetch('data/id-map.json').then(r => r.json())
+        ]);
+        const problems = problemList(rawProblems)
+          .concat(rawPageExamples.examples || [])
+          .concat(rawSpecExamples.examples || []);
+        const traps = new Map();
+        for (const p of problems) {
+          for (const trap of p.traps || []) {
+            if (!traps.has(trap)) traps.set(trap, []);
+            traps.get(trap).push(p);
+          }
+        }
+        const rows = Array.from(traps, ([trap, items]) => ({ trap, items }))
+          .sort((a, b) => b.items.length - a.items.length || a.trap.localeCompare(b.trap, 'zh-CN'));
+        const modules = unique(rows.flatMap(r => r.items.flatMap(p => p.knowledge_ids || []).map(id => (idMap[id] || {}).file)));
+        const types = unique(problems.map(p => p.type));
+        mount.innerHTML = [
+          '<div class="error-toolbar">',
+          '  <input id="error-q" type="search" placeholder="搜索错因 / 题干">',
+          '  <select id="error-module"><option value="">全部模块</option>' + modules.map(v => '<option value="' + escapeHtml(v) + '">' + escapeHtml(v) + '</option>').join('') + '</select>',
+          '  <select id="error-type"><option value="">全部题型</option>' + types.map(v => '<option value="' + escapeHtml(v) + '">' + escapeHtml(v) + '</option>').join('') + '</select>',
+          '</div>',
+          '<div id="error-summary" class="error-summary"></div>',
+          '<div id="trap-list" class="trap-list"></div>'
+        ].join('');
+
+        const qEl = document.getElementById('error-q');
+        const moduleEl = document.getElementById('error-module');
+        const typeEl = document.getElementById('error-type');
+        const listEl = document.getElementById('trap-list');
+        const summaryEl = document.getElementById('error-summary');
+        function apply() {
+          const q = qEl.value.trim().toLowerCase();
+          const module = moduleEl.value;
+          const type = typeEl.value;
+          const filtered = rows.map(row => ({
+            trap: row.trap,
+            items: row.items.filter(p => {
+              const hay = [row.trap, p.id, p.stem, p.solution, p.method].join(' ').toLowerCase();
+              const files = (p.knowledge_ids || []).map(id => (idMap[id] || {}).file);
+              return (!q || hay.includes(q))
+                && (!module || files.includes(module))
+                && (!type || p.type === type);
+            })
+          })).filter(row => row.items.length);
+          summaryEl.textContent = '当前显示 ' + filtered.length + ' 类易错点，共关联 ' + filtered.reduce((n, r) => n + r.items.length, 0) + ' 道题';
+          listEl.innerHTML = filtered.map(row => {
+            const sample = row.items.slice(0, 5);
+            return [
+              '<article class="trap-item">',
+              '  <div class="trap-meta"><span class="trap-pill">' + escapeHtml(row.items.length) + ' 题</span>' + sample.flatMap(p => p.knowledge_ids || []).slice(0, 4).map(id => '<span class="trap-pill">' + escapeHtml(idLabel(id, idMap)) + '</span>').join('') + '</div>',
+              '  <h3>' + escapeHtml(row.trap) + '</h3>',
+              '  <details><summary>查看关联题与纠正方法</summary>',
+              sample.map(p => '<p><b>' + escapeHtml(p.id) + '</b> ' + escapeHtml(p.stem) + '<br><b>纠正：</b>' + escapeHtml(p.method || p.solution || '') + '</p>').join(''),
+              row.items.length > sample.length ? '<p>还有 ' + (row.items.length - sample.length) + ' 道相关题，可在题库按关键词筛选。</p>' : '',
+              '  </details>',
+              '</article>'
+            ].join('');
+          }).join('') || '<p>没有符合条件的易错点。</p>';
+        }
+        [qEl, moduleEl, typeEl].forEach(el => el.addEventListener('input', apply));
+        apply();
+      } catch (err) {
+        mount.innerHTML = '<div class="graph-error">易错点加载失败：' + err.message + '</div>';
+      }
+    }
 
     async function renderKnowledgeGraph() {
       const mount = document.getElementById('knowledge-graph');

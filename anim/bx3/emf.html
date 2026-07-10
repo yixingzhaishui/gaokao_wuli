@@ -26,8 +26,9 @@ canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab;backgr
 <div class="wrap">
   <h2>电源电动势：拖 q、ε、R，看 ε=W非/q 与 U=ε-Ir</h2>
   <div class="lab">
-    <div class="stage"><canvas id="cv" width="720" height="450"></canvas></div>
+    <div class="stage"><canvas id="cv" width="720" height="450" aria-label="电源电动势实验台：闭合电路侧视装置、电压表图像和数据记录"></canvas></div>
     <section class="panel">
+      <button id="playBtn" style="font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;width:100%;margin-bottom:10px">▶ 播放：电荷搬运与电流循环</button>
       <div class="read">
         <div class="chip">电动势 ε = <b id="ev">6.0</b> V = J/C</div>
         <div class="chip">搬运电荷 q = <b id="qv">2.0</b> C</div>
@@ -37,8 +38,7 @@ canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab;backgr
         <div class="chip">路端电压 U = <b id="uv">5.33</b> V</div>
         <div class="chip">电路状态：<b id="statev">—</b></div>
       </div>
-      <div class="hint"><b>观察任务</b>：拖 q 看 W非 随电荷量成正比，但 ε 不变；拖 ε 看每库仑获得的能量变大；拖 R 看接外电路后路端电压 U 会小于 ε，断路极限 U=ε；点击“播放”看正电荷沿闭合回路搬运，速度随电流 I 变化。</div>
-      <div class="hint" style="margin-top:8px"><button id="playBtn" style="font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;width:100%">▶ 播放：电荷搬运与电流循环</button></div>
+      <div class="hint"><b>观察任务</b>：拖 q 看 W非 随电荷量成正比，但 ε 不变；对照闭合电路侧视装置、电压表图像和数据记录，拖 R 看接外电路后路端电压 U 会小于 ε。</div>
       <div class="formula"><b>公式绑定</b><br>电源内部绿色箭头表示非静电力把正电荷从负极搬到正极。ε=W非/q 是电源属性；接外电路后 U=ε-Ir。</div>
     </section>
   </div>

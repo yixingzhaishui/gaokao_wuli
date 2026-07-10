@@ -23,7 +23,15 @@ canvas{display:block;width:100%;max-width:760px;background:#fff;border:1px solid
 <body>
 <div class="wrap">
   <h2>远距离输电：电压越高，线路 I²r 损耗越小</h2>
-  <canvas id="cv" width="760" height="430"></canvas>
+  <div class="ctrls">
+    <label>输送功率 P = <span id="pl">100</span> kW<input id="pr" type="range" min="50" max="500" step="10" value="100"></label>
+    <label>输送电压 U = <span id="ul">10.0</span> kV<input id="ur" type="range" min="1" max="50" step="0.5" value="10"></label>
+    <label>线路总电阻 r = <span id="rl">10</span> Ω<input id="rr" type="range" min="1" max="50" step="1" value="10"></label>
+    <button id="play-btn">暂停演示</button>
+    <button id="reset-btn">重置</button>
+    <span style="font-size:13px;color:#5a6b7b">也可拖右下曲线上的蓝点改电压</span>
+  </div>
+  <canvas id="cv" width="760" height="430" aria-label="远距离输电实验台：输电线路侧视装置、损耗图像和数据记录"></canvas>
   <div class="chips">
     <span class="chip">输送功率 P = <b id="pv">100</b> kW</span>
     <span class="chip">输送电压 U = <b id="uv">10.0</b> kV</span>
@@ -34,15 +42,7 @@ canvas{display:block;width:100%;max-width:760px;background:#fff;border:1px solid
     <span class="chip">效率 = <b id="effv">99.0</b>%</span>
     <span class="chip">状态：<b id="statev">自动演示高压降损</b></span>
   </div>
-  <div class="ctrls">
-    <label>输送功率 P = <span id="pl">100</span> kW<input id="pr" type="range" min="50" max="500" step="10" value="100"></label>
-    <label>输送电压 U = <span id="ul">10.0</span> kV<input id="ur" type="range" min="1" max="50" step="0.5" value="10"></label>
-    <label>线路总电阻 r = <span id="rl">10</span> Ω<input id="rr" type="range" min="1" max="50" step="1" value="10"></label>
-    <button id="play-btn">暂停演示</button>
-    <button id="reset-btn">重置</button>
-    <span style="font-size:13px;color:#5a6b7b">也可拖右下曲线上的蓝点改电压</span>
-  </div>
-  <div class="hint"><b>观察任务</b>：保持 P 和 r 不变，拖蓝点把 U 从 1 kV 拉到 10 kV，看 I 变为 1/10，而 P损=I²r 变为 1/100。线路损耗用线路电流 I 算，不用输送电压 U 直接套 U²/r。</div>
+  <div class="hint"><b>观察任务</b>：保持 P 和 r 不变，对照输电线路侧视装置、损耗图像和数据记录，拖蓝点把 U 从 1 kV 拉到 10 kV，看 I 变为 1/10，而 P损=I²r 变为 1/100。</div>
 </div>
 <script>
 (function(){

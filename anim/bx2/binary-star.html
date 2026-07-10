@@ -34,9 +34,9 @@
 </head>
 <body>
 <div class="root">
-  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="双星模型交互实验台"></canvas></div>
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="双星模型交互实验台：轨道俯视装置、质量柱状图和数据记录"></canvas></div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>抓任一颗星向外拖，看 L 增大时周期怎样变长；再改质量，看共同质心如何靠近质量大的星。</div>
+    <div class="card task"><b>观察任务：</b>抓任一颗星向外拖，看轨道俯视装置、质量图像和实时数据记录怎样一起变化。</div>
     <button id="playBtn" class="primary">播放</button>
     <div class="card">
       <div class="title">快速情境</div>
@@ -181,7 +181,7 @@
   }
   function draw(){
     const g=geom();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);
-    text('双星模型实验台：两颗星都绕共同质心转',460,30,'#0f172a','center',19,'900');
+    text('双星模型实验台：轨道俯视装置 + 质量图像 + 数据记录',460,30,'#0f172a','center',19,'900');
     drawOrbit();drawBars(g);bottom();update(g);
   }
   function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}

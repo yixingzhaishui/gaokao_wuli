@@ -8,61 +8,73 @@
 <style>
   *{box-sizing:border-box}
   body{margin:0;background:#edf3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
-  .root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px;min-height:560px}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 316px;gap:10px;padding:10px;min-height:760px}
   .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
-  canvas{display:block;width:100%;height:auto;touch-action:none}
-  .panel{display:flex;flex-direction:column;gap:8px}
+  canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab}
+  canvas:active{cursor:grabbing}
+  .panel{display:flex;flex-direction:column;gap:8px;max-height:760px;overflow:auto}
   .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
   .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.45}
   .title{font-weight:800;margin-bottom:5px;color:#0f172a}
   .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:31px;cursor:pointer;color:#102a43}
-  .primary{background:#2563eb;color:#fff;border-color:#2563eb}
+  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:31px;cursor:pointer;color:#102a43;font-weight:700}
+  button.active{background:#2563eb;color:#fff;border-color:#2563eb}
   .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:48px}
+  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:50px}
   .meter span{display:block;font-size:11px;color:#b6c5d8}
-  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:16px;font-variant-numeric:tabular-nums}
-  .formula{display:grid;gap:5px;font-size:13px;color:#334155}
+  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:15px;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .formula{display:grid;gap:5px;font-size:12px;color:#334155}
   .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
   .formula div:last-child{border-bottom:0;padding-bottom:0}
   .formula b{white-space:nowrap;color:#0f172a}
   .small{font-size:12px;line-height:1.5;color:#475569}
   .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
-  @media(max-width:760px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
+  .status.warn{border-color:#f59e0b;background:#fff7ed;color:#b45309}
+  .status.bad{border-color:#f87171;background:#fef2f2;color:#b91c1c}
+  @media(max-width:820px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
 <div class="root">
-  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="弹簧瞬时问题交互实验台"></canvas></div>
+  <div class="stage"><canvas id="canvas" width="960" height="760" aria-label="弹簧瞬时问题交互实验台"></canvas></div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>拖动左图下方 T0 拉力箭头，看 t=0- 的弹簧被拉长；再点剪断，看右图绳力变 0，而弹簧长度和 F弹 瞬时不变。</div>
-    <button id="cutBtn" class="primary">剪断绳</button>
+    <div class="card task"><b>观察任务：</b>先看 `t=0-` 是否平衡，再切换 `cut_target`。剪断瞬间只删除被剪断/撤去的约束，未剪断弹簧的 `x` 和 `F弹=kx` 保持原值。</div>
+    <div class="chips"><button id="playBtn">播放 0+ 短过程</button><button id="resetBtn">重置</button></div>
+    <div class="card">
+      <div class="title">cut_target 瞬时事件</div>
+      <div class="chips">
+        <button data-target="rope" class="active">剪断 A-B 绳</button>
+        <button data-target="spring">剪断上弹簧</button>
+        <button data-target="support">撤去下支撑</button>
+        <button id="balanceBtn">令 x=平衡值</button>
+      </div>
+    </div>
     <div class="card">
       <div class="title">快速情境</div>
       <div class="chips">
-        <button data-case="base">基础</button>
-        <button data-case="largeT">大拉力</button>
-        <button data-case="smallM">小质量</button>
-        <button data-case="soft">软弹簧</button>
+        <button data-case="equal">双物块基础</button>
+        <button data-case="heavyB">下物块更重</button>
+        <button data-case="soft">软弹簧大形变</button>
+        <button data-case="support">撤支撑下落</button>
       </div>
     </div>
     <div class="card">
       <div class="title">实时读数</div>
       <div class="readout">
-        <div class="meter"><span>形变量 x</span><b id="xText">0.300 m</b></div>
-        <div class="meter"><span>弹簧力 F弹</span><b id="fText">30.0 N</b></div>
-        <div class="meter"><span>剪断后 T</span><b id="afterTText">0 N</b></div>
-        <div class="meter"><span>瞬时加速度 a</span><b id="aText">5.0 m/s²</b></div>
+        <div class="meter"><span>F弹=kx</span><b id="fText">30.0 N</b></div>
+        <div class="meter"><span>平衡前 ΣF</span><b id="eqText">0.0 N</b></div>
+        <div class="meter"><span>a1 / a2</span><b id="aText">5.0 / -10.0</b></div>
+        <div class="meter"><span>事件</span><b id="targetText">剪下绳</b></div>
       </div>
     </div>
     <div class="card formula">
-      <div><span>剪断前</span><b>kx=mg+T0</b></div>
-      <div><span>剪断瞬间</span><b>x 不突变</b></div>
-      <div><span>剪断后</span><b>a=T0/m</b></div>
+      <div><span>弹簧弹力</span><b>F弹=kx</b></div>
+      <div><span>平衡前</span><b>ΣF=0</b></div>
+      <div><span>剪断瞬间</span><b>F弹 保持原值</b></div>
+      <div><span>重新受力</span><b>ΣF=ma</b></div>
     </div>
-    <div class="card small"><b>可直接操作：</b>抓左图蓝色 T0 箭头末端，或拖底部 m、k、T0 三个手柄。多视角：左图是 t=0- 侧视实物场景，右图是 t=0+ 瞬时受力，底部图像记录“瞬时不变，随后才变”。</div>
-    <div class="chips"><button id="playBtn">▶ 播放：0+ 后极短过程</button><button id="resetBtn">重置</button></div>
-    <div class="status" id="status">准备剪断：左图平衡，右图预览剪断后一瞬间。</div>
+    <div class="card small"><b>三视图：</b>左侧是 `t=0-` 侧视实物，右侧是 `t=0+` 瞬时受力图，右下是图像记录时间线。可拖 `m1`、`m2`、`k`、`x`、`g`。</div>
+    <div class="status" id="status">默认是剪断 A-B 绳：A 保留弹簧力，B 只受重力。</div>
   </div>
 </div>
 <script>
@@ -70,78 +82,223 @@
   'use strict';
   const canvas=document.getElementById('canvas');
   const ctx=canvas.getContext('2d');
-  const state={m:2,k:100,T:10,g:10,cut:false,drag:null,playing:false,playT:0};
-  const els={x:document.getElementById('xText'),f:document.getElementById('fText'),afterT:document.getElementById('afterTText'),a:document.getElementById('aText'),status:document.getElementById('status'),cut:document.getElementById('cutBtn')};
-  const colors={red:'#dc2626',blue:'#2563eb',orange:'#f59e0b',purple:'#7c3aed',ink:'#102a43',green:'#0f766e'};
+  const state={m1:2,m2:1,k:100,x:.30,g:10,target:'rope',drag:null,playing:false,playT:0};
+  const els={f:document.getElementById('fText'),eq:document.getElementById('eqText'),a:document.getElementById('aText'),target:document.getElementById('targetText'),status:document.getElementById('status')};
+  const playBtn=document.getElementById('playBtn');
+  let animSeq=0;
+  const colors={red:'#dc2626',blue:'#2563eb',cyan:'#0891b2',orange:'#f59e0b',purple:'#7c3aed',ink:'#102a43',green:'#0f766e',muted:'#64748b'};
   const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
-  const fmt=(v,d=1)=>v.toFixed(d);
-  function values(){const mg=state.m*state.g,F=mg+state.T,x=F/state.k,a=state.T/state.m;return{mg,F,x,a}}
-  function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){ctx.fillStyle=c;ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
-  function line(x1,y1,x2,y2,c='#94a3b8',w=2,dash){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
-  function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore()}
-  function roundRect(x,y,w,h,r,fill,stroke){ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}ctx.restore()}
-  function spring(cx,top,len){ctx.save();ctx.strokeStyle='#334155';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(cx,top);const n=8,amp=13,seg=len/(n*2);for(let i=1;i<=n*2;i++)ctx.lineTo(cx+(i%2?amp:-amp),top+i*seg);ctx.lineTo(cx,top+len);ctx.stroke();ctx.restore()}
-  function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-36,c,'center',12,'900')}
-  function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-20,active?'#92400e':c,'center',12,'900');ctx.restore()}
-  function geom(){return{m:{x:98+(state.m-.5)/4.5*150,y:494},k:{x:300+(state.k-50)/200*150,y:494},T:{x:502+state.T/40*160,y:494},g:{x:716+(state.g-9.8)/.2*120,y:494}}}
-  function drawSetup(cx,title,after,q){
-    roundRect(cx-160,56,320,368,8,'#fff','#d7dee8');
-    text(title,cx,82,'#0f172a','center',16,'900');
-    const top=112,stretch=76+Math.min(132,q.x*210),massY=top+stretch;
-    line(cx-80,top,cx+80,top,'#334155',4);
-    spring(cx,top,stretch);
-    roundRect(cx-36,massY,72,44,6,colors.blue,'#102a43');
-    text('m',cx,massY+22,'#fff','center',16,'900');
-    const fLen=clamp(q.F/Math.max(q.mg,1)*58,42,130),gLen=clamp(q.mg/20*44,42,108),tLen=clamp(state.T/40*86,0,98),aLen=clamp(q.a/12*100,0,118);
-    arrow(cx,massY,cx,massY-fLen,colors.red,4);
-    text(`F弹=${fmt(q.F)}N`,cx+13,massY-fLen/2,colors.red,'left',13,'900');
-    arrow(cx-25,massY+20,cx-25,massY+20+gLen,colors.red,4);
-    text(`mg=${fmt(q.mg)}N`,cx-38,massY+56,colors.red,'right',13,'900');
-    if(after){
-      line(cx+25,massY+44,cx+25,massY+88,'#94a3b8',4,[7,5]);
-      text('T=0',cx+38,massY+72,'#64748b','left',13,'900');
-      if(q.a>0){arrow(cx+95,massY+36,cx+95,massY+36-aLen,colors.purple,4);text(`a=${fmt(q.a)}m/s²`,cx+108,massY+30-aLen/2,colors.purple,'left',13,'900')}
-      text('剪断后：绳力突变，弹簧力不突变',cx,398,colors.green,'center',13,'900');
+  const fmt=(v,d=1)=>Number.isFinite(v)?v.toFixed(d):'--';
+  function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){
+    ctx.fillStyle=c;ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y);
+  }
+  function line(x1,y1,x2,y2,c='#94a3b8',w=2,dash){
+    ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();
+  }
+  function arrow(x1,y1,x2,y2,c,w=3){
+    if(Math.hypot(x2-x1,y2-y1)<2)return;
+    const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore();
+  }
+  function box(x,y,w,h,r,fill,stroke='#cbd5e1'){
+    ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.5;ctx.stroke()}ctx.restore();
+  }
+  function spring(cx,top,len,flip){
+    ctx.save();ctx.strokeStyle='#334155';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(cx,top);
+    const n=8,amp=13,seg=len/(n*2);
+    for(let i=1;i<=n*2;i++)ctx.lineTo(cx+(i%2?amp:-amp),top+(flip?-i*seg:i*seg));
+    ctx.lineTo(cx,top+(flip?-len:len));ctx.stroke();ctx.restore();
+  }
+  function values(){
+    const F=state.k*state.x, w1=state.m1*state.g, w2=state.m2*state.g, total=(state.m1+state.m2)*state.g;
+    const eqForce=state.target==='support'?F-total:F-total;
+    let a1=0,a2=0,label='剪下绳',afterSpring=F,afterRope=0,afterSupport=0;
+    if(state.target==='rope'){
+      a1=(F-w1)/state.m1;
+      a2=-state.g;
+      label='剪下绳';
+    }else if(state.target==='spring'){
+      afterSpring=0;
+      a1=-state.g;
+      a2=-state.g;
+      label='剪弹簧';
     }else{
-      line(cx+25,massY+44,cx+25,massY+90,'#334155',3);
-      if(state.T>0)arrow(cx+25,massY+44,cx+25,massY+44+tLen,colors.blue,4);
-      text(`T0=${fmt(state.T,0)}N`,cx+38,massY+76,colors.blue,'left',13,'900');
-      ctx.save();ctx.fillStyle=state.drag==='Tarrow'?'#fde68a':'#fff';ctx.strokeStyle=state.drag==='Tarrow'?'#d97706':colors.blue;ctx.lineWidth=3;ctx.beginPath();ctx.arc(cx+25,massY+44+tLen,9,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();
-      text('剪断前：F弹 = mg + T0，a=0',cx,398,'#475569','center',13,'900');
+      a1=(F-total)/(state.m1+state.m2);
+      a2=a1;
+      afterSupport=0;
+      label='撤支撑';
     }
-    text(`x=${fmt(q.x,3)}m`,cx,372,'#475569','center',13,'900');
+    const xEq=state.target==='support'?total/state.k:total/state.k;
+    return{F,w1,w2,total,eqForce,a1,a2,label,afterSpring,afterRope,afterSupport,xEq};
   }
-  function drawTimeline(q){
-    const x=420,y=438,w=360,h=74;
-    roundRect(x,y,w,h,8,'#fff','#d7dee8');
-    text('图像记录：0+ 瞬时不变，随后才变化',x+w/2,y+16,'#0f172a','center',13,'900');
-    line(x+36,y+50,x+w-28,y+50,'#cbd5e1',2);
-    line(x+36,y+50,x+150,y+50,colors.green,5);
-    line(x+150,y+50,x+w-34,y+32,colors.orange,3);
-    text('t=0+',x+38,y+64,'#475569','center',11,'900');
-    text('F弹保持原读数',x+104,y+34,colors.green,'center',11,'900');
-    text('之后随形变量改变',x+248,y+26,colors.orange,'center',11,'900');
-    const dotX=x+36+Math.min(1,state.playT/2.2)*(w-70);
-    ctx.fillStyle=colors.purple;
-    ctx.beginPath();ctx.arc(dotX,y+50,7,0,Math.PI*2);ctx.fill();
-    text(`t=${fmt(state.playT,2)}s`,dotX,y+66,colors.purple,'center',11,'900');
+  function setBalanced(){state.x=clamp(values().xEq,.05,.7);state.playT=0;draw()}
+  function scaleForce(F){return clamp(Math.abs(F)*3.2,24,120)}
+  function drawHanging(cx,title,after,q){
+    box(cx-145,56,290,394,8,'#fff','#d7dee8');
+    text(title,cx,82,'#0f172a','center',16,'900');
+    text(after?'瞬时受力图':'侧视实物装置',cx,104,after?colors.purple:colors.green,'center',12,'900');
+    const top=114,stretch=76+clamp(state.x*.78,0,160),baseAY=top+stretch,baseBY=baseAY+104;
+    const tau=after?Math.min(state.playT,1.45):0;
+    const aShift=clamp(-0.5*q.a1*tau*tau*12,-78,108);
+    const bShift=clamp(-0.5*q.a2*tau*tau*12,-78,116);
+    const aY=baseAY+aShift,bY=baseBY+bShift;
+    line(cx-86,top,cx+86,top,'#334155',4);
+    if(after&&tau>0){
+      box(cx-38,baseAY,76,46,6,'rgba(37,99,235,.12)','#bfdbfe');
+      box(cx-36,baseBY,72,44,6,'rgba(8,145,178,.12)','#bae6fd');
+      text('0+瞬间位置',cx,baseAY-14,colors.muted,'center',11,'900');
+    }
+    if(after&&state.target==='spring'){line(cx,top,cx,baseAY-16,'#b0bcc9',4,[7,5]);text('F弹=0',cx+24,top+42,colors.muted,'left',12,'900')}
+    else spring(cx,top,aY-top,false);
+    box(cx-36,aY,72,44,6,colors.blue,'#102a43');text('A m1',cx,aY+22,'#fff','center',13,'900');
+    if(after&&state.target==='rope'){line(cx,aY+44,cx,bY,'#b0bcc9',4,[7,5]);text('T=0',cx+22,(aY+bY)/2,colors.muted,'left',12,'900')}
+    else line(cx,aY+44,cx,bY,'#334155',4);
+    box(cx-34,bY,68,42,6,colors.cyan,'#0e7490');text('B m2',cx,bY+21,'#ecfeff','center',13,'900');
+    const springF=after?q.afterSpring:q.F;
+    if(springF>0){arrow(cx,aY,cx,aY-scaleForce(springF),colors.red,4);text(`F弹=${fmt(springF)}N`,cx+12,aY-scaleForce(springF)/2,colors.red,'left',12,'900')}
+    arrow(cx-28,aY+24,cx-28,aY+24+scaleForce(q.w1),colors.red,4);text(`m1g=${fmt(q.w1)}N`,cx-38,aY+72,colors.red,'right',12,'900');
+    arrow(cx-26,bY+22,cx-26,bY+22+scaleForce(q.w2),colors.red,4);text(`m2g=${fmt(q.w2)}N`,cx-36,bY+70,colors.red,'right',12,'900');
+    if(!after){
+      arrow(cx+28,aY+44,cx+28,aY+44+scaleForce(q.w2),colors.orange,4);text(`T=m2g`,cx+40,aY+94,colors.orange,'left',12,'900');
+      text('t=0-：F弹=(m1+m2)g 时平衡',cx,422,Math.abs(q.eqForce)<.25?colors.green:colors.orange,'center',12,'900');
+    }else{
+      arrow(cx+96,aY+28,cx+96,aY+28-clamp(q.a1*10,-110,110),colors.purple,4);
+      arrow(cx+96,bY+24,cx+96,bY+24-clamp(q.a2*10,-110,110),colors.purple,4);
+      text(`a1=${fmt(q.a1)}m/s²`,cx+108,aY+16,colors.purple,'left',12,'900');
+      text(`a2=${fmt(q.a2)}m/s²`,cx+108,bY+18,colors.purple,'left',12,'900');
+      text(state.target==='spring'?'t=0+：被剪弹簧力消失':'t=0+：T=0，A/B 立即按各自加速度分离',cx,422,colors.green,'center',12,'900');
+    }
+    text(`x=${fmt(state.x,3)}m`,cx,392,'#475569','center',12,'900');
   }
-  function update(q){els.x.textContent=`${fmt(q.x,3)} m`;els.f.textContent=`${fmt(q.F)} N`;els.afterT.textContent='0 N';els.a.textContent=`${fmt(q.a)} m/s²`;els.cut.textContent=state.cut?'复位到剪断前':'剪断绳';els.status.textContent=(state.cut?`已剪断：T 立刻为 0，弹簧仍保持 ${fmt(q.F)} N，物块瞬时向上加速。`:'准备剪断：左图平衡，右图预览剪断后一瞬间。')+(state.playing?'（播放中：紫点显示 0+ 后时间线）':'')}
-  function draw(){const q=values(),g0=geom();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('弹簧瞬时问题实验台：弹簧力看形变量，绳力看约束是否还在',460,30,'#0f172a','center',19,'900');drawSetup(240,'t=0- 剪断前',false,q);drawSetup(620,'t=0+ 剪断后',true,q);drawTimeline(q);roundRect(48,458,350,62,8,'#fff','#d7dee8');ruler(68,494,145,'m',colors.blue);handle(68+(state.m-.5)/4.5*77,494,`m=${fmt(state.m)}`,state.drag==='m',colors.blue);ruler(160,494,238,'k',colors.green);handle(160+(state.k-50)/200*78,494,`k=${fmt(state.k,0)}`,state.drag==='k',colors.green);ruler(254,494,332,'T0',colors.purple);handle(254+state.T/40*78,494,`T0=${fmt(state.T,0)}`,state.drag==='T',colors.purple);if(state.cut){roundRect(438,218,84,38,8,'#ecfdf5','#14b8a6');text('已剪断',480,237,colors.green,'center',13,'900')}else{roundRect(438,218,84,38,8,'#fff7ed','#f59e0b');text('准备剪断',480,237,'#b45309','center',13,'900')}update(q)}
+  function drawSupport(cx,title,after,q){
+    box(cx-145,56,290,394,8,'#fff','#d7dee8');text(title,cx,82,'#0f172a','center',16,'900');text(after?'瞬时受力图':'侧视实物装置',cx,104,after?colors.purple:colors.green,'center',12,'900');
+    const floor=362,len=64+clamp(state.x*.72,0,150),top=floor-len,aY=top-88,bY=aY+44;
+    line(cx-120,floor,cx+120,floor,'#334155',5);
+    spring(cx,floor,-len,true);
+    box(cx-38,bY,76,42,6,colors.cyan,'#0e7490');text('B m2',cx,bY+21,'#ecfeff','center',13,'900');
+    box(cx-38,aY,76,42,6,colors.blue,'#102a43');text('A m1',cx,aY+21,'#fff','center',13,'900');
+    if(!after){line(cx-86,bY+54,cx+86,bY+54,'#f59e0b',8);text('下支撑 N',cx+96,bY+54,colors.orange,'left',12,'900')}
+    else{line(cx-86,bY+54,cx+86,bY+54,'#b0bcc9',5,[7,5]);text('N=0',cx+96,bY+54,colors.muted,'left',12,'900')}
+    arrow(cx,bY+42,cx,bY+42-scaleForce(after?q.afterSpring:q.F),colors.red,4);text(`F弹=${fmt(after?q.afterSpring:q.F)}N`,cx+12,bY+6,colors.red,'left',12,'900');
+    arrow(cx-34,aY+21,cx-34,aY+21+scaleForce(q.w1),colors.red,4);text('m1g',cx-44,aY+70,colors.red,'right',12,'900');
+    arrow(cx-34,bY+21,cx-34,bY+21+scaleForce(q.w2),colors.red,4);text('m2g',cx-44,bY+70,colors.red,'right',12,'900');
+    if(after){arrow(cx+108,bY,cx+108,bY-clamp(q.a1*10,-110,110),colors.purple,4);text(`a=${fmt(q.a1)}m/s²`,cx+120,bY-8,colors.purple,'left',12,'900')}
+    text(!after?'t=0-：支撑可提供差额 N':'t=0+：支撑撤去，按新合力加速',cx,422,after?colors.green:colors.orange,'center',12,'900');
+    text(`x=${fmt(state.x,3)}m`,cx,392,'#475569','center',12,'900');
+  }
+  function drawFormulaPanel(q){
+    box(680,260,240,150,8,'#fff','#d7dee8');
+    text('受力方程绑定',800,282,'#0f172a','center',14,'900');
+    const rows=state.target==='support'
+      ?[`F弹=kx=${fmt(q.F)}N`,`t=0-: F弹+N=(m1+m2)g`,`t=0+: N=0, ΣF=F弹-(m1+m2)g`,`a=ΣF/(m1+m2)=${fmt(q.a1)}m/s²`]
+      :state.target==='spring'
+        ?[`F弹=kx=${fmt(q.F)}N`,`t=0-: F弹=(m1+m2)g`,`t=0+: 被剪弹簧 F弹'=0`,`A、B 瞬时均自由下落 a=-g`]
+        :[`F弹=kx=${fmt(q.F)}N`,`t=0-: F弹=m1g+T, T=m2g`,`t=0+: T=0, A 保留 F弹`,`a1=(F弹-m1g)/m1=${fmt(q.a1)}m/s²`];
+    rows.forEach((r,i)=>text(r,696,312+i*22,i===0?colors.red:(i===2?colors.orange:colors.ink),'left',11,'800'));
+  }
+  function ruler(x1,y,x2,label,c,hx,txt,active){
+    line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=5;i++){const x=x1+(x2-x1)*i/5;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-18,c,'center',12,'900');
+    ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#b45309':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(hx,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();text(txt,hx,y-36,active?'#92400e':c,'center',12,'900');
+  }
+  function geometry(){
+    return{
+      m1:{x:58+(state.m1-.5)/4.5*140,y:660},
+      m2:{x:226+(state.m2-.5)/4.5*140,y:660},
+      k:{x:394+(state.k-50)/230*140,y:660},
+      x:{x:562+(state.x-.05)/.65*140,y:660},
+      g:{x:730+(state.g-2)/10*140,y:660}
+    };
+  }
+  function drawControls(g){
+    box(34,612,876,102,8,'#fff','#d7dee8');
+    text('拖动 m1、m2、k、x、g：先看平衡前 ΣF，再看 t=0+ 哪个力保留、哪个力消失',380,630,colors.orange,'center',12,'900');
+    ruler(58,660,198,'m1',colors.blue,g.m1,`m1=${fmt(state.m1)}kg`,state.drag==='m1');
+    ruler(226,660,366,'m2',colors.cyan,g.m2,`m2=${fmt(state.m2)}kg`,state.drag==='m2');
+    ruler(394,660,534,'k',colors.green,g.k,`k=${fmt(state.k,0)}N/m`,state.drag==='k');
+    ruler(562,660,702,'x',colors.red,g.x,`x=${fmt(state.x,2)}m`,state.drag==='x');
+    ruler(730,660,870,'g',colors.orange,g.g,`g=${fmt(state.g)}m/s²`,state.drag==='g');
+  }
+  function drawTimeline(){
+    box(680,70,240,168,8,'#fff','#d7dee8');
+    text('瞬时规则时间线',800,94,'#0f172a','center',15,'900');
+    line(706,162,900,162,'#cbd5e1',3);
+    line(706,162,770,162,colors.green,6);
+    line(770,162,900,142,colors.orange,3);
+    text('t=0-',706,186,colors.muted,'center',12,'900');
+    text('t=0+',770,186,colors.purple,'center',12,'900');
+    text('x、F弹先不变',742,136,colors.green,'center',12,'900');
+    text('之后才变',858,120,colors.orange,'center',12,'900');
+    const dotX=770+Math.min(1,state.playT/2.2)*120;
+    ctx.fillStyle=colors.purple;ctx.beginPath();ctx.arc(dotX,162,7,0,Math.PI*2);ctx.fill();
+    text(`t=${fmt(state.playT,2)}s`,dotX,210,colors.purple,'center',12,'900');
+  }
+  function update(q){
+    els.f.textContent=`${fmt(q.F)} N`;
+    els.eq.textContent=`${fmt(q.eqForce)} N`;
+    els.a.textContent=`${fmt(q.a1)} / ${fmt(q.a2)}`;
+    els.target.textContent=q.label;
+    const off=Math.abs(q.eqForce),warn=off>.3;
+    els.status.className='status'+(warn?' warn':'');
+    els.status.textContent=(warn?`当前 x 不是平衡形变量，ΣF=${fmt(q.eqForce)}N；可点“令 x=平衡值”。`:`平衡前 ΣF≈0。`)+` ${q.label} 后按 t=0+ 新受力图列 ΣF=ma，未剪断弹簧保持 F弹=${fmt(q.F)}N。`;
+  }
+  function draw(){
+    const q=values(),g=geometry();
+    ctx.clearRect(0,0,960,760);
+    const bg=ctx.createLinearGradient(0,0,0,760);bg.addColorStop(0,'#fbfdff');bg.addColorStop(1,'#eaf0f7');ctx.fillStyle=bg;ctx.fillRect(0,0,960,760);
+    text('弹簧瞬时问题实验台：先求 t=0- 平衡，再重画 t=0+ 受力',480,28,'#0f172a','center',20,'900');
+    if(state.target==='support'){drawSupport(205,'t=0- 撤支撑前',false,q);drawSupport(515,'t=0+ 撤支撑后',true,q)}
+    else{drawHanging(205,'t=0- 剪断前',false,q);drawHanging(515,'t=0+ 剪断后',true,q)}
+    drawTimeline();drawFormulaPanel(q);drawControls(g);update(q);
+  }
   function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
-  function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
-  function tArrowPoint(){const q=values(),top=112,stretch=76+Math.min(132,q.x*210),massY=top+stretch,tLen=clamp(state.T/40*86,0,98);return{x:265,y:massY+44+tLen}}
-  function down(e){if(state.playing){state.playing=false;document.getElementById('playBtn').textContent='▶ 播放：0+ 后极短过程'}const p=pos(e);if(near(p,tArrowPoint(),28))state.drag='Tarrow';else if(near(p,{x:68+(state.m-.5)/4.5*77,y:494},26))state.drag='m';else if(near(p,{x:160+(state.k-50)/200*78,y:494},26))state.drag='k';else if(near(p,{x:254+state.T/40*78,y:494},26))state.drag='T';else state.drag=null;if(state.drag){canvas.setPointerCapture(e.pointerId);move(e)}}
-  function move(e){if(!state.drag)return;const p=pos(e);if(state.drag==='m')state.m=clamp(.5+(p.x-68)/77*4.5,.5,5);if(state.drag==='k')state.k=clamp(50+(p.x-160)/78*200,50,250);if(state.drag==='T')state.T=clamp((p.x-254)/78*40,0,40);if(state.drag==='Tarrow'){const q=values(),top=112,stretch=76+Math.min(132,q.x*210),baseY=top+stretch+44;state.T=clamp((p.y-baseY)/98*40,0,40)}draw()}
+  function near(p,h,rad=25){return Math.hypot(p.x-h.x,p.y-h.y)<=rad}
+  function down(e){
+    state.playing=false;animSeq++;playBtn.textContent='播放 0+ 短过程';
+    const p=pos(e),g=geometry();state.drag=null;
+    if(near(p,g.m1))state.drag='m1';else if(near(p,g.m2))state.drag='m2';else if(near(p,g.k))state.drag='k';else if(near(p,g.x))state.drag='x';else if(near(p,g.g))state.drag='g';
+    if(state.drag){canvas.setPointerCapture(e.pointerId);move(e)}
+  }
+  function move(e){
+    if(!state.drag)return;
+    const p=pos(e);
+    if(state.drag==='m1')state.m1=clamp(.5+(p.x-58)/140*4.5,.5,5);
+    if(state.drag==='m2')state.m2=clamp(.5+(p.x-226)/140*4.5,.5,5);
+    if(state.drag==='k')state.k=clamp(50+(p.x-394)/140*230,50,280);
+    if(state.drag==='x')state.x=clamp(.05+(p.x-562)/140*.65,.05,.7);
+    if(state.drag==='g')state.g=clamp(2+(p.x-730)/140*10,2,12);
+    draw();
+  }
   function up(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
   canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
-  els.cut.addEventListener('click',()=>{state.cut=!state.cut;draw()});
-  document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='base'){state.m=2;state.k=100;state.T=10;state.g=10}if(c==='largeT'){state.m=2;state.k=100;state.T=32;state.g=10}if(c==='smallM'){state.m=1;state.k=120;state.T=18;state.g=10}if(c==='soft'){state.m=2;state.k=60;state.T=18;state.g=10}draw()}));
-  const playBtn=document.getElementById('playBtn');
-  function animate(){if(!state.playing)return;state.playT=Math.min(2.2,state.playT+0.035);draw();if(state.playT>=2.2){state.playing=false;playBtn.textContent='▶ 播放：0+ 后极短过程';draw();return}requestAnimationFrame(animate)}
-  playBtn.addEventListener('click',()=>{state.playing=!state.playing;state.cut=true;playBtn.textContent=state.playing?'⏸ 暂停':'▶ 播放：0+ 后极短过程';if(state.playing){state.playT=0;animate()}else draw()});
-  document.getElementById('resetBtn').addEventListener('click',()=>{state.playing=false;state.playT=0;state.cut=false;playBtn.textContent='▶ 播放：0+ 后极短过程';draw()});
-  draw();
+  function refreshTargetButtons(){document.querySelectorAll('[data-target]').forEach(btn=>btn.classList.toggle('active',btn.dataset.target===state.target))}
+  function startEvent(target){
+    state.target=target;
+    state.playing=false;
+    state.playT=0;
+    refreshTargetButtons();
+    setBalanced();
+    state.playing=true;
+    playBtn.textContent='暂停';
+    animate(++animSeq);
+  }
+  document.querySelectorAll('[data-target]').forEach(btn=>btn.addEventListener('click',()=>startEvent(btn.dataset.target)));
+  document.getElementById('balanceBtn').addEventListener('click',setBalanced);
+  document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{
+    const c=btn.dataset.case;
+    if(c==='equal'){Object.assign(state,{target:'rope',m1:2,m2:1,k:100,g:10})}
+    if(c==='heavyB'){Object.assign(state,{target:'rope',m1:1.5,m2:3,k:120,g:10})}
+    if(c==='soft'){Object.assign(state,{target:'rope',m1:2,m2:2,k:65,g:10})}
+    if(c==='support'){Object.assign(state,{target:'support',m1:1.5,m2:1.5,k:120,g:10})}
+    refreshTargetButtons();setBalanced();
+  }));
+  function animate(seq){
+    if(!state.playing||seq!==animSeq)return;
+    state.playT=Math.min(2.2,state.playT+.035);draw();
+    if(state.playT>=2.2){state.playing=false;playBtn.textContent='播放 0+ 短过程';draw();return}
+    requestAnimationFrame(()=>animate(seq));
+  }
+  playBtn.addEventListener('click',()=>{state.playing=!state.playing;playBtn.textContent=state.playing?'暂停':'播放 0+ 短过程';if(state.playing){state.playT=0;animate(++animSeq)}else{animSeq++;draw()}});
+  document.getElementById('resetBtn').addEventListener('click',()=>{animSeq++;Object.assign(state,{m1:2,m2:1,k:100,x:.30,g:10,target:'rope',playing:false,playT:0});playBtn.textContent='播放 0+ 短过程';refreshTargetButtons();draw()});
+  refreshTargetButtons();draw();
 })();
 </script>
 </body>

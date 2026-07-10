@@ -34,9 +34,9 @@
 </head>
 <body>
 <div class="root">
-  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="小船过河运动合成交互实验台"></canvas></div>
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="小船过河运动合成交互实验台：河面俯视装置、矢量图像和数据记录"></canvas></div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>抓绿色船头速度箭头，看它不是实际航向；红色合速度和黑色航迹才是岸上看到的运动。</div>
+    <div class="card task"><b>观察任务：</b>抓绿色船头速度箭头，对照河面俯视装置、矢量图像和数据记录，看它为什么不是实际航向。</div>
     <button id="playBtn" class="primary">播放</button>
     <div class="card">
       <div class="title">快速情境</div>
@@ -107,7 +107,7 @@
     roundRect(620,252,244,118,8,'#fff','#d7dee8');text('当前结果',742,280,'#0f172a','center',15,'900');text(v.straight?'正对到达':'会被冲偏',742,318,v.straight?colors.green:colors.orange,'center',19,'900');text(`t=${fmt(v.time,1)}s，x=${fmt(v.drift,1)}m`,742,348,'#475569','center',12,'700');
   }
   function update(v){els.vx.textContent=`${fmt(v.vx,2)} m/s`;els.vy.textContent=`${fmt(v.vy,2)} m/s`;els.time.textContent=`${fmt(v.time,1)} s`;els.drift.textContent=`${fmt(v.drift,1)} m`;els.status.className='status'+(v.straight?'':' warn');els.status.textContent=v.straight?'船头上游分量抵消水流：合速度垂直河岸，正对到达。':'垂直河岸分量决定时间，沿河分量决定偏移。';els.play.textContent=state.running?'暂停':'播放'}
-  function draw(){const v=values(),g0=geom();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('运动合成与分解实验台：合运动是矢量和，不是船头指向',460,30,'#0f172a','center',19,'900');drawRiver(v);drawExplain(v);roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(94,494,244,'v船',colors.green);handle(g0.vb.x,g0.vb.y,`v船=${fmt(state.vb)}`,state.drag==='vb',colors.green);ruler(292,494,442,'v水',colors.purple);handle(g0.vw.x,g0.vw.y,`v水=${fmt(state.vw)}`,state.drag==='vw',colors.purple);ruler(500,494,670,'θ',colors.red);handle(g0.theta.x,g0.theta.y,`θ=${fmt(state.theta,0)}°`,state.drag==='theta',colors.red);ruler(728,494,848,'d',colors.orange);handle(g0.d.x,g0.d.y,`d=${fmt(state.d,0)}m`,state.drag==='d',colors.orange);update(v)}
+  function draw(){const v=values(),g0=geom();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('运动合成实验台：河面俯视装置 + 矢量图像 + 数据记录',460,30,'#0f172a','center',19,'900');drawRiver(v);drawExplain(v);roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(94,494,244,'v船',colors.green);handle(g0.vb.x,g0.vb.y,`v船=${fmt(state.vb)}`,state.drag==='vb',colors.green);ruler(292,494,442,'v水',colors.purple);handle(g0.vw.x,g0.vw.y,`v水=${fmt(state.vw)}`,state.drag==='vw',colors.purple);ruler(500,494,670,'θ',colors.red);handle(g0.theta.x,g0.theta.y,`θ=${fmt(state.theta,0)}°`,state.drag==='theta',colors.red);ruler(728,494,848,'d',colors.orange);handle(g0.d.x,g0.d.y,`d=${fmt(state.d,0)}m`,state.drag==='d',colors.orange);update(v)}
   function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
   function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
   function down(e){const p=pos(e),v=values(),bp=boatPoint(v),ends=vectorEnds(bp,v),g0=geom();if(near(p,ends.boat,30))state.drag='boat';else if(near(p,ends.water,30))state.drag='water';else if(near(p,g0.vb,26))state.drag='vb';else if(near(p,g0.vw,26))state.drag='vw';else if(near(p,g0.theta,26))state.drag='theta';else if(near(p,g0.d,26))state.drag='d';else state.drag=null;if(state.drag){state.running=false;canvas.setPointerCapture(e.pointerId);move(e)}}

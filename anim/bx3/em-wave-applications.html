@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>电磁波应用与现代通信交互动画</title>
+<link rel="icon" href="data:,">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #f5f7fb; color: #102a43; font-family: -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; }
+  .root { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 12px; padding: 12px; min-height: 700px; }
+  .stage { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; overflow: hidden; }
+  canvas { display: block; width: 100%; height: auto; touch-action: none; cursor: crosshair; }
+  .panel { display: flex; flex-direction: column; gap: 10px; }
+  .card { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 10px; }
+  .task { background: #fff7e6; border-left: 4px solid #f0a500; color: #486581; font-size: 13px; line-height: 1.5; }
+  .title { font-weight: 800; margin-bottom: 7px; color: #102a43; }
+  .seg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  button { border: 1px solid #b0bcc9; background: #fff; border-radius: 6px; padding: 7px 8px; cursor: pointer; font: inherit; font-size: 13px; }
+  button.active { border-color: #2c7be5; background: #e0f2fe; color: #1554ad; font-weight: 800; }
+  .param { display: grid; gap: 2px; margin: 8px 0; font-size: 13px; }
+  .param span { display: flex; justify-content: space-between; gap: 8px; color: #486581; }
+  .param b { color: #102a43; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  input[type=range] { width: 100%; accent-color: #2c7be5; }
+  .readout { background: #102a43; color: #d9e2ec; border-radius: 8px; padding: 10px; line-height: 1.65; font-size: 13px; }
+  .readout b { color: #ffd166; font-variant-numeric: tabular-nums; }
+  .status { border: 1px solid #38b2ac; background: #e6fffa; color: #087f5b; border-radius: 8px; padding: 8px; font-size: 13px; font-weight: 800; line-height: 1.45; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th, td { border-bottom: 1px solid #d9e2ec; padding: 4px 3px; text-align: right; font-variant-numeric: tabular-nums; }
+  th:first-child, td:first-child { text-align: left; }
+  .formula { font-size: 13px; color: #334e68; line-height: 1.6; }
+  @media (max-width: 820px) { .root { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage">
+    <canvas id="canvas" width="900" height="620" aria-label="电磁波应用与现代通信：天线发射、空间传播、接收机、频谱图像、调制波形和数据读数"></canvas>
+  </div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>切换广播、卫星、雷达、光纤通信，拖动画面中的接收机或频谱探针，看频率升高时波长如何变短、传播延迟如何由距离决定、信号强度如何随距离衰减。</div>
+    <div class="card">
+      <div class="title">应用场景</div>
+      <div class="seg">
+        <button data-mode="radio" class="active">广播</button>
+        <button data-mode="satellite">卫星</button>
+        <button data-mode="radar">雷达</button>
+        <button data-mode="fiber">光纤</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="title">调参数</div>
+      <label class="param"><span>频率 f <b id="fLabel">100 MHz</b></span><input id="freq" type="range" min="1" max="5" step="0.01" value="2"></label>
+      <label class="param"><span>振幅 A <b id="aLabel">60%</b></span><input id="amp" type="range" min="20" max="100" step="1" value="60"></label>
+      <label class="param"><span>距离 d <b id="dLabel">120 km</b></span><input id="dist" type="range" min="10" max="36000" step="10" value="120"></label>
+      <label class="param"><span>带宽 B <b id="bLabel">8 MHz</b></span><input id="band" type="range" min="1" max="80" step="1" value="8"></label>
+    </div>
+    <div class="readout" id="readout"></div>
+    <div class="card">
+      <div class="title">数据记录</div>
+      <table>
+        <thead><tr><th>场景</th><th>f/MHz</th><th>λ/m</th><th>延迟/ms</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <div class="card formula">
+      <div class="title">公式与图像</div>
+      <div>波速：c = λf，真空和空气中 c≈3.0×10<sup>8</sup> m/s。</div>
+      <div>延迟：t = d/c；雷达测距：s = ct/2。</div>
+      <div>能量与频率：E = hf；接收强度近似随距离增大而减弱。</div>
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const els = {
+    freq: document.getElementById('freq'), amp: document.getElementById('amp'), dist: document.getElementById('dist'), band: document.getElementById('band'),
+    fLabel: document.getElementById('fLabel'), aLabel: document.getElementById('aLabel'), dLabel: document.getElementById('dLabel'), bLabel: document.getElementById('bLabel'),
+    readout: document.getElementById('readout'), status: document.getElementById('status'), rows: document.getElementById('rows')
+  };
+  const buttons = Array.from(document.querySelectorAll('button[data-mode]'));
+  const C = 3e8;
+  const state = { mode: 'radio', t: 0, receiverX: 690, probeX: 650, drag: null, records: [] };
+  const colors = { ink:'#102a43', muted:'#486581', blue:'#2c7be5', red:'#e03131', green:'#087f5b', gold:'#f0a500', purple:'#7c3aed', sky:'#0ea5e9' };
+  const presets = {
+    radio: { f: 2, d: 120, b: 8, note: '广播：用调制把声音信息加载到电磁波上，接收机再解调。' },
+    satellite: { f: 4.1, d: 36000, b: 36, note: '卫星通信：距离远，延迟明显，需定向天线提高接收质量。' },
+    radar: { f: 4.4, d: 80, b: 20, note: '雷达：发射脉冲并接收回波，用往返时间求距离。' },
+    fiber: { f: 5, d: 40, b: 80, note: '光纤通信：红外光在光纤中传播，频率高、带宽大、抗干扰强。' }
+  };
+  function freqMHz() {
+    const x = +els.freq.value;
+    return Math.round(Math.pow(10, x) * 10) / 10;
+  }
+  function params() {
+    const fMHz = freqMHz();
+    const dKm = +els.dist.value;
+    return { fMHz, fHz: fMHz * 1e6, amp: +els.amp.value / 100, dKm, band: +els.band.value };
+  }
+  function fmt(n, d=2) { return Math.abs(n) >= 100 ? n.toFixed(0) : n.toFixed(d); }
+  function line(x1,y1,x2,y2,c='#9fb3c8',w=2,dash) {
+    ctx.save(); ctx.strokeStyle=c; ctx.lineWidth=w; if (dash) ctx.setLineDash(dash);
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); ctx.restore();
+  }
+  function box(x,y,w,h,fill='#fff',stroke='#d9e2ec') {
+    ctx.save(); ctx.fillStyle=fill; ctx.strokeStyle=stroke; ctx.beginPath(); ctx.roundRect(x,y,w,h,8); ctx.fill(); ctx.stroke(); ctx.restore();
+  }
+  function text(s,x,y,c=colors.ink,align='center',size=13,weight='700') {
+    ctx.fillStyle=c; ctx.font=weight+' '+size+'px -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif';
+    ctx.textAlign=align; ctx.textBaseline='middle'; ctx.fillText(s,x,y);
+  }
+  function arrow(x1,y1,x2,y2,c,w=3) {
+    const a=Math.atan2(y2-y1,x2-x1);
+    line(x1,y1,x2,y2,c,w);
+    ctx.fillStyle=c; ctx.beginPath(); ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-10*Math.cos(a-.45), y2-10*Math.sin(a-.45));
+    ctx.lineTo(x2-10*Math.cos(a+.45), y2-10*Math.sin(a+.45));
+    ctx.closePath(); ctx.fill();
+  }
+  function drawAntenna(x,y,label) {
+    line(x,y,x,y-95,colors.ink,5);
+    line(x,y-70,x-32,y-20,colors.ink,3); line(x,y-70,x+32,y-20,colors.ink,3);
+    box(x-45,y,90,28,'#eef2ff','#9fb3c8'); text(label,x,y+14,colors.ink,'center',12,'800');
+  }
+  function drawReceiver(x,y) {
+    box(x-45,y-25,90,52,'#f8fafc','#9fb3c8');
+    line(x-28,y-25,x-44,y-62,colors.ink,3); line(x+28,y-25,x+44,y-62,colors.ink,3);
+    text('接收机',x,y,colors.ink,'center',12,'800');
+  }
+  function drawWave(x1,y1,x2,y2,p) {
+    const n = 180, amp = 18 + 34*p.amp, cycles = 3 + Math.log10(p.fMHz)*2.1;
+    ctx.save(); ctx.strokeStyle=colors.blue; ctx.lineWidth=3; ctx.beginPath();
+    for (let i=0;i<=n;i++) {
+      const u=i/n, x=x1+(x2-x1)*u, y=y1+(y2-y1)*u + Math.sin(u*Math.PI*2*cycles - state.t*3)*amp;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke(); ctx.restore();
+    arrow(x1+70,y1-56,x2-70,y2-56,colors.green,2);
+    text('电磁波传播：c=λf', (x1+x2)/2, y1-78, colors.green, 'center', 13, '900');
+  }
+  function drawScene() {
+    const p=params();
+    ctx.clearRect(0,0,900,620);
+    box(34,36,832,288,'#fbfdff');
+    text('电磁波应用场景：发射 → 传播 → 接收/回波',450,60,colors.ink,'center',16,'800');
+    if (state.mode === 'fiber') {
+      box(110,145,640,96,'#eefcf6','#38b2ac');
+      for(let i=0;i<6;i++) {
+        const x=130+i*105+((state.t*24)%105);
+        arrow(x,193,x+52,193,colors.sky,3);
+      }
+      text('光纤芯',430,166,colors.green,'center',13,'900');
+      text('全反射导光，信息以光脉冲形式传输',430,222,colors.green,'center',12,'800');
+      drawAntenna(92,260,'发光端');
+      drawReceiver(792,260);
+    } else {
+      drawAntenna(120,270,'发射天线');
+      drawReceiver(state.receiverX,270);
+      drawWave(158,202,state.receiverX-54,202,p);
+      if (state.mode === 'satellite') {
+        ctx.fillStyle='#e0f2fe'; ctx.beginPath(); ctx.arc(450,124,24,0,Math.PI*2); ctx.fill(); ctx.strokeStyle=colors.blue; ctx.stroke();
+        line(428,124,382,100,colors.blue,3); line(472,124,518,100,colors.blue,3);
+        text('通信卫星',450,88,colors.blue,'center',12,'900');
+        arrow(170,183,430,124,colors.purple,2); arrow(470,124,state.receiverX-40,183,colors.purple,2);
+      }
+      if (state.mode === 'radar') {
+        box(470,232,78,48,'#fff7e6','#f0a500'); text('目标',509,256,colors.gold,'center',13,'900');
+        arrow(160,188,485,240,colors.blue,2); arrow(485,250,170,212,colors.red,2);
+        text('回波往返时间',330,233,colors.red,'center',12,'900');
+      }
+    }
+    drawSpectrum(p);
+    drawGraphs(p);
+  }
+  function drawSpectrum(p) {
+    box(52,350,376,214,'#fff');
+    text('频谱图像：频率越高，波长越短',240,374,colors.ink,'center',15,'800');
+    const gx=86, gy=520, gw=300, gh=104;
+    line(gx,gy,gx+gw,gy,colors.ink,2); line(gx,gy,gx,gy-gh,colors.ink,2);
+    const marks = [
+      ['无线电',20,colors.green], ['微波',120,colors.blue], ['红外/光',235,colors.purple]
+    ];
+    marks.forEach(m=>{ box(gx+m[1]-28,gy+14,58,24,'#f8fafc','#d9e2ec'); text(m[0],gx+m[1],gy+26,m[2],'center',11,'800'); });
+    const pos = Math.min(gw, Math.max(0, Math.log10(p.fMHz)/5*gw));
+    line(gx+pos,gy,gx+pos,gy-gh,colors.gold,3);
+    text('探针 f='+fmt(p.fMHz,1)+' MHz',gx+pos,gy-gh-18,colors.gold,'center',12,'900');
+    const bw = Math.max(10, p.band/80*86);
+    ctx.fillStyle='rgba(44,123,229,.18)'; ctx.fillRect(gx+pos-bw/2,gy-gh,gx+pos+bw/2>gx+gw?gx+gw-(gx+pos-bw/2):bw,gh);
+    text('带宽 B',gx+pos,gy-gh/2,colors.blue,'center',12,'900');
+  }
+  function drawGraphs(p) {
+    box(472,350,376,214,'#fff');
+    text('调制波形与接收强度',660,374,colors.ink,'center',15,'800');
+    const x0=506, y0=462, w=300;
+    line(x0,y0,x0+w,y0,'#d9e2ec',1);
+    ctx.strokeStyle=colors.blue; ctx.lineWidth=2; ctx.beginPath();
+    for (let i=0;i<=220;i++) {
+      const u=i/220, carrier=Math.sin(u*Math.PI*34+state.t*4), info=0.55+0.35*Math.sin(u*Math.PI*4);
+      const y=y0-carrier*info*(22+22*p.amp);
+      const x=x0+u*w;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    const strength = Math.min(1, (p.amp*p.amp) / Math.max(0.08, Math.sqrt(p.dKm/80)));
+    box(528,504,250,28,'#eef2ff','#9fb3c8');
+    ctx.fillStyle=colors.green; ctx.fillRect(528,504,250*strength,28);
+    text('接收强度 '+Math.round(strength*100)+'%',653,518,colors.ink,'center',12,'900');
+    const delayMs = p.dKm*1000/C*1000;
+    text('传播延迟 t=d/c='+fmt(delayMs,2)+' ms',653,548,colors.purple,'center',13,'900');
+  }
+  function updatePanel() {
+    const p=params();
+    const lambda = C / p.fHz;
+    const delayMs = p.dKm*1000/C*1000;
+    els.fLabel.textContent = fmt(p.fMHz,1)+' MHz';
+    els.aLabel.textContent = Math.round(p.amp*100)+'%';
+    els.dLabel.textContent = p.dKm >= 1000 ? fmt(p.dKm,0)+' km' : fmt(p.dKm,0)+' km';
+    els.bLabel.textContent = p.band+' MHz';
+    els.readout.innerHTML =
+      '场景：<b>' + modeName() + '</b><br>' +
+      '波长 λ=c/f：<b>' + fmt(lambda,2) + ' m</b><br>' +
+      '传播延迟 t=d/c：<b>' + fmt(delayMs,2) + ' ms</b><br>' +
+      '带宽越大：<b>可承载信息量越大</b>';
+    els.status.textContent = presets[state.mode].note;
+    els.rows.innerHTML = state.records.slice(-6).map(r =>
+      '<tr><td>'+r.mode+'</td><td>'+fmt(r.f,1)+'</td><td>'+fmt(r.l,2)+'</td><td>'+fmt(r.t,2)+'</td></tr>'
+    ).join('') || '<tr><td colspan="4">拖动接收机或切换场景后自动记录</td></tr>';
+  }
+  function modeName() {
+    return { radio:'广播通信', satellite:'卫星通信', radar:'雷达测距', fiber:'光纤通信' }[state.mode];
+  }
+  function record() {
+    const p=params();
+    state.records.push({ mode: modeName(), f: p.fMHz, l: C/p.fHz, t: p.dKm*1000/C*1000 });
+    if (state.records.length > 9) state.records.shift();
+  }
+  function setMode(mode) {
+    state.mode = mode;
+    const pre = presets[mode];
+    els.freq.value = pre.f; els.dist.value = pre.d; els.band.value = pre.b;
+    buttons.forEach(b=>b.classList.toggle('active', b.dataset.mode===mode));
+    record();
+  }
+  buttons.forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
+  [els.freq, els.amp, els.dist, els.band].forEach(el=>el.addEventListener('input',()=>{ record(); drawScene(); updatePanel(); }));
+  canvas.addEventListener('pointerdown', e => {
+    const r=canvas.getBoundingClientRect(), x=(e.clientX-r.left)*canvas.width/r.width, y=(e.clientY-r.top)*canvas.height/r.height;
+    if (y < 330 && x > 430) state.drag = 'receiver';
+    else if (y > 350 && x < 430) state.drag = 'freq';
+    canvas.setPointerCapture(e.pointerId);
+  });
+  canvas.addEventListener('pointermove', e => {
+    if (!state.drag) return;
+    const r=canvas.getBoundingClientRect(), x=(e.clientX-r.left)*canvas.width/r.width;
+    if (state.drag === 'receiver') {
+      state.receiverX = Math.max(560, Math.min(805, x));
+      els.dist.value = Math.round(10 + (state.receiverX-560)/(805-560)*500);
+    } else {
+      els.freq.value = Math.max(1, Math.min(5, (x-86)/300*5));
+    }
+    drawScene(); updatePanel();
+  });
+  canvas.addEventListener('pointerup', e => { state.drag=null; record(); try { canvas.releasePointerCapture(e.pointerId); } catch(_) {} });
+  function loop() {
+    state.t += 0.035;
+    drawScene(); updatePanel();
+    requestAnimationFrame(loop);
+  }
+  setMode('radio');
+  loop();
+})();
+</script>
+</body>
+</html>

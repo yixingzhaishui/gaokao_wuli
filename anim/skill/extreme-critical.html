@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>极值与临界专题实验台</title>
+<link rel="icon" href="data:,">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}.root{display:grid;grid-template-columns:minmax(0,1fr)340px;gap:12px;padding:12px;min-height:700px}.stage,.card{background:#fff;border:1px solid #d9e2ec;border-radius:8px}.stage{overflow:hidden}.card{padding:10px}.panel{display:flex;flex-direction:column;gap:10px}canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab}.task{background:#fff7e6;border-left:4px solid #f0a500;color:#486581;font-size:13px;line-height:1.5}.title{font-weight:900;margin-bottom:7px}.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px}.tabs button.active{background:#102a43;color:#fff;border-color:#102a43}.param{display:grid;gap:3px;margin:8px 0;font-size:13px}.param span{display:flex;justify-content:space-between;gap:8px;color:#486581}.param b{color:#102a43;font-variant-numeric:tabular-nums;white-space:nowrap}input[type=range]{width:100%;accent-color:#2c7be5}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}button{border:1px solid #b0bcc9;background:#fff;border-radius:6px;padding:7px 8px;cursor:pointer;font:inherit;font-size:13px}.readout{background:#102a43;color:#d9e2ec;border-radius:8px;padding:10px;line-height:1.6;font-size:13px}.readout b{color:#ffd166;font-variant-numeric:tabular-nums}.status{border:1px solid #38b2ac;background:#e6fffa;color:#087f5b;border-radius:8px;padding:8px;font-size:13px;font-weight:800;line-height:1.45}.formula{font-size:13px;color:#334e68;line-height:1.6}table{width:100%;border-collapse:collapse;font-size:12px}td,th{border-bottom:1px solid #d9e2ec;padding:4px 3px;text-align:right;font-variant-numeric:tabular-nums}@media(max-width:880px){.root{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="930" height="620" aria-label="极值与临界专题实验台：圆周最高点、抛体最远射程、临界速度、图像顶点、轨迹和数据记录多视角"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>拖动小球或角度指针，观察“刚好不脱离”“射程最大”对应的力、速度和图像顶点。</div>
+    <div class="card">
+      <div class="title">模型选择</div>
+      <div class="tabs"><button id="circle" class="active">圆周临界</button><button id="projectile">射程极值</button></div>
+      <label class="param"><span>速度/角度 <b id="mainLabel">6.0</b></span><input id="main" type="range" min="1" max="12" step="0.05" value="6"></label>
+      <label class="param"><span>半径/初速 <b id="scaleLabel">3.0</b></span><input id="scale" type="range" min="1" max="8" step="0.05" value="3"></label>
+      <label class="param"><span>高度/重力 <b id="gLabel">9.8</b></span><input id="grav" type="range" min="4" max="12" step="0.1" value="9.8"></label>
+      <div class="buttons"><button id="play">暂停</button><button id="record">记录临界</button></div>
+    </div>
+    <div class="readout" id="readout"></div>
+    <div class="card"><div class="title">临界记录</div><table><thead><tr><th>模型</th><th>判据</th><th>状态</th></tr></thead><tbody id="rows"></tbody></table></div>
+    <div class="card formula">
+      <div class="title">常用判据</div>
+      <div>圆周最高点：N=0，v临=√(gR)</div>
+      <div>极值：图像顶点、导数为 0 或判别式临界</div>
+      <div>抛体同高射程：R=v0²sin2θ/g，θ=45° 最大</div>
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+</div>
+<script>
+(function(){
+'use strict';
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+const E={circle:document.getElementById('circle'),projectile:document.getElementById('projectile'),main:document.getElementById('main'),scale:document.getElementById('scale'),grav:document.getElementById('grav'),mainLabel:document.getElementById('mainLabel'),scaleLabel:document.getElementById('scaleLabel'),gLabel:document.getElementById('gLabel'),readout:document.getElementById('readout'),rows:document.getElementById('rows'),status:document.getElementById('status'),play:document.getElementById('play'),record:document.getElementById('record')};
+const C={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',green:'#087f5b',gold:'#f0a500',purple:'#7048e8'};
+const S={mode:'circle',run:true,t:0,drag:false,records:[]};
+function box(x,y,w,h,f='#fff',s='#d9e2ec'){ctx.save();ctx.fillStyle=f;ctx.strokeStyle=s;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.restore()}
+function text(s,x,y,c=C.ink,a='center',z=13,w='800'){ctx.fillStyle=c;ctx.font=w+' '+z+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+function line(x1,y1,x2,y2,c='#9fb3c8',w=2,d){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(d)ctx.setLineDash(d);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
+function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.45),y2-10*Math.sin(a-.45));ctx.lineTo(x2-10*Math.cos(a+.45),y2-10*Math.sin(a+.45));ctx.closePath();ctx.fill()}
+function values(){const g=+E.grav.value;if(S.mode==='circle'){const v=+E.main.value,R=+E.scale.value,vc=Math.sqrt(g*R),N=v*v/R-g;return{g,v,R,vc,N,state:N>=0?'不脱离':'会脱离'}}const theta=+E.main.value/12*Math.PI/2,v0=+E.scale.value*4,range=v0*v0*Math.sin(2*theta)/g,max=v0*v0/g;return{g,theta,v0,range,max,state:Math.abs(theta-Math.PI/4)<.04?'接近最大':'未达最大'}}
+function draw(){const v=values();ctx.clearRect(0,0,930,620);box(34,30,862,548,'#fff');text('G-06 极值与临界：找“刚好”、找顶点、找约束条件',465,56,C.ink,'center',17,'900');if(S.mode==='circle')drawCircle(v);else drawProjectile(v);drawFlow(v);update(v)}
+function drawCircle(v){box(70,88,560,252,'#fbfdff');text('圆周最高点侧视装置：临界状态是支持力 N=0',350,112,C.muted,'center',12,'900');const cx=350,cy=222,R=92;ctx.strokeStyle='#52606d';ctx.lineWidth=5;ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.stroke();const a=-Math.PI/2+S.t*1.2;const bx=cx+Math.cos(a)*R,by=cy+Math.sin(a)*R;ctx.fillStyle=v.N>=0?C.gold:C.red;ctx.beginPath();ctx.arc(bx,by,14,0,7);ctx.fill();arrow(bx,by,bx,by+58,C.red,3);text('mg',bx+22,by+48,C.red,'left',12,'900');arrow(bx,by,bx+Math.cos(a)*42,by+Math.sin(a)*42,C.blue,3);text('N',bx+Math.cos(a)*54,by+Math.sin(a)*54,C.blue,'center',12,'900');arrow(cx+150,cy+80,cx+150,cy+20,C.green,3);text('拖动速度让最高点刚好不断轨',cx+150,cy+98,C.green,'center',12,'900');text('v临=√(gR)='+v.vc.toFixed(2)+' m/s，当前 v='+v.v.toFixed(2)+' m/s',350,318,C.purple,'center',12,'900');drawGraph(v)}
+function drawProjectile(v){box(70,88,560,252,'#fbfdff');text('抛体实验台：同高射程的极值在 θ=45°',350,112,C.muted,'center',12,'900');const x0=120,y0=286,scale=16;line(x0,y0,x0+430,y0,'#52606d',3);const th=v.theta;arrow(x0,y0,x0+80*Math.cos(th),y0-80*Math.sin(th),C.red,4);text('拖动发射角',x0+88*Math.cos(th),y0-88*Math.sin(th),C.red,'center',12,'900');ctx.strokeStyle=C.blue;ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=80;i++){const t=i/80*2*v.v0*Math.sin(th)/v.g;const x=v.v0*Math.cos(th)*t,y=v.v0*Math.sin(th)*t-.5*v.g*t*t;const px=x0+x*scale,py=y0-y*scale;if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py)}ctx.stroke();text('R=v0²sin2θ/g，θ=45° 最大',350,318,C.purple,'center',12,'900');drawGraph(v)}
+function drawGraph(v){box(70,366,560,166,'#fff');text('图像视角：极值看顶点，临界看边界',350,388,C.muted,'center',12,'900');const x0=116,y0=496,w=450,h=78;arrow(x0,y0,x0+w+18,y0,'#52606d',2);arrow(x0,y0,x0,y0-h-18,'#52606d',2);for(let i=0;i<=5;i++){line(x0+i*w/5,y0,x0+i*w/5,y0-h,'rgba(130,154,177,.16)',1);line(x0,y0-i*h/5,x0+w,y0-i*h/5,'rgba(130,154,177,.16)',1)}ctx.strokeStyle=C.blue;ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=120;i++){const x=i/120;if(S.mode==='circle'){const y=Math.min(1,Math.max(0,(x*x*1.8-.35)));if(i===0)ctx.moveTo(x0+x*w,y0-y*h);else ctx.lineTo(x0+x*w,y0-y*h)}else{const y=Math.sin(Math.PI*x);if(i===0)ctx.moveTo(x0+x*w,y0-y*h);else ctx.lineTo(x0+x*w,y0-y*h)}}ctx.stroke();const px=S.mode==='circle'?x0+Math.min(1,v.v/12)*w:x0+(v.theta/(Math.PI/2))*w;const py=S.mode==='circle'?y0-Math.min(1,Math.max(0,(v.v/12)*(v.v/12)*1.8-.35))*h:y0-Math.sin(2*v.theta)*h;ctx.fillStyle=C.gold;ctx.beginPath();ctx.arc(px,py,9,0,7);ctx.fill();text('当前状态',px,py-18,C.gold,'center',11,'900');text('多视角：物理场景 + 受力箭头 + 函数图像 + 临界记录',350,524,C.purple,'center',12,'900')}
+function drawFlow(v){box(664,88,196,444,'#fff');text('解题流程',762,114,C.ink,'center',14,'900');['找关键词：刚好/最大/最小','画临界状态','写边界条件','列函数或方程','求顶点/判别式','回到物理意义'].forEach((s,i)=>{box(686,142+i*54,152,34,i===0?'#fff7e6':i===2?'#e6fffa':'#eef4ff');text(s,762,159+i*54,i===0?C.gold:i===2?C.green:C.blue,'center',12,'900')});text(S.mode==='circle'?'N='+v.N.toFixed(2):'R='+v.range.toFixed(2),762,474,C.red,'center',14,'900');text(v.state,762,502,C.muted,'center',12,'800')}
+function update(v){E.circle.classList.toggle('active',S.mode==='circle');E.projectile.classList.toggle('active',S.mode==='projectile');E.mainLabel.textContent=S.mode==='circle'?v.v.toFixed(2)+' m/s':(v.theta*180/Math.PI).toFixed(1)+'°';E.scaleLabel.textContent=S.mode==='circle'?v.R.toFixed(2)+' m':v.v0.toFixed(1)+' m/s';E.gLabel.textContent=v.g.toFixed(1);E.readout.innerHTML=S.mode==='circle'?'临界速度：<b>'+v.vc.toFixed(2)+' m/s</b><br>当前 N/m：<b>'+v.N.toFixed(2)+' N/kg</b><br>状态：<b>'+v.state+'</b><br>判据：<b>N=0</b>':'当前射程：<b>'+v.range.toFixed(2)+' m</b><br>最大射程：<b>'+v.max.toFixed(2)+' m</b><br>发射角：<b>'+(v.theta*180/Math.PI).toFixed(1)+'°</b><br>判据：<b>sin2θ 最大</b>';E.rows.innerHTML=S.records.slice(-6).map(r=>'<tr><td>'+r.m+'</td><td>'+r.c+'</td><td>'+r.s+'</td></tr>').join('')||'<tr><td colspan="3">暂无记录</td></tr>';E.status.textContent='识别信号：刚好、恰能、最大、最小、临界、至少、至多，通常对应边界条件或函数极值。'}
+function record(){const v=values();S.records.push({m:S.mode==='circle'?'圆周':'抛体',c:S.mode==='circle'?'N=0':'θ=45°',s:v.state});if(S.records.length>8)S.records.shift();update(v)}
+E.circle.onclick=()=>{S.mode='circle';E.main.min=1;E.main.max=12;E.main.value=6;E.scale.value=3;record();draw()};E.projectile.onclick=()=>{S.mode='projectile';E.main.min=0;E.main.max=12;E.main.value=6;E.scale.value=5;record();draw()};[E.main,E.scale,E.grav].forEach(el=>el.addEventListener('input',draw));E.record.onclick=record;E.play.onclick=()=>{S.run=!S.run;E.play.textContent=S.run?'暂停':'播放'};function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}function setMain(p){if(S.mode==='circle')E.main.value=Math.max(1,Math.min(12,(p.x-120)/430*12)).toFixed(2);else{const ang=Math.atan2(286-p.y,p.x-120);E.main.value=Math.max(0,Math.min(12,ang/(Math.PI/2)*12)).toFixed(2)}draw()}canvas.addEventListener('pointerdown',e=>{const p=pos(e);if(p.x>70&&p.x<630&&p.y>85&&p.y<340){S.drag=true;canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing';setMain(p)}});canvas.addEventListener('pointermove',e=>{if(S.drag)setMain(pos(e))});canvas.addEventListener('pointerup',e=>{if(S.drag)record();S.drag=false;canvas.style.cursor='grab';try{canvas.releasePointerCapture(e.pointerId)}catch(_){}});canvas.addEventListener('pointercancel',()=>{S.drag=false});let last=performance.now();function loop(now){const dt=Math.min((now-last)/1000,.04);last=now;if(S.run&&!S.drag){S.t+=dt;if(S.mode==='circle')E.main.value=(6+2*Math.sin(S.t*.7)).toFixed(2);else E.main.value=(6+3*Math.sin(S.t*.5)).toFixed(2)}draw();requestAnimationFrame(loop)}record();loop();
+})();
+</script>
+</body>
+</html>

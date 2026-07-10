@@ -7,37 +7,52 @@
 <style>
   * { box-sizing: border-box; }
   body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
-  .wrap { max-width: 1000px; margin: 0 auto; padding: 16px; }
-  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 286px; gap: 14px; align-items: stretch; }
-  canvas { width: 100%; height: 470px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 16px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 14px; align-items: stretch; }
+  canvas { width: 100%; height: 540px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; touch-action: none; cursor: crosshair; }
   .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
-  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-top: 11px; }
   input { width: 100%; }
-  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.72; font-size: 14px; }
-  .status { margin-top: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13px; line-height: 1.55; background: #e6fffa; color: #087f5b; font-weight: 700; }
+  .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
+  button { border: 1px solid #bcccdc; background: #fff; color: #243b53; border-radius: 8px; padding: 8px 6px; font-weight: 800; cursor: pointer; }
+  button.primary { background: #2c7be5; border-color: #2c7be5; color: #fff; }
+  .readout { margin-top: 12px; padding: 11px; background: #eef4ff; border-radius: 8px; line-height: 1.68; font-size: 14px; }
+  .status { margin-top: 9px; padding: 9px 10px; border-radius: 8px; font-size: 13px; line-height: 1.55; background: #e6fffa; color: #087f5b; font-weight: 700; }
   .status.bad { background: #fff5f5; color: #c92a2a; }
-  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
-  @media (max-width: 780px) { .stage { grid-template-columns: 1fr; } canvas { height: 400px; } }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.58; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+  th, td { border-bottom: 1px solid #d9e2ec; padding: 4px 3px; text-align: right; }
+  th:first-child, td:first-child { text-align: left; }
+  @media (max-width: 820px) { .stage { grid-template-columns: 1fr; } canvas { height: 460px; } }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="stage">
-    <canvas id="c" width="700" height="470" aria-label="导电纸描绘等势线实验"></canvas>
+    <canvas id="c" width="740" height="540" aria-label="导电纸俯视实验台、电压表读数、φ-x图像和等势点数据记录"></canvas>
     <section class="panel">
+      <div class="row">
+        <button id="playBtn" class="primary" type="button">播放</button>
+        <button id="markBtn" type="button">描点</button>
+        <button id="resetBtn" type="button">重置</button>
+      </div>
       <label for="voltage">电源电压 U/V：<span id="voltageVal"></span></label>
       <input id="voltage" type="range" min="4" max="16" value="10" step="1">
       <label for="spacing">电极间距 d/cm：<span id="spacingVal"></span></label>
       <input id="spacing" type="range" min="12" max="28" value="20" step="1">
       <label for="target">目标电势 φ/V：<span id="targetVal"></span></label>
-      <input id="target" type="range" min="1" max="9" value="5" step="0.5">
+      <input id="target" type="range" min="1" max="15" value="5" step="0.5">
       <label for="probeX">探针横坐标 x/cm：<span id="probeXVal"></span></label>
       <input id="probeX" type="range" min="0" max="20" value="10" step="0.5">
       <label for="probeY">探针纵坐标 y/cm：<span id="probeYVal"></span></label>
       <input id="probeY" type="range" min="-8" max="8" value="3" step="0.5">
       <div id="readout" class="readout"></div>
       <div id="status" class="status"></div>
-      <div class="hint">观察任务：移动探针，让电压表读数接近目标电势；把这些点连起来，就是一条等势线。</div>
+      <div class="hint">观察任务：直接拖动探针，让电压表读数接近目标 φ；点“描点”留下同电势点，观察这些点连成的等势线如何与电场线垂直。</div>
+      <table aria-label="等势点数据记录">
+        <thead><tr><th>点</th><th>x/cm</th><th>y/cm</th><th>φ/V</th></tr></thead>
+        <tbody id="markRows"></tbody>
+      </table>
     </section>
   </div>
 </div>
@@ -55,12 +70,44 @@ const els = {
   targetVal: document.getElementById('targetVal'),
   probeXVal: document.getElementById('probeXVal'),
   probeYVal: document.getElementById('probeYVal'),
+  playBtn: document.getElementById('playBtn'),
+  markBtn: document.getElementById('markBtn'),
+  resetBtn: document.getElementById('resetBtn'),
   readout: document.getElementById('readout'),
-  status: document.getElementById('status')
+  status: document.getElementById('status'),
+  markRows: document.getElementById('markRows')
+};
+const state = {
+  running: false,
+  last: 0,
+  time: 0,
+  drag: null,
+  marks: []
 };
 function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+function getVals() {
+  const U = Number(els.voltage.value);
+  const d = Number(els.spacing.value);
+  const target = Math.min(Number(els.target.value), U - 0.5);
+  const x = clamp(Number(els.probeX.value), 0, d);
+  const y = Number(els.probeY.value);
+  const phi = U * (1 - x / d);
+  const targetX = d * (1 - target / U);
+  const diff = Math.abs(phi - target);
+  const E = U / (d / 100);
+  return { U, d, target, x, y, phi, targetX, diff, E };
+}
+function setProbe(x, y) {
+  const v = getVals();
+  els.probeX.max = String(v.d);
+  els.probeX.value = clamp(x, 0, v.d).toFixed(1);
+  els.probeY.value = clamp(y, -8, 8).toFixed(1);
+}
+function paperGeom(v) {
+  return { ox: 70, oy: 84, w: 420, h: 282, sx: 420 / v.d, sy: 282 / 18 };
+}
 function drawArrow(x1, y1, x2, y2, color) {
-  const a = Math.atan2(y2-y1, x2-x1);
+  const a = Math.atan2(y2 - y1, x2 - x1);
   ctx.strokeStyle = color;
   ctx.fillStyle = color;
   ctx.lineWidth = 3;
@@ -70,28 +117,114 @@ function drawArrow(x1, y1, x2, y2, color) {
   ctx.stroke();
   ctx.beginPath();
   ctx.moveTo(x2, y2);
-  ctx.lineTo(x2 - 10*Math.cos(a-0.45), y2 - 10*Math.sin(a-0.45));
-  ctx.lineTo(x2 - 10*Math.cos(a+0.45), y2 - 10*Math.sin(a+0.45));
+  ctx.lineTo(x2 - 10 * Math.cos(a - 0.45), y2 - 10 * Math.sin(a - 0.45));
+  ctx.lineTo(x2 - 10 * Math.cos(a + 0.45), y2 - 10 * Math.sin(a + 0.45));
   ctx.closePath();
   ctx.fill();
 }
-function draw() {
+function meter(cx, cy, val, target) {
+  ctx.fillStyle = '#f7f9fc';
+  ctx.strokeStyle = '#bcccdc';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 58, Math.PI, 0);
+  ctx.lineTo(cx + 58, cy + 36);
+  ctx.lineTo(cx - 58, cy + 36);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  for (let i = 0; i <= 10; i++) {
+    const a = Math.PI - i * Math.PI / 10;
+    const r1 = 44, r2 = 52;
+    ctx.strokeStyle = '#829ab1';
+    ctx.beginPath();
+    ctx.moveTo(cx + r1 * Math.cos(a), cy - r1 * Math.sin(a));
+    ctx.lineTo(cx + r2 * Math.cos(a), cy - r2 * Math.sin(a));
+    ctx.stroke();
+  }
   const U = Number(els.voltage.value);
-  const d = Number(els.spacing.value);
-  let target = Number(els.target.value);
-  if (target >= U) target = U - 0.5;
-  const xCm = Number(els.probeX.value);
-  const yCm = Number(els.probeY.value);
-  const phi = U * (1 - clamp(xCm, 0, d) / d);
-  const diff = Math.abs(phi - target);
-  const E = U / (d / 100);
-  const targetX = d * (1 - target / U);
-  const match = diff <= 0.25;
-  els.voltageVal.textContent = U.toFixed(0);
-  els.spacingVal.textContent = d.toFixed(0);
-  els.targetVal.textContent = target.toFixed(1);
-  els.probeXVal.textContent = xCm.toFixed(1);
-  els.probeYVal.textContent = yCm.toFixed(1);
+  const a = Math.PI - clamp(val / U, 0, 1) * Math.PI;
+  ctx.strokeStyle = Math.abs(val - target) <= 0.2 ? '#087f5b' : '#e03131';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(cx, cy + 16);
+  ctx.lineTo(cx + 46 * Math.cos(a), cy + 16 - 46 * Math.sin(a));
+  ctx.stroke();
+  ctx.fillStyle = '#102a43';
+  ctx.textAlign = 'center';
+  ctx.font = '700 13px system-ui';
+  ctx.fillText('电压表读数', cx, cy + 58);
+}
+function drawGraph(x0, y0, w, h, v) {
+  ctx.strokeStyle = '#334e68';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(x0, y0);
+  ctx.lineTo(x0 + w, y0);
+  ctx.moveTo(x0, y0);
+  ctx.lineTo(x0, y0 - h);
+  ctx.stroke();
+  ctx.strokeStyle = '#38b2ac';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(x0, y0 - h);
+  ctx.lineTo(x0 + w, y0);
+  ctx.stroke();
+  const px = x0 + clamp(v.x / v.d, 0, 1) * w;
+  const py = y0 - clamp(v.phi / v.U, 0, 1) * h;
+  ctx.fillStyle = '#e03131';
+  ctx.beginPath();
+  ctx.arc(px, py, 5, 0, Math.PI * 2);
+  ctx.fill();
+  const targetY = y0 - clamp(v.target / v.U, 0, 1) * h;
+  ctx.strokeStyle = '#7b2cbf';
+  ctx.setLineDash([5, 4]);
+  ctx.beginPath();
+  ctx.moveTo(x0, targetY);
+  ctx.lineTo(x0 + w, targetY);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#486581';
+  ctx.font = '12px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('φ-x 图像', x0 + w / 2, y0 + 22);
+  ctx.fillText('φ', x0 - 14, y0 - h - 4);
+  ctx.fillText('x轴', x0 + w + 16, y0 + 4);
+}
+function drawMarks(g, v) {
+  const grouped = state.marks.filter(p => Math.abs(p.target - v.target) < 0.01 && Math.abs(p.U - v.U) < 0.01);
+  ctx.fillStyle = '#7b2cbf';
+  grouped.forEach(p => {
+    const x = g.ox + clamp(p.x, 0, v.d) * g.sx;
+    const y = g.oy + g.h / 2 - p.y * g.sy;
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  if (grouped.length >= 2) {
+    ctx.strokeStyle = '#7b2cbf';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    grouped.sort((a, b) => a.y - b.y).forEach((p, idx) => {
+      const x = g.ox + clamp(p.x, 0, v.d) * g.sx;
+      const y = g.oy + g.h / 2 - p.y * g.sy;
+      if (idx === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+  }
+}
+function draw() {
+  const v = getVals();
+  els.probeX.max = String(v.d);
+  els.target.max = String(Math.max(1, v.U - 0.5));
+  els.voltageVal.textContent = v.U.toFixed(0);
+  els.spacingVal.textContent = v.d.toFixed(0);
+  els.targetVal.textContent = v.target.toFixed(1);
+  els.probeXVal.textContent = v.x.toFixed(1);
+  els.probeYVal.textContent = v.y.toFixed(1);
+  const match = v.diff <= 0.25;
+  const g = paperGeom(v);
 
   ctx.clearRect(0, 0, c.width, c.height);
   ctx.fillStyle = '#fff';
@@ -99,130 +232,188 @@ function draw() {
   ctx.fillStyle = '#102a43';
   ctx.font = '700 18px system-ui';
   ctx.textAlign = 'center';
-  ctx.fillText('导电纸描点：同一电势的点连成等势线', 350, 30);
+  ctx.fillText('导电纸描绘等势线：俯视实验台 + 电压表 + φ-x图像 + 数据记录', 370, 28);
 
-  const ox = 92, oy = 88, w = 420, h = 270;
-  const sx = w / d, sy = h / 18;
   ctx.fillStyle = '#f7f9fc';
   ctx.strokeStyle = '#d9e2ec';
   ctx.lineWidth = 2;
-  ctx.fillRect(ox, oy, w, h);
-  ctx.strokeRect(ox, oy, w, h);
-  for (let i = 0; i <= d; i += 4) {
-    const x = ox + i * sx;
+  ctx.fillRect(g.ox, g.oy, g.w, g.h);
+  ctx.strokeRect(g.ox, g.oy, g.w, g.h);
+  ctx.fillStyle = '#486581';
+  ctx.textAlign = 'left';
+  ctx.font = '13px system-ui';
+  ctx.fillText('俯视导电纸：拖动黑色探针，寻找同一电势读数点', g.ox, g.oy - 16);
+  for (let i = 0; i <= v.d; i += 4) {
+    const x = g.ox + i * g.sx;
     ctx.strokeStyle = '#e5ecf3';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(x, oy);
-    ctx.lineTo(x, oy + h);
+    ctx.moveTo(x, g.oy);
+    ctx.lineTo(x, g.oy + g.h);
     ctx.stroke();
   }
   for (let j = -8; j <= 8; j += 4) {
-    const y = oy + h/2 - j * sy;
-    ctx.strokeStyle = '#e5ecf3';
+    const y = g.oy + g.h / 2 - j * g.sy;
     ctx.beginPath();
-    ctx.moveTo(ox, y);
-    ctx.lineTo(ox + w, y);
+    ctx.moveTo(g.ox, y);
+    ctx.lineTo(g.ox + g.w, y);
     ctx.stroke();
   }
   ctx.fillStyle = '#e03131';
-  ctx.fillRect(ox - 12, oy, 12, h);
+  ctx.fillRect(g.ox - 12, g.oy, 12, g.h);
   ctx.fillStyle = '#2c7be5';
-  ctx.fillRect(ox + w, oy, 12, h);
+  ctx.fillRect(g.ox + g.w, g.oy, 12, g.h);
   ctx.fillStyle = '#102a43';
   ctx.font = '700 13px system-ui';
-  ctx.fillText('+ ' + U.toFixed(0) + 'V', ox - 10, oy - 14);
-  ctx.fillText('0V', ox + w + 12, oy - 14);
+  ctx.textAlign = 'center';
+  ctx.fillText('+ ' + v.U.toFixed(0) + 'V', g.ox - 8, g.oy - 12);
+  ctx.fillText('0V', g.ox + g.w + 12, g.oy - 12);
 
   for (let p = 0.2; p < 1; p += 0.2) {
-    const lineX = ox + d * (1 - p) * sx;
+    const lineX = g.ox + v.d * (1 - p) * g.sx;
     ctx.strokeStyle = '#2c7be5';
     ctx.lineWidth = 2;
     ctx.setLineDash([7, 5]);
     ctx.beginPath();
-    ctx.moveTo(lineX, oy + 12);
-    ctx.lineTo(lineX, oy + h - 12);
+    ctx.moveTo(lineX, g.oy + 12);
+    ctx.lineTo(lineX, g.oy + g.h - 12);
     ctx.stroke();
     ctx.setLineDash([]);
     ctx.fillStyle = '#2c7be5';
     ctx.font = '12px system-ui';
-    ctx.fillText((U*p).toFixed(0) + 'V', lineX, oy + h + 18);
+    ctx.fillText((v.U * p).toFixed(0) + 'V', lineX, g.oy + g.h + 18);
   }
-  const tx = ox + targetX * sx;
+  const tx = g.ox + v.targetX * g.sx;
   ctx.strokeStyle = '#7b2cbf';
   ctx.lineWidth = 4;
   ctx.beginPath();
-  ctx.moveTo(tx, oy + 8);
-  ctx.lineTo(tx, oy + h - 8);
+  ctx.moveTo(tx, g.oy + 8);
+  ctx.lineTo(tx, g.oy + g.h - 8);
   ctx.stroke();
   ctx.fillStyle = '#7b2cbf';
   ctx.font = '700 13px system-ui';
-  ctx.fillText('目标等势线 ' + target.toFixed(1) + 'V', tx, oy + h + 40);
-
+  ctx.fillText('目标等势线 ' + v.target.toFixed(1) + 'V', tx, g.oy + g.h + 40);
   for (let j = 0; j < 5; j++) {
-    const y = oy + 45 + j * 45;
-    drawArrow(ox + 42, y, ox + w - 42, y, '#e03131');
+    const y = g.oy + 44 + j * 48;
+    drawArrow(g.ox + 38, y, g.ox + g.w - 38, y, '#e03131');
   }
   ctx.fillStyle = '#e03131';
   ctx.font = '700 13px system-ui';
-  ctx.fillText('电场线方向：高电势 → 低电势，且垂直等势线', ox + w/2, oy - 34);
+  ctx.fillText('电场线：高电势 → 低电势，处处垂直等势线', g.ox + g.w / 2, g.oy - 38);
+  drawMarks(g, v);
 
-  const px = ox + clamp(xCm, 0, d) * sx;
-  const py = oy + h/2 - yCm * sy;
-  ctx.fillStyle = match ? '#087f5b' : '#f08c00';
+  const px = g.ox + clamp(v.x, 0, v.d) * g.sx;
+  const py = g.oy + g.h / 2 - v.y * g.sy;
   ctx.strokeStyle = '#102a43';
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 3;
   ctx.beginPath();
-  ctx.arc(px, py, 8, 0, Math.PI * 2);
+  ctx.moveTo(px - 22, py - 48);
+  ctx.lineTo(px, py);
+  ctx.stroke();
+  ctx.fillStyle = match ? '#087f5b' : '#f08c00';
+  ctx.beginPath();
+  ctx.arc(px, py, 9, 0, Math.PI * 2);
   ctx.fill();
   ctx.stroke();
   ctx.fillStyle = '#102a43';
   ctx.font = '700 12px system-ui';
-  ctx.fillText('探针', px + 28, py - 12);
+  ctx.fillText('探针手柄', px + 34, py - 13);
 
-  const gx = 548, gy = 350, gw = 108, gh = 220;
-  ctx.strokeStyle = '#334e68';
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(gx, gy);
-  ctx.lineTo(gx + gw, gy);
-  ctx.moveTo(gx, gy);
-  ctx.lineTo(gx, gy - gh);
-  ctx.stroke();
-  ctx.strokeStyle = '#38b2ac';
-  ctx.lineWidth = 4;
-  ctx.beginPath();
-  ctx.moveTo(gx, gy - gh);
-  ctx.lineTo(gx + gw, gy);
-  ctx.stroke();
-  const ppx = gx + clamp(xCm/d, 0, 1) * gw;
-  const ppy = gy - clamp(phi/U, 0, 1) * gh;
-  ctx.fillStyle = '#e03131';
-  ctx.beginPath();
-  ctx.arc(ppx, ppy, 5, 0, Math.PI * 2);
-  ctx.fill();
+  meter(594, 138, v.phi, v.target);
+  drawGraph(520, 462, 150, 136, v);
+  ctx.fillStyle = '#eef4ff';
+  ctx.strokeStyle = '#d9e2ec';
+  ctx.lineWidth = 2;
+  ctx.fillRect(520, 244, 158, 76);
+  ctx.strokeRect(520, 244, 158, 76);
   ctx.fillStyle = '#486581';
-  ctx.font = '12px system-ui';
-  ctx.fillText('φ-x 图像', gx + 54, gy + 26);
-  ctx.fillText('φ', gx - 16, gy - gh - 4);
-  ctx.fillText('x', gx + gw + 10, gy + 4);
+  ctx.textAlign = 'center';
+  ctx.font = '13px system-ui';
+  ctx.fillText('侧视/剖面关系', 599, 268);
+  ctx.fillText('沿等势线移动：UAB=0', 599, 291);
+  ctx.fillText('W=qUAB=0', 599, 310);
 
   els.readout.innerHTML = [
-    `<div id="r1">探针电势 φ≈${phi.toFixed(2)}V</div>`,
-    `<div id="r2">目标电势 φ0=${target.toFixed(2)}V，差值≈${diff.toFixed(2)}V</div>`,
-    `<div id="r3">等势线位置 x=d(1-φ0/U)≈${targetX.toFixed(1)}cm</div>`,
-    `<div id="r4">场强估计 E≈U/d=${E.toFixed(0)}V/m</div>`,
+    `<div id="r1">探针电势 φ≈${v.phi.toFixed(2)} V</div>`,
+    `<div id="r2">目标电势 φ0=${v.target.toFixed(2)} V，差值≈${v.diff.toFixed(2)} V</div>`,
+    `<div id="r3">等势线位置 x=d(1-φ0/U)≈${v.targetX.toFixed(1)} cm</div>`,
+    `<div id="r4">场强估计 E≈U/d=${v.E.toFixed(0)} V/m</div>`,
     `<div id="r5">沿等势线移动：UAB=0，W=qUAB=0</div>`
   ].join('');
   els.status.className = match ? 'status' : 'status bad';
   els.status.textContent = match
-    ? '通过：探针读数接近目标电势，可以把该点标在等势线上。'
-    : '继续找点：横向移动探针，让读数接近目标电势。';
+    ? '通过：电压表读数接近目标电势，可以描下这个等势点。'
+    : (v.phi > v.target ? '继续向右移：读数偏高，探针要靠近低电势端。' : '继续向左移：读数偏低，探针要靠近高电势端。');
+}
+function renderMarks() {
+  els.markRows.innerHTML = state.marks.slice(-5).map((p, i) =>
+    `<tr><td>${i + 1}</td><td>${p.x.toFixed(1)}</td><td>${p.y.toFixed(1)}</td><td>${p.phi.toFixed(2)}</td></tr>`
+  ).join('');
+}
+function pointerToProbe(ev) {
+  const v = getVals();
+  const g = paperGeom(v);
+  const rect = c.getBoundingClientRect();
+  const x = (ev.clientX - rect.left) * c.width / rect.width;
+  const y = (ev.clientY - rect.top) * c.height / rect.height;
+  const xCm = (x - g.ox) / g.sx;
+  const yCm = (g.oy + g.h / 2 - y) / g.sy;
+  setProbe(xCm, yCm);
+}
+function loop(ts) {
+  if (!state.last) state.last = ts;
+  const dt = Math.min(0.05, (ts - state.last) / 1000);
+  state.last = ts;
+  if (state.running && !state.drag) {
+    state.time += dt;
+    const v = getVals();
+    const y = 6.4 * Math.sin(state.time * 1.25);
+    const nextX = Number(els.probeX.value) + (v.targetX - Number(els.probeX.value)) * Math.min(1, dt * 1.8);
+    setProbe(nextX, y);
+  }
+  draw();
+  requestAnimationFrame(loop);
 }
 Object.values(els).forEach(el => {
   if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
 });
-draw();
+els.playBtn.addEventListener('click', () => {
+  state.running = !state.running;
+  els.playBtn.textContent = state.running ? '暂停' : '播放';
+});
+els.markBtn.addEventListener('click', () => {
+  const v = getVals();
+  state.marks.push({ x: v.x, y: v.y, phi: v.phi, target: v.target, U: v.U });
+  renderMarks();
+});
+els.resetBtn.addEventListener('click', () => {
+  state.running = false;
+  state.time = 0;
+  state.drag = null;
+  state.marks = [];
+  els.voltage.value = '10';
+  els.spacing.value = '20';
+  els.target.value = '5';
+  els.probeX.value = '10';
+  els.probeY.value = '3';
+  els.playBtn.textContent = '播放';
+  renderMarks();
+  draw();
+});
+c.addEventListener('pointerdown', ev => {
+  state.drag = 'probe';
+  pointerToProbe(ev);
+  ev.preventDefault();
+});
+c.addEventListener('pointermove', ev => {
+  if (!state.drag) return;
+  pointerToProbe(ev);
+  ev.preventDefault();
+});
+c.addEventListener('pointerup', () => { state.drag = null; });
+c.addEventListener('pointerleave', () => { state.drag = null; });
+renderMarks();
+requestAnimationFrame(loop);
 </script>
 </body>
 </html>

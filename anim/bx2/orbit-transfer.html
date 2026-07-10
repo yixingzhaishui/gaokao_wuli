@@ -35,9 +35,9 @@
 </head>
 <body>
 <div class="root">
-  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="卫星变轨交互实验台"></canvas></div>
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="卫星变轨交互实验台：轨道俯视装置、速度柱状图像和数据记录"></canvas></div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>拖右侧第一次点火点或左侧第二次点火点，看低圆、高圆和转移椭圆怎样一起改变；比较 v1、vt1、vt2、v2。</div>
+    <div class="card task"><b>观察任务：</b>拖右侧第一次点火点或左侧第二次点火点，对照轨道俯视装置、速度柱状图像和数据记录，比较 v1、vt1、vt2、v2。</div>
     <button id="playBtn" class="primary">播放</button>
     <div class="card">
       <div class="title">阶段</div>
@@ -205,7 +205,7 @@
   }
   function draw(){
     const v=values();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);
-    text('卫星变轨实验台：两次切向点火，不是把圆轨慢慢拉大',460,30,'#0f172a','center',19,'900');
+    text('卫星变轨实验台：轨道俯视装置 + 速度图像 + 数据记录',460,30,'#0f172a','center',19,'900');
     drawOrbit(v);drawBars(v);bottom(v);update(v);
   }
   function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}

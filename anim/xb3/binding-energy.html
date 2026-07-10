@@ -3,116 +3,44 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>结合能与质量亏损</title>
+<title>结合能与质量亏损实验台</title>
 <style>
-  * { box-sizing: border-box; }
-  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
-  .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
-  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 14px; align-items: stretch; }
-  canvas { width: 100%; height: 430px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
-  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
-  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
-  input { width: 100%; }
-  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.8; font-size: 14px; }
-  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
-  @media (max-width: 760px) { .stage { grid-template-columns: 1fr; } canvas { height: 360px; } }
+  *{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#102a43;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}.wrap{max-width:1180px;margin:0 auto;padding:14px}.stage{display:grid;grid-template-columns:minmax(0,1fr)310px;gap:12px;align-items:start}canvas{width:100%;height:640px;background:#fff;border:1px solid #d9e2ec;border-radius:8px;display:block;touch-action:none}.panel{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:12px}.row{display:flex;gap:8px;margin-bottom:10px}button{flex:1;border:0;border-radius:6px;background:#2c7be5;color:#fff;font-weight:700;padding:9px 10px;cursor:pointer}.secondary{background:#e6edf7;color:#102a43}label{display:block;font-size:13px;font-weight:700;margin-top:10px}input{width:100%;accent-color:#2c7be5}.readout{margin-top:12px;padding:10px;background:#eef4ff;border-radius:8px;line-height:1.65;font-size:13px}.status{margin-top:10px;padding:9px 10px;border-radius:8px;font-size:13px;line-height:1.5;background:#e6fffa;color:#087f5b;font-weight:700}.bad{background:#fff5f5;color:#c92a2a}.hint{margin-top:10px;color:#486581;font-size:13px;line-height:1.55}table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px}th,td{border-bottom:1px solid #d9e2ec;padding:5px 4px;text-align:right}th:first-child,td:first-child{text-align:left}@media(max-width:860px){.stage{grid-template-columns:1fr}canvas{height:560px}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="stage">
-    <canvas id="c" width="680" height="430" aria-label="结合能与质量亏损模型"></canvas>
-    <section class="panel">
-      <label for="a">核子数 A：<span id="aVal"></span></label>
-      <input id="a" type="range" min="2" max="240" value="56" step="1">
-      <label for="eb">总结合能 Eb/MeV：<span id="ebVal"></span></label>
-      <input id="eb" type="range" min="5" max="2000" value="492" step="1">
-      <label for="compare">对比核平均结合能：<span id="compareVal"></span></label>
-      <input id="compare" type="range" min="1" max="9" value="7" step="0.1">
-      <div id="readout" class="readout"></div>
-      <div class="hint">观察任务：不要只看总结合能，比较稳定性时看平均结合能 Eb/A。</div>
-    </section>
-  </div>
-</div>
+<div class="wrap"><div class="stage">
+  <canvas id="c" width="940" height="640" aria-label="结合能实验台：核子模型、结合能曲线、质量亏损和数据记录"></canvas>
+  <section class="panel">
+    <div class="row"><button id="playBtn" class="play-btn">播放</button><button id="resetBtn" class="secondary">重置</button><button id="recordBtn" class="secondary">记录</button></div>
+    <label for="a">核子数 A：<span id="aVal"></span></label><input id="a" type="range" min="2" max="240" value="56" step="1">
+    <label for="eb">总结合能 Eb/MeV：<span id="ebVal"></span></label><input id="eb" type="range" min="5" max="2000" value="492" step="1">
+    <label for="compare">对比核平均结合能：<span id="compareVal"></span></label><input id="compare" type="range" min="1" max="9" value="7" step="0.1">
+    <div id="readout" class="readout"></div><div id="status" class="status"></div>
+    <div class="hint">观察任务：拖动画面中结合能曲线上的蓝色探针。比较稳定性时看 Eb/A，不要只看总结合能。</div>
+    <table><thead><tr><th>记录</th><th>A</th><th>Eb/A</th><th>更稳定</th></tr></thead><tbody id="recordBody"><tr><td colspan="4">点击“记录”保存一次比较</td></tr></tbody></table>
+  </section>
+</div></div>
 <script>
-const c = document.getElementById('c');
-const ctx = c.getContext('2d');
-const els = {
-  a: document.getElementById('a'),
-  eb: document.getElementById('eb'),
-  compare: document.getElementById('compare'),
-  aVal: document.getElementById('aVal'),
-  ebVal: document.getElementById('ebVal'),
-  compareVal: document.getElementById('compareVal'),
-  readout: document.getElementById('readout')
-};
-function drawBar(x, y, w, h, value, max, color, label) {
-  ctx.fillStyle = '#e9eef5';
-  ctx.fillRect(x, y, w, h);
-  ctx.fillStyle = color;
-  ctx.fillRect(x, y, Math.min(w, w * value / max), h);
-  ctx.fillStyle = '#102a43';
-  ctx.font = '14px system-ui';
-  ctx.textAlign = 'left';
-  ctx.fillText(label, x, y - 8);
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d'),els={a:by('a'),eb:by('eb'),compare:by('compare'),aVal:by('aVal'),ebVal:by('ebVal'),compareVal:by('compareVal'),readout:by('readout'),status:by('status'),playBtn:by('playBtn'),resetBtn:by('resetBtn'),recordBtn:by('recordBtn'),recordBody:by('recordBody')};function by(id){return document.getElementById(id)}
+let playing=false,t=0,last=0,dragging=false,records=[];const graph={x:584,y:438,w:300,h:250};
+function params(){const A=+els.a.value,Eb=+els.eb.value,avg=Eb/A,dm=Eb/931.5,cmp=+els.compare.value;return{A,Eb,avg,dm,cmp,stable:avg>cmp}}
+function curve(A){return 8.8*(1-Math.exp(-A/18))*Math.exp(-Math.max(0,A-62)/520)}
+function label(s,x,y,c='#102a43',size=13,align='center',w='700'){ctx.fillStyle=c;ctx.font=`${w} ${size}px system-ui`;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.48),y2-10*Math.sin(a-.48));ctx.lineTo(x2-10*Math.cos(a+.48),y2-10*Math.sin(a+.48));ctx.closePath();ctx.fill()}
+function drawScene(p){ctx.fillStyle='#fff';ctx.fillRect(0,0,940,640);label('结合能实验台：用 Eb/A 判断原子核稳定性',470,28,'#102a43',19);label('三视图联动：核子模型、结合能曲线、质量亏损仪表和数据记录',470,52,'#486581',13,'center','600');
+ ctx.fillStyle='#f2f7ff';ctx.strokeStyle='#2c7be5';ctx.lineWidth=2;ctx.fillRect(54,82,486,284);ctx.strokeRect(54,82,486,284);label('核子装置：核子被强相互作用束缚',297,106,'#2c7be5',14);ctx.save();ctx.translate(188,224);ctx.rotate(playing?t*.25:0);ctx.fillStyle='#fff7e6';ctx.strokeStyle='#f0a500';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,82,0,Math.PI*2);ctx.fill();ctx.stroke();for(let i=0;i<Math.min(72,p.A);i++){const a=i*2.399+t*.4,r=10+Math.sqrt(i)*8.2;ctx.fillStyle=i%2?'#2c7be5':'#e03131';ctx.beginPath();ctx.arc(Math.cos(a)*r,Math.sin(a)*r,5,0,Math.PI*2);ctx.fill()}ctx.restore();label(`A=${p.A}`,188,326,'#102a43',17);meter(330,156,152,22,Math.min(1,p.Eb/2000),'#2c7be5','总结合能 Eb');meter(330,224,152,22,Math.min(1,p.avg/9),'#e03131','平均结合能 Eb/A');meter(330,292,152,22,Math.min(1,p.dm/2.2),'#f0a500','质量亏损 Δm');
+ ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1;ctx.fillRect(578,82,318,398);ctx.strokeRect(578,82,318,398);label('图像：平均结合能曲线与可拖动探针',737,106,'#102a43',14);drawGraph(p);
+ ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(70,420,470,156);ctx.strokeRect(70,420,470,156);label('公式绑定与稳定性判定',305,444,'#102a43',14);label('Eb = Δmc²；平均结合能 = Eb/A',305,482,'#2c7be5',17);label(`当前 Eb/A=${p.avg.toFixed(2)} MeV/核子，对比=${p.cmp.toFixed(1)} MeV/核子`,305,522,'#102a43',15);label(p.stable?'当前核平均结合能更大，通常更稳定':'对比核平均结合能更大，通常更稳定',305,552,p.stable?'#087f5b':'#c92a2a',15);
 }
-function draw() {
-  const A = Number(els.a.value);
-  const Eb = Number(els.eb.value);
-  const avg = Eb / A;
-  const dm = Eb / 931.5;
-  const cmp = Number(els.compare.value);
-  els.aVal.textContent = A;
-  els.ebVal.textContent = Eb;
-  els.compareVal.textContent = cmp.toFixed(1) + ' MeV/核子';
-  ctx.clearRect(0, 0, c.width, c.height);
-  ctx.fillStyle = '#f7f9fc';
-  ctx.fillRect(0, 0, c.width, c.height);
-
-  ctx.fillStyle = '#fff7e6';
-  ctx.strokeStyle = '#f0a500';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.arc(135, 145, 72, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.stroke();
-  for (let i = 0; i < Math.min(A, 48); i++) {
-    const angle = i * 2.399;
-    const r = 8 + Math.sqrt(i) * 8;
-    ctx.fillStyle = i % 2 ? '#2c7be5' : '#e03131';
-    ctx.beginPath();
-    ctx.arc(135 + Math.cos(angle) * r, 145 + Math.sin(angle) * r, 5, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.fillStyle = '#486581';
-  ctx.font = '13px system-ui';
-  ctx.textAlign = 'center';
-  ctx.fillText('原子核：核子结合越紧，平均结合能越大', 160, 246);
-
-  drawBar(340, 92, 250, 26, Eb, 2000, '#2c7be5', '总结合能 Eb');
-  drawBar(340, 168, 250, 26, avg, 9, '#e03131', '平均结合能 Eb/A');
-  drawBar(340, 244, 250, 26, dm, 2.2, '#f0a500', '质量亏损 Δm');
-  ctx.fillStyle = '#102a43';
-  ctx.font = '700 16px system-ui';
-  ctx.textAlign = 'left';
-  ctx.fillText(`${Eb.toFixed(0)} MeV`, 604, 112);
-  ctx.fillText(`${avg.toFixed(2)} MeV/核子`, 604, 188);
-  ctx.fillText(`${dm.toFixed(3)} u`, 604, 264);
-  ctx.fillStyle = avg > cmp ? '#087f5b' : '#b30000';
-  ctx.font = '700 17px system-ui';
-  ctx.fillText(avg > cmp ? '本核平均结合能更大，通常更稳定' : '对比核平均结合能更大，通常更稳定', 340, 334);
-
-  els.readout.innerHTML = [
-    `A=${A}，Eb=${Eb.toFixed(0)} MeV`,
-    `平均结合能 Eb/A=${avg.toFixed(2)} MeV/核子`,
-    `质量亏损 Δm=Eb/931.5≈${dm.toFixed(3)} u`,
-    `对比：${cmp.toFixed(1)} MeV/核子，${avg > cmp ? '本核更稳定' : '对比核更稳定'}`
-  ].join('<br>');
-}
-Object.values(els).forEach(el => {
-  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
-});
-draw();
+function meter(x,y,w,h,val,c,txt){label(txt,x,y-14,'#486581',12,'left');ctx.fillStyle='#e9eef5';ctx.fillRect(x,y,w,h);ctx.fillStyle=c;ctx.fillRect(x,y,w*val,h)}
+function drawGraph(p){const x=graph.x+36,y=graph.y,w=graph.w-58,h=graph.h-92;arrow(x,y,x+w,y,'#52606d',2);arrow(x,y,x,y-h,'#52606d',2);label('A',x+w+10,y+16,'#52606d',11);label('Eb/A',x-20,y-h+8,'#52606d',11);ctx.strokeStyle='#38b2ac';ctx.lineWidth=3;ctx.beginPath();for(let i=2;i<=240;i+=2){const px=x+(i-2)/238*w,py=y-curve(i)/9*h;if(i===2)ctx.moveTo(px,py);else ctx.lineTo(px,py)}ctx.stroke();const px=x+(p.A-2)/238*w,py=y-Math.min(9,p.avg)/9*h;ctx.setLineDash([4,4]);ctx.strokeStyle='#2c7be5';ctx.beginPath();ctx.moveTo(px,y);ctx.lineTo(px,py);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=dragging?'#e03131':'#2c7be5';ctx.beginPath();ctx.arc(px,py,9,0,Math.PI*2);ctx.fill();label('拖动探针',px,py-18,'#2c7be5',11);ctx.strokeStyle='#f0a500';ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(x,y-p.cmp/9*h);ctx.lineTo(x+w,y-p.cmp/9*h);ctx.stroke();ctx.setLineDash([]);label('对比线',x+w-30,y-p.cmp/9*h-12,'#f0a500',11)}
+function update(p){els.aVal.textContent=p.A;els.ebVal.textContent=p.Eb.toFixed(0);els.compareVal.textContent=p.cmp.toFixed(1)+' MeV/核子';els.readout.innerHTML=[`A=${p.A}，Eb=${p.Eb.toFixed(0)} MeV`,`平均结合能 Eb/A=${p.avg.toFixed(2)} MeV/核子`,`质量亏损 Δm=Eb/931.5=${p.dm.toFixed(3)} u`,`比较：${p.stable?'当前核更稳定':'对比核更稳定'}`].join('<br>');els.status.className=p.stable?'status':'status bad';els.status.textContent=p.stable?'判定：当前核平均结合能更大。':'判定：对比核平均结合能更大。'}
+function render(){const p=params();drawScene(p);update(p)}
+function animate(now){if(!last)last=now;const dt=Math.min(.04,(now-last)/1000);last=now;if(playing)t+=dt;render();requestAnimationFrame(animate)}
+function dragProbe(clientX,clientY){const r=canvas.getBoundingClientRect(),x=(clientX-r.left)*canvas.width/r.width,y=(clientY-r.top)*canvas.height/r.height;const gx=graph.x+36,gy=graph.y,gw=graph.w-58,gh=graph.h-92;const A=Math.max(2,Math.min(240,Math.round(2+(x-gx)/gw*238)));const avg=Math.max(1,Math.min(9,(gy-y)/gh*9));els.a.value=String(A);els.eb.value=String(Math.max(5,Math.min(2000,Math.round(avg*A))));render()}
+canvas.addEventListener('pointerdown',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.height;if(x>graph.x&&x<graph.x+graph.w&&y>130&&y<graph.y+20){dragging=true;canvas.setPointerCapture(e.pointerId);dragProbe(e.clientX,e.clientY)}});canvas.addEventListener('pointermove',e=>{if(dragging)dragProbe(e.clientX,e.clientY)});canvas.addEventListener('pointerup',e=>{dragging=false;try{canvas.releasePointerCapture(e.pointerId)}catch{}});canvas.addEventListener('pointercancel',()=>dragging=false);
+els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textContent=playing?'暂停':'播放'});els.resetBtn.addEventListener('click',()=>{playing=false;t=0;els.playBtn.textContent='播放';render()});els.recordBtn.addEventListener('click',()=>{const p=params();records.unshift({A:p.A,avg:p.avg,stable:p.stable});records=records.slice(0,5);els.recordBody.innerHTML=records.map((r,i)=>`<tr><td>${i+1}</td><td>${r.A}</td><td>${r.avg.toFixed(2)}</td><td>${r.stable?'当前':'对比'}</td></tr>`).join('')});[els.a,els.eb,els.compare].forEach(el=>el.addEventListener('input',render));render();requestAnimationFrame(animate);
 </script>
 </body>
 </html>

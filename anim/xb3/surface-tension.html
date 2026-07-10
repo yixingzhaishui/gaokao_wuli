@@ -1,28 +1,59 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>液体表面张力</title>
-<link rel="icon" href="data:,">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>液体表面张力实验台</title>
 <style>
-  body{margin:0;background:#f7f9fc;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}.root{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:10px;padding:10px;box-sizing:border-box;min-height:540px}.stage{background:#fff;border:1px solid #d9e2ec;border-radius:8px;overflow:hidden}canvas{display:block;width:100%;height:auto}.panel{display:flex;flex-direction:column;gap:7px}.card{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:8px}.task{background:#fff7e6;border-left:3px solid #f0a500;color:#486581;line-height:1.38;font-size:12px}.title{font-weight:700;margin-bottom:4px}.param{display:grid;gap:2px;margin:6px 0;font-size:13px}.param span{display:flex;justify-content:space-between;color:#486581;gap:10px}.param b{color:#102a43;font-variant-numeric:tabular-nums;white-space:nowrap}input[type=range]{width:100%;accent-color:#2c7be5}.stepper{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:2px}button{border:1px solid #b0bcc9;background:#fff;border-radius:6px;padding:5px 8px;cursor:pointer}.readout{background:#102a43;color:#d9e2ec;border-radius:8px;padding:8px;line-height:1.45;font-size:13px}.readout b{color:#f0a500}.formula{font-size:13px;line-height:1.42;color:#334e68}.status{font-size:12px;font-weight:700;border-radius:6px;padding:7px;border:1px solid #38b2ac;background:#e6fffa;color:#087f5b;line-height:1.35}.status.bad{background:#ffe6e6;border-color:#ff6b6b;color:#b30000}@media(max-width:780px){.root{grid-template-columns:1fr}}
+  *{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#102a43;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:14px}.stage{display:grid;grid-template-columns:minmax(0,1fr)310px;gap:12px;align-items:start}
+  canvas{width:100%;height:640px;background:#fff;border:1px solid #d9e2ec;border-radius:8px;display:block;touch-action:none}
+  .panel{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:12px}.row{display:flex;gap:8px;margin-bottom:10px}
+  button{flex:1;border:0;border-radius:6px;background:#2c7be5;color:#fff;font-weight:700;padding:9px 10px;cursor:pointer}.secondary{background:#e6edf7;color:#102a43}
+  label{display:block;font-size:13px;font-weight:700;margin-top:10px}input{width:100%;accent-color:#2c7be5}
+  .readout{margin-top:12px;padding:10px;background:#eef4ff;border-radius:8px;line-height:1.65;font-size:13px}.status{margin-top:10px;padding:9px 10px;border-radius:8px;font-size:13px;line-height:1.5;background:#e6fffa;color:#087f5b;font-weight:700}.bad{background:#fff5f5;color:#c92a2a}
+  .hint{margin-top:10px;color:#486581;font-size:13px;line-height:1.55}table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px}th,td{border-bottom:1px solid #d9e2ec;padding:5px 4px;text-align:right}th:first-child,td:first-child{text-align:left}
+  @media(max-width:860px){.stage{grid-template-columns:1fr}canvas{height:560px}}
 </style>
 </head>
 <body>
-<div class="root"><div class="stage"><canvas id="canvas" width="850" height="520"></canvas></div><div class="panel">
-  <div class="card task"><b>观察任务：</b>调 σ 和 L 看 F=σL；调 G 看表面张力能否托住物体。</div>
-  <div class="card"><div class="title">参数</div>
-    <label class="param"><span>表面张力系数 σ <b id="sText">0.070 N/m</b></span><input id="sigma" type="range" min="0.02" max="0.10" step="0.005" value="0.07"></label>
-    <label class="param"><span>边界长度 L <b id="lText">0.20 m</b></span><input id="length" type="range" min="0.05" max="0.50" step="0.01" value="0.20"></label>
-    <label class="param"><span>物体重力 G <b id="gText">0.010 N</b></span><input id="weight" type="range" min="0.002" max="0.040" step="0.001" value="0.010"></label>
-  </div>
-  <div class="readout" id="readout"></div>
-  <div class="card formula"><div class="title">简单边界</div><div>F = σL</div><div>方向沿液面切线</div></div>
-  <div class="status" id="status"></div>
+<div class="wrap"><div class="stage">
+  <canvas id="c" width="940" height="640" aria-label="液体表面张力实验台：液面、针、张力计、侧视和数据记录"></canvas>
+  <section class="panel">
+    <div class="row"><button id="playBtn" class="play-btn">播放</button><button id="resetBtn" class="secondary">重置</button><button id="recordBtn" class="secondary">记录</button></div>
+    <label for="sigma">表面张力系数 σ/(N/m)：<span id="sigmaVal"></span></label><input id="sigma" type="range" min="0.02" max="0.10" step="0.005" value="0.07">
+    <label for="length">有效边界长度 L/m：<span id="lengthVal"></span></label><input id="length" type="range" min="0.05" max="0.50" step="0.01" value="0.20">
+    <label for="weight">物体重力 G/N：<span id="weightVal"></span></label><input id="weight" type="range" min="0.002" max="0.040" step="0.001" value="0.010">
+    <div id="readout" class="readout"></div><div id="status" class="status"></div>
+    <div class="hint">观察任务：拖动画面里的细针或边界尺，看液面形变、切向张力、张力计和 F=σL 读数如何同步变化。</div>
+    <table><thead><tr><th>记录</th><th>F</th><th>G</th><th>状态</th></tr></thead><tbody id="recordBody"><tr><td colspan="4">点击“记录”保存一次测量</td></tr></tbody></table>
+  </section>
 </div></div>
 <script>
-(function(){'use strict';const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');const els={sigma:document.getElementById('sigma'),length:document.getElementById('length'),weight:document.getElementById('weight')};function fmt(n,d){return n.toFixed(d)}function p(){const s=+els.sigma.value,L=+els.length.value,G=+els.weight.value,F=s*L;return{s,L,G,F,ok:F>=G}}function text(s,x,y,c,a,size,w){ctx.fillStyle=c||'#102a43';ctx.font=(w?w+' ':'')+(size||13)+'px -apple-system,\"PingFang SC\",sans-serif';ctx.textAlign=a||'center';ctx.textBaseline='middle';ctx.fillText(s,x,y)}function arrow(x1,y1,x2,y2,c,w){const ang=Math.atan2(y2-y1,x2-x1);ctx.save();ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w||3;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-11*Math.cos(ang-.45),y2-11*Math.sin(ang-.45));ctx.lineTo(x2-11*Math.cos(ang+.45),y2-11*Math.sin(ang+.45));ctx.closePath();ctx.fill();ctx.restore()}function box(x,y,w,h,fill,stroke){ctx.save();ctx.fillStyle=fill;ctx.strokeStyle=stroke||'#d9e2ec';ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.restore()}function draw(){const q=p();ctx.clearRect(0,0,850,520);ctx.fillStyle='#fff';ctx.fillRect(0,0,850,520);text('液体表面张力：表面有收缩趋势，张力沿切线方向',425,34,'#102a43','center',18,'700');box(70,90,430,250,'#fff','#d9e2ec');ctx.fillStyle='#d8f3ff';ctx.fillRect(90,190,390,120);ctx.strokeStyle='#2c7be5';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(90,190);ctx.quadraticCurveTo(285,q.ok?215:250,480,190);ctx.stroke();for(let i=0;i<8;i++){ctx.fillStyle='#2c7be5';ctx.beginPath();ctx.arc(120+i*45,190+Math.sin(i)*8,5,0,Math.PI*2);ctx.fill()}const len=60+q.F/0.05*120;arrow(270,180,270-len/2,180,'#e03131',4);arrow(300,180,300+len/2,180,'#e03131',4);text('表面张力沿切线',285,152,'#e03131','center',14,'700');ctx.fillStyle='#444';ctx.beginPath();ctx.roundRect(245,q.ok?160:210,80,14,7);ctx.fill();arrow(285,q.ok?174:224,285,(q.ok?174:224)+50,'#7b2cbf',4);text('G',300,(q.ok?210:260),'#7b2cbf','left',13,'700');box(560,112,210,190,'#f7f9fc','#d9e2ec');text('张力比较',665,144,'#102a43','center',15,'700');text('F=σL='+fmt(q.F,4)+'N',665,190,'#e03131','center',17,'700');text('G='+fmt(q.G,4)+'N',665,226,'#7b2cbf','center',17,'700');text(q.ok?'F ≥ G，可维持':'F < G，会压破液面',665,266,q.ok?'#087f5b':'#b30000','center',15,'700');update(q)}function update(q){document.getElementById('sText').textContent=fmt(q.s,3)+' N/m';document.getElementById('lText').textContent=fmt(q.L,2)+' m';document.getElementById('gText').textContent=fmt(q.G,3)+' N';document.getElementById('readout').innerHTML='F=σL=<b>'+fmt(q.F,4)+' N</b><br>G=<b>'+fmt(q.G,4)+' N</b><br>比较：<b>'+(q.ok?'F≥G':'F&lt;G')+'</b>';const st=document.getElementById('status');st.className=q.ok?'status':'status bad';st.textContent=q.ok?'表面张力足以与重力平衡，液面可托住物体。':'重力超过表面张力估算值，物体会压破液面。'}Object.values(els).forEach(el=>el.addEventListener('input',draw));draw();})();
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+const els={sigma:by('sigma'),length:by('length'),weight:by('weight'),sigmaVal:by('sigmaVal'),lengthVal:by('lengthVal'),weightVal:by('weightVal'),readout:by('readout'),status:by('status'),playBtn:by('playBtn'),resetBtn:by('resetBtn'),recordBtn:by('recordBtn'),recordBody:by('recordBody')};
+function by(id){return document.getElementById(id)}
+let playing=false,t=0,last=0,dragMode='',records=[];const tank={x:70,y:108,w:500,h:290};
+function params(){const s=+els.sigma.value,L=+els.length.value,G=+els.weight.value,F=s*L;return{s,L,G,F,ok:F>=G,ratio:G/Math.max(F,.0001)}}
+function label(s,x,y,c='#102a43',size=13,align='center',w='700'){ctx.fillStyle=c;ctx.font=`${w} ${size}px system-ui`;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.48),y2-10*Math.sin(a-.48));ctx.lineTo(x2-10*Math.cos(a+.48),y2-10*Math.sin(a+.48));ctx.closePath();ctx.fill()}
+function drawScene(p){ctx.fillStyle='#fff';ctx.fillRect(0,0,940,640);label('液体表面张力实验台：表面像被拉紧的薄膜',470,28,'#102a43',19);label('三视图联动：俯视液面、侧视形变、张力计、公式读数和数据记录',470,52,'#486581',13,'center','600');drawTank(p);drawMeters(p);drawHandles(p)}
+function drawTank(p){ctx.fillStyle='#f2f7ff';ctx.strokeStyle='#2c7be5';ctx.lineWidth=2;ctx.fillRect(tank.x,tank.y,tank.w,tank.h);ctx.strokeRect(tank.x,tank.y,tank.w,tank.h);label('俯视/侧视液面：拖动细针改变重力，拖动边界尺改变 L',tank.x+tank.w/2,tank.y+24,'#2c7be5',14);
+ const sag=Math.min(78,20+p.ratio*35+(playing?Math.sin(t*4)*6:0));ctx.fillStyle='#d8f3ff';ctx.fillRect(tank.x+34,tank.y+150,tank.w-68,112);ctx.strokeStyle='#2c7be5';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(tank.x+34,tank.y+150);ctx.quadraticCurveTo(tank.x+tank.w/2,tank.y+150+sag,tank.x+tank.w-34,tank.y+150);ctx.stroke();
+ for(let i=0;i<10;i++){ctx.fillStyle='#2c7be5';ctx.beginPath();ctx.arc(tank.x+66+i*42,tank.y+150+Math.sin(i+t)*7,5,0,Math.PI*2);ctx.fill()}
+ const needleY=tank.y+132+sag*.55;ctx.fillStyle=dragMode==='needle'?'#e03131':'#444';ctx.beginPath();ctx.roundRect(tank.x+210,needleY,tank.w?110:110,14,7);ctx.fill();arrow(tank.x+265,needleY+16,tank.x+265,needleY+16+Math.min(70,p.G/.04*70),'#7b2cbf',4);label('G',tank.x+286,needleY+55,'#7b2cbf',13,'left');
+ const len=50+p.F/.05*145;arrow(tank.x+250,tank.y+132,tank.x+250-len/2,tank.y+132,'#e03131',4);arrow(tank.x+280,tank.y+132,tank.x+280+len/2,tank.y+132,'#e03131',4);label('切向表面张力',tank.x+265,tank.y+102,'#e03131',13);
+ ctx.strokeStyle=dragMode==='length'?'#e03131':'#38b2ac';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(tank.x+128,tank.y+318);ctx.lineTo(tank.x+128+p.L/.5*320,tank.y+318);ctx.stroke();label(`L=${p.L.toFixed(2)} m`,tank.x+300,tank.y+342,'#38b2ac',13)}
+function drawMeters(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(610,92,270,236);ctx.strokeRect(610,92,270,236);label('张力计/临界读数',745,116,'#102a43',14);meter(652,168,170,18,p.F/.05,'#e03131',`F=σL=${p.F.toFixed(4)} N`);meter(652,230,170,18,p.G/.04,'#7b2cbf',`G=${p.G.toFixed(4)} N`);label(p.ok?'F≥G：液面可托住':'F<G：会压破液面',745,292,p.ok?'#087f5b':'#c92a2a',15);ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(610,364,270,142);ctx.strokeRect(610,364,270,142);label('公式绑定',745,388,'#102a43',14);label('F = σL',745,430,'#2c7be5',22);label('张力沿液面切线，竖直效果来自液面弯曲后的合力',745,470,'#486581',12)}
+function meter(x,y,w,h,val,c,txt){label(txt,x,y-12,c,12,'left');ctx.fillStyle='#e9eef5';ctx.fillRect(x,y,w,h);ctx.fillStyle=c;ctx.fillRect(x,y,Math.min(w,w*val),h)}
+function drawHandles(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(70,444,500,132);ctx.strokeRect(70,444,500,132);label('画面内可拖动控制',320,468,'#102a43',14);handle(124,512,180,p.L,.05,.5,'#38b2ac','边界长度');handle(342,512,160,p.G,.002,.04,'#7b2cbf','细针重力')}
+function handle(x,y,w,val,min,max,c,name){ctx.strokeStyle='#d9e2ec';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+w,y);ctx.stroke();const hx=x+(val-min)/(max-min)*w;ctx.fillStyle=c;ctx.beginPath();ctx.arc(hx,y,13,0,Math.PI*2);ctx.fill();label(name,hx,y+26,c,12)}
+function update(p){els.sigmaVal.textContent=p.s.toFixed(3);els.lengthVal.textContent=p.L.toFixed(2);els.weightVal.textContent=p.G.toFixed(3);els.readout.innerHTML=[`F=σL=${p.F.toFixed(4)} N`,`G=${p.G.toFixed(4)} N`,`比较：${p.ok?'F≥G':'F<G'}`,`方向：沿液面切线`].join('<br>');els.status.className=p.ok?'status':'status bad';els.status.textContent=p.ok?'表面张力足以维持液面形变，物体可被托住。':'重力超过表面张力估算值，物体会压破液面。'}
+function render(){const p=params();drawScene(p);update(p)}
+function animate(now){if(!last)last=now;const dt=Math.min(.04,(now-last)/1000);last=now;if(playing)t+=dt;render();requestAnimationFrame(animate)}
+function setFromPointer(e){const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.height;if(dragMode==='length'){const val=.05+(Math.max(124,Math.min(304,x))-124)/180*.45;els.length.value=val.toFixed(2)}if(dragMode==='needle'||dragMode==='weight'){const val=.002+(Math.max(342,Math.min(502,x))-342)/160*.038;els.weight.value=val.toFixed(3)}if(dragMode==='needle'&&y>tank.y+120&&y<tank.y+260){const val=.002+Math.max(0,Math.min(1,(y-(tank.y+120))/140))*.038;els.weight.value=val.toFixed(3)}render()}
+canvas.addEventListener('pointerdown',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.height;dragMode='';if(y>492&&y<536&&x>104&&x<324)dragMode='length';else if(y>492&&y<536&&x>322&&x<522)dragMode='weight';else if(x>260&&x<410&&y>220&&y<330)dragMode='needle';if(dragMode){canvas.setPointerCapture(e.pointerId);setFromPointer(e)}});canvas.addEventListener('pointermove',e=>{if(dragMode)setFromPointer(e)});canvas.addEventListener('pointerup',e=>{dragMode='';try{canvas.releasePointerCapture(e.pointerId)}catch{}});canvas.addEventListener('pointercancel',()=>dragMode='');
+els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textContent=playing?'暂停':'播放'});els.resetBtn.addEventListener('click',()=>{playing=false;t=0;els.sigma.value=.07;els.length.value=.20;els.weight.value=.010;els.playBtn.textContent='播放';render()});els.recordBtn.addEventListener('click',()=>{const p=params();records.unshift({F:p.F,G:p.G,ok:p.ok});records=records.slice(0,5);els.recordBody.innerHTML=records.map((r,i)=>`<tr><td>${i+1}</td><td>${r.F.toFixed(4)}</td><td>${r.G.toFixed(4)}</td><td>${r.ok?'托住':'压破'}</td></tr>`).join('')});[els.sigma,els.length,els.weight].forEach(el=>el.addEventListener('input',render));render();requestAnimationFrame(animate);
 </script>
 </body>
 </html>

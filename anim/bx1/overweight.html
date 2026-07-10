@@ -35,9 +35,9 @@
 </head>
 <body>
 <div class="root">
-  <div class="stage"><canvas id="canvas" width="920" height="520" aria-label="超重与失重交互实验台"></canvas></div>
+  <div class="stage"><canvas id="canvas" width="920" height="520" aria-label="超重与失重交互实验台：电梯侧视装置、秤读数图像和数据记录"></canvas></div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>拖动电梯旁的加速度手柄：向上时看秤读数 N 变大，向下时变小；拖到自由下落时，确认 N=0 但 mg 仍存在。</div>
+    <div class="card task"><b>观察任务：</b>拖动电梯旁的加速度手柄，对照电梯侧视装置、秤读数图像和数据记录：向上时看 N 变大，向下时变小。</div>
     <div class="card">
       <div class="title">快速情境</div>
       <div class="chips">
@@ -45,6 +45,7 @@
         <button data-a="0" class="active">匀速/静止</button>
         <button data-a="-2">加速向下</button>
         <button data-free="1">自由下落</button>
+        <button id="playBtn">播放演示</button>
       </div>
     </div>
     <div class="card">
@@ -70,7 +71,7 @@
   'use strict';
   const canvas=document.getElementById('canvas');
   const ctx=canvas.getContext('2d');
-  const state={m:60,a:0,g:10,drag:null};
+  const state={m:60,a:0,g:10,drag:null,running:false,phase:0};
   const els={G:document.getElementById('gForceText'),N:document.getElementById('nText'),a:document.getElementById('aText'),m:document.getElementById('mText'),status:document.getElementById('status')};
   const colors={red:'#dc2626',blue:'#2563eb',purple:'#7c3aed',ink:'#102a43',muted:'#64748b',green:'#0f766e',orange:'#f59e0b'};
   const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
@@ -129,7 +130,7 @@
     else if(state.a<0){cls='status bad';msg='失重：加速度向下，N<mg，秤读数变小。';}
     els.status.className=cls;els.status.textContent=msg;
   }
-  function draw(){const v=values(),g0=geom();ctx.clearRect(0,0,920,520);var _bg=ctx.createLinearGradient(0,0,0,520);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,520);text('超重与失重实验台：重力 mg 没变，变的是支持力 N',460,30,'#0f172a','center',19,'900');drawScene(v,g0);drawScale(v);roundRect(42,404,816,76,8,'#fff','#d7dee8');ruler(118,448,368,'拖 m：轻 → 重',colors.blue);handle(g0.mass.x,g0.mass.y,`m=${fmt(state.m,0)}`,state.drag==='m',colors.blue);ruler(512,448,762,'拖 g：月球 → 地球',colors.orange);handle(g0.grav.x,g0.grav.y,`g=${fmt(state.g)}`,state.drag==='g',colors.orange);update(v)}
+  function draw(){const v=values(),g0=geom();ctx.clearRect(0,0,920,520);var _bg=ctx.createLinearGradient(0,0,0,520);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,520);text('超重与失重实验台：电梯侧视装置 + 秤读数图像 + 数据记录',460,30,'#0f172a','center',19,'900');drawScene(v,g0);drawScale(v);roundRect(42,404,816,76,8,'#fff','#d7dee8');ruler(118,448,368,'拖 m：轻 → 重',colors.blue);handle(g0.mass.x,g0.mass.y,`m=${fmt(state.m,0)}`,state.drag==='m',colors.blue);ruler(512,448,762,'拖 g：月球 → 地球',colors.orange);handle(g0.grav.x,g0.grav.y,`g=${fmt(state.g)}`,state.drag==='g',colors.orange);update(v)}
   function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
   function near(a,b,rad=26){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
   function down(e){const p=pos(e),g0=geom();if(near(p,g0.acc,30))state.drag='a';else if(near(p,g0.mass,28))state.drag='m';else if(near(p,g0.grav,28))state.drag='g';else state.drag=null;if(state.drag){canvas.setPointerCapture(e.pointerId);move(e)}}
@@ -138,7 +139,17 @@
   canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
   document.querySelectorAll('[data-a]').forEach(btn=>btn.addEventListener('click',()=>{state.a=+btn.dataset.a;draw()}));
   document.querySelector('[data-free]').addEventListener('click',()=>{state.a=-state.g;draw()});
+  document.getElementById('playBtn').addEventListener('click',function(){state.running=!state.running;this.textContent=state.running?'暂停演示':'播放演示'});
+  function tick(){
+    if(state.running&&!state.drag){
+      state.phase+=0.035;
+      state.a=Math.max(-state.g,Math.sin(state.phase)*4.5);
+      draw();
+    }
+    requestAnimationFrame(tick);
+  }
   draw();
+  requestAnimationFrame(tick);
 })();
 </script>
 </body>

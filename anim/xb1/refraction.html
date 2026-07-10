@@ -25,19 +25,19 @@ canvas{display:block;width:100%;max-width:660px;background:#0b1220;border-radius
 <body>
 <div class="wrap">
   <h2>光的折射：n₁sinθ₁ = n₂sinθ₂（光进玻璃变慢 → 偏向法线）</h2>
-  <canvas id="cv" width="660" height="420"></canvas>
-  <div class="chips">
-    <span class="chip">入射角 θ₁ = <b id="i">45</b>°</span>
-    <span class="chip">折射率 n = <b id="n">1.50</b></span>
-    <span class="chip">折射角 θ₂ = <b id="r">—</b>°</span>
-    <span class="chip">玻璃中光速 v = <b id="sp">—</b>·c</span>
-  </div>
   <div class="ctrls">
     <button class="btn on" id="play">⏸ 暂停</button>
     <button class="btn" id="reset">重置</button>
     <label>入射角 θ₁ = <span id="il">45</span>°<input type="range" id="ir" min="0" max="85" step="1" value="45"></label>
     <label>玻璃折射率 n = <span id="nl">1.50</span><input type="range" id="nr" min="1.1" max="2.4" step="0.05" value="1.5"></label>
     <span style="font-size:13px;color:#5a6b7b">或<b>拖动入射光线</b></span>
+  </div>
+  <canvas id="cv" width="660" height="420" aria-label="光的折射实验台：光路侧视装置、角度图像和数据记录"></canvas>
+  <div class="chips">
+    <span class="chip">入射角 θ₁ = <b id="i">45</b>°</span>
+    <span class="chip">折射率 n = <b id="n">1.50</b></span>
+    <span class="chip">折射角 θ₂ = <b id="r">—</b>°</span>
+    <span class="chip">玻璃中光速 v = <b id="sp">—</b>·c</span>
   </div>
   <div class="hint"><b>怎么玩</b>：黄色<b>光脉冲</b>沿入射光线射到界面 O（播放时在动），在界面处分成<b>折射光</b>（进入玻璃）和微弱的反射光。注意脉冲进入玻璃后<b>走得更慢</b>（v=c/n）——正是"光变慢"让波前偏转、折射光<b>偏向法线</b>。拖<b>入射角 θ₁</b>：折射角 θ₂ 随之变，始终满足 sinθ₁/sinθ₂=n；拖<b>折射率 n</b> 变大 → 折射光弯折更厉害、玻璃中光速更小。可直接拖入射光线改角度。</div>
 </div>

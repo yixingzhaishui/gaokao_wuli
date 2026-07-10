@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>等温气体压强与体积关系实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#f5f7fb;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:12px;padding:12px;min-height:690px}
+  .stage{background:#fff;border:1px solid #d9e2ec;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab}
+  .panel{display:flex;flex-direction:column;gap:10px}.card{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:10px}
+  .task{background:#fff7e6;border-left:4px solid #f0a500;color:#486581;font-size:13px;line-height:1.5}.title{font-weight:800;margin-bottom:7px}
+  .buttons{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}button{border:1px solid #b0bcc9;background:#fff;border-radius:6px;padding:7px 8px;cursor:pointer;font:inherit;font-size:13px}
+  .param{display:grid;gap:2px;margin:8px 0;font-size:13px}.param span{display:flex;justify-content:space-between;color:#486581;gap:8px}.param b{color:#102a43;font-variant-numeric:tabular-nums}
+  input[type=range]{width:100%;accent-color:#2c7be5}.readout{background:#102a43;color:#d9e2ec;border-radius:8px;padding:10px;line-height:1.65;font-size:13px}
+  .readout b{color:#ffd166;font-variant-numeric:tabular-nums}.status{border:1px solid #38b2ac;background:#e6fffa;color:#087f5b;border-radius:8px;padding:8px;font-size:13px;font-weight:800;line-height:1.45}
+  table{width:100%;border-collapse:collapse;font-size:12px}th,td{border-bottom:1px solid #d9e2ec;padding:4px 3px;text-align:right;font-variant-numeric:tabular-nums}th:first-child,td:first-child{text-align:left}
+  .formula{font-size:13px;color:#334e68;line-height:1.6}@media(max-width:820px){.root{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="900" height="620" aria-label="等温气体实验台：注射器侧视装置、压力表、P-V图像、P-1/V图线和数据记录"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>拖动活塞改变气体体积；保持恒温后读压强表，记录多组 P、V，再比较 P-V 曲线和 P-1/V 直线。</div>
+    <div class="card">
+      <div class="title">实验条件</div>
+      <label class="param"><span>体积 V <b id="vLabel">40.0 mL</b></span><input id="vol" type="range" min="20" max="80" step="1" value="40"></label>
+      <label class="param"><span>温度 T <b id="tLabel">300 K</b></span><input id="temp" type="range" min="290" max="320" step="1" value="300"></label>
+      <label class="param"><span>摩擦/漏气误差 <b id="errLabel">0%</b></span><input id="err" type="range" min="0" max="8" step="1" value="0"></label>
+      <div class="buttons"><button id="play">播放</button><button id="record">记录</button><button id="reset">重置</button></div>
+    </div>
+    <div class="readout" id="readout"></div>
+    <div class="card"><div class="title">数据记录</div><table><thead><tr><th>V/mL</th><th>1/V</th><th>P/kPa</th><th>PV</th></tr></thead><tbody id="rows"></tbody></table></div>
+    <div class="card formula"><div class="title">公式绑定</div><div>等温：PV = C，P = C · 1/V。</div><div>P-1/V 图像斜率 C 约等于 PV 的平均值。</div></div>
+    <div class="status" id="status"></div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+  const ids=['vol','temp','err','vLabel','tLabel','errLabel','readout','rows','status','play'];
+  const el=Object.fromEntries(ids.map(k=>[k,document.getElementById(k)]));
+  const state={playing:false,t:0,drag:null,records:[]};
+  const colors={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',gold:'#f0a500',green:'#087f5b',purple:'#7c3aed'};
+  const C0=4000;
+  function val(){const V=+el.vol.value,T=+el.temp.value,E=+el.err.value;const ideal=C0*T/300/V;const drift=1+E/100*Math.sin(V/7+state.t);const P=ideal*drift;return{V,T,E,P,PV:P*V,inv:1/V};}
+  function fmt(n,d=2){return(Math.abs(n)<1e-9?0:n).toFixed(d)}
+  function text(s,x,y,c=colors.ink,a='center',size=13,w='700'){ctx.fillStyle=c;ctx.font=w+' '+size+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+  function line(x1,y1,x2,y2,c='#9fb3c8',w=2,dash){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
+  function box(x,y,w,h,fill='#fff',stroke='#d9e2ec'){ctx.save();ctx.fillStyle=fill;ctx.strokeStyle=stroke;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.restore()}
+  function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.45),y2-10*Math.sin(a-.45));ctx.lineTo(x2-10*Math.cos(a+.45),y2-10*Math.sin(a+.45));ctx.closePath();ctx.fill();ctx.restore()}
+  function gauge(x,y,P){box(x-58,y-48,116,96,'#fbfdff');text('压强表',x,y-28,colors.muted,'center',12,'900');ctx.save();ctx.translate(x,y+12);ctx.strokeStyle='#334e68';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,42,Math.PI,0);ctx.stroke();const a=-.9+Math.min(1.8,P/220*1.8);arrow(0,0,36*Math.cos(Math.PI-a),-36*Math.sin(Math.PI-a),colors.red,3);ctx.restore();text(fmt(P,1)+' kPa',x,y+33,colors.red,'center',13,'900')}
+  function drawApparatus(v){box(42,72,810,260,'#fff');text('注射器侧视装置：恒温水浴 + 活塞 + 压强表',447,100,colors.ink,'center',16,'900');box(120,150,500,96,'#e6fffa','#38b2ac');text('恒温水浴 '+v.T+' K',370,266,colors.green,'center',13,'900');const sx=160,sy=174,sw=390,sh=48;ctx.fillStyle='#fbfdff';ctx.strokeStyle=colors.ink;ctx.lineWidth=3;ctx.fillRect(sx,sy,sw,sh);ctx.strokeRect(sx,sy,sw,sh);const piston=sx+sw-(v.V-20)/60*300;ctx.fillStyle='#d9e2ec';ctx.fillRect(piston,sy-14,18,sh+28);ctx.strokeRect(piston,sy-14,18,sh+28);ctx.fillStyle='rgba(44,123,229,.20)';ctx.fillRect(piston+18,sy+2,sx+sw-piston-20,sh-4);text('封闭气体 V='+fmt(v.V,0)+' mL',(piston+sx+sw)/2,sy+24,colors.blue,'center',13,'900');line(sx+sw,198,665,198,colors.ink,3);gauge(706,196,v.P);ctx.fillStyle=colors.purple;ctx.beginPath();ctx.arc(piston+9,sy+74,10,0,Math.PI*2);ctx.fill();text('拖动活塞',piston+9,sy+98,colors.purple,'center',12,'900');arrow(piston-18,198,piston-70,198,colors.gold,4);arrow(piston+36,198,piston+86,198,colors.gold,4);text('压缩 V 减小，P 增大；拉出 V 增大，P 减小',365,128,colors.gold,'center',13,'900')}
+  function drawGraphs(v){box(42,356,810,210,'#fff');text('P-V 曲线与 P-1/V 直线作图',447,382,colors.ink,'center',15,'900');const g1={x:82,y:526,w:320,h:112},g2={x:506,y:526,w:300,h:112};line(g1.x,g1.y,g1.x+g1.w,g1.y,colors.ink,2);line(g1.x,g1.y,g1.x,g1.y-g1.h,colors.ink,2);text('V',g1.x+g1.w+18,g1.y,colors.muted,'center',12,'900');text('P',g1.x,g1.y-g1.h-16,colors.muted,'center',12,'900');ctx.strokeStyle=colors.blue;ctx.lineWidth=2.5;ctx.beginPath();for(let V=20;V<=80;V++){const P=C0/V,x=g1.x+(V-20)/60*g1.w,y=g1.y-P/220*g1.h;if(V===20)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke();line(g2.x,g2.y,g2.x+g2.w,g2.y,colors.ink,2);line(g2.x,g2.y,g2.x,g2.y-g2.h,colors.ink,2);text('1/V',g2.x+g2.w+24,g2.y,colors.muted,'center',12,'900');text('P',g2.x,g2.y-g2.h-16,colors.muted,'center',12,'900');ctx.strokeStyle=colors.gold;ctx.beginPath();for(let V=20;V<=80;V++){const inv=1/V,x=g2.x+(inv-1/80)/(1/20-1/80)*g2.w,y=g2.y-(C0*inv)/220*g2.h;if(V===20)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke();state.records.forEach(r=>{ctx.fillStyle=colors.purple;let x=g1.x+(r.V-20)/60*g1.w,y=g1.y-r.P/220*g1.h;ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fill();x=g2.x+(r.inv-1/80)/(1/20-1/80)*g2.w;y=g2.y-r.P/220*g2.h;ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fill()});ctx.fillStyle=colors.red;ctx.beginPath();ctx.arc(g1.x+(v.V-20)/60*g1.w,g1.y-v.P/220*g1.h,7,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(g2.x+(v.inv-1/80)/(1/20-1/80)*g2.w,g2.y-v.P/220*g2.h,7,0,Math.PI*2);ctx.fill()}
+  function update(v){el.vLabel.textContent=fmt(v.V,1)+' mL';el.tLabel.textContent=fmt(v.T,0)+' K';el.errLabel.textContent=fmt(v.E,0)+'%';el.readout.innerHTML='体积 V：<b>'+fmt(v.V,1)+' mL</b><br>压强 P：<b>'+fmt(v.P,2)+' kPa</b><br>1/V：<b>'+fmt(v.inv,4)+' mL^-1</b><br>PV：<b>'+fmt(v.PV,1)+' kPa·mL</b><br>温度：<b>'+fmt(v.T,0)+' K</b>';el.rows.innerHTML=state.records.slice(-6).map(r=>'<tr><td>'+fmt(r.V,1)+'</td><td>'+fmt(r.inv,4)+'</td><td>'+fmt(r.P,1)+'</td><td>'+fmt(r.PV,0)+'</td></tr>').join('')||'<tr><td colspan=\"4\">暂无记录</td></tr>';const avg=state.records.length?state.records.reduce((s,r)=>s+r.PV,0)/state.records.length:v.PV;el.status.textContent='等温验证：若误差小，PV 应近似恒定；当前记录的 PV 平均值约 '+fmt(avg,0)+' kPa·mL。'}
+  function draw(){const x=val();ctx.clearRect(0,0,900,620);const bg=ctx.createLinearGradient(0,0,0,620);bg.addColorStop(0,'#fbfdff');bg.addColorStop(1,'#edf3f8');ctx.fillStyle=bg;ctx.fillRect(0,0,900,620);text('E-26 等温气体实验台：注射器侧视 + 压强表 + P-V/P-1/V 图像',450,34,colors.ink,'center',18,'900');drawApparatus(x);drawGraphs(x);update(x)}
+  function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+  canvas.addEventListener('pointerdown',e=>{const p=pos(e);if(p.y>216&&p.y<270&&p.x>220&&p.x<520){state.drag='piston';canvas.setPointerCapture(e.pointerId);move(e);e.preventDefault()}});
+  canvas.addEventListener('pointermove',move);function move(e){if(state.drag!=='piston')return;const p=pos(e);let V=20+(550-p.x)/300*60;el.vol.value=Math.max(20,Math.min(80,Math.round(V)));draw();e.preventDefault()}
+  canvas.addEventListener('pointerup',e=>{state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}});canvas.addEventListener('pointercancel',()=>state.drag=null);
+  [el.vol,el.temp,el.err].forEach(x=>x.addEventListener('input',draw));
+  el.play.onclick=()=>{state.playing=!state.playing;el.play.textContent=state.playing?'暂停':'播放'};
+  document.getElementById('record').onclick=()=>{state.records.push(val());draw()};
+  document.getElementById('reset').onclick=()=>{el.vol.value=40;el.temp.value=300;el.err.value=0;state.records=[];draw()};
+  function loop(){if(state.playing){state.t+=0.04;el.vol.value=Math.round(50+25*Math.sin(state.t));}draw();requestAnimationFrame(loop)}
+  draw();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

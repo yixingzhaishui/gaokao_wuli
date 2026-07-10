@@ -33,9 +33,10 @@
 </head>
 <body>
 <div class="root">
-  <div class="stage"><canvas id="canvas" width="920" height="520" aria-label="牛顿第二定律交互实验台"></canvas></div>
+  <div class="stage"><canvas id="canvas" width="920" height="520" aria-label="牛顿第二定律交互实验台：小车侧视装置、a-F图像和数据记录"></canvas></div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>直接拖推力箭头看 a-F 图红点；拖质量砝码看 a-1/m 图红点；再拖粗糙度尺看合力如何先被摩擦抵消。</div>
+    <div class="card task"><b>观察任务：</b>直接拖推力箭头，对照小车侧视装置、a-F 图像和数据记录，看 a-F 图红点；拖质量砝码看 a-1/m 图红点。</div>
+    <div class="chips"><button id="playBtn">▶ 播放：按 a 匀加速滑动</button><button id="resetBtn">重置</button></div>
     <div class="card">
       <div class="title">快速情境</div>
       <div class="chips">
@@ -60,7 +61,6 @@
       <div><span>控制变量</span><b>a∝F合, a∝1/m</b></div>
     </div>
     <div class="card small"><b>可直接操作：</b>抓红色推力箭头端点改变 F；抓砝码尺改变 m；抓粗糙度尺改变 μ。</div>
-    <div class="chips"><button id="playBtn">▶ 播放：按 a 匀加速滑动</button><button id="resetBtn">重置</button></div>
     <div class="status" id="status">合力不为 0，小车加速；a 与 F合 同向。</div>
   </div>
 </div>

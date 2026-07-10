@@ -3,203 +3,75 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>测电阻率</title>
+<title>测电阻率实验台</title>
 <style>
   * { box-sizing: border-box; }
   body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
-  .wrap { max-width: 1000px; margin: 0 auto; padding: 16px; }
-  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 286px; gap: 14px; align-items: stretch; }
-  canvas { width: 100%; height: 470px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
-  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
-  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
-  input { width: 100%; }
-  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.72; font-size: 14px; }
-  .status { margin-top: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13px; line-height: 1.55; background: #e6fffa; color: #087f5b; font-weight: 700; }
-  .status.bad { background: #fff5f5; color: #c92a2a; }
-  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
-  @media (max-width: 780px) { .stage { grid-template-columns: 1fr; } canvas { height: 400px; } }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 14px; }
+  .stage { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 14px; }
+  canvas { width: 100%; height: 560px; display: block; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; touch-action: none; }
+  .panel { background:#fff; border:1px solid #d9e2ec; border-radius:8px; padding:14px; }
+  .row { display:flex; gap:8px; margin-bottom:10px; }
+  button { flex:1; border:1px solid #bcccdc; background:#f0f4f8; color:#102a43; border-radius:8px; padding:9px 10px; font-weight:700; cursor:pointer; }
+  button.primary { background:#2c7be5; border-color:#2c7be5; color:#fff; }
+  label { display:block; font-size:13px; font-weight:700; margin:11px 0 4px; }
+  input { width:100%; }
+  .readout { margin-top:12px; padding:10px; background:#eef4ff; border-radius:8px; line-height:1.6; font-size:13px; }
+  table { width:100%; margin-top:10px; border-collapse:collapse; font-size:12px; }
+  th,td { border-bottom:1px solid #d9e2ec; padding:5px 4px; text-align:right; }
+  th:first-child,td:first-child { text-align:left; }
+  .hint { margin-top:10px; color:#486581; font-size:13px; line-height:1.55; }
+  @media(max-width:820px){.stage{grid-template-columns:1fr}canvas{height:500px}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="stage">
-    <canvas id="c" width="700" height="470" aria-label="测金属丝电阻率实验"></canvas>
+    <canvas id="c" width="790" height="560" aria-label="测电阻率实验台：电路俯视图、螺旋测微器剖面、I-U图像和数据记录"></canvas>
     <section class="panel">
-      <label for="length">接入长度 L/cm：<span id="lengthVal"></span></label>
-      <input id="length" type="range" min="30" max="100" value="60" step="5">
-      <label for="diameter">直径读数 d/mm：<span id="diameterVal"></span></label>
-      <input id="diameter" type="range" min="0.20" max="0.80" value="0.40" step="0.01">
-      <label for="voltage">电压 U/V：<span id="voltageVal"></span></label>
-      <input id="voltage" type="range" min="0.2" max="3.0" value="1.2" step="0.1">
-      <label for="rho">真实电阻率 ρ/(10^-6 Ω·m)：<span id="rhoVal"></span></label>
-      <input id="rho" type="range" min="0.30" max="1.50" value="0.50" step="0.05">
-      <label for="heat">温升误差：<span id="heatVal"></span></label>
-      <input id="heat" type="range" min="0" max="12" value="3" step="1">
+      <div class="row"><button id="playBtn" class="primary" type="button">播放</button><button id="resetBtn" type="button">重置</button><button id="recordBtn" type="button">记录</button></div>
+      <label for="length">接入长度 L/cm：<span id="lengthVal"></span></label><input id="length" type="range" min="30" max="100" value="60" step="5">
+      <label for="diameter">直径读数 d/mm：<span id="diameterVal"></span></label><input id="diameter" type="range" min="0.20" max="0.80" value="0.40" step="0.01">
+      <label for="voltage">电压 U/V：<span id="voltageVal"></span></label><input id="voltage" type="range" min="0.2" max="3.0" value="1.2" step="0.1">
+      <label for="rho">真实电阻率 ρ/(10^-6 Ω·m)：<span id="rhoVal"></span></label><input id="rho" type="range" min="0.30" max="1.50" value="0.50" step="0.05">
+      <label for="heat">温升误差/%：<span id="heatVal"></span></label><input id="heat" type="range" min="0" max="12" value="3" step="1">
       <div id="readout" class="readout"></div>
-      <div id="status" class="status"></div>
-      <div class="hint">观察任务：改变直径读数，看截面积 S 和 ρ 为什么对 d 的误差特别敏感。</div>
+      <table><thead><tr><th>记录</th><th>R/Ω</th><th>d/mm</th><th>ρ</th></tr></thead><tbody id="records"></tbody></table>
+      <div class="hint">观察任务：拖金属丝接线夹改变 L，拖电压旋钮改变 U，拖测微器测砧改变 d；看 d 的微小误差如何经 S=πd²/4 放大到 ρ。</div>
     </section>
   </div>
 </div>
 <script>
-const c = document.getElementById('c');
-const ctx = c.getContext('2d');
-const els = {
-  length: document.getElementById('length'),
-  diameter: document.getElementById('diameter'),
-  voltage: document.getElementById('voltage'),
-  rho: document.getElementById('rho'),
-  heat: document.getElementById('heat'),
-  lengthVal: document.getElementById('lengthVal'),
-  diameterVal: document.getElementById('diameterVal'),
-  voltageVal: document.getElementById('voltageVal'),
-  rhoVal: document.getElementById('rhoVal'),
-  heatVal: document.getElementById('heatVal'),
-  readout: document.getElementById('readout'),
-  status: document.getElementById('status')
-};
-function line(x1,y1,x2,y2,color,w=3) {
-  ctx.strokeStyle = color || '#334e68';
-  ctx.lineWidth = w;
-  ctx.beginPath();
-  ctx.moveTo(x1,y1);
-  ctx.lineTo(x2,y2);
-  ctx.stroke();
-}
-function meter(x,y,label,value) {
-  ctx.fillStyle = '#eef4ff';
-  ctx.strokeStyle = '#2c7be5';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.arc(x,y,34,0,Math.PI*2);
-  ctx.fill();
-  ctx.stroke();
-  ctx.fillStyle = '#102a43';
-  ctx.font = '700 15px system-ui';
-  ctx.textAlign = 'center';
-  ctx.fillText(label,x,y-6);
-  ctx.font = '12px system-ui';
-  ctx.fillText(value,x,y+14);
-}
-function draw() {
-  const Lcm = Number(els.length.value);
-  const dmm = Number(els.diameter.value);
-  const U = Number(els.voltage.value);
-  const rhoTrue = Number(els.rho.value) * 1e-6;
-  const heat = Number(els.heat.value) / 100;
-  const L = Lcm / 100;
-  const d = dmm / 1000;
-  const S = Math.PI * d * d / 4;
-  const Rtrue = rhoTrue * L / S;
-  const Rmeas = Rtrue * (1 + heat);
-  const I = U / Rmeas;
-  const rhoMeas = Rmeas * S / L;
-  const rel = Math.abs(rhoMeas - rhoTrue) / rhoTrue * 100;
-  els.lengthVal.textContent = Lcm.toFixed(0);
-  els.diameterVal.textContent = dmm.toFixed(2);
-  els.voltageVal.textContent = U.toFixed(1);
-  els.rhoVal.textContent = Number(els.rho.value).toFixed(2);
-  els.heatVal.textContent = Math.round(heat*100) + '%';
-
-  ctx.clearRect(0,0,c.width,c.height);
-  ctx.fillStyle = '#fff';
-  ctx.fillRect(0,0,c.width,c.height);
-  ctx.fillStyle = '#102a43';
-  ctx.font = '700 18px system-ui';
-  ctx.textAlign = 'center';
-  ctx.fillText('测电阻率：伏安法测 R，尺和螺旋测微器测 L、d', 350, 30);
-
-  line(82,238,160,238);
-  meter(200,238,'A',I.toFixed(3)+'A');
-  line(234,238,340,238);
-  ctx.fillStyle = '#ffe8cc';
-  ctx.strokeStyle = '#f08c00';
-  ctx.lineWidth = 3;
-  ctx.fillRect(340,226,190,24);
-  ctx.strokeRect(340,226,190,24);
-  ctx.fillStyle = '#102a43';
-  ctx.font = '700 13px system-ui';
-  ctx.fillText('待测金属丝 L=' + Lcm.toFixed(0) + 'cm',435,219);
-  line(530,238,610,238);
-  line(610,238,610,330);
-  line(610,330,82,330);
-  line(82,330,82,238);
-  ctx.fillStyle = '#f7f9fc';
-  ctx.strokeStyle = '#334e68';
-  ctx.fillRect(116,306,88,48);
-  ctx.strokeRect(116,306,88,48);
-  ctx.fillStyle = '#102a43';
-  ctx.font = '700 13px system-ui';
-  ctx.fillText('电源',160,335);
-  meter(435,150,'V',U.toFixed(2)+'V');
-  line(352,226,390,174,'#2c7be5',2);
-  line(518,226,480,174,'#2c7be5',2);
-
-  ctx.fillStyle = '#f7f9fc';
-  ctx.strokeStyle = '#d9e2ec';
-  ctx.fillRect(72,70,190,86);
-  ctx.strokeRect(72,70,190,86);
-  ctx.fillStyle = '#334e68';
-  ctx.fillRect(92,112,140,16);
-  ctx.fillStyle = '#d9e2ec';
-  ctx.fillRect(120,96,20,48);
-  ctx.fillRect(196,96,20,48);
-  ctx.fillStyle = '#102a43';
-  ctx.font = '13px system-ui';
-  ctx.fillText('螺旋测微器读直径 d=' + dmm.toFixed(2) + 'mm',167,164);
-
-  const gx = 424, gy = 418, gw = 190, gh = 78;
-  ctx.strokeStyle = '#334e68';
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(gx,gy);
-  ctx.lineTo(gx+gw,gy);
-  ctx.moveTo(gx,gy);
-  ctx.lineTo(gx,gy-gh);
-  ctx.stroke();
-  ctx.strokeStyle = '#38b2ac';
-  ctx.lineWidth = 4;
-  ctx.beginPath();
-  for (let i=0;i<=8;i++) {
-    const u = i*0.375;
-    const px = gx + u/3*gw;
-    const py = gy - Math.min(1, (u/Rmeas)/0.5) * gh;
-    if (i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
-  }
-  ctx.stroke();
-  ctx.fillStyle = '#e03131';
-  ctx.beginPath();
-  ctx.arc(gx + U/3*gw, gy - Math.min(1, I/0.5)*gh, 5, 0, Math.PI*2);
-  ctx.fill();
-  ctx.fillStyle = '#486581';
-  ctx.font = '12px system-ui';
-  ctx.fillText('I-U 图斜率=1/R', gx+96, gy+28);
-  ctx.fillText('U', gx+gw+12, gy+4);
-  ctx.fillText('I', gx-14, gy-gh-4);
-
-  ctx.fillStyle = '#486581';
-  ctx.font = '13px system-ui';
-  ctx.textAlign = 'center';
-  ctx.fillText('公式链：R=U/I，S=πd²/4，ρ=RS/L。直径 d 要多点测量取平均。',350,452);
-
-  els.readout.innerHTML = [
-    `<div id="r1">R=U/I≈${Rmeas.toFixed(2)}Ω</div>`,
-    `<div id="r2">S=πd²/4≈${(S*1e6).toFixed(4)}mm²</div>`,
-    `<div id="r3">ρ=RS/L≈${(rhoMeas/1e-6).toFixed(3)}×10^-6Ω·m</div>`,
-    `<div id="r4">真实ρ≈${(rhoTrue/1e-6).toFixed(3)}×10^-6Ω·m，误差≈${rel.toFixed(1)}%</div>`,
-    `<div id="r5">电流 I≈${I.toFixed(3)}A，温升会使金属电阻偏大</div>`
-  ].join('');
-  els.status.className = rel < 5 && I < 0.7 ? 'status' : 'status bad';
-  els.status.textContent = I >= 0.7
-    ? '不通过：电流偏大，金属丝发热明显，应减小电压。'
-    : rel < 5
-      ? '通过：由 U、I、L、d 算出的电阻率接近真实值。'
-      : '不通过：温升或读数误差使电阻率偏离，应减小电流并多次测直径。';
-}
-Object.values(els).forEach(el => {
-  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
-});
-draw();
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+const els={playBtn:document.getElementById('playBtn'),resetBtn:document.getElementById('resetBtn'),recordBtn:document.getElementById('recordBtn'),length:document.getElementById('length'),diameter:document.getElementById('diameter'),voltage:document.getElementById('voltage'),rho:document.getElementById('rho'),heat:document.getElementById('heat'),lengthVal:document.getElementById('lengthVal'),diameterVal:document.getElementById('diameterVal'),voltageVal:document.getElementById('voltageVal'),rhoVal:document.getElementById('rhoVal'),heatVal:document.getElementById('heatVal'),readout:document.getElementById('readout'),records:document.getElementById('records')};
+const state={running:false,time:0,last:0,drag:null,records:[]};
+function clamp(x,a,b){return Math.max(a,Math.min(b,x));}function val(id){return Number(els[id].value);}
+function setValues(o){if(o.L!==undefined)els.length.value=Math.round(clamp(o.L,30,100)/5)*5;if(o.d!==undefined)els.diameter.value=clamp(o.d,.2,.8).toFixed(2);if(o.U!==undefined)els.voltage.value=clamp(o.U,.2,3).toFixed(1);if(o.rho!==undefined)els.rho.value=clamp(o.rho,.3,1.5).toFixed(2);if(o.heat!==undefined)els.heat.value=Math.round(clamp(o.heat,0,12));}
+function model(){const Lcm=val('length'),dmm=val('diameter'),U=val('voltage'),rhoTrue=val('rho')*1e-6,heat=val('heat')/100,L=Lcm/100,d=dmm/1000,S=Math.PI*d*d/4,Rtrue=rhoTrue*L/S,R=Rtrue*(1+heat),I=U/R,rho=R*S/L,rel=Math.abs(rho-rhoTrue)/rhoTrue*100,ok=rel<5&&I<.7;return{Lcm,dmm,U,rhoTrue,heat,L,d,S,R,I,rho,rel,ok};}
+function roundRect(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
+function box(x,y,w,h,fill,stroke='#d9e2ec'){ctx.fillStyle=fill;ctx.strokeStyle=stroke;ctx.lineWidth=1.5;roundRect(x,y,w,h,9);ctx.fill();ctx.stroke();}
+function text(s,x,y,c='#102a43',size=13,w='400',a='center'){ctx.fillStyle=c;ctx.font=`${w} ${size}px system-ui`;ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y);}
+function line(x1,y1,x2,y2,c='#334e68',w=3){ctx.strokeStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();}
+function meter(x,y,label,value,color='#2c7be5'){ctx.fillStyle='#eef4ff';ctx.strokeStyle=color;ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,34,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-7,'#102a43',15,'700');text(value,x,y+14,'#102a43',12,'700');}
+function handles(q){return[{name:'L',x:340+q.Lcm/100*190,y:238,r:13},{name:'U',x:435+q.U/3*34,y:150,r:13},{name:'d',x:120+q.dmm/.8*96,y:108,r:13}];}
+function drawCircuit(q){box(36,82,510,286,'#fff');text('俯视电路：伏安法测 R，刻度尺读 L',291,106,'#102a43',14,'700');line(82,238,160,238);meter(200,238,'A',q.I.toFixed(3)+'A');line(234,238,340,238);ctx.fillStyle='#ffe8cc';ctx.strokeStyle='#f08c00';ctx.lineWidth=3;ctx.fillRect(340,226,190,24);ctx.strokeRect(340,226,190,24);text(`待测金属丝 L=${q.Lcm.toFixed(0)}cm`,435,218,'#102a43',13,'700');line(530,238,610,238);line(610,238,610,330);line(610,330,82,330);line(82,330,82,238);box(116,306,88,48,'#f7f9fc','#334e68');text('电源',160,335,'#102a43',13,'700');meter(435,150,'V',q.U.toFixed(2)+'V');line(352,226,390,174,'#2c7be5',2);line(518,226,480,174,'#2c7be5',2);
+  if(state.running){ctx.fillStyle='#e03131';for(let i=0;i<8;i++){const t=(state.time*.8+i/8)%1;let x=82+528*t,y=330;if(t<.32){x=82+528*t;y=238;}else if(t<.55){x=250+280*(t-.32)/.23;y=238;}else if(t<.72){x=610;y=238+92*(t-.55)/.17;}else{x=610-528*(t-.72)/.28;y=330;}ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();}}
+  for(const h of handles(q)){ctx.fillStyle=h.name==='L'?'#0f9f6e':h.name==='U'?'#e03131':'#7b2cbf';ctx.beginPath();ctx.arc(h.x,h.y,h.r,0,Math.PI*2);ctx.fill();text(h.name,h.x,h.y+1,'#fff',11,'700');}}
+function drawMicrometer(q){box(60,388,250,102,'#f7f9fc');text('螺旋测微器剖面：多点测 d',185,408,'#102a43',14,'700');ctx.fillStyle='#334e68';ctx.fillRect(92,446,140,16);ctx.fillStyle='#d9e2ec';ctx.fillRect(120,430,20,48);ctx.fillRect(196,430,20,48);ctx.fillStyle='#7b2cbf';ctx.fillRect(216,438,10+q.dmm*70,32);text(`d=${q.dmm.toFixed(2)}mm`,185,482,'#7b2cbf',13,'700');}
+function drawGraph(q){box(350,388,390,102,'#f7f9fc');const gx=388,gy=460,gw=210,gh=56;ctx.strokeStyle='#334e68';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(gx,gy);ctx.lineTo(gx+gw,gy);ctx.moveTo(gx,gy);ctx.lineTo(gx,gy-gh);ctx.stroke();ctx.strokeStyle='#38b2ac';ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=40;i++){const U=3*i/40,I=U/q.R,px=gx+U/3*gw,py=gy-Math.min(1,I/.7)*gh;if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}ctx.stroke();ctx.fillStyle='#e03131';ctx.beginPath();ctx.arc(gx+q.U/3*gw,gy-Math.min(1,q.I/.7)*gh,5,0,Math.PI*2);ctx.fill();text('I-U 图像：斜率=1/R',493,404,'#102a43',14,'700');text(`R=U/I=${q.R.toFixed(2)}Ω`,650,440,'#486581',13,'700');text(`ρ=RS/L=${(q.rho/1e-6).toFixed(3)}×10^-6Ω·m`,650,466,q.ok?'#087f5b':'#b30000',13,'700');}
+function draw(){const q=model();ctx.clearRect(0,0,canvas.width,canvas.height);const bg=ctx.createLinearGradient(0,0,canvas.width,canvas.height);bg.addColorStop(0,'#fff');bg.addColorStop(1,'#f0f7ff');ctx.fillStyle=bg;ctx.fillRect(0,0,canvas.width,canvas.height);text('测电阻率：R=U/I，S=πd²/4，ρ=RS/L',395,34,'#102a43',18,'700');text('电路俯视图 + 螺旋测微器剖面 + I-U 图像 + 数据记录：读数都绑定到公式。',395,62,'#486581',13);drawCircuit(q);drawMicrometer(q);drawGraph(q);els.lengthVal.textContent=q.Lcm.toFixed(0);els.diameterVal.textContent=q.dmm.toFixed(2);els.voltageVal.textContent=q.U.toFixed(1);els.rhoVal.textContent=(q.rhoTrue/1e-6).toFixed(2);els.heatVal.textContent=(q.heat*100).toFixed(0);els.playBtn.textContent=state.running?'暂停':'播放';els.readout.innerHTML=[`R=U/I≈<b>${q.R.toFixed(2)}Ω</b>`,`S=πd²/4≈<b>${(q.S*1e6).toFixed(4)}mm²</b>`,`ρ=RS/L≈<b>${(q.rho/1e-6).toFixed(3)}×10^-6Ω·m</b>`,`电流 I≈<b>${q.I.toFixed(3)}A</b>，误差≈<b>${q.rel.toFixed(1)}%</b>`,q.ok?'判定=<b>能用</b>':'判定=<b>需重做</b>'].join('<br>');}
+function loop(now){if(!state.last)state.last=now;const dt=Math.min(.04,(now-state.last)/1000);state.last=now;if(state.running)state.time+=dt;draw();requestAnimationFrame(loop);}
+function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
+function hit(p){return handles(model()).find(h=>Math.hypot(p.x-h.x,p.y-h.y)<=h.r+8);}
+canvas.addEventListener('pointerdown',e=>{const h=hit(pos(e));if(h){state.drag=h.name;canvas.setPointerCapture(e.pointerId);}});
+canvas.addEventListener('pointermove',e=>{const p=pos(e);if(!state.drag){canvas.style.cursor=hit(p)?'grab':'default';return;}if(state.drag==='L')setValues({L:(p.x-340)/190*100});if(state.drag==='U')setValues({U:(p.x-435)/34*3});if(state.drag==='d')setValues({d:(p.x-120)/96*.8});draw();});
+canvas.addEventListener('pointerup',e=>{state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}});canvas.addEventListener('pointercancel',()=>{state.drag=null;});
+els.playBtn.addEventListener('click',()=>{state.running=!state.running;state.last=0;draw();});
+els.resetBtn.addEventListener('click',()=>{state.running=false;state.time=0;setValues({L:60,d:.4,U:1.2,rho:.5,heat:3});draw();});
+els.recordBtn.addEventListener('click',()=>{const q=model();state.records.unshift({R:q.R,d:q.dmm,rho:q.rho/1e-6});state.records=state.records.slice(0,4);renderRecords();});
+function renderRecords(){els.records.innerHTML=state.records.map((r,i)=>`<tr><td>${i+1}</td><td>${r.R.toFixed(2)}</td><td>${r.d.toFixed(2)}</td><td>${r.rho.toFixed(3)}</td></tr>`).join('');}
+for(const id of ['length','diameter','voltage','rho','heat'])els[id].addEventListener('input',draw);
+renderRecords();requestAnimationFrame(loop);
 </script>
 </body>
 </html>

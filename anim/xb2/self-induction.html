@@ -23,13 +23,6 @@ canvas{display:block;width:100%;max-width:700px;background:#fff;border:1px solid
 <body>
 <div class="wrap">
   <h2>自感：线圈阻碍自身电流变化（电流不能突变）</h2>
-  <canvas id="cv" width="700" height="420"></canvas>
-  <div class="chips">
-    <span class="chip">自感系数 L = <b id="lv">2.0</b> H</span>
-    <span class="chip">时间常数 τ=L/R = <b id="tauv">1.0</b> s</span>
-    <span class="chip">电流 I = <b id="iv">0.00</b> A</span>
-    <span class="chip">状态：<b id="statev">断开</b></span>
-  </div>
   <div class="ctrls">
     <button class="btn" id="toggle">闭合开关</button>
     <button class="btn" id="play-btn">暂停自动通断</button>
@@ -38,7 +31,14 @@ canvas{display:block;width:100%;max-width:700px;background:#fff;border:1px solid
     <label>R = <span id="rl">2.0</span> Ω<input id="rr" type="range" min="1" max="6" step="0.5" value="2"></label>
     <span style="font-size:13px;color:#5a6b7b">或直接拨动开关</span>
   </div>
-  <div class="hint"><b>观察任务</b>：直接拨动开关。闭合瞬间，线圈产生自感电动势阻碍电流增大，灯泡慢慢变亮；断开瞬间，线圈维持原电流，灯泡会闪一下再熄灭。拖 L 变大：电流上升更慢，断电余辉更久。核心结论：自感阻碍的是<b>电流变化</b>，不是阻碍电流本身。</div>
+  <canvas id="cv" width="700" height="420" aria-label="自感实验台：线圈侧视装置、电流图像和数据记录"></canvas>
+  <div class="chips">
+    <span class="chip">自感系数 L = <b id="lv">2.0</b> H</span>
+    <span class="chip">时间常数 τ=L/R = <b id="tauv">1.0</b> s</span>
+    <span class="chip">电流 I = <b id="iv">0.00</b> A</span>
+    <span class="chip">状态：<b id="statev">断开</b></span>
+  </div>
+  <div class="hint"><b>观察任务</b>：直接拨动开关。对照线圈侧视装置、电流图像和数据记录，闭合瞬间灯泡慢慢变亮；断开瞬间灯泡会闪一下再熄灭。拖 L 变大：电流上升更慢。</div>
 </div>
 <script>
 (function(){

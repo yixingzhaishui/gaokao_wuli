@@ -31,14 +31,6 @@ canvas{display:block;width:100%;max-width:720px;background:#0d1b2a;touch-action:
 <body>
 <div class="wrap">
   <h2>电荷与电场：拖动电荷，看整片电场怎么变（E = kQ/r²，矢量叠加）</h2>
-  <div class="stage-wrap"><canvas id="cv" width="720" height="440"></canvas></div>
-  <div class="readouts">
-    <span class="chip">测试点场强 E = <b id="ev">0</b> （相对）</span>
-    <span class="chip">试探电荷 q = <b id="qtv">+q</b></span>
-    <span class="chip">受力 F = qE = <b id="fv">0</b>，方向 <b id="fd">—</b></span>
-    <span class="chip">电荷数 <b id="nc">2</b></span>
-    <span class="chip">场强状态：<b id="trendv">—</b></span>
-  </div>
   <div class="toolbar">
     <button class="btn pos" id="addP"><span class="dot" style="background:#ff5b47"></span>加正电荷 +</button>
     <button class="btn neg" id="addN"><span class="dot" style="background:#4d9bff"></span>加负电荷 −</button>
@@ -52,6 +44,14 @@ canvas{display:block;width:100%;max-width:720px;background:#0d1b2a;touch-action:
       <button data-m="lines">电场线</button>
     </div>
     <button class="btn" id="playBtn">▶ 播放：试探电荷自动巡游</button>
+  </div>
+  <div class="stage-wrap"><canvas id="cv" width="720" height="440" aria-label="电荷与电场实验台：电荷俯视装置、场线图像和数据记录"></canvas></div>
+  <div class="readouts">
+    <span class="chip">测试点场强 E = <b id="ev">0</b> （相对）</span>
+    <span class="chip">试探电荷 q = <b id="qtv">+q</b></span>
+    <span class="chip">受力 F = qE = <b id="fv">0</b>，方向 <b id="fd">—</b></span>
+    <span class="chip">电荷数 <b id="nc">2</b></span>
+    <span class="chip">场强状态：<b id="trendv">—</b></span>
   </div>
   <div class="hint"><b>怎么玩</b>：直接<b>拖动</b>画面里的圆形电荷（红=正、蓝=负），整片电场的箭头会<b>实时重排</b>——箭头方向是该点场强方向、颜色越暖(红)表示场越强。拖动黄色<b>试探电荷</b>，绿色箭头读 <b>E</b>，黄色箭头读 <b>F=qE</b>；换成负试探电荷时，F 反向而 E 不变。点"加电荷"可放更多电荷，观察<b>矢量叠加</b>：某点总场强 = 各电荷单独在此产生场强的矢量和。切到"电场线"看由正到负的连续曲线。</div>
 </div>

@@ -1,27 +1,239 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>温度与温标</title>
-<link rel="icon" href="data:,">
 <style>
-  body{margin:0;background:#f7f9fc;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}.root{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:10px;padding:10px;box-sizing:border-box;min-height:540px}.stage{background:#fff;border:1px solid #d9e2ec;border-radius:8px;overflow:hidden}canvas{display:block;width:100%;height:auto}.panel{display:flex;flex-direction:column;gap:7px}.card{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:8px}.task{background:#fff7e6;border-left:3px solid #f0a500;color:#486581;line-height:1.38;font-size:12px}.title{font-weight:700;margin-bottom:4px}.param{display:grid;gap:2px;margin:6px 0;font-size:13px}.param span{display:flex;justify-content:space-between;color:#486581;gap:10px}.param b{color:#102a43;font-variant-numeric:tabular-nums;white-space:nowrap}input[type=range]{width:100%;accent-color:#2c7be5}.stepper{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:2px}button{border:1px solid #b0bcc9;background:#fff;border-radius:6px;padding:5px 8px;cursor:pointer}.readout{background:#102a43;color:#d9e2ec;border-radius:8px;padding:8px;line-height:1.45;font-size:13px}.readout b{color:#f0a500;font-variant-numeric:tabular-nums}.formula{font-size:13px;line-height:1.42;color:#334e68}.status{font-size:12px;font-weight:700;border-radius:6px;padding:7px;border:1px solid #38b2ac;background:#e6fffa;color:#087f5b;line-height:1.35}.status.warn{background:#fff7e6;border-color:#f0a500;color:#9a6700}@media(max-width:780px){.root{grid-template-columns:1fr}}
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 16px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 14px; align-items: stretch; }
+  canvas { width: 100%; height: 540px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; touch-action: none; cursor: grab; }
+  canvas:active { cursor: grabbing; }
+  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
+  .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
+  button { border: 1px solid #bcccdc; background: #fff; color: #243b53; border-radius: 8px; padding: 8px 6px; font-weight: 800; cursor: pointer; }
+  button.primary { background: #2c7be5; border-color: #2c7be5; color: #fff; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-top: 11px; }
+  input { width: 100%; }
+  .readout { margin-top: 12px; padding: 11px; background: #eef4ff; border-radius: 8px; line-height: 1.68; font-size: 14px; }
+  .status { margin-top: 9px; padding: 9px 10px; border-radius: 8px; font-size: 13px; line-height: 1.55; background: #e6fffa; color: #087f5b; font-weight: 700; }
+  .status.warn { background: #fff7e6; color: #9a6700; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.58; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+  th, td { border-bottom: 1px solid #d9e2ec; padding: 4px 3px; text-align: right; }
+  th:first-child, td:first-child { text-align: left; }
+  @media (max-width: 820px) { .stage { grid-template-columns: 1fr; } canvas { height: 460px; } }
 </style>
 </head>
 <body>
-<div class="root"><div class="stage"><canvas id="canvas" width="850" height="520"></canvas></div><div class="panel">
-  <div class="card task"><b>观察任务：</b>拖动 A 的摄氏温度，看 K 读数和平均动能比例；让 A、B 温度相同，看热平衡提示。</div>
-  <div class="card"><div class="title">参数</div>
-    <label class="param"><span>物体 A 温度 tA <b id="aText">27 ℃</b></span><input id="tempA" type="range" min="-100" max="300" step="1" value="27"></label><div class="stepper"><button data-step="tempA" data-dir="-1">- A</button><button data-step="tempA" data-dir="1">+ A</button></div>
-    <label class="param"><span>物体 B 温度 tB <b id="bText">80 ℃</b></span><input id="tempB" type="range" min="-100" max="300" step="1" value="80"></label><div class="stepper"><button data-step="tempB" data-dir="-1">- B</button><button data-step="tempB" data-dir="1">+ B</button></div>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="740" height="540" aria-label="温度与温标实验台：双温度计侧视、分子热运动俯视、温标换算图像和数据记录"></canvas>
+    <section class="panel">
+      <div class="row">
+        <button id="playBtn" class="primary" type="button">播放</button>
+        <button id="recordBtn" type="button">记录</button>
+        <button id="resetBtn" type="button">重置</button>
+      </div>
+      <label for="tempA">物体 A 温度 tA/℃：<span id="tempAVal"></span></label>
+      <input id="tempA" type="range" min="-100" max="300" value="27" step="1">
+      <label for="tempB">物体 B 温度 tB/℃：<span id="tempBVal"></span></label>
+      <input id="tempB" type="range" min="-100" max="300" value="80" step="1">
+      <div id="readout" class="readout"></div>
+      <div id="status" class="status"></div>
+      <div class="hint">观察任务：直接拖动温度计液柱改变摄氏读数；看 K 读数必须用 T=t+273.15，温差满足 ΔT=Δt，但温度倍数必须用 K。</div>
+      <table aria-label="温标换算数据记录">
+        <thead><tr><th>组</th><th>tA/℃</th><th>TA/K</th><th>ΔT</th></tr></thead>
+        <tbody id="recordRows"></tbody>
+      </table>
+    </section>
   </div>
-  <div class="readout" id="readout"></div>
-  <div class="card formula"><div class="title">温标</div><div>T = t + 273.15</div><div>ΔT = Δt</div><div>Ek(平均) ∝ T</div></div>
-  <div class="status" id="status"></div>
-</div></div>
+</div>
 <script>
-(function(){'use strict';const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');const els={tempA:document.getElementById('tempA'),tempB:document.getElementById('tempB')};let dots=[];for(let i=0;i<48;i++)dots.push({x:470+Math.random()*260,y:145+Math.random()*210,a:Math.random()*Math.PI*2});function fmt(n,d){return n.toFixed(d==null?0:d)}function K(t){return t+273.15}function p(){const a=+els.tempA.value,b=+els.tempB.value;return{a,b,KA:K(a),KB:K(b),ratio:K(a)/273.15,speed:Math.sqrt(K(a)/300)}}function text(s,x,y,c,a,size,w){ctx.fillStyle=c||'#102a43';ctx.font=(w?w+' ':'')+(size||13)+'px -apple-system,\"PingFang SC\",sans-serif';ctx.textAlign=a||'center';ctx.textBaseline='middle';ctx.fillText(s,x,y)}function box(x,y,w,h,fill,stroke){ctx.save();ctx.fillStyle=fill;ctx.strokeStyle=stroke||'#d9e2ec';ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.restore()}function thermo(x,y,t,label){box(x-52,y-20,104,270,'#fff','#d9e2ec');text(label,x,y,'#102a43','center',15,'700');ctx.strokeStyle='#829ab1';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(x-10,y+34,20,150,10);ctx.stroke();ctx.beginPath();ctx.arc(x,y+196,20,0,Math.PI*2);ctx.stroke();const frac=(t+100)/400,h=24+frac*126;ctx.fillStyle=t>=0?'#e03131':'#2c7be5';ctx.beginPath();ctx.roundRect(x-6,y+184-h,12,h,6);ctx.fill();ctx.beginPath();ctx.arc(x,y+196,16,0,Math.PI*2);ctx.fill();text(fmt(t)+'℃',x,y+225,'#102a43','center',15,'700');text(fmt(K(t),1)+' K',x,y+246,'#486581','center',13)}function step(q){for(const d of dots){d.x+=Math.cos(d.a)*q.speed*2;d.y+=Math.sin(d.a)*q.speed*2;if(d.x<462||d.x>748){d.a=Math.PI-d.a;d.x=Math.max(462,Math.min(748,d.x))}if(d.y<135||d.y>356){d.a=-d.a;d.y=Math.max(135,Math.min(356,d.y))}if(Math.random()<0.025)d.a+=(Math.random()-.5)}}function draw(){const q=p();step(q);ctx.clearRect(0,0,850,520);ctx.fillStyle='#fff';ctx.fillRect(0,0,850,520);text('温度与温标：摄氏读数要换成热力学温度再进公式',425,30,'#102a43','center',18,'700');thermo(135,86,q.a,'物体 A');thermo(295,86,q.b,'物体 B');box(444,86,330,306,'#fff','#d9e2ec');text('A 的微观热运动',609,112,'#102a43','center',15,'700');ctx.fillStyle='rgba(44,123,229,.07)';ctx.fillRect(462,135,286,220);ctx.fillStyle=q.a>=0?'#2c7be5':'#38b2ac';for(const d of dots){ctx.beginPath();ctx.arc(d.x,d.y,3,0,Math.PI*2);ctx.fill()}text('T越高，平均动能越大；但0℃不是0K',609,378,'#486581','center',13);box(90,408,660,58,'#f7f9fc','#d9e2ec');text('热平衡判断：TA '+(Math.abs(q.KA-q.KB)<.5?'=':(q.KA>q.KB?'>':'<'))+' TB',420,436,Math.abs(q.KA-q.KB)<.5?'#087f5b':'#9a6700','center',18,'700');update(q)}function update(q){document.getElementById('aText').textContent=fmt(q.a)+' ℃';document.getElementById('bText').textContent=fmt(q.b)+' ℃';document.getElementById('readout').innerHTML='A: T=t+273.15=<b>'+fmt(q.KA,1)+' K</b><br>B: T=<b>'+fmt(q.KB,1)+' K</b><br>A 平均动能比例(相对0℃)：<b>'+fmt(q.ratio,2)+'</b><br>温差 ΔT=Δt=<b>'+fmt(q.a-q.b)+' K</b>';const st=document.getElementById('status');if(Math.abs(q.a-q.b)<1){st.className='status';st.textContent='A 与 B 温度相同，达到热平衡，没有净热传递。'}else{st.className='status warn';st.textContent=q.a>q.b?'A 温度更高，接触后热量将自发从 A 传向 B。':'B 温度更高，接触后热量将自发从 B 传向 A。'}}Object.values(els).forEach(el=>el.addEventListener('input',draw));document.querySelectorAll('[data-step]').forEach(btn=>btn.addEventListener('click',()=>{const el=els[btn.dataset.step],step=+el.step||1,dir=+btn.dataset.dir;el.value=Math.max(+el.min,Math.min(+el.max,+el.value+dir*step));el.dispatchEvent(new Event('input',{bubbles:true}))}));function loop(){draw();requestAnimationFrame(loop)}draw();requestAnimationFrame(loop);})();
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const els = {
+  playBtn: document.getElementById('playBtn'),
+  recordBtn: document.getElementById('recordBtn'),
+  resetBtn: document.getElementById('resetBtn'),
+  tempA: document.getElementById('tempA'),
+  tempB: document.getElementById('tempB'),
+  tempAVal: document.getElementById('tempAVal'),
+  tempBVal: document.getElementById('tempBVal'),
+  readout: document.getElementById('readout'),
+  status: document.getElementById('status'),
+  recordRows: document.getElementById('recordRows')
+};
+const dots = [];
+const state = { running: false, last: 0, drag: null, records: [] };
+for (let i = 0; i < 52; i++) dots.push({ x: 440 + Math.random() * 250, y: 170 + Math.random() * 180, a: Math.random() * Math.PI * 2 });
+function K(t) { return t + 273.15; }
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+function values() {
+  const a = Number(els.tempA.value);
+  const b = Number(els.tempB.value);
+  return { a, b, KA: K(a), KB: K(b), speed: Math.sqrt(Math.max(1, K(a)) / 300), ratio: K(a) / 273.15 };
+}
+function step(q, dt) {
+  dots.forEach(d => {
+    d.x += Math.cos(d.a) * q.speed * 88 * dt;
+    d.y += Math.sin(d.a) * q.speed * 88 * dt;
+    if (d.x < 434 || d.x > 704) { d.a = Math.PI - d.a; d.x = clamp(d.x, 434, 704); }
+    if (d.y < 162 || d.y > 354) { d.a = -d.a; d.y = clamp(d.y, 162, 354); }
+  });
+}
+function thermometer(x, y, t, label, active) {
+  ctx.fillStyle = '#f7f9fc';
+  ctx.strokeStyle = active ? '#2c7be5' : '#d9e2ec';
+  ctx.lineWidth = active ? 3 : 2;
+  ctx.fillRect(x - 54, y - 20, 108, 276);
+  ctx.strokeRect(x - 54, y - 20, 108, 276);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 15px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText(label, x, y + 4);
+  ctx.strokeStyle = '#829ab1';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.roundRect(x - 10, y + 38, 20, 150, 10);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(x, y + 200, 20, 0, Math.PI * 2);
+  ctx.stroke();
+  const frac = clamp((t + 100) / 400, 0, 1);
+  const h = 24 + frac * 126;
+  ctx.fillStyle = t >= 0 ? '#e03131' : '#2c7be5';
+  ctx.beginPath();
+  ctx.roundRect(x - 6, y + 188 - h, 12, h, 6);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(x, y + 200, 16, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 15px system-ui';
+  ctx.fillText(t.toFixed(0) + ' ℃', x, y + 230);
+  ctx.fillStyle = '#486581';
+  ctx.font = '13px system-ui';
+  ctx.fillText(K(t).toFixed(1) + ' K', x, y + 250);
+}
+function drawMotion(q) {
+  ctx.fillStyle = '#f7f9fc';
+  ctx.strokeStyle = '#d9e2ec';
+  ctx.lineWidth = 2;
+  ctx.fillRect(416, 98, 306, 288);
+  ctx.strokeRect(416, 98, 306, 288);
+  ctx.fillStyle = '#486581';
+  ctx.font = '13px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('A 的分子热运动俯视：平均动能 ∝ T(K)', 569, 124);
+  ctx.fillStyle = q.a >= 0 ? '#2c7be5' : '#38b2ac';
+  dots.forEach(d => { ctx.beginPath(); ctx.arc(d.x, d.y, 3, 0, Math.PI * 2); ctx.fill(); });
+}
+function drawScale(q) {
+  ctx.fillStyle = '#f7f9fc';
+  ctx.strokeStyle = '#d9e2ec';
+  ctx.lineWidth = 2;
+  ctx.fillRect(68, 410, 618, 70);
+  ctx.strokeRect(68, 410, 618, 70);
+  const cmp = Math.abs(q.KA - q.KB) < 0.5 ? '=' : (q.KA > q.KB ? '>' : '<');
+  ctx.fillStyle = cmp === '=' ? '#087f5b' : '#9a6700';
+  ctx.font = '700 18px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('热平衡判断：TA ' + cmp + ' TB；ΔT=Δt=' + (q.a - q.b).toFixed(0) + ' K', 377, 440);
+  ctx.fillStyle = '#486581';
+  ctx.font = '13px system-ui';
+  ctx.fillText('温标换算图像：T=t+273.15，0℃不是0K，温度倍数必须用K', 377, 464);
+}
+function draw() {
+  const q = values();
+  els.tempAVal.textContent = q.a.toFixed(0);
+  els.tempBVal.textContent = q.b.toFixed(0);
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 18px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('温度与温标实验台：双温度计侧视 + 热运动俯视 + 温标换算图像 + 数据记录', 370, 28);
+  thermometer(140, 82, q.a, '物体 A', state.drag === 'A-thermometer-handle');
+  thermometer(300, 82, q.b, '物体 B', state.drag === 'B-thermometer-handle');
+  drawMotion(q);
+  drawScale(q);
+  els.readout.innerHTML = [
+    `<div id="r1">A：T=t+273.15=${q.KA.toFixed(1)} K</div>`,
+    `<div id="r2">B：T=${q.KB.toFixed(1)} K</div>`,
+    `<div id="r3">A 平均动能比例(相对0℃)≈${q.ratio.toFixed(2)}</div>`,
+    `<div id="r4">温差：ΔT=Δt=${(q.a - q.b).toFixed(0)} K</div>`
+  ].join('');
+  const equal = Math.abs(q.a - q.b) < 1;
+  els.status.className = equal ? 'status' : 'status warn';
+  els.status.textContent = equal ? 'A 与 B 温度相同，达到热平衡，没有净热传递。' : (q.a > q.b ? 'A 温度更高，接触后热量将自发从 A 传向 B。' : 'B 温度更高，接触后热量将自发从 B 传向 A。');
+}
+function renderRecords() {
+  els.recordRows.innerHTML = state.records.slice(-5).map((p, i) =>
+    `<tr><td>${i + 1}</td><td>${p.a.toFixed(0)}</td><td>${p.KA.toFixed(1)}</td><td>${(p.a - p.b).toFixed(0)}</td></tr>`
+  ).join('');
+}
+function setTempFromPointer(ev) {
+  const rect = c.getBoundingClientRect();
+  const y = (ev.clientY - rect.top) * c.height / rect.height;
+  const t = clamp((282 - y) / 150 * 400 - 100, -100, 300);
+  if (state.drag === 'A-thermometer-handle') els.tempA.value = String(Math.round(t));
+  if (state.drag === 'B-thermometer-handle') els.tempB.value = String(Math.round(t));
+  draw();
+}
+function loop(ts) {
+  if (!state.last) state.last = ts;
+  const dt = Math.min(0.05, (ts - state.last) / 1000);
+  state.last = ts;
+  const q = values();
+  step(q, dt || 0.016);
+  if (state.running && !state.drag) {
+    const avg = (q.a + q.b) / 2;
+    els.tempA.value = (q.a + (avg - q.a) * 0.018).toFixed(0);
+    els.tempB.value = (q.b + (avg - q.b) * 0.018).toFixed(0);
+  }
+  draw();
+  requestAnimationFrame(loop);
+}
+Object.values(els).forEach(el => {
+  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
+});
+els.playBtn.addEventListener('click', () => {
+  state.running = !state.running;
+  els.playBtn.textContent = state.running ? '暂停' : '播放';
+});
+els.recordBtn.addEventListener('click', () => {
+  state.records.push(values());
+  renderRecords();
+});
+els.resetBtn.addEventListener('click', () => {
+  state.running = false;
+  state.records = [];
+  els.tempA.value = '27';
+  els.tempB.value = '80';
+  els.playBtn.textContent = '播放';
+  renderRecords();
+  draw();
+});
+c.addEventListener('pointerdown', ev => {
+  const rect = c.getBoundingClientRect();
+  const x = (ev.clientX - rect.left) * c.width / rect.width;
+  state.drag = x < 220 ? 'A-thermometer-handle' : 'B-thermometer-handle';
+  setTempFromPointer(ev);
+  ev.preventDefault();
+});
+c.addEventListener('pointermove', ev => {
+  if (!state.drag) return;
+  setTempFromPointer(ev);
+  ev.preventDefault();
+});
+c.addEventListener('pointerup', () => { state.drag = null; });
+c.addEventListener('pointerleave', () => { state.drag = null; });
+renderRecords();
+requestAnimationFrame(loop);
 </script>
 </body>
 </html>

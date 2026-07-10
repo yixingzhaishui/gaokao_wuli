@@ -33,9 +33,9 @@
 </head>
 <body>
 <div class="root">
-  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="圆周运动基本量交互实验台"></canvas></div>
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="圆周运动基本量交互实验台：圆轨道俯视装置、角量图像和数据记录"></canvas></div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>抓蓝点向外拖，看 ω 不变时 v=ωr 变大；沿圆周拖蓝点，看 θ 和弧长 s 同步变化。</div>
+    <div class="card task"><b>观察任务：</b>抓蓝点向外拖，对照圆轨道俯视装置、角量图像和数据记录，看 ω 不变时 v=ωr 变大。</div>
     <button id="playBtn" class="primary">播放</button>
     <div class="card">
       <div class="title">快速情境</div>
@@ -91,13 +91,13 @@
     ctx.fillStyle='#0f172a';ctx.beginPath();ctx.arc(p.cx,p.cy,4,0,Math.PI*2);ctx.fill();
     ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(p.x,p.y,12,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();
     ctx.save();ctx.fillStyle=state.drag==='point'?'#fde68a':'#fff';ctx.strokeStyle=state.drag==='point'?'#d97706':colors.blue;ctx.lineWidth=3;ctx.beginPath();ctx.arc(p.x,p.y,8,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();
-    const tx=Math.sin(-v.rad),ty=Math.cos(-v.rad);arrow(p.x,p.y,p.x+tx*76,p.y+ty*76,colors.green,4);text('v 沿切线',p.x+tx*90,p.y+ty*90,colors.green,'center',13,'900');
+    const tx=Math.sin(-v.rad),ty=-Math.cos(-v.rad);arrow(p.x,p.y,p.x+tx*76,p.y+ty*76,colors.green,4);text('v 沿切线',p.x+tx*90,p.y+ty*90,colors.green,'center',13,'900');
     text(`θ=${fmt(state.theta,0)}°`,p.cx+74,p.cy-36,colors.purple,'left',13,'900');text(`s=${fmt(v.s)}m`,p.cx,p.cy-p.R-24,colors.orange,'center',13,'900');
     text('同一周期 T 下，外圈点角速度相同，但线速度更大。',306,426,'#475569','center',13,'900');
   }
   function drawExplain(v){roundRect(632,90,230,118,8,'#f8fafc','#d7dee8');text('角量',747,118,'#0f172a','center',15,'900');text(`T=${fmt(state.T,1)}s, f=${fmt(v.f)}Hz`,747,152,colors.purple,'center',13,'900');text(`ω=${fmt(v.w)}rad/s`,747,180,colors.purple,'center',13,'900');roundRect(632,256,230,116,8,'#fff','#d7dee8');text('线量',747,284,'#0f172a','center',15,'900');text(`v=ωr=${fmt(v.v)}m/s`,747,318,colors.green,'center',15,'900');text(`s=rθ=${fmt(v.s)}m`,747,346,colors.orange,'center',13,'900')}
   function update(v){els.f.textContent=`${fmt(v.f)} Hz`;els.w.textContent=`${fmt(v.w)} rad/s`;els.v.textContent=`${fmt(v.v)} m/s`;els.s.textContent=`${fmt(v.s)} m`;els.status.textContent='同一转盘上 ω 相同；r 越大，v=ωr 越大。弧长由 s=rθ 决定。';els.play.textContent=state.running?'暂停':'播放'}
-  function draw(){const v=values(),g0=geom();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('圆周运动基本量实验台：角量与线量如何相连',460,30,'#0f172a','center',19,'900');drawScene(v);drawExplain(v);roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(122,494,302,'r',colors.blue);handle(g0.r.x,g0.r.y,`r=${fmt(state.r,1)}`,state.drag==='r',colors.blue);ruler(390,494,570,'T',colors.purple);handle(g0.T.x,g0.T.y,`T=${fmt(state.T,1)}`,state.drag==='T',colors.purple);ruler(668,494,848,'θ',colors.orange);handle(g0.theta.x,g0.theta.y,`θ=${fmt(state.theta,0)}°`,state.drag==='theta',colors.orange);update(v)}
+  function draw(){const v=values(),g0=geom();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('圆周运动基本量实验台：俯视装置 + 角量图像 + 数据记录',460,30,'#0f172a','center',19,'900');drawScene(v);drawExplain(v);roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(122,494,302,'r',colors.blue);handle(g0.r.x,g0.r.y,`r=${fmt(state.r,1)}`,state.drag==='r',colors.blue);ruler(390,494,570,'T',colors.purple);handle(g0.T.x,g0.T.y,`T=${fmt(state.T,1)}`,state.drag==='T',colors.purple);ruler(668,494,848,'θ',colors.orange);handle(g0.theta.x,g0.theta.y,`θ=${fmt(state.theta,0)}°`,state.drag==='theta',colors.orange);update(v)}
   function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
   function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
   function down(e){const p=pos(e),v=values(),pt=point(v),g0=geom();if(near(p,pt,30))state.drag='point';else if(near(p,g0.r,26))state.drag='r';else if(near(p,g0.T,26))state.drag='T';else if(near(p,g0.theta,26))state.drag='theta';else state.drag=null;if(state.drag){state.running=false;canvas.setPointerCapture(e.pointerId);move(e)}}

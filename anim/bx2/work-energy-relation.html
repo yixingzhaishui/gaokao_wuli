@@ -102,8 +102,8 @@
 <body>
 <div class="lab">
   <div class="stage">
-    <canvas id="canvas" width="920" height="540" aria-label="功能关系实验台"></canvas>
-    <div class="hint">可直接拖动小球改变过程，拖动橙色高度手柄改变高度</div>
+    <canvas id="canvas" width="920" height="540" aria-label="功能关系实验台：侧视轨道、能量图像、账本读数和数据记录"></canvas>
+    <div class="hint">侧视轨道 + 能量图像 + 账本读数 + 数据记录；可直接拖动小球改变过程，拖动橙色高度手柄改变高度</div>
   </div>
   <div class="panel">
     <div class="card task">
@@ -168,7 +168,7 @@
     status: document.getElementById('status'),
     play: document.getElementById('play')
   };
-  const state = { running: false, drag: null, hot: {}, lastTime: 0 };
+  const state = { running: false, drag: null, hot: {}, lastTime: 0, caseName: '光滑下滑', pulse: 0, note: '光滑：机械能守恒，Wf=0。' };
 
   function clamp(v, min, max) {
     return Math.max(min, Math.min(max, v));
@@ -196,6 +196,12 @@
   function stopRun() {
     state.running = false;
     ui.play.textContent = '播放';
+  }
+
+  function startRun() {
+    state.running = true;
+    state.lastTime = performance.now();
+    ui.play.textContent = '暂停';
   }
 
   function calc(q) {
@@ -284,6 +290,8 @@
     state.hot.height = { x: geo.top.x + 36, y: geo.top.y, geo };
     box(24, 48, 536, 250, '#fff', '#d9e2ec');
     text('实物过程：先看力做功，再找能量变化', 292, 74, '#102a43', 'center', 16, '700');
+    box(70, 92, 180, 34, q.mu === 0 ? '#e6fffa' : '#fff0f0', q.mu === 0 ? '#38b2ac' : '#ff6b6b');
+    text(state.caseName, 160, 109, q.mu === 0 ? '#087f5b' : '#c92a2a', 'center', 14, '800');
     line(54, geo.bottom.y, 520, geo.bottom.y, '#d9e2ec', 2);
     line(geo.bottom.x, geo.bottom.y, geo.top.x, geo.top.y, '#334e68', 4);
     line(geo.bottom.x, geo.bottom.y, geo.bottom.x, geo.top.y, '#f08c00', 2.2, [6, 5]);
@@ -299,8 +307,13 @@
     text('拖 h', geo.top.x + 36, geo.top.y - 18, '#b36b00', 'center', 11, '700');
 
     if (q.mu > 0.005) {
+      for (let i = 0; i < 5; i++) {
+        const x = geo.bottom.x + 38 + i * 28;
+        line(x, geo.bottom.y - 2, x + 52, geo.bottom.y - 40 - i * 4, 'rgba(201,42,42,.35)', 3);
+      }
       line(geo.bottom.x + 28, geo.bottom.y - 2, geo.bottom.x + 118, geo.bottom.y - 70, '#c92a2a', 5);
       text('摩擦力做负功', geo.bottom.x + 110, geo.bottom.y - 86, '#c92a2a', 'center', 12, '700');
+      text('热量/内能增加', geo.bottom.x + 164, geo.bottom.y - 24, '#c92a2a', 'left', 12, '700');
     }
 
     ctx.fillStyle = '#2c7be5';
@@ -320,6 +333,14 @@
     if (r.v > 0.05) {
       arrow(geo.ball.x + 18, geo.ball.y - 8, geo.ball.x + 18 + Math.min(78, r.v * 9) * Math.cos(theta), geo.ball.y - 8 + Math.min(78, r.v * 9) * Math.sin(theta), '#e03131', 2.6);
       text('ΔEk 看速度变化', geo.ball.x + 94, geo.ball.y + 8, '#e03131', 'center', 12, '700');
+    }
+    if (state.pulse > 0) {
+      ctx.save();
+      ctx.strokeStyle = q.mu === 0 ? '#38b2ac' : '#f08c00';
+      ctx.lineWidth = 4;
+      ctx.globalAlpha = Math.min(0.75, state.pulse);
+      ctx.strokeRect(26, 50, 532, 246);
+      ctx.restore();
     }
     text(q.mu === 0 ? '光滑：W合=WG，机械能不变。' : '粗糙：W合=WG+Wf，机械能减少。', 292, 34, q.mu === 0 ? '#087f5b' : '#c92a2a', 'center', 13, '700');
   }
@@ -355,10 +376,17 @@
     const maxAbs = Math.max(10, q.m * g * q.h);
     const base = 430;
     line(98, base, 842, base, '#486581', 1.5);
+    const pulseAlpha = Math.max(0, Math.min(1, state.pulse));
     items.forEach((item, i) => {
       const x = 122 + i * 121;
       const h = Math.abs(item.value) / maxAbs * 60;
       const y = item.value >= 0 ? base - h : base;
+      if (pulseAlpha > 0) {
+        ctx.fillStyle = item.color;
+        ctx.globalAlpha = 0.12 * pulseAlpha;
+        ctx.fillRect(x - 8, 364, 64, 100);
+        ctx.globalAlpha = 1;
+      }
       ctx.fillStyle = item.color;
       ctx.fillRect(x, y, 48, Math.max(2, h));
       ctx.strokeStyle = '#102a43';
@@ -366,6 +394,8 @@
       text(item.key, x + 24, 474, '#334e68', 'center', 13, '700');
       text(fmt(item.value, 1), x + 24, item.value >= 0 ? y - 12 : y + h + 12, item.color, 'center', 12, '700');
     });
+    box(640, 338, 222, 34, q.mu === 0 ? '#e6fffa' : '#fff7e6', q.mu === 0 ? '#38b2ac' : '#f0a500');
+    text(state.note, 751, 355, q.mu === 0 ? '#087f5b' : '#9a6700', 'center', 12, '800');
     text(q.mu === 0 ? '没有摩擦时，Wf=0，所以 ΔE机=0。' : '有摩擦时，Wf<0，所以 ΔE机<0，机械能减少。', 460, 310, q.mu === 0 ? '#087f5b' : '#c92a2a', 'center', 13, '700');
   }
 
@@ -395,6 +425,21 @@
 
   function draw() {
     const q = p();
+    if (!state.drag && !state.running) {
+      if (q.mu === 0) {
+        state.caseName = '光滑下滑';
+        state.note = '光滑：机械能守恒，Wf=0。';
+      } else if (q.h >= 7.5) {
+        state.caseName = '高处下滑';
+        state.note = '高度越大，WG 和 ΔEk 越大。';
+      } else if (q.m >= 5) {
+        state.caseName = '大质量';
+        state.note = '质量越大，能量柱整体变高。';
+      } else {
+        state.caseName = '有摩擦';
+        state.note = 'Wf<0，机械能减少。';
+      }
+    }
     const r = calc(q);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = '#f7f9fc';
@@ -403,6 +448,7 @@
     drawRelationMap(q, r);
     drawBars(q, r);
     updatePanel(q, r);
+    state.pulse = Math.max(0, state.pulse - 0.035);
   }
 
   function eventPos(ev) {
@@ -479,6 +525,7 @@
   Object.values(els).forEach(el => {
     el.addEventListener('input', () => {
       stopRun();
+      state.pulse = 0.65;
       draw();
     });
   });
@@ -494,25 +541,31 @@
     setValue('h', 5);
     setValue('mu', 0);
     setValue('u', 0);
+    state.caseName = '光滑下滑';
+    state.note = '光滑：机械能守恒，Wf=0。';
+    state.pulse = 1;
     stopRun();
     draw();
   });
 
+  function applyCase(name) {
+    if (name === 'smooth') {
+      setValue('m', 2); setValue('h', 5); setValue('mu', 0); state.caseName = '光滑下滑'; state.note = 'Wf=0，ΔE机=0。';
+    } else if (name === 'rough') {
+      setValue('m', 2); setValue('h', 5); setValue('mu', 0.32); state.caseName = '增大摩擦'; state.note = 'Wf<0，机械能明显减少。';
+    } else if (name === 'high') {
+      setValue('m', 2); setValue('h', 8); setValue('mu', 0.12); state.caseName = '增高'; state.note = 'WG 与 ΔEk 同时变大。';
+    } else {
+      setValue('m', 6); setValue('h', 5); setValue('mu', 0.18); state.caseName = '大质量'; state.note = '所有能量量级随 m 放大。';
+    }
+    setValue('u', 0);
+    state.pulse = 1;
+    startRun();
+    draw();
+  }
+
   document.querySelectorAll('button[data-case]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const name = btn.dataset.case;
-      if (name === 'smooth') {
-        setValue('m', 2); setValue('h', 5); setValue('mu', 0); setValue('u', 0.75);
-      } else if (name === 'rough') {
-        setValue('m', 2); setValue('h', 5); setValue('mu', 0.25); setValue('u', 0.75);
-      } else if (name === 'high') {
-        setValue('m', 2); setValue('h', 7); setValue('mu', 0.12); setValue('u', 0.7);
-      } else {
-        setValue('m', 5); setValue('h', 5); setValue('mu', 0.18); setValue('u', 0.65);
-      }
-      stopRun();
-      draw();
-    });
+    btn.addEventListener('click', () => applyCase(btn.dataset.case));
   });
 
   function tick(now) {
@@ -520,7 +573,10 @@
       const dt = Math.min(0.035, (now - state.lastTime) / 1000 || 0.016);
       state.lastTime = now;
       let next = Number(els.u.value) + dt * 0.35;
-      if (next > 1) next = 0;
+      if (next > 1) {
+        next = 1;
+        stopRun();
+      }
       els.u.value = String(next);
     }
     draw();

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>光纤通信与全反射应用实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #f5f7fb; color: #102a43; font-family: -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; }
+  .root { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 12px; padding: 12px; min-height: 680px; }
+  .stage { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; overflow: hidden; }
+  canvas { display: block; width: 100%; height: auto; touch-action: none; cursor: crosshair; }
+  .panel { display: flex; flex-direction: column; gap: 10px; }
+  .card { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 10px; }
+  .task { background: #fff7e6; border-left: 4px solid #f0a500; color: #486581; font-size: 13px; line-height: 1.5; }
+  .title { font-weight: 800; margin-bottom: 7px; color: #102a43; }
+  .param { display: grid; gap: 2px; margin: 8px 0; font-size: 13px; }
+  .param span { display: flex; justify-content: space-between; gap: 8px; color: #486581; }
+  .param b { color: #102a43; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  input[type=range] { width: 100%; accent-color: #2c7be5; }
+  .buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  button { border: 1px solid #b0bcc9; background: #fff; border-radius: 6px; padding: 7px 8px; cursor: pointer; font: inherit; font-size: 13px; }
+  .readout { background: #102a43; color: #d9e2ec; border-radius: 8px; padding: 10px; line-height: 1.65; font-size: 13px; }
+  .readout b { color: #ffd166; font-variant-numeric: tabular-nums; }
+  .status { border: 1px solid #38b2ac; background: #e6fffa; color: #087f5b; border-radius: 8px; padding: 8px; font-size: 13px; font-weight: 800; line-height: 1.45; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th, td { border-bottom: 1px solid #d9e2ec; padding: 4px 3px; text-align: right; font-variant-numeric: tabular-nums; }
+  th:first-child, td:first-child { text-align: left; }
+  .formula { font-size: 13px; color: #334e68; line-height: 1.6; }
+  @media (max-width: 820px) { .root { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage">
+    <canvas id="canvas" width="900" height="600" aria-label="光纤通信实验台装置：光纤侧视剖面、端面截面图、全反射光路图像、角度读数和数据记录"></canvas>
+  </div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>对照光纤侧视剖面和端面截面图，拖动蓝色入射光线改变入射角；调芯层/包层折射率，看临界角如何变化，判断光信号能否在芯层中多次全反射传输。</div>
+    <div class="card">
+      <div class="title">调光纤</div>
+      <label class="param"><span>芯层折射率 n₁ <b id="n1Label">1.50</b></span><input id="n1" type="range" min="1.42" max="1.62" step="0.01" value="1.50"></label>
+      <label class="param"><span>包层折射率 n₂ <b id="n2Label">1.46</b></span><input id="n2" type="range" min="1.30" max="1.55" step="0.01" value="1.46"></label>
+      <label class="param"><span>入射角 i <b id="angleLabel">78°</b></span><input id="angle" type="range" min="35" max="89" step="1" value="78"></label>
+      <label class="param"><span>弯曲程度 <b id="bendLabel">20%</b></span><input id="bend" type="range" min="0" max="80" step="1" value="20"></label>
+      <div class="buttons"><button id="play">暂停</button><button id="record">记录读数</button></div>
+    </div>
+    <div class="readout" id="readout"></div>
+    <div class="card">
+      <div class="title">传输记录</div>
+      <table>
+        <thead><tr><th>i</th><th>C</th><th>状态</th><th>损耗</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <div class="card formula">
+      <div class="title">公式与图像</div>
+      <div>全反射条件：n₁&gt;n₂，且 i ≥ C。</div>
+      <div>临界角：sinC = n₂/n₁。</div>
+      <div>通信：光脉冲多次全反射，沿芯层低损耗传播。</div>
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const els = {
+    n1: document.getElementById('n1'), n2: document.getElementById('n2'), angle: document.getElementById('angle'), bend: document.getElementById('bend'),
+    n1Label: document.getElementById('n1Label'), n2Label: document.getElementById('n2Label'), angleLabel: document.getElementById('angleLabel'), bendLabel: document.getElementById('bendLabel'),
+    readout: document.getElementById('readout'), status: document.getElementById('status'), rows: document.getElementById('rows'), play: document.getElementById('play'), record: document.getElementById('record')
+  };
+  const state = { t: 0, running: true, drag: false, records: [] };
+  const colors = { ink:'#102a43', muted:'#486581', blue:'#2c7be5', red:'#e03131', green:'#087f5b', gold:'#f0a500', purple:'#7c3aed', sky:'#0ea5e9' };
+  function p(){
+    let n1 = +els.n1.value, n2 = +els.n2.value;
+    if (n2 >= n1) n2 = n1 - 0.01;
+    const i = +els.angle.value, bend = +els.bend.value;
+    const C = Math.asin(n2/n1)*180/Math.PI;
+    const ok = n1 > n2 && i >= C && bend < 68;
+    const loss = ok ? Math.min(18, 3 + bend*0.12 + Math.max(0, C-i)*0.2) : Math.min(95, 40 + Math.abs(C-i)*1.2 + bend*0.45);
+    return { n1, n2, i, bend, C, ok, loss };
+  }
+  function fmt(n,d=1){ return n.toFixed(d); }
+  function line(x1,y1,x2,y2,c='#9fb3c8',w=2,dash){ ctx.save(); ctx.strokeStyle=c; ctx.lineWidth=w; if(dash)ctx.setLineDash(dash); ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); ctx.restore(); }
+  function box(x,y,w,h,fill='#fff',stroke='#d9e2ec'){ ctx.save(); ctx.fillStyle=fill; ctx.strokeStyle=stroke; ctx.beginPath(); ctx.roundRect(x,y,w,h,8); ctx.fill(); ctx.stroke(); ctx.restore(); }
+  function text(s,x,y,c=colors.ink,align='center',size=13,weight='700'){ ctx.fillStyle=c; ctx.font=weight+' '+size+'px -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif'; ctx.textAlign=align; ctx.textBaseline='middle'; ctx.fillText(s,x,y); }
+  function arrow(x1,y1,x2,y2,c,w=3){ const a=Math.atan2(y2-y1,x2-x1); line(x1,y1,x2,y2,c,w); ctx.fillStyle=c; ctx.beginPath(); ctx.moveTo(x2,y2); ctx.lineTo(x2-10*Math.cos(a-.45),y2-10*Math.sin(a-.45)); ctx.lineTo(x2-10*Math.cos(a+.45),y2-10*Math.sin(a+.45)); ctx.closePath(); ctx.fill(); }
+  function draw(){
+    const q=p();
+    ctx.clearRect(0,0,900,600);
+    box(34,34,832,520,'#fff');
+    text('光纤通信：全反射把光脉冲限制在芯层传播',450,60,colors.ink,'center',16,'800');
+    drawFiber(q);
+    drawCrossSection(q);
+    drawAnglePanel(q);
+    drawSignal(q);
+  }
+  function fiberY(x,q,top){
+    const bend = q.bend / 80;
+    const curve = Math.sin((x-120)/660*Math.PI*2 + 0.5) * 35 * bend;
+    const center = 250 + curve;
+    return top ? center - 62 : center + 62;
+  }
+  function drawFiber(q){
+    text('侧视剖面：芯层 n₁ > 包层 n₂',350,104,colors.ink,'center',14,'800');
+    ctx.save();
+    ctx.beginPath();
+    for(let x=110;x<=780;x+=8) ctx.lineTo(x,fiberY(x,q,true));
+    for(let x=780;x>=110;x-=8) ctx.lineTo(x,fiberY(x,q,false));
+    ctx.closePath(); ctx.fillStyle='#e0f2fe'; ctx.fill(); ctx.strokeStyle='#9fb3c8'; ctx.stroke();
+    ctx.restore();
+    ctx.save();
+    ctx.beginPath();
+    for(let x=120;x<=770;x+=8) ctx.lineTo(x,fiberY(x,q,true)+24);
+    for(let x=770;x>=120;x-=8) ctx.lineTo(x,fiberY(x,q,false)-24);
+    ctx.closePath(); ctx.fillStyle='#fff7e6'; ctx.fill(); ctx.strokeStyle='#f0a500'; ctx.stroke();
+    ctx.restore();
+    text('包层 n₂='+fmt(q.n2,2),700,154,colors.blue,'center',12,'800');
+    text('芯层 n₁='+fmt(q.n1,2),320,252,colors.gold,'center',12,'900');
+    drawRay(q);
+  }
+  function drawRay(q){
+    const pts = [];
+    let x=130, y=250, dir = (q.i-90) * Math.PI/180, sign = -1;
+    pts.push([x,y]);
+    for(let k=0;k<8;k++){
+      const nextX = x + 82;
+      const targetY = sign<0 ? fiberY(nextX,q,true)+25 : fiberY(nextX,q,false)-25;
+      pts.push([nextX,targetY]);
+      x=nextX; y=targetY; sign*=-1;
+    }
+    ctx.save();
+    ctx.strokeStyle = q.ok ? colors.sky : colors.red;
+    ctx.lineWidth = 4;
+    ctx.shadowColor = q.ok ? 'rgba(14,165,233,.55)' : 'rgba(224,49,49,.45)';
+    ctx.shadowBlur = 12;
+    ctx.beginPath();
+    pts.forEach((pt,i)=>{ if(i===0)ctx.moveTo(pt[0],pt[1]); else ctx.lineTo(pt[0],pt[1]); });
+    ctx.stroke();
+    ctx.restore();
+    for(let k=0;k<pts.length-1;k+=2) arrow(pts[k][0],pts[k][1],pts[k+1][0],pts[k+1][1],q.ok?colors.sky:colors.red,2);
+    if(!q.ok){
+      const leak = pts[2] || pts[1];
+      arrow(leak[0],leak[1],leak[0]+36,leak[1]-70,colors.red,3);
+      text('漏出包层',leak[0]+54,leak[1]-76,colors.red,'center',12,'900');
+    }
+    const hx = 195, hy = 210;
+    ctx.fillStyle=colors.purple; ctx.beginPath(); ctx.arc(hx,hy,10,0,Math.PI*2); ctx.fill();
+    text('拖入射角',hx,hy-20,colors.purple,'center',11,'800');
+  }
+  function drawCrossSection(q){
+    box(612,92,210,174,'#fbfdff');
+    text('端面截面图',717,116,colors.ink,'center',14,'800');
+    ctx.fillStyle='#e0f2fe'; ctx.beginPath(); ctx.arc(717,184,64,0,Math.PI*2); ctx.fill(); ctx.strokeStyle='#9fb3c8'; ctx.stroke();
+    ctx.fillStyle='#fff7e6'; ctx.beginPath(); ctx.arc(717,184,38,0,Math.PI*2); ctx.fill(); ctx.strokeStyle='#f0a500'; ctx.stroke();
+    text('包层',717,132,colors.blue,'center',11,'800');
+    text('芯层',717,184,colors.gold,'center',12,'900');
+    ctx.fillStyle=q.ok?colors.sky:colors.red; ctx.beginPath(); ctx.arc(717+Math.cos(state.t)*22,184+Math.sin(state.t)*22,7,0,Math.PI*2); ctx.fill();
+  }
+  function drawAnglePanel(q){
+    box(74,390,350,124,'#fff');
+    text('角度图像：相对法线读入射角',249,414,colors.ink,'center',14,'800');
+    const x=180,y=470;
+    line(x-90,y,x+90,y,colors.ink,2);
+    line(x,y-60,x,y+28,colors.muted,2,[5,5]);
+    const a=(90-q.i)*Math.PI/180;
+    arrow(x-80,y-50,x,y,colors.sky,3);
+    line(x,y,x+80*Math.sin(a),y-80*Math.cos(a),colors.sky,3);
+    ctx.strokeStyle=colors.gold; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(x,y,42,-Math.PI/2,-Math.PI/2+a,a<0); ctx.stroke();
+    text('i='+fmt(q.i,0)+'°',x+62,y-42,colors.sky,'center',12,'900');
+    text('C='+fmt(q.C,1)+'°',330,464,colors.gold,'center',13,'900');
+    text(q.ok?'i≥C：全反射':'i<C 或弯曲过大：泄漏',330,492,q.ok?colors.green:colors.red,'center',12,'900');
+  }
+  function drawSignal(q){
+    box(464,390,364,124,'#fff');
+    text('通信脉冲与损耗读数',646,414,colors.ink,'center',14,'800');
+    line(510,470,780,470,'#d9e2ec',2);
+    for(let k=0;k<6;k++){
+      const x=520 + ((state.t*80 + k*55)%260);
+      const amp = (1-q.loss/100) * (q.ok ? 35 : 18);
+      ctx.fillStyle=q.ok?colors.sky:colors.red;
+      ctx.fillRect(x,470-amp,18,amp);
+    }
+    box(548,494,196,12,'#fee2e2','#fecaca');
+    ctx.fillStyle=q.ok?colors.green:colors.red; ctx.fillRect(548,494,196*(1-q.loss/100),12);
+    text('剩余信号 '+Math.round(100-q.loss)+'%',646,522,q.ok?colors.green:colors.red,'center',12,'900');
+  }
+  function update(){
+    const q=p();
+    els.n1Label.textContent = fmt(q.n1,2);
+    els.n2Label.textContent = fmt(q.n2,2);
+    els.angleLabel.textContent = fmt(q.i,0)+'°';
+    els.bendLabel.textContent = fmt(q.bend,0)+'%';
+    els.readout.innerHTML = '临界角 C：<b>'+fmt(q.C,1)+'°</b><br>入射角 i：<b>'+fmt(q.i,0)+'°</b><br>全反射条件：<b>n₁&gt;n₂ 且 i≥C</b><br>估计损耗：<b>'+fmt(q.loss,0)+'%</b>';
+    els.status.textContent = q.ok ? '满足全反射：光脉冲被限制在芯层内，多次反射后仍可向前传播。' : '条件不足：部分光会进入包层或在弯曲处泄漏，通信信号衰减明显。';
+    els.rows.innerHTML = state.records.slice(-6).map(r=>'<tr><td>'+r.i+'°</td><td>'+r.c+'°</td><td>'+r.s+'</td><td>'+r.loss+'%</td></tr>').join('') || '<tr><td colspan="4">暂无记录</td></tr>';
+  }
+  function record(){
+    const q=p();
+    state.records.push({ i:fmt(q.i,0), c:fmt(q.C,1), s:q.ok?'全反射':'泄漏', loss:fmt(q.loss,0) });
+    if(state.records.length>8) state.records.shift();
+    update();
+  }
+  [els.n1,els.n2,els.angle,els.bend].forEach(el=>el.addEventListener('input',()=>{draw();update();}));
+  els.record.addEventListener('click',record);
+  els.play.addEventListener('click',()=>{ state.running=!state.running; els.play.textContent=state.running?'暂停':'播放'; });
+  canvas.addEventListener('pointerdown',e=>{ state.drag=true; canvas.setPointerCapture(e.pointerId); });
+  canvas.addEventListener('pointermove',e=>{
+    if(!state.drag) return;
+    const r=canvas.getBoundingClientRect(), y=(e.clientY-r.top)*canvas.height/r.height;
+    const deg=Math.max(35,Math.min(89,90-Math.abs(y-250)/3));
+    els.angle.value=deg; draw(); update();
+  });
+  canvas.addEventListener('pointerup',e=>{ state.drag=false; record(); try{canvas.releasePointerCapture(e.pointerId);}catch(_){} });
+  function loop(){ if(state.running) state.t+=0.04; draw(); update(); requestAnimationFrame(loop); }
+  record(); loop();
+})();
+</script>
+</body>
+</html>

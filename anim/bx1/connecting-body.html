@@ -39,6 +39,7 @@
   <div class="stage"><canvas id="canvas" width="960" height="760" aria-label="连接体模型交互实验台"></canvas></div>
   <div class="panel">
     <div class="card task"><b>观察任务：</b>切换连接方式，先看哪些力是整体外力；再隔离 m1，看绳张力 T 为什么不能在整体方程里重复写。</div>
+    <div class="chips"><button id="playBtn">播放过程</button><button id="resetBtn">重置</button></div>
     <div class="card">
       <div class="title">连接方式</div>
       <div class="chips">
@@ -64,7 +65,6 @@
       <div><span>顺序</span><b>先整体求 a，再隔离求 T</b></div>
     </div>
     <div class="card small"><b>三视图绑定：</b>左侧是实物连接，右侧是整体/隔离方程和 a-F 图；底部刻度尺拖 `m1、m2、μ、θ、g`，红色箭头拖外力 `F`。</div>
-    <div class="chips"><button id="playBtn">播放过程</button><button id="resetBtn">重置</button></div>
     <div class="status" id="status">整体法求 a，隔离法求 T；绳张力是内力，不进整体方程。</div>
   </div>
 </div>

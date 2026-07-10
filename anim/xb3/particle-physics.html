@@ -3,120 +3,65 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>粒子物理初步：分类与守恒</title>
+<title>粒子物理初步实验台</title>
 <style>
-  * { box-sizing: border-box; }
-  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
-  .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
-  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 14px; align-items: stretch; }
-  canvas { width: 100%; height: 430px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
-  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
-  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
-  input { width: 100%; }
-  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.8; font-size: 14px; }
-  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
-  @media (max-width: 760px) { .stage { grid-template-columns: 1fr; } canvas { height: 360px; } }
+  *{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#102a43;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:14px}.stage{display:grid;grid-template-columns:minmax(0,1fr)310px;gap:12px;align-items:start}
+  canvas{width:100%;height:640px;background:#fff;border:1px solid #d9e2ec;border-radius:8px;display:block;touch-action:none}
+  .panel{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:12px}.row{display:flex;gap:8px;margin-bottom:10px}
+  button{flex:1;border:0;border-radius:6px;background:#2c7be5;color:#fff;font-weight:700;padding:9px 10px;cursor:pointer}.secondary{background:#e6edf7;color:#102a43}
+  label{display:block;font-size:13px;font-weight:700;margin-top:10px}input{width:100%;accent-color:#2c7be5}
+  .readout{margin-top:12px;padding:10px;background:#eef4ff;border-radius:8px;line-height:1.65;font-size:13px}.status{margin-top:10px;padding:9px 10px;border-radius:8px;font-size:13px;line-height:1.5;background:#e6fffa;color:#087f5b;font-weight:700}.bad{background:#fff5f5;color:#c92a2a}
+  .hint{margin-top:10px;color:#486581;font-size:13px;line-height:1.55}table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px}th,td{border-bottom:1px solid #d9e2ec;padding:5px 4px;text-align:right}th:first-child,td:first-child{text-align:left}
+  @media(max-width:860px){.stage{grid-template-columns:1fr}canvas{height:560px}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="stage">
-    <canvas id="c" width="680" height="430" aria-label="粒子分类模型"></canvas>
-    <section class="panel">
-      <label for="particle">粒子类型：<span id="particleVal"></span></label>
-      <input id="particle" type="range" min="0" max="5" value="2" step="1">
-      <label for="anti">反粒子开关：<span id="antiVal"></span></label>
-      <input id="anti" type="range" min="0" max="1" value="0" step="1">
-      <label for="check">守恒检查：<span id="checkVal"></span></label>
-      <input id="check" type="range" min="0" max="1" value="1" step="1">
-      <div id="readout" class="readout"></div>
-      <div class="hint">观察任务：切换质子、中子、电子、夸克，看基本粒子和复合粒子的区别；打开反粒子看电荷反号。</div>
-    </section>
-  </div>
-</div>
+<div class="wrap"><div class="stage">
+  <canvas id="c" width="940" height="640" aria-label="粒子物理初步实验台：探测器、分类、夸克组成、守恒图像和数据记录"></canvas>
+  <section class="panel">
+    <div class="row"><button id="playBtn" class="play-btn">播放</button><button id="resetBtn" class="secondary">重置</button><button id="recordBtn" class="secondary">记录</button></div>
+    <label for="particle">粒子卡片：<span id="particleVal"></span></label><input id="particle" type="range" min="0" max="5" value="2" step="1">
+    <label for="anti">反粒子开关：<span id="antiVal"></span></label><input id="anti" type="range" min="0" max="1" value="0" step="1">
+    <label for="reaction">反应室目标电荷/e：<span id="reactionVal"></span></label><input id="reaction" type="range" min="-1" max="1" value="1" step="1">
+    <div id="readout" class="readout"></div><div id="status" class="status"></div>
+    <div class="hint">观察任务：拖动画面里的粒子卡进入反应室，观察分类、夸克组成、电荷表和守恒差值。打开反粒子时重点看 q反=-q。</div>
+    <table><thead><tr><th>记录</th><th>粒子</th><th>q/e</th><th>差值</th></tr></thead><tbody id="recordBody"><tr><td colspan="4">点击“记录”保存一次检查</td></tr></tbody></table>
+  </section>
+</div></div>
 <script>
-const c = document.getElementById('c');
-const ctx = c.getContext('2d');
-const els = {
-  particle: document.getElementById('particle'),
-  anti: document.getElementById('anti'),
-  check: document.getElementById('check'),
-  particleVal: document.getElementById('particleVal'),
-  antiVal: document.getElementById('antiVal'),
-  checkVal: document.getElementById('checkVal'),
-  readout: document.getElementById('readout')
-};
-const particles = [
-  { name: '电子 e', cls: '轻子', charge: -1, comp: '基本粒子', detail: '不由夸克组成' },
-  { name: '中微子 ν', cls: '轻子', charge: 0, comp: '基本粒子', detail: '电中性，参与弱相互作用' },
-  { name: '质子 p', cls: '强子', charge: 1, comp: 'uud', detail: '由两个 u 和一个 d 组成' },
-  { name: '中子 n', cls: '强子', charge: 0, comp: 'udd', detail: '由一个 u 和两个 d 组成' },
-  { name: 'u 夸克', cls: '夸克', charge: 2/3, comp: '基本粒子', detail: '电荷 +2/3e' },
-  { name: 'd 夸克', cls: '夸克', charge: -1/3, comp: '基本粒子', detail: '电荷 -1/3e' }
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+const els={particle:by('particle'),anti:by('anti'),reaction:by('reaction'),particleVal:by('particleVal'),antiVal:by('antiVal'),reactionVal:by('reactionVal'),readout:by('readout'),status:by('status'),playBtn:by('playBtn'),resetBtn:by('resetBtn'),recordBtn:by('recordBtn'),recordBody:by('recordBody')};
+function by(id){return document.getElementById(id)}
+const particles=[
+ {name:'电子 e',cls:'轻子',charge:-1,comp:'基本粒子',quarks:[],detail:'目前看作基本粒子，不由夸克组成'},
+ {name:'中微子 ν',cls:'轻子',charge:0,comp:'基本粒子',quarks:[],detail:'电中性，参与弱相互作用'},
+ {name:'质子 p',cls:'强子',charge:1,comp:'uud',quarks:['u','u','d'],detail:'由两个 u 和一个 d 组成'},
+ {name:'中子 n',cls:'强子',charge:0,comp:'udd',quarks:['u','d','d'],detail:'由一个 u 和两个 d 组成'},
+ {name:'u 夸克',cls:'夸克',charge:2/3,comp:'基本粒子',quarks:['u'],detail:'电荷 +2/3e'},
+ {name:'d 夸克',cls:'夸克',charge:-1/3,comp:'基本粒子',quarks:['d'],detail:'电荷 -1/3e'}
 ];
-function chargeText(q) {
-  if (q === 0) return '0';
-  if (q === 1) return '+1e';
-  if (q === -1) return '-1e';
-  if (q > 0) return '+2/3e';
-  return '-1/3e';
-}
-function draw() {
-  const p = particles[Number(els.particle.value)];
-  const anti = Number(els.anti.value) === 1;
-  const check = Number(els.check.value) === 1;
-  const charge = anti ? -p.charge : p.charge;
-  els.particleVal.textContent = p.name;
-  els.antiVal.textContent = anti ? '反粒子' : '普通粒子';
-  els.checkVal.textContent = check ? '显示' : '隐藏';
-  ctx.clearRect(0, 0, c.width, c.height);
-  ctx.fillStyle = '#f7f9fc';
-  ctx.fillRect(0, 0, c.width, c.height);
-  const boxes = [
-    {x:50,y:58,w:160,h:112,label:'轻子',color:'#eef4ff'},
-    {x:260,y:58,w:160,h:112,label:'夸克',color:'#fff7e6'},
-    {x:470,y:58,w:160,h:112,label:'强子',color:'#f8f0ff'}
-  ];
-  boxes.forEach(b => {
-    ctx.fillStyle = b.color;
-    ctx.strokeStyle = p.cls === b.label ? '#e03131' : '#d9e2ec';
-    ctx.lineWidth = p.cls === b.label ? 4 : 2;
-    ctx.fillRect(b.x, b.y, b.w, b.h);
-    ctx.strokeRect(b.x, b.y, b.w, b.h);
-    ctx.fillStyle = '#102a43';
-    ctx.font = '700 18px system-ui';
-    ctx.textAlign = 'center';
-    ctx.fillText(b.label, b.x + b.w/2, b.y + 42);
-  });
-  ctx.fillStyle = '#102a43';
-  ctx.font = '700 34px system-ui';
-  ctx.textAlign = 'center';
-  ctx.fillText((anti ? '反' : '') + p.name, 340, 234);
-  ctx.font = '17px system-ui';
-  ctx.fillStyle = '#486581';
-  ctx.fillText(`分类：${p.cls}；组成：${p.comp}；电荷：${chargeText(charge)}`, 340, 270);
-  ctx.fillText(p.detail, 340, 304);
-  if (check) {
-    ctx.fillStyle = '#eef4ff';
-    ctx.strokeStyle = '#2c7be5';
-    ctx.lineWidth = 2;
-    ctx.fillRect(142, 332, 396, 54);
-    ctx.strokeRect(142, 332, 396, 54);
-    ctx.fillStyle = '#102a43';
-    ctx.font = '700 15px system-ui';
-    ctx.fillText('守恒观念：粒子反应先检查电荷守恒，再看能量和动量条件。', 340, 364);
-  }
-  els.readout.innerHTML = [
-    `对象=${anti ? '反' : ''}${p.name}`,
-    `分类=${p.cls}，组成=${p.comp}`,
-    `电荷=${chargeText(charge)}；${anti ? '反粒子电荷取相反数' : '普通粒子'}`,
-    check ? '反应判断：先查电荷守恒，再查能量动量。' : '已隐藏守恒提示。'
-  ].join('<br>');
-}
-Object.values(els).forEach(el => {
-  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
-});
-draw();
+let playing=false,t=0,last=0,dragging=false,card={x:145,y:172},records=[];
+function params(){const base=particles[+els.particle.value],anti=+els.anti.value===1,target=+els.reaction.value;const q=anti?-base.charge:base.charge;return{base,anti,q,target,diff:q-target,ok:Math.abs(q-target)<.02}}
+function qText(q){if(Math.abs(q)<.01)return '0';if(Math.abs(q-1)<.01)return '+1e';if(Math.abs(q+1)<.01)return '-1e';if(q>0)return '+2/3e';return '-1/3e'}
+function label(s,x,y,c='#102a43',size=13,align='center',w='700'){ctx.fillStyle=c;ctx.font=`${w} ${size}px system-ui`;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.48),y2-10*Math.sin(a-.48));ctx.lineTo(x2-10*Math.cos(a+.48),y2-10*Math.sin(a+.48));ctx.closePath();ctx.fill()}
+function drawScene(p){ctx.fillStyle='#fff';ctx.fillRect(0,0,940,640);label('粒子物理初步实验台：分类、夸克组成与守恒检查',470,28,'#102a43',19);label('三视图联动：探测器轨迹、粒子分类、组成仪表、守恒图像和数据记录',470,52,'#486581',13,'center','600');
+ ctx.fillStyle='#f2f7ff';ctx.strokeStyle='#2c7be5';ctx.lineWidth=2;ctx.fillRect(54,82,510,322);ctx.strokeRect(54,82,510,322);label('探测器装置：把粒子卡拖入反应室',309,108,'#2c7be5',14);
+ drawDetector(p);drawCard(p);drawClassPanel(p);drawQuarks(p);drawMeters(p);drawGraph(p)}
+function drawDetector(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1;ctx.fillRect(86,230,442,132);ctx.strokeRect(86,230,442,132);label('反应室',307,250,'#486581',13);ctx.strokeStyle='#38b2ac';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(115,315);for(let i=0;i<=18;i++){const x=115+i*22,y=315+Math.sin(i*.8+t*4)*(playing?18:10)*(+els.anti.value?-.7:1);ctx.lineTo(x,y)}ctx.stroke();const prog=playing?(Math.sin(t*2)+1)/2:.55;const px=115+prog*360,py=315+Math.sin(prog*12+t*4)*18;ctx.fillStyle=p.q>=0?'#e03131':'#2c7be5';ctx.beginPath();ctx.arc(px,py,8,0,Math.PI*2);ctx.fill();label('轨迹弯曲方向提示电荷符号',307,374,'#38b2ac',12)}
+function drawCard(p){ctx.fillStyle='#fff7e6';ctx.strokeStyle=dragging?'#e03131':'#f0a500';ctx.lineWidth=3;ctx.fillRect(card.x-58,card.y-42,116,84);ctx.strokeRect(card.x-58,card.y-42,116,84);label(p.anti?'反粒子卡':'粒子卡',card.x,card.y-20,'#f0a500',12);label((p.anti?'反':'')+p.base.name,card.x,card.y+4,'#102a43',15);label(`q=${qText(p.q)}`,card.x,card.y+28,p.q>=0?'#e03131':'#2c7be5',13)}
+function drawClassPanel(p){const boxes=[['轻子',90,'#eef4ff','#2c7be5'],['夸克',230,'#fff7e6','#f0a500'],['强子',370,'#f8f0ff','#7b2cbf']];boxes.forEach(([name,x,fill,stroke])=>{ctx.fillStyle=fill;ctx.strokeStyle=p.base.cls===name?'#e03131':stroke;ctx.lineWidth=p.base.cls===name?4:2;ctx.fillRect(x,126,112,72);ctx.strokeRect(x,126,112,72);label(name,x+56,162,stroke,17)});label(`分类：${p.base.cls}；组成：${p.base.comp}`,309,214,'#102a43',14)}
+function drawQuarks(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1;ctx.fillRect(610,82,270,186);ctx.strokeRect(610,82,270,186);label('组成仪表：强子由夸克组成',745,106,'#102a43',14);if(p.base.quarks.length===0){label('基本粒子',745,172,'#2c7be5',24);label(p.base.detail,745,214,'#486581',12)}else{p.base.quarks.forEach((q,i)=>{const x=686+i*58,y=164;ctx.fillStyle=q==='u'?'#e03131':'#2c7be5';ctx.beginPath();ctx.arc(x,y,24,0,Math.PI*2);ctx.fill();label(q,x,y,'#fff',20);label(q==='u'?'+2/3e':'-1/3e',x,y+42,q==='u'?'#e03131':'#2c7be5',12)});label(p.base.name.includes('质子')?'2/3+2/3-1/3=+1':'2/3-1/3-1/3=0',745,238,'#102a43',14)}}
+function drawMeters(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(70,438,490,138);ctx.strokeRect(70,438,490,138);label('公式绑定与守恒检查',315,462,'#102a43',14);label('p=uud，n=udd，q反=-q',315,500,'#2c7be5',18);meter(118,538,160,18,Math.abs(p.q),p.q>=0?'#e03131':'#2c7be5',`粒子电荷 ${qText(p.q)}`);meter(330,538,160,18,Math.abs(p.diff),2,'#7b2cbf',`守恒差值 ${p.diff.toFixed(2)}e`)}
+function meter(x,y,w,h,val,c,txt){label(txt,x,y-12,c,12,'left');ctx.fillStyle='#e9eef5';ctx.fillRect(x,y,w,h);ctx.fillStyle=c;ctx.fillRect(x,y,Math.min(w,w*val),h)}
+function drawGraph(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(610,304,270,182);ctx.strokeRect(610,304,270,182);label('图像：电荷守恒差值',745,328,'#102a43',13);arrow(642,448,850,448,'#52606d',2);arrow(642,448,642,350,'#52606d',2);label('检查',842,466,'#52606d',11);label('差值',620,354,'#52606d',11);ctx.strokeStyle='#7b2cbf';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(660,442);ctx.lineTo(728,448-Math.abs(p.diff)*42);ctx.lineTo(830,442);ctx.stroke();ctx.fillStyle=p.ok?'#087f5b':'#c92a2a';ctx.beginPath();ctx.arc(728,448-Math.abs(p.diff)*42,7,0,Math.PI*2);ctx.fill();label(p.ok?'守恒':'不守恒',745,468,p.ok?'#087f5b':'#c92a2a',13)}
+function update(p){els.particleVal.textContent=p.base.name;els.antiVal.textContent=p.anti?'反粒子':'普通粒子';els.reactionVal.textContent=(p.target>0?'+':'')+p.target+'e';els.readout.innerHTML=[`对象=${p.anti?'反':''}${p.base.name}`,`分类=${p.base.cls}，组成=${p.base.comp}`,`电荷=${qText(p.q)}；反粒子满足 q反=-q`,`目标电荷=${p.target}e，差值=${p.diff.toFixed(2)}e`].join('<br>');els.status.className=p.ok?'status':'status bad';els.status.textContent=p.ok?'判定：电荷守恒检查通过。':'判定：电荷不守恒，这个反应通道不成立。'}
+function render(){const p=params();drawScene(p);update(p)}
+function animate(now){if(!last)last=now;const dt=Math.min(.04,(now-last)/1000);last=now;if(playing)t+=dt;render();requestAnimationFrame(animate)}
+function dragCard(clientX,clientY){const r=canvas.getBoundingClientRect(),x=(clientX-r.left)*canvas.width/r.width,y=(clientY-r.top)*canvas.height/r.height;card.x=Math.max(90,Math.min(500,x));card.y=Math.max(140,Math.min(330,y));if(card.x>370&&card.y>230)els.reaction.value=String(Math.round(params().q));render()}
+canvas.addEventListener('pointerdown',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.height;if(Math.abs(x-card.x)<70&&Math.abs(y-card.y)<55){dragging=true;canvas.setPointerCapture(e.pointerId);dragCard(e.clientX,e.clientY)}});canvas.addEventListener('pointermove',e=>{if(dragging)dragCard(e.clientX,e.clientY)});canvas.addEventListener('pointerup',e=>{dragging=false;try{canvas.releasePointerCapture(e.pointerId)}catch{}});canvas.addEventListener('pointercancel',()=>dragging=false);
+els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textContent=playing?'暂停':'播放'});els.resetBtn.addEventListener('click',()=>{playing=false;t=0;card={x:145,y:172};els.playBtn.textContent='播放';render()});els.recordBtn.addEventListener('click',()=>{const p=params();records.unshift({name:(p.anti?'反':'')+p.base.name,q:p.q,d:p.diff});records=records.slice(0,5);els.recordBody.innerHTML=records.map((r,i)=>`<tr><td>${i+1}</td><td>${r.name}</td><td>${r.q.toFixed(2)}</td><td>${r.d.toFixed(2)}</td></tr>`).join('')});[els.particle,els.anti,els.reaction].forEach(el=>el.addEventListener('input',render));render();requestAnimationFrame(animate);
 </script>
 </body>
 </html>

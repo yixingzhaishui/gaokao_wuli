@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>图像斜率、面积、截距专题实验台</title>
+<link rel="icon" href="data:,">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}.root{display:grid;grid-template-columns:minmax(0,1fr)330px;gap:12px;padding:12px;min-height:690px}.stage,.card{background:#fff;border:1px solid #d9e2ec;border-radius:8px}.stage{overflow:hidden}.card{padding:10px}canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab}.panel{display:flex;flex-direction:column;gap:10px}.task{background:#fff7e6;border-left:4px solid #f0a500;color:#486581;font-size:13px;line-height:1.5}.title{font-weight:800;margin-bottom:7px}.tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}.tabs button{font-weight:800}.tabs button.active{background:#102a43;color:#fff;border-color:#102a43}.param{display:grid;gap:2px;margin:8px 0;font-size:13px}.param span{display:flex;justify-content:space-between;color:#486581;gap:8px}.param b{color:#102a43;font-variant-numeric:tabular-nums;white-space:nowrap}input[type=range]{width:100%;accent-color:#2c7be5}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}button{border:1px solid #b0bcc9;background:#fff;border-radius:6px;padding:7px 8px;cursor:pointer;font:inherit;font-size:13px}.readout{background:#102a43;color:#d9e2ec;border-radius:8px;padding:10px;line-height:1.65;font-size:13px}.readout b{color:#ffd166;font-variant-numeric:tabular-nums}.status{border:1px solid #38b2ac;background:#e6fffa;color:#087f5b;border-radius:8px;padding:8px;font-size:13px;font-weight:800;line-height:1.45}.formula{font-size:13px;color:#334e68;line-height:1.6}table{width:100%;border-collapse:collapse;font-size:12px}td,th{border-bottom:1px solid #d9e2ec;padding:4px 3px;text-align:right;font-variant-numeric:tabular-nums}@media(max-width:850px){.root{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+<div class="stage"><canvas id="canvas" width="920" height="610" aria-label="高考图像能力实验台装置：多视角坐标图像、斜率三角形、面积涂色、截距读数、运动电学热学图像记录"></canvas></div>
+<div class="panel">
+<div class="card task"><b>观察任务：</b>切换 v-t、F-x、I-U 图像，直接拖动两点探针，看斜率、面积、截距各代表什么物理量。</div>
+<div class="card">
+<div class="title">选择图像类型</div>
+<div class="tabs"><button id="vt" class="active">v-t</button><button id="fx">F-x</button><button id="iu">I-U</button></div>
+<label class="param"><span>点 A 横坐标 <b id="aLabel">1.0</b></span><input id="a" type="range" min="0" max="8" step="0.1" value="1"></label>
+<label class="param"><span>点 B 横坐标 <b id="bLabel">6.0</b></span><input id="b" type="range" min="1" max="10" step="0.1" value="6"></label>
+<label class="param"><span>截距/初值 <b id="cLabel">2.0</b></span><input id="c" type="range" min="0" max="5" step="0.1" value="2"></label>
+<div class="buttons"><button id="play">暂停</button><button id="record">记录读数</button></div>
+</div>
+<div class="readout" id="readout"></div>
+<div class="card"><div class="title">读图记录</div><table><thead><tr><th>图像</th><th>斜率</th><th>面积</th><th>截距</th></tr></thead><tbody id="rows"></tbody></table></div>
+<div class="card formula"><div class="title">读图三问</div><div>斜率：纵轴量/横轴量。</div><div>面积：纵轴量 × 横轴量。</div><div>截距：横轴为 0 时的初始量或参数。</div></div>
+<div class="status" id="status"></div>
+</div>
+</div>
+<script>
+(function(){
+'use strict';
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+const els={vt:document.getElementById('vt'),fx:document.getElementById('fx'),iu:document.getElementById('iu'),a:document.getElementById('a'),b:document.getElementById('b'),c:document.getElementById('c'),aLabel:document.getElementById('aLabel'),bLabel:document.getElementById('bLabel'),cLabel:document.getElementById('cLabel'),readout:document.getElementById('readout'),rows:document.getElementById('rows'),status:document.getElementById('status'),play:document.getElementById('play'),record:document.getElementById('record')};
+const C={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',green:'#087f5b',gold:'#f0a500',purple:'#7c3aed'};
+const S={mode:'vt',run:true,t:0,drag:null,records:[]};
+function y(x){const c=+els.c.value;if(S.mode==='vt')return c+.8*x;if(S.mode==='fx')return Math.max(0,c+1.5*Math.sin(x/10*Math.PI));return c+.45*x}
+function p(){let a=+els.a.value,b=+els.b.value;if(b<=a)b=a+.1;const ya=y(a),yb=y(b),slope=(yb-ya)/(b-a);let area=0;for(let i=0;i<100;i++){const x=a+(b-a)*(i+.5)/100;area+=y(x)*(b-a)/100}return{a,b,c:+els.c.value,ya,yb,slope,area,xLabel:S.mode==='vt'?'t/s':S.mode==='fx'?'x/m':'U/V',yLabel:S.mode==='vt'?'v/(m/s)':S.mode==='fx'?'F/N':'I/A'}}
+function box(x,y,w,h,f='#fff',s='#d9e2ec'){ctx.save();ctx.fillStyle=f;ctx.strokeStyle=s;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.restore()}function text(s,x,y,c=C.ink,a='center',z=13,w='700'){ctx.fillStyle=c;ctx.font=w+' '+z+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}function line(x1,y1,x2,y2,c='#9fb3c8',w=2,d){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(d)ctx.setLineDash(d);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.45),y2-10*Math.sin(a-.45));ctx.lineTo(x2-10*Math.cos(a+.45),y2-10*Math.sin(a+.45));ctx.closePath();ctx.fill()}
+function mapX(x){return 106+x/10*500}function mapY(v){return 480-v/12*330}
+function draw(){const q=p();ctx.clearRect(0,0,920,610);box(34,34,852,528,'#fff');text('G-01 图像斜率、面积、截距：先看轴，再读意义',460,60,C.ink,'center',17,'900');drawGraph(q);drawMeaning(q);update(q)}
+function drawGraph(q){box(72,92,560,430,'#fbfdff');text('多视角坐标图像实验台：斜率三角形 + 面积涂色 + 截距读数',352,118,C.muted,'center',12,'800');const x0=106,y0=480,w=500,h=330;arrow(x0,y0,x0+w+24,y0,'#52606d',2);arrow(x0,y0,x0,y0-h-18,'#52606d',2);text(q.xLabel,x0+w+36,y0,C.muted,'left',12,'800');text(q.yLabel,x0-4,y0-h-28,C.muted,'right',12,'800');for(let i=0;i<=10;i++){line(x0+i*w/10,y0,x0+i*w/10,y0-h,'rgba(130,154,177,.16)',1);if(i%2===0)text(i,x0+i*w/10,y0+18,C.muted,'center',10,'700')}for(let v=0;v<=12;v+=2){line(x0,y0-v/12*h,x0+w,y0-v/12*h,'rgba(130,154,177,.16)',1);text(v,x0-16,y0-v/12*h,C.muted,'right',10,'700')}
+ctx.fillStyle='rgba(44,123,229,.16)';ctx.beginPath();ctx.moveTo(mapX(q.a),y0);for(let i=0;i<=80;i++){const x=q.a+(q.b-q.a)*i/80;ctx.lineTo(mapX(x),mapY(y(x)))}ctx.lineTo(mapX(q.b),y0);ctx.closePath();ctx.fill();ctx.strokeStyle=C.blue;ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=180;i++){const x=i/180*10;if(i===0)ctx.moveTo(mapX(x),mapY(y(x)));else ctx.lineTo(mapX(x),mapY(y(x)))}ctx.stroke();const ax=mapX(q.a),ay=mapY(q.ya),bx=mapX(q.b),by=mapY(q.yb);line(ax,ay,bx,ay,C.gold,2,[5,4]);line(bx,ay,bx,by,C.gold,2,[5,4]);line(ax,ay,bx,by,C.red,3);[[ax,ay,'A'],[bx,by,'B']].forEach(([x,y0,l])=>{ctx.fillStyle=S.drag===l?'#e03131':'#f0a500';ctx.beginPath();ctx.arc(x,y0,10,0,7);ctx.fill();text('拖动'+l,x,y0-20,C.gold,'center',12,'900')});ctx.strokeStyle=C.green;ctx.setLineDash([5,4]);line(x0,mapY(q.c),x0+w,mapY(q.c),C.green,2,[5,4]);ctx.setLineDash([]);text('截距='+q.c.toFixed(1),x0+72,mapY(q.c)-14,C.green,'center',12,'900')}
+function drawMeaning(q){box(662,98,198,424,'#fff');text('读图翻译器',761,124,C.ink,'center',14,'900');const items=S.mode==='vt'?['斜率 a','面积 位移','截距 初速度']:S.mode==='fx'?['斜率 劲度/变化率','面积 功','截距 初始力']:['斜率 1/R','面积 无常规主意义','截距 初始电流'];items.forEach((it,i)=>{box(688,154+i*88,146,58,i===0?'#fff7e6':i===1?'#e6fffa':'#eef4ff');text(it,761,183+i*88,i===0?C.gold:i===1?C.green:C.blue,'center',13,'900')});text('公式绑定',761,432,C.muted,'center',12,'800');text('k=Δy/Δx',761,456,C.red,'center',13,'900');text('S=∫y dx',761,480,C.blue,'center',13,'900')}
+function update(q){els.vt.classList.toggle('active',S.mode==='vt');els.fx.classList.toggle('active',S.mode==='fx');els.iu.classList.toggle('active',S.mode==='iu');els.aLabel.textContent=q.a.toFixed(1);els.bLabel.textContent=q.b.toFixed(1);els.cLabel.textContent=q.c.toFixed(1);els.readout.innerHTML='斜率 k：<b>'+q.slope.toFixed(2)+'</b><br>面积 S：<b>'+q.area.toFixed(2)+'</b><br>截距：<b>'+q.c.toFixed(1)+'</b><br>坐标轴：<b>'+q.yLabel+' - '+q.xLabel+'</b>';els.status.textContent='读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。';els.rows.innerHTML=S.records.slice(-6).map(r=>'<tr><td>'+r.m+'</td><td>'+r.k+'</td><td>'+r.s+'</td><td>'+r.c+'</td></tr>').join('')||'<tr><td colspan="4">暂无记录</td></tr>'}
+function record(){const q=p();S.records.push({m:S.mode,k:q.slope.toFixed(2),s:q.area.toFixed(1),c:q.c.toFixed(1)});if(S.records.length>8)S.records.shift();update(q)}
+function mode(m){S.mode=m;record();draw()}els.vt.onclick=()=>mode('vt');els.fx.onclick=()=>mode('fx');els.iu.onclick=()=>mode('iu');[els.a,els.b,els.c].forEach(el=>el.addEventListener('input',draw));els.play.onclick=()=>{S.run=!S.run;els.play.textContent=S.run?'暂停':'播放'};els.record.onclick=record;function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}function setX(p0){const x=Math.max(0,Math.min(10,(p0.x-106)/500*10));if(S.drag==='A')els.a.value=x.toFixed(1);if(S.drag==='B')els.b.value=x.toFixed(1);draw()}canvas.addEventListener('pointerdown',e=>{const q=p(),p0=pos(e),ax=mapX(q.a),ay=mapY(q.ya),bx=mapX(q.b),by=mapY(q.yb);if(Math.hypot(p0.x-ax,p0.y-ay)<24)S.drag='A';else if(Math.hypot(p0.x-bx,p0.y-by)<24)S.drag='B';if(S.drag){canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing';setX(p0)}});canvas.addEventListener('pointermove',e=>{if(S.drag)setX(pos(e))});canvas.addEventListener('pointerup',e=>{if(S.drag)record();S.drag=null;canvas.style.cursor='grab';try{canvas.releasePointerCapture(e.pointerId)}catch(_){}});canvas.addEventListener('pointercancel',()=>{S.drag=null});let last=performance.now();function loop(now){const dt=Math.min((now-last)/1000,.04);last=now;if(S.run){S.t+=dt;if(S.t>.5){S.t=0;els.b.value=(+els.b.value>=9?3:+els.b.value+.2).toFixed(1)}}draw();requestAnimationFrame(loop)}record();loop();
+})();
+</script>
+</body>
+</html>

@@ -24,7 +24,7 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
 <body>
 <div class="container">
   <h2>光电效应：Eₖ = hν − W₀（频率不够，再强也不发射）</h2>
-  <canvas id="canvas" width="660" height="360"></canvas>
+  <canvas id="canvas" width="660" height="360" aria-label="光电效应实验台：金属侧视装置、能量图像和数据记录"></canvas>
   <div class="readouts">
     <span class="r">频率 ν = <b id="nu-v">7.0</b> ×10¹⁴ Hz</span>
     <span class="r">逸出功 W₀ = <b id="w-v">2.3</b> eV</span>
@@ -44,7 +44,7 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
     <span style="font-size:13px;color:#486581">或拖能量条端点</span>
   </div>
   <div class="hint">
-    <p><b>观察任务</b>：光照到金属上。拖<b>蓝色 hν 条端点</b>改频率：低于截止频率 ν₀=W₀/h 时<b>一个电子都打不出</b>（无论多强）；超过 ν₀ 才有电子逸出，且 ν 越高电子飞得越快（最大初动能 Eₖ=hν−W₀ 越大）。拖<b>光强</b>：只改变逸出电子的<b>数量</b>（多少），<b>不改变</b>每个电子的最大动能。拖<b>灰色 W₀ 条端点</b>：金属越"难逸出"，截止频率越高。</p>
+    <p><b>观察任务</b>：光照到金属上。对照金属侧视装置、能量图像和数据记录，拖<b>蓝色 hν 条端点</b>改频率：低于截止频率 ν₀=W₀/h 时<b>一个电子都打不出</b>；超过 ν₀ 才有电子逸出。</p>
   </div>
 </div>
 <script>

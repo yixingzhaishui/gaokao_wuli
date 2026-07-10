@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>伽利略理想实验与科学推理</title>
+<link rel="icon" href="data:,">
+<style>
+  *{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:12px;padding:12px;min-height:650px}.stage{background:#fff;border:1px solid #d9e2ec;border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab}.panel{display:flex;flex-direction:column;gap:10px}.card{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:10px}
+  .task{background:#fff7e6;border-left:4px solid #f0a500;color:#486581;font-size:13px;line-height:1.5}.title{font-weight:800;margin-bottom:7px}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  button{border:1px solid #b0bcc9;background:#fff;border-radius:6px;padding:7px 8px;cursor:pointer;font:inherit;font-size:13px}.param{display:grid;gap:2px;margin:8px 0;font-size:13px}.param span{display:flex;justify-content:space-between;color:#486581;gap:8px}.param b{color:#102a43}
+  input[type=range]{width:100%;accent-color:#2c7be5}.readout{background:#102a43;color:#d9e2ec;border-radius:8px;padding:10px;line-height:1.65;font-size:13px}.readout b{color:#ffd166}
+  .status{border:1px solid #38b2ac;background:#e6fffa;color:#087f5b;border-radius:8px;padding:8px;font-size:13px;font-weight:800;line-height:1.45}.formula{font-size:13px;color:#334e68;line-height:1.6}@media(max-width:820px){.root{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="900" height="600" aria-label="伽利略理想实验台：双斜面侧视、摩擦调节、轨迹图像和推理记录"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>逐渐减小摩擦和右斜面角度；看小球为什么趋向滚到等高位置，并推出水平面上若无阻力将持续运动。</div>
+    <div class="card">
+      <div class="title">实验参数</div>
+      <label class="param"><span>右斜面角度 <b id="angleLab">25°</b></span><input id="angle" type="range" min="0" max="45" step="1" value="25"></label>
+      <label class="param"><span>摩擦强度 <b id="fricLab">20%</b></span><input id="fric" type="range" min="0" max="70" step="1" value="20"></label>
+      <label class="param"><span>释放高度 <b id="hLab">120</b></span><input id="height" type="range" min="70" max="170" step="5" value="120"></label>
+      <div class="buttons"><button id="play">释放</button><button id="reset">重置</button></div>
+    </div>
+    <div class="readout" id="readout"></div>
+    <div class="card formula"><div class="title">推理公式</div><div>能量近似：mgh ≈ 1/2mv² + W_f。</div><div>摩擦趋于 0 时，小球趋向回到同一高度；右斜面趋于水平时，距离趋向无限长。</div></div>
+    <div class="status" id="status"></div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+  const el={angle:id('angle'),fric:id('fric'),height:id('height'),angleLab:id('angleLab'),fricLab:id('fricLab'),hLab:id('hLab'),readout:id('readout'),status:id('status'),play:id('play')};
+  const colors={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',gold:'#f0a500',green:'#087f5b',purple:'#7c3aed'};
+  const state={running:false,t:0,drag:null,trail:[]};
+  function id(s){return document.getElementById(s)}function fmt(n,d=1){return n.toFixed(d)}
+  function vals(){const a=+el.angle.value*Math.PI/180,F=+el.fric.value/100,H=+el.height.value;const reach=H*(1-F);const dist=a<.02?620:Math.min(620,reach/Math.sin(a));return{a,F,H,reach,dist}}
+  function text(s,x,y,c=colors.ink,a='center',size=13,w='700'){ctx.fillStyle=c;ctx.font=w+' '+size+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+  function line(x1,y1,x2,y2,c='#9fb3c8',w=2,dash){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
+  function box(x,y,w,h,fill='#fff',stroke='#d9e2ec'){ctx.save();ctx.fillStyle=fill;ctx.strokeStyle=stroke;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.restore()}
+  function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.45),y2-10*Math.sin(a-.45));ctx.lineTo(x2-10*Math.cos(a+.45),y2-10*Math.sin(a+.45));ctx.closePath();ctx.fill();ctx.restore()}
+  function pathPoint(v){const baseY=390,cx=410,leftTop={x:160,y:baseY-v.H},leftBase={x:cx,y:baseY};const rightEnd={x:cx+v.dist*Math.cos(v.a),y:baseY-v.dist*Math.sin(v.a)};const p=Math.min(1,state.t/4);if(p<.45){const q=p/.45;return{x:leftTop.x+(leftBase.x-leftTop.x)*q,y:leftTop.y+(leftBase.y-leftTop.y)*q}}const q=(p-.45)/.55;return{x:leftBase.x+(rightEnd.x-leftBase.x)*q,y:leftBase.y+(rightEnd.y-leftBase.y)*q}}
+  function drawApp(v){const baseY=390,cx=410;box(42,72,810,290,'#fff');text('双斜面理想实验侧视：控制摩擦，观察等高思想',447,100,colors.ink,'center',16,'900');const lt={x:160,y:baseY-v.H},lb={x:cx,y:baseY},re={x:cx+v.dist*Math.cos(v.a),y:baseY-v.dist*Math.sin(v.a)};line(lt.x,lt.y,lb.x,lb.y,colors.blue,7);line(lb.x,lb.y,re.x,re.y,colors.red,7);line(110,baseY,790,baseY,colors.muted,2,[6,6]);line(110,lt.y,790,lt.y,colors.green,2,[6,6]);text('释放高度 h',118,(lt.y+baseY)/2,colors.green,'left',13,'900');text('若无摩擦，应回到同一高度',600,lt.y-18,colors.green,'center',13,'900');const p=pathPoint(v);state.trail.push(p);if(state.trail.length>120)state.trail.shift();state.trail.forEach((q,i)=>{ctx.fillStyle='rgba(124,58,237,'+(i/state.trail.length*.55)+')';ctx.beginPath();ctx.arc(q.x,q.y,3,0,Math.PI*2);ctx.fill()});ctx.fillStyle=colors.gold;ctx.beginPath();ctx.arc(p.x,p.y-13,15,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#9a6700';ctx.stroke();arrow(p.x-32,p.y-42,p.x+32,p.y-42,colors.gold,3);text('小球',p.x,p.y-38,colors.gold,'center',12,'900');const yReach=baseY-v.reach;line(cx,yReach,re.x,yReach,colors.purple,2,[4,4]);text('实际能达到的高度：h-Wf/mg',610,yReach-14,colors.purple,'center',12,'900')}
+  function drawGraph(v){box(42,390,810,150,'#fff');text('推理图像：右斜面越平，达到同一高度所需路程越长',447,416,colors.ink,'center',15,'900');const gx=118,gy=510,gw=660,gh=72;line(gx,gy,gx+gw,gy,colors.ink,2);line(gx,gy,gx,gy-gh,colors.ink,2);ctx.strokeStyle=colors.green;ctx.lineWidth=3;ctx.beginPath();for(let a=45;a>=2;a--){const rad=a*Math.PI/180,d=Math.min(620,v.H/Math.sin(rad));const x=gx+(45-a)/43*gw,y=gy-d/620*gh;if(a===45)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke();const x=gx+(45-v.a*180/Math.PI)/43*gw,y=gy-v.dist/620*gh;ctx.fillStyle=colors.red;ctx.beginPath();ctx.arc(x,y,7,0,Math.PI*2);ctx.fill();text('角度趋向 0°',gx+gw-30,gy+22,colors.muted,'center',12,'900');text('路程趋向无限长',gx+gw-68,gy-gh-14,colors.green,'center',12,'900')}
+  function update(v){el.angleLab.textContent=Math.round(v.a*180/Math.PI)+'°';el.fricLab.textContent=Math.round(v.F*100)+'%';el.hLab.textContent=v.H;el.readout.innerHTML='右斜面角度：<b>'+Math.round(v.a*180/Math.PI)+'°</b><br>摩擦强度：<b>'+Math.round(v.F*100)+'%</b><br>可回升高度：<b>'+fmt(v.reach,1)+'</b><br>右侧路程：<b>'+fmt(v.dist,1)+'</b><br>方法：<b>控制变量 + 极限推理</b>';el.status.textContent=v.F<.05&&v.a<.08?'理想推理：若水平面无阻力，小球将持续运动，不需要力来维持运动。':'继续减小摩擦或右斜面角度，观察结论怎样逼近惯性思想。'}
+  function draw(){const v=vals();ctx.clearRect(0,0,900,600);const bg=ctx.createLinearGradient(0,0,0,600);bg.addColorStop(0,'#fbfdff');bg.addColorStop(1,'#edf3f8');ctx.fillStyle=bg;ctx.fillRect(0,0,900,600);text('B1-32 伽利略理想实验：斜面侧视 + 轨迹图像 + 科学推理记录',450,34,colors.ink,'center',18,'900');drawApp(v);drawGraph(v);update(v)}
+  function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+  canvas.addEventListener('pointerdown',e=>{state.drag='angle';canvas.setPointerCapture(e.pointerId);move(e);e.preventDefault()});canvas.addEventListener('pointermove',move);function move(e){if(!state.drag)return;const p=pos(e);el.angle.value=Math.max(0,Math.min(45,Math.round((760-p.x)/11)));draw();e.preventDefault()}canvas.addEventListener('pointerup',e=>{state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}});canvas.addEventListener('pointercancel',()=>state.drag=null);
+  [el.angle,el.fric,el.height].forEach(x=>x.addEventListener('input',()=>{state.trail=[];draw()}));el.play.onclick=()=>{state.running=!state.running;el.play.textContent=state.running?'暂停':'释放'};id('reset').onclick=()=>{state.running=false;state.t=0;state.trail=[];el.angle.value=25;el.fric.value=20;el.height.value=120;el.play.textContent='释放';draw()};
+  function loop(){if(state.running){state.t+=0.025;if(state.t>4.2)state.t=0}else state.t=0;draw();requestAnimationFrame(loop)}draw();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

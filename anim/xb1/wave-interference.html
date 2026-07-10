@@ -24,7 +24,7 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
 <body>
 <div class="container">
   <h2>波的干涉：Δr=kλ 加强，Δr=(k+½)λ 减弱</h2>
-  <canvas id="canvas" width="660" height="360"></canvas>
+  <canvas id="canvas" width="660" height="360" aria-label="波的干涉实验台：双波源俯视装置、条纹图像和数据记录"></canvas>
   <div class="readouts">
     <span class="r">波长 λ = <b id="lam-v">40</b> px</span>
     <span class="r">双源间距 d = <b id="d-v">120</b> px</span>
@@ -40,7 +40,7 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
     <button id="reset-btn">重置</button>
   </div>
   <div class="hint">
-    <p><b>观察任务</b>：两个同频同相波源发出的圆形波叠加。亮暗相间的<b>稳定条纹</b>就是干涉图样。拖动<b>白色测试点</b>（或看它自动移动），读它到两源的<b>路程差 Δr</b>：当 Δr=0,λ,2λ…（kλ）时该点<b>振动加强</b>；当 Δr=½λ,1.5λ…时<b>振动减弱</b>。拖动 λ 或 d 看条纹疏密变化。</p>
+    <p><b>观察任务</b>：两个同频同相波源发出的圆形波叠加。对照双波源俯视装置、条纹图像和数据记录，拖动<b>白色测试点</b>读路程差 Δr：当 Δr=kλ 时该点<b>振动加强</b>，半波长奇数倍时<b>振动减弱</b>。</p>
   </div>
 </div>
 <script>

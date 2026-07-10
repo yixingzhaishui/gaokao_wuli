@@ -3,65 +3,76 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>平抛运动实验台</title>
+<title>平抛与类平抛实验台</title>
 <link rel="icon" href="data:,">
 <style>
   *{box-sizing:border-box}
   body{margin:0;background:#edf3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
-  .root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px;min-height:560px}
+  .root{display:grid;grid-template-columns:minmax(0,1fr) 316px;gap:10px;padding:10px;min-height:760px}
   .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
-  canvas{display:block;width:100%;height:auto;touch-action:none}
+  canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab}
+  canvas:active{cursor:grabbing}
   .panel{display:flex;flex-direction:column;gap:8px}
   .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
   .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.45}
   .title{font-weight:800;margin-bottom:5px;color:#0f172a}
   .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:31px;cursor:pointer;color:#102a43}
-  .primary{background:#2563eb;color:#fff;border-color:#2563eb}
+  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:31px;cursor:pointer;color:#102a43;font-weight:700}
+  button.active{background:#2563eb;color:#fff;border-color:#2563eb}
   .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:48px}
+  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:50px}
   .meter span{display:block;font-size:11px;color:#b6c5d8}
-  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:16px;font-variant-numeric:tabular-nums}
-  .formula{display:grid;gap:5px;font-size:13px;color:#334155}
+  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:15px;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .formula{display:grid;gap:5px;font-size:12px;color:#334155}
   .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
   .formula div:last-child{border-bottom:0;padding-bottom:0}
   .formula b{white-space:nowrap;color:#0f172a}
   .small{font-size:12px;line-height:1.5;color:#475569}
   .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
-  @media(max-width:760px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
+  .status.warn{border-color:#f59e0b;background:#fff7ed;color:#b45309}
+  @media(max-width:820px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
 <div class="root">
-  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="平抛运动交互实验台"></canvas></div>
+  <div class="stage"><canvas id="canvas" width="960" height="760" aria-label="平抛与类平抛交互实验台"></canvas></div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>拖大蓝色 v0 箭头，看射程变大但落地时间不变；拖高桌面，看时间和射程一起变大。</div>
-    <button id="playBtn" class="primary">播放</button>
+    <div class="card task"><b>观察任务：</b>切换平抛/电场偏转，拖 `v0` 看匀速方向只改变 x；拖 `g` 或 `q/E/m` 看加速方向如何改变 y、vy 和偏角。</div>
+    <div class="chips"><button id="playBtn">播放</button><button id="resetBtn">重置</button></div>
+    <div class="card">
+      <div class="title">模型模式</div>
+      <div class="chips">
+        <button id="gravityMode" class="active">重力平抛</button>
+        <button id="electricMode">电场类平抛</button>
+      </div>
+    </div>
     <div class="card">
       <div class="title">快速情境</div>
       <div class="chips">
-        <button data-case="base">基础</button>
-        <button data-case="fast">初速更大</button>
-        <button data-case="high">高度更高</button>
-        <button data-case="moon">小 g</button>
+        <button data-case="base">标准平抛</button>
+        <button data-case="fast">大初速</button>
+        <button data-case="positive">正电偏转</button>
+        <button data-case="negative">负电偏转</button>
       </div>
     </div>
     <div class="card">
       <div class="title">实时读数</div>
       <div class="readout">
-        <div class="meter"><span>落地时间</span><b id="timeText">1.26 s</b></div>
-        <div class="meter"><span>水平射程</span><b id="rangeText">12.6 m</b></div>
-        <div class="meter"><span>当前 vy</span><b id="vyText">6.3 m/s</b></div>
-        <div class="meter"><span>落地速度</span><b id="vText">16.1 m/s</b></div>
+        <div class="meter"><span>x / y</span><b id="xyText">5.0 / 1.3 m</b></div>
+        <div class="meter"><span>vx / vy</span><b id="vText">10.0 / 5.0</b></div>
+        <div class="meter"><span>偏角 tanθ</span><b id="thetaText">0.50</b></div>
+        <div class="meter"><span>加速度 a</span><b id="aText">10.0 m/s²</b></div>
       </div>
     </div>
     <div class="card formula">
-      <div><span>水平</span><b>x=v0t</b></div>
-      <div><span>竖直</span><b>y=1/2gt²</b></div>
-      <div><span>落地时间</span><b>t=√(2h/g)</b></div>
+      <div><span>匀速方向</span><b>x=v0t</b></div>
+      <div><span>加速方向</span><b>y=1/2at²</b></div>
+      <div><span>速度分解</span><b>vy=at</b></div>
+      <div><span>合速度方向</span><b>tanθ=vy/vx</b></div>
+      <div><span>电偏转</span><b>a=qE/m</b></div>
     </div>
-    <div class="card small"><b>可直接操作：</b>抓蓝色 v0 箭头端点、桌面高度手柄，或拖底部 v0、h、g、t 四个手柄。多视角：左侧是侧视实物轨迹，右侧是分运动图像记录和读数。</div>
-    <div class="status" id="status">水平匀速、竖直自由落体，两个分运动同时发生。</div>
+    <div class="card small"><b>三视图：</b>左侧是侧视实物轨迹；右侧是 x-t、y-t 图像记录；速度箭头把公式和当前点绑定。底部可拖 `v0,h,g,q,m,E,plate_length`。</div>
+    <div class="status" id="status">平抛：水平方向匀速，竖直方向自由落体。</div>
   </div>
 </div>
 <script>
@@ -69,57 +80,162 @@
   'use strict';
   const canvas=document.getElementById('canvas');
   const ctx=canvas.getContext('2d');
-  const state={v0:10,h:8,g:10,t:.5,running:false,drag:null};
-  const els={time:document.getElementById('timeText'),range:document.getElementById('rangeText'),vy:document.getElementById('vyText'),v:document.getElementById('vText'),status:document.getElementById('status'),play:document.getElementById('playBtn')};
-  const colors={red:'#dc2626',blue:'#2563eb',purple:'#7c3aed',green:'#0f766e',orange:'#f59e0b',ink:'#102a43'};
+  const state={mode:'gravity',v0:10,h:8,g:10,q:1.0,m:1.0,E:4.0,plate:8,t:.5,running:false,drag:null};
+  const els={xy:document.getElementById('xyText'),v:document.getElementById('vText'),theta:document.getElementById('thetaText'),a:document.getElementById('aText'),status:document.getElementById('status'),play:document.getElementById('playBtn')};
+  const gravityBtn=document.getElementById('gravityMode');
+  const electricBtn=document.getElementById('electricMode');
+  const colors={red:'#dc2626',blue:'#2563eb',purple:'#7c3aed',green:'#0f766e',orange:'#f59e0b',cyan:'#0891b2',ink:'#102a43',muted:'#64748b'};
   const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
-  const fmt=(v,d=1)=>v.toFixed(d);
-  function values(){const tf=Math.sqrt(2*state.h/state.g),range=state.v0*tf,tc=clamp(state.t,0,tf),x=state.v0*tc,y=.5*state.g*tc*tc,vy=state.g*tc,vLand=Math.sqrt(state.v0*state.v0+2*state.g*state.h),theta=Math.atan2(Math.sqrt(2*state.g*state.h),state.v0)*180/Math.PI;return{tf,range,tc,x,y,vy,vLand,theta}}
-  function layout(v){const bottom=398,left=96,heightPx=80+(state.h-2)/18*220,top=bottom-heightPx,yScale=heightPx/state.h,xScale=Math.min(440/Math.max(v.range,1),32);return{bottom,left,top,heightPx,yScale,xScale,launchX:left+58,launchY:top}}
+  const fmt=(v,d=1)=>Number.isFinite(v)?v.toFixed(d):'--';
+  function accel(){return state.mode==='gravity'?state.g:state.q*state.E/state.m}
+  function values(){
+    const a=accel(),limitT=state.mode==='gravity'?Math.sqrt(2*state.h/Math.max(.1,Math.abs(a))):state.plate/state.v0;
+    const tc=clamp(state.t,0,Math.max(.1,limitT)),x=state.v0*tc,y=.5*a*tc*tc,vy=a*tc,vx=state.v0,tan=vy/vx,theta=Math.atan(tan)*180/Math.PI;
+    return{a,limitT,tc,x,y,vy,vx,tan,theta,range:state.v0*limitT,endY:.5*a*limitT*limitT};
+  }
   function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){ctx.fillStyle=c;ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
   function line(x1,y1,x2,y2,c='#94a3b8',w=2,dash){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
-  function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore()}
-  function roundRect(x,y,w,h,r,fill,stroke){ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}ctx.restore()}
-  function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-36,c,'center',12,'900')}
-  function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-20,active?'#92400e':c,'center',12,'900');ctx.restore()}
-  function geom(v){const tf=v.tf;return{v0:{x:104+(state.v0-2)/28*150,y:494},h:{x:300+(state.h-2)/18*150,y:494},g:{x:500+(state.g-1)/19*150,y:494},t:{x:704+state.t/Math.max(tf,.1)*150,y:494}}}
-  function pointAt(t,L){return{x:L.launchX+state.v0*t*L.xScale,y:L.launchY+.5*state.g*t*t*L.yScale}}
-  function drawScene(v,L){
-    roundRect(42,58,560,382,8,'#fff','#d7dee8');
-    line(72,L.bottom,568,L.bottom,'#334155',3);
-    roundRect(72,L.top,82,L.heightPx,4,'#dbe4ee','#334155');
-    text(`h=${fmt(state.h)}m`,86,L.top+L.heightPx/2,'#475569','left',12,'900');
-    line(64,L.top,64,L.bottom,colors.orange,3);handle(64,L.top,`h`,state.drag==='heightDirect',colors.orange);
-    ctx.save();ctx.strokeStyle='#334155';ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=120;i++){const p=pointAt(v.tf*i/120,L);if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y)}ctx.stroke();ctx.restore();
-    for(let i=0;i<=6;i++){const tt=v.tf*i/6,p=pointAt(tt,L);ctx.fillStyle=colors.red;ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fill();ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(p.x,L.launchY,3,0,Math.PI*2);ctx.fill();ctx.fillStyle=colors.purple;ctx.beginPath();ctx.arc(L.launchX,p.y,3,0,Math.PI*2);ctx.fill()}
+  function arrow(x1,y1,x2,y2,c,w=3){if(Math.hypot(x2-x1,y2-y1)<2)return;const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore()}
+  function box(x,y,w,h,r,fill,stroke='#cbd5e1'){ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.5;ctx.stroke()}ctx.restore()}
+  function layout(v){
+    const left=74,top=92,w=500,h=360,axisY=state.mode==='gravity'?top+74:top+h/2;
+    const xScale=Math.min((w-78)/Math.max(v.range,state.plate,1),42);
+    const yMax=Math.max(state.h,Math.abs(v.endY),Math.abs(v.y),1);
+    const yScale=(state.mode==='gravity'?(h-110):140)/yMax;
+    return{left,top,w,h,axisY,xScale,yScale};
+  }
+  function pointAt(t,L){const a=accel();return{x:L.left+52+state.v0*t*L.xScale,y:L.axisY+.5*a*t*t*L.yScale}}
+  function drawGravityScene(v,L){
+    box(34,56,552,436,8,'#fff','#d7dee8');
+    text('侧视实物：平抛小球',310,82,'#0f172a','center',16,'900');
+    const tableTop=L.axisY,ground=L.axisY+state.h*L.yScale;
+    line(74,ground,548,ground,'#334155',3);box(74,tableTop,82,ground-tableTop,4,'#dbe4ee','#334155');
+    line(64,tableTop,64,ground,colors.orange,3);text(`h=${fmt(state.h)}m`,82,(tableTop+ground)/2,colors.orange,'left',12,'900');
+    drawTrajectory(v,L);
+    text('红轨迹：x=v0t 与 y=1/2gt² 同时生成',310,472,colors.muted,'center',13,'900');
+  }
+  function drawElectricScene(v,L){
+    box(34,56,552,436,8,'#fff','#d7dee8');
+    text('侧视实物：匀强电场中的类平抛',310,82,'#0f172a','center',16,'900');
+    const x0=L.left+52,x1=x0+state.plate*L.xScale,mid=L.axisY,plateGap=Math.max(90,state.h*16);
+    line(x0,mid-plateGap/2,x1,mid-plateGap/2,'#334155',6);
+    line(x0,mid+plateGap/2,x1,mid+plateGap/2,'#334155',6);
+    for(let i=0;i<=6;i++){const x=x0+(x1-x0)*i/6;arrow(x,mid-plateGap/2+18,x,mid+plateGap/2-18,colors.cyan,2)}
+    text(`plate_length=${fmt(state.plate)}m`,(x0+x1)/2,mid+plateGap/2+22,colors.cyan,'center',12,'900');
+    text(`E=${fmt(state.E)}kN/C，q=${fmt(state.q)}μC`,(x0+x1)/2,mid-plateGap/2-22,colors.cyan,'center',12,'900');
+    drawTrajectory(v,L);
+    const pExit=pointAt(v.limitT,L);line(pExit.x,L.top+40,pExit.x,L.top+392,colors.orange,2,[5,5]);text('出电场后不再加速',pExit.x+10,L.top+372,colors.orange,'left',12,'900');
+  }
+  function drawTrajectory(v,L){
+    ctx.save();ctx.strokeStyle=colors.red;ctx.lineWidth=3;ctx.beginPath();
+    for(let i=0;i<=120;i++){const p=pointAt(v.limitT*i/120,L);if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y)}
+    ctx.stroke();ctx.restore();
+    for(let i=0;i<=6;i++){const tt=v.limitT*i/6,p=pointAt(tt,L);ctx.fillStyle=colors.red;ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fill();ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(p.x,L.axisY,3,0,Math.PI*2);ctx.fill();ctx.fillStyle=colors.purple;ctx.beginPath();ctx.arc(L.left+52,p.y,3,0,Math.PI*2);ctx.fill()}
     const p=pointAt(v.tc,L);
     ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(p.x,p.y,11,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();
-    const v0End={x:L.launchX+40+state.v0*4,y:L.launchY};
-    arrow(L.launchX,L.launchY,v0End.x,v0End.y,colors.blue,4);text(`v0=${fmt(state.v0)}m/s`,v0End.x+12,v0End.y-12,colors.blue,'left',13,'900');
-    ctx.save();ctx.fillStyle=state.drag==='v0Direct'?'#fde68a':'#fff';ctx.strokeStyle=state.drag==='v0Direct'?'#d97706':colors.blue;ctx.lineWidth=3;ctx.beginPath();ctx.arc(v0End.x,v0End.y,9,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();
-    arrow(p.x,p.y,p.x+state.v0*4,p.y,colors.blue,3);text('vx=v0',p.x+state.v0*4+10,p.y,colors.blue,'left',12,'900');
-    if(v.tc>0)arrow(p.x,p.y,p.x,p.y+Math.min(96,v.vy*4),colors.purple,3);
-    text('vy=gt',p.x-12,p.y+Math.min(80,v.vy*2)+18,colors.purple,'right',12,'900');
-    line(L.launchX,L.bottom,L.launchX+v.range*L.xScale,L.bottom,colors.orange,5);
-    text(`x=${fmt(v.range)}m`,L.launchX+v.range*L.xScale/2,L.bottom+22,colors.orange,'center',13,'900');
-    text('蓝点等间距：水平匀速；紫点间距增大：竖直加速',312,428,'#475569','center',13,'900');
+    const launch=pointAt(0,L),v0End={x:launch.x+44+state.v0*3.2,y:launch.y};
+    arrow(launch.x,launch.y,v0End.x,v0End.y,colors.blue,4);text(`v0=${fmt(state.v0)}m/s`,v0End.x+10,v0End.y-12,colors.blue,'left',12,'900');
+    arrow(p.x,p.y,p.x+state.v0*3.2,p.y,colors.blue,3);text('vx=v0',p.x+state.v0*3.2+8,p.y,colors.blue,'left',12,'900');
+    arrow(p.x,p.y,p.x,p.y+clamp(v.vy*8,-96,96),colors.purple,3);text('vy=at',p.x-10,p.y+clamp(v.vy*4,-70,70),colors.purple,'right',12,'900');
+    arrow(p.x,p.y,p.x+state.v0*3,p.y+clamp(v.vy*7,-92,92),colors.green,3);text('v合',p.x+state.v0*3+10,p.y+clamp(v.vy*7,-92,92),colors.green,'left',12,'900');
   }
-  function drawExplain(v){
-    roundRect(632,80,230,122,8,'#f8fafc','#d7dee8');text('谁决定什么？',747,106,'#0f172a','center',15,'900');text('时间只由 h 和 g 决定',747,140,colors.purple,'center',13,'900');text('射程由 v0 × 时间决定',747,170,colors.orange,'center',13,'900');
-    roundRect(632,244,230,120,8,'#fff','#d7dee8');text('当前落地',747,272,'#0f172a','center',15,'900');text(`t=${fmt(v.tf,2)}s`,747,308,colors.purple,'center',18,'900');text(`v=${fmt(v.vLand)}m/s，θ=${fmt(v.theta)}°`,747,338,'#475569','center',12,'700');
+  function drawGraphs(v){
+    const gx=626,gw=260;
+    box(604,72,306,196,8,'#fff','#d7dee8');text('图像记录：x-t 匀速，y-t 匀加速',757,94,'#0f172a','center',14,'900');
+    line(gx,234,gx+gw,234,'#94a3b8',1.5);line(gx,234,gx,126,'#94a3b8',1.5);
+    ctx.beginPath();for(let i=0;i<=80;i++){const t=v.limitT*i/80,x=gx+gw*i/80,y=234-(i/80)*88;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.strokeStyle=colors.blue;ctx.lineWidth=3;ctx.stroke();
+    ctx.beginPath();for(let i=0;i<=80;i++){const t=v.limitT*i/80,r=(t/v.limitT);const x=gx+gw*i/80,y=234-r*r*88;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.strokeStyle=colors.purple;ctx.lineWidth=3;ctx.stroke();
+    const tx=gx+gw*v.tc/v.limitT;line(tx,238,tx,116,colors.orange,2,[4,4]);text('x-t',875,134,colors.blue,'right',12,'900');text('y-t',875,154,colors.purple,'right',12,'900');
+    box(604,292,306,160,8,'#f8fafc','#d7dee8');text('分运动方程',757,314,'#0f172a','center',14,'900');
+    text(`x=v0t=${fmt(v.x,2)}m`,626,346,colors.blue,'left',13,'900');
+    text(`y=1/2at²=${fmt(v.y,2)}m`,626,374,colors.purple,'left',13,'900');
+    text(`vy=at=${fmt(v.vy,2)}m/s`,626,402,colors.purple,'left',13,'900');
+    text(`tanθ=vy/vx=${fmt(v.tan,2)}`,626,430,colors.green,'left',13,'900');
   }
-  function update(v){els.time.textContent=`${fmt(v.tf,2)} s`;els.range.textContent=`${fmt(v.range)} m`;els.vy.textContent=`${fmt(v.vy)} m/s`;els.v.textContent=`${fmt(v.vLand)} m/s`;els.status.textContent='落地时间由竖直方向决定；v0 只通过 x=v0t 改变射程。';els.play.textContent=state.running?'暂停':'播放'}
-  function draw(){const v=values(),L=layout(v),g0=geom(v);ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('平抛运动实验台：水平匀速 + 竖直自由落体',460,30,'#0f172a','center',19,'900');drawScene(v,L);drawExplain(v);roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(104,494,254,'v0',colors.blue);handle(g0.v0.x,g0.v0.y,`v0=${fmt(state.v0)}`,state.drag==='v0',colors.blue);ruler(300,494,450,'h',colors.orange);handle(g0.h.x,g0.h.y,`h=${fmt(state.h)}`,state.drag==='h',colors.orange);ruler(500,494,650,'g',colors.purple);handle(g0.g.x,g0.g.y,`g=${fmt(state.g)}`,state.drag==='g',colors.purple);ruler(704,494,854,'t',colors.green);handle(g0.t.x,g0.t.y,`t=${fmt(v.tc,2)}s`,state.drag==='t',colors.green);update(v)}
+  function ruler(x1,y,x2,label,c,hx,txt,active){
+    line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=5;i++){const x=x1+(x2-x1)*i/5;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-18,c,'center',12,'900');
+    ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#b45309':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(hx,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();text(txt,hx,y-36,active?'#92400e':c,'center',12,'900');
+  }
+  function geometry(v){
+    return{
+      v0:{x:60+(state.v0-2)/28*132,y:630},
+      h:{x:218+(state.h-2)/18*132,y:630},
+      g:{x:376+(state.g-1)/19*132,y:630},
+      q:{x:534+(state.q+3)/6*132,y:688},
+      m:{x:692+(state.m-.2)/4.8*132,y:688},
+      E:{x:60+(state.E-1)/9*132,y:688},
+      plate:{x:218+(state.plate-4)/12*132,y:688},
+      t:{x:376+state.t/Math.max(.1,v.limitT)*132,y:688}
+    };
+  }
+  function drawControls(v,g0){
+    box(34,592,876,126,8,'#fff','#d7dee8');
+    text('拖参数：v0、h、g、q、m、E、plate_length；同一时间 t 连接两个方向',392,610,colors.orange,'center',12,'900');
+    ruler(60,630,192,'v0',colors.blue,g0.v0,`${fmt(state.v0)}m/s`,state.drag==='v0');
+    ruler(218,630,350,'h',colors.orange,g0.h,`${fmt(state.h)}m`,state.drag==='h');
+    ruler(376,630,508,'g',colors.purple,g0.g,`${fmt(state.g)}m/s²`,state.drag==='g');
+    ruler(534,688,666,'q',colors.red,g0.q,`${fmt(state.q)}μC`,state.drag==='q');
+    ruler(692,688,824,'m',colors.green,g0.m,`${fmt(state.m)}g`,state.drag==='m');
+    ruler(60,688,192,'E',colors.cyan,g0.E,`${fmt(state.E)}kN/C`,state.drag==='E');
+    ruler(218,688,350,'plate_length',colors.cyan,g0.plate,`${fmt(state.plate)}m`,state.drag==='plate');
+    ruler(376,688,508,'t',colors.orange,g0.t,`${fmt(v.tc,2)}s`,state.drag==='t');
+  }
+  function update(v){
+    els.xy.textContent=`${fmt(v.x,2)} / ${fmt(v.y,2)} m`;
+    els.v.textContent=`${fmt(v.vx,1)} / ${fmt(v.vy,2)}`;
+    els.theta.textContent=`${fmt(v.tan,2)} (${fmt(v.theta,1)}°)`;
+    els.a.textContent=`${fmt(v.a,2)} m/s²`;
+    els.status.className='status'+(state.mode==='electric'&&Math.abs(state.q)<.05?' warn':'');
+    els.status.textContent=state.mode==='gravity'
+      ?'平抛：水平方向无力，x=v0t；竖直方向受重力，y=1/2gt²。'
+      :`电场类平抛：加速度 a=qE/m=${fmt(v.a,2)}m/s²，q 的正负决定偏转方向；出电场后不再继续电加速。`;
+    els.play.textContent=state.running?'暂停':'播放';
+  }
+  function draw(){
+    const v=values(),L=layout(v),g0=geometry(v);
+    ctx.clearRect(0,0,960,760);
+    const bg=ctx.createLinearGradient(0,0,0,760);bg.addColorStop(0,'#fbfdff');bg.addColorStop(1,'#eaf0f7');ctx.fillStyle=bg;ctx.fillRect(0,0,960,760);
+    text('平抛与类平抛实验台：一个方向匀速，垂直方向匀加速',480,28,'#0f172a','center',20,'900');
+    if(state.mode==='gravity')drawGravityScene(v,L);else drawElectricScene(v,L);
+    drawGraphs(v);drawControls(v,g0);update(v);
+  }
   function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
-  function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
-  function directGeom(){const v=values(),L=layout(v),v0End={x:L.launchX+40+state.v0*4,y:L.launchY};return{v,L,v0End,height:{x:64,y:L.top}}}
-  function down(e){const p=pos(e),v=values(),g0=geom(v),d=directGeom();if(near(p,d.v0End,30))state.drag='v0Direct';else if(near(p,d.height,28))state.drag='heightDirect';else if(near(p,g0.v0,26))state.drag='v0';else if(near(p,g0.h,26))state.drag='h';else if(near(p,g0.g,26))state.drag='g';else if(near(p,g0.t,26))state.drag='t';else state.drag=null;if(state.drag){state.running=false;canvas.setPointerCapture(e.pointerId);move(e)}}
-  function move(e){if(!state.drag)return;const p=pos(e),v=values();if(state.drag==='v0')state.v0=clamp(2+(p.x-104)/150*28,2,30);if(state.drag==='h')state.h=clamp(2+(p.x-300)/150*18,2,20);if(state.drag==='g')state.g=clamp(1+(p.x-500)/150*19,1,20);if(state.drag==='t')state.t=clamp((p.x-704)/150*v.tf,0,v.tf);if(state.drag==='v0Direct')state.v0=clamp((p.x-136)/4,2,30);if(state.drag==='heightDirect'){const bottom=398,heightPx=clamp(bottom-p.y,80,300);state.h=clamp(2+(heightPx-80)/220*18,2,20)}draw()}
+  function near(p,h,rad=25){return Math.hypot(p.x-h.x,p.y-h.y)<=rad}
+  function down(e){
+    state.running=false;
+    const p=pos(e),v=values(),g0=geometry(v);state.drag=null;
+    for(const key of ['v0','h','g','q','m','E','plate','t']){if(near(p,g0[key],24)){state.drag=key;break}}
+    if(state.drag){canvas.setPointerCapture(e.pointerId);move(e)}
+  }
+  function move(e){
+    if(!state.drag)return;
+    const p=pos(e),v=values();
+    if(state.drag==='v0')state.v0=clamp(2+(p.x-60)/132*28,2,30);
+    if(state.drag==='h')state.h=clamp(2+(p.x-218)/132*18,2,20);
+    if(state.drag==='g')state.g=clamp(1+(p.x-376)/132*19,1,20);
+    if(state.drag==='q')state.q=clamp(-3+(p.x-534)/132*6,-3,3);
+    if(state.drag==='m')state.m=clamp(.2+(p.x-692)/132*4.8,.2,5);
+    if(state.drag==='E')state.E=clamp(1+(p.x-60)/132*9,1,10);
+    if(state.drag==='plate')state.plate=clamp(4+(p.x-218)/132*12,4,16);
+    if(state.drag==='t')state.t=clamp((p.x-376)/132*v.limitT,0,v.limitT);
+    state.t=clamp(state.t,0,values().limitT);draw();
+  }
   function up(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
   canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
+  function setMode(mode){state.mode=mode;state.t=0;gravityBtn.classList.toggle('active',mode==='gravity');electricBtn.classList.toggle('active',mode==='electric');draw()}
+  gravityBtn.addEventListener('click',()=>setMode('gravity'));
+  electricBtn.addEventListener('click',()=>setMode('electric'));
   els.play.addEventListener('click',()=>{state.running=!state.running;draw()});
-  document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='base'){state.v0=10;state.h=8;state.g=10;state.t=.5}if(c==='fast'){state.v0=20;state.h=8;state.g=10;state.t=.5}if(c==='high'){state.v0=10;state.h=16;state.g=10;state.t=.5}if(c==='moon'){state.v0=10;state.h=8;state.g=1.6;state.t=.5}draw()}));
-  function tick(){if(state.running){const v=values();state.t+=.012;if(state.t>v.tf)state.t=0}draw();requestAnimationFrame(tick)}
+  document.getElementById('resetBtn').addEventListener('click',()=>{Object.assign(state,{mode:'gravity',v0:10,h:8,g:10,q:1,m:1,E:4,plate:8,t:.5,running:false});setMode('gravity')});
+  document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{
+    const c=btn.dataset.case;
+    if(c==='base'){Object.assign(state,{mode:'gravity',v0:10,h:8,g:10,t:.5})}
+    if(c==='fast'){Object.assign(state,{mode:'gravity',v0:22,h:8,g:10,t:.5})}
+    if(c==='positive'){Object.assign(state,{mode:'electric',v0:12,q:1.5,m:1,E:4,plate:8,h:8,t:.3})}
+    if(c==='negative'){Object.assign(state,{mode:'electric',v0:12,q:-1.5,m:1,E:4,plate:8,h:8,t:.3})}
+    setMode(state.mode);
+  }));
+  function tick(){if(state.running){const v=values();state.t+=.014;if(state.t>v.limitT)state.t=0}draw();requestAnimationFrame(tick)}
   draw();requestAnimationFrame(tick);
 })();
 </script>

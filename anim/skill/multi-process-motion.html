@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>多过程运动专题实验台</title>
+<link rel="icon" href="data:,">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}.root{display:grid;grid-template-columns:minmax(0,1fr)340px;gap:12px;padding:12px;min-height:700px}.stage,.card{background:#fff;border:1px solid #d9e2ec;border-radius:8px}.stage{overflow:hidden}.card{padding:10px}.panel{display:flex;flex-direction:column;gap:10px}canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab}.task{background:#fff7e6;border-left:4px solid #f0a500;color:#486581;font-size:13px;line-height:1.5}.title{font-weight:900;margin-bottom:7px}.param{display:grid;gap:3px;margin:8px 0;font-size:13px}.param span{display:flex;justify-content:space-between;gap:8px;color:#486581}.param b{color:#102a43;font-variant-numeric:tabular-nums;white-space:nowrap}input[type=range]{width:100%;accent-color:#2c7be5}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}button{border:1px solid #b0bcc9;background:#fff;border-radius:6px;padding:7px 8px;cursor:pointer;font:inherit;font-size:13px}.readout{background:#102a43;color:#d9e2ec;border-radius:8px;padding:10px;line-height:1.6;font-size:13px}.readout b{color:#ffd166;font-variant-numeric:tabular-nums}.status{border:1px solid #38b2ac;background:#e6fffa;color:#087f5b;border-radius:8px;padding:8px;font-size:13px;font-weight:800;line-height:1.45}.formula{font-size:13px;color:#334e68;line-height:1.6}table{width:100%;border-collapse:collapse;font-size:12px}td,th{border-bottom:1px solid #d9e2ec;padding:4px 3px;text-align:right;font-variant-numeric:tabular-nums}@media(max-width:880px){.root{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="930" height="620" aria-label="多过程运动专题实验台：分段运动装置、v-t图像、接续条件、面积位移、数据记录、多视角"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>拖动分段时刻，看三段运动如何在同一张 v-t 图像中接续，面积怎样累加为总位移。</div>
+    <div class="card">
+      <div class="title">分段参数</div>
+      <label class="param"><span>第一段加速度 a1 <b id="a1Label">2.0</b></span><input id="a1" type="range" min="0" max="4" step="0.1" value="2"></label>
+      <label class="param"><span>匀速时长 t2 <b id="t2Label">3.0</b></span><input id="t2" type="range" min="1" max="5" step="0.1" value="3"></label>
+      <label class="param"><span>制动加速度大小 a3 <b id="a3Label">3.0</b></span><input id="a3" type="range" min="1" max="6" step="0.1" value="3"></label>
+      <label class="param"><span>切换时刻 t1 <b id="t1Label">3.0</b></span><input id="t1" type="range" min="1" max="5" step="0.1" value="3"></label>
+      <div class="buttons"><button id="play">暂停</button><button id="record">记录分段</button></div>
+    </div>
+    <div class="readout" id="readout"></div>
+    <div class="card"><div class="title">过程记录</div><table><thead><tr><th>段</th><th>时间</th><th>位移</th></tr></thead><tbody id="rows"></tbody></table></div>
+    <div class="card formula">
+      <div class="title">分段公式</div>
+      <div>接续条件：后一段初速度=前一段末速度</div>
+      <div>v-t 面积：x=Σ面积</div>
+      <div>匀变速：v=v0+at，x=v0t+1/2 at²</div>
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+</div>
+<script>
+(function(){
+'use strict';
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+const E={a1:document.getElementById('a1'),t1:document.getElementById('t1'),t2:document.getElementById('t2'),a3:document.getElementById('a3'),a1Label:document.getElementById('a1Label'),t1Label:document.getElementById('t1Label'),t2Label:document.getElementById('t2Label'),a3Label:document.getElementById('a3Label'),readout:document.getElementById('readout'),rows:document.getElementById('rows'),status:document.getElementById('status'),play:document.getElementById('play'),record:document.getElementById('record')};
+const C={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',green:'#087f5b',gold:'#f0a500',purple:'#7048e8'};
+const S={run:true,t:0,drag:false,records:[]};
+function box(x,y,w,h,f='#fff',s='#d9e2ec'){ctx.save();ctx.fillStyle=f;ctx.strokeStyle=s;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.restore()}
+function text(s,x,y,c=C.ink,a='center',z=13,w='800'){ctx.fillStyle=c;ctx.font=w+' '+z+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+function line(x1,y1,x2,y2,c='#9fb3c8',w=2,d){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(d)ctx.setLineDash(d);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
+function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.45),y2-10*Math.sin(a-.45));ctx.lineTo(x2-10*Math.cos(a+.45),y2-10*Math.sin(a+.45));ctx.closePath();ctx.fill()}
+function calc(){const a1=+E.a1.value,t1=+E.t1.value,t2=+E.t2.value,a3=+E.a3.value;const v1=a1*t1,t3=v1/a3,T=t1+t2+t3;const x1=.5*a1*t1*t1,x2=v1*t2,x3=.5*v1*t3;return{a1,t1,t2,a3,v1,t3,T,x1,x2,x3,total:x1+x2+x3}}
+function vel(t,q){if(t<=q.t1)return q.a1*t;if(t<=q.t1+q.t2)return q.v1;return Math.max(0,q.v1-q.a3*(t-q.t1-q.t2))}
+const gx=92,gy=500,gw=520,gh=300;function mx(t,q){return gx+t/q.T*gw}function my(v,q){return gy-v/Math.max(2,q.v1*1.25)*gh}
+function draw(){const q=calc();ctx.clearRect(0,0,930,620);box(34,30,862,548,'#fff');text('G-07 多过程运动：分段列式，接续速度，面积求总位移',465,56,C.ink,'center',17,'900');drawScene(q);drawGraph(q);drawFlow(q);update(q)}
+function drawScene(q){box(70,88,560,150,'#fbfdff');text('运动装置侧视图：启动-匀速-制动三段接续',350,112,C.muted,'center',12,'900');line(110,188,580,188,'#52606d',5);const tt=S.t%q.T,x=110+(vel(tt,q)>0?(tt/q.T):1)*420;ctx.fillStyle=C.blue;ctx.fillRect(x,154,46,28);text('车',x+23,143,C.blue,'center',11,'900');arrow(x+48,154,x+95,132,tt<q.t1?C.green:tt<q.t1+q.t2?C.gold:C.red,3);text(tt<q.t1?'加速':tt<q.t1+q.t2?'匀速':'制动',x+100,128,C.muted,'left',12,'900');text('每一段末速度，是下一段初速度',350,220,C.green,'center',12,'900')}
+function drawGraph(q){box(70,260,560,286,'#fff');text('v-t 图像：三段面积相加，总位移 x=x1+x2+x3',350,282,C.muted,'center',12,'900');arrow(gx,gy,gx+gw+24,gy,'#52606d',2);arrow(gx,gy,gx,gy-gh-18,'#52606d',2);text('t/s',gx+gw+36,gy,C.muted,'left',12,'800');text('v/(m/s)',gx-4,gy-gh-28,C.muted,'right',12,'800');for(let i=0;i<=6;i++){line(gx+i*gw/6,gy,gx+i*gw/6,gy-gh,'rgba(130,154,177,.16)',1);line(gx,gy-i*gh/6,gx+gw,gy-i*gh/6,'rgba(130,154,177,.16)',1)}ctx.fillStyle='rgba(44,123,229,.14)';ctx.beginPath();ctx.moveTo(mx(0,q),gy);for(let i=0;i<=160;i++){const t=q.T*i/160;ctx.lineTo(mx(t,q),my(vel(t,q),q))}ctx.lineTo(mx(q.T,q),gy);ctx.closePath();ctx.fill();ctx.strokeStyle=C.blue;ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=160;i++){const t=q.T*i/160;if(i===0)ctx.moveTo(mx(t,q),my(vel(t,q),q));else ctx.lineTo(mx(t,q),my(vel(t,q),q))}ctx.stroke();[q.t1,q.t1+q.t2].forEach((t,i)=>{line(mx(t,q),gy,mx(t,q),my(q.v1,q),i?C.gold:C.green,2,[6,4]);ctx.fillStyle=i?C.gold:C.green;ctx.beginPath();ctx.arc(mx(t,q),my(q.v1,q),10,0,7);ctx.fill();text(i?'拖动 t2 结束':'拖动 t1',mx(t,q),my(q.v1,q)-22,i?C.gold:C.green,'center',11,'900')});text('多视角：车辆运动 + v-t 图像 + 面积位移 + 分段数据记录',350,530,C.purple,'center',12,'900')}
+function drawFlow(q){box(664,88,196,458,'#fff');text('解题流程',762,114,C.ink,'center',14,'900');['划分阶段','列每段公式','用末速接续','画 v-t 图像','面积求位移','合并答案'].forEach((s,i)=>{box(686,142+i*54,152,34,i===0?'#fff7e6':i===2?'#e6fffa':'#eef4ff');text(s,762,159+i*54,i===0?C.gold:i===2?C.green:C.blue,'center',12,'900')});text('总时间 '+q.T.toFixed(2)+'s',762,474,C.red,'center',14,'900');text('总位移 '+q.total.toFixed(2)+'m',762,502,C.muted,'center',12,'800')}
+function update(q){E.a1Label.textContent=q.a1.toFixed(1);E.t1Label.textContent=q.t1.toFixed(1);E.t2Label.textContent=q.t2.toFixed(1);E.a3Label.textContent=q.a3.toFixed(1);E.readout.innerHTML='末速度 v1：<b>'+q.v1.toFixed(2)+' m/s</b><br>制动时间 t3：<b>'+q.t3.toFixed(2)+' s</b><br>总时间：<b>'+q.T.toFixed(2)+' s</b><br>总位移：<b>'+q.total.toFixed(2)+' m</b>';E.rows.innerHTML='<tr><td>加速</td><td>'+q.t1.toFixed(1)+'</td><td>'+q.x1.toFixed(2)+'</td></tr><tr><td>匀速</td><td>'+q.t2.toFixed(1)+'</td><td>'+q.x2.toFixed(2)+'</td></tr><tr><td>制动</td><td>'+q.t3.toFixed(1)+'</td><td>'+q.x3.toFixed(2)+'</td></tr>';E.status.textContent='多过程题不要把一个公式套到底：每段单独建模，用速度和位置接续。'}
+function record(){const q=calc();S.records.push(q);if(S.records.length>4)S.records.shift();update(q)}
+[E.a1,E.t1,E.t2,E.a3].forEach(el=>el.addEventListener('input',draw));E.record.onclick=record;E.play.onclick=()=>{S.run=!S.run;E.play.textContent=S.run?'暂停':'播放'};function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}function setPoint(p){const q=calc(),t=Math.max(.5,Math.min(q.T,(p.x-gx)/gw*q.T));if(Math.abs(t-q.t1)<Math.abs(t-q.t1-q.t2))E.t1.value=Math.max(1,Math.min(5,t)).toFixed(1);else E.t2.value=Math.max(1,Math.min(5,t-q.t1)).toFixed(1);draw()}canvas.addEventListener('pointerdown',e=>{const p=pos(e);if(p.x>70&&p.x<640&&p.y>250&&p.y<550){S.drag=true;canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing';setPoint(p)}});canvas.addEventListener('pointermove',e=>{if(S.drag)setPoint(pos(e))});canvas.addEventListener('pointerup',e=>{S.drag=false;canvas.style.cursor='grab';try{canvas.releasePointerCapture(e.pointerId)}catch(_){}});canvas.addEventListener('pointercancel',()=>{S.drag=false});let last=performance.now();function loop(now){const dt=Math.min((now-last)/1000,.04);last=now;if(S.run)S.t+=dt;draw();requestAnimationFrame(loop)}record();loop();
+})();
+</script>
+</body>
+</html>

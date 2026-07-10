@@ -23,13 +23,6 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
 <body>
 <div class="container">
   <h2>洛伦兹力：F = qvB sinθ</h2>
-  <canvas id="canvas" width="600" height="360"></canvas>
-  <div class="readouts">
-    <span class="r">力 F = <b id="f-val">3.2</b>×10⁻¹³ N</span>
-    <span class="r">速度 v = <b id="v-val">2.0</b>×10⁶ m/s</span>
-    <span class="r">磁感应强度 B = <b id="b-val">1.0</b> T</span>
-    <span class="r" id="dir-val">方向：垂直纸面向里</span>
-  </div>
   <div class="controls">
     <label>速度 v = <span id="v-display">2.0</span>×10⁶ m/s
       <input type="range" id="v" min="0.5" max="5" step="0.1" value="2"></label>
@@ -43,8 +36,15 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
     <button id="reset-btn">重置</button>
     <span style="font-size:13px;color:#486581">或拖蓝色速度箭头</span>
   </div>
+  <canvas id="canvas" width="600" height="360" aria-label="洛伦兹力实验台：三维磁场方向装置、速度投影图像和数据记录"></canvas>
+  <div class="readouts">
+    <span class="r">力 F = <b id="f-val">3.2</b>×10⁻¹³ N</span>
+    <span class="r">速度 v = <b id="v-val">2.0</b>×10⁶ m/s</span>
+    <span class="r">磁感应强度 B = <b id="b-val">1.0</b> T</span>
+    <span class="r" id="dir-val">方向：垂直纸面向里</span>
+  </div>
   <div class="hint">
-    <p><b>观察任务</b>：直接拖<b>蓝色速度箭头</b>改变 v 和 θ，看 F 如何随 vBsinθ 变化；θ=90° 时最大，θ=0° 时 F=0。拖动 q 看力方向反转。洛伦兹力始终垂直于 v 和 B，只改变方向不改变速度大小。</p>
+    <p><b>观察任务</b>：直接拖<b>蓝色速度箭头</b>改变 v 和 θ，对照三维磁场方向装置、速度投影图像和数据记录，看 F 如何随 vBsinθ 变化；θ=90° 时最大，θ=0° 时 F=0。</p>
   </div>
 </div>
 <script>

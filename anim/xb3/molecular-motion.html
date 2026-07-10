@@ -1,103 +1,279 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>分子热运动</title>
-<link rel="stylesheet" href="../common/controls.css">
 <style>
-body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#f7f9fc;color:#1f2933}
-.container{padding:12px}
-h2{font-size:16px;margin:0 0 8px;color:#102a43}
-canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid #d9e2ec;border-radius:8px}
-.readouts{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0;font-size:13px}
-.readouts .r{background:#102a43;color:#d9e2ec;padding:6px 10px;border-radius:6px}
-.readouts .r b{color:#f0a500}
-.controls{display:flex;flex-wrap:wrap;gap:14px;margin:10px 0;align-items:center}
-.controls label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:#334e68}
-.controls input[type=range]{width:160px;accent-color:#2c7be5}
-.controls button{font:inherit;padding:6px 14px;border:1px solid #b0bcc9;background:#fff;border-radius:6px;cursor:pointer}
-.controls button:hover{background:#eef2f7}
-.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:8px 12px;border-radius:4px;font-size:13px;color:#486581;margin-top:10px}
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 16px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 14px; align-items: stretch; }
+  canvas { width: 100%; height: 540px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; touch-action: none; cursor: grab; }
+  canvas:active { cursor: grabbing; }
+  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
+  .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
+  button { border: 1px solid #bcccdc; background: #fff; color: #243b53; border-radius: 8px; padding: 8px 6px; font-weight: 800; cursor: pointer; }
+  button.primary { background: #2c7be5; border-color: #2c7be5; color: #fff; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-top: 11px; }
+  input { width: 100%; }
+  .readout { margin-top: 12px; padding: 11px; background: #eef4ff; border-radius: 8px; line-height: 1.68; font-size: 14px; }
+  .status { margin-top: 9px; padding: 9px 10px; border-radius: 8px; font-size: 13px; line-height: 1.55; background: #e6fffa; color: #087f5b; font-weight: 700; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.58; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+  th, td { border-bottom: 1px solid #d9e2ec; padding: 4px 3px; text-align: right; }
+  th:first-child, td:first-child { text-align: left; }
+  @media (max-width: 820px) { .stage { grid-template-columns: 1fr; } canvas { height: 460px; } }
 </style>
 </head>
 <body>
-<div class="container">
-  <h2>分子热运动：温度是分子平均动能的标志</h2>
-  <canvas id="canvas" width="660" height="330"></canvas>
-  <div class="readouts">
-    <span class="r">温度 T = <b id="t-v">300</b> K</span>
-    <span class="r">分子平均速率 ∝ √T = <b id="v-v">—</b></span>
-    <span class="r">平均动能 ∝ T = <b id="ek-v">—</b></span>
-    <span class="r">大颗粒（布朗运动）：<b id="br-v">中等</b></span>
-  </div>
-  <div class="controls">
-    <label>温度 T = <span id="t-d">300</span> K
-      <input type="range" id="t" min="100" max="600" step="10" value="300"></label>
-    <button id="play-btn">暂停</button>
-    <button id="reset-btn">重置</button>
-  </div>
-  <div class="hint">
-    <p><b>观察任务</b>：小蓝点是气体分子，做<b>永不停息的无规则运动</b>。拖<b>温度 T</b> 升高→分子平均速率变大（平均动能 ∝ T），撞击更频繁猛烈。大红点是悬浮的<b>花粉/颗粒</b>，它被四面八方的分子撞击，走出无规则的"布朗运动"折线——温度越高、颗粒越小，布朗运动越剧烈。注意：布朗运动是<b>颗粒</b>的运动，间接反映了分子的运动，但它本身不是分子。</p>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="740" height="540" aria-label="分子热运动实验台：显微镜俯视、温度计侧视、速率图像和数据记录"></canvas>
+    <section class="panel">
+      <div class="row">
+        <button id="playBtn" class="primary" type="button">暂停</button>
+        <button id="recordBtn" type="button">记录</button>
+        <button id="resetBtn" type="button">重置</button>
+      </div>
+      <label for="temp">温度 T/K：<span id="tempVal"></span></label>
+      <input id="temp" type="range" min="100" max="600" value="300" step="10">
+      <label for="size">颗粒大小：<span id="sizeVal"></span></label>
+      <input id="size" type="range" min="6" max="18" value="10" step="1">
+      <div id="readout" class="readout"></div>
+      <div id="status" class="status"></div>
+      <div class="hint">观察任务：拖动红色大颗粒看布朗运动轨迹；拖动温度计改变 T，观察分子平均速率 ∝√T、平均动能 ∝T 和轨迹抖动强弱。</div>
+      <table aria-label="热运动数据记录">
+        <thead><tr><th>组</th><th>T/K</th><th>√T比</th><th>布朗</th></tr></thead>
+        <tbody id="recordRows"></tbody>
+      </table>
+    </section>
   </div>
 </div>
 <script>
-(function(){
-  const canvas=document.getElementById('canvas');
-  const ctx=canvas.getContext('2d');
-  const W=canvas.width,H=canvas.height;
-  let T=300, running=true;
-  const N=60; let mol=[];
-  let big={x:W/2,y:H/2,vx:0,vy:0,trail:[]};
-  function speedScale(){return Math.sqrt(T/300);}
-  function init(){
-    mol=[];
-    for(let i=0;i<N;i++){
-      const a=Math.random()*Math.PI*2;
-      mol.push({x:20+Math.random()*(W-40),y:20+Math.random()*(H-40),ang:a});
-    }
-    big={x:W/2,y:H/2,vx:0,vy:0,trail:[]};
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const els = {
+  playBtn: document.getElementById('playBtn'),
+  recordBtn: document.getElementById('recordBtn'),
+  resetBtn: document.getElementById('resetBtn'),
+  temp: document.getElementById('temp'),
+  size: document.getElementById('size'),
+  tempVal: document.getElementById('tempVal'),
+  sizeVal: document.getElementById('sizeVal'),
+  readout: document.getElementById('readout'),
+  status: document.getElementById('status'),
+  recordRows: document.getElementById('recordRows')
+};
+const state = { running: true, last: 0, drag: null, records: [] };
+const mol = [];
+const big = { x: 230, y: 230, vx: 0, vy: 0, trail: [] };
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+function values() {
+  const T = Number(els.temp.value);
+  const size = Number(els.size.value);
+  return { T, size, speed: Math.sqrt(T / 300), ek: T / 300, brown: Math.sqrt(T / 300) * (12 / size) };
+}
+function initMol() {
+  mol.length = 0;
+  for (let i = 0; i < 72; i++) mol.push({ x: 70 + Math.random() * 315, y: 86 + Math.random() * 298, a: Math.random() * Math.PI * 2 });
+  big.x = 230; big.y = 230; big.vx = 0; big.vy = 0; big.trail = [];
+}
+function step(q, dt) {
+  const sp = 92 * q.speed;
+  mol.forEach(m => {
+    m.x += Math.cos(m.a) * sp * dt;
+    m.y += Math.sin(m.a) * sp * dt;
+    if (m.x < 58 || m.x > 402) { m.a = Math.PI - m.a; m.x = clamp(m.x, 58, 402); }
+    if (m.y < 82 || m.y > 398) { m.a = -m.a; m.y = clamp(m.y, 82, 398); }
+    if (Math.random() < 0.02) m.a += (Math.random() - 0.5) * 0.8;
+  });
+  big.vx += (Math.random() - 0.5) * sp * dt * 5.8 / q.size;
+  big.vy += (Math.random() - 0.5) * sp * dt * 5.8 / q.size;
+  big.vx *= 0.92;
+  big.vy *= 0.92;
+  big.x += big.vx;
+  big.y += big.vy;
+  if (big.x < 70 || big.x > 390) { big.vx *= -1; big.x = clamp(big.x, 70, 390); }
+  if (big.y < 96 || big.y > 386) { big.vy *= -1; big.y = clamp(big.y, 96, 386); }
+  big.trail.push({ x: big.x, y: big.y });
+  if (big.trail.length > 85) big.trail.shift();
+}
+function drawMicroscope(q) {
+  ctx.fillStyle = '#eef4ff';
+  ctx.strokeStyle = '#d9e2ec';
+  ctx.lineWidth = 2;
+  ctx.fillRect(44, 72, 376, 346);
+  ctx.strokeRect(44, 72, 376, 346);
+  ctx.fillStyle = '#486581';
+  ctx.font = '13px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('显微镜俯视实验台：小蓝点是分子，红点是悬浮颗粒', 232, 98);
+  ctx.strokeStyle = 'rgba(201,42,42,0.5)';
+  ctx.lineWidth = 1.6;
+  ctx.beginPath();
+  big.trail.forEach((p, i) => { if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y); });
+  ctx.stroke();
+  ctx.fillStyle = '#2c7be5';
+  mol.forEach(m => { ctx.beginPath(); ctx.arc(m.x, m.y, 3, 0, Math.PI * 2); ctx.fill(); });
+  ctx.fillStyle = '#c92a2a';
+  ctx.beginPath();
+  ctx.arc(big.x, big.y, q.size, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#102a43';
+  ctx.stroke();
+  ctx.fillStyle = '#486581';
+  ctx.font = '13px system-ui';
+  ctx.fillText('布朗轨迹：颗粒被四面八方分子撞击而无规则抖动', 232, 392);
+}
+function drawThermometer(q) {
+  const x = 482, y = 90;
+  ctx.fillStyle = '#f7f9fc';
+  ctx.strokeStyle = '#d9e2ec';
+  ctx.lineWidth = 2;
+  ctx.fillRect(x, y, 190, 126);
+  ctx.strokeRect(x, y, 190, 126);
+  ctx.fillStyle = '#486581';
+  ctx.font = '13px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('温度计侧视读数', x + 95, y + 24);
+  ctx.strokeStyle = '#829ab1';
+  ctx.lineWidth = 8;
+  ctx.beginPath();
+  ctx.moveTo(x + 44, y + 34);
+  ctx.lineTo(x + 44, y + 102);
+  ctx.stroke();
+  const fill = clamp((q.T - 100) / 500, 0, 1) * 68;
+  ctx.strokeStyle = '#e03131';
+  ctx.beginPath();
+  ctx.moveTo(x + 44, y + 102);
+  ctx.lineTo(x + 44, y + 102 - fill);
+  ctx.stroke();
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 18px system-ui';
+  ctx.fillText(q.T + ' K', x + 118, y + 74);
+}
+function drawGraph(q) {
+  const x0 = 482, y0 = 428, w = 200, h = 154;
+  ctx.strokeStyle = '#334e68';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(x0, y0);
+  ctx.lineTo(x0 + w, y0);
+  ctx.moveTo(x0, y0);
+  ctx.lineTo(x0, y0 - h);
+  ctx.stroke();
+  ctx.strokeStyle = '#2c7be5';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  for (let i = 0; i <= 80; i++) {
+    const T = 100 + i / 80 * 500;
+    const x = x0 + (T - 100) / 500 * w;
+    const y = y0 - clamp(Math.sqrt(T / 300) / 1.45, 0, 1) * h;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
   }
-  function step(dt){
-    const sp=90*speedScale();
-    for(const m of mol){
-      m.x+=Math.cos(m.ang)*sp*dt; m.y+=Math.sin(m.ang)*sp*dt;
-      if(m.x<10||m.x>W-10){m.ang=Math.PI-m.ang;m.x=Math.max(10,Math.min(W-10,m.x));}
-      if(m.y<10||m.y>H-10){m.ang=-m.ang;m.y=Math.max(10,Math.min(H-10,m.y));}
-      if(Math.random()<0.02)m.ang+=(Math.random()-0.5);
-    }
-    // brownian: random kicks scaled by T
-    big.vx+=(Math.random()-0.5)*sp*dt*6; big.vy+=(Math.random()-0.5)*sp*dt*6;
-    big.vx*=0.92; big.vy*=0.92;
-    big.x+=big.vx*dt; big.y+=big.vy*dt;
-    if(big.x<20||big.x>W-20){big.vx*=-1;big.x=Math.max(20,Math.min(W-20,big.x));}
-    if(big.y<20||big.y>H-20){big.vy*=-1;big.y=Math.max(20,Math.min(H-20,big.y));}
-    big.trail.push({x:big.x,y:big.y}); if(big.trail.length>60)big.trail.shift();
+  ctx.stroke();
+  const px = x0 + (q.T - 100) / 500 * w;
+  const py = y0 - clamp(q.speed / 1.45, 0, 1) * h;
+  ctx.fillStyle = '#e03131';
+  ctx.beginPath();
+  ctx.arc(px, py, 6, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#486581';
+  ctx.font = '12px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('速率统计图像：平均速率 ∝ √T，平均动能 ∝ T', x0 + w / 2, y0 + 28);
+}
+function draw() {
+  const q = values();
+  els.tempVal.textContent = q.T.toFixed(0);
+  els.sizeVal.textContent = q.size.toFixed(0);
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 18px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('分子热运动实验台：显微镜俯视 + 温度计侧视 + 速率图像 + 数据记录', 370, 28);
+  drawMicroscope(q);
+  drawThermometer(q);
+  drawGraph(q);
+  els.readout.innerHTML = [
+    `<div id="r1">温度 T=${q.T.toFixed(0)} K，平均速率比例≈${q.speed.toFixed(2)}</div>`,
+    `<div id="r2">平均动能比例∝T≈${q.ek.toFixed(2)}</div>`,
+    `<div id="r3">布朗运动强度≈${q.brown.toFixed(2)}；颗粒越小越明显</div>`,
+    `<div id="r4">注意：布朗运动是颗粒运动，间接反映分子热运动</div>`
+  ].join('');
+  els.status.textContent = q.T < 220 ? '低温：分子仍不停运动，只是平均动能较小。' : (q.T < 420 ? '中温：颗粒轨迹呈明显无规则折线。' : '高温：分子撞击更频繁猛烈，布朗运动更剧烈。');
+}
+function renderRecords() {
+  els.recordRows.innerHTML = state.records.slice(-5).map((p, i) =>
+    `<tr><td>${i + 1}</td><td>${p.T}</td><td>${p.speed.toFixed(2)}</td><td>${p.brown.toFixed(2)}</td></tr>`
+  ).join('');
+}
+function setFromPointer(ev) {
+  const rect = c.getBoundingClientRect();
+  const x = (ev.clientX - rect.left) * c.width / rect.width;
+  const y = (ev.clientY - rect.top) * c.height / rect.height;
+  if (state.drag === 'particle-handle') {
+    big.x = clamp(x, 70, 390);
+    big.y = clamp(y, 96, 386);
+    big.trail.push({ x: big.x, y: big.y });
+    if (big.trail.length > 85) big.trail.shift();
+  } else {
+    const T = clamp(600 - (y - 90) / 126 * 500, 100, 600);
+    els.temp.value = String(Math.round(T / 10) * 10);
   }
-  function draw(){
-    ctx.clearRect(0,0,W,H);
-    ctx.strokeStyle='#d9e2ec';ctx.strokeRect(4,4,W-8,H-8);
-    ctx.fillStyle='#7fa8d8';
-    for(const m of mol){ctx.beginPath();ctx.arc(m.x,m.y,3,0,Math.PI*2);ctx.fill();}
-    // brownian trail
-    ctx.strokeStyle='rgba(201,42,42,0.5)';ctx.lineWidth=1.5;ctx.beginPath();
-    big.trail.forEach((p,i)=>{if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);});ctx.stroke();
-    ctx.fillStyle='#c92a2a';ctx.beginPath();ctx.arc(big.x,big.y,9,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#243b53';ctx.font='13px sans-serif';ctx.textAlign='left';
-    ctx.fillText('温度↑ → 分子平均动能↑、平均速率↑（∝√T）',12,H-12);
-    document.getElementById('t-v').textContent=T;
-    document.getElementById('v-v').textContent=speedScale().toFixed(2);
-    document.getElementById('ek-v').textContent=(T/300).toFixed(2);
-    document.getElementById('br-v').textContent= T<220?'较弱':(T<420?'中等':'剧烈');
-  }
-  document.getElementById('t').addEventListener('input',e=>{T=parseInt(e.target.value);document.getElementById('t-d').textContent=T;draw();});
-  document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
-  document.getElementById('reset-btn').addEventListener('click',()=>{init();draw();});
-  init();
-  let last=performance.now();
-  function loop(now){const dt=Math.min((now-last)/1000,0.03);last=now;if(running)step(dt);draw();requestAnimationFrame(loop);}
-  draw();requestAnimationFrame(loop);
-})();
+  draw();
+}
+function loop(ts) {
+  if (!state.last) state.last = ts;
+  const dt = Math.min(0.03, (ts - state.last) / 1000);
+  state.last = ts;
+  const q = values();
+  if (state.running && !state.drag) step(q, dt || 0.016);
+  draw();
+  requestAnimationFrame(loop);
+}
+Object.values(els).forEach(el => {
+  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
+});
+els.playBtn.addEventListener('click', () => {
+  state.running = !state.running;
+  els.playBtn.textContent = state.running ? '暂停' : '播放';
+});
+els.recordBtn.addEventListener('click', () => {
+  const q = values();
+  state.records.push({ T: q.T, speed: q.speed, brown: q.brown });
+  renderRecords();
+});
+els.resetBtn.addEventListener('click', () => {
+  state.running = true;
+  state.records = [];
+  els.temp.value = '300';
+  els.size.value = '10';
+  els.playBtn.textContent = '暂停';
+  initMol();
+  renderRecords();
+  draw();
+});
+c.addEventListener('pointerdown', ev => {
+  const rect = c.getBoundingClientRect();
+  const x = (ev.clientX - rect.left) * c.width / rect.width;
+  state.drag = x < 430 ? 'particle-handle' : 'thermometer-handle';
+  setFromPointer(ev);
+  ev.preventDefault();
+});
+c.addEventListener('pointermove', ev => {
+  if (!state.drag) return;
+  setFromPointer(ev);
+  ev.preventDefault();
+});
+c.addEventListener('pointerup', () => { state.drag = null; });
+c.addEventListener('pointerleave', () => { state.drag = null; });
+initMol();
+renderRecords();
+requestAnimationFrame(loop);
 </script>
 </body>
 </html>

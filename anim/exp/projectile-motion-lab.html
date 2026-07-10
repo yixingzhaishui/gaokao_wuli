@@ -3,48 +3,64 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>探究平抛运动特点</title>
+<title>探究平抛运动特点实验台</title>
 <style>
   * { box-sizing: border-box; }
   body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
-  .wrap { max-width: 1000px; margin: 0 auto; padding: 16px; }
-  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 286px; gap: 14px; align-items: stretch; }
-  canvas { width: 100%; height: 470px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 14px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 14px; }
+  canvas { width: 100%; height: 560px; display: block; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; touch-action: none; }
   .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
-  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  .row { display: flex; gap: 8px; margin-bottom: 10px; }
+  button { flex: 1; border: 1px solid #bcccdc; background: #f0f4f8; color: #102a43; border-radius: 8px; padding: 9px 10px; font-weight: 700; cursor: pointer; }
+  button.primary { background: #2c7be5; border-color: #2c7be5; color: #fff; }
+  label { display: block; font-size: 13px; font-weight: 700; margin: 11px 0 4px; }
   input { width: 100%; }
-  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.72; font-size: 14px; }
-  .status { margin-top: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13px; line-height: 1.55; background: #e6fffa; color: #087f5b; font-weight: 700; }
-  .status.bad { background: #fff5f5; color: #c92a2a; }
-  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
-  @media (max-width: 780px) { .stage { grid-template-columns: 1fr; } canvas { height: 400px; } }
+  .readout { margin-top: 12px; padding: 10px; background: #eef4ff; border-radius: 8px; line-height: 1.6; font-size: 13px; }
+  table { width: 100%; margin-top: 10px; border-collapse: collapse; font-size: 12px; }
+  th, td { border-bottom: 1px solid #d9e2ec; padding: 5px 4px; text-align: right; }
+  th:first-child, td:first-child { text-align: left; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.55; }
+  @media (max-width: 820px) { .stage { grid-template-columns: 1fr; } canvas { height: 500px; } }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="stage">
-    <canvas id="c" width="700" height="470" aria-label="平抛运动描迹实验"></canvas>
+    <canvas id="c" width="790" height="560" aria-label="平抛运动实验台：侧视轨迹、频闪坐标、x-t图像、y-t平方图像和数据记录"></canvas>
     <section class="panel">
+      <div class="row">
+        <button id="playBtn" class="primary" type="button">播放</button>
+        <button id="resetBtn" type="button">重置</button>
+        <button id="recordBtn" type="button">记录</button>
+      </div>
       <label for="speed">水平初速度 v0/(m/s)：<span id="speedVal"></span></label>
-      <input id="speed" type="range" min="1" max="8" value="4" step="0.2">
+      <input id="speed" type="range" min="1" max="8" value="4" step="0.1">
       <label for="height">桌面高度 h/m：<span id="heightVal"></span></label>
       <input id="height" type="range" min="0.6" max="2.5" value="1.8" step="0.1">
-      <label for="dt">相邻闪光时间 Δt/s：<span id="dtVal"></span></label>
+      <label for="dt">闪光时间 Δt/s：<span id="dtVal"></span></label>
       <input id="dt" type="range" min="0.05" max="0.16" value="0.10" step="0.01">
-      <label for="point">观察点 n：<span id="pointVal"></span></label>
+      <label for="point">测点 n：<span id="pointVal"></span></label>
       <input id="point" type="range" min="2" max="8" value="4" step="1">
-      <label for="tilt">发射口调平误差 θ：<span id="tiltVal"></span></label>
+      <label for="tilt">发射口调平误差 θ/°：<span id="tiltVal"></span></label>
       <input id="tilt" type="range" min="-6" max="6" value="0" step="0.5">
       <div id="readout" class="readout"></div>
-      <div id="status" class="status"></div>
-      <div class="hint">观察任务：调 θ 到 0，看同一时刻平抛球与自由落体球是否等高；再调大 θ，看竖直规律怎样被破坏。</div>
+      <table aria-label="数据记录表">
+        <thead><tr><th>记录</th><th>x/t</th><th>2y/t²</th><th>判定</th></tr></thead>
+        <tbody id="records"></tbody>
+      </table>
+      <div class="hint">观察任务：先播放看频闪点如何形成；再拖蓝色速度箭头、绿色测点和红色桌高标尺，看水平与竖直分运动是否各自满足规律。</div>
     </section>
   </div>
 </div>
 <script>
-const c = document.getElementById('c');
-const ctx = c.getContext('2d');
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const g = 9.8;
 const els = {
+  playBtn: document.getElementById('playBtn'),
+  resetBtn: document.getElementById('resetBtn'),
+  recordBtn: document.getElementById('recordBtn'),
   speed: document.getElementById('speed'),
   height: document.getElementById('height'),
   dt: document.getElementById('dt'),
@@ -56,159 +72,328 @@ const els = {
   pointVal: document.getElementById('pointVal'),
   tiltVal: document.getElementById('tiltVal'),
   readout: document.getElementById('readout'),
-  status: document.getElementById('status')
+  records: document.getElementById('records')
 };
-const g = 9.8;
-function pointAt(v0, dt, n, deg) {
-  const t = n * dt;
+const state = { running: false, time: 0, last: 0, drag: null, records: [] };
+const origin = { x: 70, y: 96 };
+const sx = 76, sy = 128;
+
+function clamp(x, lo, hi) { return Math.max(lo, Math.min(hi, x)); }
+function val(id) { return Number(els[id].value); }
+function setValues(next) {
+  if (next.v0 !== undefined) els.speed.value = clamp(next.v0, 1, 8).toFixed(1);
+  if (next.h !== undefined) els.height.value = clamp(next.h, 0.6, 2.5).toFixed(1);
+  if (next.dt !== undefined) els.dt.value = clamp(next.dt, 0.05, 0.16).toFixed(2);
+  if (next.n !== undefined) els.point.value = Math.round(clamp(next.n, 2, 8));
+  if (next.tilt !== undefined) els.tilt.value = clamp(next.tilt, -6, 6).toFixed(1);
+}
+function pointAt(v0, t, deg) {
   const rad = deg * Math.PI / 180;
   const vx = v0 * Math.cos(rad);
   const vy0 = v0 * Math.sin(rad);
   return { t, x: vx * t, y: 0.5 * g * t * t + vy0 * t, vx, vy0 };
 }
-function draw() {
-  const v0 = Number(els.speed.value);
-  const h = Number(els.height.value);
-  const dt = Number(els.dt.value);
-  const n = Number(els.point.value);
-  const deg = Number(els.tilt.value);
-  const p = pointAt(v0, dt, n, deg);
+function model() {
+  const v0 = val('speed');
+  const h = val('height');
+  const dt = val('dt');
+  const n = val('point');
+  const tilt = val('tilt');
+  const p = pointAt(v0, n * dt, tilt);
   const freeY = 0.5 * g * p.t * p.t;
-  const verticalG = 2 * p.y / (p.t * p.t);
+  const xt = p.x / p.t;
+  const gy = 2 * p.y / (p.t * p.t);
   const valid = p.y < h;
-  const horizontalOk = Math.abs(deg) < 0.6;
-  els.speedVal.textContent = v0.toFixed(1);
-  els.heightVal.textContent = h.toFixed(1);
-  els.dtVal.textContent = dt.toFixed(2);
-  els.pointVal.textContent = n;
-  els.tiltVal.textContent = deg.toFixed(1) + '°';
-
-  ctx.clearRect(0, 0, c.width, c.height);
-  ctx.fillStyle = '#fff';
-  ctx.fillRect(0, 0, c.width, c.height);
-  ctx.fillStyle = '#102a43';
-  ctx.font = '700 18px system-ui';
-  ctx.textAlign = 'center';
-  ctx.fillText('平抛描迹：水平等距，竖直与自由落体同步', 350, 30);
-
-  const ox = 76;
-  const oy = 78;
-  const sx = 92;
-  const sy = 160;
-  ctx.strokeStyle = '#e5ecf3';
+  const ok = valid && Math.abs(tilt) < 0.6 && Math.abs(gy - g) < 0.5;
+  const tFall = Math.sqrt(2 * h / g);
+  return { v0, h, dt, n, tilt, p, freeY, xt, gy, valid, ok, tFall };
+}
+function roundRect(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+function box(x, y, w, h, fill, stroke = '#d9e2ec') {
+  ctx.fillStyle = fill;
+  ctx.strokeStyle = stroke;
+  ctx.lineWidth = 1.5;
+  roundRect(x, y, w, h, 9);
+  ctx.fill();
+  ctx.stroke();
+}
+function text(s, x, y, color = '#102a43', size = 13, weight = '400', align = 'center') {
+  ctx.fillStyle = color;
+  ctx.font = `${weight} ${size}px system-ui, -apple-system, sans-serif`;
+  ctx.textAlign = align;
+  ctx.textBaseline = 'middle';
+  ctx.fillText(s, x, y);
+}
+function arrow(x1, y1, x2, y2, color, width = 3) {
+  const a = Math.atan2(y2 - y1, x2 - x1);
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = width;
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - 10 * Math.cos(a - 0.45), y2 - 10 * Math.sin(a - 0.45));
+  ctx.lineTo(x2 - 10 * Math.cos(a + 0.45), y2 - 10 * Math.sin(a + 0.45));
+  ctx.closePath();
+  ctx.fill();
+}
+function toCanvas(p) { return { x: origin.x + p.x * sx, y: origin.y + p.y * sy }; }
+function handles(q) {
+  const selected = toCanvas(q.p);
+  const vHandle = { name: 'v0', x: origin.x + 62 + q.v0 * 18, y: origin.y - 34, r: 14 };
+  const hHandle = { name: 'h', x: 512, y: origin.y + q.h * sy, r: 14 };
+  const nHandle = { name: 'n', x: selected.x, y: selected.y, r: 14 };
+  return [vHandle, hHandle, nHandle];
+}
+function drawGrid(x, y, w, h, nx, ny) {
+  ctx.strokeStyle = '#e6edf5';
   ctx.lineWidth = 1;
-  for (let i = 0; i <= 6; i++) {
-    ctx.beginPath();
-    ctx.moveTo(ox + i * sx, oy);
-    ctx.lineTo(ox + i * sx, 420);
-    ctx.stroke();
-  }
-  for (let j = 0; j <= 5; j++) {
-    ctx.beginPath();
-    ctx.moveTo(ox, oy + j * 60);
-    ctx.lineTo(644, oy + j * 60);
-    ctx.stroke();
-  }
+  for (let i = 0; i <= nx; i++) { const xx = x + w * i / nx; ctx.beginPath(); ctx.moveTo(xx, y); ctx.lineTo(xx, y + h); ctx.stroke(); }
+  for (let i = 0; i <= ny; i++) { const yy = y + h * i / ny; ctx.beginPath(); ctx.moveTo(x, yy); ctx.lineTo(x + w, yy); ctx.stroke(); }
+}
+function drawTrajectory(q) {
+  box(28, 82, 508, 300, '#fff', '#d9e2ec');
+  text('侧视频闪轨迹：蓝点平抛，紫点自由落体对照', 282, 106, '#102a43', 14, '700');
+  drawGrid(origin.x, origin.y, 430, 250, 6, 5);
   ctx.strokeStyle = '#334e68';
   ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(ox, oy);
-  ctx.lineTo(ox, 430);
-  ctx.moveTo(ox, oy);
-  ctx.lineTo(655, oy);
-  ctx.stroke();
-  ctx.fillStyle = '#486581';
-  ctx.font = '13px system-ui';
-  ctx.textAlign = 'left';
-  ctx.fillText('x/m', 658, oy + 4);
-  ctx.fillText('y/m', ox - 32, 430);
+  ctx.beginPath(); ctx.moveTo(origin.x, origin.y); ctx.lineTo(512, origin.y); ctx.moveTo(origin.x, origin.y); ctx.lineTo(origin.x, 360); ctx.stroke();
   ctx.fillStyle = '#d9e2ec';
-  ctx.fillRect(28, oy - 16, 98, 16);
+  ctx.fillRect(30, origin.y - 16, 106, 16);
   ctx.fillStyle = '#eef4ff';
   ctx.strokeStyle = '#2c7be5';
-  ctx.lineWidth = 2;
-  ctx.fillRect(32, oy - 50, 88, 34);
-  ctx.strokeRect(32, oy - 50, 88, 34);
-  ctx.fillStyle = '#102a43';
-  ctx.textAlign = 'center';
-  ctx.fillText('水平发射器', 76, oy - 29);
+  roundRect(34, origin.y - 58, 98, 40, 6);
+  ctx.fill();
+  ctx.stroke();
+  text('水平发射器', 83, origin.y - 38, '#102a43', 12, '700');
+  arrow(origin.x + 52, origin.y - 34, origin.x + 62 + q.v0 * 18, origin.y - 34, '#2c7be5', 4);
+  text('拖 v0', origin.x + 170, origin.y - 36, '#2c7be5', 12, '700');
 
-  ctx.strokeStyle = '#f0a500';
-  ctx.lineWidth = 2;
-  ctx.setLineDash([5, 5]);
-  for (let i = 1; i <= 8; i++) {
-    const fp = pointAt(v0, dt, i, deg);
-    const x = ox + fp.x * sx;
-    const y = oy + fp.y * sy;
-    const yFree = oy + 0.5 * g * Math.pow(i * dt, 2) * sy;
-    if (x < 650 && y < 430) {
-      ctx.beginPath();
-      ctx.moveTo(x, oy);
-      ctx.lineTo(x, y);
-      ctx.stroke();
-    }
-    if (yFree < 430) {
-      ctx.beginPath();
-      ctx.moveTo(ox - 18, yFree);
-      ctx.lineTo(x, yFree);
-      ctx.stroke();
-    }
-  }
-  ctx.setLineDash([]);
+  ctx.strokeStyle = '#d64545';
+  ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(512, origin.y); ctx.lineTo(512, origin.y + q.h * sy); ctx.stroke();
+  text(`h=${q.h.toFixed(1)}m`, 530, origin.y + q.h * sy / 2, '#d64545', 12, '700', 'left');
+  ctx.fillStyle = '#f0f4f8';
+  ctx.fillRect(50, origin.y + q.h * sy, 470, 16);
+  text('地面/落点前边界', 278, origin.y + q.h * sy + 28, '#486581', 11, '700');
 
-  for (let i = 0; i <= 8; i++) {
-    const fp = pointAt(v0, dt, i, deg);
-    const x = ox + fp.x * sx;
-    const y = oy + fp.y * sy;
-    const yFree = oy + 0.5 * g * Math.pow(i * dt, 2) * sy;
-    if (x < 650 && y < 430) {
-      ctx.fillStyle = i === n ? '#e03131' : '#2c7be5';
-      ctx.beginPath();
-      ctx.arc(x, y, i === n ? 6 : 4, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    if (yFree < 430) {
-      ctx.fillStyle = '#7b2cbf';
-      ctx.beginPath();
-      ctx.arc(ox - 20, yFree, 4, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-  const px = ox + p.x * sx;
-  const py = oy + p.y * sy;
-  ctx.strokeStyle = '#e03131';
+  ctx.strokeStyle = '#2c7be5';
   ctx.lineWidth = 3;
   ctx.beginPath();
-  ctx.moveTo(px, oy);
-  ctx.lineTo(px, py);
-  ctx.lineTo(ox, py);
+  for (let i = 0; i <= 80; i++) {
+    const t = q.tFall * i / 80;
+    const p = toCanvas(pointAt(q.v0, t, q.tilt));
+    if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
+  }
   ctx.stroke();
-  ctx.fillStyle = '#e03131';
-  ctx.font = '700 13px system-ui';
-  ctx.fillText('测点 n=' + n, Math.min(630, px + 44), Math.min(418, py - 12));
-  ctx.fillStyle = '#486581';
-  ctx.font = '13px system-ui';
-  ctx.textAlign = 'center';
-  ctx.fillText('蓝点：平抛小球；紫点：同一时刻自由落体小球；橙虚线帮助比较等时位置。', 360, 452);
 
-  els.readout.innerHTML = [
-    `<div id="r1">t=nΔt=${p.t.toFixed(2)}s</div>`,
-    `<div id="r2">x=v0t≈${p.x.toFixed(2)}m，x/t≈${(p.x / p.t).toFixed(2)}m/s</div>`,
-    `<div id="r3">y≈${p.y.toFixed(2)}m，自由落体 y0=1/2gt²≈${freeY.toFixed(2)}m</div>`,
-    `<div id="r4">2y/t²≈${verticalG.toFixed(2)}m/s²</div>`,
-    `<div id="r5">落地前有效：${valid ? '是' : '否'}</div>`
-  ].join('');
-  els.status.className = valid && horizontalOk ? 'status' : 'status bad';
-  els.status.textContent = !valid
-    ? '测点已低于桌面高度：应选更小 n、更小 Δt 或更高桌面。'
-    : horizontalOk
-      ? '通过：水平相邻点近似等距，竖直位置与自由落体同步。'
-      : '不通过：发射口未调平，竖直方向带初速度，不能当标准平抛处理。';
+  const maxVisible = state.running ? Math.floor(state.time / q.dt) : 8;
+  for (let i = 0; i <= 8; i++) {
+    const pp = pointAt(q.v0, i * q.dt, q.tilt);
+    const cp = toCanvas(pp);
+    const fy = origin.y + 0.5 * g * Math.pow(i * q.dt, 2) * sy;
+    const visible = i <= maxVisible || !state.running;
+    if (cp.x < 520 && cp.y < 360) {
+      ctx.globalAlpha = visible ? 1 : 0.18;
+      ctx.fillStyle = i === q.n ? '#0f9f6e' : '#2c7be5';
+      ctx.beginPath(); ctx.arc(cp.x, cp.y, i === q.n ? 6 : 4, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#f0a500';
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath(); ctx.moveTo(cp.x, origin.y); ctx.lineTo(cp.x, cp.y); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.globalAlpha = 1;
+    }
+    if (fy < 360) {
+      ctx.globalAlpha = visible ? 1 : 0.18;
+      ctx.fillStyle = '#7b2cbf';
+      ctx.beginPath(); ctx.arc(origin.x - 20, fy, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+  }
+  const cp = toCanvas(q.p);
+  ctx.strokeStyle = '#0f9f6e';
+  ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(cp.x, origin.y); ctx.lineTo(cp.x, cp.y); ctx.lineTo(origin.x, cp.y); ctx.stroke();
+  text(`测点 n=${q.n}`, Math.min(500, cp.x + 46), Math.min(350, cp.y - 12), '#0f9f6e', 12, '700');
+
+  for (const h of handles(q)) {
+    ctx.fillStyle = h.name === 'v0' ? '#2c7be5' : h.name === 'h' ? '#d64545' : '#0f9f6e';
+    ctx.beginPath(); ctx.arc(h.x, h.y, h.r, 0, Math.PI * 2); ctx.fill();
+    text(h.name, h.x, h.y + 1, '#fff', 11, '700');
+  }
 }
-Object.values(els).forEach(el => {
-  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
+function drawCharts(q) {
+  box(566, 82, 180, 300, '#f7f9fc', '#d9e2ec');
+  text('图像记录', 656, 106, '#102a43', 14, '700');
+  const x1 = 590, y1 = 136, w = 132, h = 86;
+  drawGrid(x1, y1, w, h, 4, 3);
+  text('x-t', x1 + w - 15, y1 + h + 14, '#486581', 11, '700');
+  ctx.strokeStyle = '#2c7be5';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  for (let i = 0; i <= 50; i++) {
+    const t = q.tFall * i / 50;
+    const p = pointAt(q.v0, t, q.tilt);
+    const px = x1 + w * t / q.tFall;
+    const py = y1 + h - h * p.x / Math.max(q.v0 * q.tFall, 0.1);
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+  const px1 = x1 + w * q.p.t / q.tFall;
+  const py1 = y1 + h - h * q.p.x / Math.max(q.v0 * q.tFall, 0.1);
+  ctx.fillStyle = '#0f9f6e'; ctx.beginPath(); ctx.arc(px1, py1, 5, 0, Math.PI * 2); ctx.fill();
+
+  const x2 = 590, y2 = 266;
+  drawGrid(x2, y2, w, h, 4, 3);
+  text('y-t²', x2 + w - 18, y2 + h + 14, '#486581', 11, '700');
+  ctx.strokeStyle = '#7b2cbf';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  for (let i = 0; i <= 50; i++) {
+    const t = q.tFall * i / 50;
+    const p = pointAt(q.v0, t, q.tilt);
+    const px = x2 + w * (t * t) / (q.tFall * q.tFall);
+    const py = y2 + h - h * p.y / q.h;
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+  const px2 = x2 + w * (q.p.t * q.p.t) / (q.tFall * q.tFall);
+  const py2 = y2 + h - h * q.p.y / q.h;
+  ctx.fillStyle = '#0f9f6e'; ctx.beginPath(); ctx.arc(px2, py2, 5, 0, Math.PI * 2); ctx.fill();
+}
+function drawFormula(q) {
+  box(52, 410, 694, 112, '#f7f9fc', '#d9e2ec');
+  text('数据记录与公式绑定', 399, 430, '#102a43', 14, '700');
+  text(`t=nΔt=${q.p.t.toFixed(2)}s，x=v0t=${q.p.x.toFixed(2)}m，x/t=${q.xt.toFixed(2)}m/s`, 78, 458, '#486581', 13, '700', 'left');
+  text(`y=1/2gt²=${q.freeY.toFixed(2)}m，对照读数 y=${q.p.y.toFixed(2)}m，2y/t²=${q.gy.toFixed(2)}m/s²`, 78, 486, '#486581', 13, '700', 'left');
+  const msg = !q.valid ? '需重做，测点已落地' : Math.abs(q.tilt) >= 0.6 ? '需重做，发射口未调平' : '能用，水平匀速且竖直近似自由落体';
+  text(`状态判定：${msg}`, 78, 514, q.ok ? '#087f5b' : '#b30000', 13, '700', 'left');
+}
+function draw() {
+  const q = model();
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const bg = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+  bg.addColorStop(0, '#ffffff');
+  bg.addColorStop(1, '#f0f7ff');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  text('探究平抛运动特点：水平匀速 + 竖直自由落体', 395, 34, '#102a43', 18, '700');
+  text('侧视轨迹 + 频闪坐标 + x-t 图像 + y-t² 图像 + 数据记录：先看见过程，再读公式。', 395, 62, '#486581', 13);
+  drawTrajectory(q);
+  drawCharts(q);
+  drawFormula(q);
+  els.speedVal.textContent = q.v0.toFixed(1);
+  els.heightVal.textContent = q.h.toFixed(1);
+  els.dtVal.textContent = q.dt.toFixed(2);
+  els.pointVal.textContent = q.n;
+  els.tiltVal.textContent = q.tilt.toFixed(1);
+  els.playBtn.textContent = state.running ? '暂停' : '播放';
+  els.readout.innerHTML = [
+    `t=nΔt=<b>${q.p.t.toFixed(2)}s</b>`,
+    `x=v0t≈<b>${q.p.x.toFixed(2)}m</b>，x/t≈<b>${q.xt.toFixed(2)}m/s</b>`,
+    `y≈<b>${q.p.y.toFixed(2)}m</b>，自由落体 y0≈<b>${q.freeY.toFixed(2)}m</b>`,
+    `2y/t²≈<b>${q.gy.toFixed(2)}m/s²</b>`,
+    q.ok ? '判定=<b>能用</b>' : '判定=<b>需重做</b>'
+  ].join('<br>');
+}
+function loop(now) {
+  if (!state.last) state.last = now;
+  const dt = Math.min(0.04, (now - state.last) / 1000);
+  state.last = now;
+  if (state.running) {
+    state.time += dt;
+    const q = model();
+    if (state.time > q.tFall) {
+      state.time = q.tFall;
+      state.running = false;
+    }
+  }
+  draw();
+  requestAnimationFrame(loop);
+}
+function pos(evt) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (evt.clientX - rect.left) * canvas.width / rect.width,
+    y: (evt.clientY - rect.top) * canvas.height / rect.height
+  };
+}
+function hit(p) {
+  return handles(model()).find(h => Math.hypot(p.x - h.x, p.y - h.y) <= h.r + 8);
+}
+canvas.addEventListener('pointerdown', evt => {
+  const h = hit(pos(evt));
+  if (h) {
+    state.drag = h.name;
+    canvas.setPointerCapture(evt.pointerId);
+  }
 });
-draw();
+canvas.addEventListener('pointermove', evt => {
+  const p = pos(evt);
+  if (!state.drag) {
+    canvas.style.cursor = hit(p) ? 'grab' : 'default';
+    return;
+  }
+  if (state.drag === 'v0') setValues({ v0: (p.x - origin.x - 62) / 18 });
+  if (state.drag === 'h') setValues({ h: (p.y - origin.y) / sy });
+  if (state.drag === 'n') {
+    const q = model();
+    let best = q.n, dist = Infinity;
+    for (let i = 2; i <= 8; i++) {
+      const cp = toCanvas(pointAt(q.v0, i * q.dt, q.tilt));
+      const d = Math.hypot(p.x - cp.x, p.y - cp.y);
+      if (d < dist) { dist = d; best = i; }
+    }
+    setValues({ n: best });
+  }
+  draw();
+});
+canvas.addEventListener('pointerup', evt => {
+  state.drag = null;
+  try { canvas.releasePointerCapture(evt.pointerId); } catch (e) {}
+});
+canvas.addEventListener('pointercancel', () => { state.drag = null; });
+els.playBtn.addEventListener('click', () => {
+  state.running = !state.running;
+  state.last = 0;
+  if (state.time >= model().tFall) state.time = 0;
+  draw();
+});
+els.resetBtn.addEventListener('click', () => {
+  state.running = false;
+  state.time = 0;
+  setValues({ v0: 4, h: 1.8, dt: 0.10, n: 4, tilt: 0 });
+  draw();
+});
+els.recordBtn.addEventListener('click', () => {
+  const q = model();
+  state.records.unshift({ xt: q.xt, gy: q.gy, ok: q.ok });
+  state.records = state.records.slice(0, 4);
+  renderRecords();
+});
+function renderRecords() {
+  els.records.innerHTML = state.records.map((r, idx) =>
+    `<tr><td>${idx + 1}</td><td>${r.xt.toFixed(2)}</td><td>${r.gy.toFixed(2)}</td><td>${r.ok ? '能用' : '重做'}</td></tr>`
+  ).join('');
+}
+for (const id of ['speed', 'height', 'dt', 'point', 'tilt']) els[id].addEventListener('input', draw);
+renderRecords();
+requestAnimationFrame(loop);
 </script>
 </body>
 </html>

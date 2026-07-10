@@ -28,7 +28,7 @@ button{font:inherit;border:1px solid var(--line);background:#fff;border-radius:8
 <div class="wrap">
   <h2>动量：拖动车身质量和速度箭头，看 p = mv 的方向与大小</h2>
   <div class="lab">
-    <div class="stage"><canvas id="cv" width="720" height="470" aria-label="动量交互实验台"></canvas></div>
+    <div class="stage"><canvas id="cv" width="720" height="470" aria-label="动量交互实验台：小车侧视装置、p-v图像和数据记录"></canvas></div>
     <section class="panel">
       <button id="play">⏸ 暂停运动</button>
       <button id="reset">复位</button>
@@ -40,7 +40,7 @@ button{font:inherit;border:1px solid var(--line);background:#fff;border-radius:8
         <div class="chip warn">运动状态：<b id="stout">向右匀速</b></div>
         <div class="chip">取向右为正：<b id="signout">p 为正，方向向右</b></div>
       </div>
-      <div class="hint"><b>观察任务</b>：拖车身右侧金色把手改变 m，拖蓝色速度箭头端点改变 v 的大小和方向。看车上紫色动量箭头、右侧 p-v 图像点和下方动能柱如何同步变化；把速度拖到左边，注意 p 变负而 Ek 仍为正。</div>
+      <div class="hint"><b>观察任务</b>：拖车身右侧金色把手改变 m，拖蓝色速度箭头端点改变 v。对照小车侧视装置、p-v 图像和数据记录，看紫色动量箭头和动能柱如何同步变化。</div>
       <div class="formula">
         <b>画面绑定</b><br>
         车身宽度代表 m，蓝色箭头代表 v，紫色箭头代表 p。p-v 图像的斜率就是 m；动能柱只跟 v² 有关，所以速度反向时不会变成负值。

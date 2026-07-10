@@ -9,10 +9,13 @@
   body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
   .wrap { max-width: 1000px; margin: 0 auto; padding: 16px; }
   .stage { display: grid; grid-template-columns: minmax(0, 1fr) 286px; gap: 14px; align-items: stretch; }
-  canvas { width: 100%; height: 470px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  canvas { width: 100%; height: 470px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; touch-action:none; }
   .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
   label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
   input { width: 100%; }
+  .row { display:flex; gap:8px; margin-bottom:10px; }
+  button { flex:1; border:1px solid #bcccdc; background:#f0f4f8; color:#102a43; border-radius:8px; padding:8px; font-weight:700; cursor:pointer; }
+  button.primary { background:#2c7be5; border-color:#2c7be5; color:#fff; }
   .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.72; font-size: 14px; }
   .status { margin-top: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13px; line-height: 1.55; background: #e6fffa; color: #087f5b; font-weight: 700; }
   .status.bad { background: #fff5f5; color: #c92a2a; }
@@ -25,6 +28,7 @@
   <div class="stage">
     <canvas id="c" width="700" height="470" aria-label="测电源电动势和内阻实验"></canvas>
     <section class="panel">
+      <div class="row"><button id="playBtn" class="primary" type="button">播放</button><button id="resetBtn" type="button">重置</button><button id="recordBtn" type="button">记录</button></div>
       <label for="emf">电动势 E/V：<span id="emfVal"></span></label>
       <input id="emf" type="range" min="1.0" max="6.0" value="3.0" step="0.1">
       <label for="inner">内阻 r/Ω：<span id="innerVal"></span></label>
@@ -36,6 +40,7 @@
       <label for="error">电压表读数误差：<span id="errorVal"></span></label>
       <input id="error" type="range" min="-6" max="6" value="1" step="1">
       <div id="readout" class="readout"></div>
+      <table style="width:100%;margin-top:10px;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;border-bottom:1px solid #d9e2ec">记录</th><th style="border-bottom:1px solid #d9e2ec">I/A</th><th style="border-bottom:1px solid #d9e2ec">U/V</th><th style="border-bottom:1px solid #d9e2ec">R/Ω</th></tr></thead><tbody id="records"></tbody></table>
       <div id="status" class="status"></div>
       <div class="hint">观察任务：改变外阻 R，观察 U-I 点沿直线移动；看纵截距和斜率如何读出 E、r。</div>
     </section>
@@ -56,8 +61,13 @@ const els = {
   spreadVal: document.getElementById('spreadVal'),
   errorVal: document.getElementById('errorVal'),
   readout: document.getElementById('readout'),
-  status: document.getElementById('status')
+  status: document.getElementById('status'),
+  playBtn: document.getElementById('playBtn'),
+  resetBtn: document.getElementById('resetBtn'),
+  recordBtn: document.getElementById('recordBtn'),
+  records: document.getElementById('records')
 };
+const state={running:false,time:0,last:0,drag:null,records:[]};
 function calc(E, r, R, err) {
   const I = E / (R + r);
   const U = I * R;
@@ -89,7 +99,8 @@ function meter(x,y,label,value) {
 function draw() {
   const E = Number(els.emf.value);
   const r = Number(els.inner.value);
-  const R = Number(els.outer.value);
+  let R = Number(els.outer.value);
+  if(state.running){R = 2 + (Math.sin(state.time*1.2)+1)/2*16; els.outer.value=R.toFixed(1);}
   const n = Number(els.spread.value);
   const err = Number(els.error.value) / 100;
   const q = calc(E, r, R, err);
@@ -106,7 +117,7 @@ function draw() {
   ctx.fillStyle = '#102a43';
   ctx.font = '700 18px system-ui';
   ctx.textAlign = 'center';
-  ctx.fillText('U-I 图像法：纵截距为 E，斜率绝对值为内阻 r', 350, 30);
+  ctx.fillText('测电源实验台：俯视电路 + U-I 图像 + 截距/斜率数据记录', 350, 30);
 
   line(78,238,150,238);
   meter(190,238,'A',q.I.toFixed(3)+'A');
@@ -119,6 +130,7 @@ function draw() {
   ctx.fillStyle = '#102a43';
   ctx.font = '700 13px system-ui';
   ctx.fillText('滑动变阻器 R',396,243);
+  ctx.fillStyle='#e03131';ctx.beginPath();ctx.arc(330+R/20*132,205,11,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.font='700 10px system-ui';ctx.fillText('R',330+R/20*132,209);
   line(462,238,612,238);
   line(612,238,612,330);
   line(612,330,78,330);
@@ -174,6 +186,7 @@ function draw() {
   ctx.font = '13px system-ui';
   ctx.textAlign = 'center';
   ctx.fillText('公式绑定：U=E-Ir。图像向右下倾斜，说明电流越大，内阻压降 Ir 越大。',350,452);
+  els.playBtn.textContent = state.running ? '暂停' : '播放';
 
   els.readout.innerHTML = [
     `<div id="r1">I=E/(R+r)≈${q.I.toFixed(3)}A</div>`,
@@ -190,7 +203,15 @@ function draw() {
 Object.values(els).forEach(el => {
   if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
 });
-draw();
+function pos(e){const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height};}
+c.addEventListener('pointerdown',e=>{const p=pos(e),R=Number(els.outer.value);if(Math.hypot(p.x-(330+R/20*132),p.y-205)<22){state.drag='R';c.setPointerCapture(e.pointerId);}});
+c.addEventListener('pointermove',e=>{const p=pos(e);if(!state.drag){c.style.cursor='grab';return;}if(state.drag==='R')els.outer.value=Math.max(1,Math.min(20,(p.x-330)/132*20)).toFixed(1);draw();});
+c.addEventListener('pointerup',e=>{state.drag=null;try{c.releasePointerCapture(e.pointerId)}catch(err){}});c.addEventListener('pointercancel',()=>{state.drag=null;});
+els.playBtn.addEventListener('click',()=>{state.running=!state.running;state.last=0;draw();});
+els.resetBtn.addEventListener('click',()=>{state.running=false;state.time=0;els.emf.value=3;els.inner.value=1;els.outer.value=5;els.spread.value=6;els.error.value=1;draw();});
+els.recordBtn.addEventListener('click',()=>{const E=Number(els.emf.value),r=Number(els.inner.value),R=Number(els.outer.value),err=Number(els.error.value)/100,q=calc(E,r,R,err);state.records.unshift({I:q.I,U:q.Uread,R});state.records=state.records.slice(0,4);els.records.innerHTML=state.records.map((q,i)=>`<tr><td style="text-align:left;border-bottom:1px solid #d9e2ec">${i+1}</td><td style="border-bottom:1px solid #d9e2ec">${q.I.toFixed(3)}</td><td style="border-bottom:1px solid #d9e2ec">${q.U.toFixed(2)}</td><td style="border-bottom:1px solid #d9e2ec">${q.R.toFixed(1)}</td></tr>`).join('');});
+function loop(now){if(!state.last)state.last=now;const dt=Math.min(.04,(now-state.last)/1000);state.last=now;if(state.running)state.time+=dt;draw();requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
 </script>
 </body>
 </html>

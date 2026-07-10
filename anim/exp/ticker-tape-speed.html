@@ -3,43 +3,117 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>打点计时器测速度</title>
+<title>打点计时器测直线运动速度</title>
 <style>
   * { box-sizing: border-box; }
-  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
-  .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
-  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 14px; align-items: stretch; }
-  canvas { width: 100%; height: 430px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
-  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
-  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: #102a43;
+    background: #f7f9fc;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 14px; }
+  .stage {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 14px;
+    align-items: stretch;
+  }
+  canvas {
+    width: 100%;
+    height: 560px;
+    display: block;
+    background: #fff;
+    border: 1px solid #d9e2ec;
+    border-radius: 8px;
+    touch-action: none;
+  }
+  .panel {
+    background: #fff;
+    border: 1px solid #d9e2ec;
+    border-radius: 8px;
+    padding: 14px;
+  }
+  .row { display: flex; gap: 8px; margin-bottom: 10px; }
+  button {
+    flex: 1;
+    border: 1px solid #bcccdc;
+    background: #f0f4f8;
+    color: #102a43;
+    border-radius: 8px;
+    padding: 9px 10px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  button.primary { background: #2c7be5; border-color: #2c7be5; color: #fff; }
+  label { display: block; font-size: 13px; font-weight: 700; margin: 11px 0 4px; }
   input { width: 100%; }
-  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.8; font-size: 14px; }
-  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
-  @media (max-width: 760px) { .stage { grid-template-columns: 1fr; } canvas { height: 360px; } }
+  .readout {
+    margin-top: 12px;
+    padding: 10px;
+    background: #eef4ff;
+    border-radius: 8px;
+    line-height: 1.65;
+    font-size: 13px;
+  }
+  .record {
+    width: 100%;
+    margin-top: 10px;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .record th, .record td {
+    border-bottom: 1px solid #d9e2ec;
+    padding: 5px 4px;
+    text-align: right;
+  }
+  .record th:first-child, .record td:first-child { text-align: left; }
+  .hint {
+    margin-top: 10px;
+    color: #486581;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  @media (max-width: 820px) {
+    .stage { grid-template-columns: 1fr; }
+    canvas { height: 500px; }
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="stage">
-    <canvas id="c" width="680" height="430" aria-label="纸带测速度虚拟实验"></canvas>
+    <canvas id="c" width="790" height="560" aria-label="打点计时器测速实验台，含纸带、刻度尺、v-t 图像和数据记录"></canvas>
     <section class="panel">
+      <div class="row">
+        <button id="playBtn" class="primary" type="button">播放</button>
+        <button id="resetBtn" type="button">重置</button>
+        <button id="recordBtn" type="button">记录</button>
+      </div>
       <label for="period">打点周期 T/s：<span id="periodVal"></span></label>
       <input id="period" type="range" min="0.02" max="0.06" value="0.02" step="0.01">
       <label for="v0">初速度 v0/(m/s)：<span id="v0Val"></span></label>
-      <input id="v0" type="range" min="0.2" max="2.0" value="0.8" step="0.1">
+      <input id="v0" type="range" min="0.20" max="2.00" value="0.80" step="0.05">
       <label for="acc">加速度 a/(m/s²)：<span id="accVal"></span></label>
-      <input id="acc" type="range" min="0" max="4" value="1.2" step="0.2">
+      <input id="acc" type="range" min="0.00" max="4.00" value="1.20" step="0.05">
       <label for="index">测量点 i：<span id="indexVal"></span></label>
       <input id="index" type="range" min="1" max="10" value="5" step="1">
       <div id="readout" class="readout"></div>
-      <div class="hint">观察任务：点距由运动决定，时间间隔由打点周期决定；求某点速度用前后两点夹住它。</div>
+      <table class="record" aria-label="数据记录表">
+        <thead><tr><th>记录</th><th>T/s</th><th>i</th><th>vi/(m/s)</th></tr></thead>
+        <tbody id="records"></tbody>
+      </table>
+      <div class="hint">观察任务：先播放看纸带怎样留下等时点，再拖动画面内蓝色速度把手、红色加速度把手和绿色测点，看公式里的 x、T、vi 如何跟着读数改变。</div>
     </section>
   </div>
 </div>
 <script>
-const c = document.getElementById('c');
-const ctx = c.getContext('2d');
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
 const els = {
+  playBtn: document.getElementById('playBtn'),
+  resetBtn: document.getElementById('resetBtn'),
+  recordBtn: document.getElementById('recordBtn'),
   period: document.getElementById('period'),
   v0: document.getElementById('v0'),
   acc: document.getElementById('acc'),
@@ -48,80 +122,402 @@ const els = {
   v0Val: document.getElementById('v0Val'),
   accVal: document.getElementById('accVal'),
   indexVal: document.getElementById('indexVal'),
-  readout: document.getElementById('readout')
+  readout: document.getElementById('readout'),
+  records: document.getElementById('records')
 };
-function pos(v0, a, t) { return v0 * t + 0.5 * a * t * t; }
+
+const state = {
+  running: false,
+  time: 0,
+  last: 0,
+  drag: null,
+  records: []
+};
+
+function val(name) { return Number(els[name].value); }
+function clamp(x, lo, hi) { return Math.max(lo, Math.min(hi, x)); }
+function motionX(v0, a, t) { return v0 * t + 0.5 * a * t * t; }
+function motionV(v0, a, t) { return v0 + a * t; }
+function dots(v0, a, T, count) {
+  const arr = [];
+  for (let k = 0; k <= count; k++) arr.push({ k, t: k * T, x: motionX(v0, a, k * T), v: motionV(v0, a, k * T) });
+  return arr;
+}
+function params() {
+  return { T: val('period'), v0: val('v0'), a: val('acc'), i: val('index') };
+}
+function selectedData() {
+  const { T, v0, a, i } = params();
+  const ds = dots(v0, a, T, 12);
+  const prev = ds[i - 1], mid = ds[i], next = ds[i + 1];
+  const vi = (next.x - prev.x) / (2 * T);
+  const avg = (ds[10].x - ds[2].x) / (8 * T);
+  return { T, v0, a, i, ds, prev, mid, next, vi, avg };
+}
+function setValues({ v0, a, i, T }) {
+  if (v0 !== undefined) els.v0.value = clamp(v0, 0.2, 2).toFixed(2);
+  if (a !== undefined) els.acc.value = clamp(a, 0, 4).toFixed(2);
+  if (i !== undefined) els.index.value = Math.round(clamp(i, 1, 10));
+  if (T !== undefined) els.period.value = clamp(T, 0.02, 0.06).toFixed(2);
+}
+function roundRect(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+function arrow(x1, y1, x2, y2, color, width = 3) {
+  const ang = Math.atan2(y2 - y1, x2 - x1);
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = width;
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - 10 * Math.cos(ang - 0.45), y2 - 10 * Math.sin(ang - 0.45));
+  ctx.lineTo(x2 - 10 * Math.cos(ang + 0.45), y2 - 10 * Math.sin(ang + 0.45));
+  ctx.closePath();
+  ctx.fill();
+}
+function drawGrid(x, y, w, h, xSteps, ySteps) {
+  ctx.strokeStyle = '#e6edf5';
+  ctx.lineWidth = 1;
+  for (let n = 0; n <= xSteps; n++) {
+    const xx = x + w * n / xSteps;
+    ctx.beginPath(); ctx.moveTo(xx, y); ctx.lineTo(xx, y + h); ctx.stroke();
+  }
+  for (let n = 0; n <= ySteps; n++) {
+    const yy = y + h * n / ySteps;
+    ctx.beginPath(); ctx.moveTo(x, yy); ctx.lineTo(x + w, yy); ctx.stroke();
+  }
+}
+function dotToCanvas(dot, scale, originX) {
+  return originX + dot.x * scale;
+}
+function handles(data, scale, originX) {
+  const vHandle = { name: 'v0', x: 160 + data.v0 * 76, y: 252, r: 13, label: '拖动 v0' };
+  const aHandle = { name: 'a', x: 126 + data.a * 42, y: 304, r: 13, label: '拖动 a' };
+  const mHandle = { name: 'i', x: dotToCanvas(data.mid, scale, originX), y: 166, r: 13, label: '拖动测点 i' };
+  return [vHandle, aHandle, mHandle];
+}
 function draw() {
-  const T = Number(els.period.value);
-  const v0 = Number(els.v0.value);
-  const a = Number(els.acc.value);
-  const i = Number(els.index.value);
-  els.periodVal.textContent = T.toFixed(2);
-  els.v0Val.textContent = v0.toFixed(1);
-  els.accVal.textContent = a.toFixed(1);
-  els.indexVal.textContent = i;
-  const xs = [];
-  for (let k = 0; k <= 12; k++) xs.push(pos(v0, a, k * T));
-  const scale = 480 / Math.max(xs[12], 0.1);
-  const xPrev = xs[i - 1], xNext = xs[i + 1];
-  const vi = (xNext - xPrev) / (2 * T);
-  const avg = (xs[10] - xs[2]) / (8 * T);
-  ctx.clearRect(0, 0, c.width, c.height);
+  const data = selectedData();
+  const maxX = Math.max(data.ds[12].x, 0.25);
+  const scale = 455 / maxX;
+  const originX = 254;
+  const tapeY = 126;
+  const progressCount = Math.min(12, Math.floor(state.time / data.T));
+  const currentX = motionX(data.v0, data.a, Math.min(state.time, 12 * data.T));
+  const carX = clamp(originX + currentX * scale, 248, 700);
+  const hs = handles(data, scale, originX);
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = '#f7f9fc';
-  ctx.fillRect(0, 0, c.width, c.height);
-  ctx.fillStyle = '#eef4ff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const bg = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+  bg.addColorStop(0, '#ffffff');
+  bg.addColorStop(1, '#f0f7ff');
+  ctx.fillStyle = bg;
+  roundRect(18, 18, 754, 524, 12);
+  ctx.fill();
+
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 18px system-ui';
+  ctx.textAlign = 'left';
+  ctx.fillText('实物实验台：打点计时器、纸带、刻度尺', 32, 48);
+  ctx.font = '13px system-ui';
+  ctx.fillStyle = '#486581';
+  ctx.fillText('俯视装置 + 下方 v-t 图像 + 右侧数据记录，把“等时点距”变成可读数。', 32, 70);
+
+  ctx.fillStyle = '#e6f0ff';
   ctx.strokeStyle = '#2c7be5';
   ctx.lineWidth = 2;
-  ctx.fillRect(48, 70, 140, 86);
-  ctx.strokeRect(48, 70, 140, 86);
+  roundRect(40, 90, 166, 92, 8);
+  ctx.fill();
+  ctx.stroke();
   ctx.fillStyle = '#102a43';
   ctx.font = '700 16px system-ui';
   ctx.textAlign = 'center';
-  ctx.fillText('打点计时器', 118, 108);
+  ctx.fillText('打点计时器', 123, 122);
+  ctx.font = '12px system-ui';
+  ctx.fillStyle = '#486581';
+  ctx.fillText(`每隔 T=${data.T.toFixed(2)} s 打一点`, 123, 148);
+  ctx.fillStyle = '#d8e2ef';
+  ctx.fillRect(185, 118, 32, 20);
+  ctx.fillStyle = '#7b8794';
+  ctx.fillRect(196, 93, 10, 70);
+
   ctx.fillStyle = '#fff7e6';
   ctx.strokeStyle = '#f0a500';
-  ctx.fillRect(190, 108, 430, 32);
-  ctx.strokeRect(190, 108, 430, 32);
-  for (let k = 0; k <= 12; k++) {
-    const x = 210 + xs[k] * scale;
-    ctx.fillStyle = k === i ? '#e03131' : k === i - 1 || k === i + 1 ? '#2c7be5' : '#102a43';
+  ctx.lineWidth = 2;
+  roundRect(210, 112, 514, 36, 5);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = '#f8d57e';
+  ctx.fillRect(210, 148, 514, 10);
+  ctx.strokeStyle = '#9fb3c8';
+  ctx.lineWidth = 1;
+  for (let n = 0; n <= 20; n++) {
+    const x = 226 + n * 24;
     ctx.beginPath();
-    ctx.arc(x, 124, k === i ? 6 : 4, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#486581';
-    ctx.font = '11px system-ui';
-    ctx.fillText(String(k), x, 158);
+    ctx.moveTo(x, 154);
+    ctx.lineTo(x, n % 5 === 0 ? 176 : 168);
+    ctx.stroke();
   }
-  const xp = 210 + xPrev * scale;
-  const xn = 210 + xNext * scale;
-  ctx.strokeStyle = '#e03131';
+  ctx.fillStyle = '#486581';
+  ctx.font = '11px system-ui';
+  ctx.fillText('刻度尺读 x', 280, 190);
+
+  for (const d of data.ds) {
+    const x = dotToCanvas(d, scale, originX);
+    const visible = d.k <= progressCount || !state.running;
+    ctx.fillStyle = d.k === data.i ? '#0f9f6e' : (d.k === data.i - 1 || d.k === data.i + 1 ? '#2c7be5' : '#102a43');
+    ctx.globalAlpha = visible ? 1 : 0.18;
+    ctx.beginPath();
+    ctx.arc(x, tapeY + 4, d.k === data.i ? 6 : 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    if (visible) {
+      ctx.fillStyle = '#486581';
+      ctx.font = '10px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText(String(d.k), x, 111);
+    }
+  }
+
+  const xp = dotToCanvas(data.prev, scale, originX);
+  const xn = dotToCanvas(data.next, scale, originX);
+  ctx.strokeStyle = '#0f9f6e';
   ctx.lineWidth = 3;
   ctx.beginPath();
-  ctx.moveTo(xp, 188);
-  ctx.lineTo(xn, 188);
+  ctx.moveTo(xp, 202);
+  ctx.lineTo(xn, 202);
   ctx.stroke();
-  ctx.fillStyle = '#e03131';
-  ctx.font = '13px system-ui';
+  arrow(xp, 202, xp + 1, 202, '#0f9f6e', 3);
+  arrow(xn, 202, xn - 1, 202, '#0f9f6e', 3);
+  ctx.fillStyle = '#0f9f6e';
+  ctx.font = '12px system-ui';
   ctx.textAlign = 'center';
-  ctx.fillText('用于估计 vi 的前后两点距离', (xp + xn) / 2, 210);
+  ctx.fillText(`x${data.i + 1}-x${data.i - 1}`, (xp + xn) / 2, 222);
+
+  ctx.fillStyle = '#d9e2ec';
+  roundRect(carX - 32, 74, 64, 28, 6);
+  ctx.fill();
+  ctx.fillStyle = '#102a43';
+  ctx.fillRect(carX - 22, 83, 44, 10);
+  ctx.fillStyle = '#2c7be5';
+  ctx.beginPath(); ctx.arc(carX - 20, 106, 7, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(carX + 20, 106, 7, 0, Math.PI * 2); ctx.fill();
+  arrow(carX - 18, 68, carX + 46 + data.v0 * 8, 68, '#2c7be5', 4);
+  ctx.fillStyle = '#2c7be5';
+  ctx.font = '12px system-ui';
+  ctx.textAlign = 'left';
+  ctx.fillText('小车速度方向', carX + 50, 72);
+
+  ctx.strokeStyle = '#bcccdc';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(42, 234, 344, 92);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 13px system-ui';
+  ctx.textAlign = 'left';
+  ctx.fillText('画面内拖动区', 54, 256);
+  ctx.fillStyle = '#486581';
+  ctx.font = '12px system-ui';
+  ctx.fillText('蓝色调初速度，红色调加速度，绿色直接选测点。', 54, 282);
+  ctx.strokeStyle = '#2c7be5';
+  ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.moveTo(175, 252); ctx.lineTo(314, 252); ctx.stroke();
+  ctx.strokeStyle = '#d64545';
+  ctx.beginPath(); ctx.moveTo(126, 304); ctx.lineTo(294, 304); ctx.stroke();
+
+  for (const h of hs) {
+    ctx.fillStyle = h.name === 'v0' ? '#2c7be5' : h.name === 'a' ? '#d64545' : '#0f9f6e';
+    ctx.beginPath();
+    ctx.arc(h.x, h.y, h.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = '700 11px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText(h.name === 'v0' ? 'v' : h.name, h.x, h.y + 4);
+  }
+
+  const gx = 430, gy = 252, gw = 310, gh = 190;
+  ctx.fillStyle = '#fff';
+  ctx.strokeStyle = '#d9e2ec';
+  ctx.lineWidth = 1.5;
+  roundRect(gx - 14, gy - 28, gw + 28, gh + 58, 8);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 14px system-ui';
+  ctx.textAlign = 'left';
+  ctx.fillText('图像记录：v-t 图线', gx, gy - 8);
+  drawGrid(gx, gy, gw, gh, 6, 5);
+  ctx.strokeStyle = '#334e68';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(gx, gy + gh); ctx.lineTo(gx + gw, gy + gh); ctx.lineTo(gx + gw - 7, gy + gh - 4); ctx.moveTo(gx + gw, gy + gh); ctx.lineTo(gx + gw - 7, gy + gh + 4); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(gx, gy + gh); ctx.lineTo(gx, gy); ctx.lineTo(gx - 4, gy + 7); ctx.moveTo(gx, gy); ctx.lineTo(gx + 4, gy + 7); ctx.stroke();
+  ctx.fillStyle = '#486581';
+  ctx.font = '11px system-ui';
+  ctx.fillText('t/s', gx + gw - 18, gy + gh + 18);
+  ctx.fillText('v/(m/s)', gx + 8, gy + 14);
+  const maxT = 12 * data.T;
+  const maxV = Math.max(motionV(data.v0, data.a, maxT), 1);
+  ctx.strokeStyle = '#d64545';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  for (let n = 0; n <= 60; n++) {
+    const t = maxT * n / 60;
+    const vx = gx + gw * t / maxT;
+    const vy = gy + gh - gh * motionV(data.v0, data.a, t) / maxV;
+    if (n === 0) ctx.moveTo(vx, vy); else ctx.lineTo(vx, vy);
+  }
+  ctx.stroke();
+  const ptX = gx + gw * data.mid.t / maxT;
+  const ptY = gy + gh - gh * data.vi / maxV;
+  ctx.fillStyle = '#0f9f6e';
+  ctx.beginPath(); ctx.arc(ptX, ptY, 6, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = '#0f9f6e';
+  ctx.setLineDash([5, 4]);
+  ctx.beginPath(); ctx.moveTo(ptX, ptY); ctx.lineTo(ptX, gy + gh); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 12px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText(`vi=${data.vi.toFixed(2)}`, ptX, ptY - 12);
+
   ctx.fillStyle = '#102a43';
   ctx.font = '700 16px system-ui';
-  ctx.fillText(`vi≈(x${i+1}-x${i-1})/(2T)=${vi.toFixed(2)} m/s`, 340, 282);
+  ctx.textAlign = 'left';
+  ctx.fillText(`公式绑定：vi≈(x${data.i + 1}-x${data.i - 1})/(2T)=${data.vi.toFixed(2)} m/s`, 40, 470);
   ctx.fillStyle = '#486581';
-  ctx.font = '14px system-ui';
-  ctx.fillText(`点 2 到点 10 的平均速度约 ${avg.toFixed(2)} m/s`, 340, 318);
-  ctx.fillText('点距逐渐变大，说明相同时间内位移变大，速度变大。', 340, 374);
+  ctx.font = '13px system-ui';
+  ctx.fillText(`读数：x${data.i - 1}=${data.prev.x.toFixed(3)} m，x${data.i + 1}=${data.next.x.toFixed(3)} m，平均速度 v=Δx/Δt=${data.avg.toFixed(2)} m/s`, 40, 494);
+
+  const okText = data.T <= 0.04 && data.v0 >= 0.35 ? '能用：点迹清楚且点距适中' : '需重做：点太疏/太密或起步不稳';
+  ctx.fillStyle = data.T <= 0.04 && data.v0 >= 0.35 ? '#0f9f6e' : '#d64545';
+  ctx.font = '700 13px system-ui';
+  ctx.fillText(`状态判定：${okText}`, 40, 520);
+
+  els.periodVal.textContent = data.T.toFixed(2);
+  els.v0Val.textContent = data.v0.toFixed(2);
+  els.accVal.textContent = data.a.toFixed(2);
+  els.indexVal.textContent = data.i;
+  els.playBtn.textContent = state.running ? '暂停' : '播放';
   els.readout.innerHTML = [
-    `T=${T.toFixed(2)}s，v0=${v0.toFixed(1)}m/s，a=${a.toFixed(1)}m/s²`,
-    `选中点 i=${i}，x${i-1}=${xPrev.toFixed(3)}m，x${i+1}=${xNext.toFixed(3)}m`,
-    `vi≈(x${i+1}-x${i-1})/(2T)=${vi.toFixed(2)}m/s`,
-    `点2到点10平均速度≈${avg.toFixed(2)}m/s`
+    `T=${data.T.toFixed(2)}s，v0=${data.v0.toFixed(2)}m/s，a=${data.a.toFixed(2)}m/s²`,
+    `选中点 i=${data.i}，时间 ti=${data.mid.t.toFixed(2)}s`,
+    `x${data.i - 1}=${data.prev.x.toFixed(3)}m，x${data.i + 1}=${data.next.x.toFixed(3)}m`,
+    `vi≈(x${data.i + 1}-x${data.i - 1})/(2T)=${data.vi.toFixed(2)}m/s`
   ].join('<br>');
 }
-Object.values(els).forEach(el => {
-  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
+
+function loop(now) {
+  if (!state.last) state.last = now;
+  const dt = Math.min(0.04, (now - state.last) / 1000);
+  state.last = now;
+  if (state.running) {
+    const { T } = params();
+    state.time += dt * 0.55;
+    if (state.time > 12 * T) {
+      state.time = 12 * T;
+      state.running = false;
+    }
+  }
+  draw();
+  requestAnimationFrame(loop);
+}
+function pointerPos(evt) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (evt.clientX - rect.left) * canvas.width / rect.width,
+    y: (evt.clientY - rect.top) * canvas.height / rect.height
+  };
+}
+function hitHandle(p) {
+  const data = selectedData();
+  const scale = 455 / Math.max(data.ds[12].x, 0.25);
+  const hs = handles(data, scale, 254);
+  return hs.find(h => Math.hypot(p.x - h.x, p.y - h.y) <= h.r + 7);
+}
+canvas.addEventListener('pointerdown', evt => {
+  const p = pointerPos(evt);
+  const h = hitHandle(p);
+  if (h) {
+    state.drag = h.name;
+    canvas.setPointerCapture(evt.pointerId);
+  }
 });
-draw();
+canvas.addEventListener('pointermove', evt => {
+  const p = pointerPos(evt);
+  if (!state.drag) {
+    canvas.style.cursor = hitHandle(p) ? 'grab' : 'default';
+    return;
+  }
+  if (state.drag === 'v0') setValues({ v0: (p.x - 160) / 76 });
+  if (state.drag === 'a') setValues({ a: (p.x - 126) / 42 });
+  if (state.drag === 'i') {
+    const data = selectedData();
+    let best = data.i, dist = Infinity;
+    const scale = 455 / Math.max(data.ds[12].x, 0.25);
+    for (let k = 1; k <= 10; k++) {
+      const x = 254 + data.ds[k].x * scale;
+      const d = Math.abs(p.x - x);
+      if (d < dist) { dist = d; best = k; }
+    }
+    setValues({ i: best });
+  }
+  state.time = Math.min(state.time, 12 * val('period'));
+  draw();
+});
+canvas.addEventListener('pointerup', evt => {
+  state.drag = null;
+  try { canvas.releasePointerCapture(evt.pointerId); } catch (e) {}
+});
+canvas.addEventListener('pointercancel', () => { state.drag = null; });
+
+els.playBtn.addEventListener('click', () => {
+  state.running = !state.running;
+  state.last = 0;
+  if (state.time >= 12 * val('period')) state.time = 0;
+  draw();
+});
+els.resetBtn.addEventListener('click', () => {
+  state.running = false;
+  state.time = 0;
+  setValues({ T: 0.02, v0: 0.8, a: 1.2, i: 5 });
+  draw();
+});
+els.recordBtn.addEventListener('click', () => {
+  const d = selectedData();
+  state.records.unshift({ T: d.T, i: d.i, vi: d.vi });
+  state.records = state.records.slice(0, 4);
+  renderRecords();
+});
+function renderRecords() {
+  els.records.innerHTML = state.records.map((r, idx) =>
+    `<tr><td>${idx + 1}</td><td>${r.T.toFixed(2)}</td><td>${r.i}</td><td>${r.vi.toFixed(2)}</td></tr>`
+  ).join('');
+}
+for (const key of ['period', 'v0', 'acc', 'index']) {
+  els[key].addEventListener('input', () => {
+    state.time = Math.min(state.time, 12 * val('period'));
+    draw();
+  });
+}
+renderRecords();
+requestAnimationFrame(loop);
 </script>
 </body>
 </html>

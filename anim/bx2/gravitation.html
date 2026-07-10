@@ -33,9 +33,9 @@
 </head>
 <body>
 <div class="root">
-  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="万有引力定律交互实验台"></canvas></div>
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="万有引力定律交互实验台：两天体俯视装置、F-r图像和数据记录"></canvas></div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>抓右侧蓝色天体水平拖动，观察 r 翻倍时 F 是否约变为 1/4；注意两侧红箭头始终等长反向。</div>
+    <div class="card task"><b>观察任务：</b>抓右侧蓝色天体水平拖动，对照两天体俯视装置、F-r 图像和数据记录，观察 r 翻倍时 F 是否约变为 1/4。</div>
     <div class="card">
       <div class="title">快速情境</div>
       <div class="chips">
@@ -102,7 +102,7 @@
     roundRect(672,326,152,38,7,'#fff7ed','#f59e0b');text('r 翻倍 → F 变 1/4',748,345,'#b45309','center',12,'900');
   }
   function update(v){els.f.textContent=`${sci(v.F)} N`;els.f2.textContent=`${sci(v.F2)} N`;els.r.textContent=`${sci(v.r)} m`;els.ratio.textContent='1/4';els.status.className='status'+(state.r<3?' warn':'');els.status.textContent=state.r<3?'距离很近时引力迅速增大；仍要确认能否看作质点或均匀球体。':'两物体受到的引力大小相等、方向相反，沿质心连线。'}
-  function draw(){const v=values(),g0=geom();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('万有引力定律实验台：质量相乘，距离平方反比',460,30,'#0f172a','center',19,'900');drawBodies(v);drawGraph(v);roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(108,494,268,'M',colors.purple);handle(g0.M.x,g0.M.y,`M=${state.M.toFixed(1)}`,state.drag==='M',colors.purple);ruler(350,494,510,'m',colors.blue);handle(g0.m.x,g0.m.y,`m=${state.m.toFixed(1)}`,state.drag==='m',colors.blue);ruler(644,494,834,'r',colors.orange);handle(g0.r.x,g0.r.y,`r=${state.r.toFixed(1)}`,state.drag==='r',colors.orange);update(v)}
+  function draw(){const v=values(),g0=geom();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('万有引力实验台：两天体俯视装置 + F-r图像 + 数据记录',460,30,'#0f172a','center',19,'900');drawBodies(v);drawGraph(v);roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(108,494,268,'M',colors.purple);handle(g0.M.x,g0.M.y,`M=${state.M.toFixed(1)}`,state.drag==='M',colors.purple);ruler(350,494,510,'m',colors.blue);handle(g0.m.x,g0.m.y,`m=${state.m.toFixed(1)}`,state.drag==='m',colors.blue);ruler(644,494,834,'r',colors.orange);handle(g0.r.x,g0.r.y,`r=${state.r.toFixed(1)}`,state.drag==='r',colors.orange);update(v)}
   function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
   function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
   function down(e){const p=pos(e),b=bodyGeom(),g0=geom();if(near(p,{x:b.x2,y:b.y},b.R2+18))state.drag='body';else if(near(p,g0.M,26))state.drag='M';else if(near(p,g0.m,26))state.drag='m';else if(near(p,g0.r,26))state.drag='r';else state.drag=null;if(state.drag){canvas.setPointerCapture(e.pointerId);move(e)}}

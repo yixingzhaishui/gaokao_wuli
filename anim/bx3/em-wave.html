@@ -23,13 +23,6 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
 <body>
 <div class="container">
   <h2>电磁波：E ⊥ B ⊥ 传播方向 k</h2>
-  <canvas id="canvas" width="600" height="380"></canvas>
-  <div class="readouts">
-    <span class="r">频率 f = <b id="f-val">2.0</b> GHz</span>
-    <span class="r">波长 λ = <b id="lam-val">150</b> mm</span>
-    <span class="r">周期 T = <b id="t-val">0.50</b> ns</span>
-    <span class="r">播放状态：<b id="state-val">播放中</b></span>
-  </div>
   <div class="controls">
     <label>频率 f = <span id="f-display">2.0</span> GHz
       <input type="range" id="freq" min="0.5" max="5" step="0.1" value="2"></label>
@@ -38,8 +31,15 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
     <button id="play-btn">暂停</button>
     <button id="reset-btn">重置</button>
   </div>
+  <canvas id="canvas" width="600" height="380" aria-label="电磁波实验台：传播方向侧视装置、E-B图像和数据记录"></canvas>
+  <div class="readouts">
+    <span class="r">频率 f = <b id="f-val">2.0</b> GHz</span>
+    <span class="r">波长 λ = <b id="lam-val">150</b> mm</span>
+    <span class="r">周期 T = <b id="t-val">0.50</b> ns</span>
+    <span class="r">播放状态：<b id="state-val">播放中</b></span>
+  </div>
   <div class="hint">
-    <p><b>观察任务</b>：看红色 E 场（竖直方向）和蓝色 B 场（垂直纸面方向的投影）如何同频同相振动，且都垂直于传播方向（绿色箭头 k）。拖动 f 或画面里的 λ 手柄，看波长如何反比变化。</p>
+    <p><b>观察任务</b>：对照传播方向侧视装置、E-B 图像和数据记录，看红色 E 场和蓝色 B 场如何同频同相振动，且都垂直于传播方向 k。</p>
   </div>
 </div>
 <script>

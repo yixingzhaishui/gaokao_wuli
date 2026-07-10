@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>核反应与质能方程模型实验台</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#f5f7fb;color:#102a43;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:14px}
+  .stage{display:grid;grid-template-columns:minmax(0,1fr)314px;gap:12px;align-items:start}
+  canvas{width:100%;height:640px;background:#fff;border:1px solid #d9e2ec;border-radius:8px;display:block;touch-action:none}
+  .panel{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:12px}
+  .row{display:flex;gap:8px;margin:0 0 10px}
+  button{flex:1;border:0;border-radius:6px;background:#2c7be5;color:#fff;font-weight:700;padding:9px 10px;cursor:pointer}
+  button.secondary{background:#e6edf7;color:#102a43}
+  label{display:block;font-size:13px;font-weight:700;margin-top:10px}
+  input,select{width:100%;accent-color:#2c7be5}
+  .readout{margin-top:12px;padding:10px;background:#eef4ff;border-radius:8px;line-height:1.62;font-size:13px}
+  .status{margin-top:10px;padding:9px 10px;border-radius:8px;font-size:13px;line-height:1.5;background:#e6fffa;color:#087f5b;font-weight:700}
+  .status.warn{background:#fff7e6;color:#9c5c00}
+  .hint{margin-top:10px;color:#486581;font-size:13px;line-height:1.55}
+  table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px}
+  th,td{border-bottom:1px solid #d9e2ec;padding:5px 4px;text-align:right}
+  th:first-child,td:first-child{text-align:left}
+  @media(max-width:860px){.stage{grid-template-columns:1fr}canvas{height:560px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="940" height="640" aria-label="核反应与质能方程模型实验台：俯视反应室、质量天平、图像、数据记录和多视角读数"></canvas>
+    <section class="panel" aria-label="核反应模型控制面板">
+      <div class="row">
+        <button id="playBtn" class="play-btn">播放</button>
+        <button id="resetBtn" class="secondary">重置</button>
+        <button id="recordBtn" class="secondary">记录</button>
+      </div>
+      <label for="template">反应模板：<span id="templateVal"></span></label>
+      <select id="template">
+        <option value="fission">中子诱发裂变</option>
+        <option value="fusion">氘氚聚变</option>
+        <option value="alpha">α 衰变配平</option>
+      </select>
+      <label for="dm">质量亏损 Δm/u：<span id="dmVal"></span></label>
+      <input id="dm" type="range" min="-0.04" max="0.32" value="0.21" step="0.005">
+      <label for="count">反应次数 N/(10^20 次)：<span id="countVal"></span></label>
+      <input id="count" type="range" min="1" max="80" value="12" step="1">
+      <label for="binding">产物平均结合能 Eb/A/MeV：<span id="bindingVal"></span></label>
+      <input id="binding" type="range" min="6.5" max="8.8" value="8.45" step="0.05">
+      <label for="probeA">结合能曲线探针 A：<span id="probeVal"></span></label>
+      <input id="probeA" type="range" min="2" max="240" value="56" step="1">
+      <div id="readout" class="readout"></div>
+      <div id="status" class="status"></div>
+      <div class="hint">观察任务：拖动画面里的 Δm 砝码或曲线探针，看质量天平、E=Δmc²、E/MeV≈Δm/u×931.5、ΣA/ΣZ 守恒和数据记录如何同步变化。</div>
+      <table aria-label="实验数据记录表">
+        <thead><tr><th>数据记录</th><th>Δm/u</th><th>Q/MeV</th><th>判定</th></tr></thead>
+        <tbody id="recordBody"><tr><td colspan="4">点击“记录”保存一次读数</td></tr></tbody>
+      </table>
+    </section>
+  </div>
+</div>
+<script>
+const canvas=document.getElementById('c');
+const ctx=canvas.getContext('2d');
+const els={
+  template:document.getElementById('template'),dm:document.getElementById('dm'),count:document.getElementById('count'),
+  binding:document.getElementById('binding'),probeA:document.getElementById('probeA'),templateVal:document.getElementById('templateVal'),
+  dmVal:document.getElementById('dmVal'),countVal:document.getElementById('countVal'),bindingVal:document.getElementById('bindingVal'),
+  probeVal:document.getElementById('probeVal'),readout:document.getElementById('readout'),status:document.getElementById('status'),
+  playBtn:document.getElementById('playBtn'),resetBtn:document.getElementById('resetBtn'),recordBtn:document.getElementById('recordBtn'),
+  recordBody:document.getElementById('recordBody')
+};
+const templates={
+  fission:{name:'中子诱发裂变',left:'²³⁵U + ¹n',right:'¹⁴¹Ba + ⁹²Kr + 3¹n',aL:236,zL:92,aR:236,zR:92,baseDm:.21,reactants:[235,1],products:[141,92,1,1,1]},
+  fusion:{name:'氘氚聚变',left:'²H + ³H',right:'⁴He + ¹n',aL:5,zL:2,aR:5,zR:2,baseDm:.0189,reactants:[2,3],products:[4,1]},
+  alpha:{name:'α 衰变配平',left:'²³⁸U',right:'²³⁴Th + ⁴He',aL:238,zL:92,aR:238,zR:92,baseDm:.0046,reactants:[238],products:[234,4]}
+};
+let playing=false,last=0,t=0,records=[],dragging=null;
+const box={rx:54,ry:76,rw:520,rh:250,scaleX:74,scaleY:386,graphX:618,graphY:86,graphW:264,graphH:180,curveX:618,curveY:316,curveW:264,curveH:200};
+function params(){
+  const tpl=templates[els.template.value];
+  const dm=Number(els.dm.value),count=Number(els.count.value),binding=Number(els.binding.value),probeA=Number(els.probeA.value);
+  const q=dm*931.5;
+  const joule=q*1.602e-13*count*1e20;
+  const stable=binding>=8.0||dm>0;
+  return {tpl,dm,count,binding,probeA,q,joule,stable};
+}
+function setLabels(p){
+  els.templateVal.textContent=p.tpl.name;
+  els.dmVal.textContent=p.dm.toFixed(3);
+  els.countVal.textContent=p.count.toFixed(0);
+  els.bindingVal.textContent=p.binding.toFixed(2);
+  els.probeVal.textContent=p.probeA.toFixed(0);
+}
+function label(text,x,y,color='#102a43',size=13,align='center',weight='700'){
+  ctx.fillStyle=color;ctx.font=`${weight} ${size}px system-ui,-apple-system,"Segoe UI",sans-serif`;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(text,x,y);
+}
+function arrow(x1,y1,x2,y2,color,w=3){
+  const a=Math.atan2(y2-y1,x2-x1);
+  ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=w;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.48),y2-10*Math.sin(a-.48));ctx.lineTo(x2-10*Math.cos(a+.48),y2-10*Math.sin(a+.48));ctx.closePath();ctx.fill();
+}
+function nucleus(x,y,r,color,text){
+  ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='rgba(16,42,67,.25)';ctx.lineWidth=2;ctx.stroke();
+  label(text,x,y,'#fff',12);
+}
+function drawReactionRoom(p){
+  const {rx:x,ry:y,rw:w,rh:h}=box;
+  ctx.fillStyle='#f2f7ff';ctx.strokeStyle='#2c7be5';ctx.lineWidth=2;ctx.fillRect(x,y,w,h);ctx.strokeRect(x,y,w,h);
+  label('俯视反应室：先配平 ΣA、ΣZ，再读质量差 Δm',x+w/2,y+22,'#2c7be5',14);
+  label(p.tpl.left,x+132,y+62,'#102a43',18);
+  arrow(x+242,y+64,x+326,y+64,'#334e68',4);
+  label(p.tpl.right,x+418,y+62,'#102a43',18);
+  p.tpl.reactants.forEach((a,i)=>nucleus(x+86+i*66,y+136,Math.max(16,Math.min(38,a/5)),'#2c7be5',String(a)));
+  const flash=playing?0.5+0.5*Math.sin(t*5):.75;
+  ctx.fillStyle=`rgba(240,165,0,${flash})`;ctx.beginPath();ctx.arc(x+274,y+136,34+10*flash,0,Math.PI*2);ctx.fill();
+  label('Q',x+274,y+136,'#7a4b00',18);
+  p.tpl.products.forEach((a,i)=>nucleus(x+374+i*46,y+136+(i%2)*42,Math.max(14,Math.min(34,a/5)),'#38b2ac',String(a)));
+  ctx.fillStyle='#fff';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1;ctx.fillRect(x+34,y+196,452,40);ctx.strokeRect(x+34,y+196,452,40);
+  label(`ΣA前=${p.tpl.aL}，ΣA后=${p.tpl.aR}`,x+150,y+216,p.tpl.aL===p.tpl.aR?'#087f5b':'#c92a2a',14);
+  label(`ΣZ前=${p.tpl.zL}，ΣZ后=${p.tpl.zR}`,x+366,y+216,p.tpl.zL===p.tpl.zR?'#087f5b':'#c92a2a',14);
+  arrow(x+430,y+166,x+508,y+116,'#f0a500',4);
+  label(p.q>=0?'放能':'吸能',x+524,y+106,p.q>=0?'#f0a500':'#c92a2a',14);
+}
+function drawScale(p){
+  const x=box.scaleX,y=box.scaleY,w=500,h=194;
+  ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1;ctx.fillRect(x,y,w,h);ctx.strokeRect(x,y,w,h);
+  label('质量天平与能量计：Δm 砝码可拖动读数',x+w/2,y+20,'#102a43',14);
+  ctx.strokeStyle='#52606d';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(x+92,y+96);ctx.lineTo(x+334,y+96);ctx.stroke();
+  ctx.fillStyle='#52606d';ctx.fillRect(x+206,y+96,16,58);
+  ctx.strokeStyle='#52606d';ctx.lineWidth=3;ctx.beginPath();ctx.arc(x+214,y+158,46,Math.PI,0);ctx.stroke();
+  const tilt=Math.max(-24,Math.min(24,p.dm*120-7));
+  ctx.save();ctx.translate(x+214,y+96);ctx.rotate(tilt*Math.PI/180);
+  ctx.strokeStyle=p.dm>=0?'#087f5b':'#c92a2a';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-128,0);ctx.lineTo(128,0);ctx.stroke();
+  ctx.restore();
+  const blockX=x+372,blockY=y+72+Math.max(-26,Math.min(46,(.21-p.dm)*115));
+  ctx.fillStyle=p.dm>=0?'#38b2ac':'#e03131';ctx.fillRect(blockX-34,blockY-24,68,48);
+  ctx.strokeStyle='#102a43';ctx.lineWidth=2;ctx.strokeRect(blockX-34,blockY-24,68,48);
+  label('Δm',blockX,blockY-5,'#fff',17);
+  label('拖动砝码',blockX,blockY+17,'#fff',11);
+  const e=Math.max(-120,Math.min(120,p.q/2.2));
+  ctx.strokeStyle='#d9e2ec';ctx.lineWidth=10;ctx.beginPath();ctx.arc(x+430,y+142,52,Math.PI*.78,Math.PI*2.22);ctx.stroke();
+  ctx.strokeStyle=p.q>=0?'#f0a500':'#c92a2a';ctx.lineWidth=10;ctx.beginPath();ctx.arc(x+430,y+142,52,Math.PI*.78,Math.PI*.78+(Math.PI*1.44)*(e+120)/240);ctx.stroke();
+  label('Q 表',x+430,y+122,'#102a43',13);
+  label(`${p.q.toFixed(1)} MeV`,x+430,y+150,p.q>=0?'#9c5c00':'#c92a2a',14);
+}
+function drawEnergyGraph(p){
+  const x=box.graphX,y=box.graphY,w=box.graphW,h=box.graphH;
+  ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1;ctx.fillRect(x,y,w,h);ctx.strokeRect(x,y,w,h);
+  label('图像：Q 与 Δm 线性关系',x+w/2,y+18,'#102a43',14);
+  arrow(x+34,y+h-34,x+w-18,y+h-34,'#52606d',2);arrow(x+34,y+h-34,x+34,y+40,'#52606d',2);
+  label('Δm/u',x+w-26,y+h-17,'#52606d',11);label('Q/MeV',x+37,y+30,'#52606d',11);
+  ctx.strokeStyle='#2c7be5';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x+46,y+h-34);ctx.lineTo(x+w-26,y+54);ctx.stroke();
+  const px=x+46+(p.dm+0.04)/0.36*(w-72),py=y+h-34-(p.q+37.26)/(335.34+37.26)*(h-82);
+  ctx.fillStyle=p.q>=0?'#f0a500':'#c92a2a';ctx.beginPath();ctx.arc(px,py,7,0,Math.PI*2);ctx.fill();
+  ctx.setLineDash([4,4]);ctx.strokeStyle='#087f5b';ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px,y+h-34);ctx.lineTo(x+34,py);ctx.stroke();ctx.setLineDash([]);
+  label('E=Δmc²',x+w-70,y+66,'#2c7be5',13);
+}
+function bindingAt(A){
+  return 1.2+7.7*(1-Math.exp(-A/18))-0.00045*Math.max(0,A-56)**1.55;
+}
+function drawBindingCurve(p){
+  const x=box.curveX,y=box.curveY,w=box.curveW,h=box.curveH;
+  ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1;ctx.fillRect(x,y,w,h);ctx.strokeRect(x,y,w,h);
+  label('结合能曲线：产物更稳定时释放能量',x+w/2,y+18,'#102a43',14);
+  arrow(x+35,y+h-34,x+w-18,y+h-34,'#52606d',2);arrow(x+35,y+h-34,x+35,y+38,'#52606d',2);
+  label('A',x+w-18,y+h-17,'#52606d',11);label('Eb/A',x+33,y+29,'#52606d',11);
+  ctx.strokeStyle='#38b2ac';ctx.lineWidth=3;ctx.beginPath();
+  for(let i=0;i<=120;i++){
+    const A=2+i*238/120,eb=bindingAt(A);
+    const px=x+42+(A-2)/238*(w-72),py=y+h-34-(eb/9.2)*(h-78);
+    if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+  const px=x+42+(p.probeA-2)/238*(w-72),py=y+h-34-(bindingAt(p.probeA)/9.2)*(h-78);
+  ctx.fillStyle='#7b2cbf';ctx.beginPath();ctx.arc(px,py,8,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#7b2cbf';ctx.lineWidth=2;ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px,y+h-34);ctx.stroke();ctx.setLineDash([]);
+  label('拖动探针',Math.min(x+w-58,px+38),py-14,'#7b2cbf',11);
+  const targetY=y+h-34-(p.binding/9.2)*(h-78);
+  ctx.strokeStyle='#f0a500';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x+42,targetY);ctx.lineTo(x+w-24,targetY);ctx.stroke();
+  label('产物 Eb/A',x+w-70,targetY-12,'#9c5c00',11);
+}
+function drawMultiView(p){
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
+  label('核反应与质能方程模型实验台',canvas.width/2,26,'#102a43',19);
+  label('多视角：俯视反应室 + 质量天平 + 图像坐标 + 数据记录，公式与读数绑定',canvas.width/2,52,'#486581',13,'center','600');
+  drawReactionRoom(p);drawScale(p);drawEnergyGraph(p);drawBindingCurve(p);
+}
+function updateReadout(p){
+  setLabels(p);
+  const ok=p.tpl.aL===p.tpl.aR&&p.tpl.zL===p.tpl.zR;
+  els.readout.innerHTML=[
+    `<div>守恒检查：ΣA ${p.tpl.aL}=${p.tpl.aR}，ΣZ ${p.tpl.zL}=${p.tpl.zR}</div>`,
+    `<div>质能换算：Q=Δm×931.5=${p.q.toFixed(2)} MeV</div>`,
+    `<div>总能量：N=${p.count.toFixed(0)}×10^20 次，E=${p.joule.toExponential(2)} J</div>`,
+    `<div>结合能读数：Eb/A=${p.binding.toFixed(2)} MeV，探针 A=${p.probeA.toFixed(0)}</div>`,
+    `<div>公式绑定：E=Δmc²，E/MeV≈Δm/u×931.5；Δm>0 放能，Δm<0 吸能</div>`
+  ].join('');
+  els.status.className=p.q>=0&&ok?'status':'status warn';
+  els.status.textContent=p.q>=0&&ok?'判定：A、Z 守恒且 Δm>0，反应释放能量。':'判定：守恒仍需检查；若 Δm<0，则该反应需要外界输入能量。';
+}
+function render(ts=0){
+  if(!last)last=ts;
+  if(playing)t+=(ts-last)/1000;
+  last=ts;
+  const p=params();
+  drawMultiView(p);
+  updateReadout(p);
+  requestAnimationFrame(render);
+}
+function record(){
+  const p=params();
+  records.unshift({name:p.tpl.name,dm:p.dm,q:p.q,state:p.q>=0?'放能':'吸能'});
+  records=records.slice(0,5);
+  els.recordBody.innerHTML=records.map((r,i)=>`<tr><td>${i+1}. ${r.name}</td><td>${r.dm.toFixed(3)}</td><td>${r.q.toFixed(1)}</td><td>${r.state}</td></tr>`).join('');
+}
+function reset(){
+  const tpl=templates[els.template.value];
+  els.dm.value=tpl.baseDm;els.count.value=12;els.binding.value=els.template.value==='fusion'?7.1:8.45;els.probeA.value=els.template.value==='fission'?56:4;t=0;
+}
+function pointerPos(e){
+  const r=canvas.getBoundingClientRect();
+  return {x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};
+}
+function applyDrag(pos){
+  if(dragging==='mass'){
+    const val=.21-(pos.y-(box.scaleY+72))/115;
+    els.dm.value=String(Math.max(-.04,Math.min(.32,val)).toFixed(3));
+  }
+  if(dragging==='probe'){
+    const val=2+(pos.x-(box.curveX+42))/(box.curveW-72)*238;
+    els.probeA.value=String(Math.max(2,Math.min(240,val)).toFixed(0));
+  }
+}
+canvas.addEventListener('pointerdown',e=>{
+  const p=params(),pos=pointerPos(e);
+  const blockX=box.scaleX+372,blockY=box.scaleY+72+Math.max(-26,Math.min(46,(.21-p.dm)*115));
+  const probeX=box.curveX+42+(p.probeA-2)/238*(box.curveW-72);
+  if(Math.hypot(pos.x-blockX,pos.y-blockY)<44)dragging='mass';
+  else if(Math.abs(pos.x-probeX)<28&&pos.y>box.curveY+40)dragging='probe';
+  if(dragging){canvas.setPointerCapture(e.pointerId);applyDrag(pos);}
+});
+canvas.addEventListener('pointermove',e=>{if(dragging)applyDrag(pointerPos(e));});
+canvas.addEventListener('pointerup',e=>{dragging=null;canvas.releasePointerCapture(e.pointerId);});
+els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textContent=playing?'暂停':'播放';});
+els.resetBtn.addEventListener('click',reset);
+els.recordBtn.addEventListener('click',record);
+els.template.addEventListener('change',reset);
+[els.dm,els.count,els.binding,els.probeA].forEach(el=>el.addEventListener('input',()=>{}));
+reset();
+requestAnimationFrame(render);
+</script>
+</body>
+</html>

@@ -24,14 +24,6 @@ canvas{display:block;width:100%;max-width:780px;background:#f8fbff;border:1px so
 <body>
 <div class="wrap">
   <h2>楞次定律：3D磁铁-线圈实验台 + 俯视电流 + 电流计/Φ图像记录</h2>
-  <canvas id="cv" width="780" height="500"></canvas>
-  <div class="chips">
-    <span class="chip">磁通量 Φ = <b id="phi-v">0.00</b></span>
-    <span class="chip">ΔΦ/Δt = <b id="dphi-v">0.000</b></span>
-    <span class="chip">感应电流 = <b id="cur-v">无</b></span>
-    <span class="chip">线圈近端 = <b id="pole-v">—</b></span>
-    <span class="chip">作用 = <b id="force-v">—</b></span>
-  </div>
   <div class="ctrls">
     <button class="btn" id="play-btn">自动靠近/远离</button>
     <button class="btn on" id="n-btn">N 极朝线圈</button>
@@ -39,6 +31,14 @@ canvas{display:block;width:100%;max-width:780px;background:#f8fbff;border:1px so
     <button class="btn" id="reset-btn">重置</button>
     <label>自动速度 = <span id="speed-d">2</span>
       <input id="speed" type="range" min="0" max="8" step="1" value="2"></label>
+  </div>
+  <canvas id="cv" width="780" height="500"></canvas>
+  <div class="chips">
+    <span class="chip">磁通量 Φ = <b id="phi-v">0.00</b></span>
+    <span class="chip">ΔΦ/Δt = <b id="dphi-v">0.000</b></span>
+    <span class="chip">感应电流 = <b id="cur-v">无</b></span>
+    <span class="chip">线圈近端 = <b id="pole-v">—</b></span>
+    <span class="chip">作用 = <b id="force-v">—</b></span>
   </div>
   <div class="hint">
     <b>观察任务</b>：直接拖左侧条形磁铁靠近/远离线圈。先看 Φ 是增大还是减小，再看蓝色 B感 如何“反抗变化”，最后用俯视小图判断电流顺/逆时针。核心不是“线圈讨厌磁铁”，而是：感应电流总阻碍<b>磁通量变化</b>；靠近多为排斥，远离多为吸引，即“来拒去留”。

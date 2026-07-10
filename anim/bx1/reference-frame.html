@@ -35,11 +35,12 @@
 <body>
 <div class="root">
   <div class="stage">
-    <canvas id="canvas" width="940" height="560" aria-label="参考系与相对速度交互实验台"></canvas>
+    <canvas id="canvas" width="940" height="560" aria-label="参考系与相对速度交互实验台：道路侧视装置、速度图像和数据记录"></canvas>
     <div class="tip">可拖动画面中的橙色速度端点，改变 vA、vB 或雨/人速度</div>
   </div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>拖速度箭头，再切换参考系；看“对地速度”减去“参考系速度”后，绿色相对速度怎样改变。</div>
+    <div class="card task"><b>观察任务：</b>拖速度箭头，再切换参考系；对照道路侧视装置、速度图像和数据记录，看绿色相对速度怎样改变。</div>
+    <button id="playBtn">暂停</button>
     <div class="card">
       <div class="title">实验类型</div>
       <div class="tabs"><button id="tabLine" class="active">两车一维</button><button id="tabRain">雨中人二维</button></div>
@@ -204,21 +205,22 @@
   function setFormula(s){document.getElementById('formula').innerHTML='<div class="title">公式和画面绑定</div><div>'+s+'</div>';}
   function setStatus(s){document.getElementById('status').textContent=s;}
   function draw(){layout={}; if(mode==='line') drawLineMode(); else drawRainMode();}
+  function syncPlayButton(){document.getElementById('playBtn').textContent=running?'暂停':'播放';}
   function controls(){
     const el=document.getElementById('controlCard');
     if(mode==='line'){
-      el.innerHTML='<div class="title">参考系</div><div class="seg"><button id="fGround">地面</button><button id="fA">车A</button><button id="fB">车B</button></div><div class="title" style="margin-top:8px">播放</div><button id="playBtn">'+(running?'暂停':'播放')+'</button>';
+      el.innerHTML='<div class="title">参考系</div><div class="seg"><button id="fGround">地面</button><button id="fA">车A</button><button id="fB">车B</button></div>';
       [['fGround','ground'],['fA','A'],['fB','B']].forEach(pair=>{
         const b=document.getElementById(pair[0]);
         b.classList.toggle('active',frame===pair[1]);
         b.onclick=()=>{frame=pair[1];controls();draw();};
       });
-      document.getElementById('playBtn').onclick=()=>{running=!running;controls();};
     }else{
       el.innerHTML='<div class="title">二维参数</div><label class="param"><span>雨速 v雨 <b id="rainText">'+vRain+' m/s</b></span><input id="rainSlider" type="range" min="1" max="8" step="0.5" value="'+vRain+'"></label><label class="param"><span>人速 v人 <b id="manText">'+vMan+' m/s</b></span><input id="manSlider" type="range" min="0" max="8" step="0.5" value="'+vMan+'"></label>';
       document.getElementById('rainSlider').oninput=e=>{vRain=+e.target.value;controls();draw();};
       document.getElementById('manSlider').oninput=e=>{vMan=+e.target.value;controls();draw();};
     }
+    syncPlayButton();
   }
   function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
   canvas.addEventListener('pointerdown',e=>{
@@ -242,6 +244,7 @@
     canvas.style.cursor=hit?'grab':'default';
   });
   window.addEventListener('pointerup',()=>{drag=null;canvas.style.cursor='default';});
+  document.getElementById('playBtn').onclick=()=>{running=!running;syncPlayButton();};
   document.getElementById('tabLine').onclick=()=>{mode='line';document.getElementById('tabLine').classList.add('active');document.getElementById('tabRain').classList.remove('active');controls();draw();};
   document.getElementById('tabRain').onclick=()=>{mode='rain';document.getElementById('tabRain').classList.add('active');document.getElementById('tabLine').classList.remove('active');controls();draw();};
   let last=performance.now();

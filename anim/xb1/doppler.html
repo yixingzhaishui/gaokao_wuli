@@ -24,7 +24,7 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
 <body>
 <div class="container">
   <h2>多普勒效应：波源运动使波前一边挤密、一边拉疏</h2>
-  <canvas id="canvas" width="660" height="360"></canvas>
+  <canvas id="canvas" width="660" height="360" aria-label="多普勒效应实验台：波面俯视装置、频率图像和数据记录"></canvas>
   <div class="readouts">
     <span class="r">波速 v = <b id="v-v">120</b></span>
     <span class="r">波源速度 vs = <b id="vs-v">40</b></span>
@@ -38,7 +38,7 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
     <button id="reset-btn">重置</button>
   </div>
   <div class="hint">
-    <p><b>观察任务</b>：黑点是运动的波源（喇叭/救护车），每隔一个周期发出一圈波（波速 v 不变）。看波源<b>前进方向</b>的波圈被挤得<b>密</b>（波长短→接收频率高→音调高），<b>后方</b>的波圈被拉<b>疏</b>（波长长→频率低→音调低）。拖动 <b>vs</b> 变大，前后疏密差别更明显；vs 接近 v 时前方波圈几乎叠在一起。</p>
+    <p><b>观察任务</b>：黑点是运动的波源（喇叭/救护车），对照波面俯视装置、频率图像和数据记录，看前方波圈变密、后方波圈变疏。拖动 <b>vs</b> 变大，前后疏密差别更明显。</p>
   </div>
 </div>
 <script>

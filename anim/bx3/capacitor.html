@@ -30,8 +30,9 @@ button.on{background:#2c7be5;color:#fff}
 <div class="wrap">
   <h2>平行板电容器：拖板距 d、面积 S，比较接电源与断电源</h2>
   <div class="lab">
-    <div class="stage"><canvas id="cv" width="720" height="450" aria-label="平行板电容器交互实验台"></canvas></div>
+    <div class="stage"><canvas id="cv" width="720" height="450" aria-label="平行板电容器交互实验台：极板侧视装置、C-d图像和数据记录"></canvas></div>
     <section class="panel">
+      <button id="playBtn" style="width:100%;margin-bottom:10px">▶ 播放：自动拉开/靠近极板</button>
       <div class="seg" id="mode">
         <button class="on" data-mode="battery">接电源 U不变</button>
         <button data-mode="isolated">断电源 Q不变</button>
@@ -45,8 +46,7 @@ button.on{background:#2c7be5;color:#fff}
         <div class="chip">板距 d = <b id="dv">0</b> mm，面积 S = <b id="sv">0</b> cm²</div>
         <div class="chip">电容状态：<b id="statev">—</b></div>
       </div>
-      <div class="hint"><b>观察任务</b>：拖动蓝色下极板改变 d；拖动右侧金色边把极板加宽改变 S；在“接电源”和“断电源”间切换，看 d 变大时 U、Q、E 谁保持不变；点击“播放”让极板自动来回拉开/靠近，持续观察谁变、谁不变。</div>
-      <button id="playBtn" style="width:100%;margin-bottom:10px">▶ 播放：自动拉开/靠近极板</button>
+      <div class="hint"><b>观察任务</b>：拖动蓝色下极板改变 d，对照极板侧视装置、C-d 图像和数据记录；在“接电源”和“断电源”间切换，看 d 变大时 U、Q、E 谁保持不变。</div>
       <div class="formula">
         <b>公式绑定</b><br>
         C=εS/d 绑定到极板面积和间距；接电源时 U 固定、Q=CU；断电源时 Q 固定、U=Q/C。

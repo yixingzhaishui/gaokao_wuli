@@ -23,16 +23,6 @@ canvas{display:block;width:100%;max-width:700px;background:#fff;border:1px solid
 <body>
 <div class="container">
   <h2>理想变压器：匝数定电压，功率守恒定电流</h2>
-  <canvas id="canvas" width="700" height="420"></canvas>
-  <div class="readouts">
-    <span class="r">U₁ = <b id="u1-val">220</b> V</span>
-    <span class="r">U₂ = <b id="u2-val">22.0</b> V</span>
-    <span class="r">I₁ = <b id="i1-val">0.20</b> A</span>
-    <span class="r">I₂ = <b id="i2-val">2.00</b> A</span>
-    <span class="r">P₁≈P₂ = <b id="p-val">44</b> W</span>
-    <span class="r">n₁:n₂ = <b id="ratio-val">1000:100</b></span>
-    <span class="r" id="type-val">降压变压器</span>
-  </div>
   <div class="controls">
     <label>初级匝数 n₁ = <span id="n1-display">1000</span>
       <input type="range" id="n1" min="100" max="2000" step="50" value="1000"></label>
@@ -45,7 +35,17 @@ canvas{display:block;width:100%;max-width:700px;background:#fff;border:1px solid
     <button id="play-btn">暂停</button>
     <button id="reset-btn">重置</button>
   </div>
-  <div class="hint"><b>观察任务</b>：拖左右线圈或滑动 n₁、n₂，看 U₂ 跟 n₂/n₁ 同步；比较同一时刻两侧电流，电压高的一侧电流较小（I₁/I₂=n₂/n₁）。拖负载 R 时，功率按 U₂²/R 改变。所有电压电流读数都是有效值。</div>
+  <canvas id="canvas" width="700" height="420" aria-label="变压器实验台：铁芯线圈侧视装置、电压电流图像和数据记录"></canvas>
+  <div class="readouts">
+    <span class="r">U₁ = <b id="u1-val">220</b> V</span>
+    <span class="r">U₂ = <b id="u2-val">22.0</b> V</span>
+    <span class="r">I₁ = <b id="i1-val">0.20</b> A</span>
+    <span class="r">I₂ = <b id="i2-val">2.00</b> A</span>
+    <span class="r">P₁≈P₂ = <b id="p-val">44</b> W</span>
+    <span class="r">n₁:n₂ = <b id="ratio-val">1000:100</b></span>
+    <span class="r" id="type-val">降压变压器</span>
+  </div>
+  <div class="hint"><b>观察任务</b>：拖左右线圈或滑动 n₁、n₂，对照铁芯线圈侧视装置、电压电流图像和数据记录，看 U₂ 跟 n₂/n₁ 同步；比较同一时刻两侧电流。</div>
 </div>
 <script>
 (function(){

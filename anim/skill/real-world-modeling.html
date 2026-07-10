@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>真实情境建模专题实验台</title>
+<link rel="icon" href="data:,">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}.root{display:grid;grid-template-columns:minmax(0,1fr)340px;gap:12px;padding:12px;min-height:700px}.stage,.card{background:#fff;border:1px solid #d9e2ec;border-radius:8px}.stage{overflow:hidden}.card{padding:10px}.panel{display:flex;flex-direction:column;gap:10px}canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab}.task{background:#fff7e6;border-left:4px solid #f0a500;color:#486581;font-size:13px;line-height:1.5}.title{font-weight:900;margin-bottom:7px}.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px}.tabs button.active{background:#102a43;color:#fff;border-color:#102a43}.param{display:grid;gap:3px;margin:8px 0;font-size:13px}.param span{display:flex;justify-content:space-between;gap:8px;color:#486581}.param b{color:#102a43;font-variant-numeric:tabular-nums;white-space:nowrap}input[type=range]{width:100%;accent-color:#2c7be5}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}button{border:1px solid #b0bcc9;background:#fff;border-radius:6px;padding:7px 8px;cursor:pointer;font:inherit;font-size:13px}.readout{background:#102a43;color:#d9e2ec;border-radius:8px;padding:10px;line-height:1.6;font-size:13px}.readout b{color:#ffd166;font-variant-numeric:tabular-nums}.status{border:1px solid #38b2ac;background:#e6fffa;color:#087f5b;border-radius:8px;padding:8px;font-size:13px;font-weight:800;line-height:1.45}.formula{font-size:13px;color:#334e68;line-height:1.6}table{width:100%;border-collapse:collapse;font-size:12px}td,th{border-bottom:1px solid #d9e2ec;padding:4px 3px;text-align:right;font-variant-numeric:tabular-nums}@media(max-width:880px){.root{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="930" height="620" aria-label="真实情境建模实验台：汽车制动、无人机投放、抽象为质点、受力图、图像、数据记录、公式、多视角"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>切换真实场景，拖动关键参数，看怎样把“文字情境”抽象为物理模型、变量和方程。</div>
+    <div class="card">
+      <div class="title">情境选择</div>
+      <div class="tabs"><button id="brake" class="active">汽车制动</button><button id="drop">无人机投放</button></div>
+      <label class="param"><span>速度 v <b id="vLabel">20.0 m/s</b></span><input id="v" type="range" min="5" max="35" step="0.5" value="20"></label>
+      <label class="param"><span>关键参数 <b id="pLabel">0.70</b></span><input id="p" type="range" min="0.2" max="1.2" step="0.05" value="0.7"></label>
+      <label class="param"><span>高度/反应时 <b id="hLabel">1.0</b></span><input id="h" type="range" min="0.2" max="30" step="0.1" value="1"></label>
+      <div class="buttons"><button id="play">暂停</button><button id="record">记录模型</button></div>
+    </div>
+    <div class="readout" id="readout"></div>
+    <div class="card"><div class="title">建模记录</div><table><thead><tr><th>情境</th><th>模型</th><th>结果</th></tr></thead><tbody id="rows"></tbody></table></div>
+    <div class="card formula">
+      <div class="title">建模模板</div>
+      <div>对象：把复杂物体抽象为质点/刚体/系统</div>
+      <div>过程：分清匀速、匀变速、圆周、能量转化</div>
+      <div>方程：先列符号式，再代入数据和单位</div>
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+</div>
+<script>
+(function(){
+'use strict';
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+const E={brake:document.getElementById('brake'),drop:document.getElementById('drop'),v:document.getElementById('v'),p:document.getElementById('p'),h:document.getElementById('h'),vLabel:document.getElementById('vLabel'),pLabel:document.getElementById('pLabel'),hLabel:document.getElementById('hLabel'),readout:document.getElementById('readout'),rows:document.getElementById('rows'),status:document.getElementById('status'),play:document.getElementById('play'),record:document.getElementById('record')};
+const C={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',green:'#087f5b',gold:'#f0a500',purple:'#7048e8'};
+const S={mode:'brake',run:true,t:0,drag:false,records:[]};
+function box(x,y,w,h,f='#fff',s='#d9e2ec'){ctx.save();ctx.fillStyle=f;ctx.strokeStyle=s;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.restore()}
+function text(s,x,y,c=C.ink,a='center',z=13,w='800'){ctx.fillStyle=c;ctx.font=w+' '+z+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+function line(x1,y1,x2,y2,c='#9fb3c8',w=2,d){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(d)ctx.setLineDash(d);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
+function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.45),y2-10*Math.sin(a-.45));ctx.lineTo(x2-10*Math.cos(a+.45),y2-10*Math.sin(a+.45));ctx.closePath();ctx.fill()}
+function calc(){const v=+E.v.value,p=+E.p.value,h=+E.h.value;if(S.mode==='brake'){const mu=p,tr=h,a=mu*9.8,reaction=v*tr,brake=v*v/(2*a),total=reaction+brake;return{v,p,h,a,reaction,brake,total,model:'反应匀速+制动匀减速',result:total.toFixed(1)+'m'}}const H=h,g=9.8,wind=p,t=Math.sqrt(2*H/g),x=v*t+wind*t*t;return{v,p,h,t,x,model:'水平匀速+竖直自由落体',result:x.toFixed(1)+'m'}}
+function draw(){const q=calc();ctx.clearRect(0,0,930,620);box(34,30,862,548,'#fff');text('G-11 真实情境建模：删去非关键细节，留下对象、过程、变量和方程',465,56,C.ink,'center',16,'900');if(S.mode==='brake')drawBrake(q);else drawDrop(q);drawMap(q);drawFlow(q);update(q)}
+function drawBrake(q){box(70,88,560,210,'#fbfdff');text('真实场景：道路制动。抽象：汽车质点 + 反应匀速 + 制动匀减速',350,112,C.muted,'center',12,'900');line(100,246,590,246,'#52606d',5);const x=120+Math.min(1,S.t/3)*260;ctx.fillStyle=C.blue;ctx.fillRect(x,206,72,34);text('汽车',x+36,194,C.blue,'center',12,'900');arrow(x+74,205,x+132,185,C.red,3);text('v',x+138,183,C.red,'left',12,'900');line(120,266,120+q.reaction*4,266,C.gold,5);line(120+q.reaction*4,266,120+q.total*4,266,C.red,5);text('反应距离',120+q.reaction*2,282,C.gold,'center',11,'900');text('制动距离',120+(q.reaction+q.brake/2)*4,282,C.red,'center',11,'900');text('把司机、轮胎、路面简化为 μg 制动加速度',350,294,C.green,'center',12,'900')}
+function drawDrop(q){box(70,88,560,210,'#fbfdff');text('真实场景：无人机投放。抽象：水平匀速 + 竖直自由落体',350,112,C.muted,'center',12,'900');line(110,255,590,255,'#52606d',4);const ox=145+Math.min(1,S.t/4)*230,oy=140;ctx.fillStyle=C.blue;ctx.fillRect(ox-30,oy-10,60,20);text('无人机',ox,oy-26,C.blue,'center',12,'900');arrow(ox+32,oy,ox+90,oy,C.red,3);text('v',ox+98,oy,C.red,'left',12,'900');ctx.strokeStyle=C.gold;ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=80;i++){const t=q.t*i/80,x=ox+q.v*t*4,y=oy+.5*9.8*t*t*4;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke();text('水平不受力，竖直只受重力',350,294,C.green,'center',12,'900')}
+function drawMap(q){box(70,330,560,202,'#fff');text('图像/变量视角：把题干文字翻译成模型图、过程图和方程',350,352,C.muted,'center',12,'900');const x0=118,y0=492,w=455,h=88;arrow(x0,y0,x0+w+18,y0,'#52606d',2);arrow(x0,y0,x0,y0-h-18,'#52606d',2);for(let i=0;i<=5;i++){line(x0+i*w/5,y0,x0+i*w/5,y0-h,'rgba(130,154,177,.16)',1);line(x0,y0-i*h/5,x0+w,y0-i*h/5,'rgba(130,154,177,.16)',1)}if(S.mode==='brake'){line(x0,y0-h*.65,x0+w*.35,y0-h*.65,C.gold,3);line(x0+w*.35,y0-h*.65,x0+w*.88,y0,C.red,3);text('v-t 面积=停车距离',x0+220,y0-68,C.purple,'center',12,'900')}else{ctx.strokeStyle=C.gold;ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=80;i++){const x=i/80,y=x*x;if(i===0)ctx.moveTo(x0+x*w*.85,y0-y*h*.85);else ctx.lineTo(x0+x*w*.85,y0-y*h*.85)}ctx.stroke();text('x=v0t，h=1/2gt²',x0+220,y0-68,C.purple,'center',12,'900')}text('多视角：真实图景 + 抽象模型 + 图像 + 数据记录',350,524,C.purple,'center',12,'900')}
+function drawFlow(q){box(664,88,196,444,'#fff');text('建模流程',762,114,C.ink,'center',14,'900');['读情境信号','选研究对象','忽略次要因素','分过程建模','列符号方程','代数值与单位'].forEach((s,i)=>{box(686,142+i*54,152,34,i===0?'#fff7e6':i===2?'#e6fffa':'#eef4ff');text(s,762,159+i*54,i===0?C.gold:i===2?C.green:C.blue,'center',12,'900')});text(q.model,762,474,C.red,'center',12,'900');text('结果 '+q.result,762,502,C.muted,'center',12,'800')}
+function update(q){E.brake.classList.toggle('active',S.mode==='brake');E.drop.classList.toggle('active',S.mode==='drop');E.vLabel.textContent=q.v.toFixed(1)+' m/s';E.pLabel.textContent=S.mode==='brake'?q.p.toFixed(2):q.p.toFixed(2)+' m/s²';E.hLabel.textContent=S.mode==='brake'?q.h.toFixed(1)+' s':q.h.toFixed(1)+' m';E.readout.innerHTML=S.mode==='brake'?'模型：<b>'+q.model+'</b><br>反应距离：<b>'+q.reaction.toFixed(1)+' m</b><br>制动距离：<b>'+q.brake.toFixed(1)+' m</b><br>停车距离：<b>'+q.total.toFixed(1)+' m</b>':'模型：<b>'+q.model+'</b><br>下落时间：<b>'+q.t.toFixed(2)+' s</b><br>水平位移：<b>'+q.x.toFixed(1)+' m</b><br>风/修正项：<b>'+q.p.toFixed(2)+'</b>';E.rows.innerHTML=S.records.slice(-6).map(r=>'<tr><td>'+r.s+'</td><td>'+r.m+'</td><td>'+r.r+'</td></tr>').join('')||'<tr><td colspan="3">暂无记录</td></tr>';E.status.textContent='真实情境题先翻译：对象是什么、过程分几段、哪些量可忽略、目标量是什么。'}
+function record(){const q=calc();S.records.push({s:S.mode==='brake'?'制动':'投放',m:q.model,r:q.result});if(S.records.length>8)S.records.shift();update(q)}
+E.brake.onclick=()=>{S.mode='brake';E.h.min=.2;E.h.max=3;E.h.value=1;E.p.min=.2;E.p.max=1.2;E.p.value=.7;record();draw()};E.drop.onclick=()=>{S.mode='drop';E.h.min=2;E.h.max=30;E.h.value=20;E.p.min=-1;E.p.max=1;E.p.value=0;record();draw()};[E.v,E.p,E.h].forEach(el=>el.addEventListener('input',draw));E.record.onclick=record;E.play.onclick=()=>{S.run=!S.run;E.play.textContent=S.run?'暂停':'播放'};function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}function setV(p){E.v.value=Math.max(5,Math.min(35,(p.x-100)/430*35)).toFixed(1);draw()}canvas.addEventListener('pointerdown',e=>{const p=pos(e);if(p.x>70&&p.x<630&&p.y>85&&p.y<310){S.drag=true;canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing';setV(p)}});canvas.addEventListener('pointermove',e=>{if(S.drag)setV(pos(e))});canvas.addEventListener('pointerup',e=>{if(S.drag)record();S.drag=false;canvas.style.cursor='grab';try{canvas.releasePointerCapture(e.pointerId)}catch(_){}});canvas.addEventListener('pointercancel',()=>{S.drag=false});let last=performance.now();function loop(now){const dt=Math.min((now-last)/1000,.04);last=now;if(S.run)S.t+=dt;draw();requestAnimationFrame(loop)}record();loop();
+})();
+</script>
+</body>
+</html>

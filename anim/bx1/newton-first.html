@@ -34,9 +34,10 @@
 </head>
 <body>
 <div class="root">
-  <div class="stage"><canvas id="canvas" width="920" height="520" aria-label="牛顿第一定律交互实验台"></canvas></div>
+  <div class="stage"><canvas id="canvas" width="920" height="520" aria-label="牛顿第一定律交互实验台：小车侧视装置、v-t图像和数据记录"></canvas></div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>拖动粗糙度尺把 μ 变小；看频闪点、停止距离和 v-t 图怎样变化。把 μ 拖到 0，看速度是否保持不变。</div>
+    <div class="card task"><b>观察任务：</b>拖动粗糙度尺把 μ 变小；对照小车侧视装置、v-t 图像和数据记录，看频闪点、停止距离怎样变化。</div>
+    <div class="chips"><button id="playBtn">▶ 播放：小车随时间运动</button><button id="resetBtn">重置</button></div>
     <div class="card">
       <div class="title">快速情境</div>
       <div class="chips">
@@ -61,7 +62,6 @@
       <div><span>停止距离</span><b>s停=v0²/(2μg)</b></div>
     </div>
     <div class="card small"><b>可直接操作：</b>抓蓝色速度发射器改变 v0；抓粗糙度尺改变 μ；抓时间尺红点改变观察时刻。</div>
-    <div class="chips"><button id="playBtn">▶ 播放：小车随时间运动</button><button id="resetBtn">重置</button></div>
     <div class="status" id="status">有摩擦：合力不为 0，速度被改变，最后停止。</div>
   </div>
 </div>

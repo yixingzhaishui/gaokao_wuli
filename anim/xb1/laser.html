@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>激光特性与应用实验台</title>
+<link rel="icon" href="data:,">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #f5f7fb; color: #102a43; font-family: -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; }
+  .root { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 12px; padding: 12px; min-height: 680px; }
+  .stage { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; overflow: hidden; }
+  canvas { display: block; width: 100%; height: auto; touch-action: none; cursor: crosshair; }
+  .panel { display: flex; flex-direction: column; gap: 10px; }
+  .card { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 10px; }
+  .task { background: #fff7e6; border-left: 4px solid #f0a500; color: #486581; font-size: 13px; line-height: 1.5; }
+  .title { font-weight: 800; margin-bottom: 7px; color: #102a43; }
+  .param { display: grid; gap: 2px; margin: 8px 0; font-size: 13px; }
+  .param span { display: flex; justify-content: space-between; gap: 8px; color: #486581; }
+  .param b { color: #102a43; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  input[type=range] { width: 100%; accent-color: #e03131; }
+  .buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  button { border: 1px solid #b0bcc9; background: #fff; border-radius: 6px; padding: 7px 8px; cursor: pointer; font: inherit; font-size: 13px; }
+  .readout { background: #102a43; color: #d9e2ec; border-radius: 8px; padding: 10px; line-height: 1.65; font-size: 13px; }
+  .readout b { color: #ffd166; font-variant-numeric: tabular-nums; }
+  .status { border: 1px solid #38b2ac; background: #e6fffa; color: #087f5b; border-radius: 8px; padding: 8px; font-size: 13px; font-weight: 800; line-height: 1.45; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th, td { border-bottom: 1px solid #d9e2ec; padding: 4px 3px; text-align: right; font-variant-numeric: tabular-nums; }
+  th:first-child, td:first-child { text-align: left; }
+  .formula { font-size: 13px; color: #334e68; line-height: 1.6; }
+  @media (max-width: 820px) { .root { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage">
+    <canvas id="canvas" width="900" height="600" aria-label="激光实验台装置：光源侧视装置、光束俯视图、屏幕光斑图像、干涉条纹图像和数据记录"></canvas>
+  </div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>对照普通光源与激光的侧视装置、光束俯视图和屏幕图像，拖动红色光束手柄改变发散角；调相干性看条纹是否清晰，调波长看单色光颜色和光子能量如何变化。</div>
+    <div class="card">
+      <div class="title">调激光器</div>
+      <label class="param"><span>发散角 θ <b id="divLabel">2.0 mrad</b></span><input id="divergence" type="range" min="0.2" max="12" step="0.1" value="2"></label>
+      <label class="param"><span>相干性 <b id="cohLabel">85%</b></span><input id="coherence" type="range" min="0" max="100" step="1" value="85"></label>
+      <label class="param"><span>功率 P <b id="powerLabel">5.0 mW</b></span><input id="power" type="range" min="1" max="20" step="0.5" value="5"></label>
+      <label class="param"><span>波长 λ <b id="lambdaLabel">650 nm</b></span><input id="lambda" type="range" min="405" max="780" step="5" value="650"></label>
+      <div class="buttons"><button id="play">暂停</button><button id="record">记录读数</button></div>
+    </div>
+    <div class="readout" id="readout"></div>
+    <div class="card">
+      <div class="title">应用数据</div>
+      <table>
+        <thead><tr><th>应用</th><th>光斑半径</th><th>能量/eV</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <div class="card formula">
+      <div class="title">公式与图像</div>
+      <div>方向性：远处光斑半径 r≈Lθ。</div>
+      <div>单色性：λ 集中，颜色单一，E=hc/λ。</div>
+      <div>高亮度：同样功率集中到小面积，照度更高。</div>
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const els = {
+    divergence: document.getElementById('divergence'), coherence: document.getElementById('coherence'), power: document.getElementById('power'), lambda: document.getElementById('lambda'),
+    divLabel: document.getElementById('divLabel'), cohLabel: document.getElementById('cohLabel'), powerLabel: document.getElementById('powerLabel'), lambdaLabel: document.getElementById('lambdaLabel'),
+    readout: document.getElementById('readout'), status: document.getElementById('status'), rows: document.getElementById('rows'), play: document.getElementById('play'), record: document.getElementById('record')
+  };
+  const state = { t: 0, running: true, drag: false, records: [] };
+  const colors = { ink:'#102a43', muted:'#486581', red:'#e03131', blue:'#2c7be5', green:'#087f5b', gold:'#f0a500', purple:'#7c3aed' };
+  function p(){
+    const theta = +els.divergence.value, coh = +els.coherence.value/100, power = +els.power.value, lambda = +els.lambda.value;
+    const L = 1000;
+    const rLaser = L * theta * 1e-3;
+    const rLamp = L * 0.18;
+    const eEv = 1240 / lambda;
+    return { theta, coh, power, lambda, L, rLaser, rLamp, eEv };
+  }
+  function fmt(n,d=1){ return n.toFixed(d); }
+  function line(x1,y1,x2,y2,c='#9fb3c8',w=2,dash){ ctx.save(); ctx.strokeStyle=c; ctx.lineWidth=w; if(dash)ctx.setLineDash(dash); ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); ctx.restore(); }
+  function box(x,y,w,h,fill='#fff',stroke='#d9e2ec'){ ctx.save(); ctx.fillStyle=fill; ctx.strokeStyle=stroke; ctx.beginPath(); ctx.roundRect(x,y,w,h,8); ctx.fill(); ctx.stroke(); ctx.restore(); }
+  function text(s,x,y,c=colors.ink,align='center',size=13,weight='700'){ ctx.fillStyle=c; ctx.font=weight+' '+size+'px -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif'; ctx.textAlign=align; ctx.textBaseline='middle'; ctx.fillText(s,x,y); }
+  function arrow(x1,y1,x2,y2,c,w=3){ const a=Math.atan2(y2-y1,x2-x1); line(x1,y1,x2,y2,c,w); ctx.fillStyle=c; ctx.beginPath(); ctx.moveTo(x2,y2); ctx.lineTo(x2-10*Math.cos(a-.45),y2-10*Math.sin(a-.45)); ctx.lineTo(x2-10*Math.cos(a+.45),y2-10*Math.sin(a+.45)); ctx.closePath(); ctx.fill(); }
+  function wavelengthColor(lambda){
+    if(lambda < 460) return '#4f46e5';
+    if(lambda < 520) return '#0ea5e9';
+    if(lambda < 580) return '#22c55e';
+    if(lambda < 620) return '#f0a500';
+    return '#e03131';
+  }
+  function draw(){
+    const q=p(), beam=wavelengthColor(q.lambda);
+    ctx.clearRect(0,0,900,600);
+    box(34,34,832,520,'#fff');
+    text('激光特性对比：普通光源 vs 激光',450,60,colors.ink,'center',16,'800');
+    drawSources(q, beam);
+    drawScreen(q, beam);
+    drawCoherence(q, beam);
+    drawApplications(q, beam);
+  }
+  function drawSources(q, beam){
+    box(64,92,500,210,'#fbfdff');
+    text('侧视装置 + 光束俯视图：方向性和高亮度',314,116,colors.ink,'center',14,'800');
+    box(96,156,68,42,'#fff7e6','#f0a500'); text('普通光源',130,177,colors.gold,'center',12,'800');
+    const spread = 95;
+    for(let i=-3;i<=3;i++) arrow(164,177,360,177+i*spread/3,'rgba(240,165,0,.5)',2);
+    box(96,240,68,36,'#ffe3e3','#ffb3b3'); text('激光器',130,258,colors.red,'center',12,'900');
+    const half = 6 + q.theta*2.2;
+    ctx.save();
+    ctx.fillStyle = beam.replace(')', ',.18)').replace('rgb','rgba');
+    ctx.beginPath(); ctx.moveTo(164,258); ctx.lineTo(460,258-half); ctx.lineTo(460,258+half); ctx.closePath(); ctx.fill();
+    ctx.restore();
+    line(164,258,460,258-half,beam,3); line(164,258,460,258+half,beam,3);
+    arrow(170,258,450,258,beam,4);
+    const hx = 460, hy = 258 + half;
+    ctx.fillStyle=colors.purple; ctx.beginPath(); ctx.arc(hx,hy,9,0,Math.PI*2); ctx.fill();
+    text('拖发散角',hx,hy+20,colors.purple,'center',11,'800');
+    text('激光：发散角小，能量集中',324,282,colors.red,'center',12,'900');
+  }
+  function drawScreen(q, beam){
+    box(596,92,232,210,'#fbfdff');
+    text('屏幕光斑图像',712,116,colors.ink,'center',14,'800');
+    line(712,144,712,274,colors.muted,2);
+    const lampR = 46, laserR = Math.max(5, Math.min(48, q.rLaser*12));
+    ctx.save(); ctx.fillStyle='rgba(240,165,0,.22)'; ctx.beginPath(); ctx.arc(672,210,lampR,0,Math.PI*2); ctx.fill(); ctx.restore();
+    const grad = ctx.createRadialGradient(752,210,2,752,210,laserR);
+    grad.addColorStop(0, beam); grad.addColorStop(1, 'rgba(255,255,255,.05)');
+    ctx.fillStyle=grad; ctx.beginPath(); ctx.arc(752,210,laserR,0,Math.PI*2); ctx.fill();
+    text('普通',672,276,colors.gold,'center',12,'800');
+    text('激光',752,276,colors.red,'center',12,'800');
+  }
+  function drawCoherence(q, beam){
+    box(64,330,360,184,'#fff');
+    text('相干性图像：条纹清晰度',244,354,colors.ink,'center',14,'800');
+    const x0=94,y0=420,w=300,h=60;
+    line(x0,y0,x0+w,y0,'#d9e2ec',1);
+    for(let i=0;i<w;i++){
+      const u=i/w, fringe=0.5+0.5*Math.sin(u*Math.PI*18-state.t*3);
+      const alpha = 0.08 + q.coh*fringe*0.65;
+      ctx.fillStyle = beam + Math.floor(alpha*255).toString(16).padStart(2,'0');
+      ctx.fillRect(x0+i,y0-h/2,1,h);
+    }
+    text(q.coh>0.7?'条纹清晰：相干性强':q.coh>0.35?'条纹变浅：相干性一般':'条纹模糊：相干性弱',244,490,q.coh>0.7?colors.green:colors.gold,'center',13,'900');
+  }
+  function drawApplications(q, beam){
+    box(464,330,364,184,'#fff');
+    text('应用场景：测距、通信、加工',646,354,colors.ink,'center',14,'800');
+    const xs=[530,646,762], names=['测距','通信','加工'];
+    xs.forEach((x,i)=>{
+      box(x-42,392,84,58,'#f8fafc','#d9e2ec');
+      ctx.fillStyle = i===2 ? beam : (i===1 ? colors.blue : colors.green);
+      ctx.beginPath(); ctx.arc(x,414,10+q.power/3,0,Math.PI*2); ctx.fill();
+      text(names[i],x,466,colors.ink,'center',12,'900');
+    });
+    arrow(512,414,548,414,beam,3);
+    arrow(628,414,664,414,colors.blue,3);
+    arrow(744,414,780,414,beam,3);
+    text('单色 + 方向性 + 高亮度',646,498,colors.purple,'center',13,'900');
+  }
+  function update(){
+    const q=p();
+    els.divLabel.textContent = fmt(q.theta,1)+' mrad';
+    els.cohLabel.textContent = Math.round(q.coh*100)+'%';
+    els.powerLabel.textContent = fmt(q.power,1)+' mW';
+    els.lambdaLabel.textContent = fmt(q.lambda,0)+' nm';
+    els.readout.innerHTML = '远处 L=<b>'+q.L+' m</b><br>激光光斑半径 r≈Lθ：<b>'+fmt(q.rLaser,2)+' m</b><br>光子能量 E=hc/λ：<b>'+fmt(q.eEv,2)+' eV</b><br>相干性：<b>'+Math.round(q.coh*100)+'%</b>';
+    els.status.textContent = q.theta < 3 ? '发散角小：方向性强，远处光斑仍小，适合测距和准直。' : '发散角变大：光束扩散，远处光斑变大，能量不再集中。';
+    els.rows.innerHTML = state.records.slice(-6).map(r=>'<tr><td>'+r.app+'</td><td>'+r.radius+' m</td><td>'+r.energy+'</td></tr>').join('') || '<tr><td colspan="3">暂无记录</td></tr>';
+  }
+  function record(){
+    const q=p();
+    state.records.push({ app: q.theta<3?'测距/通信':'普通照明对比', radius: fmt(q.rLaser,2), energy: fmt(q.eEv,2) });
+    if(state.records.length>8) state.records.shift();
+    update();
+  }
+  [els.divergence,els.coherence,els.power,els.lambda].forEach(el=>el.addEventListener('input',()=>{draw();update();}));
+  els.record.addEventListener('click',record);
+  els.play.addEventListener('click',()=>{ state.running=!state.running; els.play.textContent=state.running?'暂停':'播放'; });
+  canvas.addEventListener('pointerdown',e=>{ state.drag=true; canvas.setPointerCapture(e.pointerId); });
+  canvas.addEventListener('pointermove',e=>{
+    if(!state.drag) return;
+    const r=canvas.getBoundingClientRect(), y=(e.clientY-r.top)*canvas.height/r.height;
+    const val=Math.max(0.2,Math.min(12,Math.abs(y-258)/2.2));
+    els.divergence.value=val;
+    draw(); update();
+  });
+  canvas.addEventListener('pointerup',e=>{ state.drag=false; record(); try{canvas.releasePointerCapture(e.pointerId);}catch(_){} });
+  function loop(){ if(state.running) state.t+=0.04; draw(); update(); requestAnimationFrame(loop); }
+  record(); loop();
+})();
+</script>
+</body>
+</html>

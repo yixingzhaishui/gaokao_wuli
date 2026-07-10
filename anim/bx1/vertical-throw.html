@@ -10,9 +10,9 @@
 </head>
 <body>
 <div class="wrap">
-  <div class="stage"><canvas id="canvas" width="940" height="560" aria-label="竖直上抛交互实验台"></canvas><div class="hint">可拖动 v0 点、调 g 点和橙色时间游标；最高点处 v=0 但 a 仍向下</div></div>
+  <div class="stage"><canvas id="canvas" width="940" height="560" aria-label="竖直上抛交互实验台：小球侧视装置、v-t图像和数据记录"></canvas><div class="hint">可拖动 v0 点、调 g 点和橙色时间游标；最高点处 v=0 但 a 仍向下</div></div>
   <div class="panel">
-    <div class="box task"><b>观察任务：</b>拖 t 到紫色最高点竖线，看速度为 0 时加速度箭头是否消失；拖 v0 看 Hmax 是否按 v0² 增长；拖 g 看整条 v-t 线斜率。</div>
+    <div class="box task"><b>观察任务：</b>拖 t 到紫色最高点竖线，对照小球侧视装置、v-t 图像和数据记录，看速度为 0 时加速度箭头是否消失。</div>
     <div class="box"><b>环境</b><div class="buttons" style="margin-top:7px"><button id="mEarth" class="active">地球</button><button id="mMoon">月球</button><button id="mHigh">大 g</button><button id="mFast">高速上抛</button></div></div>
     <div class="box"><button id="play" style="width:100%">▶ 播放上抛</button></div>
     <div class="readout" id="readout"></div><div class="box formula"><b>公式绑定</b><br>v=v0-gt。<br>h=v0t-1/2gt²。<br>t上=v0/g，Hmax=v0²/(2g)。<br>回抛点：t总=2t上，v=-v0。</div><div class="box warn" id="status"></div>

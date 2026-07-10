@@ -33,9 +33,9 @@
 </head>
 <body>
 <div class="root">
-  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="向心加速度与向心力交互实验台"></canvas></div>
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="向心加速度与向心力交互实验台：圆周俯视装置、受力图像和数据记录"></canvas></div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>抓蓝色速度箭头端点把 v 调大，看 F向 是否按 v² 增大；再把小球向外拖，看 r 变大时 F向 变小。</div>
+    <div class="card task"><b>观察任务：</b>抓蓝色速度箭头端点把 v 调大，对照圆周俯视装置、受力图像和数据记录，看 F向 是否按 v² 增大。</div>
     <button id="playBtn" class="primary">播放</button>
     <div class="card">
       <div class="title">快速情境</div>
@@ -102,7 +102,7 @@
     roundRect(636,258,222,112,8,'#fff','#d7dee8');text('谁提供向心力？',747,286,'#0f172a','center',15,'900');text('绳拉力/摩擦/重力分力',747,320,colors.green,'center',13,'900');text('都可能是“向心力来源”',747,346,'#475569','center',12,'700');
   }
   function update(){const v=values();els.a.textContent=`${fmt(v.a)} m/s²`;els.f.textContent=`${fmt(v.F)} N`;els.w.textContent=`${fmt(v.w)} rad/s`;els.t.textContent=`${fmt(v.T,2)} s`;els.status.textContent='向心力是指向圆心的合力效果；它改变速度方向，不改变速率。';els.play.textContent=state.running?'暂停':'播放'}
-  function draw(){const g0=geom();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('向心加速度与向心力实验台：速度切线，合力指圆心',460,30,'#0f172a','center',19,'900');drawScene();drawCompare();roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(100,494,250,'m',colors.purple);handle(g0.m.x,g0.m.y,`m=${fmt(state.m)}kg`,state.drag==='m',colors.purple);ruler(306,494,456,'v',colors.blue);handle(g0.v.x,g0.v.y,`v=${fmt(state.v)}`,state.drag==='v',colors.blue);ruler(516,494,666,'r',colors.orange);handle(g0.r.x,g0.r.y,`r=${fmt(state.r,2)}`,state.drag==='r',colors.orange);ruler(728,494,848,'位置',colors.green);handle(g0.angle.x,g0.angle.y,'拖位置',state.drag==='angle',colors.green);update()}
+  function draw(){const g0=geom();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('向心力实验台：圆周俯视装置 + 受力图像 + 数据记录',460,30,'#0f172a','center',19,'900');drawScene();drawCompare();roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(100,494,250,'m',colors.purple);handle(g0.m.x,g0.m.y,`m=${fmt(state.m)}kg`,state.drag==='m',colors.purple);ruler(306,494,456,'v',colors.blue);handle(g0.v.x,g0.v.y,`v=${fmt(state.v)}`,state.drag==='v',colors.blue);ruler(516,494,666,'r',colors.orange);handle(g0.r.x,g0.r.y,`r=${fmt(state.r,2)}`,state.drag==='r',colors.orange);ruler(728,494,848,'位置',colors.green);handle(g0.angle.x,g0.angle.y,'拖位置',state.drag==='angle',colors.green);update()}
   function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
   function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
   function down(e){const p=pos(e),bp=bodyPoint(),ve=vectorEnds(bp),g0=geom();if(near(p,ve.v,28))state.drag='vVector';else if(near(p,bp,30))state.drag='ball';else if(near(p,g0.m,26))state.drag='m';else if(near(p,g0.v,26))state.drag='v';else if(near(p,g0.r,26))state.drag='r';else if(near(p,g0.angle,26))state.drag='angle';else state.drag=null;if(state.drag){state.running=false;canvas.setPointerCapture(e.pointerId);move(e)}}

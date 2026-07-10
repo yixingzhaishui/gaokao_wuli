@@ -24,7 +24,7 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
 <body>
 <div class="container">
   <h2>简谐运动：x = A·sin(2πt/T + φ)</h2>
-  <canvas id="canvas" width="660" height="340"></canvas>
+  <canvas id="canvas" width="660" height="340" aria-label="简谐运动实验台：弹簧振子侧视装置、x-t图像和数据记录"></canvas>
   <div class="readouts">
     <span class="r">位移 x = <b id="x-v">0.00</b> cm</span>
     <span class="r">速度 v = <b id="v-v">0.00</b> cm/s</span>
@@ -40,7 +40,7 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
     <button id="reset-btn">重置</button>
   </div>
   <div class="hint">
-    <p><b>观察任务</b>：直接拖左侧振子块到一端再释放，右侧 x-t 图幅度同步改变。看振子经过<b>平衡位置</b>时速度最大、回复力为零；到达<b>两端</b>时速度为零、回复力最大且指向平衡位置。拖动 T 改变图像疏密（快慢）。</p>
+    <p><b>观察任务</b>：直接拖左侧振子块到一端再释放，对照弹簧振子侧视装置、x-t 图像和数据记录。看振子经过<b>平衡位置</b>时速度最大、回复力为零。</p>
   </div>
 </div>
 <script>

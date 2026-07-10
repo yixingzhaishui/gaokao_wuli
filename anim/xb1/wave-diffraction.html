@@ -24,7 +24,7 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
 <body>
 <div class="container">
   <h2>波的衍射：缝宽 a 与波长 λ 相近时最明显</h2>
-  <canvas id="canvas" width="660" height="360"></canvas>
+  <canvas id="canvas" width="660" height="360" aria-label="波的衍射实验台：挡板俯视装置、波前图像和数据记录"></canvas>
   <div class="readouts">
     <span class="r">波长 λ = <b id="lam-v">40</b> px</span>
     <span class="r">缝宽 a = <b id="a-v">80</b> px</span>
@@ -40,7 +40,7 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
     <button id="reset-btn">重置</button>
   </div>
   <div class="hint">
-    <p><b>观察任务</b>：左侧是<b>向右传播的平面波</b>，中间挡板开一条缝。看波穿过缝后如何<b>绕到挡板后面</b>展开。拖<b>缝宽 a</b> 变小、或拖<b>波长 λ</b> 变大：当 a 与 λ 差不多（a/λ→1）时，缝口近似一个子波源，波前接近<b>半圆形</b>；当缝远大于波长（a/λ≫1）时，缝内许多子波叠加，中央近似直行，只在边缘弯折。衍射只说<b>明显/不明显</b>，不说加强/减弱。</p>
+    <p><b>观察任务</b>：左侧是<b>向右传播的平面波</b>，对照挡板俯视装置、波前图像和数据记录，看波穿过缝后如何<b>绕到挡板后面</b>展开。拖<b>缝宽 a</b> 变小、或拖<b>波长 λ</b> 变大：当 a 与 λ 差不多时，波前接近<b>半圆形</b>。</p>
   </div>
 </div>
 <script>

@@ -3,118 +3,72 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>核反应方程配平</title>
+<title>核反应方程配平实验台</title>
 <style>
-  * { box-sizing: border-box; }
-  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
-  .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
-  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 14px; align-items: stretch; }
-  canvas { width: 100%; height: 430px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
-  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
-  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
-  input { width: 100%; }
-  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.8; font-size: 14px; }
-  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
-  @media (max-width: 760px) { .stage { grid-template-columns: 1fr; } canvas { height: 360px; } }
+  *{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#102a43;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:14px}.stage{display:grid;grid-template-columns:minmax(0,1fr)310px;gap:12px;align-items:start}
+  canvas{width:100%;height:640px;background:#fff;border:1px solid #d9e2ec;border-radius:8px;display:block;touch-action:none}
+  .panel{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:12px}.row{display:flex;gap:8px;margin-bottom:10px}
+  button{flex:1;border:0;border-radius:6px;background:#2c7be5;color:#fff;font-weight:700;padding:9px 10px;cursor:pointer}.secondary{background:#e6edf7;color:#102a43}
+  label{display:block;font-size:13px;font-weight:700;margin-top:10px}input{width:100%;accent-color:#2c7be5}
+  .readout{margin-top:12px;padding:10px;background:#eef4ff;border-radius:8px;line-height:1.65;font-size:13px}.status{margin-top:10px;padding:9px 10px;border-radius:8px;font-size:13px;line-height:1.5;background:#e6fffa;color:#087f5b;font-weight:700}.bad{background:#fff5f5;color:#c92a2a}
+  .hint{margin-top:10px;color:#486581;font-size:13px;line-height:1.55}table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px}th,td{border-bottom:1px solid #d9e2ec;padding:5px 4px;text-align:right}th:first-child,td:first-child{text-align:left}
+  @media(max-width:860px){.stage{grid-template-columns:1fr}canvas{height:560px}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="stage">
-    <canvas id="c" width="680" height="430" aria-label="核反应方程配平模型"></canvas>
-    <section class="panel">
-      <label for="template">反应模板：<span id="templateVal"></span></label>
-      <input id="template" type="range" min="0" max="2" value="0" step="1">
-      <label for="unknown">未知位置：<span id="unknownVal"></span></label>
-      <input id="unknown" type="range" min="0" max="1" value="1" step="1">
-      <div id="readout" class="readout"></div>
-      <div class="hint">观察任务：每次先配平质量数，再配平电荷数；用两个差值判断未知粒子。</div>
-    </section>
-  </div>
-</div>
+<div class="wrap"><div class="stage">
+  <canvas id="c" width="940" height="640" aria-label="核反应方程配平实验台：装置、守恒账本、图像和数据记录"></canvas>
+  <section class="panel">
+    <div class="row"><button id="playBtn" class="play-btn">播放</button><button id="resetBtn" class="secondary">重置</button><button id="recordBtn" class="secondary">记录</button></div>
+    <label for="template">反应模板：<span id="templateVal"></span></label><input id="template" type="range" min="0" max="2" value="0" step="1">
+    <label for="unknown">未知项位置：<span id="unknownVal"></span></label><input id="unknown" type="range" min="0" max="1" value="1" step="1">
+    <label for="guessA">学生猜测 A：<span id="guessAVal"></span></label><input id="guessA" type="range" min="0" max="6" value="1" step="1">
+    <label for="guessZ">学生猜测 Z：<span id="guessZVal"></span></label><input id="guessZ" type="range" min="-1" max="3" value="1" step="1">
+    <div id="readout" class="readout"></div><div id="status" class="status"></div>
+    <div class="hint">观察任务：拖动画面里的“未知粒子卡片”或调 A、Z，先看质量数账本，再看电荷数账本。两张账都为 0 才配平。</div>
+    <table><thead><tr><th>记录</th><th>A差</th><th>Z差</th><th>判定</th></tr></thead><tbody id="recordBody"><tr><td colspan="4">点击“记录”保存一次配平</td></tr></tbody></table>
+  </section>
+</div></div>
 <script>
-const c = document.getElementById('c');
-const ctx = c.getContext('2d');
-const els = {
-  template: document.getElementById('template'),
-  unknown: document.getElementById('unknown'),
-  templateVal: document.getElementById('templateVal'),
-  unknownVal: document.getElementById('unknownVal'),
-  readout: document.getElementById('readout')
-};
-const reactions = [
-  { name: 'α 轰击氮核', left: [{a:14,z:7,s:'N'}, {a:4,z:2,s:'He'}], right: [{a:17,z:8,s:'O'}, {a:1,z:1,s:'H'}], type: '人工核转变' },
-  { name: '氘氚反应', left: [{a:2,z:1,s:'H'}, {a:3,z:1,s:'H'}], right: [{a:4,z:2,s:'He'}, {a:1,z:0,s:'n'}], type: '聚变反应' },
-  { name: '中子轰击铀核', left: [{a:235,z:92,s:'U'}, {a:1,z:0,s:'n'}], right: [{a:141,z:56,s:'Ba'}, {a:92,z:36,s:'Kr'}, {a:3,z:0,s:'n'}], type: '裂变反应示例' }
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+const els={template:by('template'),unknown:by('unknown'),guessA:by('guessA'),guessZ:by('guessZ'),templateVal:by('templateVal'),unknownVal:by('unknownVal'),guessAVal:by('guessAVal'),guessZVal:by('guessZVal'),readout:by('readout'),status:by('status'),playBtn:by('playBtn'),resetBtn:by('resetBtn'),recordBtn:by('recordBtn'),recordBody:by('recordBody')};
+function by(id){return document.getElementById(id)}
+const reactions=[
+ {name:'α 轰击氮核',type:'人工核转变',left:[{a:14,z:7,s:'N'},{a:4,z:2,s:'He'}],right:[{a:17,z:8,s:'O'},{a:1,z:1,s:'H'}]},
+ {name:'氘氚聚变',type:'聚变反应',left:[{a:2,z:1,s:'H'},{a:3,z:1,s:'H'}],right:[{a:4,z:2,s:'He'},{a:1,z:0,s:'n'}]},
+ {name:'铀核裂变',type:'裂变反应',left:[{a:235,z:92,s:'U'},{a:1,z:0,s:'n'}],right:[{a:141,z:56,s:'Ba'},{a:92,z:36,s:'Kr'},{a:3,z:0,s:'n'}]}
 ];
-function sum(list, key) { return list.reduce((acc, x) => acc + x[key], 0); }
-function particleName(a, z) {
-  if (a === 1 && z === 1) return '质子 ¹₁H';
-  if (a === 1 && z === 0) return '中子 ¹₀n';
-  if (a > 1 && z === 0) return `${a} 个中子`;
-  if (a === 0 && z === -1) return '电子 ⁰₋₁e';
-  if (a === 4 && z === 2) return 'α 粒子 ⁴₂He';
-  return `核素 A=${a}, Z=${z}`;
+let playing=false,t=0,last=0,dragging=false,card={x:710,y:160},records=[];
+function sum(list,k){return list.reduce((a,x)=>a+x[k],0)}
+function pName(a,z){if(a===1&&z===1)return '质子 1/1H';if(a===1&&z===0)return '中子 1/0n';if(a===0&&z===-1)return '电子 0/-1e';if(a===4&&z===2)return 'α 粒子 4/2He';if(a>1&&z===0)return `${a} 个中子`;return `A=${a}, Z=${z}`}
+function params(){const r=reactions[+els.template.value],ur=+els.unknown.value===1;const knownL=ur?r.left:r.left.slice(0,-1),knownR=ur?r.right.slice(0,-1):r.right;const needA=ur?sum(r.left,'a')-sum(knownR,'a'):sum(r.right,'a')-sum(knownL,'a');const needZ=ur?sum(r.left,'z')-sum(knownR,'z'):sum(r.right,'z')-sum(knownL,'z');const gA=+els.guessA.value,gZ=+els.guessZ.value;return{r,ur,needA,needZ,gA,gZ,dA:gA-needA,dZ:gZ-needZ,ok:gA===needA&&gZ===needZ}}
+function label(s,x,y,c='#102a43',size=13,align='center',w='700'){ctx.fillStyle=c;ctx.font=`${w} ${size}px system-ui`;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.48),y2-10*Math.sin(a-.48));ctx.lineTo(x2-10*Math.cos(a+.48),y2-10*Math.sin(a+.48));ctx.closePath();ctx.fill()}
+function term(x){return `${x.a}/${x.z}${x.s}`}
+function drawNucleus(x,y,r,c,text){ctx.fillStyle=c;ctx.globalAlpha=.18;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;ctx.strokeStyle=c;ctx.lineWidth=2;ctx.stroke();label(text,x,y,c,14)}
+function drawScene(p){
+ ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);label('核反应配平实验台：装置、守恒账本、图像与数据记录',470,28,'#102a43',19);label('三视图联动：反应装置看过程，账本看 ΣA/ΣZ，图像看差值是否归零',470,52,'#486581',13,'center','600');
+ ctx.fillStyle='#f2f7ff';ctx.strokeStyle='#2c7be5';ctx.lineWidth=2;ctx.fillRect(52,82,510,300);ctx.strokeRect(52,82,510,300);label('实验装置：入射粒子触发核反应',307,106,'#2c7be5',14);
+ const leftText=p.r.left.map((x,i)=>(!p.ur&&i===p.r.left.length-1)?'x':term(x)).join(' + ');const rightText=p.r.right.map((x,i)=>(p.ur&&i===p.r.right.length-1)?'x':term(x)).join(' + ');
+ label(leftText+'  →  '+rightText,307,145,'#102a43',24);
+ const prog=playing?(Math.sin(t*5)+1)/2:.52;drawNucleus(150+110*prog,238,32,'#e03131','入射');arrow(92,238,270,238,'#e03131',4);drawNucleus(318,238,54,'#2c7be5','靶核');arrow(372,238,488,198,'#38b2ac',4);arrow(372,238,494,282,'#7b2cbf',4);label('产物',520,196,'#38b2ac',13);label('未知 x',520,282,'#7b2cbf',13);
+ ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(610,82,270,180);ctx.strokeRect(610,82,270,180);label('守恒账本/仪器读数',745,106,'#102a43',14);bar(642,142,180,20,Math.abs(p.dA),6,'#e03131','A差='+p.dA);bar(642,198,180,20,Math.abs(p.dZ),6,'#7b2cbf','Z差='+p.dZ);
+ ctx.fillStyle='#fff7e6';ctx.strokeStyle=dragging?'#e03131':'#f0a500';ctx.lineWidth=3;ctx.fillRect(card.x-58,card.y-42,116,84);ctx.strokeRect(card.x-58,card.y-42,116,84);label('未知粒子卡片',card.x,card.y-20,'#f0a500',12);label(`A=${p.gA}  Z=${p.gZ}`,card.x,card.y+8,'#102a43',18);label(pName(p.gA,p.gZ),card.x,card.y+30,'#486581',12);
+ ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1;ctx.fillRect(610,298,270,180);ctx.strokeRect(610,298,270,180);label('图像：差值越接近 0 越接近配平',745,322,'#102a43',13);axis(642,446,210,96);plotDiff(p);
+ ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(70,430,492,142);ctx.strokeRect(70,430,492,142);label('公式绑定',316,454,'#102a43',14);label('ΣA反应前 = ΣA反应后；ΣZ反应前 = ΣZ反应后',316,492,'#2c7be5',17);label(`未知 x 应满足 A=${p.needA}, Z=${p.needZ}，即 ${pName(p.needA,p.needZ)}`,316,532,p.ok?'#087f5b':'#c92a2a',15);
 }
-function termText(x) { return `${x.a}/${x.z}${x.s}`; }
-function draw() {
-  const r = reactions[Number(els.template.value)];
-  const unknownRight = Number(els.unknown.value) === 1;
-  els.templateVal.textContent = r.name;
-  els.unknownVal.textContent = unknownRight ? '右侧最后一项' : '左侧最后一项';
-  const leftKnown = unknownRight ? r.left : r.left.slice(0, -1);
-  const rightKnown = unknownRight ? r.right.slice(0, -1) : r.right;
-  const unknown = unknownRight ? r.right[r.right.length - 1] : r.left[r.left.length - 1];
-  const leftA = sum(r.left, 'a'), rightA = sum(r.right, 'a');
-  const leftZ = sum(r.left, 'z'), rightZ = sum(r.right, 'z');
-  const needA = unknownRight ? sum(r.left, 'a') - sum(rightKnown, 'a') : sum(r.right, 'a') - sum(leftKnown, 'a');
-  const needZ = unknownRight ? sum(r.left, 'z') - sum(rightKnown, 'z') : sum(r.right, 'z') - sum(leftKnown, 'z');
-
-  ctx.clearRect(0, 0, c.width, c.height);
-  ctx.fillStyle = '#f7f9fc';
-  ctx.fillRect(0, 0, c.width, c.height);
-  ctx.fillStyle = '#102a43';
-  ctx.font = '700 18px system-ui';
-  ctx.textAlign = 'center';
-  ctx.fillText(r.name + '：' + r.type, 340, 48);
-
-  ctx.font = '700 30px system-ui';
-  const leftText = r.left.map((x, i) => (!unknownRight && i === r.left.length - 1) ? 'x' : termText(x)).join(' + ');
-  const rightText = r.right.map((x, i) => (unknownRight && i === r.right.length - 1) ? 'x' : termText(x)).join(' + ');
-  ctx.fillText(leftText + '  →  ' + rightText, 340, 122);
-
-  ctx.fillStyle = '#eef4ff';
-  ctx.strokeStyle = '#2c7be5';
-  ctx.lineWidth = 2;
-  ctx.fillRect(70, 172, 250, 130);
-  ctx.strokeRect(70, 172, 250, 130);
-  ctx.fillStyle = '#fff7e6';
-  ctx.strokeStyle = '#f0a500';
-  ctx.fillRect(360, 172, 250, 130);
-  ctx.strokeRect(360, 172, 250, 130);
-  ctx.fillStyle = '#102a43';
-  ctx.font = '700 16px system-ui';
-  ctx.textAlign = 'left';
-  ctx.fillText(`质量数：左 ${leftA}，右 ${rightA}`, 92, 216);
-  ctx.fillText(`电荷数：左 ${leftZ}，右 ${rightZ}`, 92, 252);
-  ctx.fillText(`未知 x：A=${needA}，Z=${needZ}`, 382, 216);
-  ctx.fillText(`判断：${particleName(needA, needZ)}`, 382, 252);
-  ctx.fillStyle = leftA === rightA && leftZ === rightZ ? '#087f5b' : '#b30000';
-  ctx.font = '700 18px system-ui';
-  ctx.textAlign = 'center';
-  ctx.fillText(leftA === rightA && leftZ === rightZ ? '质量数、电荷数均守恒' : '方程未配平', 340, 356);
-
-  els.readout.innerHTML = [
-    `模板=${r.name}`,
-    `ΣA：左=${leftA}，右=${rightA}`,
-    `ΣZ：左=${leftZ}，右=${rightZ}`,
-    `未知 x 应为 A=${needA}, Z=${needZ}，${particleName(needA, needZ)}`
-  ].join('<br>');
-}
-Object.values(els).forEach(el => {
-  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
-});
-draw();
+function bar(x,y,w,h,val,max,c,txt){ctx.fillStyle='#e9eef5';ctx.fillRect(x,y,w,h);ctx.fillStyle=c;ctx.fillRect(x,y,Math.min(w,w*val/max),h);label(txt,x+w/2,y-12,c,12)}
+function axis(x,y,w,h){arrow(x,y,x+w,y,'#52606d',2);arrow(x,y,x,y-h,'#52606d',2);label('猜测',x+w-10,y+18,'#52606d',11);label('差值',x-22,y-h+8,'#52606d',11)}
+function plotDiff(p){const x0=642,y0=446;ctx.strokeStyle='#e03131';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x0+20,y0-12);ctx.lineTo(x0+95,y0-Math.abs(p.dA)*14);ctx.lineTo(x0+170,y0-4);ctx.stroke();ctx.strokeStyle='#7b2cbf';ctx.beginPath();ctx.moveTo(x0+20,y0-18);ctx.lineTo(x0+95,y0-Math.abs(p.dZ)*16);ctx.lineTo(x0+170,y0-6);ctx.stroke();label('A差','#'.length?x0+178:x0+178,y0-70,'#e03131',11);label('Z差',x0+178,y0-48,'#7b2cbf',11)}
+function update(p){els.templateVal.textContent=p.r.name;els.unknownVal.textContent=p.ur?'右侧未知项':'左侧未知项';els.guessAVal.textContent=p.gA;els.guessZVal.textContent=p.gZ;els.readout.innerHTML=[`模板=${p.r.name}（${p.r.type}）`,`需要：A=${p.needA}, Z=${p.needZ}，${pName(p.needA,p.needZ)}`,`当前猜测：A=${p.gA}, Z=${p.gZ}`,`差值：A差=${p.dA}, Z差=${p.dZ}`].join('<br>');els.status.className=p.ok?'status':'status bad';els.status.textContent=p.ok?'判定：质量数和电荷数同时守恒，方程配平。':'判定：还未配平，继续让 A差、Z差都回到 0。'}
+function render(){const p=params();drawScene(p);update(p)}
+function animate(now){if(!last)last=now;const dt=Math.min(.04,(now-last)/1000);last=now;if(playing)t+=dt;render();requestAnimationFrame(animate)}
+function setGuessFromCard(clientX,clientY){const r=canvas.getBoundingClientRect(),x=(clientX-r.left)*canvas.width/r.width,y=(clientY-r.top)*canvas.height/r.height;card.x=Math.max(650,Math.min(830,x));card.y=Math.max(135,Math.min(245,y));els.guessA.value=String(Math.max(0,Math.min(6,Math.round((card.x-650)/30))));els.guessZ.value=String(Math.max(-1,Math.min(3,Math.round((245-card.y)/28))));render()}
+canvas.addEventListener('pointerdown',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.height;if(Math.abs(x-card.x)<70&&Math.abs(y-card.y)<52){dragging=true;canvas.setPointerCapture(e.pointerId);setGuessFromCard(e.clientX,e.clientY)}})
+canvas.addEventListener('pointermove',e=>{if(dragging)setGuessFromCard(e.clientX,e.clientY)});canvas.addEventListener('pointerup',e=>{dragging=false;try{canvas.releasePointerCapture(e.pointerId)}catch{}});canvas.addEventListener('pointercancel',()=>dragging=false);
+els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textContent=playing?'暂停':'播放'});els.resetBtn.addEventListener('click',()=>{playing=false;t=0;card={x:710,y:160};els.playBtn.textContent='播放';render()});els.recordBtn.addEventListener('click',()=>{const p=params();records.unshift({dA:p.dA,dZ:p.dZ,ok:p.ok});records=records.slice(0,5);els.recordBody.innerHTML=records.map((r,i)=>`<tr><td>${i+1}</td><td>${r.dA}</td><td>${r.dZ}</td><td>${r.ok?'通过':'未平'}</td></tr>`).join('')});
+[els.template,els.unknown,els.guessA,els.guessZ].forEach(el=>el.addEventListener('input',render));render();requestAnimationFrame(animate);
 </script>
 </body>
 </html>

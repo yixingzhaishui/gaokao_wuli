@@ -25,7 +25,7 @@ canvas{display:block;width:100%;max-width:720px;background:#0e1a2b;border-radius
 <body>
 <div class="wrap">
   <h2>电容器充放电：看电荷积累、电压上升、充电电流衰减（Q=CU，q=CE(1−e^(−t/RC))）</h2>
-  <canvas id="cv" width="720" height="430"></canvas>
+  <canvas id="cv" width="720" height="430" aria-label="电容充放电实验台：极板侧视装置、Uc-t图像和数据记录"></canvas>
   <div class="chips">
     <span class="chip">电容器电压 U_C = <b id="uc">0</b> V</span>
     <span class="chip">电荷量 Q = CU = <b id="q">0</b> μC</span>
@@ -42,7 +42,7 @@ canvas{display:block;width:100%;max-width:720px;background:#0e1a2b;border-radius
     <label>电阻 R = <span id="Rl">10</span> kΩ<input type="range" id="R" min="2" max="30" step="1" value="10"></label>
     <label>电容 C = <span id="Cl">100</span> μF<input type="range" id="C" min="20" max="200" step="10" value="100"></label>
   </div>
-  <div class="hint"><b>怎么玩</b>：点<b>充电</b>——看电荷（+在上板、−在下板）逐个<b>积累</b>到极板上，两板间<b>电场线</b>随之变密，电压 U_C 沿曲线<b>上升</b>逼近电源电压 E，而充电电流从最大<b>逐渐衰减到零</b>（充满就不再有电流）。点<b>放电</b>看电荷反向流走、U_C 衰减到零。拖<b>R</b> 变大或 <b>C</b> 变大 → 时间常数 τ=RC 变大 → 充/放电变<b>慢</b>。始终满足 Q=CU。右侧小图是 U_C 随时间的实时曲线，可直接<b>拖动曲线区域</b>用探针读某一时刻的电压。</div>
+  <div class="hint"><b>怎么玩</b>：点<b>充电</b>，对照极板侧视装置、Uc-t 图像和数据记录，看电荷逐个<b>积累</b>到极板上，电压 U_C 沿曲线<b>上升</b>逼近电源电压 E。拖<b>R</b> 或 <b>C</b> 看时间常数 τ=RC 怎样改变。</div>
 </div>
 <script>
 (function(){

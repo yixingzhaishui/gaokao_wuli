@@ -33,9 +33,10 @@
 </head>
 <body>
 <div class="root">
-  <div class="stage"><canvas id="canvas" width="920" height="520" aria-label="力的分解交互实验台"></canvas></div>
+  <div class="stage"><canvas id="canvas" width="920" height="520" aria-label="力的分解交互实验台：斜面侧视装置、分力图像和数据记录"></canvas></div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>拖动斜面顶端手柄改变 θ，再拖动 m、g 仪表；看红色重力始终竖直向下，橙色与蓝色分力如何合成回红色箭头。</div>
+    <div class="card task"><b>观察任务：</b>拖动斜面顶端手柄改变 θ，对照斜面侧视装置、分力图像和数据记录，看红色重力始终竖直向下，分力如何合成回红色箭头。</div>
+    <div class="chips"><button id="playBtn">▶ 播放：θ 自动扫描</button><button id="resetBtn">重置</button></div>
     <div class="card">
       <div class="title">快速角度</div>
       <div class="chips">
@@ -60,7 +61,6 @@
       <div><span>蓝色分力</span><b>G⊥=mg cosθ</b></div>
     </div>
     <div class="card small"><b>可直接操作：</b>抓斜面顶端圆点改角度；抓底部两个仪表改质量 m 和 g。虚线平行四边形闭合，说明分力只是等效替代，不是新增的力。</div>
-    <div class="chips"><button id="playBtn">▶ 播放：θ 自动扫描</button><button id="resetBtn">重置</button></div>
     <div class="status" id="status">分解后列方程时，G 与 G∥、G⊥ 不要重复计入。</div>
   </div>
 </div>

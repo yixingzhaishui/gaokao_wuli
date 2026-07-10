@@ -1,28 +1,417 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>热力学第二定律</title>
-<link rel="icon" href="data:,">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>热力学第二定律与热机效率实验台</title>
 <style>
-  body{margin:0;background:#f7f9fc;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}.root{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:10px;padding:10px;box-sizing:border-box;min-height:550px}.stage{background:#fff;border:1px solid #d9e2ec;border-radius:8px;overflow:hidden}canvas{display:block;width:100%;height:auto}.panel{display:flex;flex-direction:column;gap:7px}.card{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:8px}.task{background:#fff7e6;border-left:3px solid #f0a500;color:#486581;line-height:1.38;font-size:12px}.title{font-weight:700;margin-bottom:4px}.param{display:grid;gap:2px;margin:6px 0;font-size:13px}.param span{display:flex;justify-content:space-between;color:#486581;gap:10px}.param b{color:#102a43;font-variant-numeric:tabular-nums;white-space:nowrap}input[type=range]{width:100%;accent-color:#2c7be5}.stepper{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:2px}button{border:1px solid #b0bcc9;background:#fff;border-radius:6px;padding:5px 8px;cursor:pointer}.readout{background:#102a43;color:#d9e2ec;border-radius:8px;padding:8px;line-height:1.45;font-size:13px}.readout b{color:#f0a500;font-variant-numeric:tabular-nums}.formula{font-size:13px;line-height:1.42;color:#334e68}.status{font-size:12px;font-weight:700;border-radius:6px;padding:7px;border:1px solid #38b2ac;background:#e6fffa;color:#087f5b;line-height:1.35}.status.bad{background:#ffe6e6;border-color:#ff6b6b;color:#b30000}@media(max-width:780px){.root{grid-template-columns:1fr}}
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #f7f9fc;
+    color: #102a43;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 14px; }
+  .stage {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 14px;
+  }
+  canvas {
+    width: 100%;
+    height: 560px;
+    display: block;
+    background: #fff;
+    border: 1px solid #d9e2ec;
+    border-radius: 8px;
+    touch-action: none;
+  }
+  .panel {
+    background: #fff;
+    border: 1px solid #d9e2ec;
+    border-radius: 8px;
+    padding: 14px;
+  }
+  .row { display: flex; gap: 8px; margin-bottom: 10px; }
+  button {
+    flex: 1;
+    border: 1px solid #bcccdc;
+    background: #f0f4f8;
+    color: #102a43;
+    border-radius: 8px;
+    padding: 9px 10px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  button.primary { background: #2c7be5; border-color: #2c7be5; color: #fff; }
+  label { display: block; margin: 11px 0 4px; font-size: 13px; font-weight: 700; }
+  input { width: 100%; }
+  .readout {
+    margin-top: 12px;
+    padding: 10px;
+    background: #eef4ff;
+    border-radius: 8px;
+    line-height: 1.65;
+    font-size: 13px;
+  }
+  .readout b { color: #9a6700; }
+  table {
+    width: 100%;
+    margin-top: 10px;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  th, td { border-bottom: 1px solid #d9e2ec; padding: 5px 4px; text-align: right; }
+  th:first-child, td:first-child { text-align: left; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.55; }
+  @media (max-width: 820px) {
+    .stage { grid-template-columns: 1fr; }
+    canvas { height: 500px; }
+  }
 </style>
 </head>
 <body>
-<div class="root"><div class="stage"><canvas id="canvas" width="850" height="530"></canvas></div><div class="panel">
-  <div class="card task"><b>观察任务：</b>调高 TC 看效率上限降低；把 η 调到超过上限，看为什么判为不可能。</div>
-  <div class="card"><div class="title">参数</div>
-    <label class="param"><span>高温热库 TH <b id="thText">600 K</b></span><input id="hot" type="range" min="350" max="900" step="10" value="600"></label><div class="stepper"><button data-step="hot" data-dir="-1">- TH</button><button data-step="hot" data-dir="1">+ TH</button></div>
-    <label class="param"><span>低温热库 TC <b id="tcText">300 K</b></span><input id="cold" type="range" min="250" max="500" step="10" value="300"></label><div class="stepper"><button data-step="cold" data-dir="-1">- TC</button><button data-step="cold" data-dir="1">+ TC</button></div>
-    <label class="param"><span>设定效率 η <b id="etaText">35%</b></span><input id="eta" type="range" min="0" max="100" step="1" value="35"></label>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="790" height="560" aria-label="热机效率实验台：俯视热流装置、能流剖面、效率图像和数据记录"></canvas>
+    <section class="panel">
+      <div class="row">
+        <button id="playBtn" class="primary" type="button">播放</button>
+        <button id="resetBtn" type="button">重置</button>
+        <button id="recordBtn" type="button">记录</button>
+      </div>
+      <label for="hot">高温热库 TH/K：<span id="hotVal"></span></label>
+      <input id="hot" type="range" min="350" max="900" step="10" value="600">
+      <label for="cold">低温热库 TC/K：<span id="coldVal"></span></label>
+      <input id="cold" type="range" min="250" max="500" step="10" value="300">
+      <label for="eta">设定效率 η/%：<span id="etaVal"></span></label>
+      <input id="eta" type="range" min="0" max="100" step="1" value="35">
+      <div id="readout" class="readout"></div>
+      <table aria-label="数据记录表">
+        <thead><tr><th>记录</th><th>η</th><th>ηmax</th><th>判定</th></tr></thead>
+        <tbody id="records"></tbody>
+      </table>
+      <div class="hint">观察任务：先播放看 QH 怎样分成 W 和 QC；再拖红色热库、蓝色热库和黑色效率阀，看 ηmax=1-TC/TH 怎样限制热机。</div>
+    </section>
   </div>
-  <div class="readout" id="readout"></div>
-  <div class="card formula"><div class="title">热机</div><div>η = W/QH</div><div>ηmax = 1 - TC/TH</div><div>QH = W + QC</div></div>
-  <div class="status" id="status"></div>
-</div></div>
+</div>
 <script>
-(function(){'use strict';const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');const els={hot:document.getElementById('hot'),cold:document.getElementById('cold'),eta:document.getElementById('eta')};const QH=1000;function fmt(n,d){return n.toFixed(d==null?0:d)}function p(){let TH=+els.hot.value,TC=+els.cold.value;if(TC>=TH){TC=TH-10;els.cold.value=TC}const eta=+els.eta.value/100,max=1-TC/TH,W=eta*QH,QC=QH-W;return{TH,TC,eta,max,W,QC,ok:eta<=max&&eta<1&&QC>0}}function text(s,x,y,c,a,size,w){ctx.fillStyle=c||'#102a43';ctx.font=(w?w+' ':'')+(size||13)+'px -apple-system,\"PingFang SC\",sans-serif';ctx.textAlign=a||'center';ctx.textBaseline='middle';ctx.fillText(s,x,y)}function arrow(x1,y1,x2,y2,c,w){const ang=Math.atan2(y2-y1,x2-x1);ctx.save();ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w||4;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-14*Math.cos(ang-.45),y2-14*Math.sin(ang-.45));ctx.lineTo(x2-14*Math.cos(ang+.45),y2-14*Math.sin(ang+.45));ctx.closePath();ctx.fill();ctx.restore()}function box(x,y,w,h,fill,stroke){ctx.save();ctx.fillStyle=fill;ctx.strokeStyle=stroke||'#d9e2ec';ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.restore()}function draw(){const q=p();ctx.clearRect(0,0,850,530);ctx.fillStyle='#fff';ctx.fillRect(0,0,850,530);text('热力学第二定律：热过程有方向，热机效率有上限',425,34,'#102a43','center',18,'700');box(290,72,250,70,'#ffe6e6','#ff6b6b');text('高温热库 TH='+fmt(q.TH)+'K',415,107,'#b30000','center',16,'700');box(340,210,150,90,'#fff7e6','#f0a500');text('热机',415,242,'#102a43','center',18,'700');text('η='+fmt(q.eta*100)+'%',415,270,q.ok?'#087f5b':'#b30000','center',18,'700');box(290,372,250,58,'#e6f4ff','#2c7be5');text('低温热库 TC='+fmt(q.TC)+'K',415,401,'#2c7be5','center',16,'700');arrow(415,144,415,204,'#e03131',6);text('QH=1000J',475,174,'#e03131','left',14,'700');arrow(415,300,415,366,'#2c7be5',Math.max(2,6*q.QC/QH));text('QC='+fmt(q.QC)+'J',475,334,'#2c7be5','left',14,'700');arrow(490,255,625,255,'#102a43',Math.max(2,6*q.W/QH));text('W='+fmt(q.W)+'J',560,232,'#102a43','center',14,'700');box(72,110,170,240,'#f7f9fc','#d9e2ec');text('效率上限',157,142,'#102a43','center',15,'700');const maxH=150;ctx.fillStyle='#d9e2ec';ctx.fillRect(124,170,66,maxH);ctx.fillStyle='#38b2ac';ctx.fillRect(124,170+maxH*(1-q.max),66,maxH*q.max);text(fmt(q.max*100,1)+'%',157,344,'#087f5b','center',18,'700');update(q)}function update(q){document.getElementById('thText').textContent=fmt(q.TH)+' K';document.getElementById('tcText').textContent=fmt(q.TC)+' K';document.getElementById('etaText').textContent=fmt(q.eta*100)+'%';document.getElementById('readout').innerHTML='ηmax=1-TC/TH=<b>'+fmt(q.max*100,1)+'%</b><br>W=ηQH=<b>'+fmt(q.W)+' J</b><br>QC=QH-W=<b>'+fmt(q.QC)+' J</b><br>QH=<b>1000 J</b>';const st=document.getElementById('status');if(q.ok){st.className='status';st.textContent='可行：效率未超过第二定律允许的上限，且仍向低温热库排热。'}else{st.className='status bad';st.textContent='不可能：效率超过卡诺上限或试图把吸热全部变成功，违反第二定律。'}}Object.values(els).forEach(el=>el.addEventListener('input',draw));document.querySelectorAll('[data-step]').forEach(btn=>btn.addEventListener('click',()=>{const el=els[btn.dataset.step],step=+el.step||1,dir=+btn.dataset.dir;el.value=Math.max(+el.min,Math.min(+el.max,+el.value+dir*step));el.dispatchEvent(new Event('input',{bubbles:true}))}));draw();})();
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const QH = 1000;
+const els = {
+  playBtn: document.getElementById('playBtn'),
+  resetBtn: document.getElementById('resetBtn'),
+  recordBtn: document.getElementById('recordBtn'),
+  hot: document.getElementById('hot'),
+  cold: document.getElementById('cold'),
+  eta: document.getElementById('eta'),
+  hotVal: document.getElementById('hotVal'),
+  coldVal: document.getElementById('coldVal'),
+  etaVal: document.getElementById('etaVal'),
+  readout: document.getElementById('readout'),
+  records: document.getElementById('records')
+};
+const state = { running: false, time: 0, last: 0, drag: null, records: [] };
+
+function clamp(x, lo, hi) { return Math.max(lo, Math.min(hi, x)); }
+function val(id) { return Number(els[id].value); }
+function setValues(next) {
+  if (next.TH !== undefined) els.hot.value = Math.round(clamp(next.TH, 350, 900) / 10) * 10;
+  if (next.TC !== undefined) els.cold.value = Math.round(clamp(next.TC, 250, 500) / 10) * 10;
+  if (next.eta !== undefined) els.eta.value = Math.round(clamp(next.eta, 0, 100));
+  if (val('cold') >= val('hot')) els.cold.value = Math.max(250, val('hot') - 10);
+}
+function model() {
+  let TH = val('hot');
+  let TC = val('cold');
+  if (TC >= TH) {
+    TC = TH - 10;
+    els.cold.value = TC;
+  }
+  const eta = val('eta') / 100;
+  const max = 1 - TC / TH;
+  const W = eta * QH;
+  const QC = QH - W;
+  const ok = eta <= max && eta < 1 && QC > 0;
+  return { TH, TC, eta, max, W, QC, ok };
+}
+function roundRect(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+function box(x, y, w, h, fill, stroke = '#d9e2ec') {
+  ctx.fillStyle = fill;
+  ctx.strokeStyle = stroke;
+  ctx.lineWidth = 1.5;
+  roundRect(x, y, w, h, 9);
+  ctx.fill();
+  ctx.stroke();
+}
+function text(s, x, y, color = '#102a43', size = 13, weight = '400', align = 'center') {
+  ctx.fillStyle = color;
+  ctx.font = `${weight} ${size}px system-ui, -apple-system, sans-serif`;
+  ctx.textAlign = align;
+  ctx.textBaseline = 'middle';
+  ctx.fillText(s, x, y);
+}
+function arrow(x1, y1, x2, y2, color, width = 4) {
+  const a = Math.atan2(y2 - y1, x2 - x1);
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = width;
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - 12 * Math.cos(a - 0.45), y2 - 12 * Math.sin(a - 0.45));
+  ctx.lineTo(x2 - 12 * Math.cos(a + 0.45), y2 - 12 * Math.sin(a + 0.45));
+  ctx.closePath();
+  ctx.fill();
+}
+function drawThermometer(x, y, h, value, lo, hi, color, label) {
+  const fillH = h * (value - lo) / (hi - lo);
+  ctx.strokeStyle = '#829ab1';
+  ctx.lineWidth = 2;
+  roundRect(x, y, 28, h, 14);
+  ctx.stroke();
+  ctx.fillStyle = color;
+  roundRect(x + 5, y + h - fillH, 18, fillH, 9);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(x + 14, y + h + 16, 19, 0, Math.PI * 2);
+  ctx.fill();
+  text(label, x + 14, y - 16, color, 12, '700');
+  text(`${value.toFixed(0)}K`, x + 14, y + h + 48, color, 13, '700');
+}
+function drawGrid(x, y, w, h, nx, ny) {
+  ctx.strokeStyle = '#e6edf5';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= nx; i++) {
+    const xx = x + w * i / nx;
+    ctx.beginPath(); ctx.moveTo(xx, y); ctx.lineTo(xx, y + h); ctx.stroke();
+  }
+  for (let i = 0; i <= ny; i++) {
+    const yy = y + h * i / ny;
+    ctx.beginPath(); ctx.moveTo(x, yy); ctx.lineTo(x + w, yy); ctx.stroke();
+  }
+}
+function handles(q) {
+  return [
+    { name: 'TH', x: 94, y: 210 - (q.TH - 350) * 130 / 550, r: 14 },
+    { name: 'TC', x: 676, y: 210 - (q.TC - 250) * 130 / 250, r: 14 },
+    { name: 'eta', x: 355 + q.eta * 210, y: 270, r: 15 }
+  ];
+}
+function heatPacket(x, y, color, phase, delay) {
+  const pulse = 0.65 + 0.35 * Math.sin((phase + delay) * Math.PI * 2);
+  ctx.globalAlpha = pulse;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(x, y, 7, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+}
+function drawEngine(q) {
+  const phase = (state.time % 2.2) / 2.2;
+  box(42, 88, 160, 110, '#ffe6e6', '#ff6b6b');
+  text('高温热库', 122, 116, '#b30000', 16, '700');
+  text(`TH=${q.TH.toFixed(0)}K`, 122, 150, '#b30000', 18, '700');
+  drawThermometer(78, 220, 130, q.TH, 350, 900, '#e03131', '拖 TH');
+
+  box(330, 150, 150, 120, '#fff7e6', '#f0a500');
+  text('热机', 405, 184, '#102a43', 19, '700');
+  text(`η=${(q.eta * 100).toFixed(0)}%`, 405, 222, q.ok ? '#087f5b' : '#b30000', 20, '700');
+  text('效率阀', 405, 252, '#486581', 12, '700');
+
+  box(588, 326, 160, 96, '#e6f4ff', '#2c7be5');
+  text('低温热库', 668, 352, '#2c7be5', 16, '700');
+  text(`TC=${q.TC.toFixed(0)}K`, 668, 384, '#2c7be5', 18, '700');
+  drawThermometer(662, 220, 130, q.TC, 250, 500, '#2c7be5', '拖 TC');
+
+  arrow(202, 144, 326, 188, '#e03131', 6);
+  arrow(480, 206, 612, 126, '#102a43', Math.max(2, 2 + 6 * q.W / QH));
+  arrow(478, 240, 590, 348, '#2c7be5', Math.max(2, 2 + 6 * q.QC / QH));
+  text('QH=1000J', 266, 146, '#e03131', 13, '700');
+  text(`W=${q.W.toFixed(0)}J`, 564, 106, '#102a43', 13, '700');
+  text(`QC=${q.QC.toFixed(0)}J`, 540, 318, '#2c7be5', 13, '700');
+
+  for (let i = 0; i < 5; i++) {
+    const t = (phase + i * 0.18) % 1;
+    heatPacket(202 + 124 * t, 144 + 44 * t, '#e03131', phase, i);
+  }
+  for (let i = 0; i < 4; i++) {
+    const t = (phase + i * 0.22) % 1;
+    heatPacket(480 + 132 * t, 206 - 80 * t, '#102a43', phase, i);
+  }
+  for (let i = 0; i < 4; i++) {
+    const t = (phase + i * 0.22) % 1;
+    heatPacket(478 + 112 * t, 240 + 108 * t, '#2c7be5', phase, i);
+  }
+
+  ctx.strokeStyle = '#bcccdc';
+  ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(355, 270); ctx.lineTo(565, 270); ctx.stroke();
+  for (const h of handles(q)) {
+    ctx.fillStyle = h.name === 'TH' ? '#e03131' : h.name === 'TC' ? '#2c7be5' : '#102a43';
+    ctx.beginPath(); ctx.arc(h.x, h.y, h.r, 0, Math.PI * 2); ctx.fill();
+    text(h.name === 'eta' ? 'η' : h.name, h.x, h.y + 1, '#fff', 11, '700');
+  }
+}
+function drawChart(q) {
+  const x = 50, y = 405, w = 300, h = 112;
+  box(32, 382, 344, 148, '#fff', '#d9e2ec');
+  text('图像：ηmax=1-TC/TH', 204, 398, '#102a43', 14, '700');
+  drawGrid(x, y, w, h, 5, 4);
+  ctx.strokeStyle = '#334e68';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(x, y + h); ctx.lineTo(x + w, y + h); ctx.lineTo(x + w - 7, y + h - 4); ctx.moveTo(x + w, y + h); ctx.lineTo(x + w - 7, y + h + 4); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x, y + h); ctx.lineTo(x, y); ctx.lineTo(x - 4, y + 7); ctx.moveTo(x, y); ctx.lineTo(x + 4, y + 7); ctx.stroke();
+  const maxEta = 0.75;
+  ctx.strokeStyle = '#0f9f6e';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  for (let i = 0; i <= 80; i++) {
+    const TH = 350 + (900 - 350) * i / 80;
+    const e = 1 - q.TC / TH;
+    const px = x + w * i / 80;
+    const py = y + h - h * e / maxEta;
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+  const px = x + w * (q.TH - 350) / 550;
+  const py = y + h - h * q.max / maxEta;
+  ctx.fillStyle = q.ok ? '#0f9f6e' : '#d64545';
+  ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI * 2); ctx.fill();
+  const etaY = y + h - h * q.eta / maxEta;
+  ctx.strokeStyle = '#d64545';
+  ctx.setLineDash([5, 4]);
+  ctx.beginPath(); ctx.moveTo(x, etaY); ctx.lineTo(x + w, etaY); ctx.stroke();
+  ctx.setLineDash([]);
+  text('TH/K', x + w - 18, y + h + 16, '#486581', 11);
+  text('η', x + 10, y + 12, '#486581', 11);
+  text(`设定η ${(q.eta * 100).toFixed(0)}%`, x + w - 52, etaY - 10, '#d64545', 11, '700');
+}
+function drawFormula(q) {
+  box(414, 382, 332, 148, '#f7f9fc', '#d9e2ec');
+  text('能流剖面与公式读数', 580, 400, '#102a43', 14, '700');
+  text('QH = W + QC', 436, 430, '#486581', 13, '700', 'left');
+  text(`${QH} = ${q.W.toFixed(0)} + ${q.QC.toFixed(0)} J`, 710, 430, '#102a43', 13, '700', 'right');
+  text('η = W/QH', 436, 462, '#486581', 13, '700', 'left');
+  text(`${(q.eta * 100).toFixed(0)}%`, 710, 462, q.ok ? '#087f5b' : '#b30000', 13, '700', 'right');
+  text('ηmax = 1 - TC/TH', 436, 494, '#486581', 13, '700', 'left');
+  text(`${(q.max * 100).toFixed(1)}%`, 710, 494, '#0f9f6e', 13, '700', 'right');
+  text(q.ok ? '状态判定：可行，仍向低温热库排热' : '状态判定：不可能，超过第二定律上限', 436, 518, q.ok ? '#087f5b' : '#b30000', 13, '700', 'left');
+}
+function draw() {
+  const q = model();
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const bg = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+  bg.addColorStop(0, '#ffffff');
+  bg.addColorStop(1, '#f0f7ff');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  text('热力学第二定律：热流有方向，热机效率有上限', 395, 34, '#102a43', 18, '700');
+  text('俯视热流装置 + 能流剖面 + 图像数据记录：能量守恒之外，还要看方向性是否允许。', 395, 62, '#486581', 13);
+  drawEngine(q);
+  drawChart(q);
+  drawFormula(q);
+
+  els.hotVal.textContent = q.TH.toFixed(0);
+  els.coldVal.textContent = q.TC.toFixed(0);
+  els.etaVal.textContent = (q.eta * 100).toFixed(0);
+  els.playBtn.textContent = state.running ? '暂停' : '播放';
+  els.readout.innerHTML = [
+    `QH=<b>${QH}J</b>，W=<b>${q.W.toFixed(0)}J</b>，QC=<b>${q.QC.toFixed(0)}J</b>`,
+    `η=W/QH=<b>${(q.eta * 100).toFixed(0)}%</b>`,
+    `ηmax=1-TC/TH=<b>${(q.max * 100).toFixed(1)}%</b>`,
+    q.ok ? '判定=<b>可行</b>' : '判定=<b>不可能</b>'
+  ].join('<br>');
+}
+function loop(now) {
+  if (!state.last) state.last = now;
+  const dt = Math.min(0.04, (now - state.last) / 1000);
+  state.last = now;
+  if (state.running) state.time += dt;
+  draw();
+  requestAnimationFrame(loop);
+}
+function pos(evt) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (evt.clientX - rect.left) * canvas.width / rect.width,
+    y: (evt.clientY - rect.top) * canvas.height / rect.height
+  };
+}
+function hit(p) {
+  return handles(model()).find(h => Math.hypot(p.x - h.x, p.y - h.y) <= h.r + 8);
+}
+canvas.addEventListener('pointerdown', evt => {
+  const h = hit(pos(evt));
+  if (h) {
+    state.drag = h.name;
+    canvas.setPointerCapture(evt.pointerId);
+  }
+});
+canvas.addEventListener('pointermove', evt => {
+  const p = pos(evt);
+  if (!state.drag) {
+    canvas.style.cursor = hit(p) ? 'grab' : 'default';
+    return;
+  }
+  if (state.drag === 'TH') setValues({ TH: 350 + (210 - p.y) * 550 / 130 });
+  if (state.drag === 'TC') setValues({ TC: 250 + (210 - p.y) * 250 / 130 });
+  if (state.drag === 'eta') setValues({ eta: (p.x - 355) * 100 / 210 });
+  draw();
+});
+canvas.addEventListener('pointerup', evt => {
+  state.drag = null;
+  try { canvas.releasePointerCapture(evt.pointerId); } catch (e) {}
+});
+canvas.addEventListener('pointercancel', () => { state.drag = null; });
+
+els.playBtn.addEventListener('click', () => {
+  state.running = !state.running;
+  state.last = 0;
+  draw();
+});
+els.resetBtn.addEventListener('click', () => {
+  state.running = false;
+  state.time = 0;
+  setValues({ TH: 600, TC: 300, eta: 35 });
+  draw();
+});
+els.recordBtn.addEventListener('click', () => {
+  const q = model();
+  state.records.unshift({ eta: q.eta, max: q.max, ok: q.ok });
+  state.records = state.records.slice(0, 4);
+  renderRecords();
+});
+function renderRecords() {
+  els.records.innerHTML = state.records.map((r, idx) =>
+    `<tr><td>${idx + 1}</td><td>${(r.eta * 100).toFixed(0)}%</td><td>${(r.max * 100).toFixed(1)}%</td><td>${r.ok ? '可行' : '不可能'}</td></tr>`
+  ).join('');
+}
+for (const id of ['hot', 'cold', 'eta']) {
+  els[id].addEventListener('input', () => {
+    setValues({});
+    draw();
+  });
+}
+renderRecords();
+requestAnimationFrame(loop);
 </script>
 </body>
 </html>

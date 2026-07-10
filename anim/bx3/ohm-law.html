@@ -30,7 +30,7 @@ button.on{background:#2c7be5;color:#fff}
 <div class="wrap">
   <h2>欧姆定律：拖 U、R 和 I-U 图工作点，看 I=U/R</h2>
   <div class="lab">
-    <div class="stage"><canvas id="cv" width="720" height="450" aria-label="欧姆定律交互实验台"></canvas><div style="padding:6px 10px;display:flex;gap:12px;align-items:center;font-size:13px;border-top:1px solid #eef2f7"><button id="play-btn" style="font:inherit;border:1px solid #cbd5e1;background:#fff;border-radius:6px;padding:5px 12px;cursor:pointer">⏸ 暂停</button><span>状态：<b id="run-st">运行中</b></span></div></div>
+    <div class="stage"><canvas id="cv" width="720" height="450" aria-label="欧姆定律交互实验台：电路俯视装置、I-U图像和数据记录"></canvas><div style="padding:6px 10px;display:flex;gap:12px;align-items:center;font-size:13px;border-top:1px solid #eef2f7"><button id="play-btn" style="font:inherit;border:1px solid #cbd5e1;background:#fff;border-radius:6px;padding:5px 12px;cursor:pointer">⏸ 暂停</button><span>状态：<b id="run-st">运行中</b></span></div></div>
     <section class="panel">
       <div class="seg" id="mode">
         <button class="on" data-mode="linear">线性电阻</button>
@@ -43,7 +43,7 @@ button.on{background:#2c7be5;color:#fff}
         <div class="chip">I-U 斜率 = <b id="kv">0.100</b> A/V</div>
         <div class="chip">判断：<b id="judge">I=U/R 成立</b></div>
       </div>
-      <div class="hint"><b>观察任务</b>：拖红色电压手柄，在线性电阻模式下 I 和 U 成正比；拖金色电阻手柄，R 变大则斜率 1/R 变小；切到灯泡模式，看 I-U 曲线弯曲，不能拿一个固定 R 直接套全程。</div>
+      <div class="hint"><b>观察任务</b>：拖红色电压手柄，对照电路俯视装置、I-U 图像和数据记录，在线性电阻模式下 I 和 U 成正比；切到灯泡模式看曲线弯曲。</div>
       <div class="formula"><b>画面绑定</b><br>电池高度读 U，电阻长度读 R，蓝色工作点在 I-U 图上。线性元件图线过原点且为直线，斜率 k=I/U=1/R。</div>
     </section>
   </div>

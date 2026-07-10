@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>电磁波的发射、传播与接收实验台</title>
+<link rel="icon" href="data:,">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}.root{display:grid;grid-template-columns:minmax(0,1fr)330px;gap:12px;padding:12px;min-height:680px}.stage,.card{background:#fff;border:1px solid #d9e2ec;border-radius:8px}.stage{overflow:hidden}.card{padding:10px}canvas{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair}.panel{display:flex;flex-direction:column;gap:10px}.task{background:#fff7e6;border-left:4px solid #f0a500;color:#486581;font-size:13px;line-height:1.5}.title{font-weight:800;margin-bottom:7px}.param{display:grid;gap:2px;margin:8px 0;font-size:13px}.param span{display:flex;justify-content:space-between;color:#486581;gap:8px}.param b{color:#102a43;font-variant-numeric:tabular-nums;white-space:nowrap}input[type=range]{width:100%;accent-color:#2c7be5}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}button{border:1px solid #b0bcc9;background:#fff;border-radius:6px;padding:7px 8px;cursor:pointer;font:inherit;font-size:13px}.readout{background:#102a43;color:#d9e2ec;border-radius:8px;padding:10px;line-height:1.65;font-size:13px}.readout b{color:#ffd166;font-variant-numeric:tabular-nums}.status{border:1px solid #38b2ac;background:#e6fffa;color:#087f5b;border-radius:8px;padding:8px;font-size:13px;font-weight:800;line-height:1.45}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border-bottom:1px solid #d9e2ec;padding:4px 3px;text-align:right;font-variant-numeric:tabular-nums}.formula{font-size:13px;color:#334e68;line-height:1.6}@media(max-width:820px){.root{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+<div class="stage"><canvas id="canvas" width="900" height="600" aria-label="电磁波通信实验台装置：发射天线侧视装置、空间传播俯视图、接收机调谐表盘、调制波形图像和数据记录"></canvas></div>
+<div class="panel">
+<div class="card task"><b>观察任务：</b>对照发射天线侧视装置、空间传播俯视图和接收机调谐表盘，拖动接收机调谐旋钮，看载波频率与接收频率接近时信号最强，调制波形怎样携带声音信息。</div>
+<div class="card"><div class="title">调通信链路</div>
+<label class="param"><span>载波频率 f₀ <b id="carrierLabel">100 MHz</b></span><input id="carrier" type="range" min="80" max="120" step="1" value="100"></label>
+<label class="param"><span>调谐频率 fᵣ <b id="tuneLabel">98 MHz</b></span><input id="tune" type="range" min="80" max="120" step="1" value="98"></label>
+<label class="param"><span>调制深度 <b id="modLabel">60%</b></span><input id="mod" type="range" min="0" max="100" step="1" value="60"></label>
+<label class="param"><span>距离 d <b id="dLabel">20 km</b></span><input id="dist" type="range" min="1" max="100" step="1" value="20"></label>
+<div class="buttons"><button id="play">暂停</button><button id="record">记录状态</button></div></div>
+<div class="readout" id="readout"></div>
+<div class="card"><div class="title">调谐记录</div><table><thead><tr><th>f₀</th><th>fᵣ</th><th>强度</th><th>状态</th></tr></thead><tbody id="rows"></tbody></table></div>
+<div class="card formula"><div class="title">公式与图像</div><div>发射：高频载波经调制后送入天线。</div><div>传播：电磁波以 c≈3.0×10⁸ m/s 传播，c=λf。</div><div>接收：调谐选频，解调还原声音/信息。</div></div>
+<div class="status" id="status"></div>
+</div>
+</div>
+<script>
+(function(){
+'use strict';
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+const els={carrier:document.getElementById('carrier'),tune:document.getElementById('tune'),mod:document.getElementById('mod'),dist:document.getElementById('dist'),carrierLabel:document.getElementById('carrierLabel'),tuneLabel:document.getElementById('tuneLabel'),modLabel:document.getElementById('modLabel'),dLabel:document.getElementById('dLabel'),readout:document.getElementById('readout'),rows:document.getElementById('rows'),status:document.getElementById('status'),play:document.getElementById('play'),record:document.getElementById('record')};
+const S={t:0,run:true,drag:false,records:[]},C={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',green:'#087f5b',gold:'#f0a500',purple:'#7c3aed'};
+function p(){const f0=+els.carrier.value,fr=+els.tune.value,mod=+els.mod.value/100,d=+els.dist.value,delta=Math.abs(f0-fr),strength=Math.exp(-delta*delta/18)/(1+d/120);return{f0,fr,mod,d,delta,strength,lambda:300/f0,delay:d*1000/3e8*1000}}
+function fmt(n,d=1){return n.toFixed(d)}function line(x1,y1,x2,y2,c='#9fb3c8',w=2,d){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(d)ctx.setLineDash(d);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}function box(x,y,w,h,f='#fff',s='#d9e2ec'){ctx.save();ctx.fillStyle=f;ctx.strokeStyle=s;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.restore()}function text(s,x,y,c=C.ink,a='center',z=13,w='700'){ctx.fillStyle=c;ctx.font=w+' '+z+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.45),y2-10*Math.sin(a-.45));ctx.lineTo(x2-10*Math.cos(a+.45),y2-10*Math.sin(a+.45));ctx.closePath();ctx.fill()}
+function draw(){const q=p();ctx.clearRect(0,0,900,600);box(34,34,832,520,'#fff');text('电磁波通信流程：调制 → 发射 → 传播 → 调谐 → 解调',450,60,C.ink,'center',16,'800');drawChain(q);drawWave(q);drawTune(q);update()}
+function drawChain(q){box(62,92,760,175,'#fbfdff');const xs=[125,275,450,625,760],names=['信号源','调制器','发射天线','接收机','解调输出'];xs.forEach((x,i)=>{box(x-48,155,96,48,i===3?'#e0f2fe':'#fff','#9fb3c8');text(names[i],x,179,C.ink,'center',12,'900');if(i<xs.length-1)arrow(x+52,179,xs[i+1]-55,179,C.green,3)});line(450,155,450,100,C.ink,4);line(625,155,625,105,C.ink,4);text('侧视天线装置',450,122,C.muted,'center',12,'800');text('调谐表盘',625,124,C.blue,'center',12,'800')}
+function drawWave(q){box(62,292,500,205,'#fff');text('空间传播俯视图 + 调制波形图像',312,315,C.ink,'center',14,'800');const x0=100,y0=395,w=420;ctx.strokeStyle=C.blue;ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=260;i++){const u=i/260,env=1+q.mod*.55*Math.sin(u*Math.PI*6),y=y0-Math.sin(u*Math.PI*42-S.t*6)*env*28,x=x0+u*w;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke();arrow(115,455,510,455,C.green,3);text('传播方向',315,476,C.green,'center',12,'900');const pulse=100+((S.t*80)%(400));ctx.fillStyle='rgba(44,123,229,.25)';ctx.beginPath();ctx.arc(pulse,455,18,0,Math.PI*2);ctx.fill();text('调制让信息进入载波包络',312,348,C.purple,'center',12,'900')}
+function drawTune(q){box(590,292,232,205,'#fff');text('接收调谐读数',706,315,C.ink,'center',14,'800');ctx.strokeStyle='#d9e2ec';ctx.lineWidth=14;ctx.beginPath();ctx.arc(706,392,62,Math.PI*.15,Math.PI*.85);ctx.stroke();ctx.strokeStyle=q.strength>.65?C.green:q.strength>.25?C.gold:C.red;ctx.beginPath();ctx.arc(706,392,62,Math.PI*.15,Math.PI*(.15+.7*q.strength));ctx.stroke();text(Math.round(q.strength*100)+'%',706,392,q.strength>.65?C.green:C.red,'center',24,'900');const angle=Math.PI*.85-(q.fr-80)/40*Math.PI*.7;arrow(706,392,706+58*Math.cos(angle),392-58*Math.sin(angle),C.purple,4);text('拖调谐旋钮',706,472,C.purple,'center',12,'900')}
+function update(){const q=p();els.carrierLabel.textContent=q.f0+' MHz';els.tuneLabel.textContent=q.fr+' MHz';els.modLabel.textContent=Math.round(q.mod*100)+'%';els.dLabel.textContent=q.d+' km';els.readout.innerHTML='波长 λ：<b>'+fmt(q.lambda,2)+' m</b><br>传播延迟：<b>'+fmt(q.delay,3)+' ms</b><br>频差 |f₀-fᵣ|：<b>'+q.delta+' MHz</b><br>接收强度：<b>'+Math.round(q.strength*100)+'%</b>';els.status.textContent=q.strength>.65?'调谐接近载波频率，接收强，解调输出清晰。':'调谐偏离载波频率，接收弱，信息难以还原。';els.rows.innerHTML=S.records.slice(-6).map(r=>'<tr><td>'+r.f0+'</td><td>'+r.fr+'</td><td>'+r.s+'</td><td>'+r.st+'</td></tr>').join('')||'<tr><td colspan="4">暂无记录</td></tr>'}
+function record(){const q=p();S.records.push({f0:q.f0,fr:q.fr,s:Math.round(q.strength*100)+'%',st:q.strength>.65?'成功':'偏离'});if(S.records.length>8)S.records.shift();update()}
+[els.carrier,els.tune,els.mod,els.dist].forEach(el=>el.addEventListener('input',()=>{draw();update()}));els.play.addEventListener('click',()=>{S.run=!S.run;els.play.textContent=S.run?'暂停':'播放'});els.record.addEventListener('click',record);canvas.addEventListener('pointerdown',e=>{S.drag=true;canvas.setPointerCapture(e.pointerId)});canvas.addEventListener('pointermove',e=>{if(!S.drag)return;const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width;els.tune.value=Math.max(80,Math.min(120,80+(x-648)/116*40));draw()});canvas.addEventListener('pointerup',e=>{S.drag=false;record();try{canvas.releasePointerCapture(e.pointerId)}catch(_){}});function loop(){if(S.run)S.t+=.016;draw();requestAnimationFrame(loop)}record();loop();
+})();
+</script>
+</body>
+</html>

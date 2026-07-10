@@ -1,29 +1,82 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>p-V 图像</title>
-<link rel="icon" href="data:,">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>p-V 图像实验台</title>
 <style>
-  body{margin:0;background:#f7f9fc;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}.root{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:10px;padding:10px;box-sizing:border-box;min-height:580px}.stage{background:#fff;border:1px solid #d9e2ec;border-radius:8px;overflow:hidden}canvas{display:block;width:100%;height:auto}.panel{display:flex;flex-direction:column;gap:7px}.card{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:8px}.task{background:#fff7e6;border-left:3px solid #f0a500;color:#486581;line-height:1.38;font-size:12px}.title{font-weight:700;margin-bottom:4px}.seg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}.seg button.active{background:#2c7be5;color:#fff;border-color:#2c7be5}.param{display:grid;gap:2px;margin:6px 0;font-size:13px}.param span{display:flex;justify-content:space-between;color:#486581;gap:10px}.param b{color:#102a43;font-variant-numeric:tabular-nums;white-space:nowrap}input[type=range]{width:100%;accent-color:#2c7be5}button{border:1px solid #b0bcc9;background:#fff;border-radius:6px;padding:5px 8px;cursor:pointer}.readout{background:#102a43;color:#d9e2ec;border-radius:8px;padding:8px;line-height:1.45;font-size:13px}.readout b{color:#f0a500;font-variant-numeric:tabular-nums}.formula{font-size:13px;line-height:1.42;color:#334e68}.status{font-size:12px;font-weight:700;border-radius:6px;padding:7px;border:1px solid #38b2ac;background:#e6fffa;color:#087f5b;line-height:1.35}@media(max-width:780px){.root{grid-template-columns:1fr}}
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: #f7f9fc; color: #102a43; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 14px; }
+  .stage { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 14px; }
+  canvas { width: 100%; height: 560px; display: block; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; touch-action: none; }
+  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
+  .row,.seg { display: flex; gap: 8px; margin-bottom: 10px; }
+  button { flex: 1; border: 1px solid #bcccdc; background: #f0f4f8; color: #102a43; border-radius: 8px; padding: 8px; font-weight: 700; cursor: pointer; }
+  button.primary, button.active { background: #2c7be5; border-color: #2c7be5; color: #fff; }
+  label { display: block; font-size: 13px; font-weight: 700; margin: 11px 0 4px; }
+  input { width: 100%; }
+  .readout { margin-top: 12px; padding: 10px; background: #eef4ff; border-radius: 8px; line-height: 1.6; font-size: 13px; }
+  table { width: 100%; margin-top: 10px; border-collapse: collapse; font-size: 12px; }
+  th,td { border-bottom: 1px solid #d9e2ec; padding: 5px 4px; text-align: right; }
+  th:first-child,td:first-child { text-align: left; }
+  .hint { margin-top: 10px; color:#486581; font-size:13px; line-height:1.55; }
+  @media(max-width:820px){.stage{grid-template-columns:1fr}canvas{height:500px}}
 </style>
 </head>
 <body>
-<div class="root"><div class="stage"><canvas id="canvas" width="860" height="560"></canvas></div><div class="panel">
-  <div class="card task"><b>观察任务：</b>切换过程类型，看图线形状；调 V2 到小于 V1，看做功符号如何改变。</div>
-  <div class="card"><div class="title">过程类型</div><div class="seg"><button data-mode="isoT" class="active">等温</button><button data-mode="isoP">等压</button><button data-mode="isoV">等容</button></div></div>
-  <div class="card"><div class="title">状态参数</div>
-    <label class="param"><span>初态体积 V1 <b id="v1Text">1.0</b></span><input id="v1" type="range" min="0.5" max="2.5" step="0.1" value="1"></label>
-    <label class="param"><span>末态体积 V2 <b id="v2Text">2.0</b></span><input id="v2" type="range" min="0.5" max="2.5" step="0.1" value="2"></label>
-    <label class="param"><span>初态压强 p1 <b id="p1Text">2.0</b></span><input id="p1" type="range" min="0.8" max="4" step="0.1" value="2"></label>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="790" height="560" aria-label="p-V 图像实验台：气缸剖面、p-V坐标图像、面积做功和数据记录"></canvas>
+    <section class="panel">
+      <div class="row"><button id="playBtn" class="primary" type="button">播放</button><button id="resetBtn" type="button">重置</button><button id="recordBtn" type="button">记录</button></div>
+      <div class="seg"><button data-mode="isoT" class="active">等温</button><button data-mode="isoP">等压</button><button data-mode="isoV">等容</button></div>
+      <label for="v1">初态体积 V1：<span id="v1Val"></span></label><input id="v1" type="range" min="0.5" max="2.5" step="0.1" value="1">
+      <label for="v2">末态体积 V2：<span id="v2Val"></span></label><input id="v2" type="range" min="0.5" max="2.5" step="0.1" value="2">
+      <label for="p1">初态压强 p1：<span id="p1Val"></span></label><input id="p1" type="range" min="0.8" max="4" step="0.1" value="2">
+      <div id="readout" class="readout"></div>
+      <table><thead><tr><th>记录</th><th>过程</th><th>W</th><th>方向</th></tr></thead><tbody id="records"></tbody></table>
+      <div class="hint">观察任务：拖 p-V 图上的 1、2 状态点，播放过程箭头；看曲线下方面积 W=∫p dV 如何随膨胀/压缩改变正负。</div>
+    </section>
   </div>
-  <div class="readout" id="readout"></div>
-  <div class="card formula"><div class="title">读图规则</div><div>水平线：等压</div><div>竖直线：等容，W=0</div><div>曲线面积：W=∫p dV</div></div>
-  <div class="status" id="status"></div>
-</div></div>
+</div>
 <script>
-(function(){'use strict';const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');const els={v1:document.getElementById('v1'),v2:document.getElementById('v2'),p1:document.getElementById('p1')};let mode='isoT';function fmt(n,d){return n.toFixed(d==null?2:d)}function p(){const V1=+els.v1.value,V2=+els.v2.value,p1=+els.p1.value;let p2=p1,work=0,label='';if(mode==='isoT'){p2=p1*V1/V2;work=p1*V1*Math.log(V2/V1);label='等温：pV=常量'}if(mode==='isoP'){p2=p1;work=p1*(V2-V1);label='等压：p=常量'}if(mode==='isoV'){p2=+els.p1.value*1.6;work=0;label='等容：V=常量；此时 V2 读作压强终态调节无效'}return{V1,V2:mode==='isoV'?V1:V2,p1,p2,work,label}}function text(s,x,y,c,a,size,w){ctx.fillStyle=c||'#102a43';ctx.font=(w?w+' ':'')+(size||13)+'px -apple-system,\"PingFang SC\",sans-serif';ctx.textAlign=a||'center';ctx.textBaseline='middle';ctx.fillText(s,x,y)}function box(x,y,w,h,fill,stroke){ctx.save();ctx.fillStyle=fill;ctx.strokeStyle=stroke||'#d9e2ec';ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.restore()}function arrow(x1,y1,x2,y2,c){const ang=Math.atan2(y2-y1,x2-x1);ctx.save();ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(ang-.45),y2-10*Math.sin(ang-.45));ctx.lineTo(x2-10*Math.cos(ang+.45),y2-10*Math.sin(ang+.45));ctx.closePath();ctx.fill();ctx.restore()}function mapX(V){return 90+(V-.4)/2.3*420}function mapY(p){return 430-(p-.4)/4.0*320}function draw(){const q=p();ctx.clearRect(0,0,860,560);ctx.fillStyle='#fff';ctx.fillRect(0,0,860,560);text('p-V 图像：图线形状读过程，面积读做功',430,30,'#102a43','center',18,'700');box(56,62,500,420,'#fff','#d9e2ec');ctx.strokeStyle='#334e68';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(90,430);ctx.lineTo(520,430);ctx.moveTo(90,430);ctx.lineTo(90,90);ctx.stroke();text('V',525,448,'#486581','center',13);text('p',72,92,'#486581','center',13);ctx.fillStyle='rgba(240,165,0,.18)';ctx.beginPath();ctx.moveTo(mapX(q.V1),430);if(mode==='isoT'){for(let V=q.V1; q.V2>=q.V1?V<=q.V2:V>=q.V2; V+=q.V2>=q.V1?.03:-.03){ctx.lineTo(mapX(V),mapY(q.p1*q.V1/V))}}else if(mode==='isoP'){ctx.lineTo(mapX(q.V1),mapY(q.p1));ctx.lineTo(mapX(q.V2),mapY(q.p1))}else{ctx.lineTo(mapX(q.V1),mapY(q.p1));ctx.lineTo(mapX(q.V1),mapY(q.p2))}ctx.lineTo(mapX(q.V2),430);ctx.closePath();if(mode!=='isoV')ctx.fill();ctx.strokeStyle=mode==='isoT'?'#e8590c':mode==='isoP'?'#2c7be5':'#7b2cbf';ctx.lineWidth=3;ctx.beginPath();if(mode==='isoT'){let first=true;for(let V=q.V1; q.V2>=q.V1?V<=q.V2+.001:V>=q.V2-.001; V+=q.V2>=q.V1?.03:-.03){const x=mapX(V),y=mapY(q.p1*q.V1/V);if(first){ctx.moveTo(x,y);first=false}else ctx.lineTo(x,y)}}else{ctx.moveTo(mapX(q.V1),mapY(q.p1));ctx.lineTo(mapX(q.V2),mapY(q.p2))}ctx.stroke();arrow(mapX(q.V1),mapY(q.p1),mapX((q.V1+q.V2)/2),mapY(mode==='isoT'?q.p1*q.V1/((q.V1+q.V2)/2):(q.p1+q.p2)/2),'#c92a2a');ctx.fillStyle='#102a43';ctx.beginPath();ctx.arc(mapX(q.V1),mapY(q.p1),5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#c92a2a';ctx.beginPath();ctx.arc(mapX(q.V2),mapY(q.p2),5,0,Math.PI*2);ctx.fill();text('1',mapX(q.V1)-12,mapY(q.p1)-12,'#102a43','center',13,'700');text('2',mapX(q.V2)+12,mapY(q.p2)-12,'#c92a2a','center',13,'700');box(610,110,190,240,'#f7f9fc','#d9e2ec');text(q.label,705,142,'#102a43','center',14,'700');text('p1='+fmt(q.p1,2),705,184,'#486581','center',13);text('V1='+fmt(q.V1,2),705,212,'#486581','center',13);text('p2='+fmt(q.p2,2),705,240,'#486581','center',13);text('V2='+fmt(q.V2,2),705,268,'#486581','center',13);text('W='+fmt(q.work,2),705,310,q.work>=0?'#087f5b':'#b30000','center',18,'700');update(q)}function update(q){document.getElementById('v1Text').textContent=fmt(q.V1,1);document.getElementById('v2Text').textContent=fmt(+els.v2.value,1);document.getElementById('p1Text').textContent=fmt(q.p1,1);document.getElementById('readout').innerHTML='过程：<b>'+q.label+'</b><br>末态 p2=<b>'+fmt(q.p2,2)+'</b><br>做功 W(示意)=<b>'+fmt(q.work,2)+'</b><br>方向：<b>'+(q.V2>q.V1?'膨胀':q.V2<q.V1?'压缩':'体积不变')+'</b>';document.getElementById('status').textContent=q.work>0?'向右膨胀，气体对外做正功。':q.work<0?'向左压缩，气体对外做负功。':'体积不变，气体对外做功为 0。'}Object.values(els).forEach(el=>el.addEventListener('input',draw));document.querySelectorAll('[data-mode]').forEach(btn=>btn.addEventListener('click',()=>{mode=btn.dataset.mode;document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',b===btn));draw()}));draw();})();
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+const els={playBtn:document.getElementById('playBtn'),resetBtn:document.getElementById('resetBtn'),recordBtn:document.getElementById('recordBtn'),v1:document.getElementById('v1'),v2:document.getElementById('v2'),p1:document.getElementById('p1'),v1Val:document.getElementById('v1Val'),v2Val:document.getElementById('v2Val'),p1Val:document.getElementById('p1Val'),readout:document.getElementById('readout'),records:document.getElementById('records')};
+const state={mode:'isoT',running:false,time:0,last:0,drag:null,records:[]};
+function clamp(x,a,b){return Math.max(a,Math.min(b,x));}
+function val(id){return Number(els[id].value);}
+function setValues(o){if(o.V1!==undefined)els.v1.value=clamp(o.V1,.5,2.5).toFixed(1);if(o.V2!==undefined)els.v2.value=clamp(o.V2,.5,2.5).toFixed(1);if(o.p1!==undefined)els.p1.value=clamp(o.p1,.8,4).toFixed(1);}
+function model(){const V1=val('v1'),rawV2=val('v2'),p1=val('p1');let V2=rawV2,p2=p1,work=0,label='等温：pV=常量';if(state.mode==='isoT'){p2=p1*V1/V2;work=p1*V1*Math.log(V2/V1);}if(state.mode==='isoP'){p2=p1;work=p1*(V2-V1);label='等压：p=常量';}if(state.mode==='isoV'){V2=V1;p2=p1*1.6;work=0;label='等容：V=常量，W=0';}return{V1,V2,rawV2,p1,p2,work,label};}
+function roundRect(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
+function box(x,y,w,h,fill,stroke='#d9e2ec'){ctx.fillStyle=fill;ctx.strokeStyle=stroke;ctx.lineWidth=1.5;roundRect(x,y,w,h,9);ctx.fill();ctx.stroke();}
+function text(s,x,y,c='#102a43',size=13,w='400',a='center'){ctx.fillStyle=c;ctx.font=`${w} ${size}px system-ui`;ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y);}
+function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.45),y2-10*Math.sin(a-.45));ctx.lineTo(x2-10*Math.cos(a+.45),y2-10*Math.sin(a+.45));ctx.closePath();ctx.fill();}
+const gx=74,gy=104,gw=430,gh=310;
+function mapX(V){return gx+(V-.4)/2.3*gw;}function mapY(p){return gy+gh-(p-.4)/4.0*gh;}function invX(x){return .4+(x-gx)/gw*2.3;}function invY(y){return .4+(gy+gh-y)/gh*4.0;}
+function pathPoint(q,t){if(state.mode==='isoT'){const V=q.V1+(q.V2-q.V1)*t;return{V,p:q.p1*q.V1/V};}if(state.mode==='isoP'){return{V:q.V1+(q.V2-q.V1)*t,p:q.p1};}return{V:q.V1,p:q.p1+(q.p2-q.p1)*t};}
+function drawGraph(q){box(36,82,510,360,'#fff');text('p-V 图像：图线形状读过程，曲线下面积读做功',291,106,'#102a43',14,'700');for(let i=0;i<=5;i++){ctx.strokeStyle='#e6edf5';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(gx+gw*i/5,gy);ctx.lineTo(gx+gw*i/5,gy+gh);ctx.stroke();ctx.beginPath();ctx.moveTo(gx,gy+gh*i/5);ctx.lineTo(gx+gw,gy+gh*i/5);ctx.stroke();}ctx.strokeStyle='#334e68';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(gx,gy+gh);ctx.lineTo(gx+gw,gy+gh);ctx.moveTo(gx,gy+gh);ctx.lineTo(gx,gy);ctx.stroke();text('V',gx+gw+16,gy+gh+4,'#486581',12,'700');text('p',gx-12,gy,'#486581',12,'700');
+  if(state.mode!=='isoV'){ctx.fillStyle='rgba(240,165,0,.20)';ctx.beginPath();ctx.moveTo(mapX(q.V1),gy+gh);for(let i=0;i<=80;i++){const pp=pathPoint(q,i/80);ctx.lineTo(mapX(pp.V),mapY(pp.p));}ctx.lineTo(mapX(q.V2),gy+gh);ctx.closePath();ctx.fill();}
+  ctx.strokeStyle=state.mode==='isoT'?'#e8590c':state.mode==='isoP'?'#2c7be5':'#7b2cbf';ctx.lineWidth=4;ctx.beginPath();for(let i=0;i<=80;i++){const pp=pathPoint(q,i/80),x=mapX(pp.V),y=mapY(pp.p);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}ctx.stroke();
+  const now=pathPoint(q,state.running?Math.min(1,state.time/2.4):1),mid=pathPoint(q,.55);arrow(mapX(pathPoint(q,.45).V),mapY(pathPoint(q,.45).p),mapX(mid.V),mapY(mid.p),'#c92a2a',3);
+  ctx.fillStyle='#102a43';ctx.beginPath();ctx.arc(mapX(q.V1),mapY(q.p1),7,0,Math.PI*2);ctx.fill();ctx.fillStyle='#c92a2a';ctx.beginPath();ctx.arc(mapX(q.V2),mapY(q.p2),7,0,Math.PI*2);ctx.fill();ctx.fillStyle='#0f9f6e';ctx.beginPath();ctx.arc(mapX(now.V),mapY(now.p),6,0,Math.PI*2);ctx.fill();text('1',mapX(q.V1)-13,mapY(q.p1)-14,'#102a43',13,'700');text('2',mapX(q.V2)+13,mapY(q.p2)-14,'#c92a2a',13,'700');}
+function drawCylinder(q){box(576,82,170,190,'#f7f9fc');text('气缸剖面读数',661,106,'#102a43',14,'700');const pp=pathPoint(q,state.running?Math.min(1,state.time/2.4):1);const x=602,y=146,w=112,h=70,piston=x+pp.V/2.5*w;ctx.strokeStyle='#334e68';ctx.lineWidth=3;ctx.strokeRect(x,y,w,h);ctx.fillStyle='rgba(44,123,229,.12)';ctx.fillRect(x,y,piston-x,h);ctx.fillStyle='#829ab1';ctx.fillRect(piston,y-7,12,h+14);text(`V=${pp.V.toFixed(2)}`,661,240,'#2c7be5',13,'700');text(`p=${pp.p.toFixed(2)}`,661,258,'#e8590c',13,'700');}
+function drawFormula(q){box(576,292,170,122,'#fff7e6','#f0a500');text('公式绑定',661,314,'#102a43',14,'700');text('W=∫p dV',661,344,'#9a6700',14,'700');text(`W=${q.work.toFixed(2)}`,661,370,q.work>=0?'#087f5b':'#b30000',18,'700');text(q.V2>q.V1?'膨胀：正功':q.V2<q.V1?'压缩：负功':'等容：零功',661,394,'#486581',12,'700');}
+function handles(q){return[{name:'s1',x:mapX(q.V1),y:mapY(q.p1),r:14},{name:'s2',x:mapX(q.V2),y:mapY(q.p2),r:14}];}
+function draw(){const q=model();ctx.clearRect(0,0,canvas.width,canvas.height);const bg=ctx.createLinearGradient(0,0,canvas.width,canvas.height);bg.addColorStop(0,'#fff');bg.addColorStop(1,'#f0f7ff');ctx.fillStyle=bg;ctx.fillRect(0,0,canvas.width,canvas.height);text('气体状态变化模型：过程类型、状态点、p-V 面积做功',395,34,'#102a43',18,'700');text('气缸剖面 + p-V 坐标图像 + 面积读数 + 数据记录：拖状态点直接改 V、p。',395,62,'#486581',13);drawGraph(q);drawCylinder(q);drawFormula(q);for(const h of handles(q)){ctx.fillStyle=h.name==='s1'?'#102a43':'#c92a2a';ctx.beginPath();ctx.arc(h.x,h.y,h.r,0,Math.PI*2);ctx.fill();text(h.name==='s1'?'1':'2',h.x,h.y+1,'#fff',11,'700');}els.v1Val.textContent=q.V1.toFixed(1);els.v2Val.textContent=q.rawV2.toFixed(1);els.p1Val.textContent=q.p1.toFixed(1);els.playBtn.textContent=state.running?'暂停':'播放';els.readout.innerHTML=[`过程：<b>${q.label}</b>`,`末态 p2=<b>${q.p2.toFixed(2)}</b>`,`做功 W=∫p dV=<b>${q.work.toFixed(2)}</b>`,`方向：<b>${q.V2>q.V1?'膨胀':q.V2<q.V1?'压缩':'体积不变'}</b>`].join('<br>');}
+function loop(now){if(!state.last)state.last=now;const dt=Math.min(.04,(now-state.last)/1000);state.last=now;if(state.running){state.time+=dt;if(state.time>2.4){state.time=2.4;state.running=false;}}draw();requestAnimationFrame(loop);}
+function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
+function hit(p){return handles(model()).find(h=>Math.hypot(p.x-h.x,p.y-h.y)<=h.r+8);}
+canvas.addEventListener('pointerdown',e=>{const h=hit(pos(e));if(h){state.drag=h.name;canvas.setPointerCapture(e.pointerId);}});
+canvas.addEventListener('pointermove',e=>{const p=pos(e);if(!state.drag){canvas.style.cursor=hit(p)?'grab':'default';return;}if(state.drag==='s1')setValues({V1:invX(p.x),p1:invY(p.y)});if(state.drag==='s2')setValues({V2:invX(p.x)});draw();});
+canvas.addEventListener('pointerup',e=>{state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}});canvas.addEventListener('pointercancel',()=>{state.drag=null;});
+els.playBtn.addEventListener('click',()=>{state.running=!state.running;state.last=0;if(state.time>=2.4)state.time=0;draw();});
+els.resetBtn.addEventListener('click',()=>{state.running=false;state.time=0;state.mode='isoT';document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode==='isoT'));setValues({V1:1,V2:2,p1:2});draw();});
+els.recordBtn.addEventListener('click',()=>{const q=model();state.records.unshift({mode:state.mode,W:q.work,dir:q.V2>q.V1?'膨胀':q.V2<q.V1?'压缩':'等容'});state.records=state.records.slice(0,4);renderRecords();});
+function renderRecords(){els.records.innerHTML=state.records.map((r,i)=>`<tr><td>${i+1}</td><td>${r.mode}</td><td>${r.W.toFixed(2)}</td><td>${r.dir}</td></tr>`).join('');}
+for(const id of ['v1','v2','p1'])els[id].addEventListener('input',draw);
+document.querySelectorAll('[data-mode]').forEach(btn=>btn.addEventListener('click',()=>{state.mode=btn.dataset.mode;document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',b===btn));state.time=0;draw();}));
+renderRecords();requestAnimationFrame(loop);
 </script>
 </body>
 </html>

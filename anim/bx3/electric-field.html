@@ -23,14 +23,6 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
 <body>
 <div class="container">
   <h2>电场强度：E = kQ/r²</h2>
-  <canvas id="canvas" width="600" height="380"></canvas>
-  <div class="readouts">
-    <span class="r">源电荷 Q = <b id="q-val">+5.0</b> μC</span>
-    <span class="r">距离 r = <b id="r-val">3.0</b> m</span>
-    <span class="r">场强 E = <b id="e-val">5.00</b> N/C</span>
-    <span class="r" id="dir-val">方向：向外</span>
-    <span class="r">场强状态：<b id="trend-val">—</b></span>
-  </div>
   <div class="controls">
     <label>Q = <span id="q-display">+5.0</span> μC
       <input type="range" id="q" min="-10" max="10" step="0.5" value="5"></label>
@@ -39,8 +31,16 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
     <button id="play-btn">播放</button>
     <button id="reset-btn">重置</button>
   </div>
+  <canvas id="canvas" width="600" height="380" aria-label="电场强度实验台：点电荷俯视装置、场强图像和数据记录"></canvas>
+  <div class="readouts">
+    <span class="r">源电荷 Q = <b id="q-val">+5.0</b> μC</span>
+    <span class="r">距离 r = <b id="r-val">3.0</b> m</span>
+    <span class="r">场强 E = <b id="e-val">5.00</b> N/C</span>
+    <span class="r" id="dir-val">方向：向外</span>
+    <span class="r">场强状态：<b id="trend-val">—</b></span>
+  </div>
   <div class="hint">
-    <p><b>观察任务</b>：直接<b>拖动画面里橙色的试探点</b>改变 r，看场强如何按 1/r² 减小；拖动 Q 看场强如何正比变化；Q 为正时电场线向外，Q 为负时向内。注意 E 与试探电荷无关。</p>
+    <p><b>观察任务</b>：直接<b>拖动画面里橙色的试探点</b>改变 r，对照点电荷俯视装置、场强图像和数据记录，看场强如何按 1/r² 减小。</p>
   </div>
 </div>
 <script>

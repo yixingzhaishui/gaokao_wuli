@@ -1,28 +1,424 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>阿伏伽德罗常数</title>
-<link rel="icon" href="data:,">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>阿伏伽德罗常数实验台</title>
 <style>
-  body{margin:0;background:#f7f9fc;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}.root{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:10px;padding:10px;box-sizing:border-box;min-height:540px}.stage{background:#fff;border:1px solid #d9e2ec;border-radius:8px;overflow:hidden}canvas{display:block;width:100%;height:auto}.panel{display:flex;flex-direction:column;gap:7px}.card{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:8px}.task{background:#fff7e6;border-left:3px solid #f0a500;color:#486581;line-height:1.38;font-size:12px}.title{font-weight:700;margin-bottom:4px}.param{display:grid;gap:2px;margin:6px 0;font-size:13px}.param span{display:flex;justify-content:space-between;color:#486581;gap:10px}.param b{color:#102a43;font-variant-numeric:tabular-nums;white-space:nowrap}input[type=range]{width:100%;accent-color:#2c7be5}.stepper{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:2px}button{border:1px solid #b0bcc9;background:#fff;border-radius:6px;padding:5px 8px;cursor:pointer}.readout{background:#102a43;color:#d9e2ec;border-radius:8px;padding:8px;line-height:1.45;font-size:13px}.readout b{color:#f0a500;font-variant-numeric:tabular-nums}.formula{font-size:13px;line-height:1.42;color:#334e68}.status{font-size:12px;font-weight:700;border-radius:6px;padding:7px;border:1px solid #38b2ac;background:#e6fffa;color:#087f5b;line-height:1.35}@media(max-width:780px){.root{grid-template-columns:1fr}}
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #f7f9fc;
+    color: #102a43;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 14px; }
+  .stage {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 14px;
+  }
+  canvas {
+    width: 100%;
+    height: 560px;
+    display: block;
+    background: #fff;
+    border: 1px solid #d9e2ec;
+    border-radius: 8px;
+    touch-action: none;
+  }
+  .panel {
+    background: #fff;
+    border: 1px solid #d9e2ec;
+    border-radius: 8px;
+    padding: 14px;
+  }
+  .row { display: flex; gap: 8px; margin-bottom: 10px; }
+  button {
+    flex: 1;
+    border: 1px solid #bcccdc;
+    background: #f0f4f8;
+    color: #102a43;
+    border-radius: 8px;
+    padding: 9px 10px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  button.primary { background: #2c7be5; border-color: #2c7be5; color: #fff; }
+  label { display: block; margin: 11px 0 4px; font-size: 13px; font-weight: 700; }
+  input { width: 100%; }
+  .readout {
+    margin-top: 12px;
+    padding: 10px;
+    background: #eef4ff;
+    border-radius: 8px;
+    line-height: 1.65;
+    font-size: 13px;
+  }
+  table {
+    width: 100%;
+    margin-top: 10px;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  th, td { border-bottom: 1px solid #d9e2ec; padding: 5px 4px; text-align: right; }
+  th:first-child, td:first-child { text-align: left; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.55; }
+  @media (max-width: 820px) {
+    .stage { grid-template-columns: 1fr; }
+    canvas { height: 500px; }
+  }
 </style>
 </head>
 <body>
-<div class="root"><div class="stage"><canvas id="canvas" width="860" height="520"></canvas></div><div class="panel">
-  <div class="card task"><b>观察任务：</b>固定摩尔质量 M 时把质量 m 加倍，看 n 和 N 是否加倍；固定 m 时增大 M，看同样质量对应的粒子数怎样变化。</div>
-  <div class="card"><div class="title">参数</div>
-    <label class="param"><span>样品质量 m <b id="mText">18 g</b></span><input id="mass" type="range" min="1" max="120" step="1" value="18"></label><div class="stepper"><button data-step="mass" data-dir="-1">- m</button><button data-step="mass" data-dir="1">+ m</button></div>
-    <label class="param"><span>摩尔质量 M <b id="MText">18 g/mol</b></span><input id="molar" type="range" min="2" max="120" step="1" value="18"></label><div class="stepper"><button data-step="molar" data-dir="-1">- M</button><button data-step="molar" data-dir="1">+ M</button></div>
-    <label class="param"><span>每点代表 <b id="scaleText">0.05 mol</b></span><input id="scale" type="range" min="0.02" max="0.3" step="0.01" value="0.05"></label>
+<div class="wrap">
+  <div class="stage">
+    <canvas id="c" width="790" height="560" aria-label="阿伏伽德罗常数实验台：俯视装置、换算剖面、粒子计数器、图像和数据记录"></canvas>
+    <section class="panel">
+      <div class="row">
+        <button id="playBtn" class="primary" type="button">播放</button>
+        <button id="resetBtn" type="button">重置</button>
+        <button id="recordBtn" type="button">记录</button>
+      </div>
+      <label for="mass">样品质量 m/g：<span id="massVal"></span></label>
+      <input id="mass" type="range" min="1" max="120" value="18" step="1">
+      <label for="molar">摩尔质量 M/(g/mol)：<span id="molarVal"></span></label>
+      <input id="molar" type="range" min="2" max="120" value="18" step="1">
+      <label for="scale">显示比例：每点代表 mol：<span id="scaleVal"></span></label>
+      <input id="scale" type="range" min="0.02" max="0.30" value="0.05" step="0.01">
+      <div id="readout" class="readout"></div>
+      <table aria-label="数据记录表">
+        <thead><tr><th>记录</th><th>m/g</th><th>M</th><th>n/mol</th></tr></thead>
+        <tbody id="records"></tbody>
+      </table>
+      <div class="hint">观察任务：拖动画面里的蓝色砝码改变 m，拖橙色摩尔卡改变 M；看天平读数、mol 表盘和粒子计数器怎样按 N=nNA 同步变化。</div>
+    </section>
   </div>
-  <div class="readout" id="readout"></div>
-  <div class="card formula"><div class="title">换算链</div><div>n = m/M</div><div>N = nNA = (m/M)NA</div><div>NA = 6.02×10^23 mol^-1</div></div>
-  <div class="status" id="status"></div>
-</div></div>
+</div>
 <script>
-(function(){'use strict';const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');const els={mass:document.getElementById('mass'),molar:document.getElementById('molar'),scale:document.getElementById('scale')};const NA=6.02e23;function fmt(n,d){return n.toFixed(d==null?2:d)}function sci(x){const e=Math.floor(Math.log10(Math.max(x,1)));const a=x/Math.pow(10,e);return a.toFixed(2)+'×10^'+e}function p(){const m=+els.mass.value,M=+els.molar.value,scale=+els.scale.value,n=m/M,N=n*NA,dots=Math.max(1,Math.min(140,Math.round(n/scale)));return{m,M,scale,n,N,dots}}function text(s,x,y,c,a,size,w){ctx.fillStyle=c||'#102a43';ctx.font=(w?w+' ':'')+(size||13)+'px -apple-system,\"PingFang SC\",sans-serif';ctx.textAlign=a||'center';ctx.textBaseline='middle';ctx.fillText(s,x,y)}function arrow(x1,y1,x2,y2,c){const ang=Math.atan2(y2-y1,x2-x1);ctx.save();ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-11*Math.cos(ang-.45),y2-11*Math.sin(ang-.45));ctx.lineTo(x2-11*Math.cos(ang+.45),y2-11*Math.sin(ang+.45));ctx.closePath();ctx.fill();ctx.restore()}function box(x,y,w,h,fill,stroke){ctx.save();ctx.fillStyle=fill;ctx.strokeStyle=stroke||'#d9e2ec';ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.restore()}function draw(){const q=p();ctx.clearRect(0,0,860,520);ctx.fillStyle='#fff';ctx.fillRect(0,0,860,520);text('阿伏伽德罗常数：把 mol 换成粒子个数',430,30,'#102a43','center',18,'700');box(40,78,190,128,'#fff','#d9e2ec');text('宏观质量',135,105,'#102a43','center',16,'700');text('m = '+fmt(q.m,0)+' g',135,142,'#2c7be5','center',24,'700');text('天平能直接测量',135,180,'#486581','center',13);arrow(238,142,318,142,'#2c7be5');text('除以 M',278,120,'#2c7be5','center',13,'700');box(326,78,190,128,'#fff7e6','#f0a500');text('物质的量',421,105,'#102a43','center',16,'700');text('n = '+fmt(q.n,3)+' mol',421,142,'#9a6700','center',22,'700');text('n = m/M',421,180,'#486581','center',13);arrow(524,142,604,142,'#2c7be5');text('乘以 NA',564,120,'#2c7be5','center',13,'700');box(612,78,200,128,'#fff','#d9e2ec');text('微观粒子数',712,105,'#102a43','center',16,'700');text('N = '+sci(q.N),712,142,'#c92a2a','center',20,'700');text('分子、原子或离子个数',712,180,'#486581','center',13);box(54,250,752,206,'#f7f9fc','#d9e2ec');text('比例粒子图：小点不是实际粒子总数，每个点代表 '+fmt(q.scale,2)+' mol',430,275,'#486581','center',13,'700');const cols=28,gap=21,startX=140,startY=312;for(let i=0;i<q.dots;i++){const x=startX+(i%cols)*gap,y=startY+Math.floor(i/cols)*gap;ctx.fillStyle=i%3===0?'#2c7be5':(i%3===1?'#e8590c':'#38b2ac');ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fill()}text('显示点数约 '+q.dots+' 个；真实粒子数是 '+sci(q.N)+' 个',430,438,'#102a43','center',14,'700');update(q)}function update(q){document.getElementById('mText').textContent=fmt(q.m,0)+' g';document.getElementById('MText').textContent=fmt(q.M,0)+' g/mol';document.getElementById('scaleText').textContent=fmt(q.scale,2)+' mol';document.getElementById('readout').innerHTML='n=m/M=<b>'+fmt(q.n,3)+' mol</b><br>N=nNA=<b>'+sci(q.N)+' 个</b><br>NA=<b>6.02×10^23 mol^-1</b><br>每点代表=<b>'+fmt(q.scale,2)+' mol</b>';document.getElementById('status').textContent='NA 是每 1 mol 基本粒子的个数；先确认计数对象，再做 n 与 N 的换算。'}Object.values(els).forEach(el=>el.addEventListener('input',draw));document.querySelectorAll('[data-step]').forEach(btn=>btn.addEventListener('click',()=>{const el=els[btn.dataset.step],step=+el.step||1,dir=+btn.dataset.dir;el.value=Math.max(+el.min,Math.min(+el.max,+el.value+dir*step));el.dispatchEvent(new Event('input',{bubbles:true}))}));draw();})();
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const NA = 6.02e23;
+const els = {
+  playBtn: document.getElementById('playBtn'),
+  resetBtn: document.getElementById('resetBtn'),
+  recordBtn: document.getElementById('recordBtn'),
+  mass: document.getElementById('mass'),
+  molar: document.getElementById('molar'),
+  scale: document.getElementById('scale'),
+  massVal: document.getElementById('massVal'),
+  molarVal: document.getElementById('molarVal'),
+  scaleVal: document.getElementById('scaleVal'),
+  readout: document.getElementById('readout'),
+  records: document.getElementById('records')
+};
+const state = { running: false, time: 0, last: 0, drag: null, records: [] };
+
+function clamp(x, lo, hi) { return Math.max(lo, Math.min(hi, x)); }
+function val(id) { return Number(els[id].value); }
+function fmt(x, digits = 2) { return Number(x).toFixed(digits); }
+function sci(x) {
+  const e = Math.floor(Math.log10(Math.max(x, 1)));
+  const a = x / Math.pow(10, e);
+  return a.toFixed(2) + '×10^' + e;
+}
+function data() {
+  const m = val('mass');
+  const M = val('molar');
+  const scale = val('scale');
+  const n = m / M;
+  const N = n * NA;
+  const dots = Math.max(1, Math.min(150, Math.round(n / scale)));
+  return { m, M, scale, n, N, dots };
+}
+function setData(next) {
+  if (next.m !== undefined) els.mass.value = Math.round(clamp(next.m, 1, 120));
+  if (next.M !== undefined) els.molar.value = Math.round(clamp(next.M, 2, 120));
+  if (next.scale !== undefined) els.scale.value = clamp(next.scale, 0.02, 0.3).toFixed(2);
+}
+function roundRect(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+function box(x, y, w, h, fill, stroke = '#d9e2ec') {
+  ctx.fillStyle = fill;
+  ctx.strokeStyle = stroke;
+  ctx.lineWidth = 1.5;
+  roundRect(x, y, w, h, 9);
+  ctx.fill();
+  ctx.stroke();
+}
+function text(s, x, y, color = '#102a43', size = 13, weight = '400', align = 'center') {
+  ctx.fillStyle = color;
+  ctx.font = `${weight} ${size}px system-ui, -apple-system, sans-serif`;
+  ctx.textAlign = align;
+  ctx.textBaseline = 'middle';
+  ctx.fillText(s, x, y);
+}
+function arrow(x1, y1, x2, y2, color, width = 3) {
+  const a = Math.atan2(y2 - y1, x2 - x1);
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = width;
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - 11 * Math.cos(a - 0.45), y2 - 11 * Math.sin(a - 0.45));
+  ctx.lineTo(x2 - 11 * Math.cos(a + 0.45), y2 - 11 * Math.sin(a + 0.45));
+  ctx.closePath();
+  ctx.fill();
+}
+function drawGrid(x, y, w, h, nx, ny) {
+  ctx.strokeStyle = '#e6edf5';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= nx; i++) {
+    const xx = x + w * i / nx;
+    ctx.beginPath(); ctx.moveTo(xx, y); ctx.lineTo(xx, y + h); ctx.stroke();
+  }
+  for (let i = 0; i <= ny; i++) {
+    const yy = y + h * i / ny;
+    ctx.beginPath(); ctx.moveTo(x, yy); ctx.lineTo(x + w, yy); ctx.stroke();
+  }
+}
+function handles(q) {
+  return [
+    { name: 'm', x: 94 + q.m * 1.55, y: 190, r: 15, label: '拖动 m' },
+    { name: 'M', x: 368 + q.M * 1.35, y: 190, r: 15, label: '拖动 M' },
+    { name: 'scale', x: 607 + q.scale * 450, y: 486, r: 13, label: '拖动显示比例' }
+  ];
+}
+function drawBalance(q, progress) {
+  box(38, 88, 210, 170, '#fff', '#d9e2ec');
+  text('天平称量', 143, 112, '#102a43', 16, '700');
+  ctx.strokeStyle = '#829ab1';
+  ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.moveTo(78, 214); ctx.lineTo(208, 214); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(143, 144); ctx.lineTo(143, 214); ctx.stroke();
+  ctx.strokeStyle = '#2c7be5';
+  ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(82, 154); ctx.lineTo(204, 154); ctx.stroke();
+  ctx.fillStyle = '#eef4ff';
+  ctx.fillRect(68, 154, 56, 14);
+  ctx.fillRect(162, 154, 56, 14);
+  ctx.strokeStyle = '#2c7be5';
+  ctx.strokeRect(68, 154, 56, 14);
+  ctx.strokeRect(162, 154, 56, 14);
+  const massH = 24 + q.m * 0.55 * progress;
+  ctx.fillStyle = '#2c7be5';
+  roundRect(84, 154 - massH, 24, massH, 4);
+  ctx.fill();
+  text('样品', 96, 140 - massH, '#2c7be5', 12, '700');
+  ctx.fillStyle = '#d9e2ec';
+  roundRect(180, 124, 22, 30, 4);
+  ctx.fill();
+  text('砝码', 191, 116, '#486581', 11, '700');
+  text(`m = ${q.m.toFixed(0)} g`, 143, 238, '#2c7be5', 18, '700');
+}
+function drawMolMeter(q, progress) {
+  box(292, 88, 220, 170, '#fff7e6', '#f0a500');
+  text('物质的量表盘', 402, 112, '#102a43', 16, '700');
+  const cx = 402, cy = 176, r = 56;
+  ctx.strokeStyle = '#f0a500';
+  ctx.lineWidth = 8;
+  ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI, Math.PI * (1 + Math.min(q.n / 4, 1))); ctx.stroke();
+  ctx.strokeStyle = '#d9e2ec';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI, Math.PI * 2); ctx.stroke();
+  const angle = Math.PI + Math.PI * Math.min(q.n / 4, 1) * progress;
+  arrow(cx, cy, cx + Math.cos(angle) * 45, cy + Math.sin(angle) * 45, '#9a6700', 3);
+  text(`n = m/M = ${q.n.toFixed(3)} mol`, cx, 238, '#9a6700', 16, '700');
+  text(`M = ${q.M.toFixed(0)} g/mol`, cx, 136, '#486581', 13, '700');
+}
+function drawCounter(q, progress) {
+  box(554, 88, 204, 170, '#fff', '#d9e2ec');
+  text('粒子计数器', 656, 112, '#102a43', 16, '700');
+  const visible = Math.round(q.dots * progress);
+  const cols = 12;
+  for (let i = 0; i < q.dots; i++) {
+    const x = 582 + (i % cols) * 13;
+    const y = 138 + Math.floor(i / cols) * 13;
+    ctx.globalAlpha = i < visible ? 1 : 0.14;
+    ctx.fillStyle = i % 3 === 0 ? '#2c7be5' : (i % 3 === 1 ? '#0f9f6e' : '#d64545');
+    ctx.beginPath(); ctx.arc(x, y, 4.3, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  text(`N = nNA = ${sci(q.N)} 个`, 656, 238, '#c92a2a', 15, '700');
+}
+function drawChart(q) {
+  const x = 54, y = 318, w = 310, h = 160;
+  box(36, 286, 348, 224, '#fff', '#d9e2ec');
+  text('图像：固定 M 时 N 与 m 成正比', 210, 304, '#102a43', 14, '700');
+  drawGrid(x, y, w, h, 5, 4);
+  ctx.strokeStyle = '#334e68';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(x, y + h); ctx.lineTo(x + w, y + h); ctx.lineTo(x + w - 7, y + h - 4); ctx.moveTo(x + w, y + h); ctx.lineTo(x + w - 7, y + h + 4); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x, y + h); ctx.lineTo(x, y); ctx.lineTo(x - 4, y + 7); ctx.moveTo(x, y); ctx.lineTo(x + 4, y + 7); ctx.stroke();
+  const maxM = 120;
+  const maxN = (120 / q.M) * NA;
+  ctx.strokeStyle = '#2c7be5';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  for (let k = 0; k <= 60; k++) {
+    const m = maxM * k / 60;
+    const px = x + w * m / maxM;
+    const py = y + h - h * ((m / q.M) * NA) / maxN;
+    if (k === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+  const px = x + w * q.m / maxM;
+  const py = y + h - h * q.N / maxN;
+  ctx.fillStyle = '#d64545';
+  ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI * 2); ctx.fill();
+  ctx.setLineDash([5, 4]);
+  ctx.strokeStyle = '#d64545';
+  ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px, y + h); ctx.stroke();
+  ctx.setLineDash([]);
+  text('m/g', x + w - 16, y + h + 18, '#486581', 11, '400');
+  text('N/个', x + 20, y + 14, '#486581', 11, '400');
+}
+function drawFormulaBoard(q) {
+  box(420, 286, 330, 224, '#f7f9fc', '#d9e2ec');
+  text('数据记录与公式绑定', 585, 306, '#102a43', 14, '700');
+  text('1. 天平读质量 m', 442, 342, '#486581', 13, '700', 'left');
+  text(`m = ${q.m.toFixed(0)} g`, 710, 342, '#2c7be5', 13, '700', 'right');
+  text('2. 查表得到摩尔质量 M', 442, 374, '#486581', 13, '700', 'left');
+  text(`M = ${q.M.toFixed(0)} g/mol`, 710, 374, '#9a6700', 13, '700', 'right');
+  text('3. 物质的量 n=m/M', 442, 406, '#486581', 13, '700', 'left');
+  text(`n = ${q.n.toFixed(3)} mol`, 710, 406, '#9a6700', 13, '700', 'right');
+  text('4. 粒子数 N=nNA', 442, 438, '#486581', 13, '700', 'left');
+  text(`N = ${sci(q.N)}`, 710, 438, '#c92a2a', 13, '700', 'right');
+  const status = q.m > 0 && q.M > 0 ? '能用：对象明确、m 与 M 单位统一' : '不能用：质量或摩尔质量无效';
+  text(`状态判定：${status}`, 442, 478, '#0f9f6e', 13, '700', 'left');
+}
+function draw() {
+  const q = data();
+  const progress = state.running ? Math.min(1, state.time / 2.4) : 1;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const bg = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+  bg.addColorStop(0, '#ffffff');
+  bg.addColorStop(1, '#f0f7ff');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  text('阿伏伽德罗常数：从可称的质量换算到不可数的粒子', 395, 34, '#102a43', 18, '700');
+  text('俯视装置 + 换算剖面 + 图像数据记录；拖动把手直接改变读数。', 395, 62, '#486581', 13, '400');
+  drawBalance(q, progress);
+  arrow(252, 172, 284, 172, '#2c7be5');
+  text('除以 M', 268, 150, '#2c7be5', 12, '700');
+  drawMolMeter(q, progress);
+  arrow(518, 172, 548, 172, '#2c7be5');
+  text('乘以 NA', 533, 150, '#2c7be5', 12, '700');
+  drawCounter(q, progress);
+  drawChart(q);
+  drawFormulaBoard(q);
+
+  for (const h of handles(q)) {
+    ctx.fillStyle = h.name === 'm' ? '#2c7be5' : h.name === 'M' ? '#f0a500' : '#0f9f6e';
+    ctx.beginPath(); ctx.arc(h.x, h.y, h.r, 0, Math.PI * 2); ctx.fill();
+    text(h.name, h.x, h.y + 1, '#fff', 12, '700');
+  }
+  text('拖动 m', 160, 214, '#2c7be5', 12, '700');
+  text('拖动 M', 434, 214, '#9a6700', 12, '700');
+  text('拖显示比例', 668, 512, '#0f9f6e', 12, '700');
+
+  els.massVal.textContent = q.m.toFixed(0);
+  els.molarVal.textContent = q.M.toFixed(0);
+  els.scaleVal.textContent = q.scale.toFixed(2);
+  els.playBtn.textContent = state.running ? '暂停' : '播放';
+  els.readout.innerHTML = [
+    `m=${q.m.toFixed(0)}g，M=${q.M.toFixed(0)}g/mol`,
+    `n=m/M=<b>${q.n.toFixed(3)}mol</b>`,
+    `N=nNA=<b>${sci(q.N)}个</b>`,
+    `NA=<b>6.02×10^23 mol^-1</b>`
+  ].join('<br>');
+}
+function loop(now) {
+  if (!state.last) state.last = now;
+  const dt = Math.min(0.04, (now - state.last) / 1000);
+  state.last = now;
+  if (state.running) {
+    state.time += dt;
+    if (state.time > 2.4) {
+      state.time = 2.4;
+      state.running = false;
+    }
+  }
+  draw();
+  requestAnimationFrame(loop);
+}
+function pos(evt) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (evt.clientX - rect.left) * canvas.width / rect.width,
+    y: (evt.clientY - rect.top) * canvas.height / rect.height
+  };
+}
+function hit(p) {
+  return handles(data()).find(h => Math.hypot(p.x - h.x, p.y - h.y) <= h.r + 8);
+}
+canvas.addEventListener('pointerdown', evt => {
+  const h = hit(pos(evt));
+  if (h) {
+    state.drag = h.name;
+    canvas.setPointerCapture(evt.pointerId);
+  }
+});
+canvas.addEventListener('pointermove', evt => {
+  const p = pos(evt);
+  if (!state.drag) {
+    canvas.style.cursor = hit(p) ? 'grab' : 'default';
+    return;
+  }
+  if (state.drag === 'm') setData({ m: (p.x - 94) / 1.55 });
+  if (state.drag === 'M') setData({ M: (p.x - 368) / 1.35 });
+  if (state.drag === 'scale') setData({ scale: (p.x - 607) / 450 });
+  draw();
+});
+canvas.addEventListener('pointerup', evt => {
+  state.drag = null;
+  try { canvas.releasePointerCapture(evt.pointerId); } catch (e) {}
+});
+canvas.addEventListener('pointercancel', () => { state.drag = null; });
+
+els.playBtn.addEventListener('click', () => {
+  state.running = !state.running;
+  state.last = 0;
+  if (state.time >= 2.4) state.time = 0;
+  draw();
+});
+els.resetBtn.addEventListener('click', () => {
+  state.running = false;
+  state.time = 0;
+  setData({ m: 18, M: 18, scale: 0.05 });
+  draw();
+});
+els.recordBtn.addEventListener('click', () => {
+  const q = data();
+  state.records.unshift({ m: q.m, M: q.M, n: q.n });
+  state.records = state.records.slice(0, 4);
+  renderRecords();
+});
+function renderRecords() {
+  els.records.innerHTML = state.records.map((r, idx) =>
+    `<tr><td>${idx + 1}</td><td>${r.m.toFixed(0)}</td><td>${r.M.toFixed(0)}</td><td>${r.n.toFixed(3)}</td></tr>`
+  ).join('');
+}
+for (const id of ['mass', 'molar', 'scale']) {
+  els[id].addEventListener('input', draw);
+}
+renderRecords();
+requestAnimationFrame(loop);
 </script>
 </body>
 </html>

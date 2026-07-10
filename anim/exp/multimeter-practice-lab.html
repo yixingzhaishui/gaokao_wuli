@@ -9,10 +9,13 @@
   body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
   .wrap { max-width: 1000px; margin: 0 auto; padding: 16px; }
   .stage { display: grid; grid-template-columns: minmax(0, 1fr) 286px; gap: 14px; align-items: stretch; }
-  canvas { width: 100%; height: 470px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  canvas { width: 100%; height: 470px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; touch-action:none; }
   .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
   label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
   input { width: 100%; }
+  .row { display:flex; gap:8px; margin-bottom:10px; }
+  button { flex:1; border:1px solid #bcccdc; background:#f0f4f8; color:#102a43; border-radius:8px; padding:8px; font-weight:700; cursor:pointer; }
+  button.primary { background:#2c7be5; border-color:#2c7be5; color:#fff; }
   .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.72; font-size: 14px; }
   .status { margin-top: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13px; line-height: 1.55; background: #e6fffa; color: #087f5b; font-weight: 700; }
   .status.bad { background: #fff5f5; color: #c92a2a; }
@@ -25,6 +28,7 @@
   <div class="stage">
     <canvas id="c" width="700" height="470" aria-label="多用电表练习"></canvas>
     <section class="panel">
+      <div class="row"><button id="playBtn" class="primary" type="button">播放</button><button id="resetBtn" type="button">重置</button><button id="recordBtn" type="button">记录</button></div>
       <label for="mode">测量模式：<span id="modeVal"></span></label>
       <input id="mode" type="range" min="0" max="2" value="2" step="1">
       <label for="range">量程/倍率：<span id="rangeVal"></span></label>
@@ -36,6 +40,7 @@
       <label for="power">被测电路带电：<span id="powerVal"></span></label>
       <input id="power" type="range" min="0" max="1" value="0" step="1">
       <div id="readout" class="readout"></div>
+      <table style="width:100%;margin-top:10px;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;border-bottom:1px solid #d9e2ec">记录</th><th style="border-bottom:1px solid #d9e2ec">模式</th><th style="border-bottom:1px solid #d9e2ec">挡位</th><th style="border-bottom:1px solid #d9e2ec">结果</th></tr></thead><tbody id="records"></tbody></table>
       <div id="status" class="status"></div>
       <div class="hint">观察任务：测电阻时先断电、选倍率、短接表笔调零，再读表盘数并乘倍率。</div>
     </section>
@@ -56,8 +61,13 @@ const els = {
   zeroVal: document.getElementById('zeroVal'),
   powerVal: document.getElementById('powerVal'),
   readout: document.getElementById('readout'),
-  status: document.getElementById('status')
+  status: document.getElementById('status'),
+  playBtn: document.getElementById('playBtn'),
+  resetBtn: document.getElementById('resetBtn'),
+  recordBtn: document.getElementById('recordBtn'),
+  records: document.getElementById('records')
 };
+const state={running:false,time:0,last:0,drag:null,records:[]};
 const modes = ['直流电压 V', '直流电流 A', '电阻 Ω'];
 const vRanges = [2.5, 10, 50];
 const aRanges = [0.1, 0.5, 2.0];
@@ -159,7 +169,8 @@ function draw() {
   ctx.fillStyle = '#102a43';
   ctx.font = '700 18px system-ui';
   ctx.textAlign = 'center';
-  ctx.fillText('多用电表：选挡、接法、调零、读数换算', 350, 30);
+  if(state.running){ratio = Math.max(0, Math.min(1, ratio + Math.sin(state.time*6)*0.03));}
+  ctx.fillText('多用电表实验台：俯视接线 + 表盘读数 + 挡位练习 + 数据记录', 350, 30);
 
   ctx.fillStyle = '#f7f9fc';
   ctx.strokeStyle = '#334e68';
@@ -182,6 +193,8 @@ function draw() {
   ctx.fillStyle = '#102a43';
   ctx.font = '700 14px system-ui';
   ctx.fillText('读数：' + result,236,344);
+  ctx.fillStyle='#2c7be5';ctx.beginPath();ctx.arc(236,382,17,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.font='700 10px system-ui';ctx.fillText('挡',236,386);
+  ctx.fillStyle='#0f9f6e';ctx.beginPath();ctx.arc(530,204,12,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.fillText('值',530,208);
   ctx.fillStyle = '#e03131';
   ctx.beginPath(); ctx.arc(182,392,10,0,Math.PI*2); ctx.fill();
   ctx.fillStyle = '#102a43';
@@ -231,11 +244,20 @@ function draw() {
   ].join('');
   els.status.className = ok ? 'status' : 'status bad';
   els.status.textContent = ok ? '通过：挡位、接法和读数条件合格。' : '不通过：' + problem;
+  els.playBtn.textContent = state.running ? '暂停' : '播放';
 }
 Object.values(els).forEach(el => {
   if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
 });
-draw();
+function pos(e){const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height};}
+c.addEventListener('pointerdown',e=>{const p=pos(e);if(Math.hypot(p.x-236,p.y-382)<28){state.drag='mode';c.setPointerCapture(e.pointerId);}else if(Math.hypot(p.x-530,p.y-204)<24){state.drag='value';c.setPointerCapture(e.pointerId);}});
+c.addEventListener('pointermove',e=>{const p=pos(e);if(!state.drag){c.style.cursor='grab';return;}if(state.drag==='mode')els.mode.value=Math.round(Math.max(0,Math.min(2,(p.x-176)/60)));if(state.drag==='value')els.value.value=Math.round(Math.max(1,Math.min(100,(p.x-448)/164*100)));draw();});
+c.addEventListener('pointerup',e=>{state.drag=null;try{c.releasePointerCapture(e.pointerId)}catch(err){}});c.addEventListener('pointercancel',()=>{state.drag=null;});
+els.playBtn.addEventListener('click',()=>{state.running=!state.running;state.last=0;draw();});
+els.resetBtn.addEventListener('click',()=>{state.running=false;state.time=0;els.mode.value=2;els.range.value=1;els.value.value=47;els.zero.value=100;els.power.value=0;draw();});
+els.recordBtn.addEventListener('click',()=>{const mode=Number(els.mode.value),rangeIndex=Number(els.range.value),raw=Number(els.value.value),zero=Number(els.zero.value),powered=Number(els.power.value)===1;let rangeText='',result='';if(mode===0){const V=raw/10,range=vRanges[rangeIndex];rangeText=range+'V';result=V>range?'超量程':V.toFixed(2)+'V';}else if(mode===1){const A=raw/100,range=aRanges[rangeIndex];rangeText=range+'A';result=A>range?'超量程':A.toFixed(3)+'A';}else{const R=raw*10,mul=ohmMul[rangeIndex],scale=R/mul,zeroFactor=zero/100,readScale=scale/Math.max(.2,zeroFactor);rangeText='×'+mul;result=powered?'带电禁测':(readScale*mul).toFixed(0)+'Ω';}state.records.unshift({mode:modes[mode],rangeText,result});state.records=state.records.slice(0,4);els.records.innerHTML=state.records.map((r,i)=>`<tr><td style="text-align:left;border-bottom:1px solid #d9e2ec">${i+1}</td><td style="border-bottom:1px solid #d9e2ec">${r.mode}</td><td style="border-bottom:1px solid #d9e2ec">${r.rangeText}</td><td style="border-bottom:1px solid #d9e2ec">${r.result}</td></tr>`).join('');});
+function loop(now){if(!state.last)state.last=now;const dt=Math.min(.04,(now-state.last)/1000);state.last=now;if(state.running)state.time+=dt;draw();requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
 </script>
 </body>
 </html>

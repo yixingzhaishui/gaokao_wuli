@@ -23,13 +23,6 @@ canvas{display:block;width:100%;max-width:700px;background:#fff;border:1px solid
 <body>
 <div class="wrap">
   <h2>磁通量：Φ = BScosθ（θ 是 B 与面积法线的夹角）</h2>
-  <canvas id="cv" width="700" height="400"></canvas>
-  <div class="chips">
-    <span class="chip">B = <b id="bv">0.50</b> T</span>
-    <span class="chip">S = <b id="sv">0.020</b> m²</span>
-    <span class="chip">θ = <b id="tv">0</b>°</span>
-    <span class="chip">Φ = <b id="pv">0.0100</b> Wb</span>
-  </div>
   <div class="ctrls">
     <button class="btn" id="play">▶ 自动转动</button>
     <button class="btn" id="reset">重置</button>
@@ -38,7 +31,14 @@ canvas{display:block;width:100%;max-width:700px;background:#fff;border:1px solid
     <label>θ = <span id="tl">0</span>°<input id="tr" type="range" min="0" max="90" step="1" value="0"></label>
     <span style="font-size:13px;color:#5a6b7b">或拖蓝色法线箭头</span>
   </div>
-  <div class="hint"><b>观察任务</b>：直接拖<b>蓝色面积法线</b>转动线圈。θ=0° 时线圈正对磁场，穿过的磁感线最多；θ=90° 时线圈平行磁场，投影面积为 0，Φ=0。注意 θ 是 B 与<b>法线</b>的夹角，不是 B 与线圈平面的夹角。</div>
+  <canvas id="cv" width="700" height="400" aria-label="磁通量实验台：三维线圈法线装置、投影面积图像和数据记录"></canvas>
+  <div class="chips">
+    <span class="chip">B = <b id="bv">0.50</b> T</span>
+    <span class="chip">S = <b id="sv">0.020</b> m²</span>
+    <span class="chip">θ = <b id="tv">0</b>°</span>
+    <span class="chip">Φ = <b id="pv">0.0100</b> Wb</span>
+  </div>
+  <div class="hint"><b>观察任务</b>：直接拖<b>蓝色面积法线</b>转动线圈。对照三维线圈法线装置、投影面积图像和数据记录，θ=0° 时磁感线最多；θ=90° 时投影面积为 0。</div>
 </div>
 <script>
 (function(){

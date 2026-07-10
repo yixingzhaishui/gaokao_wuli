@@ -33,9 +33,9 @@
 </head>
 <body>
 <div class="root">
-  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="开普勒定律交互实验台"></canvas></div>
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="开普勒定律交互实验台：椭圆轨道俯视装置、T2-a3图像和数据记录"></canvas></div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>拖太阳改变偏心率 e，看太阳始终在焦点；拖椭圆右端改变 a，看周期 T 按 T²/a³ 变化。</div>
+    <div class="card task"><b>观察任务：</b>拖太阳改变偏心率 e，对照椭圆轨道俯视装置、T²/a³ 图像和数据记录，看太阳是否始终在焦点。</div>
     <button id="playBtn" class="primary">播放</button>
     <div class="card">
       <div class="title">快速情境</div>
@@ -108,7 +108,7 @@
     roundRect(668,348,162,34,7,'#f8fafc','#d7dee8');text(`T²/a³=${fmt(v.K)}`,749,365,colors.purple,'center',13,'900');
   }
   function update(v){els.rp.textContent=`${fmt(v.rp)} AU`;els.ra.textContent=`${fmt(v.ra)} AU`;els.period.textContent=`${fmt(v.T)} 年`;els.k.textContent=fmt(v.K);els.status.textContent=state.e===0?'e=0 时轨道为圆，太阳也在圆心。':'偏心率越大，近日点越近、速度越快；太阳在焦点，不在椭圆中心。';els.play.textContent=state.running?'暂停':'播放'}
-  function draw(){const v=values(),L=layout(),g0=geom();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('开普勒定律实验台：椭圆焦点、等面积、T²/a³',460,30,'#0f172a','center',19,'900');drawOrbit(v,L);drawThird(v);roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(100,494,270,'a',colors.purple);handle(g0.a.x,g0.a.y,`a=${fmt(state.a,1)}`,state.drag==='a',colors.purple);ruler(364,494,534,'e',colors.orange);handle(g0.e.x,g0.e.y,`e=${fmt(state.e)}`,state.drag==='e',colors.orange);ruler(638,494,808,'M',colors.green);handle(g0.mu.x,g0.mu.y,`M=${fmt(state.mu,1)}`,state.drag==='mu',colors.green);update(v)}
+  function draw(){const v=values(),L=layout(),g0=geom();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('开普勒定律实验台：椭圆俯视装置 + T²/a³图像 + 数据记录',460,30,'#0f172a','center',19,'900');drawOrbit(v,L);drawThird(v);roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(100,494,270,'a',colors.purple);handle(g0.a.x,g0.a.y,`a=${fmt(state.a,1)}`,state.drag==='a',colors.purple);ruler(364,494,534,'e',colors.orange);handle(g0.e.x,g0.e.y,`e=${fmt(state.e)}`,state.drag==='e',colors.orange);ruler(638,494,808,'M',colors.green);handle(g0.mu.x,g0.mu.y,`M=${fmt(state.mu,1)}`,state.drag==='mu',colors.green);update(v)}
   function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
   function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
   function down(e){const p=pos(e),v=values(),L=layout(),planet=orbitPoint(v.E,L),g0=geom();if(near(p,L.sun,28))state.drag='sun';else if(near(p,L.right,28))state.drag='aDirect';else if(near(p,planet,26))state.drag='planet';else if(near(p,g0.a,26))state.drag='a';else if(near(p,g0.e,26))state.drag='e';else if(near(p,g0.mu,26))state.drag='mu';else state.drag=null;if(state.drag){state.running=false;canvas.setPointerCapture(e.pointerId);move(e)}}

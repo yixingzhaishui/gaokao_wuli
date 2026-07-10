@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>信息题与科技前沿专题实验台</title>
+<link rel="icon" href="data:,">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}.root{display:grid;grid-template-columns:minmax(0,1fr)340px;gap:12px;padding:12px;min-height:700px}.stage,.card{background:#fff;border:1px solid #d9e2ec;border-radius:8px}.stage{overflow:hidden}.card{padding:10px}.panel{display:flex;flex-direction:column;gap:10px}canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab}.task{background:#fff7e6;border-left:4px solid #f0a500;color:#486581;font-size:13px;line-height:1.5}.title{font-weight:900;margin-bottom:7px}.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px}.tabs button.active{background:#102a43;color:#fff;border-color:#102a43}.param{display:grid;gap:3px;margin:8px 0;font-size:13px}.param span{display:flex;justify-content:space-between;gap:8px;color:#486581}.param b{color:#102a43;font-variant-numeric:tabular-nums;white-space:nowrap}input[type=range]{width:100%;accent-color:#2c7be5}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}button{border:1px solid #b0bcc9;background:#fff;border-radius:6px;padding:7px 8px;cursor:pointer;font:inherit;font-size:13px}.readout{background:#102a43;color:#d9e2ec;border-radius:8px;padding:10px;line-height:1.6;font-size:13px}.readout b{color:#ffd166;font-variant-numeric:tabular-nums}.status{border:1px solid #38b2ac;background:#e6fffa;color:#087f5b;border-radius:8px;padding:8px;font-size:13px;font-weight:800;line-height:1.45}.formula{font-size:13px;color:#334e68;line-height:1.6}table{width:100%;border-collapse:collapse;font-size:12px}td,th{border-bottom:1px solid #d9e2ec;padding:4px 3px;text-align:right;font-variant-numeric:tabular-nums}@media(max-width:880px){.root{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="930" height="620" aria-label="信息题与科技前沿实验台：航天器、太阳能电池、科技材料、信息提取、单位换算、图像数据、多视角"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>切换航天器和光伏材料情境，拖动题干数据，看如何从新信息中提取已学公式并完成单位换算。</div>
+    <div class="card">
+      <div class="title">信息题场景</div>
+      <div class="tabs"><button id="orbit" class="active">航天器</button><button id="solar">光伏材料</button></div>
+      <label class="param"><span>信息量 A <b id="aLabel">400 km</b></span><input id="a" type="range" min="200" max="2000" step="50" value="400"></label>
+      <label class="param"><span>信息量 B <b id="bLabel">7.7 km/s</b></span><input id="b" type="range" min="1" max="12" step="0.1" value="7.7"></label>
+      <label class="param"><span>效率/比例 <b id="etaLabel">20%</b></span><input id="eta" type="range" min="5" max="45" step="1" value="20"></label>
+      <div class="buttons"><button id="play">暂停</button><button id="record">记录提取</button></div>
+    </div>
+    <div class="readout" id="readout"></div>
+    <div class="card"><div class="title">信息提取记录</div><table><thead><tr><th>场景</th><th>公式</th><th>结果</th></tr></thead><tbody id="rows"></tbody></table></div>
+    <div class="card formula">
+      <div class="title">信息题策略</div>
+      <div>圈新名词，翻译成熟悉物理量</div>
+      <div>圈单位，先统一 SI 单位</div>
+      <div>圈比例、效率、斜率、面积，再代入旧模型</div>
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+</div>
+<script>
+(function(){
+'use strict';
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+const E={orbit:document.getElementById('orbit'),solar:document.getElementById('solar'),a:document.getElementById('a'),b:document.getElementById('b'),eta:document.getElementById('eta'),aLabel:document.getElementById('aLabel'),bLabel:document.getElementById('bLabel'),etaLabel:document.getElementById('etaLabel'),readout:document.getElementById('readout'),rows:document.getElementById('rows'),status:document.getElementById('status'),play:document.getElementById('play'),record:document.getElementById('record')};
+const C={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',green:'#087f5b',gold:'#f0a500',purple:'#7048e8'};
+const S={mode:'orbit',run:true,t:0,drag:false,records:[]};
+function box(x,y,w,h,f='#fff',s='#d9e2ec'){ctx.save();ctx.fillStyle=f;ctx.strokeStyle=s;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.restore()}
+function text(s,x,y,c=C.ink,a='center',z=13,w='800'){ctx.fillStyle=c;ctx.font=w+' '+z+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+function line(x1,y1,x2,y2,c='#9fb3c8',w=2,d){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(d)ctx.setLineDash(d);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
+function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.45),y2-10*Math.sin(a-.45));ctx.lineTo(x2-10*Math.cos(a+.45),y2-10*Math.sin(a+.45));ctx.closePath();ctx.fill()}
+function calc(){const A=+E.a.value,B=+E.b.value,eta=+E.eta.value/100;if(S.mode==='orbit'){const h=A*1000,v=B*1000,r=6.37e6+h,T=2*Math.PI*r/v/60;return{A,B,eta,h,v,T,formula:'T=2πr/v',result:T.toFixed(1)+'min'}}const area=A/100,powerDensity=B*100,output=area*powerDensity*eta;return{A,B,eta,area,powerDensity,output,formula:'P=IAη',result:output.toFixed(0)+'W'}}
+function draw(){const q=calc();ctx.clearRect(0,0,930,620);box(34,30,862,548,'#fff');text('G-12 信息题与科技前沿：新情境不怕，先提取信息再回到旧模型',465,56,C.ink,'center',16,'900');if(S.mode==='orbit')drawOrbit(q);else drawSolar(q);drawData(q);drawFlow(q);update(q)}
+function drawOrbit(q){box(70,88,560,220,'#fbfdff');text('科技情境：空间站/卫星。信息翻译：高度、轨道半径、线速度、周期',350,112,C.muted,'center',12,'900');const cx=350,cy=210,R=82;ctx.fillStyle='#e6f0ff';ctx.beginPath();ctx.arc(cx,cy,44,0,7);ctx.fill();text('地球',cx,cy,C.blue,'center',12,'900');ctx.strokeStyle=C.purple;ctx.lineWidth=3;ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.stroke();const a=S.t*.8;const sx=cx+Math.cos(a)*R,sy=cy+Math.sin(a)*R;ctx.fillStyle=C.gold;ctx.beginPath();ctx.arc(sx,sy,10,0,7);ctx.fill();arrow(sx,sy,sx-Math.sin(a)*55,sy+Math.cos(a)*55,C.red,3);text('v',sx-Math.sin(a)*62,sy+Math.cos(a)*62,C.red,'center',12,'900');text('新名词“轨道高度”要先换成 r=R地+h',350,286,C.green,'center',12,'900')}
+function drawSolar(q){box(70,88,560,220,'#fbfdff');text('科技情境：太阳能电池/新材料。信息翻译：辐照度、面积、效率、输出功率',350,112,C.muted,'center',12,'900');box(150,154,260,96,'#e6fffa','#38b2ac');for(let i=0;i<5;i++)line(150+i*52,154,150+i*52,250,'#38b2ac',1);for(let j=0;j<3;j++)line(150,154+j*32,410,154+j*32,'#38b2ac',1);for(let i=0;i<7;i++)arrow(92+i*36,126,132+i*36,154,C.gold,2);box(458,168,58,40,'#102a43','#102a43');text(q.output.toFixed(0)+'W',487,188,'#ffd166','center',12,'900');text('效率 η 把入射能流转成电功率：P=IAη',350,286,C.green,'center',12,'900')}
+function drawData(q){box(70,342,560,190,'#fff');text('数据/图像视角：圈单位、圈比例、圈公式入口',350,364,C.muted,'center',12,'900');const x0=120,y0=488,w=440,h=82;arrow(x0,y0,x0+w+18,y0,'#52606d',2);arrow(x0,y0,x0,y0-h-18,'#52606d',2);for(let i=0;i<=5;i++){line(x0+i*w/5,y0,x0+i*w/5,y0-h,'rgba(130,154,177,.16)',1);line(x0,y0-i*h/5,x0+w,y0-i*h/5,'rgba(130,154,177,.16)',1)}ctx.fillStyle=C.blue;ctx.fillRect(x0+70,y0-h*.45,56,h*.45);ctx.fillStyle=C.gold;ctx.fillRect(x0+190,y0-h*.65,56,h*.65);ctx.fillStyle=C.green;ctx.fillRect(x0+310,y0-h*.35,56,h*.35);['量A','量B','比例'].forEach((s,i)=>text(s,x0+98+i*120,y0+18,C.muted,'center',11,'800'));text('多视角：科技装置 + 信息表 + 单位换算 + 旧模型公式',350,524,C.purple,'center',12,'900')}
+function drawFlow(q){box(664,88,196,444,'#fff');text('信息题流程',762,114,C.ink,'center',14,'900');['划出新名词','翻译物理量','统一 SI 单位','识别旧模型','代入公式','检查数量级'].forEach((s,i)=>{box(686,142+i*54,152,34,i===0?'#fff7e6':i===2?'#e6fffa':'#eef4ff');text(s,762,159+i*54,i===0?C.gold:i===2?C.green:C.blue,'center',12,'900')});text(q.formula,762,474,C.red,'center',13,'900');text('结果 '+q.result,762,502,C.muted,'center',12,'800')}
+function update(q){E.orbit.classList.toggle('active',S.mode==='orbit');E.solar.classList.toggle('active',S.mode==='solar');E.aLabel.textContent=S.mode==='orbit'?q.A.toFixed(0)+' km':(q.A/100).toFixed(1)+' m²';E.bLabel.textContent=S.mode==='orbit'?q.B.toFixed(1)+' km/s':(q.B*100).toFixed(0)+' W/m²';E.etaLabel.textContent=(q.eta*100).toFixed(0)+'%';E.readout.innerHTML=S.mode==='orbit'?'轨道半径：<b>'+(q.h/1000+6370).toFixed(0)+' km</b><br>速度：<b>'+q.B.toFixed(1)+' km/s</b><br>周期：<b>'+q.T.toFixed(1)+' min</b><br>公式入口：<b>'+q.formula+'</b>':'面积：<b>'+q.area.toFixed(1)+' m²</b><br>辐照度：<b>'+q.powerDensity.toFixed(0)+' W/m²</b><br>输出功率：<b>'+q.output.toFixed(0)+' W</b><br>公式入口：<b>'+q.formula+'</b>';E.rows.innerHTML=S.records.slice(-6).map(r=>'<tr><td>'+r.s+'</td><td>'+r.f+'</td><td>'+r.r+'</td></tr>').join('')||'<tr><td colspan="3">暂无记录</td></tr>';E.status.textContent='信息题的核心不是背新知识，而是把新材料翻译成已经学过的物理量和模型。'}
+function record(){const q=calc();S.records.push({s:S.mode==='orbit'?'航天':'光伏',f:q.formula,r:q.result});if(S.records.length>8)S.records.shift();update(q)}
+E.orbit.onclick=()=>{S.mode='orbit';E.a.min=200;E.a.max=2000;E.a.step=50;E.a.value=400;E.b.min=1;E.b.max=12;E.b.step=.1;E.b.value=7.7;record();draw()};E.solar.onclick=()=>{S.mode='solar';E.a.min=50;E.a.max=500;E.a.step=10;E.a.value=200;E.b.min=3;E.b.max=12;E.b.step=.1;E.b.value=8;record();draw()};[E.a,E.b,E.eta].forEach(el=>el.addEventListener('input',draw));E.record.onclick=record;E.play.onclick=()=>{S.run=!S.run;E.play.textContent=S.run?'暂停':'播放'};function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}function setA(p){const min=+E.a.min,max=+E.a.max;E.a.value=Math.max(min,Math.min(max,min+(p.x-90)/500*(max-min))).toFixed(0);draw()}canvas.addEventListener('pointerdown',e=>{const p=pos(e);if(p.x>70&&p.x<630&&p.y>85&&p.y<330){S.drag=true;canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing';setA(p)}});canvas.addEventListener('pointermove',e=>{if(S.drag)setA(pos(e))});canvas.addEventListener('pointerup',e=>{if(S.drag)record();S.drag=false;canvas.style.cursor='grab';try{canvas.releasePointerCapture(e.pointerId)}catch(_){}});canvas.addEventListener('pointercancel',()=>{S.drag=false});let last=performance.now();function loop(now){const dt=Math.min((now-last)/1000,.04);last=now;if(S.run)S.t+=dt;draw();requestAnimationFrame(loop)}record();loop();
+})();
+</script>
+</body>
+</html>

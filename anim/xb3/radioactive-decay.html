@@ -3,134 +3,55 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>放射性衰变：A 和 Z 的变化</title>
+<title>放射性衰变实验台</title>
 <style>
-  * { box-sizing: border-box; }
-  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
-  .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
-  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 14px; align-items: stretch; }
-  canvas { width: 100%; height: 430px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
-  .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
-  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
-  input { width: 100%; }
-  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.8; font-size: 14px; }
-  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
-  @media (max-width: 760px) { .stage { grid-template-columns: 1fr; } canvas { height: 360px; } }
+  *{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#102a43;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:14px}.stage{display:grid;grid-template-columns:minmax(0,1fr)310px;gap:12px;align-items:start}
+  canvas{width:100%;height:640px;background:#fff;border:1px solid #d9e2ec;border-radius:8px;display:block;touch-action:none}
+  .panel{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:12px}.row{display:flex;gap:8px;margin-bottom:10px}
+  button{flex:1;border:0;border-radius:6px;background:#2c7be5;color:#fff;font-weight:700;padding:9px 10px;cursor:pointer}.secondary{background:#e6edf7;color:#102a43}
+  label{display:block;font-size:13px;font-weight:700;margin-top:10px}input{width:100%;accent-color:#2c7be5}
+  .readout{margin-top:12px;padding:10px;background:#eef4ff;border-radius:8px;line-height:1.65;font-size:13px}.status{margin-top:10px;padding:9px 10px;border-radius:8px;font-size:13px;line-height:1.5;background:#e6fffa;color:#087f5b;font-weight:700}
+  .hint{margin-top:10px;color:#486581;font-size:13px;line-height:1.55}table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px}th,td{border-bottom:1px solid #d9e2ec;padding:5px 4px;text-align:right}th:first-child,td:first-child{text-align:left}
+  @media(max-width:860px){.stage{grid-template-columns:1fr}canvas{height:560px}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="stage">
-    <canvas id="c" width="680" height="430" aria-label="放射性衰变模型"></canvas>
-    <section class="panel">
-      <label for="type">衰变类型：<span id="typeVal"></span></label>
-      <input id="type" type="range" min="0" max="2" value="0" step="1">
-      <label for="z">母核质子数 Z：<span id="zVal"></span></label>
-      <input id="z" type="range" min="20" max="92" value="92" step="1">
-      <label for="n">母核中子数 N：<span id="nVal"></span></label>
-      <input id="n" type="range" min="20" max="150" value="146" step="1">
-      <div id="readout" class="readout"></div>
-      <div class="hint">观察任务：切换 α、β、γ，盯住左上角 A 和左下角 Z；最后用质量数和电荷数守恒检查。</div>
-    </section>
-  </div>
-</div>
+<div class="wrap"><div class="stage">
+  <canvas id="c" width="940" height="640" aria-label="放射性衰变实验台：母核、子核、射线、守恒账本、探测器"></canvas>
+  <section class="panel">
+    <div class="row"><button id="playBtn" class="play-btn">播放</button><button id="resetBtn" class="secondary">重置</button><button id="recordBtn" class="secondary">记录</button></div>
+    <label for="type">衰变类型：<span id="typeVal"></span></label><input id="type" type="range" min="0" max="2" value="0" step="1">
+    <label for="z">母核质子数 Z：<span id="zVal"></span></label><input id="z" type="range" min="20" max="92" value="92" step="1">
+    <label for="n">母核中子数 N：<span id="nVal"></span></label><input id="n" type="range" min="20" max="150" value="146" step="1">
+    <div id="readout" class="readout"></div><div id="status" class="status"></div>
+    <div class="hint">观察任务：播放衰变过程，拖动探测器看 α、β、γ 的穿透和偏转差异；盯住 A、Z 两张守恒账。</div>
+    <table><thead><tr><th>记录</th><th>类型</th><th>A'</th><th>Z'</th></tr></thead><tbody id="recordBody"><tr><td colspan="4">点击“记录”保存一次衰变</td></tr></tbody></table>
+  </section>
+</div></div>
 <script>
-const c = document.getElementById('c');
-const ctx = c.getContext('2d');
-const els = {
-  type: document.getElementById('type'),
-  z: document.getElementById('z'),
-  n: document.getElementById('n'),
-  typeVal: document.getElementById('typeVal'),
-  zVal: document.getElementById('zVal'),
-  nVal: document.getElementById('nVal'),
-  readout: document.getElementById('readout')
-};
-const labels = ['α 衰变', 'β⁻ 衰变', 'γ 衰变'];
-function daughter(a, z, t) {
-  if (t === 0) return { a: a - 4, z: z - 2, particle: '⁴₂He', note: 'α：A-4，Z-2', prop: '电离强，穿透弱' };
-  if (t === 1) return { a, z: z + 1, particle: '⁰₋₁e', note: 'β⁻：A 不变，Z+1', prop: '高速电子流，穿透中等' };
-  return { a, z, particle: 'γ', note: 'γ：A、Z 不变', prop: '高频电磁波，穿透强' };
-}
-function drawNucleus(x, y, title, a, z, color) {
-  ctx.fillStyle = color;
-  ctx.strokeStyle = '#334e68';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.arc(x, y, 58, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.stroke();
-  ctx.fillStyle = '#102a43';
-  ctx.font = '700 18px system-ui';
-  ctx.textAlign = 'center';
-  ctx.fillText(title, x, y - 14);
-  ctx.font = '700 20px system-ui';
-  ctx.fillText(`${a}/${z}X`, x, y + 18);
-}
-function arrow(x1, y1, x2, y2, color) {
-  ctx.strokeStyle = color;
-  ctx.fillStyle = color;
-  ctx.lineWidth = 4;
-  ctx.beginPath();
-  ctx.moveTo(x1, y1);
-  ctx.lineTo(x2, y2);
-  ctx.stroke();
-  const ang = Math.atan2(y2 - y1, x2 - x1);
-  ctx.beginPath();
-  ctx.moveTo(x2, y2);
-  ctx.lineTo(x2 - 12 * Math.cos(ang - 0.45), y2 - 12 * Math.sin(ang - 0.45));
-  ctx.lineTo(x2 - 12 * Math.cos(ang + 0.45), y2 - 12 * Math.sin(ang + 0.45));
-  ctx.closePath();
-  ctx.fill();
-}
-function draw() {
-  const t = Number(els.type.value);
-  const z = Number(els.z.value);
-  const n = Number(els.n.value);
-  const a = z + n;
-  const d = daughter(a, z, t);
-  els.typeVal.textContent = labels[t];
-  els.zVal.textContent = z;
-  els.nVal.textContent = n;
-  ctx.clearRect(0, 0, c.width, c.height);
-  ctx.fillStyle = '#f7f9fc';
-  ctx.fillRect(0, 0, c.width, c.height);
-
-  drawNucleus(120, 190, '母核', a, z, '#fff7e6');
-  arrow(190, 190, 312, 190, '#e03131');
-  drawNucleus(390, 190, '子核', d.a, d.z, '#eef4ff');
-  arrow(430, 145, 570, 84, t === 0 ? '#e03131' : t === 1 ? '#2c7be5' : '#7b2cbf');
-  ctx.fillStyle = t === 0 ? '#e03131' : t === 1 ? '#2c7be5' : '#7b2cbf';
-  ctx.font = '700 24px system-ui';
-  ctx.textAlign = 'center';
-  ctx.fillText(d.particle, 598, 84);
-  ctx.font = '15px system-ui';
-  ctx.fillText(d.note, 596, 120);
-  ctx.fillStyle = '#486581';
-  ctx.fillText(d.prop, 596, 150);
-
-  ctx.fillStyle = '#102a43';
-  ctx.font = '700 16px system-ui';
-  ctx.fillText('守恒检查', 340, 304);
-  ctx.font = '14px system-ui';
-  ctx.fillStyle = '#486581';
-  let rightA = d.a + (t === 0 ? 4 : 0);
-  let rightZ = d.z + (t === 0 ? 2 : t === 1 ? -1 : 0);
-  ctx.fillText(`质量数：左 A=${a}，右 A=${rightA}，${rightA === a ? '守恒' : '不守恒'}`, 340, 334);
-  ctx.fillText(`电荷数：左 Z=${z}，右 Z=${rightZ}，${rightZ === z ? '守恒' : '不守恒'}`, 340, 362);
-  ctx.fillText('配平衰变方程时，左上角质量数和左下角电荷数都要守恒。', 340, 394);
-
-  els.readout.innerHTML = [
-    `母核：A=${a}，Z=${z}`,
-    `衰变类型=${labels[t]}，放出=${d.particle}`,
-    `子核：A'=${d.a}，Z'=${d.z}`,
-    `规则：${d.note}；${d.prop}`
-  ].join('<br>');
-}
-Object.values(els).forEach(el => {
-  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
-});
-draw();
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+const els={type:by('type'),z:by('z'),n:by('n'),typeVal:by('typeVal'),zVal:by('zVal'),nVal:by('nVal'),readout:by('readout'),status:by('status'),playBtn:by('playBtn'),resetBtn:by('resetBtn'),recordBtn:by('recordBtn'),recordBody:by('recordBody')};
+function by(id){return document.getElementById(id)}
+const labels=['α 衰变','β- 衰变','γ 衰变'];
+let playing=false,t=0,last=0,dragging=false,detector={x:782,y:210},records=[];
+function daughter(A,Z,type){if(type===0)return{A:A-4,Z:Z-2,particle:'4/2He',note:'α：A-4，Z-2',color:'#e03131',ion:'强',pen:'弱',bend:'向负极偏'};if(type===1)return{A,Z:Z+1,particle:'0/-1e',note:'β-：A 不变，Z+1',color:'#2c7be5',ion:'中',pen:'中',bend:'向正极偏'};return{A,Z,particle:'γ',note:'γ：A、Z 不变',color:'#7b2cbf',ion:'弱',pen:'强',bend:'不偏转'}}
+function params(){const type=+els.type.value,Z=+els.z.value,N=+els.n.value,A=Z+N,d=daughter(A,Z,type);return{type,Z,N,A,d}}
+function label(s,x,y,c='#102a43',size=13,align='center',w='700'){ctx.fillStyle=c;ctx.font=`${w} ${size}px system-ui`;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.48),y2-10*Math.sin(a-.48));ctx.lineTo(x2-10*Math.cos(a+.48),y2-10*Math.sin(a+.48));ctx.closePath();ctx.fill()}
+function drawScene(p){ctx.fillStyle='#fff';ctx.fillRect(0,0,940,640);label('放射性衰变实验台：核素变化与射线探测',470,28,'#102a43',19);label('三视图联动：衰变过程、A/Z 守恒账本、射线探测器和数据记录',470,52,'#486581',13,'center','600');drawReaction(p);drawDetector(p);drawLedger(p);drawHandles(p)}
+function drawNucleus(x,y,title,A,Z,fill){ctx.fillStyle=fill;ctx.strokeStyle='#334e68';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,56,0,Math.PI*2);ctx.fill();ctx.stroke();label(title,x,y-15,'#102a43',18);label(`${A}/${Z}X`,x,y+18,'#102a43',20)}
+function drawReaction(p){ctx.fillStyle='#f2f7ff';ctx.strokeStyle='#2c7be5';ctx.lineWidth=2;ctx.fillRect(54,82,520,302);ctx.strokeRect(54,82,520,302);label('自发衰变装置',314,106,'#2c7be5',14);drawNucleus(150,226,'母核',p.A,p.Z,'#fff7e6');arrow(212,226,314,226,'#e03131',4);drawNucleus(382,226,'子核',p.d.A,p.d.Z,'#eef4ff');const u=playing?(t*.65)%1:.55;const sx=430,sy=190,ex=548,ey=126;const px=sx+(ex-sx)*u,py=sy+(ey-sy)*u+(p.type===1?Math.sin(u*Math.PI)*34:p.type===2?Math.sin(u*12)*8:0);ctx.fillStyle=p.d.color;ctx.beginPath();ctx.arc(px,py,10,0,Math.PI*2);ctx.fill();arrow(430,190,548,126,p.d.color,3);label(p.d.particle,560,124,p.d.color,18,'left');label(p.d.note,314,332,p.d.color,16)}
+function drawDetector(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(610,82,270,214);ctx.strokeRect(610,82,270,214);label('射线探测器/仪器读数',745,106,'#102a43',14);ctx.fillStyle=dragging?'#e03131':'#829ab1';ctx.fillRect(detector.x-18,detector.y-56,36,112);label('拖动探测器',detector.x,detector.y+74,'#486581',12);meter(650,156,150,18,p.type===0?1:p.type===1?.55:.25,'#e03131',`电离能力 ${p.d.ion}`);meter(650,218,150,18,p.type===2?1:p.type===1?.55:.25,'#7b2cbf',`穿透能力 ${p.d.pen}`);label(p.d.bend,745,270,p.d.color,14)}
+function meter(x,y,w,h,val,c,txt){label(txt,x,y-12,c,12,'left');ctx.fillStyle='#e9eef5';ctx.fillRect(x,y,w,h);ctx.fillStyle=c;ctx.fillRect(x,y,w*val,h)}
+function drawLedger(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(610,332,270,176);ctx.strokeRect(610,332,270,176);label('守恒账本/公式绑定',745,356,'#102a43',14);const rightA=p.d.A+(p.type===0?4:0),rightZ=p.d.Z+(p.type===0?2:p.type===1?-1:0);label(`质量数：${p.A} = ${rightA}`,745,400,'#2c7be5',16);label(`电荷数：${p.Z} = ${rightZ}`,745,438,'#2c7be5',16);label(p.d.note,745,480,p.d.color,14)}
+function drawHandles(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(70,432,500,136);ctx.strokeRect(70,432,500,136);label('画面内探测路径',320,456,'#102a43',14);arrow(132,516,490,516,p.d.color,4);label('拖动探测器测射线穿透/偏转',320,540,'#486581',12)}
+function update(p){els.typeVal.textContent=labels[p.type];els.zVal.textContent=p.Z;els.nVal.textContent=p.N;els.readout.innerHTML=[`母核：A=${p.A}, Z=${p.Z}`,`类型=${labels[p.type]}，放出=${p.d.particle}`,`子核：A'=${p.d.A}, Z'=${p.d.Z}`,`规则：${p.d.note}`].join('<br>');els.status.textContent='判定：左右两边质量数和电荷数都守恒；射线性质由类型决定。'}
+function render(){const p=params();drawScene(p);update(p)}
+function animate(now){if(!last)last=now;const dt=Math.min(.04,(now-last)/1000);last=now;if(playing)t+=dt;render();requestAnimationFrame(animate)}
+function dragDetector(e){const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.height;detector.x=Math.max(660,Math.min(842,x));detector.y=Math.max(155,Math.min(240,y));render()}
+canvas.addEventListener('pointerdown',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.height;if(Math.abs(x-detector.x)<40&&Math.abs(y-detector.y)<70){dragging=true;canvas.setPointerCapture(e.pointerId);dragDetector(e)}});canvas.addEventListener('pointermove',e=>{if(dragging)dragDetector(e)});canvas.addEventListener('pointerup',e=>{dragging=false;try{canvas.releasePointerCapture(e.pointerId)}catch{}});canvas.addEventListener('pointercancel',()=>dragging=false);
+els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textContent=playing?'暂停':'播放'});els.resetBtn.addEventListener('click',()=>{playing=false;t=0;detector={x:782,y:210};els.playBtn.textContent='播放';render()});els.recordBtn.addEventListener('click',()=>{const p=params();records.unshift({type:labels[p.type],A:p.d.A,Z:p.d.Z});records=records.slice(0,5);els.recordBody.innerHTML=records.map((r,i)=>`<tr><td>${i+1}</td><td>${r.type}</td><td>${r.A}</td><td>${r.Z}</td></tr>`).join('')});[els.type,els.z,els.n].forEach(el=>el.addEventListener('input',render));render();requestAnimationFrame(animate);
 </script>
 </body>
 </html>

@@ -35,9 +35,9 @@
 </head>
 <body>
 <div class="root">
-  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="重力势能交互实验台"></canvas></div>
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="重力势能交互实验台：高度侧视装置、势能柱状图像和数据记录"></canvas></div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>拖橙色参考面，看 Ep1、Ep2 一起变；再拖 A、B 点，看 ΔEp 与 WG 只由高度差决定。</div>
+    <div class="card task"><b>观察任务：</b>拖橙色参考面，对照高度侧视装置、势能柱状图像和数据记录，看 Ep1、Ep2 怎样一起变。</div>
     <button id="playBtn" class="primary">播放</button>
     <div class="card">
       <div class="title">快速情境</div>
@@ -110,7 +110,7 @@
   }
   function bottom(){const h=handles();roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(82,494,232,'m',colors.green);handle(h.m.x,h.m.y,`m=${fmt(state.m)}`,state.drag==='m',colors.green);ruler(292,494,442,'h1',colors.blue);handle(h.h1.x,h.h1.y,`h1=${fmt(state.h1)}`,state.drag==='h1',colors.blue);ruler(502,494,652,'h2',colors.purple);handle(h.h2.x,h.h2.y,`h2=${fmt(state.h2)}`,state.drag==='h2',colors.purple);ruler(712,494,862,'h0',colors.orange);handle(h.h0.x,h.h0.y,`h0=${fmt(state.h0)}`,state.drag==='h0',colors.orange)}
   function update(r){els.ep1.textContent=`${fmt(r.Ep1)} J`;els.ep2.textContent=`${fmt(r.Ep2)} J`;els.dep.textContent=`${fmt(r.dEp)} J`;els.wg.textContent=`${fmt(r.WG)} J`;els.dh.textContent=`${fmt(r.dh)} m`;els.h0.textContent=`${fmt(state.h0)} m`;els.play.textContent=state.running?'暂停':'播放';els.status.className='status '+(Math.abs(r.WG)<.05?'zero':(r.WG>0?'positive':'negative'));els.status.textContent=Math.abs(r.WG)<.05?'初末高度相同，重力做功为 0；参考面怎么选都不改变这个结论。':(r.WG>0?'物体下降：重力做正功，重力势能减少。':'物体上升：重力做负功，重力势能增加。')}
-  function draw(){const r=calc();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('重力势能实验台：零点可选，变化不变',460,30,'#0f172a','center',19,'900');drawScene(r);drawBars(r);bottom();update(r)}
+  function draw(){const r=calc();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('重力势能实验台：高度侧视装置 + 柱状图像 + 数据记录',460,30,'#0f172a','center',19,'900');drawScene(r);drawBars(r);bottom();update(r)}
   function pos(e){const b=canvas.getBoundingClientRect();return{x:(e.clientX-b.left)*canvas.width/b.width,y:(e.clientY-b.top)*canvas.height/b.height}}
   function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
   function pointerDown(e){const p=pos(e),gm=geom(),h=handles();if(near(p,gm.A,28))state.drag='A';else if(near(p,gm.B,28))state.drag='B';else if(Math.abs(p.y-gm.h0Y)<18&&p.x>80&&p.x<520)state.drag='h0line';else if(near(p,h.m,26))state.drag='m';else if(near(p,h.h1,26))state.drag='h1';else if(near(p,h.h2,26))state.drag='h2';else if(near(p,h.h0,26))state.drag='h0';else state.drag=null;if(state.drag){state.running=false;canvas.setPointerCapture(e.pointerId);pointerMove(e)}}

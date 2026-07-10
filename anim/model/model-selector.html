@@ -1,760 +1,219 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>高频模型诊断台</title>
-  <style>
-    :root {
-      --ink: #102a43;
-      --muted: #486581;
-      --line: #d9e2ec;
-      --bg: #f7f9fc;
-      --blue: #2c7be5;
-      --red: #e03131;
-      --green: #2f9e44;
-      --orange: #f08c00;
-      --purple: #7048e8;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-      color: var(--ink);
-      background: #fff;
-    }
-    .lab {
-      min-height: 700px;
-      display: grid;
-      grid-template-columns: 250px minmax(420px, 1fr) 290px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      overflow: hidden;
-      background: #fff;
-    }
-    .panel {
-      padding: 14px;
-      background: var(--bg);
-      border-right: 1px solid var(--line);
-    }
-    .right {
-      border-right: 0;
-      border-left: 1px solid var(--line);
-    }
-    h1 {
-      margin: 0 0 8px;
-      font-size: 18px;
-      line-height: 1.25;
-    }
-    h2 {
-      margin: 14px 0 8px;
-      font-size: 14px;
-    }
-    .hint {
-      margin: 0 0 10px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.55;
-    }
-    .scenario-list {
-      display: grid;
-      gap: 7px;
-    }
-    button, select {
-      font: inherit;
-    }
-    .scenario {
-      min-height: 42px;
-      padding: 8px 9px;
-      border: 1px solid var(--line);
-      border-radius: 7px;
-      background: #fff;
-      color: var(--ink);
-      text-align: left;
-      cursor: pointer;
-    }
-    .scenario.active {
-      border-color: var(--blue);
-      background: #e8f1ff;
-      box-shadow: inset 3px 0 0 var(--blue);
-    }
-    .tag-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 6px;
-    }
-    .tag {
-      padding: 2px 6px;
-      border-radius: 999px;
-      background: #e9ecef;
-      color: var(--muted);
-      font-size: 11px;
-    }
-    .stage {
-      display: grid;
-      grid-template-rows: auto minmax(360px, 1fr) auto;
-      min-width: 0;
-      background: #fff;
-    }
-    .topbar {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--line);
-    }
-    .case-title {
-      font-size: 17px;
-      font-weight: 800;
-      margin-bottom: 5px;
-    }
-    .case-text {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.55;
-    }
-    .view-note {
-      margin-top: 7px;
-      color: var(--blue);
-      font-size: 12px;
-      font-weight: 700;
-    }
-    .toolbar {
-      display: flex;
-      gap: 7px;
-      margin-top: 9px;
-    }
-    .tool-btn {
-      min-height: 30px;
-      padding: 5px 10px;
-      border: 1px solid var(--line);
-      border-radius: 7px;
-      background: #fff;
-      color: var(--ink);
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 700;
-    }
-    .tool-btn.primary {
-      border-color: var(--blue);
-      background: #e8f1ff;
-      color: var(--blue);
-    }
-    .meter {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 6px 8px;
-      align-items: center;
-      padding: 9px 10px;
-      border: 1px solid var(--line);
-      border-radius: 7px;
-      background: var(--bg);
-      font-size: 12px;
-      color: var(--muted);
-    }
-    .meter strong {
-      color: var(--ink);
-      font-size: 15px;
-    }
-    canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-      background: linear-gradient(#ffffff 0%, #ffffff 62%, #f1f3f5 62%, #f8f9fa 100%);
-    }
-    .controls {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-      padding: 12px 14px;
-      border-top: 1px solid var(--line);
-      background: var(--bg);
-    }
-    label {
-      display: grid;
-      gap: 5px;
-      color: var(--muted);
-      font-size: 12px;
-    }
-    input[type="range"] {
-      width: 100%;
-      accent-color: var(--blue);
-    }
-    .value {
-      color: var(--ink);
-      font-weight: 700;
-    }
-    .choice-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 7px;
-    }
-    .choice {
-      padding: 8px 7px;
-      border: 1px solid var(--line);
-      border-radius: 7px;
-      background: #fff;
-      text-align: center;
-      color: var(--ink);
-      cursor: pointer;
-      font-size: 12px;
-      line-height: 1.25;
-    }
-    .choice.selected {
-      border-color: var(--purple);
-      background: #f3f0ff;
-      box-shadow: inset 0 -3px 0 var(--purple);
-    }
-    .feedback {
-      min-height: 72px;
-      margin-top: 10px;
-      padding: 10px;
-      border-radius: 7px;
-      background: #fff;
-      border: 1px solid var(--line);
-      font-size: 13px;
-      line-height: 1.55;
-    }
-    .feedback.good {
-      border-color: #b2f2bb;
-      background: #ebfbee;
-    }
-    .feedback.bad {
-      border-color: #ffc9c9;
-      background: #fff5f5;
-    }
-    .steps {
-      display: grid;
-      gap: 7px;
-      margin-top: 8px;
-    }
-    .step {
-      display: grid;
-      grid-template-columns: 22px 1fr;
-      gap: 7px;
-      align-items: start;
-      padding: 8px;
-      border-radius: 7px;
-      background: #fff;
-      border: 1px solid var(--line);
-      font-size: 12px;
-      line-height: 1.45;
-      color: var(--muted);
-    }
-    .num {
-      display: grid;
-      place-items: center;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: var(--blue);
-      color: #fff;
-      font-weight: 800;
-      font-size: 12px;
-    }
-    .formula {
-      margin-top: 10px;
-      padding: 9px 10px;
-      background: #102a43;
-      color: #f8f9fa;
-      border-radius: 7px;
-      font-size: 12px;
-      line-height: 1.6;
-      white-space: pre-line;
-    }
-    @media (max-width: 900px) {
-      .lab { grid-template-columns: 1fr; }
-      .panel, .right { border: 0; border-bottom: 1px solid var(--line); }
-      .right { border-top: 1px solid var(--line); }
-      .stage { min-height: 620px; }
-      .controls { grid-template-columns: 1fr; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>高频模型诊断台</title>
+<style>
+  :root{--ink:#102a43;--muted:#486581;--line:#d9e2ec;--bg:#f7f9fc;--blue:#2c7be5;--red:#e03131;--green:#087f5b;--gold:#f0a500;--purple:#7048e8}
+  *{box-sizing:border-box}
+  body{margin:0;background:#fff;color:var(--ink);font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+  .app{min-height:760px;display:grid;grid-template-columns:230px minmax(0,1fr);grid-template-areas:"left main" "right right";border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+  aside{grid-area:left;padding:12px;background:var(--bg);border-right:1px solid var(--line);min-width:0;overflow:auto}
+  aside.right{grid-area:right;border-right:0;border-left:0;border-top:1px solid var(--line);display:grid;grid-template-columns:260px minmax(280px,1fr) 230px;gap:10px;align-items:start}
+  h1{font-size:18px;line-height:1.25;margin:0 0 7px}
+  h2{font-size:14px;margin:12px 0 7px}
+  p{margin:0}
+  .hint{font-size:12px;line-height:1.55;color:var(--muted)}
+  .search{width:100%;border:1px solid var(--line);border-radius:7px;padding:8px 9px;margin:9px 0;background:#fff;color:var(--ink)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+  .chip{border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);font-size:11px;padding:4px 7px;cursor:pointer}
+  .chip.on{background:#e8f1ff;border-color:var(--blue);color:var(--blue);font-weight:800}
+  .list{display:grid;gap:7px;max-height:430px;overflow:auto;padding-right:3px}
+  button{font:inherit}
+  .model-btn{border:1px solid var(--line);background:#fff;border-radius:7px;padding:8px 9px;text-align:left;cursor:pointer;color:var(--ink)}
+  .model-btn.on{border-color:var(--blue);background:#e8f1ff;box-shadow:inset 3px 0 0 var(--blue)}
+  .model-btn b{display:block;font-size:13px;line-height:1.3}
+  .model-btn span{display:block;margin-top:3px;color:var(--muted);font-size:11px;line-height:1.35;word-break:break-word}
+  main{grid-area:main;display:grid;grid-template-rows:auto minmax(390px,1fr)auto;min-width:0}
+  .top{padding:12px 14px;border-bottom:1px solid var(--line);display:grid;gap:10px}
+  .title{font-size:18px;font-weight:900}
+  .subtitle{font-size:13px;color:var(--muted);line-height:1.55;margin-top:4px}
+  .score-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .score{border:1px solid var(--line);border-radius:7px;background:var(--bg);padding:8px 9px;min-height:54px}
+  .score span{display:block;color:var(--muted);font-size:11px}
+  .score b{display:block;color:var(--ink);font-size:14px;margin-top:3px;line-height:1.25;overflow-wrap:anywhere}
+  canvas{display:block;width:100%;height:100%;background:linear-gradient(#ffffff 0%,#ffffff 64%,#f1f3f5 64%,#f8f9fa 100%);touch-action:none;cursor:grab}
+  .controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:10px 14px;border-top:1px solid var(--line);background:var(--bg)}
+  label{display:grid;gap:5px;font-size:12px;color:var(--muted)}
+  input[type=range]{width:100%;accent-color:var(--blue)}
+  .val{font-weight:800;color:var(--ink)}
+  .card{border:1px solid var(--line);border-radius:8px;background:#fff;padding:10px;margin-top:8px}
+  .card.good{border-color:#b2f2bb;background:#ebfbee}
+  .card.warn{border-color:#ffe8a3;background:#fff9db}
+  .card.bad{border-color:#ffc9c9;background:#fff5f5}
+  .k{font-size:12px;color:var(--muted);line-height:1.55}
+  .strong{font-size:14px;font-weight:900;color:var(--ink);line-height:1.45}
+  .steps{display:grid;gap:7px;margin-top:8px}
+  .step{display:grid;grid-template-columns:22px 1fr;gap:7px;border:1px solid var(--line);border-radius:7px;background:#fff;padding:8px;font-size:12px;line-height:1.45;color:var(--muted)}
+  .num{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--blue);color:#fff;font-weight:900}
+  .formula{margin-top:8px;border-radius:7px;background:#102a43;color:#f8f9fa;padding:10px;font-size:12px;line-height:1.6;white-space:pre-line}
+  .link{display:block;text-align:center;text-decoration:none;margin-top:8px;padding:9px 10px;border-radius:7px;background:var(--blue);color:#fff;font-weight:800;font-size:13px}
+  .compare{display:grid;gap:6px;margin-top:8px;max-height:230px;overflow:auto}
+  .candidate{border:1px solid var(--line);border-radius:7px;background:#fff;padding:7px 8px;font-size:12px;line-height:1.4;cursor:pointer}
+  .candidate b{color:var(--blue)}
+  @media(min-width:1120px){
+    .app{grid-template-columns:250px minmax(0,1fr)300px;grid-template-areas:"left main right"}
+    aside.right{border-top:0;border-left:1px solid var(--line);display:block}
+    .score-row{grid-template-columns:repeat(4,minmax(0,1fr))}
+  }
+  @media(max-width:760px){
+    .app{grid-template-columns:1fr;grid-template-areas:"left" "main" "right"}
+    aside,aside.right{border:0;border-bottom:1px solid var(--line);display:block}
+    main{min-height:700px}
+    .score-row,.controls{grid-template-columns:1fr}
+  }
+</style>
 </head>
 <body>
-  <div class="lab">
-    <aside class="panel">
-      <h1>高频模型诊断台</h1>
-      <p class="hint">先看题目信号，再判断模型。点不同题型，看图像、第一步和判据怎样变。</p>
-      <div class="scenario-list" id="scenarioList"></div>
-      <h2>观察任务</h2>
-      <p class="hint" id="watchTask"></p>
-    </aside>
+<div class="app">
+  <aside>
+    <h1>高频模型诊断台</h1>
+    <p class="hint">不是背模型名，而是从题眼出发：信号是什么、第一步列什么、哪个临界最容易错。</p>
+    <input id="search" class="search" placeholder="输入题眼：轻绳 / 传送带 / 导轨 / p-V / 半衰期">
+    <h2>题眼信号</h2>
+    <div class="chips" id="signalChips"></div>
+    <h2>匹配模型</h2>
+    <div class="list" id="modelList"></div>
+  </aside>
 
-    <main class="stage">
-      <div class="topbar">
-        <div>
-          <div class="case-title" id="caseTitle"></div>
-          <div class="case-text" id="caseText"></div>
-          <div class="view-note">多视角实验台：实物场景 + 侧视/俯视 + 图像记录。可直接拖动画面里的蓝色物体或探针。</div>
-          <div class="toolbar">
-            <button class="tool-btn primary play-btn" id="playBtn">▶ 播放</button>
-            <button class="tool-btn" id="resetBtn">重置</button>
-          </div>
-          <div class="tag-row" id="tags"></div>
-        </div>
-        <div class="meter">
-          <span>当前判据</span><strong id="criterion"></strong>
-          <span>状态反馈</span><strong id="stateText"></strong>
-          <span>第一公式</span><strong id="firstFormula"></strong>
-        </div>
+  <main>
+    <section class="top">
+      <div>
+        <div class="title" id="title"></div>
+        <div class="subtitle" id="subtitle"></div>
       </div>
-      <canvas id="canvas" width="920" height="430"></canvas>
-      <div class="controls">
-        <label><span id="labelA"></span><input id="ctrlA" type="range"><span class="value" id="valueA"></span></label>
-        <label><span id="labelB"></span><input id="ctrlB" type="range"><span class="value" id="valueB"></span></label>
-        <label><span id="labelC"></span><input id="ctrlC" type="range"><span class="value" id="valueC"></span></label>
+      <div class="score-row">
+        <div class="score"><span>题眼信号</span><b id="signalBox"></b></div>
+        <div class="score"><span>第一反应</span><b id="reactionBox"></b></div>
+        <div class="score"><span>判据读数</span><b id="criterionBox"></b></div>
+        <div class="score"><span>当前状态</span><b id="stateBox"></b></div>
       </div>
-    </main>
+    </section>
+    <canvas id="canvas" width="920" height="430" aria-label="高频模型诊断台：实物场景、判据图像、仪器读数和数据记录"></canvas>
+    <section class="controls">
+      <label><span id="la"></span><input id="a" type="range"><span class="val" id="va"></span></label>
+      <label><span id="lb"></span><input id="b" type="range"><span class="val" id="vb"></span></label>
+      <label><span id="lc"></span><input id="c" type="range"><span class="val" id="vc"></span></label>
+    </section>
+  </main>
 
-    <aside class="panel right">
-      <h2>选择模型</h2>
-      <div class="choice-grid" id="choiceGrid"></div>
-      <div class="feedback" id="feedback">先选择一个题目信号，再点你认为应该使用的模型。</div>
-      <h2>第一步流程</h2>
-      <div class="steps" id="steps"></div>
-      <div class="formula" id="formulaBox"></div>
-    </aside>
-  </div>
+  <aside class="right">
+    <h2>诊断结论</h2>
+    <div class="card good">
+      <div class="k">推荐模型</div>
+      <div class="strong" id="recommend"></div>
+    </div>
+    <div class="card">
+      <div class="k">为什么不是别的模型</div>
+      <div id="whyNot" class="k"></div>
+    </div>
+    <h2>第一步流程</h2>
+    <div class="steps" id="steps"></div>
+    <div class="formula" id="formula"></div>
+    <div class="card warn">
+      <div class="k">最容易错</div>
+      <div class="strong" id="trap"></div>
+    </div>
+    <a id="openLink" class="link" target="_top" href="../../#/models">进入对应模型复习</a>
+    <h2>候选对比</h2>
+    <div class="compare" id="candidates"></div>
+  </aside>
+</div>
 
-  <script>
-    const cases = [
-      {
-        key: 'connecting',
-        title: '两个物块被轻绳拉着一起走',
-        text: '题目问共同加速度和绳中张力。先把两物体看成整体求 a，再隔离一端求 T。',
-        tags: ['轻绳', '共同加速度', '张力'],
-        answer: '连接体',
-        watch: '拖动外力和质量，看整体加速度先变，绳中张力再由隔离物体决定。',
-        sliders: [
-          ['外力 F', 4, 30, 14, 'N'],
-          ['m1', 1, 8, 2, 'kg'],
-          ['m2', 1, 10, 4, 'kg']
-        ],
-        formulas: ['a=F/(m1+m2)', 'T=m1a'],
-        steps: ['确认两物体是否共同运动', '对整体列外力方程求 a', '隔离其中一个物体求内力'],
-        draw: drawConnecting
-      },
-      {
-        key: 'plank',
-        title: '物块在长木板上，被水平力拉动',
-        text: '题目问是否相对滑动。先假设共同运动，算所需静摩擦，再与最大静摩擦比较。',
-        tags: ['相对滑动', '静摩擦临界', '板块'],
-        answer: '板块',
-        watch: '拖动 F 或 μ，看状态从“共同运动”跳到“相对滑动”的临界点。',
-        sliders: [
-          ['外力 F', 2, 30, 12, 'N'],
-          ['摩擦因数 μ', 0.05, 0.8, 0.30, ''],
-          ['木板质量 M', 1, 10, 4, 'kg']
-        ],
-        formulas: ['a=F/(m+M)', 'f需=Ma', 'fmax=μmg'],
-        steps: ['假设物块和木板共同运动', '隔离木板求 f需', '比较 f需 与 fmax'],
-        draw: drawPlank
-      },
-      {
-        key: 'belt',
-        title: '物块放上传送带，速度不同',
-        text: '题目问共速时间、划痕或热量。第一步永远是比较 v物 与 v带，摩擦阻碍相对运动。',
-        tags: ['共速', '相对位移', '摩擦生热'],
-        answer: '传送带',
-        watch: '拖动物块初速度，看摩擦方向如何随 v物-v带 改变。',
-        sliders: [
-          ['传送带速度 v带', 1, 9, 5, 'm/s'],
-          ['物块初速度 v0', 0, 10, 0, 'm/s'],
-          ['摩擦因数 μ', 0.05, 0.6, 0.25, '']
-        ],
-        formulas: ['a=μg', 't共=|v带-v0|/μg', '划痕=|x带-x物|'],
-        steps: ['比较 v物 和 v带', '判断摩擦方向和加减速', '先算共速，再判断是否离开'],
-        draw: drawBelt
-      },
-      {
-        key: 'spring',
-        title: '剪断轻绳后的一瞬间',
-        text: '题目问 t=0+ 的加速度。弹簧力由形变量决定，瞬间不能突变；绳力可以立刻变为 0。',
-        tags: ['瞬时', '弹簧不突变', '绳力突变'],
-        answer: '弹簧瞬时',
-        watch: '拖动剪断前绳拉力，看 t=0+ 合力和瞬时加速度如何同步变。',
-        sliders: [
-          ['质量 m', 1, 8, 2, 'kg'],
-          ['剪断前 T0', 0, 40, 12, 'N'],
-          ['劲度系数 k', 80, 400, 160, 'N/m']
-        ],
-        formulas: ['t=0-: F弹=mg+T0', 't=0+: T=0, F弹不变', 'a=T0/m'],
-        steps: ['先用剪断前平衡求弹簧力', '删掉已断的绳力', '保留弹簧力并重画受力图'],
-        draw: drawSpring
-      },
-      {
-        key: 'rail',
-        title: '金属棒切割磁感线，导轨上灯泡发光',
-        text: '题目问感应电动势、电流、安培阻力或能量转化。先确定 B、L、v，再用右手定则和 E=BLv。',
-        tags: ['切割磁感线', '感应电流', '安培阻力'],
-        answer: '导轨',
-        watch: '拖动速度和磁感应强度，看电动势、电流、阻力、功率同时增大。',
-        sliders: [
-          ['磁感应强度 B', 0.2, 1.2, 0.6, 'T'],
-          ['棒长 L', 0.3, 1.2, 0.8, 'm'],
-          ['速度 v', 0.5, 8, 3, 'm/s']
-        ],
-        formulas: ['E=BLv', 'I=E/R', 'F安=BIL'],
-        steps: ['判断切割速度是否垂直磁场', '用右手定则判电流方向', '用能量守恒检查机械功率去向'],
-        draw: drawRail
-      },
-      {
-        key: 'collision',
-        title: '两物体短时间碰撞或爆炸',
-        text: '题目出现碰撞、反冲、爆炸。先判断系统外力冲量能否忽略，优先写动量守恒。',
-        tags: ['短时间', '内力很大', '动量守恒'],
-        answer: '碰撞',
-        watch: '拖动恢复系数，看动量总量守恒而机械能是否损失。',
-        sliders: [
-          ['m1', 1, 8, 2, 'kg'],
-          ['m2', 1, 8, 3, 'kg'],
-          ['恢复系数 e', 0, 1, 0.7, '']
-        ],
-        formulas: ['m1v1+m2v2=m1v1′+m2v2′', 'e=(v2′-v1′)/(v1-v2)'],
-        steps: ['圈定系统并判断外力冲量', '先列动量守恒', '再按弹性/非弹性补充条件'],
-        draw: drawCollision
-      }
-    ];
-    const choices = ['连接体', '板块', '传送带', '弹簧瞬时', '平抛/类平抛', '圆周临界', '天体', '机车启动', '功能关系', '碰撞', '导轨', '交流电', '复合场粒子', '气体状态', '核反应'];
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    let active = 0;
-    let selected = '';
-    let t = 0;
-    let running = true;
-    let dragTarget = null;
-    const history = [];
-    const controls = [
-      document.getElementById('ctrlA'),
-      document.getElementById('ctrlB'),
-      document.getElementById('ctrlC')
-    ];
-
-    function fmt(v) {
-      return Math.abs(v) >= 10 ? v.toFixed(0) : v.toFixed(2).replace(/0$/, '').replace(/\.0$/, '');
-    }
-    function values() {
-      return controls.map(c => Number(c.value));
-    }
-    function setup() {
-      const list = document.getElementById('scenarioList');
-      list.innerHTML = cases.map((c, i) => `<button class="scenario" data-i="${i}">${c.title}</button>`).join('');
-      list.addEventListener('click', e => {
-        const btn = e.target.closest('button');
-        if (!btn) return;
-        active = Number(btn.dataset.i);
-        selected = '';
-        renderStatic();
-      });
-      const grid = document.getElementById('choiceGrid');
-      grid.innerHTML = choices.map(c => `<button class="choice" data-choice="${c}">${c}</button>`).join('');
-      grid.addEventListener('click', e => {
-        const btn = e.target.closest('button');
-        if (!btn) return;
-        selected = btn.dataset.choice;
-        renderStatic();
-      });
-      document.getElementById('playBtn').addEventListener('click', () => {
-        running = !running;
-        document.getElementById('playBtn').textContent = running ? '暂停' : '▶ 播放';
-        renderStatic();
-      });
-      document.getElementById('resetBtn').addEventListener('click', () => {
-        running = true;
-        history.length = 0;
-        controls.forEach(c => { c.dataset.case = ''; });
-        renderStatic();
-      });
-      canvas.addEventListener('pointerdown', onPointerDown);
-      canvas.addEventListener('pointermove', onPointerMove);
-      canvas.addEventListener('pointerup', e => { dragTarget = null; canvas.releasePointerCapture?.(e.pointerId); });
-      canvas.addEventListener('pointercancel', () => { dragTarget = null; });
-      controls.forEach(c => c.addEventListener('input', renderStatic));
-      renderStatic();
-      requestAnimationFrame(loop);
-    }
-    function renderStatic() {
-      const c = cases[active];
-      document.querySelectorAll('.scenario').forEach((b, i) => b.classList.toggle('active', i === active));
-      document.querySelectorAll('.choice').forEach(b => b.classList.toggle('selected', b.dataset.choice === selected));
-      document.getElementById('caseTitle').textContent = c.title;
-      document.getElementById('caseText').textContent = c.text;
-      document.getElementById('watchTask').textContent = c.watch;
-      document.getElementById('tags').innerHTML = c.tags.map(x => `<span class="tag">${x}</span>`).join('');
-      c.sliders.forEach((s, i) => {
-        controls[i].min = s[1];
-        controls[i].max = s[2];
-        controls[i].step = s[2] - s[1] > 20 ? 1 : 0.01;
-        if (!controls[i].dataset.case || controls[i].dataset.case !== c.key) controls[i].value = s[3];
-        controls[i].dataset.case = c.key;
-        document.getElementById('label' + 'ABC'[i]).textContent = s[0];
-        document.getElementById('value' + 'ABC'[i]).textContent = fmt(Number(controls[i].value)) + (s[4] ? ' ' + s[4] : '');
-      });
-      const feedback = document.getElementById('feedback');
-      if (!selected) {
-        feedback.className = 'feedback';
-        feedback.textContent = '先看题目信号和动态图，再选择模型。';
-      } else if (selected === c.answer) {
-        feedback.className = 'feedback good';
-        feedback.textContent = '判断正确：这题的第一反应就是“' + c.answer + '模型”。现在看下面第一步流程。';
-      } else {
-        feedback.className = 'feedback bad';
-        feedback.textContent = '还不对。抓关键词：' + c.tags.join('、') + '。先不要代公式，先判断模型。';
-      }
-      document.getElementById('steps').innerHTML = c.steps.map((s, i) => `<div class="step"><span class="num">${i + 1}</span><span>${s}</span></div>`).join('');
-      document.getElementById('formulaBox').textContent = c.formulas.join('\n');
-      draw();
-    }
-    function loop(ts) {
-      if (running) t = ts / 1000;
-      draw();
-      requestAnimationFrame(loop);
-    }
-    function pointerPos(e) {
-      const r = canvas.getBoundingClientRect();
-      return {
-        x: (e.clientX - r.left) * canvas.width / r.width,
-        y: (e.clientY - r.top) * canvas.height / r.height
-      };
-    }
-    function onPointerDown(e) {
-      const p = pointerPos(e);
-      dragTarget = hitDragHandle(p);
-      if (dragTarget) {
-        canvas.setPointerCapture?.(e.pointerId);
-        onPointerMove(e);
-      }
-    }
-    function onPointerMove(e) {
-      if (!dragTarget) return;
-      const p = pointerPos(e);
-      const c = cases[active];
-      const map = dragTarget.map;
-      const next = Math.max(map.min, Math.min(map.max, map.fn(p)));
-      controls[map.index].value = next;
-      renderStatic();
-    }
-    function hitDragHandle(p) {
-      const candidates = dragHandles();
-      return candidates.find(h => Math.hypot(p.x - h.x, p.y - h.y) < h.r);
-    }
-    function dragHandles() {
-      const [a, b, c] = values();
-      if (cases[active].key === 'connecting') {
-        return [{ x: 550 + a * 8, y: 249, r: 34, map: { index: 0, min: 4, max: 30, fn: p => (p.x - 550) / 8 } }];
-      }
-      if (cases[active].key === 'plank') {
-        return [{ x: 420 + a * 7, y: 192, r: 34, map: { index: 0, min: 2, max: 30, fn: p => (p.x - 420) / 7 } }];
-      }
-      if (cases[active].key === 'belt') {
-        return [{ x: 430, y: 325, r: 36, map: { index: 0, min: 1, max: 9, fn: p => (p.x - 260) / 34 } }];
-      }
-      if (cases[active].key === 'spring') {
-        return [{ x: 308, y: 305 + ((b + a * 10) / c) * 80, r: 34, map: { index: 1, min: 0, max: 40, fn: p => (p.y - 305) * c / 80 - a * 10 } }];
-      }
-      if (cases[active].key === 'rail') {
-        return [{ x: 425, y: 240, r: 36, map: { index: 2, min: 0.5, max: 8, fn: p => (p.x - 330) / 12 } }];
-      }
-      return [{ x: 360, y: 190, r: 36, map: { index: 2, min: 0, max: 1, fn: p => (p.x - 260) / 180 } }];
-    }
-    function drawHandle(x, y, label) {
-      ctx.save();
-      ctx.fillStyle = '#fff';
-      ctx.strokeStyle = '#2c7be5';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.arc(x, y, 12, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
-      text(label, x, y - 26, '#2c7be5', 12, 'center', true);
-      ctx.restore();
-    }
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      grid();
-      cases[active].draw(values());
-    }
-    function grid() {
-      ctx.strokeStyle = '#eef2f7';
-      ctx.lineWidth = 1;
-      for (let x = 40; x < canvas.width; x += 40) line(x, 0, x, canvas.height);
-      for (let y = 40; y < canvas.height; y += 40) line(0, y, canvas.width, y);
-      text('侧视实物场景', 82, 32, '#486581', 13, 'left', true);
-      text('右下角：俯视/图像记录', 690, 32, '#486581', 13, 'left', true);
-    }
-    function line(x1, y1, x2, y2) {
-      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
-    }
-    function arrow(x1, y1, x2, y2, color, label) {
-      ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 4;
-      line(x1, y1, x2, y2);
-      const a = Math.atan2(y2 - y1, x2 - x1);
-      ctx.beginPath();
-      ctx.moveTo(x2, y2);
-      ctx.lineTo(x2 - 12 * Math.cos(a - 0.45), y2 - 12 * Math.sin(a - 0.45));
-      ctx.lineTo(x2 - 12 * Math.cos(a + 0.45), y2 - 12 * Math.sin(a + 0.45));
-      ctx.closePath(); ctx.fill();
-      if (label) text(label, (x1 + x2) / 2, (y1 + y2) / 2 - 10, color, 15, 'center', true);
-    }
-    function text(s, x, y, color = '#102a43', size = 14, align = 'left', bold = false) {
-      ctx.fillStyle = color;
-      ctx.font = `${bold ? 800 : 500} ${size}px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif`;
-      ctx.textAlign = align;
-      ctx.textBaseline = 'middle';
-      ctx.fillText(s, x, y);
-    }
-    function block(x, y, w, h, color, label) {
-      ctx.fillStyle = color;
-      roundRect(x, y, w, h, 8);
-      ctx.fill();
-      text(label, x + w / 2, y + h / 2, '#fff', 18, 'center', true);
-    }
-    function roundRect(x, y, w, h, r) {
-      ctx.beginPath();
-      ctx.moveTo(x + r, y);
-      ctx.arcTo(x + w, y, x + w, y + h, r);
-      ctx.arcTo(x + w, y + h, x, y + h, r);
-      ctx.arcTo(x, y + h, x, y, r);
-      ctx.arcTo(x, y, x + w, y, r);
-      ctx.closePath();
-    }
-    function setReadouts(criterion, state, first) {
-      document.getElementById('criterion').textContent = criterion;
-      document.getElementById('stateText').textContent = state;
-      document.getElementById('firstFormula').textContent = first;
-    }
-    function drawConnecting([F, m1, m2]) {
-      const a = F / (m1 + m2);
-      const T = m1 * a;
-      setReadouts(`a=${fmt(a)} m/s²`, `T=${fmt(T)} N`, '整体法');
-      block(240, 220, 95, 58, '#2c7be5', 'm1');
-      block(430, 220, 120, 58, '#38b2ac', 'm2');
-      ctx.strokeStyle = '#334e68'; ctx.lineWidth = 5; line(335, 249, 430, 249);
-      arrow(550, 249, 550 + F * 8, 249, '#e03131', 'F');
-      drawHandle(550 + F * 8, 249, '拖 F');
-      arrow(270, 190, 520, 190, '#7048e8', '共同 a');
-      arrow(335, 218, 390, 218, '#f08c00', 'T');
-      graphBox([a, T, F / 8], ['a', 'T', 'F']);
-      text(`整体只看外力：F=(${fmt(m1)}+${fmt(m2)})a`, 460, 86, '#102a43', 19, 'center', true);
-      text(`隔离 m1：T=m1a=${fmt(T)} N`, 460, 122, '#486581', 16, 'center');
-    }
-    function drawPlank([F, mu, M]) {
-      const m = 1.5, g = 10;
-      const a = F / (m + M);
-      const need = M * a;
-      const max = mu * m * g;
-      const slip = need > max;
-      setReadouts(`f需 ${fmt(need)} / fmax ${fmt(max)}`, slip ? '相对滑动' : '共同运动', '先假设');
-      block(310 + Math.sin(t * 2) * (slip ? 18 : 4), 165, 110, 55, '#2c7be5', 'm');
-      block(240, 220, 310, 42, '#829ab1', 'M');
-      arrow(420, 192, 420 + F * 7, 192, '#e03131', 'F');
-      drawHandle(420 + F * 7, 192, '拖 F');
-      arrow(305, 222, 245, 222, '#f08c00', 'f');
-      arrow(345, 242, 420, 242, '#f08c00', 'f');
-      graphBox([need, max, F / 3], ['f需', 'fmax', 'F']);
-      text(slip ? '静摩擦不够：改用滑动摩擦，分别列方程' : '静摩擦够：两者可看成整体', 460, 92, slip ? '#e03131' : '#2f9e44', 19, 'center', true);
-      text(`判据：f需=Ma=${fmt(need)} N，fmax=μmg=${fmt(max)} N`, 460, 126, '#486581', 16, 'center');
-    }
-    function drawBelt([vb, v0, mu]) {
-      const dv = vb - v0;
-      const dir = Math.abs(dv) < 0.08 ? 0 : Math.sign(dv);
-      const tc = Math.abs(dv) / (mu * 10);
-      setReadouts(`v物-v带=${fmt(v0 - vb)}`, dir === 0 ? '已共速' : (dir > 0 ? '摩擦向右' : '摩擦向左'), '先比速度');
-      ctx.strokeStyle = '#829ab1'; ctx.lineWidth = 7;
-      line(180, 250, 740, 250); line(180, 300, 740, 300);
-      ctx.fillStyle = '#f8f9fa'; ctx.beginPath(); ctx.ellipse(180, 275, 38, 28, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-      ctx.beginPath(); ctx.ellipse(740, 275, 38, 28, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-      const x = 310 + ((t * 45) % 80);
-      block(x, 190, 80, 60, '#2c7be5', 'm');
-      arrow(260, 325, 430, 325, '#7048e8', 'v带');
-      drawHandle(430, 325, '拖 v带');
-      if (dir) arrow(x + 40, 180, x + 40 + dir * 105, 180, '#e03131', '摩擦');
-      graphBox([vb, v0, tc], ['v带', 'v物', 't共']);
-      text(dir === 0 ? '共速后通常无滑动摩擦' : `共速时间 t=${fmt(tc)} s`, 460, 92, dir === 0 ? '#2f9e44' : '#102a43', 19, 'center', true);
-      text('摩擦阻碍的是相对传送带的滑动，不是简单阻碍对地运动', 460, 126, '#486581', 16, 'center');
-    }
-    function drawSpring([m, T0, k]) {
-      const g = 10;
-      const a = T0 / m;
-      const x = (m * g + T0) / k;
-      setReadouts(`F弹=${fmt(m * g + T0)} N`, `a=${fmt(a)} m/s²`, '重画 t=0+');
-      ctx.strokeStyle = '#334e68'; ctx.lineWidth = 5; line(250, 70, 390, 70); line(560, 70, 700, 70);
-      spring(320, 70, 320, 190 + x * 80); spring(630, 70, 630, 190 + x * 80);
-      block(280, 190 + x * 80, 80, 58, '#2c7be5', '0-');
-      block(590, 190 + x * 80 + Math.sin(t * 3) * Math.min(a * 2, 18), 80, 58, '#38b2ac', '0+');
-      arrow(320, 190 + x * 80, 320, 125, '#e03131', 'F弹');
-      arrow(308, 248 + x * 80, 308, 305 + x * 80, '#e03131', 'T0');
-      drawHandle(308, 305 + x * 80, '拖 T0');
-      arrow(630, 190 + x * 80, 630, 125, '#e03131', 'F弹不变');
-      arrow(705, 245 + x * 80, 705, 205 + x * 80, '#7048e8', 'a');
-      graphBox([m * g + T0, T0, a], ['F弹', 'T0', 'a']);
-      text('剪断后：绳力消失，弹簧力保持剪断前读数', 460, 98, '#102a43', 19, 'center', true);
-    }
-    function spring(x1, y1, x2, y2) {
-      ctx.strokeStyle = '#334e68'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(x1, y1);
-      const n = 8;
-      for (let i = 1; i <= n; i++) {
-        const y = y1 + (y2 - y1) * i / n;
-        const x = x1 + (i % 2 ? -18 : 18);
-        ctx.lineTo(x, y);
-      }
-      ctx.lineTo(x2, y2); ctx.stroke();
-    }
-    function drawRail([B, L, v]) {
-      const E = B * L * v, I = E / 2, F = B * I * L;
-      setReadouts(`E=${fmt(E)} V`, `F安=${fmt(F)} N`, 'E=BLv');
-      ctx.strokeStyle = '#334e68'; ctx.lineWidth = 5;
-      line(210, 170, 710, 170); line(210, 310, 710, 310);
-      const x = 330 + ((t * v * 18) % 260);
-      ctx.strokeStyle = '#2c7be5'; ctx.lineWidth = 10; line(x, 160, x, 320);
-      for (let i = 250; i < 700; i += 52) {
-        text('×', i, 110, '#7048e8', 28, 'center', true);
-        text('×', i, 370, '#7048e8', 28, 'center', true);
-      }
-      arrow(x, 240, x + 95, 240, '#e03131', 'v');
-      drawHandle(x + 95, 240, '拖 v');
-      arrow(x - 10, 255, x - 85, 255, '#f08c00', 'F安');
-      ctx.strokeStyle = '#f08c00'; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(210, 240, 45, -Math.PI / 2, Math.PI / 2); ctx.stroke();
-      text('灯泡', 155, 240, '#f08c00', 15, 'center', true);
-      graphBox([E, I, F], ['E', 'I', 'F安']);
-      text(`电动势 E=BLv=${fmt(E)} V，机械功率转化为电能和热`, 460, 92, '#102a43', 18, 'center', true);
-    }
-    function drawCollision([m1, m2, e]) {
-      const v1 = 5, v2 = 0;
-      const v1p = (m1 * v1 + m2 * v2 - m2 * e * (v1 - v2)) / (m1 + m2);
-      const v2p = v1p + e * (v1 - v2);
-      setReadouts('外力冲量≈0', `e=${fmt(e)}`, '动量守恒');
-      const gap = Math.max(0, 120 - ((t * 90) % 170));
-      block(250 + Math.min(80, 120 - gap), 220, 90, 58, '#2c7be5', 'm1');
-      block(470 + Math.max(0, 80 - gap), 220, 110, 58, '#38b2ac', 'm2');
-      arrow(260, 190, 360, 190, '#7048e8', 'v1');
-      drawHandle(360, 190, '拖 e');
-      arrow(500, 315, 500 + v2p * 24, 315, '#2f9e44', 'v2′');
-      arrow(315, 315, 315 + v1p * 24, 315, '#2c7be5', 'v1′');
-      graphBox([m1 * v1, m1 * v1p, m2 * v2p], ['p前', 'p1′', 'p2′']);
-      text('碰撞瞬间：先守恒动量，再补充碰撞类型条件', 460, 92, '#102a43', 19, 'center', true);
-      text(`碰后 v1′=${fmt(v1p)} m/s，v2′=${fmt(v2p)} m/s`, 460, 126, '#486581', 16, 'center');
-    }
-    function graphBox(vals, labels) {
-      const x = 690, y = 248, w = 190, h = 130;
-      ctx.fillStyle = 'rgba(255,255,255,.92)';
-      ctx.strokeStyle = '#d9e2ec';
-      ctx.lineWidth = 1.5;
-      roundRect(x, y, w, h, 8);
-      ctx.fill(); ctx.stroke();
-      text('图像记录 / 俯视读数', x + 12, y + 18, '#102a43', 13, 'left', true);
-      const max = Math.max(...vals.map(v => Math.abs(v)), 1);
-      vals.forEach((v, i) => {
-        const bh = 66 * Math.abs(v) / max;
-        const bx = x + 28 + i * 48;
-        ctx.fillStyle = ['#2c7be5', '#f08c00', '#7048e8'][i % 3];
-        ctx.fillRect(bx, y + 100 - bh, 24, bh);
-        text(labels[i], bx + 12, y + 113, '#486581', 11, 'center');
-      });
-    }
-    setup();
-  </script>
+<script>
+const models=[
+  {id:'M-01',name:'连接体模型',anchor:'model-connecting-body',family:'force',signals:['轻绳','轻杆','共同加速度','张力','内力'],desc:'多个物体被约束一起运动，先整体后隔离。',reaction:'先整体求 a，再隔离求内力',criterion:'加速度是否相同',formula:['F外=(m1+m2)a','T=m1a'],steps:['圈出可共同运动的整体','整体只保留外力求 a','隔离目标物体求张力或压力'],trap:'把绳张力放进整体方程，或没确认是否共同运动。',sliders:[['外力 F',4,32,16,'N'],['m1',1,8,2,'kg'],['m2',1,10,4,'kg']],draw:'connecting'},
+  {id:'M-02',name:'板块模型',anchor:'model-plank-block',family:'friction',signals:['木板','物块','相对滑动','滑痕','静摩擦临界'],desc:'物块与木板可能一起走，也可能相对滑动。',reaction:'先假设共同运动，比较 f需 与 fmax',criterion:'f需 ≤ fmax ?',formula:['a=F/(m+M)','f需=Ma','fmax=μmg'],steps:['假设物块与木板共同运动','隔离其中一个物体算所需静摩擦','超过最大静摩擦后改分列'],trap:'一上来就用滑动摩擦，漏掉共同运动临界。',sliders:[['外力 F',2,34,14,'N'],['摩擦因数 μ',.05,.8,.3,''],['木板质量 M',1,10,4,'kg']],draw:'plank'},
+  {id:'M-03',name:'传送带模型',anchor:'model-conveyor-belt',family:'friction',signals:['传送带','共速','划痕','相对位移','摩擦生热'],desc:'核心是物块相对传送带的运动，不是单纯对地运动。',reaction:'先比较 v物 与 v带',criterion:'v物-v带 的符号',formula:['a=μg','t共=|v带-v0|/μg','Q=fs相对'],steps:['比较物块速度和带速','判断摩擦方向','先算共速，再看带长和划痕'],trap:'把摩擦方向画成永远阻碍对地运动。',sliders:[['v带',1,9,5,'m/s'],['v0',0,10,1,'m/s'],['μ',.05,.7,.25,'']],draw:'belt'},
+  {id:'M-04',name:'弹簧瞬时问题',anchor:'model-spring-instant',family:'force',signals:['剪断','撤去支撑','瞬时加速度','弹簧','绳力突变'],desc:'t=0+ 重新受力，弹簧力不突变，绳力可突变。',reaction:'保留弹簧力，删掉断绳/支撑',criterion:'哪些力能突变',formula:['t=0- 求 F弹','t=0+ 保留 F弹','ΣF=ma'],steps:['用剪断前状态求弹簧力','删掉已断约束力','对 t=0+ 重画受力图'],trap:'把弹簧力也瞬间清零。',sliders:[['质量 m',1,8,2,'kg'],['剪断前 T0',0,40,12,'N'],['劲度系数 k',80,420,160,'N/m']],draw:'spring'},
+  {id:'M-05',name:'平抛与类平抛',anchor:'model-projectile-like',family:'motion',signals:['水平初速度','竖直加速度','偏转','类平抛','分运动'],desc:'一个方向匀速，另一个方向匀加速。',reaction:'拆成 x 匀速、y 匀加速',criterion:'两方向是否互不影响',formula:['x=v0t','y=1/2 at²','tanθ=vy/vx'],steps:['建立垂直坐标轴','沿初速度方向列匀速','沿受力方向列匀加速'],trap:'把合运动当直线，或把速度方向当加速度方向。',sliders:[['v0',2,18,8,'m/s'],['a',2,16,10,'m/s²'],['时间 t',.2,3,1.2,'s']],draw:'projectile'},
+  {id:'M-06',name:'圆周临界模型',anchor:'model-circular-critical',family:'circle',signals:['最高点','恰好过顶','绳松','杆支持','圆周临界'],desc:'最高点或最低点列向心方向方程。',reaction:'先找圆心方向，再列 v²/r',criterion:'最高点约束是否还能提供力',formula:['最高点绳：mg+T=mv²/r','恰好过顶：T=0','vmin=√gr'],steps:['判断绳、杆、轨道类型','在临界点沿半径列方程','把“恰好”翻译为 T=0 或 N=0'],trap:'绳和杆混用临界条件。',sliders:[['半径 r',.2,2,.8,'m'],['速度 v',1,8,3,'m/s'],['质量 m',.1,2,.5,'kg']],draw:'circle'},
+  {id:'M-07',name:'天体运动模型',anchor:'model-orbital-motion',family:'gravity',signals:['卫星','轨道半径','周期','双星','变轨'],desc:'万有引力提供向心力，半径越大速度越小周期越大。',reaction:'先写 GMm/r² = mv²/r',criterion:'中心天体质量与轨道半径',formula:['GMm/r²=mv²/r','T²=4π²r³/GM','v=√(GM/r)'],steps:['确认绕哪个中心天体','把万有引力列为向心力','比较 r 的幂次关系'],trap:'误以为高轨道速度更大。',sliders:[['轨道半径 r',1,6,2,'R'],['中心质量 M',1,8,4,'M0'],['速度倍率',.6,1.4,1,'']],draw:'orbit'},
+  {id:'M-08',name:'机车启动模型',anchor:'model-vehicle-start',family:'energy',signals:['恒定功率','额定功率','牵引力','最大速度','启动'],desc:'P=Fv，恒功率时速度越大牵引力越小。',reaction:'先判断恒力启动还是恒功率启动',criterion:'P=Fv 与阻力平衡',formula:['P=Fv','F-f=ma','vm=P/f'],steps:['读出是恒力阶段还是恒功率阶段','用 P=Fv 换牵引力','终速令 F=f'],trap:'恒功率阶段仍把牵引力当常量。',sliders:[['功率 P',10,80,40,'kW'],['阻力 f',1,8,4,'kN'],['速度 v',1,30,8,'m/s']],draw:'vehicle'},
+  {id:'M-09',name:'功能关系综合',anchor:'model-work-energy',family:'energy',signals:['全过程','非保守力','摩擦生热','高度变化','能量账本'],desc:'复杂过程先建能量账本，保守力用势能，非保守力用功。',reaction:'先写初末能量账本',criterion:'除重力弹力外谁做功',formula:['W非保=ΔE机','Q=f·s相对','Ek1+Ep1+W外=Ek2+Ep2'],steps:['选系统和初末状态','区分保守力与非保守力','把摩擦热或外力功放到账本里'],trap:'摩擦生热用对地位移而不是相对位移。',sliders:[['高度差 h',0,5,2,'m'],['摩擦力 f',0,20,8,'N'],['相对位移 s',0,8,3,'m']],draw:'energy'},
+  {id:'M-10',name:'碰撞模型',anchor:'model-collision',family:'momentum',signals:['碰撞','爆炸','反冲','短时间','动量守恒'],desc:'短时间内内力远大于外力，优先写动量守恒。',reaction:'先判断外力冲量能否忽略',criterion:'系统总动量守恒',formula:['m1v1+m2v2=m1v1′+m2v2′','e=(v2′-v1′)/(v1-v2)'],steps:['圈定系统','判断外力冲量是否可忽略','按弹性/粘连/反冲补条件'],trap:'动量守恒不等于机械能一定守恒。',sliders:[['m1',1,8,2,'kg'],['m2',1,8,3,'kg'],['恢复系数 e',0,1,.7,'']],draw:'collision'},
+  {id:'M-11',name:'导轨模型',anchor:'model-rail-rod',family:'em',signals:['导轨','金属棒','切割磁感线','灯泡','安培阻力'],desc:'棒是运动电源，电流后又受安培阻力。',reaction:'先定 B、L、v，再写 E=BLv',criterion:'电动势、电流、安培力闭环',formula:['E=BLv','I=E/R','F安=BIL'],steps:['判断棒是否垂直切割磁感线','用右手定则判电流方向','用安培力和能量守恒校验'],trap:'只算电动势，漏掉安培力反过来影响运动。',sliders:[['B',.2,1.2,.6,'T'],['L',.3,1.2,.8,'m'],['v',.5,8,3,'m/s']],draw:'rail'},
+  {id:'M-12',name:'交流电综合',anchor:'model-ac-transformer',family:'em',signals:['有效值','峰值','变压器','输电','匝数比'],desc:'交流电先区分瞬时值、峰值、有效值，再看理想变压器关系。',reaction:'先把题目给的是峰值还是有效值说清',criterion:'U1/U2=n1/n2',formula:['U=Um/√2','U1/U2=n1/n2','P入≈P出'],steps:['标清峰值/有效值','按匝数比变压','输电题用 P=UI 和 I²R'],trap:'把峰值直接代入有效值公式。',sliders:[['原线圈 n1',100,1000,500,'匝'],['副线圈 n2',50,1000,250,'匝'],['输入 U1',110,380,220,'V']],draw:'ac'},
+  {id:'M-13',name:'复合场粒子模型',anchor:'model-compound-field-particle',family:'em',signals:['速度选择器','复合场','偏转','带电粒子','圆周'],desc:'先看电场力和洛伦兹力方向，再判断直线、偏转或圆周。',reaction:'先比较 qE 与 qvB',criterion:'v 是否等于 E/B',formula:['qE=qvB','v=E/B','R=mv/qB'],steps:['定电荷正负和受力方向','比较电场力与磁场力','离开选择器后再列圆周'],trap:'负电荷方向忘记反向。',sliders:[['E',1,8,4,'kV/m'],['B',.2,1.5,.8,'T'],['v',1,10,5,'km/s']],draw:'compound'},
+  {id:'M-14',name:'气体状态变化模型',anchor:'model-gas-state-change',family:'thermal',signals:['p-V图','等温','等压','等容','做功'],desc:'先识别过程类型，再用状态方程和 p-V 面积。',reaction:'先在 p-V 图上读过程',criterion:'面积代表气体做功',formula:['pV/T=常量','W=∫p dV','ΔU=Q+W外'],steps:['判等温/等压/等容','用状态方程连初末态','p-V 图面积判断做功'],trap:'把 p-V 竖线也算出体积功。',sliders:[['初始 p',1,5,2,'p0'],['体积倍率',.5,3,1.8,''],['温度倍率',.5,3,1.4,'']],draw:'gas'},
+  {id:'M-15',name:'核反应与质能方程',anchor:'model-nuclear-energy',family:'nuclear',signals:['核反应方程','质量亏损','结合能','半衰期','质能方程'],desc:'先守恒 A、Z，再用质量亏损换能量。',reaction:'先配平 ΣA、ΣZ',criterion:'Δm 正负决定放能/吸能',formula:['ΣA前=ΣA后','ΣZ前=ΣZ后','E=Δmc²≈Δm×931.5MeV'],steps:['列 A 和 Z 守恒','计算反应前后静止质量差','判断放能并换算 MeV'],trap:'把质量数守恒误解成静止质量完全相等。',sliders:[['Δm',-.04,.32,.18,'u'],['反应次数',1,80,12,'×10²⁰'],['结合能',6.5,8.8,8.4,'MeV']],draw:'nuclear'}
+];
+const signalBank=['轻绳','木板','传送带','剪断','水平初速度','最高点','卫星','恒定功率','摩擦生热','碰撞','导轨','变压器','复合场','p-V图','质量亏损'];
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+const ctrls=[document.getElementById('a'),document.getElementById('b'),document.getElementById('c')];
+let active=0,query='',signal='',running=true,t=0,drag=null,records=[];
+function fmt(v){return Math.abs(v)>=10?Number(v).toFixed(0):Number(v).toFixed(2).replace(/0$/,'').replace(/\.0$/,'')}
+function vals(){return ctrls.map(x=>+x.value)}
+function matchScore(m){const q=(query+' '+signal).trim();if(!q)return active===models.indexOf(m)?100:60;let s=0;for(const w of m.signals){if(q.includes(w))s+=35}if(m.name.includes(q)||m.desc.includes(q))s+=30;if(m.family.includes(q))s+=15;return s}
+function ranked(){return models.map((m,i)=>({...m,_i:i,_score:matchScore(m)})).sort((a,b)=>b._score-a._score||a._i-b._i)}
+function init(){
+  document.getElementById('signalChips').innerHTML=signalBank.map(s=>`<button class="chip" data-s="${s}">${s}</button>`).join('');
+  document.getElementById('signalChips').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;signal=signal===b.dataset.s?'':b.dataset.s;const top=ranked()[0];active=top._i;render()});
+  document.getElementById('search').addEventListener('input',e=>{query=e.target.value.trim();const top=ranked()[0];active=top._i;render()});
+  ctrls.forEach(c=>c.addEventListener('input',render));
+  canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
+  render();requestAnimationFrame(loop);
+}
+function render(){
+  const m=models[active];
+  document.querySelectorAll('.chip').forEach(b=>b.classList.toggle('on',b.dataset.s===signal));
+  document.getElementById('modelList').innerHTML=ranked().map(r=>`<button class="model-btn ${r._i===active?'on':''}" data-i="${r._i}"><b>${r.id} ${r.name}</b><span>${r.signals.slice(0,4).join(' / ')} · 匹配 ${Math.min(100,r._score)}%</span></button>`).join('');
+  document.querySelectorAll('.model-btn').forEach(b=>b.onclick=()=>{active=+b.dataset.i;query='';signal='';document.getElementById('search').value='';render()});
+  document.getElementById('title').textContent=`${m.id} ${m.name}`;
+  document.getElementById('subtitle').textContent=m.desc;
+  document.getElementById('signalBox').textContent=m.signals.slice(0,3).join(' / ');
+  document.getElementById('reactionBox').textContent=m.reaction;
+  document.getElementById('recommend').textContent=`${m.id} ${m.name}`;
+  document.getElementById('whyNot').textContent=whyNot(m);
+  document.getElementById('steps').innerHTML=m.steps.map((s,i)=>`<div class="step"><span class="num">${i+1}</span><span>${s}</span></div>`).join('');
+  document.getElementById('formula').textContent=m.formula.join('\n');
+  document.getElementById('trap').textContent=m.trap;
+  document.getElementById('openLink').href='../../#/models?id='+m.anchor;
+  document.getElementById('candidates').innerHTML=ranked().slice(0,4).map(r=>`<button class="candidate" data-i="${r._i}"><b>${r.id}</b> ${r.name}<br>${r.reaction}</button>`).join('');
+  document.querySelectorAll('.candidate').forEach(b=>b.onclick=()=>{active=+b.dataset.i;render()});
+  m.sliders.forEach((s,i)=>{const c=ctrls[i];if(c.dataset.model!==m.id){c.min=s[1];c.max=s[2];c.step=(s[2]-s[1])>30?1:.01;c.value=s[3];c.dataset.model=m.id}document.getElementById(['la','lb','lc'][i]).textContent=s[0];document.getElementById(['va','vb','vc'][i]).textContent=fmt(c.value)+(s[4]?' '+s[4]:'')});
+  draw();
+}
+function whyNot(m){
+  const other=ranked().filter(x=>x._i!==active).slice(0,2).map(x=>x.name).join('、');
+  return `先看题眼“${m.signals.slice(0,3).join('、')}”，它们指向${m.reaction}。若误选${other||'其他模型'}，通常是还没判断临界、约束或守恒对象。`;
+}
+function setStatus(criterion,state){document.getElementById('criterionBox').textContent=criterion;document.getElementById('stateBox').textContent=state}
+function loop(ts){if(running)t=ts/1000;draw();requestAnimationFrame(loop)}
+function clear(){ctx.clearRect(0,0,920,430);ctx.strokeStyle='#eef2f7';ctx.lineWidth=1;for(let x=40;x<920;x+=40)line(x,0,x,430);for(let y=40;y<430;y+=40)line(0,y,920,y);text('实物/受力视图',48,28,'#486581',13,'left',true);text('判据图像与仪器读数',680,28,'#486581',13,'left',true)}
+function draw(){clear();const m=models[active];drawers[m.draw](vals())}
+function text(s,x,y,c='#102a43',size=14,align='left',bold=false){ctx.fillStyle=c;ctx.font=`${bold?800:500} ${size}px system-ui,-apple-system,"PingFang SC",sans-serif`;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+function line(x1,y1,x2,y2,c,w=2,dash){ctx.save();ctx.strokeStyle=c||ctx.strokeStyle;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
+function arrow(x1,y1,x2,y2,c,label){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,4);ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-12*Math.cos(a-.45),y2-12*Math.sin(a-.45));ctx.lineTo(x2-12*Math.cos(a+.45),y2-12*Math.sin(a+.45));ctx.closePath();ctx.fill();if(label)text(label,(x1+x2)/2,(y1+y2)/2-13,c,13,'center',true)}
+function box(x,y,w,h,fill,label){ctx.fillStyle=fill;round(x,y,w,h,8);ctx.fill();text(label,x+w/2,y+h/2,'#fff',16,'center',true)}
+function round(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+function gauge(vals,labels){const x=690,y=245,w=190,h=132;ctx.fillStyle='rgba(255,255,255,.94)';ctx.strokeStyle='#d9e2ec';round(x,y,w,h,8);ctx.fill();ctx.stroke();text('判据图像 / 读数',x+14,y+20,'#102a43',13,'left',true);const max=Math.max(1,...vals.map(v=>Math.abs(v)));vals.forEach((v,i)=>{const bh=68*Math.abs(v)/max,bx=x+28+i*48;ctx.fillStyle=['#2c7be5','#f0a500','#7048e8'][i%3];ctx.fillRect(bx,y+100-bh,26,bh);text(labels[i],bx+13,y+116,'#486581',11,'center')})}
+function handle(x,y,label){ctx.fillStyle='#fff';ctx.strokeStyle='#2c7be5';ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,12,0,7);ctx.fill();ctx.stroke();text(label,x,y-27,'#2c7be5',12,'center',true)}
+const drawers={
+  connecting([F,m1,m2]){const a=F/(m1+m2),T=m1*a;setStatus(`a=${fmt(a)} m/s²`,`T=${fmt(T)} N`);box(240,220,94,58,'#2c7be5','m1');box(430,220,120,58,'#38b2ac','m2');line(334,249,430,249,'#334e68',5);arrow(550,249,550+F*8,249,'#e03131','F');handle(550+F*8,249,'拖 F');arrow(270,190,520,190,'#7048e8','共同 a');arrow(335,218,390,218,'#f0a500','T');text(`整体：F=(${fmt(m1)}+${fmt(m2)})a`,460,88,'#102a43',18,'center',true);gauge([a,T,F/8],['a','T','F'])},
+  plank([F,mu,M]){const m=1.5,g=10,a=F/(m+M),need=M*a,max=mu*m*g,slip=need>max;setStatus(`f需 ${fmt(need)} / fmax ${fmt(max)}`,slip?'相对滑动':'共同运动');box(310+(slip?Math.sin(t*3)*20:0),165,110,55,'#2c7be5','m');box(240,220,310,42,'#829ab1','M');arrow(420,192,420+F*7,192,'#e03131','F');handle(420+F*7,192,'拖 F');arrow(305,222,245,222,'#f0a500','f');arrow(345,242,420,242,'#f0a500','f');text(slip?'静摩擦不够，必须分列':'静摩擦够，可共同运动',460,92,slip?'#e03131':'#087f5b',18,'center',true);gauge([need,max,F/3],['f需','fmax','F'])},
+  belt([vb,v0,mu]){const dv=vb-v0,dir=Math.abs(dv)<.08?0:Math.sign(dv),tc=Math.abs(dv)/(mu*10);setStatus(`v物-v带=${fmt(v0-vb)}`,dir?`摩擦向${dir>0?'右':'左'}`:'已共速');line(180,250,740,250,'#829ab1',7);line(180,300,740,300,'#829ab1',7);ctx.strokeStyle='#829ab1';ctx.fillStyle='#f8f9fa';ctx.beginPath();ctx.ellipse(180,275,38,28,0,0,7);ctx.fill();ctx.stroke();ctx.beginPath();ctx.ellipse(740,275,38,28,0,0,7);ctx.fill();ctx.stroke();const x=310+((t*45)%80);box(x,190,80,60,'#2c7be5','m');arrow(260,325,430,325,'#7048e8','v带');handle(430,325,'拖 v带');if(dir)arrow(x+40,180,x+40+dir*105,180,'#e03131','摩擦');text(`共速时间 t=${fmt(tc)} s；摩擦阻碍相对滑动`,460,92,'#102a43',17,'center',true);gauge([vb,v0,tc],['v带','v物','t共'])},
+  spring([m,T0,k]){const F=m*10+T0,a=T0/m,x=F/k;setStatus(`F弹=${fmt(F)} N`,`a=${fmt(a)} m/s²`);line(250,70,390,70,'#334e68',5);line(560,70,700,70,'#334e68',5);spring(320,70,320,190+x*80);spring(630,70,630,190+x*80);box(280,190+x*80,80,58,'#2c7be5','0-');box(590,190+x*80+Math.sin(t*3)*Math.min(a*2,18),80,58,'#38b2ac','0+');arrow(320,190+x*80,320,125,'#e03131','F弹');arrow(308,248+x*80,308,305+x*80,'#e03131','T0');handle(308,305+x*80,'拖 T0');arrow(630,190+x*80,630,125,'#e03131','F弹不变');text('t=0+：绳力消失，弹簧力不突变',460,98,'#102a43',18,'center',true);gauge([F,T0,a],['F弹','T0','a'])},
+  projectile([v0,a,tt]){const sx=180,sy=105,scale=42,x=v0*tt*scale/5,y=.5*a*tt*tt*scale/5;setStatus(`x=${fmt(v0*tt)}, y=${fmt(.5*a*tt*tt)}`,'类平抛');line(sx,sy,sx,350,'#d9e2ec',2);line(sx,sy,760,sy,'#d9e2ec',2);ctx.strokeStyle='#2c7be5';ctx.lineWidth=4;ctx.beginPath();for(let i=0;i<=80;i++){const u=tt*i/80,px=sx+v0*u*scale/5,py=sy+.5*a*u*u*scale/5;if(i)ctx.lineTo(px,py);else ctx.moveTo(px,py)}ctx.stroke();ctx.fillStyle='#2c7be5';ctx.beginPath();ctx.arc(sx+x,sy+y,11,0,7);ctx.fill();arrow(sx+x,sy+y,sx+x+80,sy+y,'#7048e8','vx');arrow(sx+x,sy+y,sx+x,sy+y+70,'#e03131','a');text('横向匀速，纵向匀加速',460,80,'#102a43',18,'center',true);gauge([v0,a,tt],['v0','a','t'])},
+  circle([r,v,m]){const g=10,T=m*v*v/r-m*g;setStatus(`T=${fmt(T)} N`,T>=0?'绳可绷紧':'绳会松');const cx=360,cy=235,R=r*82;ctx.strokeStyle='#829ab1';ctx.lineWidth=3;ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.stroke();const px=cx,py=cy-R;ctx.fillStyle='#2c7be5';ctx.beginPath();ctx.arc(px,py,13,0,7);ctx.fill();arrow(px,py,px+80,py,'#7048e8','v');arrow(px,py,cx,cy,'#e03131','向心');text(T>=0?'最高点绳仍有拉力':'低于 √gr：绳松，不能按圆周列',460,88,T>=0?'#087f5b':'#e03131',17,'center',true);gauge([v,Math.sqrt(10*r),T],['v','√gr','T'])},
+  orbit([r,M,rate]){const v=Math.sqrt(M/r),T=Math.sqrt(r*r*r/M);setStatus(`v∝√(M/r)`,`T∝√(r³/M)`);const cx=360,cy=230,R=r*38;ctx.fillStyle='#2c7be5';ctx.beginPath();ctx.arc(cx,cy,34+M*2,0,7);ctx.fill();text('中心天体',cx,cy,'#fff',12,'center',true);ctx.strokeStyle='#829ab1';ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.stroke();const a=t*rate,px=cx+R*Math.cos(a),py=cy+R*Math.sin(a);ctx.fillStyle='#f0a500';ctx.beginPath();ctx.arc(px,py,10,0,7);ctx.fill();arrow(px,py,px-60*Math.sin(a),py+60*Math.cos(a),'#7048e8','v');arrow(px,py,cx,cy,'#e03131','F万');text('万有引力提供向心力',460,82,'#102a43',18,'center',true);gauge([v,T,r],['v','T','r'])},
+  vehicle([P,f,v]){const F=P/v,a=F-f,vm=P/f;setStatus(`F=P/v=${fmt(F)} kN`,v<vm?'加速':'接近终速');box(260+Math.sin(t*2)*8,230,150,60,'#2c7be5','车');arrow(410,260,410+F*12,260,'#e03131','牵引力');arrow(260,278,260-f*15,278,'#f0a500','阻力');text(`最大速度 vm=P/f=${fmt(vm)} m/s`,460,90,'#102a43',18,'center',true);gauge([F,f,vm],['F','f','vm'])},
+  energy([h,f,s]){const mg=10*h,Q=f*s;setStatus(`Q=f·s=${fmt(Q)} J`,`W非保=ΔE机`);line(190,300,680,160,'#829ab1',5);box(300+Math.sin(t)*60,220-Math.sin(t)*20,80,54,'#2c7be5','m');arrow(380,245,300,265,'#f0a500','f');arrow(210,300,210,300-h*32,'#7048e8','h');text('先做能量账本：初末态 + 非保守力功',460,86,'#102a43',18,'center',true);gauge([mg,Q,s],['mgh','Q','s相对'])},
+  collision([m1,m2,e]){const v1=5,v2=0,v1p=(m1*v1-m2*e*(v1-v2))/(m1+m2),v2p=v1p+e*(v1-v2);setStatus('总动量守恒',`e=${fmt(e)}`);const gap=Math.max(0,120-((t*90)%170));box(250+Math.min(80,120-gap),220,90,58,'#2c7be5','m1');box(470+Math.max(0,80-gap),220,110,58,'#38b2ac','m2');arrow(260,190,360,190,'#7048e8','v1');handle(260+e*180,330,'拖 e');text(`碰后 v1′=${fmt(v1p)}，v2′=${fmt(v2p)}`,460,92,'#102a43',18,'center',true);gauge([m1*v1,m1*v1p,m2*v2p],['p前','p1′','p2′'])},
+  rail([B,L,v]){const E=B*L*v,I=E/2,F=B*I*L;setStatus(`E=${fmt(E)} V`,`F安=${fmt(F)} N`);line(210,170,710,170,'#334e68',5);line(210,310,710,310,'#334e68',5);const x=330+((t*v*18)%260);line(x,160,x,320,'#2c7be5',10);for(let i=250;i<700;i+=52){text('×',i,110,'#7048e8',28,'center',true);text('×',i,370,'#7048e8',28,'center',true)}arrow(x,240,x+95,240,'#e03131','v');handle(x+95,240,'拖 v');arrow(x-10,255,x-85,255,'#f0a500','F安');text(`E=BLv=${fmt(E)} V`,460,90,'#102a43',18,'center',true);gauge([E,I,F],['E','I','F安'])},
+  ac([n1,n2,U1]){const U2=U1*n2/n1;setStatus(`U2=${fmt(U2)} V`,n2>n1?'升压':'降压');box(230,150,90,170,'#2c7be5','n1');box(560,150,90,170,'#38b2ac','n2');for(let i=0;i<6;i++){line(320,175+i*22,390,175+i*22,'#829ab1',3);line(490,175+i*22,560,175+i*22,'#829ab1',3)}arrow(150,235,230,235,'#e03131','U1');arrow(650,235,750,235,'#7048e8','U2');text('理想变压器：电压比等于匝数比',460,86,'#102a43',18,'center',true);gauge([U1,U2,n2/n1],['U1','U2','比值'])},
+  compound([E,B,v]){const v0=E/B,dev=v-v0;setStatus(`v0=E/B=${fmt(v0)}`,Math.abs(dev)<.25?'直线通过':dev>0?'磁场力较大':'电场力较大');box(210,120,420,210,'#eef4ff','');for(let x=250;x<600;x+=54)for(let y=160;y<310;y+=48)text('×',x,y,'#7048e8',20,'center',true);const px=350+(t*80%150),py=225+dev*18;ctx.fillStyle='#2c7be5';ctx.beginPath();ctx.arc(px,py,12,0,7);ctx.fill();arrow(px,py,px+80,py,'#2c7be5','v');arrow(px-16,py,px-16,py+58,'#e03131','qE');arrow(px+16,py,px+16,py-58*v/v0,'#7048e8','qvB');text('速度选择器看 qE 与 qvB 是否抵消',460,82,'#102a43',18,'center',true);gauge([E,B,v0],['E','B','v0'])},
+  gas([p,vr,tr]){const p2=p*tr/vr,W=p*(vr-1);setStatus(`p2=${fmt(p2)}p0`,`W≈pΔV=${fmt(W)}`);const gx=210,gy=320;line(gx,gy,gx+360,gy,'#334e68',2);line(gx,gy,gx,gy-230,'#334e68',2);ctx.strokeStyle='#2c7be5';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(gx+70,gy-p*35);ctx.lineTo(gx+70*vr,gy-p2*35);ctx.stroke();ctx.fillStyle='rgba(44,123,229,.18)';ctx.fillRect(gx+70,gy-Math.max(p,p2)*35,(vr-1)*70,Math.max(p,p2)*35);text('p-V 图面积表示气体对外做功',460,82,'#102a43',18,'center',true);gauge([p,p2,W],['p1','p2','W'])},
+  nuclear([dm,N,eb]){const Q=dm*931.5,J=Q*1.602e-13*N*1e20;setStatus(`Q=${fmt(Q)} MeV`,dm>=0?'放能':'吸能');box(230,210,90,58,'#2c7be5','反应前');arrow(340,240,470,240,'#334e68','ΣA/ΣZ');box(500,210,120,58,'#38b2ac','反应后');arrow(620,220,720,170,dm>=0?'#f0a500':'#e03131',dm>=0?'Q':'吸能');text('先配平 A、Z，再算质量亏损',460,86,'#102a43',18,'center',true);gauge([Math.abs(Q),N,eb],['|Q|','N','Eb/A'])}
+};
+function spring(x1,y1,x2,y2){ctx.strokeStyle='#334e68';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(x1,y1);for(let i=1;i<=8;i++){const y=y1+(y2-y1)*i/8,x=x1+(i%2?-18:18);ctx.lineTo(x,y)}ctx.lineTo(x2,y2);ctx.stroke()}
+function down(e){const p=pos(e);drag=findHandle(p);if(drag){canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing';move(e)}}
+function move(e){if(!drag)return;const p=pos(e),m=models[active],s=m.sliders[drag.i],val=Math.max(s[1],Math.min(s[2],drag.fn(p)));ctrls[drag.i].value=val;render()}
+function up(e){drag=null;canvas.style.cursor='grab';try{canvas.releasePointerCapture(e.pointerId)}catch(err){}}
+function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*920/r.width,y:(e.clientY-r.top)*430/r.height}}
+function findHandle(p){const m=models[active],v=vals();let hs=[];if(m.draw==='connecting')hs=[{x:550+v[0]*8,y:249,i:0,fn:p=>(p.x-550)/8}];if(m.draw==='plank')hs=[{x:420+v[0]*7,y:192,i:0,fn:p=>(p.x-420)/7}];if(m.draw==='belt')hs=[{x:430,y:325,i:0,fn:p=>(p.x-260)/34}];if(m.draw==='spring'){const x=(v[0]*10+v[1])/v[2];hs=[{x:308,y:305+x*80,i:1,fn:p=>(p.y-305)*v[2]/80-v[0]*10}]}if(m.draw==='collision')hs=[{x:260+v[2]*180,y:330,i:2,fn:p=>(p.x-260)/180}];if(m.draw==='rail')hs=[{x:425,y:240,i:2,fn:p=>(p.x-330)/12}];return hs.find(h=>Math.hypot(p.x-h.x,p.y-h.y)<32)}
+init();
+</script>
 </body>
 </html>

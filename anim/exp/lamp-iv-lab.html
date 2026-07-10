@@ -9,10 +9,13 @@
   body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
   .wrap { max-width: 1000px; margin: 0 auto; padding: 16px; }
   .stage { display: grid; grid-template-columns: minmax(0, 1fr) 286px; gap: 14px; align-items: stretch; }
-  canvas { width: 100%; height: 470px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  canvas { width: 100%; height: 470px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; touch-action:none; }
   .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
   label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
   input { width: 100%; }
+  .row { display:flex; gap:8px; margin-bottom:10px; }
+  button { flex:1; border:1px solid #bcccdc; background:#f0f4f8; color:#102a43; border-radius:8px; padding:8px; font-weight:700; cursor:pointer; }
+  button.primary { background:#2c7be5; border-color:#2c7be5; color:#fff; }
   .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.72; font-size: 14px; }
   .status { margin-top: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13px; line-height: 1.55; background: #e6fffa; color: #087f5b; font-weight: 700; }
   .status.bad { background: #fff5f5; color: #c92a2a; }
@@ -25,6 +28,7 @@
   <div class="stage">
     <canvas id="c" width="700" height="470" aria-label="小灯泡伏安特性实验"></canvas>
     <section class="panel">
+      <div class="row"><button id="playBtn" class="primary" type="button">播放</button><button id="resetBtn" type="button">重置</button><button id="recordBtn" type="button">记录</button></div>
       <label for="voltage">灯泡两端电压 U/V：<span id="voltageVal"></span></label>
       <input id="voltage" type="range" min="0" max="3.0" value="1.5" step="0.1">
       <label for="rated">额定电压/V：<span id="ratedVal"></span></label>
@@ -36,6 +40,7 @@
       <label for="error">读数误差：<span id="errorVal"></span></label>
       <input id="error" type="range" min="0" max="8" value="2" step="1">
       <div id="readout" class="readout"></div>
+      <table style="width:100%;margin-top:10px;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;border-bottom:1px solid #d9e2ec">记录</th><th style="border-bottom:1px solid #d9e2ec">U/V</th><th style="border-bottom:1px solid #d9e2ec">I/A</th><th style="border-bottom:1px solid #d9e2ec">R/Ω</th></tr></thead><tbody id="records"></tbody></table>
       <div id="status" class="status"></div>
       <div class="hint">观察任务：逐步升高 U，看灯泡变亮时电阻 R=U/I 如何变大，I-U 曲线为何向下弯。</div>
     </section>
@@ -56,8 +61,13 @@ const els = {
   heatVal: document.getElementById('heatVal'),
   errorVal: document.getElementById('errorVal'),
   readout: document.getElementById('readout'),
-  status: document.getElementById('status')
+  status: document.getElementById('status'),
+  playBtn: document.getElementById('playBtn'),
+  resetBtn: document.getElementById('resetBtn'),
+  recordBtn: document.getElementById('recordBtn'),
+  records: document.getElementById('records')
 };
+const state={running:false,time:0,last:0,drag:null,records:[]};
 function lamp(U, rated, R0, heat) {
   const ratio = rated > 0 ? U / rated : 0;
   const R = R0 * (1 + heat * ratio * ratio);
@@ -87,7 +97,8 @@ function meter(x,y,label,value) {
   ctx.fillText(value,x,y+14);
 }
 function draw() {
-  const U = Number(els.voltage.value);
+  let U = Number(els.voltage.value);
+  if(state.running){U=Math.min(Number(els.rated.value),state.time*0.7);els.voltage.value=U.toFixed(1);}
   const rated = Number(els.rated.value);
   const R0 = Number(els.coldR.value);
   const heat = Number(els.heat.value) / 100;
@@ -108,7 +119,7 @@ function draw() {
   ctx.fillStyle = '#102a43';
   ctx.font = '700 18px system-ui';
   ctx.textAlign = 'center';
-  ctx.fillText('小灯泡伏安特性：灯丝升温，电阻增大，I-U 曲线弯曲', 350, 30);
+  ctx.fillText('小灯泡伏安实验台：俯视电路 + 亮度变化 + I-U 图像 + 数据记录', 350, 30);
 
   line(78,238,150,238);
   meter(190,238,'A',Iread.toFixed(3)+'A');
@@ -141,6 +152,7 @@ function draw() {
   ctx.font = '700 13px system-ui';
   ctx.fillText('电源/滑变',156,335);
   meter(410,142,'V',U.toFixed(2)+'V');
+  ctx.fillStyle='#e03131';ctx.beginPath();ctx.arc(410+U/rated*40,100,11,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.font='700 10px system-ui';ctx.fillText('U',410+U/rated*40,104);
   line(374,207,394,172,'#2c7be5',2);
   line(446,207,426,172,'#2c7be5',2);
 
@@ -187,6 +199,7 @@ function draw() {
   ctx.font = '13px system-ui';
   ctx.textAlign = 'center';
   ctx.fillText('读数链：每调一次滑动变阻器，记录一组 U、I，再把点描到 I-U 图像上。',350,452);
+  els.playBtn.textContent = state.running ? '暂停' : '播放';
 
   els.readout.innerHTML = [
     `<div id="r1">U=${U.toFixed(2)}V，I读≈${Iread.toFixed(3)}A</div>`,
@@ -203,7 +216,15 @@ function draw() {
 Object.values(els).forEach(el => {
   if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
 });
-draw();
+function pos(e){const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height};}
+c.addEventListener('pointerdown',e=>{const p=pos(e),U=Number(els.voltage.value),rated=Number(els.rated.value);if(Math.hypot(p.x-(410+U/rated*40),p.y-100)<22){state.drag='U';c.setPointerCapture(e.pointerId);}});
+c.addEventListener('pointermove',e=>{const p=pos(e);if(!state.drag){c.style.cursor='grab';return;}if(state.drag==='U'){const rated=Number(els.rated.value);els.voltage.value=Math.max(0,Math.min(3,(p.x-410)/40*rated)).toFixed(1);}draw();});
+c.addEventListener('pointerup',e=>{state.drag=null;try{c.releasePointerCapture(e.pointerId)}catch(err){}});c.addEventListener('pointercancel',()=>{state.drag=null;});
+els.playBtn.addEventListener('click',()=>{state.running=!state.running;state.last=0;if(state.time>Number(els.rated.value)/.7)state.time=0;draw();});
+els.resetBtn.addEventListener('click',()=>{state.running=false;state.time=0;els.voltage.value=1.5;els.rated.value=3;els.coldR.value=3;els.heat.value=120;els.error.value=2;draw();});
+els.recordBtn.addEventListener('click',()=>{const U=Number(els.voltage.value),rated=Number(els.rated.value),R0=Number(els.coldR.value),heat=Number(els.heat.value)/100,err=Number(els.error.value)/100,q=lamp(U,rated,R0,heat),I=q.I*(1-err),R=I>0?U/I:0;state.records.unshift({U,I,R});state.records=state.records.slice(0,4);els.records.innerHTML=state.records.map((r,i)=>`<tr><td style="text-align:left;border-bottom:1px solid #d9e2ec">${i+1}</td><td style="border-bottom:1px solid #d9e2ec">${r.U.toFixed(1)}</td><td style="border-bottom:1px solid #d9e2ec">${r.I.toFixed(3)}</td><td style="border-bottom:1px solid #d9e2ec">${r.R.toFixed(1)}</td></tr>`).join('');});
+function loop(now){if(!state.last)state.last=now;const dt=Math.min(.04,(now-state.last)/1000);state.last=now;if(state.running){state.time+=dt;if(state.time>Number(els.rated.value)/.7){state.time=Number(els.rated.value)/.7;state.running=false;}}draw();requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
 </script>
 </body>
 </html>

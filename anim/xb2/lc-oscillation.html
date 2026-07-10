@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LC 电磁振荡实验台</title>
+<link rel="icon" href="data:,">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}.root{display:grid;grid-template-columns:minmax(0,1fr)330px;gap:12px;padding:12px;min-height:680px}.stage,.card{background:#fff;border:1px solid #d9e2ec;border-radius:8px}.stage{overflow:hidden}.card{padding:10px}canvas{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair}.panel{display:flex;flex-direction:column;gap:10px}.task{background:#fff7e6;border-left:4px solid #f0a500;color:#486581;font-size:13px;line-height:1.5}.title{font-weight:800;margin-bottom:7px}.param{display:grid;gap:2px;margin:8px 0;font-size:13px}.param span{display:flex;justify-content:space-between;color:#486581;gap:8px}.param b{color:#102a43;font-variant-numeric:tabular-nums;white-space:nowrap}input[type=range]{width:100%;accent-color:#7c3aed}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}button{border:1px solid #b0bcc9;background:#fff;border-radius:6px;padding:7px 8px;cursor:pointer;font:inherit;font-size:13px}.readout{background:#102a43;color:#d9e2ec;border-radius:8px;padding:10px;line-height:1.65;font-size:13px}.readout b{color:#ffd166;font-variant-numeric:tabular-nums}.status{border:1px solid #38b2ac;background:#e6fffa;color:#087f5b;border-radius:8px;padding:8px;font-size:13px;font-weight:800;line-height:1.45}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border-bottom:1px solid #d9e2ec;padding:4px 3px;text-align:right;font-variant-numeric:tabular-nums}th:first-child,td:first-child{text-align:left}.formula{font-size:13px;color:#334e68;line-height:1.6}@media(max-width:820px){.root{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="900" height="600" aria-label="LC电磁振荡实验台装置：电容电感侧视电路、磁场空间方向、q-t图像、i-t图像、能量柱和数据记录"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>对照 LC 电路侧视装置、磁场空间方向和 q-t/i-t 图像，拖动紫色相位探针，看电容电场能最大时电流为零，电感磁场能最大时电容电荷为零。</div>
+    <div class="card"><div class="title">调振荡回路</div>
+      <label class="param"><span>电感 L <b id="lLabel">20 mH</b></span><input id="l" type="range" min="5" max="80" step="1" value="20"></label>
+      <label class="param"><span>电容 C <b id="cLabel">50 μF</b></span><input id="c" type="range" min="5" max="200" step="5" value="50"></label>
+      <label class="param"><span>初始电压 U₀ <b id="uLabel">6.0 V</b></span><input id="u" type="range" min="2" max="12" step="0.5" value="6"></label>
+      <div class="buttons"><button id="play">暂停</button><button id="record">记录状态</button></div>
+    </div>
+    <div class="readout" id="readout"></div>
+    <div class="card"><div class="title">状态记录</div><table><thead><tr><th>相位</th><th>q</th><th>i</th><th>能量</th></tr></thead><tbody id="rows"></tbody></table></div>
+    <div class="card formula"><div class="title">公式与图像</div><div>周期：T = 2π√(LC)，角频率 ω=1/√(LC)。</div><div>电场能：WE=q²/(2C)；磁场能：WB=Li²/2。</div><div>理想 LC：电场能和磁场能周期交换，总能量守恒。</div></div>
+    <div class="status" id="status"></div>
+  </div>
+</div>
+<script>
+(function(){
+'use strict';
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+const els={l:document.getElementById('l'),c:document.getElementById('c'),u:document.getElementById('u'),lLabel:document.getElementById('lLabel'),cLabel:document.getElementById('cLabel'),uLabel:document.getElementById('uLabel'),readout:document.getElementById('readout'),rows:document.getElementById('rows'),status:document.getElementById('status'),play:document.getElementById('play'),record:document.getElementById('record')};
+const S={t:0,run:true,drag:false,records:[]},K={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',green:'#087f5b',gold:'#f0a500',purple:'#7c3aed'};
+function par(){const L=+els.l.value/1000,C=+els.c.value*1e-6,U=+els.u.value,T=2*Math.PI*Math.sqrt(L*C),w=1/Math.sqrt(L*C),Q=C*U,phase=(S.t*w)%(Math.PI*2),q=Q*Math.cos(phase),i=-Q*w*Math.sin(phase),we=q*q/(2*C),wb=L*i*i/2;return{L,C,U,T,w,Q,phase,q,i,we,wb,e:Q*Q/(2*C)}}
+function fmt(n,d=2){return n.toFixed(d)}function line(x1,y1,x2,y2,c='#9fb3c8',w=2,d){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(d)ctx.setLineDash(d);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}function box(x,y,w,h,f='#fff',s='#d9e2ec'){ctx.save();ctx.fillStyle=f;ctx.strokeStyle=s;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.restore()}function text(s,x,y,c=K.ink,a='center',z=13,w='700'){ctx.fillStyle=c;ctx.font=w+' '+z+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.45),y2-10*Math.sin(a-.45));ctx.lineTo(x2-10*Math.cos(a+.45),y2-10*Math.sin(a+.45));ctx.closePath();ctx.fill()}
+function draw(){const p=par();ctx.clearRect(0,0,900,600);box(34,34,832,520,'#fff');text('LC 电磁振荡：电场能与磁场能周期交换',450,60,K.ink,'center',16,'800');drawCircuit(p);drawGraph(p);update()}
+function drawCircuit(p){box(64,92,470,300,'#fbfdff');text('侧视电路装置 + 磁场空间方向',299,116,K.ink,'center',14,'800');line(130,250,240,250,K.ink,4);line(350,250,465,250,K.ink,4);line(130,250,130,170,K.ink,4);line(465,250,465,170,K.ink,4);line(130,170,235,170,K.ink,4);line(360,170,465,170,K.ink,4);line(255,145,255,205,K.blue,6);line(285,145,285,205,K.blue,6);text('C',270,126,K.blue,'center',15,'900');const charge=Math.abs(p.q/p.Q);for(let k=0;k<Math.round(charge*6);k++){text(p.q>=0?'+':'-',240,158+k*8,p.q>=0?K.red:K.blue,'center',12,'900');text(p.q>=0?'-':'+',300,158+k*8,p.q>=0?K.blue:K.red,'center',12,'900')}for(let k=0;k<5;k++){ctx.strokeStyle=K.purple;ctx.lineWidth=4;ctx.beginPath();ctx.arc(300+k*13,250,8,Math.PI,0);ctx.stroke()}text('L',326,280,K.purple,'center',15,'900');if(Math.abs(p.i)>1e-6)arrow(185,250,235,250,p.i>0?K.red:K.green,3);for(let k=0;k<5;k++){const x=300+k*13;ctx.strokeStyle='rgba(124,58,237,.45)';ctx.beginPath();ctx.arc(x,250,22+Math.abs(p.i/p.Q/p.w)*16,0,Math.PI*2);ctx.stroke()}text('电容极板电场 ↔ 线圈磁场',300,350,K.muted,'center',13,'800');drawEnergy(p)}
+function drawEnergy(p){box(560,92,276,150,'#fff');text('能量柱图像',698,116,K.ink,'center',14,'800');const we=p.we/p.e,wb=p.wb/p.e;box(605,150,70,70,'#eef2ff','#9fb3c8');ctx.fillStyle=K.blue;ctx.fillRect(605,220-70*we,70,70*we);text('电场能',640,236,K.blue,'center',12,'900');box(720,150,70,70,'#f3e8ff','#c4b5fd');ctx.fillStyle=K.purple;ctx.fillRect(720,220-70*wb,70,70*wb);text('磁场能',755,236,K.purple,'center',12,'900')}
+function drawGraph(p){box(64,420,772,120,'#fff');text('q-t / i-t 图像与相位探针',450,440,K.ink,'center',14,'800');const gx=105,gy=510,gw=660,gh=48;line(gx,gy,gx+gw,gy,K.ink,2);line(gx,gy-gh,gx,gy+gh,K.ink,2);let lastQ,lastI,lastX;for(let n=0;n<=180;n++){const u=n/180*2*Math.PI,x=gx+n/180*gw,yq=gy-Math.cos(u)*gh,yi=gy+Math.sin(u)*gh*.75;if(n){line(lastX,lastQ,x,yq,K.blue,2);line(lastX,lastI,x,yi,K.red,2)}lastX=x;lastQ=yq;lastI=yi}const px=gx+(p.phase/(Math.PI*2))*gw;line(px,gy-gh,px,gy+gh,K.purple,3,[5,4]);text('探针',px,gy-gh-14,K.purple,'center',12,'900');ctx.fillStyle=K.purple;ctx.beginPath();ctx.arc(px,gy,8,0,Math.PI*2);ctx.fill();text('蓝 q，红 i',780,460,K.muted,'center',12,'800')}
+function update(){const p=par();els.lLabel.textContent=fmt(p.L*1000,0)+' mH';els.cLabel.textContent=fmt(p.C*1e6,0)+' μF';els.uLabel.textContent=fmt(p.U,1)+' V';els.readout.innerHTML='周期 T：<b>'+fmt(p.T*1000,1)+' ms</b><br>电荷 q：<b>'+fmt(p.q*1e6,1)+' μC</b><br>电流 i：<b>'+fmt(p.i*1000,1)+' mA</b><br>总能量：<b>'+fmt(p.e*1000,2)+' mJ</b>';els.status.textContent=Math.abs(p.q/p.Q)>.85?'电容电荷接近最大，电场能最大，电流接近 0。':Math.abs(p.i/(p.Q*p.w))>.85?'电流接近最大，磁场能最大，电容电荷接近 0。':'电场能和磁场能正在相互转化。';els.rows.innerHTML=S.records.slice(-6).map(r=>'<tr><td>'+r.ph+'</td><td>'+r.q+'</td><td>'+r.i+'</td><td>'+r.en+'</td></tr>').join('')||'<tr><td colspan="4">暂无记录</td></tr>'}
+function record(){const p=par();S.records.push({ph:fmt(p.phase/Math.PI,2)+'π',q:fmt(p.q*1e6,1),i:fmt(p.i*1000,1),en:fmt(p.e*1000,2)});if(S.records.length>8)S.records.shift();update()}
+[els.l,els.c,els.u].forEach(el=>el.addEventListener('input',()=>{draw();update()}));els.play.addEventListener('click',()=>{S.run=!S.run;els.play.textContent=S.run?'暂停':'播放'});els.record.addEventListener('click',record);canvas.addEventListener('pointerdown',e=>{S.drag=true;canvas.setPointerCapture(e.pointerId)});canvas.addEventListener('pointermove',e=>{if(!S.drag)return;const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width;const p=par(),phase=Math.max(0,Math.min(1,(x-105)/660))*Math.PI*2;S.t=phase/p.w;draw()});canvas.addEventListener('pointerup',e=>{S.drag=false;record();try{canvas.releasePointerCapture(e.pointerId)}catch(_){}});function loop(){const p=par();if(S.run)S.t+=0.016;draw();requestAnimationFrame(loop)}record();loop();
+})();
+</script>
+</body>
+</html>

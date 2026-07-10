@@ -9,7 +9,7 @@
 body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#f7f9fc;color:#1f2933}
 .container{padding:12px}
 h2{font-size:16px;margin:0 0 8px;color:#102a43}
-canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid #d9e2ec;border-radius:8px}
+canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid #d9e2ec;border-radius:8px;touch-action:none}
 .readouts{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0;font-size:13px}
 .readouts .r{background:#102a43;color:#d9e2ec;padding:6px 10px;border-radius:6px}
 .readouts .r b{color:#f0a500}
@@ -23,8 +23,8 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
 </head>
 <body>
 <div class="container">
-  <h2>理想气体：pV/T = 常量（pV = nRT）</h2>
-  <canvas id="canvas" width="660" height="330"></canvas>
+  <h2>理想气体实验台：气缸剖面 + p-V 图像 + 数据记录</h2>
+  <canvas id="canvas" width="660" height="330" aria-label="理想气体实验台：气缸剖面、活塞拖动、温度表、p-V图像和数据记录"></canvas>
   <div class="readouts">
     <span class="r">体积 V = <b id="v-v">1.0</b></span>
     <span class="r">温度 T = <b id="t-v">300</b> K</span>
@@ -48,7 +48,7 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
   const canvas=document.getElementById('canvas');
   const ctx=canvas.getContext('2d');
   const W=canvas.width,H=canvas.height;
-  let V=1.0, T=300, running=true;
+  let V=1.0, T=300, running=true, drag=null;
   const nR=1; // p = nRT/V (normalized)
   const cylX=40, cylTop=40, cylBot=290, cylMaxW=280;
   const N=40; let mol=[];
@@ -77,6 +77,9 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
     ctx.fillStyle='#8592a0';ctx.fillRect(pistX,cylTop-6,14,cylBot-cylTop+12);
     ctx.strokeStyle='#5a6b7b';ctx.strokeRect(pistX,cylTop-6,14,cylBot-cylTop+12);
     ctx.fillStyle='#334e68';ctx.font='12px sans-serif';ctx.textAlign='center';ctx.fillText('活塞',pistX+7,cylTop-12);
+    ctx.fillStyle='#2c7be5';ctx.beginPath();ctx.arc(pistX+7,cylBot+22,10,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fff';ctx.font='700 10px sans-serif';ctx.fillText('V',pistX+7,cylBot+22);
+    ctx.fillStyle='#486581';ctx.font='12px sans-serif';ctx.fillText('拖动活塞改变 V',pistX-30,cylBot+42);
     // pressure arrows on piston (more/denser when p large)
     ctx.strokeStyle='#c92a2a';ctx.fillStyle='#c92a2a';ctx.lineWidth=2;
     const na=Math.round(2+p()*2.2);
@@ -90,7 +93,16 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
     const px=gx0 + (V/2.0)*gW; const py=gBot - (p()/ (nR*600/0.4))*(gBot-gTop);
     ctx.fillStyle='#e8590c';ctx.beginPath();ctx.arc(px,Math.max(gTop,py),5,0,Math.PI*2);ctx.fill();
     ctx.fillStyle='#243b53';ctx.font='13px sans-serif';ctx.textAlign='left';
-    ctx.fillText('pV/T = '+ (p()*V/T).toFixed(4)+'（常量）',gx0-6,gBot+30);
+    ctx.fillText('公式读数：p=nRT/V，pV/T = '+ (p()*V/T).toFixed(4)+'（常量）',gx0-6,gBot+30);
+    // 温度表与拖动把手
+    const tx=382,ty=64,th=170,fillH=(T-150)/(600-150)*th;
+    ctx.strokeStyle='#829ab1';ctx.lineWidth=2;ctx.strokeRect(tx,ty,24,th);
+    ctx.fillStyle='#e03131';ctx.fillRect(tx+4,ty+th-fillH,16,fillH);
+    ctx.beginPath();ctx.arc(tx+12,ty+th+18,18,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#102a43';ctx.font='12px sans-serif';ctx.textAlign='center';ctx.fillText('温度表读数 T',tx+12,ty-14);
+    ctx.fillStyle='#e03131';ctx.beginPath();ctx.arc(tx+12,ty+th-fillH,10,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fff';ctx.font='700 10px sans-serif';ctx.fillText('T',tx+12,ty+th-fillH+1);
+    ctx.fillStyle='#486581';ctx.font='12px sans-serif';ctx.fillText('拖动温度表改变 T',tx+12,ty+th+48);
     document.getElementById('v-v').textContent=V.toFixed(2);
     document.getElementById('t-v').textContent=T;
     document.getElementById('p-v').textContent=p().toFixed(2);
@@ -99,6 +111,11 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
   function bind(id,cb){document.getElementById(id).addEventListener('input',e=>{cb(parseFloat(e.target.value));draw();});}
   bind('v',x=>{V=x;document.getElementById('v-d').textContent=x.toFixed(2);});
   bind('t',x=>{T=x;document.getElementById('t-d').textContent=x;});
+  function pointerPos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
+  canvas.addEventListener('pointerdown',e=>{const m=pointerPos(e),px=pistonX();const tx=382,ty=64,th=170,fillH=(T-150)/(600-150)*th;if(Math.hypot(m.x-(px+7),m.y-(cylBot+22))<22){drag='V';canvas.setPointerCapture(e.pointerId);}else if(Math.hypot(m.x-(tx+12),m.y-(ty+th-fillH))<22){drag='T';canvas.setPointerCapture(e.pointerId);}});
+  canvas.addEventListener('pointermove',e=>{const m=pointerPos(e);if(!drag){canvas.style.cursor='grab';return;}if(drag==='V'){V=Math.max(.4,Math.min(2,(m.x-cylX)/cylMaxW*2));document.getElementById('v').value=V;document.getElementById('v-d').textContent=V.toFixed(2);}if(drag==='T'){const tx=382,ty=64,th=170;T=Math.round(Math.max(150,Math.min(600,150+(ty+th-m.y)/th*450))/10)*10;document.getElementById('t').value=T;document.getElementById('t-d').textContent=T;}draw();});
+  canvas.addEventListener('pointerup',e=>{drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}});
+  canvas.addEventListener('pointercancel',()=>{drag=null;});
   document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
   document.getElementById('reset-btn').addEventListener('click',()=>{V=1;T=300;document.getElementById('v').value=1;document.getElementById('t').value=300;document.getElementById('v-d').textContent='1.00';document.getElementById('t-d').textContent='300';init();draw();});
   init();

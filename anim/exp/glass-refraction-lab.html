@@ -3,28 +3,37 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>测玻璃折射率</title>
+<title>测玻璃折射率实验台</title>
 <style>
   * { box-sizing: border-box; }
   body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
-  .wrap { max-width: 1000px; margin: 0 auto; padding: 16px; }
-  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 286px; gap: 14px; align-items: stretch; }
-  canvas { width: 100%; height: 470px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 14px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 14px; }
+  canvas { width: 100%; height: 560px; display: block; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; touch-action: none; }
   .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
-  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  .row { display: flex; gap: 8px; margin-bottom: 10px; }
+  button { flex: 1; border: 1px solid #bcccdc; background: #f0f4f8; color: #102a43; border-radius: 8px; padding: 9px 10px; font-weight: 700; cursor: pointer; }
+  button.primary { background: #2c7be5; border-color: #2c7be5; color: #fff; }
+  label { display: block; font-size: 13px; font-weight: 700; margin: 11px 0 4px; }
   input { width: 100%; }
-  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.72; font-size: 14px; }
-  .status { margin-top: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13px; line-height: 1.55; background: #e6fffa; color: #087f5b; font-weight: 700; }
-  .status.bad { background: #fff5f5; color: #c92a2a; }
-  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
-  @media (max-width: 780px) { .stage { grid-template-columns: 1fr; } canvas { height: 400px; } }
+  .readout { margin-top: 12px; padding: 10px; background: #eef4ff; border-radius: 8px; line-height: 1.6; font-size: 13px; }
+  table { width: 100%; margin-top: 10px; border-collapse: collapse; font-size: 12px; }
+  th, td { border-bottom: 1px solid #d9e2ec; padding: 5px 4px; text-align: right; }
+  th:first-child, td:first-child { text-align: left; }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.55; }
+  @media (max-width: 820px) { .stage { grid-template-columns: 1fr; } canvas { height: 500px; } }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="stage">
-    <canvas id="c" width="700" height="470" aria-label="测玻璃折射率实验"></canvas>
+    <canvas id="c" width="790" height="560" aria-label="测玻璃折射率实验台：俯视玻璃砖、插针光路、量角器、sin图像和数据记录"></canvas>
     <section class="panel">
+      <div class="row">
+        <button id="playBtn" class="primary" type="button">播放</button>
+        <button id="resetBtn" type="button">重置</button>
+        <button id="recordBtn" type="button">记录</button>
+      </div>
       <label for="incident">入射角 i/°：<span id="incidentVal"></span></label>
       <input id="incident" type="range" min="10" max="70" value="45" step="1">
       <label for="ntrue">玻璃真实 n：<span id="ntrueVal"></span></label>
@@ -34,15 +43,21 @@
       <label for="pin">插针间距/cm：<span id="pinVal"></span></label>
       <input id="pin" type="range" min="2" max="10" value="6" step="1">
       <div id="readout" class="readout"></div>
-      <div id="status" class="status"></div>
-      <div class="hint">观察任务：增大入射角，看折射角如何变化；调小插针间距，看为什么光路方向更难确定。</div>
+      <table aria-label="数据记录表">
+        <thead><tr><th>记录</th><th>i</th><th>r</th><th>n测</th></tr></thead>
+        <tbody id="records"></tbody>
+      </table>
+      <div class="hint">观察任务：先播放看光线穿过玻璃砖，再拖红色入射针改变 i，拖紫色针距把手看为什么针距太近会让方向读数变差。</div>
     </section>
   </div>
 </div>
 <script>
-const c = document.getElementById('c');
-const ctx = c.getContext('2d');
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
 const els = {
+  playBtn: document.getElementById('playBtn'),
+  resetBtn: document.getElementById('resetBtn'),
+  recordBtn: document.getElementById('recordBtn'),
   incident: document.getElementById('incident'),
   ntrue: document.getElementById('ntrue'),
   error: document.getElementById('error'),
@@ -52,69 +67,288 @@ const els = {
   errorVal: document.getElementById('errorVal'),
   pinVal: document.getElementById('pinVal'),
   readout: document.getElementById('readout'),
-  status: document.getElementById('status')
+  records: document.getElementById('records')
 };
-function rad(d){return d*Math.PI/180}
-function deg(r){return r*180/Math.PI}
-function ray(x1,y1,x2,y2,color){
-  const a=Math.atan2(y2-y1,x2-x1);
-  ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=4;
-  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-12*Math.cos(a-.45),y2-12*Math.sin(a-.45));ctx.lineTo(x2-12*Math.cos(a+.45),y2-12*Math.sin(a+.45));ctx.closePath();ctx.fill();
+const state = { running: false, time: 2.4, last: 0, drag: null, records: [] };
+const glass = { x: 180, y: 122, w: 320, h: 190 };
+const O = { x: glass.x + glass.w / 2, y: glass.y };
+
+function clamp(x, lo, hi) { return Math.max(lo, Math.min(hi, x)); }
+function rad(d) { return d * Math.PI / 180; }
+function deg(r) { return r * 180 / Math.PI; }
+function val(id) { return Number(els[id].value); }
+function setValues(next) {
+  if (next.i !== undefined) els.incident.value = Math.round(clamp(next.i, 10, 70));
+  if (next.n !== undefined) els.ntrue.value = clamp(next.n, 1.3, 1.8).toFixed(2);
+  if (next.err !== undefined) els.error.value = clamp(next.err, -3, 3).toFixed(1);
+  if (next.pin !== undefined) els.pin.value = Math.round(clamp(next.pin, 2, 10));
 }
-function draw(){
-  const i=Number(els.incident.value), n=Number(els.ntrue.value), err=Number(els.error.value), pin=Number(els.pin.value);
-  const r=deg(Math.asin(Math.sin(rad(i))/n));
-  const imeas=i+err, rmeas=r-err*0.6;
-  const nmeas=Math.sin(rad(imeas))/Math.sin(rad(rmeas));
-  const rel=Math.abs(nmeas-n)/n*100;
-  els.incidentVal.textContent=i.toFixed(0);
-  els.ntrueVal.textContent=n.toFixed(2);
-  els.errorVal.textContent=err.toFixed(1);
-  els.pinVal.textContent=pin.toFixed(0);
-  ctx.clearRect(0,0,c.width,c.height);
-  ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);
-  ctx.fillStyle='#102a43';ctx.font='700 18px system-ui';ctx.textAlign='center';
-  ctx.fillText('测玻璃折射率：描光路，量 i 和 r，算 n=sin i/sin r',350,30);
-  const left=170, top=110, w=310, h=220, O={x:left+w/2,y:top};
-  ctx.fillStyle='rgba(44,123,229,.12)';ctx.strokeStyle='#2c7be5';ctx.lineWidth=3;
-  ctx.fillRect(left,top,w,h);ctx.strokeRect(left,top,w,h);
-  ctx.setLineDash([6,5]);ctx.strokeStyle='#829ab1';ctx.beginPath();ctx.moveTo(O.x,65);ctx.lineTo(O.x,350);ctx.stroke();ctx.setLineDash([]);
-  const len=150;
-  const xi=O.x-len*Math.sin(rad(i)), yi=O.y-len*Math.cos(rad(i));
-  const xr=O.x+len*Math.sin(rad(r)), yr=O.y+len*Math.cos(rad(r));
-  ray(xi,yi,O.x,O.y,'#e03131');
-  ray(O.x,O.y,xr,yr,'#38b2ac');
-  ctx.fillStyle='#102a43';ctx.font='13px system-ui';
-  ctx.fillText('空气',110,80);ctx.fillText('玻璃砖',110,315);
-  ctx.fillStyle='#e03131';ctx.fillText('i='+i.toFixed(0)+'°',O.x-70,O.y-34);
-  ctx.fillStyle='#087f5b';ctx.fillText('r='+r.toFixed(1)+'°',O.x+72,O.y+52);
-  const gap=pin*7;
-  ctx.fillStyle='#7b2cbf';
-  [[xi,yi],[xi+(O.x-xi)*gap/len, yi+(O.y-yi)*gap/len],[xr,yr],[xr-(xr-O.x)*gap/len, yr-(yr-O.y)*gap/len]].forEach((p,idx)=>{
-    ctx.beginPath();ctx.arc(p[0],p[1],5,0,Math.PI*2);ctx.fill();
-    ctx.fillText('P'+(idx+1),p[0]+14,p[1]-8);
+function model() {
+  const i = val('incident');
+  const n = val('ntrue');
+  const err = val('error');
+  const pin = val('pin');
+  const r = deg(Math.asin(Math.sin(rad(i)) / n));
+  const imeas = i + err;
+  const rmeas = r - err * 0.6;
+  const nmeas = Math.sin(rad(imeas)) / Math.sin(rad(rmeas));
+  const rel = Math.abs(nmeas - n) / n * 100;
+  const ok = rel < 5 && i >= 25 && pin >= 4;
+  return { i, n, err, pin, r, imeas, rmeas, nmeas, rel, ok };
+}
+function roundRect(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+function box(x, y, w, h, fill, stroke = '#d9e2ec') {
+  ctx.fillStyle = fill;
+  ctx.strokeStyle = stroke;
+  ctx.lineWidth = 1.5;
+  roundRect(x, y, w, h, 9);
+  ctx.fill();
+  ctx.stroke();
+}
+function text(s, x, y, color = '#102a43', size = 13, weight = '400', align = 'center') {
+  ctx.fillStyle = color;
+  ctx.font = `${weight} ${size}px system-ui, -apple-system, sans-serif`;
+  ctx.textAlign = align;
+  ctx.textBaseline = 'middle';
+  ctx.fillText(s, x, y);
+}
+function arrow(x1, y1, x2, y2, color, width = 4) {
+  const a = Math.atan2(y2 - y1, x2 - x1);
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = width;
+  ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - 11 * Math.cos(a - 0.45), y2 - 11 * Math.sin(a - 0.45));
+  ctx.lineTo(x2 - 11 * Math.cos(a + 0.45), y2 - 11 * Math.sin(a + 0.45));
+  ctx.closePath(); ctx.fill();
+}
+function rayPoints(q) {
+  const len = 150;
+  const inStart = { x: O.x - len * Math.sin(rad(q.i)), y: O.y - len * Math.cos(rad(q.i)) };
+  const insideEnd = { x: O.x + len * Math.sin(rad(q.r)), y: O.y + len * Math.cos(rad(q.r)) };
+  const exitPoint = { x: insideEnd.x, y: insideEnd.y };
+  const outEnd = { x: exitPoint.x + 95 * Math.sin(rad(q.i)), y: exitPoint.y + 95 * Math.cos(rad(q.i)) };
+  return { inStart, insideEnd, exitPoint, outEnd };
+}
+function handles(q) {
+  const p = rayPoints(q);
+  return [
+    { name: 'i', x: p.inStart.x, y: p.inStart.y, r: 14 },
+    { name: 'n', x: 520 + (q.n - 1.3) * 180, y: 350, r: 13 },
+    { name: 'pin', x: 98 + q.pin * 15, y: 338, r: 13 }
+  ];
+}
+function drawProtractor(cx, cy) {
+  ctx.strokeStyle = '#d9e2ec';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(cx, cy, 70, -Math.PI, 0); ctx.stroke();
+  for (let d = -70; d <= 70; d += 10) {
+    const a = -Math.PI / 2 + rad(d);
+    const r1 = d % 30 === 0 ? 56 : 62;
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1);
+    ctx.lineTo(cx + Math.cos(a) * 70, cy + Math.sin(a) * 70);
+    ctx.stroke();
+  }
+  text('量角器从法线量角', cx, cy - 82, '#486581', 11, '700');
+}
+function drawLab(q) {
+  const progress = state.running ? clamp(state.time / 2.4, 0, 1) : 1;
+  const p = rayPoints(q);
+  box(36, 82, 474, 304, '#fff', '#d9e2ec');
+  text('俯视白纸与玻璃砖：插针描出入射线和折射线', 273, 106, '#102a43', 14, '700');
+  ctx.fillStyle = 'rgba(44,123,229,.12)';
+  ctx.strokeStyle = '#2c7be5';
+  ctx.lineWidth = 3;
+  ctx.fillRect(glass.x, glass.y, glass.w, glass.h);
+  ctx.strokeRect(glass.x, glass.y, glass.w, glass.h);
+  text('空气', 92, 142, '#486581', 12, '700');
+  text('玻璃砖', 96, 294, '#2c7be5', 13, '700');
+  ctx.setLineDash([6, 5]);
+  ctx.strokeStyle = '#829ab1';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(O.x, 62); ctx.lineTo(O.x, 346); ctx.stroke();
+  ctx.setLineDash([]);
+  drawProtractor(O.x, O.y);
+  if (progress > 0.05) arrow(p.inStart.x, p.inStart.y, O.x, O.y, '#e03131', 4);
+  if (progress > 0.38) arrow(O.x, O.y, p.insideEnd.x, p.insideEnd.y, '#38b2ac', 4);
+  if (progress > 0.72) arrow(p.exitPoint.x, p.exitPoint.y, p.outEnd.x, p.outEnd.y, '#2c7be5', 3);
+  text(`i=${q.i.toFixed(0)}°`, O.x - 72, O.y - 42, '#e03131', 13, '700');
+  text(`r=${q.r.toFixed(1)}°`, O.x + 76, O.y + 54, '#087f5b', 13, '700');
+  const gap = q.pin * 7;
+  const pins = [
+    p.inStart,
+    { x: p.inStart.x + (O.x - p.inStart.x) * gap / 150, y: p.inStart.y + (O.y - p.inStart.y) * gap / 150 },
+    p.exitPoint,
+    { x: p.exitPoint.x + (p.outEnd.x - p.exitPoint.x) * gap / 95, y: p.exitPoint.y + (p.outEnd.y - p.exitPoint.y) * gap / 95 }
+  ];
+  ctx.fillStyle = '#7b2cbf';
+  pins.forEach((pin, idx) => {
+    ctx.beginPath(); ctx.arc(pin.x, pin.y, 5, 0, Math.PI * 2); ctx.fill();
+    text('P' + (idx + 1), pin.x + 14, pin.y - 8, '#7b2cbf', 11, '700');
   });
-  const gx=520,gy=374,gw=120,gh=230;
-  ctx.strokeStyle='#334e68';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(gx,gy);ctx.lineTo(gx+gw,gy);ctx.moveTo(gx,gy);ctx.lineTo(gx,gy-gh);ctx.stroke();
-  ctx.strokeStyle='#38b2ac';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(gx,gy);ctx.lineTo(gx+gw,gy-gh*.85);ctx.stroke();
-  ctx.fillStyle='#e03131';ctx.beginPath();ctx.arc(gx+Math.sin(rad(imeas))*gw,gy-Math.sin(rad(rmeas))*gh,6,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#486581';ctx.font='12px system-ui';ctx.textAlign='center';
-  ctx.fillText('sin r',gx-24,gy-gh-4);ctx.fillText('sin i',gx+gw+24,gy+4);ctx.fillText('斜率≈n',gx+62,gy+26);
-  ctx.fillText('插针越远，光线方向越准；角度太小，sin 比值误差会放大。',350,452);
-  els.readout.innerHTML=[
-    `<div id="r1">测得 i≈${imeas.toFixed(1)}°，r≈${rmeas.toFixed(1)}°</div>`,
-    `<div id="r2">n=sin i/sin r≈${nmeas.toFixed(3)}</div>`,
-    `<div id="r3">真实 n≈${n.toFixed(3)}，相对误差≈${rel.toFixed(1)}%</div>`,
-    `<div id="r4">光从空气入玻璃：r&lt;i，折射线偏向法线</div>`,
-    `<div id="r5">插针间距=${pin.toFixed(0)}cm，用来确定入射线和出射线方向</div>`
-  ].join('');
-  const ok=rel<5 && i>=25 && pin>=4;
-  els.status.className=ok?'status':'status bad';
-  els.status.textContent=i<25?'不通过：入射角太小，角度读数相对误差大。':pin<4?'不通过：插针间距太小，光线方向不够准。':rel<5?'通过：由 sin i/sin r 得到的折射率接近真实值。':'不通过：角度读数误差偏大，折射率偏离明显。';
+  ctx.strokeStyle = '#7b2cbf';
+  ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.moveTo(98, 338); ctx.lineTo(248, 338); ctx.stroke();
+  text(`插针间距 ${q.pin.toFixed(0)}cm`, 173, 360, '#7b2cbf', 12, '700');
+  for (const h of handles(q)) {
+    ctx.fillStyle = h.name === 'i' ? '#e03131' : h.name === 'n' ? '#2c7be5' : '#7b2cbf';
+    ctx.beginPath(); ctx.arc(h.x, h.y, h.r, 0, Math.PI * 2); ctx.fill();
+    text(h.name, h.x, h.y + 1, '#fff', 11, '700');
+  }
 }
-Object.values(els).forEach(el=>el.addEventListener('input',draw));
-draw();
+function drawGraph(q) {
+  box(540, 82, 210, 304, '#f7f9fc', '#d9e2ec');
+  text('图像记录：sin r - sin i', 645, 106, '#102a43', 14, '700');
+  const x = 574, y = 142, w = 140, h = 160;
+  ctx.strokeStyle = '#e6edf5';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    ctx.beginPath(); ctx.moveTo(x + w * i / 4, y); ctx.lineTo(x + w * i / 4, y + h); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x, y + h * i / 4); ctx.lineTo(x + w, y + h * i / 4); ctx.stroke();
+  }
+  ctx.strokeStyle = '#334e68';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(x, y + h); ctx.lineTo(x + w, y + h); ctx.moveTo(x, y + h); ctx.lineTo(x, y); ctx.stroke();
+  ctx.strokeStyle = '#38b2ac';
+  ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(x, y + h); ctx.lineTo(x + w * 0.92, y + h - h * 0.92 / q.n); ctx.stroke();
+  const px = x + w * Math.sin(rad(q.imeas));
+  const py = y + h - h * Math.sin(rad(q.rmeas));
+  ctx.fillStyle = q.ok ? '#0f9f6e' : '#d64545';
+  ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI * 2); ctx.fill();
+  text('sin i', x + w - 12, y + h + 16, '#486581', 11);
+  text('sin r', x + 20, y - 10, '#486581', 11);
+  text(`斜率 n≈${q.nmeas.toFixed(3)}`, 645, 326, q.ok ? '#087f5b' : '#b30000', 14, '700');
+  ctx.strokeStyle = '#2c7be5';
+  ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.moveTo(520, 350); ctx.lineTo(610, 350); ctx.stroke();
+  text(`拖 n=${q.n.toFixed(2)}`, 656, 350, '#2c7be5', 12, '700', 'left');
+}
+function drawFormula(q) {
+  box(52, 414, 694, 106, '#f7f9fc', '#d9e2ec');
+  text('数据记录与公式绑定', 399, 434, '#102a43', 14, '700');
+  text(`量角器读数：i≈${q.imeas.toFixed(1)}°，r≈${q.rmeas.toFixed(1)}°，角都从法线量`, 78, 462, '#486581', 13, '700', 'left');
+  text(`n=sin i/sin r=${q.nmeas.toFixed(3)}，真实 n=${q.n.toFixed(3)}，相对误差=${q.rel.toFixed(1)}%`, 78, 490, '#102a43', 13, '700', 'left');
+  const msg = q.i < 25 ? '需重做，入射角太小' : q.pin < 4 ? '需重做，插针间距太小' : q.ok ? '能用，折射率接近真实值' : '需重做，角度读数误差偏大';
+  text(`状态判定：${msg}`, 482, 490, q.ok ? '#087f5b' : '#b30000', 13, '700', 'left');
+}
+function draw() {
+  const q = model();
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const bg = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+  bg.addColorStop(0, '#ffffff');
+  bg.addColorStop(1, '#f0f7ff');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  text('测玻璃折射率：描光路，量 i 和 r，算 n=sin i/sin r', 395, 34, '#102a43', 18, '700');
+  text('俯视玻璃砖 + 量角器读数 + sin 图像 + 数据记录：针距和角度决定测量质量。', 395, 62, '#486581', 13);
+  drawLab(q);
+  drawGraph(q);
+  drawFormula(q);
+  els.incidentVal.textContent = q.i.toFixed(0);
+  els.ntrueVal.textContent = q.n.toFixed(2);
+  els.errorVal.textContent = q.err.toFixed(1);
+  els.pinVal.textContent = q.pin.toFixed(0);
+  els.playBtn.textContent = state.running ? '暂停' : '播放';
+  els.readout.innerHTML = [
+    `测得 i≈<b>${q.imeas.toFixed(1)}°</b>，r≈<b>${q.rmeas.toFixed(1)}°</b>`,
+    `n=sin i/sin r≈<b>${q.nmeas.toFixed(3)}</b>`,
+    `真实 n≈<b>${q.n.toFixed(3)}</b>，相对误差≈<b>${q.rel.toFixed(1)}%</b>`,
+    q.ok ? '判定=<b>能用</b>' : '判定=<b>需重做</b>'
+  ].join('<br>');
+}
+function loop(now) {
+  if (!state.last) state.last = now;
+  const dt = Math.min(0.04, (now - state.last) / 1000);
+  state.last = now;
+  if (state.running) {
+    state.time += dt;
+    if (state.time > 2.4) {
+      state.time = 2.4;
+      state.running = false;
+    }
+  }
+  draw();
+  requestAnimationFrame(loop);
+}
+function pos(evt) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (evt.clientX - rect.left) * canvas.width / rect.width,
+    y: (evt.clientY - rect.top) * canvas.height / rect.height
+  };
+}
+function hit(p) {
+  return handles(model()).find(h => Math.hypot(p.x - h.x, p.y - h.y) <= h.r + 8);
+}
+canvas.addEventListener('pointerdown', evt => {
+  const h = hit(pos(evt));
+  if (h) {
+    state.drag = h.name;
+    canvas.setPointerCapture(evt.pointerId);
+  }
+});
+canvas.addEventListener('pointermove', evt => {
+  const p = pos(evt);
+  if (!state.drag) {
+    canvas.style.cursor = hit(p) ? 'grab' : 'default';
+    return;
+  }
+  if (state.drag === 'i') {
+    const dx = O.x - p.x;
+    const dy = O.y - p.y;
+    setValues({ i: deg(Math.atan2(dx, dy)) });
+  }
+  if (state.drag === 'n') setValues({ n: 1.3 + (p.x - 520) / 180 });
+  if (state.drag === 'pin') setValues({ pin: (p.x - 98) / 15 });
+  draw();
+});
+canvas.addEventListener('pointerup', evt => {
+  state.drag = null;
+  try { canvas.releasePointerCapture(evt.pointerId); } catch (e) {}
+});
+canvas.addEventListener('pointercancel', () => { state.drag = null; });
+els.playBtn.addEventListener('click', () => {
+  state.running = !state.running;
+  state.last = 0;
+  if (state.time >= 2.4) state.time = 0;
+  draw();
+});
+els.resetBtn.addEventListener('click', () => {
+  state.running = false;
+  state.time = 2.4;
+  setValues({ i: 45, n: 1.5, err: 1, pin: 6 });
+  draw();
+});
+els.recordBtn.addEventListener('click', () => {
+  const q = model();
+  state.records.unshift({ i: q.imeas, r: q.rmeas, n: q.nmeas });
+  state.records = state.records.slice(0, 4);
+  renderRecords();
+});
+function renderRecords() {
+  els.records.innerHTML = state.records.map((r, idx) =>
+    `<tr><td>${idx + 1}</td><td>${r.i.toFixed(1)}°</td><td>${r.r.toFixed(1)}°</td><td>${r.n.toFixed(3)}</td></tr>`
+  ).join('');
+}
+for (const id of ['incident', 'ntrue', 'error', 'pin']) els[id].addEventListener('input', draw);
+renderRecords();
+requestAnimationFrame(loop);
 </script>
 </body>
 </html>

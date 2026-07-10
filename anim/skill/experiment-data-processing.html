@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>实验数据处理专题实验台</title>
+<link rel="icon" href="data:,">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}.root{display:grid;grid-template-columns:minmax(0,1fr)340px;gap:12px;padding:12px;min-height:700px}.stage,.card{background:#fff;border:1px solid #d9e2ec;border-radius:8px}.stage{overflow:hidden}.card{padding:10px}.panel{display:flex;flex-direction:column;gap:10px}canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab}.task{background:#fff7e6;border-left:4px solid #f0a500;color:#486581;font-size:13px;line-height:1.5}.title{font-weight:900;margin-bottom:7px}.param{display:grid;gap:3px;margin:8px 0;font-size:13px}.param span{display:flex;justify-content:space-between;gap:8px;color:#486581}.param b{color:#102a43;font-variant-numeric:tabular-nums;white-space:nowrap}input[type=range]{width:100%;accent-color:#2c7be5}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}button{border:1px solid #b0bcc9;background:#fff;border-radius:6px;padding:7px 8px;cursor:pointer;font:inherit;font-size:13px}.active{background:#102a43;color:#fff;border-color:#102a43}.readout{background:#102a43;color:#d9e2ec;border-radius:8px;padding:10px;line-height:1.6;font-size:13px}.readout b{color:#ffd166;font-variant-numeric:tabular-nums}.status{border:1px solid #38b2ac;background:#e6fffa;color:#087f5b;border-radius:8px;padding:8px;font-size:13px;font-weight:800;line-height:1.45}table{width:100%;border-collapse:collapse;font-size:12px}td,th{border-bottom:1px solid #d9e2ec;padding:4px 3px;text-align:right;font-variant-numeric:tabular-nums}.formula{font-size:13px;color:#334e68;line-height:1.6}@media(max-width:880px){.root{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="930" height="620" aria-label="实验数据处理专题实验台：装置读数、数据记录、坐标图像、斜率截距、异常点和误差分析多视角"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>拖动作图中的异常点，再切换“保留/剔除”，看最佳拟合线的斜率、截距和结论如何变化。</div>
+    <div class="card">
+      <div class="title">数据生成与处理</div>
+      <label class="param"><span>真实斜率 k <b id="kLabel">2.50</b></span><input id="k" type="range" min="1.2" max="4.2" step="0.05" value="2.5"></label>
+      <label class="param"><span>截距 b <b id="bLabel">0.50</b></span><input id="b" type="range" min="-1" max="2" step="0.05" value="0.5"></label>
+      <label class="param"><span>随机误差 <b id="nLabel">0.35</b></span><input id="noise" type="range" min="0" max="1.2" step="0.05" value="0.35"></label>
+      <label class="param"><span>异常点偏差 <b id="oLabel">2.00</b></span><input id="outlier" type="range" min="-3" max="3" step="0.1" value="2"></label>
+      <div class="buttons"><button id="play">暂停</button><button id="toggle">剔除异常点</button></div>
+    </div>
+    <div class="readout" id="readout"></div>
+    <div class="card">
+      <div class="title">读数记录表</div>
+      <table><thead><tr><th>x</th><th>y</th><th>备注</th></tr></thead><tbody id="rows"></tbody></table>
+    </div>
+    <div class="card formula">
+      <div class="title">处理公式</div>
+      <div>平均值：x&#772;=Σx/n</div>
+      <div>拟合线：y=kx+b，k=Δy/Δx</div>
+      <div>相对误差：δ=|测量值-真实值|/真实值</div>
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+</div>
+<script>
+(function(){
+'use strict';
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+const E={k:document.getElementById('k'),b:document.getElementById('b'),noise:document.getElementById('noise'),outlier:document.getElementById('outlier'),kLabel:document.getElementById('kLabel'),bLabel:document.getElementById('bLabel'),nLabel:document.getElementById('nLabel'),oLabel:document.getElementById('oLabel'),readout:document.getElementById('readout'),rows:document.getElementById('rows'),status:document.getElementById('status'),play:document.getElementById('play'),toggle:document.getElementById('toggle')};
+const C={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',green:'#087f5b',gold:'#f0a500',purple:'#7048e8'};
+const S={run:true,t:0,drop:false,drag:false,dragPoint:4,seed:[.10,-.18,.22,-.12,.16,-.08]};
+function box(x,y,w,h,f='#fff',s='#d9e2ec'){ctx.save();ctx.fillStyle=f;ctx.strokeStyle=s;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.restore()}
+function text(s,x,y,c=C.ink,a='center',z=13,w='800'){ctx.fillStyle=c;ctx.font=w+' '+z+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+function line(x1,y1,x2,y2,c='#9fb3c8',w=2,d){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(d)ctx.setLineDash(d);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
+function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.45),y2-10*Math.sin(a-.45));ctx.lineTo(x2-10*Math.cos(a+.45),y2-10*Math.sin(a+.45));ctx.closePath();ctx.fill()}
+function data(){const k=+E.k.value,b=+E.b.value,n=+E.noise.value,o=+E.outlier.value;return[1,2,3,4,5,6].map((x,i)=>({x,y:b+k*x+S.seed[i]*n+(i===S.dragPoint?o:0),bad:i===S.dragPoint}))}
+function fit(points){const use=points.filter(p=>!S.drop||!p.bad),n=use.length,sx=use.reduce((a,p)=>a+p.x,0),sy=use.reduce((a,p)=>a+p.y,0),sxx=use.reduce((a,p)=>a+p.x*p.x,0),sxy=use.reduce((a,p)=>a+p.x*p.y,0);const k=(n*sxy-sx*sy)/(n*sxx-sx*sx),b=(sy-k*sx)/n;return{k,b,n}}
+const gx=92,gy=500,gw=520,gh=350;function mx(x){return gx+x/7*gw}function my(y){return gy-y/28*gh}
+function draw(){const pts=data(),f=fit(pts);ctx.clearRect(0,0,930,620);box(34,30,862,548,'#fff');text('G-02 实验数据处理：读数 → 记录 → 作图 → 斜率/截距 → 误差分析',465,56,C.ink,'center',17,'900');drawApparatus(pts);drawGraph(pts,f);drawTable(pts,f);update(pts,f)}
+function drawApparatus(pts){box(70,86,235,150,'#fbfdff');text('侧视实验装置',188,108,C.muted,'center',12,'900');line(98,188,275,188,'#52606d',5);for(let i=0;i<6;i++){line(112+i*28,180,112+i*28,196,'#9fb3c8',1);text(String(i+1),112+i*28,210,C.muted,'center',10,'700')}ctx.fillStyle='#2c7be5';ctx.fillRect(126+S.t*95%130,158,34,28);text('小车',143+S.t*95%130,146,C.blue,'center',11,'900');arrow(160,158,210,132,C.red,3);text('力/速度传感器读数',210,128,C.red,'left',11,'900');box(222,146,48,32,'#102a43','#102a43');text((pts[2].y).toFixed(2),246,162,'#ffd166','center',12,'900');text('装置给出原始数据，图像负责找规律',188,226,C.green,'center',11,'800')}
+function drawGraph(pts,f){box(64,252,570,296,'#fbfdff');text('俯视/坐标图像：异常点会拉偏斜率和截距',349,274,C.muted,'center',12,'900');arrow(gx,gy,gx+gw+25,gy,'#52606d',2);arrow(gx,gy,gx,gy-gh-18,'#52606d',2);text('x/格',gx+gw+38,gy,C.muted,'left',12,'800');text('y/读数',gx-4,gy-gh-28,C.muted,'right',12,'800');for(let i=0;i<=7;i++){line(gx+i*gw/7,gy,gx+i*gw/7,gy-gh,'rgba(130,154,177,.16)',1);text(i,gx+i*gw/7,gy+17,C.muted,'center',10,'700')}for(let y=0;y<=28;y+=4){line(gx,gy-y/28*gh,gx+gw,gy-y/28*gh,'rgba(130,154,177,.16)',1);text(y,gx-14,gy-y/28*gh,C.muted,'right',10,'700')}line(mx(0),my(f.b),mx(7),my(f.k*7+f.b),C.blue,3);line(mx(0),my(+E.b.value),mx(7),my(+E.k.value*7+ +E.b.value),C.green,2,[6,5]);pts.forEach((p,i)=>{ctx.fillStyle=p.bad?'#e03131':'#f0a500';ctx.beginPath();ctx.arc(mx(p.x),my(p.y),p.bad?11:8,0,7);ctx.fill();text(p.bad?'拖动异常点':'',mx(p.x),my(p.y)-22,C.red,'center',11,'900');if(S.drop&&p.bad){line(mx(p.x)-14,my(p.y)-14,mx(p.x)+14,my(p.y)+14,C.red,2);line(mx(p.x)+14,my(p.y)-14,mx(p.x)-14,my(p.y)+14,C.red,2)}});ctx.fillStyle='rgba(44,123,229,.16)';ctx.fillRect(mx(1),my(f.k+f.b),mx(2)-mx(1),my(f.b)-my(f.k+f.b));text('斜率三角形 Δy/Δx',mx(2.1),my(f.k+f.b)-18,C.blue,'left',11,'900')}
+function drawTable(pts,f){box(664,88,196,460,'#fff');text('数据处理流程',762,114,C.ink,'center',14,'900');const steps=['1 调仪器并读数','2 记录原始数据','3 作 y-x 图像','4 判断异常点','5 求斜率 k 和截距 b','6 写误差来源'];steps.forEach((s,i)=>{box(686,140+i*53,152,34,i===3?'#fff7e6':i===4?'#e6fffa':'#eef4ff');text(s,762,157+i*53,i===3?C.gold:i===4?C.green:C.blue,'center',12,'900')});text('公式绑定：y=kx+b',762,478,C.purple,'center',13,'900');text('多视角：装置 + 表格 + 图线',762,506,C.muted,'center',12,'800')}
+function update(pts,f){E.kLabel.textContent=(+E.k.value).toFixed(2);E.bLabel.textContent=(+E.b.value).toFixed(2);E.nLabel.textContent=(+E.noise.value).toFixed(2);E.oLabel.textContent=(+E.outlier.value).toFixed(2);E.toggle.textContent=S.drop?'恢复异常点':'剔除异常点';E.toggle.classList.toggle('active',S.drop);const rel=Math.abs(f.k- +E.k.value)/Math.max(.01,+E.k.value)*100;E.readout.innerHTML='拟合斜率 k：<b>'+f.k.toFixed(3)+'</b><br>截距 b：<b>'+f.b.toFixed(3)+'</b><br>参与点数：<b>'+f.n+'</b><br>相对误差：<b>'+rel.toFixed(1)+'%</b>';E.rows.innerHTML=pts.map(p=>'<tr><td>'+p.x.toFixed(1)+'</td><td>'+p.y.toFixed(2)+'</td><td>'+(p.bad?'异常点':'记录')+'</td></tr>').join('');E.status.textContent=rel<5?'判定：数据线性关系清楚，斜率可作为结论。':'判定：误差偏大，先查异常点、零点、读数和坐标轴选取。'}
+function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}function setOut(p0){const pts=data(),bad=pts[S.dragPoint],base=+E.b.value+ +E.k.value*bad.x;const y=Math.max(0,Math.min(28,(gy-p0.y)/gh*28));E.outlier.value=Math.max(-3,Math.min(3,y-base)).toFixed(1);draw()}
+canvas.addEventListener('pointerdown',e=>{const pts=data(),bad=pts[S.dragPoint],p0=pos(e);if(Math.hypot(p0.x-mx(bad.x),p0.y-my(bad.y))<28){S.drag=true;canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing';setOut(p0)}});canvas.addEventListener('pointermove',e=>{if(S.drag)setOut(pos(e))});canvas.addEventListener('pointerup',e=>{S.drag=false;canvas.style.cursor='grab';try{canvas.releasePointerCapture(e.pointerId)}catch(_){}});canvas.addEventListener('pointercancel',()=>{S.drag=false});[E.k,E.b,E.noise,E.outlier].forEach(el=>el.addEventListener('input',draw));E.toggle.onclick=()=>{S.drop=!S.drop;draw()};E.play.onclick=()=>{S.run=!S.run;E.play.textContent=S.run?'暂停':'播放'};let last=performance.now();function loop(now){const dt=Math.min((now-last)/1000,.04);last=now;if(S.run)S.t+=dt;draw();requestAnimationFrame(loop)}loop();
+})();
+</script>
+</body>
+</html>

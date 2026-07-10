@@ -5,11 +5,11 @@
 
 ## 先用模型诊断台
 
-<iframe src="anim/model/model-selector.html" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/model/model-selector.html" width="100%" height="860" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
-**观察任务**：先点左侧题目信号，再在右侧选择模型。看中间的实物图、受力/运动箭头、判据读数怎样同步变化；如果选错，回到关键词重新判断。
+**观察任务**：先输入或点击题目信号，看系统自动推荐模型；再对照中间的实物/受力图和右侧“第一步流程”。重点不是选中一个名称，而是看清：题眼为什么指向这个模型、第一式怎么列、哪个临界最容易错。
 
-这个诊断台用来训练“第一反应”：
+这个诊断台用来训练“第一反应”，现在覆盖 15 个高频模型：
 
 | 题目信号 | 第一反应 | 关键第一步 |
 |---|---|---|
@@ -30,9 +30,9 @@
 |---|---|---|---|---|
 | M-01 | [连接体模型](models?id=model-connecting-body) | B1-27 | 3 题：整体法、摩擦、内力辨析 | done |
 | M-02 | [板块模型](models?id=model-plank-block) | B1-28 | [4 题闭环：临界、滑动、误区、滑痕能量](models?id=model-plank-block-training) | done |
-| M-03 | [传送带模型](models?id=model-conveyor-belt) | B1-29 | 3 题：共速、划痕、热量 | done |
-| M-04 | [弹簧瞬时问题](models?id=model-spring-instant) | B1-30 | 3 题：剪绳、撤支撑、弹簧力不突变 | done |
-| M-05 | [平抛与类平抛](models?id=model-projectile-like) | B2-03, B3-08 | 3 题：平抛、类平抛、分区运动 | done |
+| M-03 | [传送带模型](models?id=model-conveyor-belt) | B1-29 | [4 题：共速、短带、反向初速、热量](models?id=model-conveyor-belt-training) | done |
+| M-04 | [弹簧瞬时问题](models?id=model-spring-instant) | B1-30 | 4 题：剪绳、撤支撑、弹簧力不突变 | done |
+| M-05 | [平抛与类平抛](models?id=model-projectile-like) | B2-03, B3-08 | 3 题：平抛、电场偏转、分区运动 | done |
 | M-06 | [圆周临界模型](models?id=model-circular-critical) | B2-08, X2-06 | 3 题：绳、杆、轨道临界 | done |
 | M-07 | [天体运动模型](models?id=model-orbital-motion) | B2-11, B2-13, B2-14 | 3 题：卫星、双星、变轨 | done |
 | M-08 | [机车启动模型](models?id=model-vehicle-start) | B2-17 | 3 题：恒力、恒功率、图像 | done |
@@ -434,13 +434,14 @@ a相 = μg + μmg/M = 2.5 + 0.83 = 3.33 m/s²
 </svg>
 
 #### 3. 交互模型
-<iframe src="anim/bx1/conveyor-belt.html" width="100%" height="560" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/bx1/conveyor-belt.html" width="100%" height="820" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
-可拖动参数：传送带速度 `v带`、摩擦因数 `μ`、传送带长度 `L`、物块初速度 `v0`。实时变化：速度、摩擦方向、运动阶段、是否到达末端、划痕长度。
+可拖动参数：传送带速度 `v带`、物块初速度 `v0`（可为反向）、动摩擦因数 `μ`、传送带长度 `L`、重力加速度 `g`、传送方向 `direction` 和观察时刻 `t`。实时变化：速度、摩擦方向、运动阶段、是否到达末端、共速时间、物块位移、划痕长度和摩擦生热。
 
 #### 4. 观察任务
 - 令 `v0=0`：看摩擦力为什么向右，物块如何加速到共速。
 - 令 `v0>v带`：看摩擦力为什么反向，物块如何减速到共速。
+- 令 `v0<0`：看物块先与带反向运动时，摩擦力仍由相对速度决定。
 - 减小 `L`：看物块是否来不及共速就离开传送带。
 - 增大 `μ`：看共速时间和共速前位移如何减小。
 
@@ -503,7 +504,17 @@ x带 = v带 t共
 
 #### 11. 例题与训练
 
-**例题 1**（足够长）
+<h5 id="model-conveyor-belt-training">0. 先抓住题型入口</h5>
+
+| 入口信号 | 先看什么 | 对应训练 |
+|---|---|---|
+| 轻放到长传送带 | 先算 `t共` 和 `s物` | [例题 1](models?id=model-conveyor-example-1) |
+| 传送带长度有限 | 先比 `s物` 与 `L` | [例题 2](models?id=model-conveyor-example-2) |
+| 初速度比带快或反向 | 先判相对速度和摩擦方向 | [例题 3](models?id=model-conveyor-example-3) |
+| 问划痕、热量 | 用相对位移，不用物块位移 | [例题 4](models?id=model-conveyor-example-4) |
+
+<h5 id="model-conveyor-example-1">例题 1（足够长）</h5>
+
 水平传送带以 `4 m/s` 向右匀速运动，物块轻放到传送带上，`μ=0.2`，`g=10 m/s²`。求共速时间和共速前物块位移。
 
 **答案与解析**
@@ -521,7 +532,8 @@ x物=1/2 at²=1/2×2×2²=4 m
 
 ---
 
-**例题 2**（长度有限）
+<h5 id="model-conveyor-example-2">例题 2（长度有限）</h5>
+
 若上题传送带长 `L=3 m`，判断物块是否能共速后离开。
 
 **答案与解析**
@@ -540,7 +552,8 @@ t=√3 s
 
 ---
 
-**例题 3**（易错纠偏）
+<h5 id="model-conveyor-example-3">例题 3（同向初速更快）</h5>
+
 物块初速度 `6 m/s` 向右，传送带速度 `4 m/s` 向右。摩擦力方向向哪？
 
 **答案与解析**
@@ -552,6 +565,26 @@ t=√3 s
 来源：易错题改编
 
 ---
+
+<h5 id="model-conveyor-example-4">例题 4（反向初速与热量）</h5>
+
+水平传送带以 `4 m/s` 向右匀速运动，物块以 `2 m/s` 向左滑上传送带，`μ=0.25`，`g=10 m/s²`，传送带足够长。求物块达到共速前的时间，并说明摩擦生热应使用哪段位移。
+
+**答案与解析**
+取向右为正，`v0=-2 m/s`，`v带=4 m/s`。物块相对传送带向左滑，摩擦力向右，`a=μg=2.5 m/s²`。
+
+```text
+t共=(4-(-2))/2.5=2.4 s
+s物=v0t+1/2at²=-2×2.4+1/2×2.5×2.4²=2.4 m
+s带=v带t=4×2.4=9.6 m
+s相对=|s带-s物|=7.2 m
+Q=μmg·s相对
+```
+
+**方法提炼**
+反向初速度不是新模型，仍然先比 `v物-v带`；热量必须用相对位移 `s相对`。
+
+来源：模型变式题改编
 
 <h4 id="model-spring-instant">M-04 弹簧瞬时问题 <span class="status done">done</span></h4>
 
@@ -596,15 +629,16 @@ t=√3 s
 </svg>
 
 #### 3. 交互模型
-<iframe src="anim/bx1/spring-instant.html" width="100%" height="580" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/bx1/spring-instant.html" width="100%" height="900" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
-可拖动参数：质量 `m`、劲度系数 `k`、剪断前绳拉力 `T0`、重力加速度 `g`。点击“剪断绳”后，画面对比 `t=0-` 与 `t=0+` 的受力和瞬时加速度。
+可拖动参数：`m1`、`m2`、劲度系数 `k`、弹簧形变量 `x`、重力加速度 `g`；可切换 `cut_target` 为“剪断 A-B 绳 / 剪断上弹簧 / 撤去下支撑”。画面对比 `t=0-` 与 `t=0+` 的受力、平衡差、瞬时加速度。
 
 #### 4. 观察任务
 - 增大 `T0`：看剪断后瞬时加速度 `a=T0/m` 如何变大。
-- 增大 `k`：看弹簧形变量变小，但剪断前的合力关系仍成立。
-- 点击剪断绳：看 `T` 是否立刻变为 0，而 `F弹` 是否保持原读数。
-- 增大 `m`：看同样 `T0` 下瞬时加速度如何变小。
+- 切到“剪断 A-B 绳”：看 A 保留 `F弹=kx`，B 只受重力。
+- 切到“剪断上弹簧”：看被剪断的弹簧力为什么立刻消失。
+- 切到“撤去下支撑”：看支持力 `N` 立刻变为 0，弹簧形变量仍保持。
+- 拖动 `x` 偏离平衡值：看 `t=0-` 平衡差如何提醒你先用平衡条件求原弹力。
 
 #### 5. 识别条件
 | 题目信号 | 说明 |
@@ -614,6 +648,7 @@ t=√3 s
 | 装置中有轻绳 | 绳张力可突变为 0 |
 | 问瞬时加速度 | 重画剪断后受力图，用牛顿第二定律 |
 | 问剪断前后比较 | 先写 `t=0-` 平衡关系 |
+| 多个物块用弹簧或绳相连 | 分别对每个物块重画 `t=0+` 受力 |
 
 #### 6. 第一步怎么做
 1. 先分析 `t=0-`，利用静止或匀速条件求弹簧原来的弹力。
@@ -751,17 +786,17 @@ a=T0/m=10/5=2 m/s²
 </svg>
 
 #### 3. 交互模型
-<iframe src="anim/bx2/projectile.html" width="100%" height="560" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/bx2/projectile.html" width="100%" height="820" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 <iframe src="anim/bx2/oblique-throw.html" width="100%" height="560" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px;margin-top:12px"></iframe>
 
-可拖动参数：初速度、高度、重力加速度、发射角。实时变化：轨迹、水平位移、竖直位移、落地时间、速度分量。把发射角调到 `0°`，可看到它退化为平抛/类平抛。
+可拖动参数：`v0`、`h`、`g`、`q`、`m`、`E`、`plate_length` 和时间 `t`；可切换“重力平抛 / 电场类平抛”。实时变化：轨迹、水平位移、偏转位移、速度分量、偏角、落地/出场时间和电偏转加速度 `a=qE/m`。下方斜抛实验台可作为拓展对照。
 
 #### 4. 观察任务
-- 改变 `v0`：看落地时间是否不变、水平射程是否改变。
-- 改变高度 `h`：看落地时间为什么由竖直方向决定。
-- 把角度调到 `0°`：看竖直初速度为 0 时的平抛结构。
-- 对照电场偏转：把 `g` 换成 `a=qE/m`，看公式结构是否相同。
+- 在“重力平抛”中改变 `v0`：看落地时间是否不变、水平射程是否改变。
+- 在“重力平抛”中改变高度 `h` 或 `g`：看公共时间为什么由加速方向决定。
+- 在“电场类平抛”中改变 `q` 的正负：看偏转方向为什么反过来。
+- 改变 `E`、`m`、`plate_length`：看 `a=qE/m` 和出场时间如何共同决定偏移。
 
 #### 5. 识别条件
 | 题目信号 | 说明 |
@@ -798,6 +833,8 @@ tanθ = vy/vx = gt/v0
 x = v0t
 a = qE/m
 y = 1/2 at² = qE t²/(2m)
+vy = at
+tanθ = vy/vx
 若极板长度为 l：t = l/v0
 偏移 y = qE l²/(2m v0²)
 ```
@@ -915,15 +952,16 @@ y=qE l²/(2m v0²)
 </svg>
 
 #### 3. 交互模型
-<iframe src="anim/bx2/vertical-circle.html" width="100%" height="560" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/bx2/vertical-circle.html" width="100%" height="820" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
-可拖动参数：质量 `m`、半径 `r`、最高点速度 `v_top`、约束类型。实时变化：临界速度 `√gr`、最高点约束力、底端速度、底端拉力和能否完成圆周。
+可拖动参数：质量 `m`、半径 `r`、速度 `v`、重力加速度 `g`、位置角 `position_angle`，并可切换 `type_rope_or_rod`。实时变化：径向合力 `ΣF径=mv²/r`、约束力、最高点临界速度 `√gr`、最低点支持/拉力和磁场迁移半径 `r=mv/qB`。
 
 #### 4. 观察任务
 - 在绳模型下降低 `v_top`：看何时提示绳松弛。
 - 切到杆模型：看低速过顶时杆为什么可以向上托。
-- 增大半径 `r`：看临界速度 `√gr` 如何变大。
-- 对照磁场圆周：看“刚好相切”也是一种临界边界。
+- 拖动 `position_angle`：看同一速度在不同位置时，重力径向分量如何改变约束力。
+- 增大半径 `r` 或 `g`：看临界速度 `√gr` 如何变大。
+- 看磁场迁移读数：理解“刚好相切”对应的是轨迹半径 `r=mv/qB` 的几何临界。
 
 #### 5. 识别条件
 | 题目信号 | 说明 |
@@ -1404,9 +1442,9 @@ v1=P额/F0=60000/5000=12 m/s
 </svg>
 
 #### 3. 交互模型
-<iframe src="anim/bx2/work-energy-relation.html" width="100%" height="560" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/bx2/work-energy-relation.html" width="100%" height="760" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
-<iframe src="anim/bx2/energy-conservation.html" width="100%" height="560" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px;margin-top:12px"></iframe>
+<iframe src="anim/bx2/energy-conservation.html" width="100%" height="760" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px;margin-top:12px"></iframe>
 
 可拖动参数：高度、摩擦因数、质量等。实时变化：重力做功、摩擦做功、动能变化、机械能变化、内能和总能量。
 
@@ -2016,18 +2054,60 @@ P损=I²r=20²×20=8000 W=8 kW
 
 核心判断：电场力可能做功并改变速率；洛伦兹力始终垂直速度，不做功，只改变方向。速度选择器的直线条件是 `qE=qvB`，即 `v=E/B`。
 
-#### 2. 交互模型
-<iframe src="anim/model/compound-field-particle.html" width="100%" height="580" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+#### 2. 先看图
+下面这张图把速度选择器和后续纯磁场半径测量放在同一条路径上：左侧复合场中，红色 `qE` 与紫色 `qvB` 必须等大反向，粒子才直线穿出；右侧纯磁场中，洛伦兹力提供向心力，轨迹半径就是 `R=mv/(|q|B)`。
 
-可拖动参数：电荷正负、电场强度、磁感应强度、入射速度、质量。实时变化：`qE`、`qvB`、选择速度、偏转方向和进入纯磁场后的半径。
+<svg viewBox="0 0 860 330" width="100%" style="max-width:980px">
+  <rect x="56" y="72" width="420" height="184" rx="8" fill="#f2f7ff" stroke="#2c7be5" stroke-width="2"></rect>
+  <rect x="528" y="72" width="250" height="184" rx="8" fill="#f7fbfb" stroke="#38b2ac" stroke-width="2"></rect>
+  <text x="266" y="48" font-size="18" fill="#2c7be5" text-anchor="middle" font-weight="700">复合场速度选择器</text>
+  <text x="653" y="48" font-size="18" fill="#38b2ac" text-anchor="middle" font-weight="700">纯磁场半径测量</text>
+  <g fill="#52606d" font-size="22" text-anchor="middle">
+    <text x="106" y="122">⊗</text><text x="166" y="122">⊗</text><text x="226" y="122">⊗</text><text x="286" y="122">⊗</text><text x="346" y="122">⊗</text><text x="406" y="122">⊗</text>
+    <text x="106" y="176">⊗</text><text x="166" y="176">⊗</text><text x="226" y="176">⊗</text><text x="286" y="176">⊗</text><text x="346" y="176">⊗</text><text x="406" y="176">⊗</text>
+    <text x="106" y="230">⊗</text><text x="166" y="230">⊗</text><text x="226" y="230">⊗</text><text x="286" y="230">⊗</text><text x="346" y="230">⊗</text><text x="406" y="230">⊗</text>
+  </g>
+  <g stroke="#f0a500" stroke-width="3" marker-end="url(#m13-arrow-orange)">
+    <line x1="86" y1="92" x2="86" y2="128"></line><line x1="146" y1="92" x2="146" y2="128"></line><line x1="206" y1="92" x2="206" y2="128"></line><line x1="266" y1="92" x2="266" y2="128"></line>
+  </g>
+  <text x="130" y="82" font-size="14" fill="#f0a500" font-weight="700">E 向下</text>
+  <text x="430" y="82" font-size="14" fill="#52606d" font-weight="700">B 向里</text>
+  <line x1="28" y1="166" x2="820" y2="166" stroke="#2c7be5" stroke-width="4" marker-end="url(#m13-arrow-blue)"></line>
+  <circle cx="242" cy="166" r="15" fill="#e03131"></circle>
+  <text x="242" y="172" font-size="18" fill="#fff" text-anchor="middle" font-weight="700">+</text>
+  <line x1="242" y1="166" x2="310" y2="166" stroke="#2c7be5" stroke-width="4" marker-end="url(#m13-arrow-blue)"></line>
+  <text x="324" y="171" font-size="15" fill="#2c7be5" font-weight="700">v</text>
+  <line x1="222" y1="166" x2="222" y2="216" stroke="#e03131" stroke-width="4" marker-end="url(#m13-arrow-red)"></line>
+  <text x="191" y="194" font-size="15" fill="#e03131" font-weight="700">qE</text>
+  <line x1="264" y1="166" x2="264" y2="116" stroke="#7b2cbf" stroke-width="4" marker-end="url(#m13-arrow-purple)"></line>
+  <text x="285" y="136" font-size="15" fill="#7b2cbf" font-weight="700">qvB</text>
+  <path d="M604 214 A78 78 0 0 1 704 106" fill="none" stroke="#38b2ac" stroke-width="4"></path>
+  <line x1="656" y1="166" x2="724" y2="126" stroke="#38b2ac" stroke-width="3" marker-end="url(#m13-arrow-green)"></line>
+  <text x="707" y="157" font-size="15" fill="#38b2ac" font-weight="700">R</text>
+  <text x="430" y="296" font-size="17" fill="#102a43" text-anchor="middle" font-weight="700">直线通过：qE=qvB → v=E/B；出场圆周：qvB=mv²/R → R=mv/(|q|B)</text>
+  <defs>
+    <marker id="m13-arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#2c7be5"></path></marker>
+    <marker id="m13-arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#e03131"></path></marker>
+    <marker id="m13-arrow-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#7b2cbf"></path></marker>
+    <marker id="m13-arrow-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#f0a500"></path></marker>
+    <marker id="m13-arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#38b2ac"></path></marker>
+  </defs>
+</svg>
 
-#### 3. 观察任务
-- 拖动 `v`：看何时 `qE` 与 `qvB` 等大反向。
+#### 3. 交互模型
+<iframe src="anim/model/compound-field-particle.html" width="100%" height="760" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
+可拖动参数：电荷正负、电场强度、磁感应强度、入射速度、质量；也可以直接拖动画面里的蓝色速度手柄。实时变化：`qE`、`qvB`、选择速度、偏转方向、轨迹频闪点、力表盘、`F-v` 图像游标、数据记录和进入纯磁场后的半径标尺。
+
+#### 4. 观察任务
+- 拖动画面里的蓝色速度手柄：看何时 `qE` 与 `qvB` 等大反向，轨迹从偏转变成直线。
+- 点击“播放”：看粒子经过复合场、出场进入纯磁场时，速度方向和半径尺如何联动。
+- 点击“记录”：比较不同 `v` 的偏差数据，找到最接近 `v=E/B` 的一次。
 - 改变电荷正负：看两个力方向是否同时反向，直线条件是否仍为 `v=E/B`。
 - 增大 `B`：看选择速度和磁场圆周半径如何改变。
 - 增大质量 `m`：看进入纯磁场后的半径如何变大。
 
-#### 4. 识别条件
+#### 5. 识别条件
 | 题目信号 | 说明 |
 |---|---|
 | 电场和磁场同时存在 | 先分别画 `qE` 与 `qvB` |
@@ -2036,14 +2116,14 @@ P损=I²r=20²×20=8000 W=8 kW
 | 进入纯电场区域 | 类平抛或匀加速偏转 |
 | 质谱仪、速度选择器 | 先选速度，再用磁场半径分离 |
 
-#### 5. 第一步怎么做
+#### 6. 第一步怎么做
 1. 判断粒子电性，确定电场力方向。
 2. 用左手定则判断洛伦兹力方向，负电荷方向相反。
 3. 若题目说直线通过，令 `qE=qvB`。
 4. 若进入纯磁场，写 `qvB=mv²/R`。
 5. 若进入纯电场，写 `a=qE/m`，按类平抛处理。
 
-#### 6. 公式绑定
+#### 7. 公式绑定
 速度选择器：
 
 ```text
@@ -2067,16 +2147,16 @@ x = v0t
 y = 1/2at²
 ```
 
-动画中红色箭头对应 `qE`，紫色箭头对应 `qvB`，蓝色曲线显示偏转方向。
+图中红色箭头对应 `qE`，紫色箭头对应 `qvB`，蓝色轨迹和频闪点显示偏转方向；动画右侧的 `F-v` 图像用水平线表示 `qE`，用斜线表示 `qvB`，二者交点的竖线就是 `v0=E/B`。半径标尺读出的 `R` 对应 `R=mv/(|q|B)`。
 
-#### 7. 适用边界
+#### 8. 适用边界
 - 洛伦兹力公式要求速度与磁场垂直时取 `qvB`；有夹角要乘 `sinθ`。
 - `v=E/B` 是直线通过复合场的条件，不是所有复合场题都能直接套。
 - 电场力会改变动能，磁场力不改变动能。
 - 若重力不能忽略，要把 `mg` 一并画入受力图。
 - 进入不同区域要分段处理，不能用一个方程覆盖全过程。
 
-#### 8. 常见题型
+#### 9. 常见题型
 | 题型 | 第一反应 |
 |---|---|
 | 速度选择器 | `v=E/B` |
@@ -2085,7 +2165,7 @@ y = 1/2at²
 | 判断偏转方向 | 分别判 `qE` 与 `qvB` |
 | 选择粒子种类 | 比荷 `q/m` 决定半径和周期 |
 
-#### 9. 易错点
+#### 10. 易错点
 | 易错做法 | 问题 | 改法 |
 |---|---|---|
 | 负电荷仍按正电荷判力 | 方向相反 | 先判电性 |
@@ -2094,7 +2174,7 @@ y = 1/2at²
 | 进入纯磁场忘记速度来源 | 速度可能由电场加速得到 | 分段求 |
 | 把 `q` 符号带进半径大小 | 半径取正值 | 用 `|q|` |
 
-#### 10. 例题与训练
+#### 11. 例题与训练
 
 **例题 1**（速度选择器）
 复合场中 `E=4.0×10³ V/m`，`B=0.80 T`。粒子要直线通过，速度应为多少？
@@ -2172,16 +2252,16 @@ R=mv/(|q|B)
 </svg>
 
 #### 3. 交互模型
-<iframe src="anim/xb3/gas-law.html" width="100%" height="560" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb3/gas-law.html" width="100%" height="760" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
-<iframe src="anim/xb3/pv-graph.html" width="100%" height="580" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px;margin-top:12px"></iframe>
+<iframe src="anim/xb3/pv-graph.html" width="100%" height="760" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px;margin-top:12px"></iframe>
 
-可拖动参数：体积、温度、过程类型、初末状态。实时变化：压强、`pV/T`、分子运动、p-V 图线、面积和做功正负。
+可直接拖动：气缸活塞改变体积 `V`，温度表改变 `T`，p-V 图像中的状态点改变初末状态；右侧控件可切换等温、等压、等容过程。实时变化：分子运动快慢、压强箭头、`p=nRT/V`、`pV/T`、p-V 图线、面积做功 `W=∫p dV` 和数据记录。
 
 #### 4. 观察任务
-- 固定温度拖体积：看 `pV` 是否保持常量。
-- 固定体积升温：看 `p/T` 是否保持常量。
-- 在 p-V 图像中让体积增大：看气体对外做功为什么为正。
+- 拖气缸活塞并固定温度：看 `pV` 是否保持常量，压强箭头是否随体积减小而变密。
+- 拖温度表并固定体积：看分子运动变快时 `p/T` 是否保持常量。
+- 拖 p-V 图中的状态点 2 让体积增大：看曲线下面积为什么表示气体对外做正功。
 - 切换等容过程：看图线竖直时面积和做功是否为 0。
 
 #### 5. 识别条件
@@ -2337,19 +2417,21 @@ p-V 图像面积才是做功；没有横向面积就没有体积功。
 </svg>
 
 #### 3. 交互模型
-<iframe src="anim/xb3/nuclear-reaction.html" width="100%" height="560" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/model/nuclear-mass-energy.html" width="100%" height="760" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
-<iframe src="anim/xb3/nuclear-energy.html" width="100%" height="560" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px;margin-top:12px"></iframe>
+<iframe src="anim/xb3/nuclear-reaction.html" width="100%" height="760" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
-<iframe src="anim/xb3/binding-energy.html" width="100%" height="560" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px;margin-top:12px"></iframe>
+<iframe src="anim/xb3/nuclear-energy.html" width="100%" height="760" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px;margin-top:12px"></iframe>
 
-可拖动参数：核反应模板、质量亏损、反应次数、质量数、结合能。实时变化：质量数/电荷数守恒检查、释放能量、总能量、平均结合能和稳定性判断。
+<iframe src="anim/xb3/binding-energy.html" width="100%" height="760" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px;margin-top:12px"></iframe>
+
+可拖动参数：核反应模板、未知粒子的 `A/Z`、质量亏损、反应次数、质量数、结合能；也可以直接拖动画面里的未知粒子卡片、`Δm` 砝码和结合能曲线探针。实时变化：质量数/电荷数守恒检查、释放或吸收能量、总能量、平均结合能、稳定性判断、图像游标和数据记录。新版模型总控台把“配平 → 质量亏损 → 质能换算 → 结合能稳定性 → 数据记录”放在同一个画面内，便于从高考题干一步迁移到计算。
 
 #### 4. 观察任务
-- 切换核反应模板：看左右两边 `A`、`Z` 是否同时守恒。
-- 增大质量亏损 `Δm`：看释放能量是否线性增大。
+- 切换核反应模板并拖动未知粒子卡片：看左右两边 `A`、`Z` 是否同时守恒，差值图像是否回到 0。
+- 拖动 `Δm` 砝码：看质量天平、能量计和 `E-Δm` 图像怎样同步变化；`Δm<0` 时看状态如何变成吸能。
 - 增大反应次数：看总能量如何累加。
-- 比较平均结合能：看为什么产物更稳定时会释放能量。
+- 拖动结合能曲线探针：比较 `Eb/A` 与对比线，看为什么产物更稳定时会释放能量。
 
 #### 5. 识别条件
 | 题目信号 | 说明 |
@@ -2399,7 +2481,7 @@ Eb = Δmc²
 平均结合能越大，通常原子核越稳定
 ```
 
-动画中反应方程显示 `A/Z` 守恒，能量账本显示质量亏损和释放能量，结合能柱显示稳定性比较。
+动画中核反应实验台的守恒账本显示 `ΣA`、`ΣZ` 差值；质能实验台的质量天平和能量计对应 `E=Δmc²` 与 `E/MeV≈Δm/u×931.5`；结合能实验台的曲线探针对应 `Eb/A`，用于比较稳定性。
 
 #### 8. 适用边界
 - 质量数守恒是核子数守恒，不表示精确静止质量完全相等。

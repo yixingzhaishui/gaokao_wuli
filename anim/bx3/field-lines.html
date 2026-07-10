@@ -23,12 +23,6 @@ canvas{display:block;width:100%;max-width:720px;background:#0d1b2a;border-radius
 <body>
 <div class="wrap">
   <h2>电场线：切线=场强方向，疏密=强弱，由正到负、不相交不闭合</h2>
-  <canvas id="cv" width="720" height="440"></canvas>
-  <div class="chips">
-    <span class="chip">小磁针处场强方向：<b id="dir">—</b></span>
-    <span class="chip">该点场强强弱：<b id="mag">—</b></span>
-    <span class="chip">释放的电荷：<b id="pst">未释放</b></span>
-  </div>
   <div class="tools">
     <span>场景：</span>
     <button class="btn on" data-preset="dipole">等量异种（偶极子）</button>
@@ -38,7 +32,13 @@ canvas{display:block;width:100%;max-width:720px;background:#0d1b2a;border-radius
     <button class="btn" id="release">▶ 从小磁针处释放 +q</button>
     <button class="btn" id="reset">重置</button>
   </div>
-  <div class="hint"><b>怎么玩</b>：拖动红/蓝电荷，电场线实时重画——线从<b>正电荷发出、到负电荷终止</b>，越<b>密</b>处场越<b>强</b>。拖黄色<b>小磁针</b>到任意位置，绿箭头总沿<b>电场线切线</b>指向该点场强方向。点<b>"释放 +q"</b>：一个静止的正电荷从小磁针处被释放，你会看到它<b>沿电场线方向被电场力推着加速运动</b>（初速为零时轨迹与电场线重合）——这就是"电场线切线 = 受力/加速度方向"。任意两条电场线<b>永不相交、不闭合</b>。</div>
+  <canvas id="cv" width="720" height="440" aria-label="电场线实验台：电荷俯视装置、场线图像和数据记录"></canvas>
+  <div class="chips">
+    <span class="chip">小磁针处场强方向：<b id="dir">—</b></span>
+    <span class="chip">该点场强强弱：<b id="mag">—</b></span>
+    <span class="chip">释放的电荷：<b id="pst">未释放</b></span>
+  </div>
+  <div class="hint"><b>怎么玩</b>：拖动红/蓝电荷，对照电荷俯视装置、场线图像和数据记录，电场线实时重画；拖黄色<b>小磁针</b>到任意位置，绿箭头总沿<b>电场线切线</b>指向该点场强方向。</div>
 </div>
 <script>
 (function(){

@@ -1,27 +1,71 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>热力学第一定律</title>
-<link rel="icon" href="data:,">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>热力学第一定律实验台</title>
 <style>
-  body{margin:0;background:#f7f9fc;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}.root{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:10px;padding:10px;box-sizing:border-box;min-height:540px}.stage{background:#fff;border:1px solid #d9e2ec;border-radius:8px;overflow:hidden}canvas{display:block;width:100%;height:auto}.panel{display:flex;flex-direction:column;gap:7px}.card{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:8px}.task{background:#fff7e6;border-left:3px solid #f0a500;color:#486581;line-height:1.38;font-size:12px}.title{font-weight:700;margin-bottom:4px}.param{display:grid;gap:2px;margin:6px 0;font-size:13px}.param span{display:flex;justify-content:space-between;color:#486581;gap:10px}.param b{color:#102a43;font-variant-numeric:tabular-nums;white-space:nowrap}input[type=range]{width:100%;accent-color:#2c7be5}.stepper{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:2px}button{border:1px solid #b0bcc9;background:#fff;border-radius:6px;padding:5px 8px;cursor:pointer}.readout{background:#102a43;color:#d9e2ec;border-radius:8px;padding:8px;line-height:1.45;font-size:13px}.readout b{color:#f0a500;font-variant-numeric:tabular-nums}.formula{font-size:13px;line-height:1.42;color:#334e68}.status{font-size:12px;font-weight:700;border-radius:6px;padding:7px;border:1px solid #38b2ac;background:#e6fffa;color:#087f5b;line-height:1.35}.status.bad{background:#ffe6e6;border-color:#ff6b6b;color:#b30000}.status.warn{background:#fff7e6;border-color:#f0a500;color:#9a6700}@media(max-width:780px){.root{grid-template-columns:1fr}}
+  *{box-sizing:border-box}
+  body{margin:0;background:#f5f7fb;color:#102a43;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:14px}
+  .stage{display:grid;grid-template-columns:minmax(0,1fr)310px;gap:12px;align-items:start}
+  canvas{width:100%;height:640px;background:#fff;border:1px solid #d9e2ec;border-radius:8px;display:block;touch-action:none}
+  .panel{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:12px}
+  .row{display:flex;gap:8px;margin-bottom:10px}
+  button{flex:1;border:0;border-radius:6px;background:#2c7be5;color:#fff;font-weight:700;padding:9px 10px;cursor:pointer}
+  .secondary{background:#e6edf7;color:#102a43}
+  label{display:block;font-size:13px;font-weight:700;margin-top:10px}
+  input{width:100%;accent-color:#2c7be5}
+  .readout{margin-top:12px;padding:10px;background:#eef4ff;border-radius:8px;line-height:1.65;font-size:13px}
+  .status{margin-top:10px;padding:9px 10px;border-radius:8px;font-size:13px;line-height:1.5;background:#e6fffa;color:#087f5b;font-weight:700}
+  .bad{background:#fff5f5;color:#c92a2a}.warn{background:#fff7e6;color:#9a6700}
+  .hint{margin-top:10px;color:#486581;font-size:13px;line-height:1.55}
+  table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px}
+  th,td{border-bottom:1px solid #d9e2ec;padding:5px 4px;text-align:right}th:first-child,td:first-child{text-align:left}
+  @media(max-width:860px){.stage{grid-template-columns:1fr}canvas{height:560px}}
 </style>
 </head>
 <body>
-<div class="root"><div class="stage"><canvas id="canvas" width="850" height="520"></canvas></div><div class="panel">
-  <div class="card task"><b>观察任务：</b>分别拖 Q 和 W，看 ΔU 是否等于两者代数和；注意 W 是外界对系统做功。</div>
-  <div class="card"><div class="title">参数</div>
-    <label class="param"><span>热量 Q <b id="qText">500 J</b></span><input id="heat" type="range" min="-800" max="1000" step="50" value="500"></label><div class="stepper"><button data-step="heat" data-dir="-1">- Q</button><button data-step="heat" data-dir="1">+ Q</button></div>
-    <label class="param"><span>外界做功 W <b id="wText">200 J</b></span><input id="work" type="range" min="-800" max="1000" step="50" value="200"></label><div class="stepper"><button data-step="work" data-dir="-1">- W</button><button data-step="work" data-dir="1">+ W</button></div>
-  </div>
-  <div class="readout" id="readout"></div>
-  <div class="card formula"><div class="title">本页符号</div><div>Q>0：系统吸热</div><div>W>0：外界对系统做功</div><div>ΔU = Q + W</div></div>
-  <div class="status" id="status"></div>
+<div class="wrap"><div class="stage">
+  <canvas id="c" width="940" height="640" aria-label="热力学第一定律实验台：气缸装置、p-V图像、能量账本和数据记录"></canvas>
+  <section class="panel">
+    <div class="row"><button id="playBtn" class="play-btn">播放</button><button id="resetBtn" class="secondary">重置</button><button id="recordBtn" class="secondary">记录</button></div>
+    <label for="heat">热量 Q/J：<span id="heatVal"></span></label><input id="heat" type="range" min="-800" max="1000" step="50" value="500">
+    <label for="work">外界对系统做功 W/J：<span id="workVal"></span></label><input id="work" type="range" min="-800" max="1000" step="50" value="200">
+    <label for="volume">活塞位置 V/L：<span id="volumeVal"></span></label><input id="volume" type="range" min="1.0" max="4.0" step="0.1" value="2.4">
+    <div id="readout" class="readout"></div><div id="status" class="status"></div>
+    <div class="hint">观察任务：拖动画面里的活塞或红蓝能量手柄，看气缸、p-V 面积、内能槽和 ΔU=Q+W 读数如何同步变化。</div>
+    <table><thead><tr><th>记录</th><th>Q</th><th>W</th><th>ΔU</th></tr></thead><tbody id="recordBody"><tr><td colspan="4">点击“记录”保存一次能量账本</td></tr></tbody></table>
+  </section>
 </div></div>
 <script>
-(function(){'use strict';const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');const els={heat:document.getElementById('heat'),work:document.getElementById('work')};function fmt(n){return n.toFixed(0)}function p(){const Q=+els.heat.value,W=+els.work.value,dU=Q+W;return{Q,W,dU}}function text(s,x,y,c,a,size,w){ctx.fillStyle=c||'#102a43';ctx.font=(w?w+' ':'')+(size||13)+'px -apple-system,\"PingFang SC\",sans-serif';ctx.textAlign=a||'center';ctx.textBaseline='middle';ctx.fillText(s,x,y)}function arrow(x1,y1,x2,y2,c,w){const ang=Math.atan2(y2-y1,x2-x1);ctx.save();ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w||4;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-14*Math.cos(ang-.45),y2-14*Math.sin(ang-.45));ctx.lineTo(x2-14*Math.cos(ang+.45),y2-14*Math.sin(ang+.45));ctx.closePath();ctx.fill();ctx.restore()}function box(x,y,w,h,fill,stroke){ctx.save();ctx.fillStyle=fill;ctx.strokeStyle=stroke||'#d9e2ec';ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.restore()}function draw(){const q=p();ctx.clearRect(0,0,850,520);ctx.fillStyle='#fff';ctx.fillRect(0,0,850,520);text('热力学第一定律：ΔU = Q + W',425,34,'#102a43','center',20,'700');box(300,130,250,190,'#fff','#334e68');text('系统',425,166,'#102a43','center',18,'700');const level=Math.max(0,Math.min(1,(q.dU+1200)/2400));ctx.fillStyle=q.dU>=0?'rgba(240,165,0,.45)':'rgba(44,123,229,.25)';ctx.fillRect(330,282-level*110,190,level*110);text('内能变化 ΔU',425,258,'#486581','center',14);text((q.dU>=0?'+':'')+fmt(q.dU)+' J',425,292,'#f0a500','center',28,'700');if(q.Q>=0){arrow(92,210,292,210,'#e03131',Math.max(2,Math.min(8,Math.abs(q.Q)/150)));text('吸热 Q=+'+fmt(q.Q)+'J',185,184,'#e03131','center',14,'700')}else{arrow(292,210,92,210,'#2c7be5',Math.max(2,Math.min(8,Math.abs(q.Q)/150)));text('放热 Q='+fmt(q.Q)+'J',185,184,'#2c7be5','center',14,'700')}if(q.W>=0){arrow(758,210,558,210,'#7b2cbf',Math.max(2,Math.min(8,Math.abs(q.W)/150)));text('外界做功 W=+'+fmt(q.W)+'J',665,184,'#7b2cbf','center',14,'700')}else{arrow(558,210,758,210,'#7b2cbf',Math.max(2,Math.min(8,Math.abs(q.W)/150)));text('系统对外做功 W='+fmt(q.W)+'J',665,184,'#7b2cbf','center',14,'700')}box(176,382,500,58,'#f7f9fc','#d9e2ec');text('能量账本：ΔU = '+fmt(q.Q)+' + '+fmt(q.W)+' = '+fmt(q.dU)+' J',426,411,'#102a43','center',18,'700');update(q)}function update(q){document.getElementById('qText').textContent=fmt(q.Q)+' J';document.getElementById('wText').textContent=fmt(q.W)+' J';document.getElementById('readout').innerHTML='Q=<b>'+fmt(q.Q)+' J</b><br>W=<b>'+fmt(q.W)+' J</b><br>ΔU=Q+W=<b>'+fmt(q.dU)+' J</b>';const st=document.getElementById('status');if(q.dU>0){st.className='status';st.textContent='内能增加：系统获得的能量代数和为正。'}else if(q.dU<0){st.className='status bad';st.textContent='内能减少：系统流出或对外做功的能量更多。'}else{st.className='status warn';st.textContent='内能不变：吸热和做功的代数和为 0。'}}Object.values(els).forEach(el=>el.addEventListener('input',draw));document.querySelectorAll('[data-step]').forEach(btn=>btn.addEventListener('click',()=>{const el=els[btn.dataset.step],step=+el.step||1,dir=+btn.dataset.dir;el.value=Math.max(+el.min,Math.min(+el.max,+el.value+dir*step));el.dispatchEvent(new Event('input',{bubbles:true}))}));draw();})();
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+const els={heat:by('heat'),work:by('work'),volume:by('volume'),heatVal:by('heatVal'),workVal:by('workVal'),volumeVal:by('volumeVal'),readout:by('readout'),status:by('status'),playBtn:by('playBtn'),resetBtn:by('resetBtn'),recordBtn:by('recordBtn'),recordBody:by('recordBody')};
+function by(id){return document.getElementById(id)}
+let playing=false,t=0,last=0,dragMode='',records=[];
+const cyl={x:104,y:128,w:350,h:214},graph={x:610,y:96,w:260,h:210};
+function params(){const Q=+els.heat.value,W=+els.work.value,V=+els.volume.value,dU=Q+W;const P=Math.max(.45,3.2/V+(W>0?0.28:-0.08));return{Q,W,V,dU,P,temp:300+dU/8}}
+function label(s,x,y,c='#102a43',size=13,align='center',w='700'){ctx.fillStyle=c;ctx.font=`${w} ${size}px system-ui`;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.48),y2-10*Math.sin(a-.48));ctx.lineTo(x2-10*Math.cos(a+.48),y2-10*Math.sin(a+.48));ctx.closePath();ctx.fill()}
+function drawScene(p){ctx.fillStyle='#fff';ctx.fillRect(0,0,940,640);label('热力学第一定律实验台：ΔU = Q + W',470,28,'#102a43',19);label('三视图联动：气缸装置、p-V 图像、内能槽和数据记录同时更新',470,52,'#486581',13,'center','600');
+ drawCylinder(p);drawGraph(p);drawLedger(p);drawEnergyHandles(p);drawMolecules(p)}
+function drawCylinder(p){ctx.fillStyle='#f2f7ff';ctx.strokeStyle='#2c7be5';ctx.lineWidth=2;ctx.fillRect(54,82,506,320);ctx.strokeRect(54,82,506,320);label('实验装置：气缸中的气体系统',307,108,'#2c7be5',14);
+ const pistonX=cyl.x+82+(p.V-1)/3*210;ctx.fillStyle='#eef4ff';ctx.strokeStyle='#334e68';ctx.lineWidth=3;ctx.fillRect(cyl.x,cyl.y,cyl.w,cyl.h);ctx.strokeRect(cyl.x,cyl.y,cyl.w,cyl.h);ctx.fillStyle='rgba(240,165,0,.16)';ctx.fillRect(cyl.x+4,cyl.y+4,pistonX-cyl.x-4,cyl.h-8);ctx.fillStyle='#829ab1';ctx.fillRect(pistonX,cyl.y-10,24,cyl.h+20);label('拖动活塞',pistonX+12,cyl.y+cyl.h+30,'#486581',12);
+ if(p.Q>=0){arrow(122,374,220,318,'#e03131',Math.max(3,Math.min(9,Math.abs(p.Q)/120)));label('Q 吸热',160,344,'#e03131',13)}else{arrow(220,318,122,374,'#2c7be5',Math.max(3,Math.min(9,Math.abs(p.Q)/120)));label('Q 放热',160,344,'#2c7be5',13)}
+ if(p.W>=0){arrow(502,236,pistonX+30,236,'#7b2cbf',Math.max(3,Math.min(9,Math.abs(p.W)/120)));label('W 外界压缩',476,204,'#7b2cbf',13)}else{arrow(pistonX+30,236,502,236,'#7b2cbf',Math.max(3,Math.min(9,Math.abs(p.W)/120)));label('W<0 气体膨胀做功',450,204,'#7b2cbf',13)}
+ ctx.fillStyle='#102a43';label(`压力表 p≈${p.P.toFixed(2)} atm`,222,142,'#102a43',13);label(`体积 V=${p.V.toFixed(1)} L`,222,164,'#102a43',13);label(`温度读数 T≈${Math.max(80,p.temp).toFixed(0)} K`,222,186,p.dU>=0?'#e03131':'#2c7be5',13)}
+function drawMolecules(p){const pistonX=cyl.x+82+(p.V-1)/3*210;const count=22;for(let i=0;i<count;i++){const a=i*2.399+t*(playing?1.8:.2),rx=(pistonX-cyl.x-40)*(0.18+(i%7)/8),ry=24+(i%5)*24;const x=cyl.x+28+Math.abs(Math.cos(a))*Math.max(18,rx),y=cyl.y+32+Math.abs(Math.sin(a*1.3))*Math.min(cyl.h-70,ry+80);ctx.fillStyle=i%2?'#2c7be5':'#e03131';ctx.globalAlpha=.82;ctx.beginPath();ctx.arc(Math.min(pistonX-14,x),Math.min(cyl.y+cyl.h-22,y),4.5,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1}}
+function drawGraph(p){const x=graph.x,y=graph.y,w=graph.w,h=graph.h;ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1;ctx.fillRect(x,y,w,h);ctx.strokeRect(x,y,w,h);label('图像：p-V 面积对应气体对外做功',x+w/2,y+22,'#102a43',13);arrow(x+40,y+h-34,x+w-20,y+h-34,'#52606d',2);arrow(x+40,y+h-34,x+40,y+46,'#52606d',2);label('V',x+w-14,y+h-16,'#52606d',11);label('p',x+24,y+48,'#52606d',11);const v0=2.4,p0=3.2/v0;const px0=x+40+(v0-1)/3*(w-70),py0=y+h-34-p0/3.6*(h-86);const px=x+40+(p.V-1)/3*(w-70),py=y+h-34-p.P/3.6*(h-86);ctx.fillStyle='rgba(240,165,0,.22)';ctx.beginPath();ctx.moveTo(px0,y+h-34);ctx.lineTo(px0,py0);ctx.lineTo(px,py);ctx.lineTo(px,y+h-34);ctx.closePath();ctx.fill();ctx.strokeStyle='#38b2ac';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(px0,py0);ctx.lineTo(px,py);ctx.stroke();ctx.fillStyle='#2c7be5';ctx.beginPath();ctx.arc(px,py,7,0,Math.PI*2);ctx.fill();label('面积 Wout',x+w/2,y+h-60,'#f0a500',12)}
+function drawLedger(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(610,338,260,190);ctx.strokeRect(610,338,260,190);label('能量账本/仪器读数',740,362,'#102a43',14);meter(650,398,168,18,Math.abs(p.Q)/1000,p.Q>=0?'#e03131':'#2c7be5',`Q=${p.Q} J`);meter(650,448,168,18,Math.abs(p.W)/1000,'#7b2cbf',`W=${p.W} J`);meter(650,498,168,18,Math.min(1,Math.abs(p.dU)/1600),p.dU>=0?'#f0a500':'#2c7be5',`ΔU=${p.dU} J`);label('ΔU = Q + W',740,552,'#2c7be5',18)}
+function meter(x,y,w,h,val,c,txt){label(txt,x,y-12,c,12,'left');ctx.fillStyle='#e9eef5';ctx.fillRect(x,y,w,h);ctx.fillStyle=c;ctx.fillRect(x,y,w*val,h)}
+function drawEnergyHandles(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(70,440,490,138);ctx.strokeRect(70,440,490,138);label('画面内可拖动能量手柄',315,464,'#102a43',14);handle(118,506,180,p.Q,-800,1000,'#e03131','Q 手柄');handle(330,506,180,p.W,-800,1000,'#7b2cbf','W 手柄')}
+function handle(x,y,w,val,min,max,c,name){ctx.strokeStyle='#d9e2ec';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+w,y);ctx.stroke();const hx=x+(val-min)/(max-min)*w;ctx.fillStyle=c;ctx.beginPath();ctx.arc(hx,y,13,0,Math.PI*2);ctx.fill();label(name,hx,y+28,c,12)}
+function update(p){els.heatVal.textContent=p.Q+' J';els.workVal.textContent=p.W+' J';els.volumeVal.textContent=p.V.toFixed(1);els.readout.innerHTML=[`Q=${p.Q} J（系统吸热为正）`,`W=${p.W} J（外界对系统做功为正）`,`ΔU=Q+W=${p.dU} J`,`p-V 面积表示气体对外做功，本页 W 与其符号相反`].join('<br>');els.status.className=p.dU>0?'status':(p.dU<0?'status bad':'status warn');els.status.textContent=p.dU>0?'判定：内能增加，系统获得的能量代数和为正。':p.dU<0?'判定：内能减少，流出能量或对外做功更多。':'判定：内能不变，Q 与 W 的代数和为 0。'}
+function render(){const p=params();drawScene(p);update(p)}
+function animate(now){if(!last)last=now;const dt=Math.min(.04,(now-last)/1000);last=now;if(playing)t+=dt;render();requestAnimationFrame(animate)}
+function setFromPointer(e){const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.height;if(dragMode==='piston'){const v=1+(Math.max(cyl.x+82,Math.min(cyl.x+292,x))-(cyl.x+82))/210*3;els.volume.value=v.toFixed(1)}if(dragMode==='Q'){const val=-800+(Math.max(118,Math.min(298,x))-118)/180*1800;els.heat.value=String(Math.round(val/50)*50)}if(dragMode==='W'){const val=-800+(Math.max(330,Math.min(510,x))-330)/180*1800;els.work.value=String(Math.round(val/50)*50)}render()}
+canvas.addEventListener('pointerdown',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.height;const p=params(),pistonX=cyl.x+82+(p.V-1)/3*210;dragMode='';if(Math.abs(x-pistonX)<26&&y>cyl.y-14&&y<cyl.y+cyl.h+36)dragMode='piston';else if(y>486&&y<532&&x>98&&x<318)dragMode='Q';else if(y>486&&y<532&&x>310&&x<530)dragMode='W';if(dragMode){canvas.setPointerCapture(e.pointerId);setFromPointer(e)}});canvas.addEventListener('pointermove',e=>{if(dragMode)setFromPointer(e)});canvas.addEventListener('pointerup',e=>{dragMode='';try{canvas.releasePointerCapture(e.pointerId)}catch{}});canvas.addEventListener('pointercancel',()=>dragMode='');
+els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textContent=playing?'暂停':'播放'});els.resetBtn.addEventListener('click',()=>{playing=false;t=0;els.heat.value=500;els.work.value=200;els.volume.value=2.4;els.playBtn.textContent='播放';render()});els.recordBtn.addEventListener('click',()=>{const p=params();records.unshift({Q:p.Q,W:p.W,dU:p.dU});records=records.slice(0,5);els.recordBody.innerHTML=records.map((r,i)=>`<tr><td>${i+1}</td><td>${r.Q}</td><td>${r.W}</td><td>${r.dU}</td></tr>`).join('')});[els.heat,els.work,els.volume].forEach(el=>el.addEventListener('input',render));render();requestAnimationFrame(animate);
 </script>
 </body>
 </html>

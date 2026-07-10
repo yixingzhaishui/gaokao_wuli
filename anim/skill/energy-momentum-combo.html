@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>能量与动量综合专题实验台</title>
+<link rel="icon" href="data:,">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}.root{display:grid;grid-template-columns:minmax(0,1fr)340px;gap:12px;padding:12px;min-height:700px}.stage,.card{background:#fff;border:1px solid #d9e2ec;border-radius:8px}.stage{overflow:hidden}.card{padding:10px}.panel{display:flex;flex-direction:column;gap:10px}canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab}.task{background:#fff7e6;border-left:4px solid #f0a500;color:#486581;font-size:13px;line-height:1.5}.title{font-weight:900;margin-bottom:7px}.param{display:grid;gap:3px;margin:8px 0;font-size:13px}.param span{display:flex;justify-content:space-between;gap:8px;color:#486581}.param b{color:#102a43;font-variant-numeric:tabular-nums;white-space:nowrap}input[type=range]{width:100%;accent-color:#2c7be5}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}button{border:1px solid #b0bcc9;background:#fff;border-radius:6px;padding:7px 8px;cursor:pointer;font:inherit;font-size:13px}.readout{background:#102a43;color:#d9e2ec;border-radius:8px;padding:10px;line-height:1.6;font-size:13px}.readout b{color:#ffd166;font-variant-numeric:tabular-nums}.status{border:1px solid #38b2ac;background:#e6fffa;color:#087f5b;border-radius:8px;padding:8px;font-size:13px;font-weight:800;line-height:1.45}.formula{font-size:13px;color:#334e68;line-height:1.6}table{width:100%;border-collapse:collapse;font-size:12px}td,th{border-bottom:1px solid #d9e2ec;padding:4px 3px;text-align:right;font-variant-numeric:tabular-nums}@media(max-width:880px){.root{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="root">
+  <div class="stage"><canvas id="canvas" width="930" height="620" aria-label="能量与动量综合实验台：碰撞装置、弹簧压缩、斜面上升、动量守恒、机械能、功能关系、数据记录、多视角"></canvas></div>
+  <div class="panel">
+    <div class="card task"><b>观察任务：</b>拖动入射小车速度，比较碰撞瞬间用动量守恒，碰后上坡或压弹簧用能量关系。</div>
+    <div class="card">
+      <div class="title">系统参数</div>
+      <label class="param"><span>小车 m1 <b id="m1Label">1.0 kg</b></span><input id="m1" type="range" min="0.5" max="4" step="0.1" value="1"></label>
+      <label class="param"><span>木块 m2 <b id="m2Label">2.0 kg</b></span><input id="m2" type="range" min="0.5" max="5" step="0.1" value="2"></label>
+      <label class="param"><span>入射速度 v0 <b id="v0Label">6.0 m/s</b></span><input id="v0" type="range" min="1" max="10" step="0.1" value="6"></label>
+      <label class="param"><span>弹簧劲度 k <b id="kLabel">120 N/m</b></span><input id="k" type="range" min="40" max="240" step="5" value="120"></label>
+      <div class="buttons"><button id="play">暂停</button><button id="record">记录方案</button></div>
+    </div>
+    <div class="readout" id="readout"></div>
+    <div class="card"><div class="title">过程记录</div><table><thead><tr><th>阶段</th><th>用量</th><th>结果</th></tr></thead><tbody id="rows"></tbody></table></div>
+    <div class="card formula">
+      <div class="title">选择公式</div>
+      <div>碰撞瞬间：Σp守恒，m1v0=(m1+m2)v</div>
+      <div>上坡/压簧：1/2 Mv²=Mgh 或 1/2kx²</div>
+      <div>有外力做功：ΔE=W外</div>
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+</div>
+<script>
+(function(){
+'use strict';
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+const E={m1:document.getElementById('m1'),m2:document.getElementById('m2'),v0:document.getElementById('v0'),k:document.getElementById('k'),m1Label:document.getElementById('m1Label'),m2Label:document.getElementById('m2Label'),v0Label:document.getElementById('v0Label'),kLabel:document.getElementById('kLabel'),readout:document.getElementById('readout'),rows:document.getElementById('rows'),status:document.getElementById('status'),play:document.getElementById('play'),record:document.getElementById('record')};
+const C={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',green:'#087f5b',gold:'#f0a500',purple:'#7048e8'};
+const S={run:true,t:0,drag:false,records:[]};
+function box(x,y,w,h,f='#fff',s='#d9e2ec'){ctx.save();ctx.fillStyle=f;ctx.strokeStyle=s;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.restore()}
+function text(s,x,y,c=C.ink,a='center',z=13,w='800'){ctx.fillStyle=c;ctx.font=w+' '+z+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+function line(x1,y1,x2,y2,c='#9fb3c8',w=2,d){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(d)ctx.setLineDash(d);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
+function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.45),y2-10*Math.sin(a-.45));ctx.lineTo(x2-10*Math.cos(a+.45),y2-10*Math.sin(a+.45));ctx.closePath();ctx.fill()}
+function calc(){const m1=+E.m1.value,m2=+E.m2.value,v0=+E.v0.value,k=+E.k.value,M=m1+m2,v=m1*v0/M,Ek=.5*M*v*v,h=Ek/(M*9.8),x=Math.sqrt(2*Ek/k);return{m1,m2,v0,k,M,v,Ek,h,x,p:m1*v0}}
+function draw(){const q=calc();ctx.clearRect(0,0,930,620);box(34,30,862,548,'#fff');text('G-08 能量与动量综合：碰撞看动量，转化看能量',465,56,C.ink,'center',17,'900');drawScene(q);drawBars(q);drawFlow(q);update(q)}
+function drawScene(q){box(70,88,560,250,'#fbfdff');text('侧视装置：小车碰木块后共同压弹簧/上斜面',350,112,C.muted,'center',12,'900');line(100,260,590,260,'#52606d',5);const phase=(S.t%6)/6;const x1=120+Math.min(phase/.35,1)*210;ctx.fillStyle=C.blue;ctx.fillRect(x1,224,54,32);text('m1',x1+27,214,C.blue,'center',11,'900');ctx.fillStyle=C.gold;ctx.fillRect(360+Math.max(0,phase-.35)*120,224,72,36);text('m2',396+Math.max(0,phase-.35)*120,214,C.gold,'center',11,'900');arrow(x1+58,222,x1+115,202,C.red,3);text('拖动 v0',x1+120,198,C.red,'left',12,'900');ctx.strokeStyle=C.green;ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<9;i++){const x=510+i*8,y=242+Math.sin(i*Math.PI)*12;ctx.lineTo(x,y)}ctx.stroke();line(452,260,590,186,C.purple,4);text('碰撞瞬间时间短：外力冲量可忽略，先用动量守恒',350,318,C.green,'center',12,'900')}
+function drawBars(q){box(70,366,560,166,'#fff');text('数据图像：动量守恒后，动能转化为重力势能或弹性势能',350,388,C.muted,'center',12,'900');const x0=128,y0=496,h=82;const vals=[q.p,q.M*q.v,q.Ek,0.5*q.k*q.x*q.x],max=Math.max(...vals,1);['初动量','后动量','碰后Ek','弹性Ep'].forEach((lab,i)=>{const bh=vals[i]/max*h;ctx.fillStyle=[C.blue,C.green,C.gold,C.purple][i];ctx.fillRect(x0+i*112,y0-bh,56,bh);text(lab,x0+28+i*112,y0+18,C.muted,'center',11,'800');text(vals[i].toFixed(1),x0+28+i*112,y0-bh-12,C.ink,'center',10,'800')});text('多视角：碰撞装置 + 斜面/弹簧 + 柱状图 + 过程记录',350,528,C.purple,'center',12,'900')}
+function drawFlow(q){box(664,88,196,444,'#fff');text('选规律流程',762,114,C.ink,'center',14,'900');['定研究对象','看是否碰撞瞬间','判断动量守恒','看机械能是否守恒','有外力用功能关系','检查方向和系统'].forEach((s,i)=>{box(686,142+i*54,152,34,i===1?'#fff7e6':i===3?'#e6fffa':'#eef4ff');text(s,762,159+i*54,i===1?C.gold:i===3?C.green:C.blue,'center',12,'900')});text('v后='+q.v.toFixed(2)+'m/s',762,474,C.red,'center',14,'900');text('h='+q.h.toFixed(2)+'m  x='+q.x.toFixed(2)+'m',762,502,C.muted,'center',12,'800')}
+function update(q){E.m1Label.textContent=q.m1.toFixed(1)+' kg';E.m2Label.textContent=q.m2.toFixed(1)+' kg';E.v0Label.textContent=q.v0.toFixed(1)+' m/s';E.kLabel.textContent=q.k.toFixed(0)+' N/m';E.readout.innerHTML='碰后共同速度：<b>'+q.v.toFixed(2)+' m/s</b><br>碰后动能：<b>'+q.Ek.toFixed(2)+' J</b><br>可上升高度：<b>'+q.h.toFixed(2)+' m</b><br>最大压缩量：<b>'+q.x.toFixed(2)+' m</b>';E.rows.innerHTML='<tr><td>碰撞</td><td>Σp</td><td>'+q.v.toFixed(2)+'</td></tr><tr><td>上坡</td><td>能量</td><td>'+q.h.toFixed(2)+'</td></tr><tr><td>压簧</td><td>能量</td><td>'+q.x.toFixed(2)+'</td></tr>';E.status.textContent='判断顺序：先问系统动量是否守恒，再问机械能是否守恒；两者不要混用到同一阶段。'}
+function record(){const q=calc();S.records.push(q);if(S.records.length>4)S.records.shift();update(q)}
+[E.m1,E.m2,E.v0,E.k].forEach(el=>el.addEventListener('input',draw));E.record.onclick=record;E.play.onclick=()=>{S.run=!S.run;E.play.textContent=S.run?'暂停':'播放'};function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}function setV(p){E.v0.value=Math.max(1,Math.min(10,(p.x-100)/420*10)).toFixed(1);draw()}canvas.addEventListener('pointerdown',e=>{const p=pos(e);if(p.x>70&&p.x<630&&p.y>85&&p.y<340){S.drag=true;canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing';setV(p)}});canvas.addEventListener('pointermove',e=>{if(S.drag)setV(pos(e))});canvas.addEventListener('pointerup',e=>{if(S.drag)record();S.drag=false;canvas.style.cursor='grab';try{canvas.releasePointerCapture(e.pointerId)}catch(_){}});canvas.addEventListener('pointercancel',()=>{S.drag=false});let last=performance.now();function loop(now){const dt=Math.min((now-last)/1000,.04);last=now;if(S.run)S.t+=dt;draw();requestAnimationFrame(loop)}record();loop();
+})();
+</script>
+</body>
+</html>

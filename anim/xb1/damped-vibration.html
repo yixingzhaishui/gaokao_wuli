@@ -28,7 +28,7 @@ button{font:inherit;border:1px solid var(--line);background:#fff;border-radius:8
 <div class="wrap">
   <h2>阻尼振动：拖阻尼阀，看振幅包络和能量怎样衰减</h2>
   <div class="lab">
-    <div class="stage"><canvas id="cv" width="720" height="470" aria-label="阻尼振动交互实验台"></canvas></div>
+    <div class="stage"><canvas id="cv" width="720" height="470" aria-label="阻尼振动交互实验台：振子侧视装置、振幅包络图像和数据记录"></canvas></div>
     <section class="panel">
       <div class="buttons"><button id="play">暂停</button><button id="reset">复位</button></div>
       <div class="read">
@@ -38,7 +38,7 @@ button{font:inherit;border:1px solid var(--line);background:#fff;border-radius:8
         <div class="chip">机械能比例 = <b id="Eout">100</b>%</div>
         <div class="chip warn">状态：<b id="stateout">欠阻尼：振荡衰减</b></div>
       </div>
-      <div class="hint"><b>观察任务</b>：拖蓝色振子改变初始振幅，拖右侧金色阻尼阀改变阻尼比。小阻尼时还会来回振荡但包络变窄；接近临界阻尼时最快回到平衡且不来回；过阻尼时回到平衡反而变慢。</div>
+      <div class="hint"><b>观察任务</b>：拖蓝色振子改变初始振幅，对照振子侧视装置、振幅包络图像和数据记录，拖右侧金色阻尼阀改变阻尼比。</div>
       <div class="formula">
         <b>画面绑定</b><br>
         欠阻尼时 x(t)=A₀e<sup>-βt</sup>cos(ωt+φ)，虚线包络就是 A₀e<sup>-βt</sup>。能量条随振幅平方衰减，阻尼把机械能转化为内能。

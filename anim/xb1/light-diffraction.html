@@ -25,13 +25,6 @@ canvas{display:block;width:100%;max-width:720px;background:#07101d;border-radius
 <body>
 <div class="wrap">
   <h2>光的单缝衍射：入射光从左向右，通过单缝后在屏上成条纹</h2>
-  <canvas id="cv" width="720" height="420"></canvas>
-  <div class="chips">
-    <span class="chip">波长 λ = <b id="lam">550</b> nm</span>
-    <span class="chip">缝宽 a = <b id="aw">0.10</b> mm</span>
-    <span class="chip">a/λ = <b id="ratio">—</b></span>
-    <span class="chip">中央亮纹半角 ≈ <b id="ang">—</b>°</span>
-  </div>
   <div class="ctrls">
     <button class="btn on" id="play">⏸ 暂停</button>
     <button class="btn" id="reset">重置</button>
@@ -39,7 +32,14 @@ canvas{display:block;width:100%;max-width:720px;background:#07101d;border-radius
     <label>缝宽 a = <span id="al">0.10</span> mm<input type="range" id="ar" min="0.02" max="0.30" step="0.01" value="0.10"></label>
     <span style="font-size:13px;color:#5a6b7b">或<b>拖动缝的上下边</b>改缝宽</span>
   </div>
-  <div class="hint"><b>观察任务</b>：光从<b>左侧</b>以平面波形式向右入射，先经过<b>中间单缝</b>，再到<b>右侧屏</b>形成衍射条纹。拖<b>缝宽 a</b> 变小或<b>波长 λ</b> 变大 → λ/a 变大 → 第一暗纹角 θ 满足 sinθ≈λ/a，中央亮纹变宽。注意：衍射描述的是条纹展宽是否明显，不用“加强/减弱”来判定。</div>
+  <canvas id="cv" width="720" height="420" aria-label="光的衍射实验台：单缝侧视装置、屏幕条纹图像和数据记录"></canvas>
+  <div class="chips">
+    <span class="chip">波长 λ = <b id="lam">550</b> nm</span>
+    <span class="chip">缝宽 a = <b id="aw">0.10</b> mm</span>
+    <span class="chip">a/λ = <b id="ratio">—</b></span>
+    <span class="chip">中央亮纹半角 ≈ <b id="ang">—</b>°</span>
+  </div>
+  <div class="hint"><b>观察任务</b>：光从<b>左侧</b>以平面波形式向右入射。对照单缝侧视装置、屏幕条纹图像和数据记录，拖<b>缝宽 a</b> 变小或<b>波长 λ</b> 变大，看中央亮纹变宽。</div>
 </div>
 <script>
 (function(){

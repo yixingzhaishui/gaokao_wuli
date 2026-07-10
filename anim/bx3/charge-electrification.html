@@ -36,11 +36,12 @@
 <body>
 <div class="lab">
   <div class="stage">
-    <canvas id="canvas" width="920" height="540" aria-label="电荷与起电实验台"></canvas>
+    <canvas id="canvas" width="920" height="540" aria-label="电荷与起电实验台：电子转移装置、电荷读数图像和数据记录"></canvas>
     <div class="hint">可直接拖动中间电子手柄，改变转移的电子个数</div>
   </div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>拖动电子手柄，看电子从哪边转到哪边；总电荷是否始终守恒；电荷量是否只能是 e 的整数倍。</div>
+    <div class="card task"><b>观察任务：</b>拖动电子手柄，对照电子转移装置、电荷读数图像和数据记录，看电子从哪边转到哪边；总电荷是否始终守恒。</div>
+    <button id="playBtn" style="width:100%">▶ 播放电子转移动画</button>
     <div class="card">
       <div class="title">实验控制</div>
       <div class="buttons">
@@ -56,7 +57,6 @@
         <button data-case="share">接触平分</button>
         <button data-case="invalid">非整数尝试</button>
       </div>
-      <button id="playBtn" style="width:100%">▶ 播放电子转移动画</button>
     </div>
     <div class="readout">
       qA=<b id="qaText">+6e</b>　qB=<b id="qbText">-6e</b><br>

@@ -30,8 +30,9 @@ button.on{background:#2c7be5;color:#fff}
 <div class="wrap">
   <h2>焦耳定律：拖 I、R、t，看 Q=I²Rt 和非纯电阻分流</h2>
   <div class="lab">
-    <div class="stage"><canvas id="cv" width="720" height="450"></canvas></div>
+    <div class="stage"><canvas id="cv" width="720" height="450" aria-label="焦耳定律实验台：电阻丝侧视装置、热量图像和数据记录"></canvas></div>
     <section class="panel">
+      <button id="playBtn" style="font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;width:100%;margin-bottom:10px">▶ 播放：随时间累积发热</button>
       <div class="seg" id="mode"><button class="on" data-mode="pure">纯电阻</button><button data-mode="motor">电动机</button></div>
       <div class="read">
         <div class="chip">电流 I = <b id="iv">2.0</b> A</div>
@@ -42,8 +43,7 @@ button.on{background:#2c7be5;color:#fff}
         <div class="chip">其他能量 = <b id="ov">0</b> J</div>
         <div class="chip">发热状态：<b id="statev">静止</b></div>
       </div>
-      <div class="hint"><b>观察任务</b>：拖 I 看热量按平方增长；拖 R、t 看 Q 按正比增长。切到电动机模式，看输入电能 W=UIt 大部分变机械能，线圈发热仍只按 I²Rt 算；点击“播放”看热量随时间从 0 累积到 Q 的过程，及发热区亮度同步变化。</div>
-      <div class="hint" style="margin-top:8px"><button id="playBtn" style="font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;width:100%">▶ 播放：随时间累积发热</button></div>
+      <div class="hint"><b>观察任务</b>：拖 I 对照电阻丝侧视装置、热量图像和数据记录，看热量按平方增长；拖 R、t 看 Q 按正比增长。切到电动机模式，看线圈发热仍只按 I²Rt 算。</div>
       <div class="formula"><b>公式绑定</b><br>红色热量柱读 Q=I²Rt；绿色柱读非纯电阻的其他能量。纯电阻时 W=Q；电动机时 W&gt;Q。</div>
     </section>
   </div>

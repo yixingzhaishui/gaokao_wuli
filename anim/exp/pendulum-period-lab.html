@@ -3,28 +3,40 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>探究单摆周期公式</title>
+<title>用单摆测量重力加速度</title>
 <style>
   * { box-sizing: border-box; }
   body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
-  .wrap { max-width: 1000px; margin: 0 auto; padding: 16px; }
-  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 286px; gap: 14px; align-items: stretch; }
-  canvas { width: 100%; height: 470px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 16px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 14px; align-items: stretch; }
+  canvas { width: 100%; height: 540px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; touch-action: none; cursor: grab; }
+  canvas:active { cursor: grabbing; }
   .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
-  label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
+  .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
+  button { border: 1px solid #bcccdc; background: #fff; color: #243b53; border-radius: 8px; padding: 8px 6px; font-weight: 800; cursor: pointer; }
+  button.primary { background: #2c7be5; border-color: #2c7be5; color: #fff; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-top: 11px; }
   input { width: 100%; }
-  .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.72; font-size: 14px; }
-  .status { margin-top: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13px; line-height: 1.55; background: #e6fffa; color: #087f5b; font-weight: 700; }
+  .readout { margin-top: 12px; padding: 11px; background: #eef4ff; border-radius: 8px; line-height: 1.68; font-size: 14px; }
+  .status { margin-top: 9px; padding: 9px 10px; border-radius: 8px; font-size: 13px; line-height: 1.55; background: #e6fffa; color: #087f5b; font-weight: 700; }
   .status.bad { background: #fff5f5; color: #c92a2a; }
-  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
-  @media (max-width: 780px) { .stage { grid-template-columns: 1fr; } canvas { height: 400px; } }
+  .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.58; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+  th, td { border-bottom: 1px solid #d9e2ec; padding: 4px 3px; text-align: right; }
+  th:first-child, td:first-child { text-align: left; }
+  @media (max-width: 820px) { .stage { grid-template-columns: 1fr; } canvas { height: 460px; } }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="stage">
-    <canvas id="c" width="700" height="470" aria-label="单摆周期实验"></canvas>
+    <canvas id="c" width="740" height="540" aria-label="用单摆测量重力加速度实验台：摆动侧视、秒表、T²-L图像、斜率求g和数据记录"></canvas>
     <section class="panel">
+      <div class="row">
+        <button id="playBtn" class="primary" type="button">播放</button>
+        <button id="recordBtn" type="button">记录</button>
+        <button id="resetBtn" type="button">重置</button>
+      </div>
       <label for="length">摆长 L/m：<span id="lengthVal"></span></label>
       <input id="length" type="range" min="0.30" max="1.50" value="1.00" step="0.05">
       <label for="angle">初始摆角 θ/°：<span id="angleVal"></span></label>
@@ -37,7 +49,11 @@
       <input id="error" type="range" min="-4" max="4" value="1" step="1">
       <div id="readout" class="readout"></div>
       <div id="status" class="status"></div>
-      <div class="hint">观察任务：增大摆长，看 T² 是否与 L 成正比；增大摆角，看小角度条件为何必要。</div>
+      <div class="hint">观察任务：直接拖动摆球改变摆长和摆角；点“播放”看多次全振动计时，记录几组点后看 T²-L 图像是否近似直线。</div>
+      <table aria-label="单摆周期数据记录">
+        <thead><tr><th>组</th><th>L/m</th><th>T/s</th><th>T²</th><th>g测</th></tr></thead>
+        <tbody id="recordRows"></tbody>
+      </table>
     </section>
   </div>
 </div>
@@ -45,6 +61,9 @@
 const c = document.getElementById('c');
 const ctx = c.getContext('2d');
 const els = {
+  playBtn: document.getElementById('playBtn'),
+  recordBtn: document.getElementById('recordBtn'),
+  resetBtn: document.getElementById('resetBtn'),
   length: document.getElementById('length'),
   angle: document.getElementById('angle'),
   cycles: document.getElementById('cycles'),
@@ -56,136 +75,225 @@ const els = {
   gravityVal: document.getElementById('gravityVal'),
   errorVal: document.getElementById('errorVal'),
   readout: document.getElementById('readout'),
-  status: document.getElementById('status')
+  status: document.getElementById('status'),
+  recordRows: document.getElementById('recordRows')
 };
-function period(L,g,deg) {
-  const small = 2*Math.PI*Math.sqrt(L/g);
-  const rad = deg*Math.PI/180;
-  return small * (1 + rad*rad/16);
+const state = { running: false, last: 0, time: 0, drag: null, records: [] };
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+function period(L, g, deg) {
+  const small = 2 * Math.PI * Math.sqrt(L / g);
+  const rad = deg * Math.PI / 180;
+  return small * (1 + rad * rad / 16);
 }
-function drawGraph(x0,y0,w,h,g) {
-  ctx.strokeStyle = '#334e68';
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(x0,y0);
-  ctx.lineTo(x0+w,y0);
-  ctx.moveTo(x0,y0);
-  ctx.lineTo(x0,y0-h);
-  ctx.stroke();
-  ctx.strokeStyle = '#38b2ac';
-  ctx.lineWidth = 4;
-  ctx.beginPath();
-  for (let i=0;i<=10;i++) {
-    const L = 0.3 + i*0.12;
-    const T2 = 4*Math.PI*Math.PI*L/g;
-    const px = x0 + (L-0.3)/1.2*w;
-    const py = y0 - Math.min(1,T2/6)*h;
-    if (i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
-  }
-  ctx.stroke();
-  ctx.fillStyle = '#486581';
-  ctx.font = '12px system-ui';
-  ctx.textAlign = 'center';
-  ctx.fillText('T²-L 图像', x0+w/2, y0+24);
-  ctx.fillText('L', x0+w+12, y0+4);
-  ctx.fillText('T²', x0-16, y0-h-4);
-}
-function draw() {
+function values() {
   const L = Number(els.length.value);
   const deg = Number(els.angle.value);
   const N = Number(els.cycles.value);
   const g = Number(els.gravity.value);
   const err = Number(els.error.value) / 100;
-  const T = period(L,g,deg);
-  const total = N*T*(1+err);
-  const Tmeas = total/N;
-  const gCalc = 4*Math.PI*Math.PI*L/(Tmeas*Tmeas);
-  const rel = Math.abs(gCalc-g)/g*100;
-  els.lengthVal.textContent = L.toFixed(2);
-  els.angleVal.textContent = deg.toFixed(0);
-  els.cyclesVal.textContent = N;
-  els.gravityVal.textContent = g.toFixed(1);
-  els.errorVal.textContent = Math.round(err*100) + '%';
-
-  ctx.clearRect(0,0,c.width,c.height);
-  ctx.fillStyle = '#fff';
-  ctx.fillRect(0,0,c.width,c.height);
-  ctx.fillStyle = '#102a43';
-  ctx.font = '700 18px system-ui';
+  const T = period(L, g, deg);
+  const total = N * T * (1 + err);
+  const Tmeas = total / N;
+  const gCalc = 4 * Math.PI * Math.PI * L / (Tmeas * Tmeas);
+  const rel = Math.abs(gCalc - g) / g * 100;
+  return { L, deg, N, g, err, T, total, Tmeas, gCalc, rel };
+}
+function drawGraph(v) {
+  const x0 = 458, y0 = 420, w = 194, h = 238;
+  ctx.strokeStyle = '#334e68';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(x0, y0);
+  ctx.lineTo(x0 + w, y0);
+  ctx.moveTo(x0, y0);
+  ctx.lineTo(x0, y0 - h);
+  ctx.stroke();
+  ctx.strokeStyle = '#38b2ac';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  for (let i = 0; i <= 10; i++) {
+    const L = 0.3 + i * 0.12;
+    const T2 = 4 * Math.PI * Math.PI * L / v.g;
+    const x = x0 + (L - 0.3) / 1.2 * w;
+    const y = y0 - clamp(T2 / 6, 0, 1) * h;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+  state.records.forEach(p => {
+    const x = x0 + (p.L - 0.3) / 1.2 * w;
+    const y = y0 - clamp((p.T * p.T) / 6, 0, 1) * h;
+    ctx.fillStyle = '#7b2cbf';
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  const px = x0 + (v.L - 0.3) / 1.2 * w;
+  const py = y0 - clamp(v.Tmeas * v.Tmeas / 6, 0, 1) * h;
+  ctx.fillStyle = '#e03131';
+  ctx.beginPath();
+  ctx.arc(px, py, 6, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#486581';
+  ctx.font = '12px system-ui';
   ctx.textAlign = 'center';
-  ctx.fillText('单摆周期：测多次全振动，验证 T² 与 L 成正比', 350, 30);
-  const px = 220, py = 82, scale = 220/1.5;
-  const len = L*scale;
-  const rad = deg*Math.PI/180;
-  const bx = px + len*Math.sin(rad);
-  const by = py + len*Math.cos(rad);
+  ctx.fillText('T²-L 图像/数据记录：斜率k=4π²/g，故g=4π²/k', x0 + w / 2, y0 + 28);
+}
+function drawPendulum(v) {
+  const px = 224, py = 82, scale = 224 / 1.5;
+  const len = v.L * scale;
+  const amp = v.deg * Math.PI / 180;
+  const theta = state.running ? amp * Math.cos(2 * Math.PI * state.time / v.T) : amp;
+  const bx = px + len * Math.sin(theta);
+  const by = py + len * Math.cos(theta);
+  ctx.fillStyle = '#f7f9fc';
+  ctx.strokeStyle = '#d9e2ec';
+  ctx.lineWidth = 2;
+  ctx.fillRect(44, 58, 350, 378);
+  ctx.strokeRect(44, 58, 350, 378);
+  ctx.fillStyle = '#486581';
+  ctx.font = '13px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('摆动侧视实验台：拖动摆球改变 L 和 θ', 219, 82);
   ctx.strokeStyle = '#334e68';
   ctx.lineWidth = 4;
   ctx.beginPath();
-  ctx.moveTo(px-90,py);
-  ctx.lineTo(px+90,py);
+  ctx.moveTo(px - 94, py + 22);
+  ctx.lineTo(px + 94, py + 22);
+  ctx.stroke();
+  ctx.strokeStyle = '#d9e2ec';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(px, py + 22, len, -Math.PI / 2, Math.PI / 2);
   ctx.stroke();
   ctx.strokeStyle = '#2c7be5';
   ctx.lineWidth = 4;
   ctx.beginPath();
-  ctx.moveTo(px,py);
-  ctx.lineTo(bx,by);
+  ctx.moveTo(px, py + 22);
+  ctx.lineTo(bx, by + 22);
   ctx.stroke();
   ctx.fillStyle = '#ffe8cc';
   ctx.strokeStyle = '#f08c00';
   ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.arc(bx,by,18,0,Math.PI*2);
+  ctx.arc(bx, by + 22, 18, 0, Math.PI * 2);
   ctx.fill();
-  ctx.stroke();
-  ctx.strokeStyle = '#d9e2ec';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.arc(px,py,len,-Math.PI/2,Math.PI/2);
   ctx.stroke();
   ctx.fillStyle = '#486581';
   ctx.font = '13px system-ui';
-  ctx.fillText('摆长 L 是悬点到球心', px+120, py+90);
-  ctx.fillText('小角度：θ 通常不超过 5°~10°', px+140, py+118);
-
-  ctx.fillStyle = '#f7f9fc';
-  ctx.strokeStyle = '#d9e2ec';
-  ctx.fillRect(72,360,300,50);
-  ctx.strokeRect(72,360,300,50);
+  ctx.fillText('L：悬点到球心，不是线长', 219, 390);
+  ctx.fillText('小角度条件：θ 通常不超过 5°~10°', 219, 414);
+}
+function drawStopwatch(v) {
+  ctx.fillStyle = '#fff7e6';
+  ctx.strokeStyle = '#f0a500';
+  ctx.lineWidth = 2;
+  ctx.fillRect(444, 68, 222, 94);
+  ctx.strokeRect(444, 68, 222, 94);
   ctx.fillStyle = '#102a43';
   ctx.font = '700 14px system-ui';
   ctx.textAlign = 'center';
-  ctx.fillText('计时 ' + N + ' 次：t≈' + total.toFixed(2) + 's，T=t/N≈' + Tmeas.toFixed(3) + 's', 222, 391);
-  drawGraph(450,390,175,240,g);
-  ctx.fillStyle = '#e03131';
-  const pxg = 450 + (L-0.3)/1.2*175;
-  const pyg = 390 - Math.min(1,Tmeas*Tmeas/6)*240;
-  ctx.beginPath();
-  ctx.arc(pxg,pyg,6,0,Math.PI*2);
-  ctx.fill();
-  ctx.fillStyle = '#486581';
-  ctx.font = '13px system-ui';
-  ctx.fillText('斜率=4π²/g，可由图像求 g。', 350, 452);
-
+  const phaseCycles = state.running ? (state.time / v.T) % v.N : 0;
+  const elapsed = state.running ? Math.min(v.total, state.time) : v.total;
+  ctx.fillText('秒表/计数器：测 N 次全振动求平均', 555, 94);
+  ctx.fillText('已计≈' + phaseCycles.toFixed(1) + ' 次，t≈' + elapsed.toFixed(2) + ' s', 555, 125);
+  ctx.fillText('T=t/N≈' + v.Tmeas.toFixed(3) + ' s', 555, 148);
+}
+function draw() {
+  const v = values();
+  els.lengthVal.textContent = v.L.toFixed(2);
+  els.angleVal.textContent = v.deg.toFixed(0);
+  els.cyclesVal.textContent = v.N;
+  els.gravityVal.textContent = v.g.toFixed(1);
+  els.errorVal.textContent = Math.round(v.err * 100) + '%';
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#102a43';
+  ctx.font = '700 18px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('用单摆测量重力加速度：摆动侧视 + 秒表 + T²-L图像 + 斜率求g', 370, 28);
+  drawPendulum(v);
+  drawStopwatch(v);
+  drawGraph(v);
   els.readout.innerHTML = [
-    `<div id="r1">T理论≈2π√(L/g)=${(2*Math.PI*Math.sqrt(L/g)).toFixed(3)}s</div>`,
-    `<div id="r2">计时 t=${total.toFixed(2)}s，T=t/N=${Tmeas.toFixed(3)}s</div>`,
-    `<div id="r3">T²/L≈${(Tmeas*Tmeas/L).toFixed(3)}s²/m</div>`,
-    `<div id="r4">g测=4π²L/T²≈${gCalc.toFixed(2)}m/s²</div>`,
-    `<div id="r5">相对误差≈${rel.toFixed(1)}%</div>`
+    `<div id="r1">T理论≈2π√(L/g)=${(2 * Math.PI * Math.sqrt(v.L / v.g)).toFixed(3)} s</div>`,
+    `<div id="r2">计时 t=${v.total.toFixed(2)} s，T=t/N=${v.Tmeas.toFixed(3)} s</div>`,
+    `<div id="r3">T²/L≈${(v.Tmeas * v.Tmeas / v.L).toFixed(3)} s²/m</div>`,
+    `<div id="r4">g测=4π²L/T²≈${v.gCalc.toFixed(2)} m/s²</div>`,
+    `<div id="r5">相对误差≈${v.rel.toFixed(1)}%</div>`
   ].join('');
-  const ok = deg <= 10 && rel < 5;
+  const ok = v.deg <= 10 && v.rel < 5;
   els.status.className = ok ? 'status' : 'status bad';
-  els.status.textContent = deg > 10
+  els.status.textContent = v.deg > 10
     ? '不通过：摆角过大，小角度近似变差，应减小摆角。'
-    : rel < 5
-      ? '通过：T² 与 L 的关系和 g 的反算在误差范围内合理。'
-      : '不通过：计时误差较大，应多测几次全振动并取平均。';
+    : (v.rel < 5 ? '通过：T² 与 L 的关系和 g 的反算在误差范围内合理。' : '不通过：计时误差较大，应多测几次全振动并取平均。');
+}
+function renderRecords() {
+  els.recordRows.innerHTML = state.records.slice(-5).map((p, i) =>
+    `<tr><td>${i + 1}</td><td>${p.L.toFixed(2)}</td><td>${p.T.toFixed(3)}</td><td>${(p.T * p.T).toFixed(3)}</td><td>${(4 * Math.PI * Math.PI * p.L / (p.T * p.T)).toFixed(2)}</td></tr>`
+  ).join('');
+}
+function setPendulumFromPointer(ev) {
+  const rect = c.getBoundingClientRect();
+  const x = (ev.clientX - rect.left) * c.width / rect.width;
+  const y = (ev.clientY - rect.top) * c.height / rect.height;
+  const px = 224, py = 104;
+  const dx = x - px, dy = y - py;
+  const L = clamp(Math.sqrt(dx * dx + dy * dy) / (224 / 1.5), 0.3, 1.5);
+  const deg = clamp(Math.abs(Math.atan2(dx, dy)) * 180 / Math.PI, 2, 25);
+  els.length.value = (Math.round(L / 0.05) * 0.05).toFixed(2);
+  els.angle.value = String(Math.round(deg));
+  state.time = 0;
+  draw();
+}
+function loop(ts) {
+  if (!state.last) state.last = ts;
+  const dt = Math.min(0.05, (ts - state.last) / 1000);
+  state.last = ts;
+  if (state.running) state.time += dt;
+  draw();
+  requestAnimationFrame(loop);
 }
 Object.values(els).forEach(el => {
-  if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
+  if (el && el.tagName === 'INPUT') el.addEventListener('input', () => { state.time = 0; draw(); });
 });
-draw();
+els.playBtn.addEventListener('click', () => {
+  state.running = !state.running;
+  els.playBtn.textContent = state.running ? '暂停' : '播放';
+});
+els.recordBtn.addEventListener('click', () => {
+  const v = values();
+  state.records.push({ L: v.L, T: v.Tmeas });
+  renderRecords();
+});
+els.resetBtn.addEventListener('click', () => {
+  state.running = false;
+  state.time = 0;
+  state.records = [];
+  els.length.value = '1.00';
+  els.angle.value = '6';
+  els.cycles.value = '30';
+  els.gravity.value = '9.8';
+  els.error.value = '1';
+  els.playBtn.textContent = '播放';
+  renderRecords();
+  draw();
+});
+c.addEventListener('pointerdown', ev => {
+  state.drag = 'bob-handle';
+  setPendulumFromPointer(ev);
+  ev.preventDefault();
+});
+c.addEventListener('pointermove', ev => {
+  if (!state.drag) return;
+  setPendulumFromPointer(ev);
+  ev.preventDefault();
+});
+c.addEventListener('pointerup', () => { state.drag = null; });
+c.addEventListener('pointerleave', () => { state.drag = null; });
+renderRecords();
+requestAnimationFrame(loop);
 </script>
 </body>
 </html>

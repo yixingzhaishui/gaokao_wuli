@@ -9,10 +9,13 @@
   body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #102a43; background: #f7f9fc; }
   .wrap { max-width: 1000px; margin: 0 auto; padding: 16px; }
   .stage { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 14px; align-items: stretch; }
-  canvas { width: 100%; height: 460px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; }
+  canvas { width: 100%; height: 460px; background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; display: block; touch-action:none; }
   .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; }
   label { display: block; font-size: 14px; font-weight: 700; margin-top: 12px; }
   input { width: 100%; }
+  .row { display:flex; gap:8px; margin-bottom:10px; }
+  button { flex:1; border:1px solid #bcccdc; background:#f0f4f8; color:#102a43; border-radius:8px; padding:8px; font-weight:700; cursor:pointer; }
+  button.primary { background:#2c7be5; border-color:#2c7be5; color:#fff; }
   .readout { margin-top: 14px; padding: 12px; background: #eef4ff; border-radius: 8px; line-height: 1.75; font-size: 14px; }
   .hint { margin-top: 10px; color: #486581; font-size: 13px; line-height: 1.6; }
   @media (max-width: 780px) { .stage { grid-template-columns: 1fr; } canvas { height: 390px; } }
@@ -23,6 +26,7 @@
   <div class="stage">
     <canvas id="c" width="700" height="460" aria-label="胡克定律虚拟实验"></canvas>
     <section class="panel">
+      <div class="row"><button id="playBtn" class="primary" type="button">播放</button><button id="resetBtn" type="button">重置</button><button id="recordBtn" type="button">记录</button></div>
       <label for="k">劲度系数 k/(N/m)：<span id="kVal"></span></label>
       <input id="k" type="range" min="10" max="80" value="30" step="5">
       <label for="mass">单个钩码质量/g：<span id="massVal"></span></label>
@@ -32,6 +36,7 @@
       <label for="limit">弹性限度 x/cm：<span id="limitVal"></span></label>
       <input id="limit" type="range" min="4" max="20" value="14" step="1">
       <div id="readout" class="readout"></div>
+      <table style="width:100%;margin-top:10px;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;border-bottom:1px solid #d9e2ec">记录</th><th style="border-bottom:1px solid #d9e2ec">F/N</th><th style="border-bottom:1px solid #d9e2ec">x/m</th><th style="border-bottom:1px solid #d9e2ec">k</th></tr></thead><tbody id="records"></tbody></table>
       <div class="hint">观察任务：只用线性段求斜率；超过弹性限度后，图像会偏离直线。</div>
     </section>
   </div>
@@ -48,8 +53,13 @@ const els = {
   massVal: document.getElementById('massVal'),
   countVal: document.getElementById('countVal'),
   limitVal: document.getElementById('limitVal'),
-  readout: document.getElementById('readout')
+  readout: document.getElementById('readout'),
+  playBtn: document.getElementById('playBtn'),
+  resetBtn: document.getElementById('resetBtn'),
+  recordBtn: document.getElementById('recordBtn'),
+  records: document.getElementById('records')
 };
+const state = { running:false, time:0, last:0, drag:null, records:[] };
 function spring(x, y1, y2) {
   ctx.strokeStyle = '#2c7be5';
   ctx.lineWidth = 4;
@@ -70,7 +80,8 @@ function draw() {
   const count = Number(els.count.value);
   const limit = Number(els.limit.value) / 100;
   const g = 9.8;
-  const F = m * count * g;
+  const liveCount = state.running ? Math.max(1, Math.min(count, Math.ceil(state.time * 1.8))) : count;
+  const F = m * liveCount * g;
   let x = F / k;
   const beyond = x > limit;
   const shownX = beyond ? limit + (x - limit) * 0.35 : x;
@@ -81,6 +92,8 @@ function draw() {
   ctx.clearRect(0, 0, c.width, c.height);
   ctx.fillStyle = '#f7f9fc';
   ctx.fillRect(0, 0, c.width, c.height);
+  ctx.fillStyle='#102a43';ctx.font='700 18px system-ui';ctx.textAlign='center';
+  ctx.fillText('胡克定律实验台：侧视弹簧 + 刻度尺读数 + F-x 图像 + 数据记录',350,30);
 
   ctx.strokeStyle = '#334e68';
   ctx.lineWidth = 6;
@@ -103,7 +116,7 @@ function draw() {
   ctx.font = '12px system-ui';
   ctx.textAlign = 'right';
   ctx.fillText('原长位置', 104, y0 + 4);
-  for (let i = 0; i < count; i++) {
+  for (let i = 0; i < liveCount; i++) {
     ctx.fillStyle = '#fff7e6';
     ctx.strokeStyle = '#f0a500';
     ctx.fillRect(138, yEnd + i * 16, 64, 14);
@@ -150,9 +163,13 @@ function draw() {
   ctx.textAlign = 'center';
   ctx.fillText(`F=${F.toFixed(2)}N，x=${shownX.toFixed(3)}m`, 505, 64);
   ctx.fillText(`线性段斜率 k≈${k}N/m`, 505, 92);
+  ctx.strokeStyle='#829ab1';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(246,y0);ctx.lineTo(246,y0+limit*900);ctx.stroke();
+  ctx.fillStyle='#0f9f6e';ctx.beginPath();ctx.arc(170,yEnd+liveCount*16+10,12,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.font='700 10px system-ui';ctx.fillText('n',170,yEnd+liveCount*16+14);
+  ctx.fillStyle='#e03131';ctx.beginPath();ctx.arc(300+k*2,78,11,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.fillText('k',300+k*2,82);
+  els.playBtn.textContent = state.running ? '暂停' : '播放';
 
   els.readout.innerHTML = [
-    `F=mg=${(m*1000).toFixed(0)}g×${count}×9.8≈${F.toFixed(2)}N`,
+    `F=mg=${(m*1000).toFixed(0)}g×${liveCount}×9.8≈${F.toFixed(2)}N`,
     `弹性限度内 x=F/k≈${x.toFixed(3)}m`,
     `显示伸长量=${shownX.toFixed(3)}m，弹性限度=${limit.toFixed(2)}m`,
     beyond ? '状态：超过弹性限度，不能用该点求 k' : `状态：线性段，k=F/x≈${(F/shownX).toFixed(1)}N/m`
@@ -161,7 +178,15 @@ function draw() {
 Object.values(els).forEach(el => {
   if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
 });
-draw();
+function pos(e){const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height};}
+c.addEventListener('pointerdown',e=>{const p=pos(e),k=Number(els.k.value),count=Number(els.count.value),m=Number(els.mass.value)/1000,F=m*count*9.8,x=F/k,limit=Number(els.limit.value)/100,shown=x>limit?limit+(x-limit)*.35:x,yEnd=150+shown*900;if(Math.hypot(p.x-170,p.y-(yEnd+count*16+10))<24){state.drag='count';c.setPointerCapture(e.pointerId);}else if(Math.hypot(p.x-(300+k*2),p.y-78)<22){state.drag='k';c.setPointerCapture(e.pointerId);}});
+c.addEventListener('pointermove',e=>{const p=pos(e);if(!state.drag){c.style.cursor='grab';return;}if(state.drag==='count')els.count.value=Math.round(Math.max(1,Math.min(8,(p.y-150)/34)));if(state.drag==='k')els.k.value=Math.round(Math.max(10,Math.min(80,(p.x-300)/2))/5)*5;draw();});
+c.addEventListener('pointerup',e=>{state.drag=null;try{c.releasePointerCapture(e.pointerId)}catch(err){}});c.addEventListener('pointercancel',()=>{state.drag=null;});
+els.playBtn.addEventListener('click',()=>{state.running=!state.running;state.last=0;if(state.time>Number(els.count.value)/1.8)state.time=0;draw();});
+els.resetBtn.addEventListener('click',()=>{state.running=false;state.time=0;els.k.value=30;els.mass.value=50;els.count.value=4;els.limit.value=14;draw();});
+els.recordBtn.addEventListener('click',()=>{const k=Number(els.k.value),m=Number(els.mass.value)/1000,count=Number(els.count.value),F=m*count*9.8,x=F/k;state.records.unshift({F,x,k:F/x});state.records=state.records.slice(0,4);els.records.innerHTML=state.records.map((r,i)=>`<tr><td style="text-align:left;border-bottom:1px solid #d9e2ec">${i+1}</td><td style="border-bottom:1px solid #d9e2ec">${r.F.toFixed(2)}</td><td style="border-bottom:1px solid #d9e2ec">${r.x.toFixed(3)}</td><td style="border-bottom:1px solid #d9e2ec">${r.k.toFixed(0)}</td></tr>`).join('');});
+function loop(now){if(!state.last)state.last=now;const dt=Math.min(.04,(now-state.last)/1000);state.last=now;if(state.running){state.time+=dt;if(state.time>Number(els.count.value)/1.8){state.time=Number(els.count.value)/1.8;state.running=false;}}draw();requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
 </script>
 </body>
 </html>
