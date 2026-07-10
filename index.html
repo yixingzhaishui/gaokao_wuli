@@ -67,10 +67,15 @@
     }
     .sidebar-nav a {
       border-radius: 6px;
-      color: var(--text-muted);
+      color: var(--text-main);
       display: block;
       padding: 4px 8px;
       white-space: normal;
+    }
+    .sidebar-nav li > strong {
+      color: var(--text-main);
+      display: block;
+      padding: 4px 8px;
     }
     .sidebar-nav a:hover,
     .sidebar-nav .active > a {
@@ -93,8 +98,20 @@
       padding: 30px 36px 80px !important;
     }
     .markdown-section iframe {
+      display: block;
       background: #fff;
+      width: 100%;
       max-width: 100%;
+      min-height: 560px;
+      border: 1px solid #d9e2ec;
+      border-radius: 8px;
+      pointer-events: auto;
+    }
+
+    @media (max-width: 760px) {
+      .markdown-section iframe {
+        height: 1100px;
+      }
     }
     .anchor span {
       color: var(--text-main);
@@ -291,6 +308,13 @@
         box-shadow: 8px 0 24px rgba(16, 42, 67, .16);
         transition: transform .2s ease;
       }
+      .sidebar-nav a,
+      .sidebar-nav li > strong {
+        color: #102a43 !important;
+      }
+      .sidebar-nav .active > a {
+        color: #1554b3 !important;
+      }
       body.sidebar-open .sidebar { transform: translateX(0) !important; }
       .content {
         margin-left: 0 !important;
@@ -361,9 +385,16 @@
       },
       plugins: [
         function(hook, vm) {
+          hook.beforeEach(function(content) {
+            return content.replace(/<iframe\b(?![^>]*\bloading=)[^>]*>/gi, function(tag) {
+              return tag.replace('<iframe', '<iframe loading="lazy"');
+            });
+          });
           hook.doneEach(function() {
             setupMobileSidebar();
             window.setTimeout(setupMobileSidebar, 250);
+            setupResponsiveIframes();
+            window.setTimeout(setupResponsiveIframes, 250);
             if (location.hash.indexOf('/graph') !== -1) {
               renderKnowledgeGraph();
             }
@@ -390,7 +421,11 @@
     function setupMobileSidebar() {
       const button = document.getElementById('mobile-sidebar-toggle');
       const backdrop = document.getElementById('mobile-sidebar-backdrop');
+      const main = document.querySelector('main');
       if (!button) return;
+      if (main && backdrop && backdrop.parentElement !== main) {
+        main.appendChild(backdrop);
+      }
       if (button.dataset.bound !== '1') {
         button.dataset.bound = '1';
         button.addEventListener('click', function() {
@@ -403,23 +438,42 @@
         backdrop.dataset.bound = '1';
         backdrop.addEventListener('click', closeMobileSidebar);
       }
-      if (button.dataset.navBound !== '1') {
-        button.dataset.navBound = '1';
-        document.addEventListener('click', function(event) {
-          const target = event.target && typeof event.target.closest === 'function' ? event.target : null;
-          const link = target && target.closest('.sidebar-nav a');
-          const href = link && link.getAttribute('href');
-          if (!href || !href.startsWith('#/')) return;
-          closeMobileSidebar();
-          window.setTimeout(function() {
-            if (location.hash !== href) location.hash = href;
-          }, 0);
-        }, true);
-      }
       if (button.dataset.hashBound !== '1') {
         button.dataset.hashBound = '1';
         window.addEventListener('hashchange', closeMobileSidebar);
       }
+    }
+
+    function resizeAnimationFrame(frame) {
+      if (!frame) return;
+      if (window.innerWidth > 760) {
+        frame.style.height = '';
+        return;
+      }
+      try {
+        var doc = frame.contentDocument;
+        if (!doc) return;
+        var htmlHeight = doc.documentElement ? doc.documentElement.scrollHeight : 0;
+        var bodyHeight = doc.body ? doc.body.scrollHeight : 0;
+        var declaredHeight = Number(frame.getAttribute('height')) || 560;
+        var contentHeight = Math.max(declaredHeight, htmlHeight, bodyHeight, 560);
+        frame.style.height = Math.ceil(contentHeight) + 'px';
+      } catch (error) {
+        // Cross-origin or not-yet-loaded frames keep their declared height.
+      }
+    }
+
+    function setupResponsiveIframes() {
+      document.querySelectorAll('.markdown-section iframe').forEach(function(frame) {
+        if (frame.dataset.resizeBound !== '1') {
+          frame.dataset.resizeBound = '1';
+          frame.addEventListener('load', function() {
+            resizeAnimationFrame(frame);
+            window.setTimeout(function() { resizeAnimationFrame(frame); }, 250);
+          });
+        }
+        resizeAnimationFrame(frame);
+      });
     }
 
     function escapeHtml(value) {
