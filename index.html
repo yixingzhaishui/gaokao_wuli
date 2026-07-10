@@ -107,6 +107,12 @@
       border-radius: 8px;
       pointer-events: auto;
     }
+
+    @media (max-width: 760px) {
+      .markdown-section iframe {
+        height: 1100px;
+      }
+    }
     .anchor span {
       color: var(--text-main);
     }
@@ -387,6 +393,8 @@
           hook.doneEach(function() {
             setupMobileSidebar();
             window.setTimeout(setupMobileSidebar, 250);
+            setupResponsiveIframes();
+            window.setTimeout(setupResponsiveIframes, 250);
             if (location.hash.indexOf('/graph') !== -1) {
               renderKnowledgeGraph();
             }
@@ -443,6 +451,38 @@
         button.dataset.hashBound = '1';
         window.addEventListener('hashchange', closeMobileSidebar);
       }
+    }
+
+    function resizeAnimationFrame(frame) {
+      if (!frame) return;
+      if (window.innerWidth > 760) {
+        frame.style.height = '';
+        return;
+      }
+      try {
+        var doc = frame.contentDocument;
+        if (!doc) return;
+        var htmlHeight = doc.documentElement ? doc.documentElement.scrollHeight : 0;
+        var bodyHeight = doc.body ? doc.body.scrollHeight : 0;
+        var declaredHeight = Number(frame.getAttribute('height')) || 560;
+        var contentHeight = Math.max(declaredHeight, htmlHeight, bodyHeight, 560);
+        frame.style.height = Math.ceil(contentHeight) + 'px';
+      } catch (error) {
+        // Cross-origin or not-yet-loaded frames keep their declared height.
+      }
+    }
+
+    function setupResponsiveIframes() {
+      document.querySelectorAll('.markdown-section iframe').forEach(function(frame) {
+        if (frame.dataset.resizeBound !== '1') {
+          frame.dataset.resizeBound = '1';
+          frame.addEventListener('load', function() {
+            resizeAnimationFrame(frame);
+            window.setTimeout(function() { resizeAnimationFrame(frame); }, 250);
+          });
+        }
+        resizeAnimationFrame(frame);
+      });
     }
 
     function escapeHtml(value) {
