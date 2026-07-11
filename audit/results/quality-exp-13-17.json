@@ -1,0 +1,1320 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-11T15:53:54.808Z",
+  "commit": "5e886319bb33ef4205afab66abc9f88c34a66208",
+  "module": "exp",
+  "modules": [
+    "exp"
+  ],
+  "summary": {
+    "total": 5,
+    "score": 100,
+    "pass": 5,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/exp/coulomb-force-lab.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#q1",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#q2",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#dist",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#mode",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#leak",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#recordBtn",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "2a171d2c",
+          "readout_hash": "3083aa82",
+          "physical_readout_hash": "3083aa82",
+          "readout": [
+            "电荷 q1/nC：20",
+            "电荷 q2/nC：30",
+            "球心距离 r/m：0.10",
+            "图像横轴：1/r²",
+            "电荷漏失/读数误差：2%",
+            "方向：同号相斥F理论=k|q1q2|/r²≈0.539mNF读≈0.529mNF·r²/|q1q2|≈8.81×10^9相对误差≈2.0%",
+            "通过：反查的静电力常量接近 9.0×10^9。"
+          ],
+          "physical_readout": [
+            "电荷 q1/nC：20",
+            "电荷 q2/nC：30",
+            "球心距离 r/m：0.10",
+            "图像横轴：1/r²",
+            "电荷漏失/读数误差：2%",
+            "方向：同号相斥F理论=k|q1q2|/r²≈0.539mNF读≈0.529mNF·r²/|q1q2|≈8.81×10^9相对误差≈2.0%",
+            "通过：反查的静电力常量接近 9.0×10^9。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "3f239392",
+          "readout_hash": "abbe3ce7",
+          "physical_readout_hash": "abbe3ce7",
+          "readout": [
+            "电荷 q1/nC：20",
+            "电荷 q2/nC：30",
+            "球心距离 r/m：0.10",
+            "图像横轴：1/r²",
+            "电荷漏失/读数误差：2%",
+            "方向：同号相斥F理论=k|q1q2|/r²≈0.539mNF读≈0.346mNF·r²/|q1q2|≈8.81×10^9相对误差≈2.0%",
+            "通过：反查的静电力常量接近 9.0×10^9。"
+          ],
+          "physical_readout": [
+            "电荷 q1/nC：20",
+            "电荷 q2/nC：30",
+            "球心距离 r/m：0.10",
+            "图像横轴：1/r²",
+            "电荷漏失/读数误差：2%",
+            "方向：同号相斥F理论=k|q1q2|/r²≈0.539mNF读≈0.346mNF·r²/|q1q2|≈8.81×10^9相对误差≈2.0%",
+            "通过：反查的静电力常量接近 9.0×10^9。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "2a171d2c",
+          "readout_hash": "3083aa82",
+          "physical_readout_hash": "3083aa82",
+          "readout": [
+            "电荷 q1/nC：20",
+            "电荷 q2/nC：30",
+            "球心距离 r/m：0.10",
+            "图像横轴：1/r²",
+            "电荷漏失/读数误差：2%",
+            "方向：同号相斥F理论=k|q1q2|/r²≈0.539mNF读≈0.529mNF·r²/|q1q2|≈8.81×10^9相对误差≈2.0%",
+            "通过：反查的静电力常量接近 9.0×10^9。"
+          ],
+          "physical_readout": [
+            "电荷 q1/nC：20",
+            "电荷 q2/nC：30",
+            "球心距离 r/m：0.10",
+            "图像横轴：1/r²",
+            "电荷漏失/读数误差：2%",
+            "方向：同号相斥F理论=k|q1q2|/r²≈0.539mNF读≈0.529mNF·r²/|q1q2|≈8.81×10^9相对误差≈2.0%",
+            "通过：反查的静电力常量接近 9.0×10^9。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "2a171d2c",
+          "readout_hash": "3083aa82",
+          "physical_readout_hash": "3083aa82",
+          "readout": [
+            "电荷 q1/nC：20",
+            "电荷 q2/nC：30",
+            "球心距离 r/m：0.10",
+            "图像横轴：1/r²",
+            "电荷漏失/读数误差：2%",
+            "方向：同号相斥F理论=k|q1q2|/r²≈0.539mNF读≈0.529mNF·r²/|q1q2|≈8.81×10^9相对误差≈2.0%",
+            "通过：反查的静电力常量接近 9.0×10^9。"
+          ],
+          "physical_readout": [
+            "电荷 q1/nC：20",
+            "电荷 q2/nC：30",
+            "球心距离 r/m：0.10",
+            "图像横轴：1/r²",
+            "电荷漏失/读数误差：2%",
+            "方向：同号相斥F理论=k|q1q2|/r²≈0.539mNF读≈0.529mNF·r²/|q1q2|≈8.81×10^9相对误差≈2.0%",
+            "通过：反查的静电力常量接近 9.0×10^9。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "电荷 q#/nC：#|电荷 q#/nC：#|球心距离 r/m：#|图像横轴：#/r²|电荷漏失/读数误差：#%|方向：同号相斥F理论=k|q#q#|/r²≈#mNF读≈#mNF·r²/|q#q#|≈#×#^#相对误差≈#%|通过：反查的静电力常量接近 #×#^#。",
+          "controls": [
+            {
+              "id": "q1",
+              "value": "20",
+              "checked": false
+            },
+            {
+              "id": "q2",
+              "value": "30",
+              "checked": false
+            },
+            {
+              "id": "dist",
+              "value": "0.1",
+              "checked": false
+            },
+            {
+              "id": "mode",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "leak",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "电荷 q#/nC：#|电荷 q#/nC：#|球心距离 r/m：#|图像横轴：#/r²|电荷漏失/读数误差：#%|方向：同号相斥F理论=k|q#q#|/r²≈#mNF读≈#mNF·r²/|q#q#|≈#×#^#相对误差≈#%|通过：反查的静电力常量接近 #×#^#。",
+          "controls": [
+            {
+              "id": "q1",
+              "value": "20",
+              "checked": false
+            },
+            {
+              "id": "q2",
+              "value": "30",
+              "checked": false
+            },
+            {
+              "id": "dist",
+              "value": "0.1",
+              "checked": false
+            },
+            {
+              "id": "mode",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "leak",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/exp/emf-internal-resistance-lab.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#emf",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#inner",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#outer",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#spread",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#error",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#recordBtn",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "aabd284d",
+          "readout_hash": "bcccad67",
+          "physical_readout_hash": "bcccad67",
+          "readout": [
+            "电动势 E/V：3.0",
+            "内阻 r/Ω：1.0",
+            "外阻 R/Ω：5.0",
+            "测量组数：6",
+            "电压表读数误差：1%",
+            "I=E/(R+r)≈0.500AU=E-Ir≈2.50V，U读≈2.52VU-I 图像纵截距≈E=3.00V斜率≈-r=-1.00Ω内阻消耗功率 I²r≈0.25W",
+            "通过：当前工作点可用于作 U-I 图像，截距和斜率可读出 E、r。"
+          ],
+          "physical_readout": [
+            "电动势 E/V：3.0",
+            "内阻 r/Ω：1.0",
+            "外阻 R/Ω：5.0",
+            "测量组数：6",
+            "电压表读数误差：1%",
+            "I=E/(R+r)≈0.500AU=E-Ir≈2.50V，U读≈2.52VU-I 图像纵截距≈E=3.00V斜率≈-r=-1.00Ω内阻消耗功率 I²r≈0.25W",
+            "通过：当前工作点可用于作 U-I 图像，截距和斜率可读出 E、r。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "b07dad30",
+          "readout_hash": "caf44538",
+          "physical_readout_hash": "caf44538",
+          "readout": [
+            "电动势 E/V：3.0",
+            "内阻 r/Ω：1.0",
+            "外阻 R/Ω：13.2",
+            "测量组数：6",
+            "电压表读数误差：1%",
+            "I=E/(R+r)≈0.211AU=E-Ir≈2.79V，U读≈2.82VU-I 图像纵截距≈E=3.00V斜率≈-r=-1.00Ω内阻消耗功率 I²r≈0.04W",
+            "通过：当前工作点可用于作 U-I 图像，截距和斜率可读出 E、r。"
+          ],
+          "physical_readout": [
+            "电动势 E/V：3.0",
+            "内阻 r/Ω：1.0",
+            "外阻 R/Ω：13.2",
+            "测量组数：6",
+            "电压表读数误差：1%",
+            "I=E/(R+r)≈0.211AU=E-Ir≈2.79V，U读≈2.82VU-I 图像纵截距≈E=3.00V斜率≈-r=-1.00Ω内阻消耗功率 I²r≈0.04W",
+            "通过：当前工作点可用于作 U-I 图像，截距和斜率可读出 E、r。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "4c50b462",
+          "readout_hash": "492da0e2",
+          "physical_readout_hash": "492da0e2",
+          "readout": [
+            "电动势 E/V：3.0",
+            "内阻 r/Ω：1.0",
+            "外阻 R/Ω：13.5",
+            "测量组数：6",
+            "电压表读数误差：1%",
+            "I=E/(R+r)≈0.207AU=E-Ir≈2.79V，U读≈2.82VU-I 图像纵截距≈E=3.00V斜率≈-r=-1.00Ω内阻消耗功率 I²r≈0.04W",
+            "通过：当前工作点可用于作 U-I 图像，截距和斜率可读出 E、r。"
+          ],
+          "physical_readout": [
+            "电动势 E/V：3.0",
+            "内阻 r/Ω：1.0",
+            "外阻 R/Ω：13.5",
+            "测量组数：6",
+            "电压表读数误差：1%",
+            "I=E/(R+r)≈0.207AU=E-Ir≈2.79V，U读≈2.82VU-I 图像纵截距≈E=3.00V斜率≈-r=-1.00Ω内阻消耗功率 I²r≈0.04W",
+            "通过：当前工作点可用于作 U-I 图像，截距和斜率可读出 E、r。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "4c50b462",
+          "readout_hash": "492da0e2",
+          "physical_readout_hash": "492da0e2",
+          "readout": [
+            "电动势 E/V：3.0",
+            "内阻 r/Ω：1.0",
+            "外阻 R/Ω：13.5",
+            "测量组数：6",
+            "电压表读数误差：1%",
+            "I=E/(R+r)≈0.207AU=E-Ir≈2.79V，U读≈2.82VU-I 图像纵截距≈E=3.00V斜率≈-r=-1.00Ω内阻消耗功率 I²r≈0.04W",
+            "通过：当前工作点可用于作 U-I 图像，截距和斜率可读出 E、r。"
+          ],
+          "physical_readout": [
+            "电动势 E/V：3.0",
+            "内阻 r/Ω：1.0",
+            "外阻 R/Ω：13.5",
+            "测量组数：6",
+            "电压表读数误差：1%",
+            "I=E/(R+r)≈0.207AU=E-Ir≈2.79V，U读≈2.82VU-I 图像纵截距≈E=3.00V斜率≈-r=-1.00Ω内阻消耗功率 I²r≈0.04W",
+            "通过：当前工作点可用于作 U-I 图像，截距和斜率可读出 E、r。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "电动势 E/V：#|内阻 r/Ω：#|外阻 R/Ω：#|测量组数：#|电压表读数误差：#%|I=E/(R+r)≈#AU=E-Ir≈#V，U读≈#VU-I 图像纵截距≈E=#V斜率≈-r=#Ω内阻消耗功率 I²r≈#W|通过：当前工作点可用于作 U-I 图像，截距和斜率可读出 E、r。",
+          "controls": [
+            {
+              "id": "emf",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "inner",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "outer",
+              "value": "5",
+              "checked": false
+            },
+            {
+              "id": "spread",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "error",
+              "value": "1",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "电动势 E/V：#|内阻 r/Ω：#|外阻 R/Ω：#|测量组数：#|电压表读数误差：#%|I=E/(R+r)≈#AU=E-Ir≈#V，U读≈#VU-I 图像纵截距≈E=#V斜率≈-r=#Ω内阻消耗功率 I²r≈#W|通过：当前工作点可用于作 U-I 图像，截距和斜率可读出 E、r。",
+          "controls": [
+            {
+              "id": "emf",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "inner",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "outer",
+              "value": "5",
+              "checked": false
+            },
+            {
+              "id": "spread",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "error",
+              "value": "1",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/exp/equipotential-line-lab.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#voltage",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#spacing",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#target",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#probeX",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#probeY",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:描点",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#markBtn",
+          "text": "描点",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "548891c2",
+          "readout_hash": "f2dbaf6a",
+          "physical_readout_hash": "f2dbaf6a",
+          "readout": [
+            "电源电压 U/V：10",
+            "电极间距 d/cm：20",
+            "目标电势 φ/V：5.0",
+            "探针横坐标 x/cm：10.0",
+            "探针纵坐标 y/cm：3.0",
+            "探针电势 φ≈5.00 V目标电势 φ0=5.00 V，差值≈0.00 V等势线位置 x=d(1-φ0/U)≈10.0 cm场强估计 E≈U/d=50 V/m沿等势线移动：UAB=0，W=qUAB=0演示时间 t=0.00 s",
+            "通过：电压表读数接近目标电势，可以描下这个等势点。"
+          ],
+          "physical_readout": [
+            "电源电压 U/V：10",
+            "电极间距 d/cm：20",
+            "目标电势 φ/V：5.0",
+            "探针横坐标 x/cm：10.0",
+            "探针纵坐标 y/cm：3.0",
+            "探针电势 φ≈5.00 V目标电势 φ0=5.00 V，差值≈0.00 V等势线位置 x=d(1-φ0/U)≈10.0 cm场强估计 E≈U/d=50 V/m沿等势线移动：UAB=0，W=qUAB=0演示时间 t=0.00 s",
+            "通过：电压表读数接近目标电势，可以描下这个等势点。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "5c1a4158",
+          "readout_hash": "6d9318c6",
+          "physical_readout_hash": "6d9318c6",
+          "readout": [
+            "电源电压 U/V：10",
+            "电极间距 d/cm：20",
+            "目标电势 φ/V：5.0",
+            "探针横坐标 x/cm：10.0",
+            "探针纵坐标 y/cm：2.5",
+            "探针电势 φ≈5.00 V目标电势 φ0=5.00 V，差值≈0.00 V等势线位置 x=d(1-φ0/U)≈10.0 cm场强估计 E≈U/d=50 V/m沿等势线移动：UAB=0，W=qUAB=0演示时间 t=0.35 s",
+            "通过：电压表读数接近目标电势，可以描下这个等势点。"
+          ],
+          "physical_readout": [
+            "电源电压 U/V：10",
+            "电极间距 d/cm：20",
+            "目标电势 φ/V：5.0",
+            "探针横坐标 x/cm：10.0",
+            "探针纵坐标 y/cm：2.5",
+            "探针电势 φ≈5.00 V目标电势 φ0=5.00 V，差值≈0.00 V等势线位置 x=d(1-φ0/U)≈10.0 cm场强估计 E≈U/d=50 V/m沿等势线移动：UAB=0，W=qUAB=0演示时间 t=0.35 s",
+            "通过：电压表读数接近目标电势，可以描下这个等势点。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "548891c2",
+          "readout_hash": "9c942178",
+          "physical_readout_hash": "9c942178",
+          "readout": [
+            "电源电压 U/V：10",
+            "电极间距 d/cm：20",
+            "目标电势 φ/V：5.0",
+            "探针横坐标 x/cm：10.0",
+            "探针纵坐标 y/cm：3.0",
+            "探针电势 φ≈5.00 V目标电势 φ0=5.00 V，差值≈0.00 V等势线位置 x=d(1-φ0/U)≈10.0 cm场强估计 E≈U/d=50 V/m沿等势线移动：UAB=0，W=qUAB=0演示时间 t=0.37 s",
+            "通过：电压表读数接近目标电势，可以描下这个等势点。"
+          ],
+          "physical_readout": [
+            "电源电压 U/V：10",
+            "电极间距 d/cm：20",
+            "目标电势 φ/V：5.0",
+            "探针横坐标 x/cm：10.0",
+            "探针纵坐标 y/cm：3.0",
+            "探针电势 φ≈5.00 V目标电势 φ0=5.00 V，差值≈0.00 V等势线位置 x=d(1-φ0/U)≈10.0 cm场强估计 E≈U/d=50 V/m沿等势线移动：UAB=0，W=qUAB=0演示时间 t=0.37 s",
+            "通过：电压表读数接近目标电势，可以描下这个等势点。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "548891c2",
+          "readout_hash": "9c942178",
+          "physical_readout_hash": "9c942178",
+          "readout": [
+            "电源电压 U/V：10",
+            "电极间距 d/cm：20",
+            "目标电势 φ/V：5.0",
+            "探针横坐标 x/cm：10.0",
+            "探针纵坐标 y/cm：3.0",
+            "探针电势 φ≈5.00 V目标电势 φ0=5.00 V，差值≈0.00 V等势线位置 x=d(1-φ0/U)≈10.0 cm场强估计 E≈U/d=50 V/m沿等势线移动：UAB=0，W=qUAB=0演示时间 t=0.37 s",
+            "通过：电压表读数接近目标电势，可以描下这个等势点。"
+          ],
+          "physical_readout": [
+            "电源电压 U/V：10",
+            "电极间距 d/cm：20",
+            "目标电势 φ/V：5.0",
+            "探针横坐标 x/cm：10.0",
+            "探针纵坐标 y/cm：3.0",
+            "探针电势 φ≈5.00 V目标电势 φ0=5.00 V，差值≈0.00 V等势线位置 x=d(1-φ0/U)≈10.0 cm场强估计 E≈U/d=50 V/m沿等势线移动：UAB=0，W=qUAB=0演示时间 t=0.37 s",
+            "通过：电压表读数接近目标电势，可以描下这个等势点。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "电源电压 U/V：#|电极间距 d/cm：#|目标电势 φ/V：#|探针横坐标 x/cm：#|探针纵坐标 y/cm：#|探针电势 φ≈# V目标电势 φ#=# V，差值≈# V等势线位置 x=d(#-φ#/U)≈# cm场强估计 E≈U/d=# V/m沿等势线移动：UAB=#，W=qUAB=#演示时间 t=# s|通过：电压表读数接近目标电势，可以描下这个等势点。",
+          "controls": [
+            {
+              "id": "voltage",
+              "value": "10",
+              "checked": false
+            },
+            {
+              "id": "spacing",
+              "value": "20",
+              "checked": false
+            },
+            {
+              "id": "target",
+              "value": "5",
+              "checked": false
+            },
+            {
+              "id": "probeX",
+              "value": "10",
+              "checked": false
+            },
+            {
+              "id": "probeY",
+              "value": "3",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "电源电压 U/V：#|电极间距 d/cm：#|目标电势 φ/V：#|探针横坐标 x/cm：#|探针纵坐标 y/cm：#|探针电势 φ≈# V目标电势 φ#=# V，差值≈# V等势线位置 x=d(#-φ#/U)≈# cm场强估计 E≈U/d=# V/m沿等势线移动：UAB=#，W=qUAB=#演示时间 t=# s|通过：电压表读数接近目标电势，可以描下这个等势点。",
+          "controls": [
+            {
+              "id": "voltage",
+              "value": "10",
+              "checked": false
+            },
+            {
+              "id": "spacing",
+              "value": "20",
+              "checked": false
+            },
+            {
+              "id": "target",
+              "value": "5",
+              "checked": false
+            },
+            {
+              "id": "probeX",
+              "value": "10",
+              "checked": false
+            },
+            {
+              "id": "probeY",
+              "value": "3",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/exp/lamp-iv-lab.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#voltage",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#rated",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#coldR",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#heat",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#error",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#recordBtn",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "580dafca",
+          "readout_hash": "849c23f5",
+          "physical_readout_hash": "849c23f5",
+          "readout": [
+            "灯泡两端电压 U/V：1.5",
+            "额定电压/V：3.0",
+            "冷态电阻 R0/Ω：3.0",
+            "温度效应：120%",
+            "读数误差：2%",
+            "U=1.50V，I读≈0.377AR=U/I≈3.98ΩP=UI≈0.57W，亮度≈42%曲线斜率 ΔI/ΔU 逐渐减小，说明 R 逐渐增大额定电压 3.0V，超过后不能继续加压",
+            "通过：当前点可记录到 I-U 图像；灯泡越亮，电阻越大。"
+          ],
+          "physical_readout": [
+            "灯泡两端电压 U/V：1.5",
+            "额定电压/V：3.0",
+            "冷态电阻 R0/Ω：3.0",
+            "温度效应：120%",
+            "读数误差：2%",
+            "U=1.50V，I读≈0.377AR=U/I≈3.98ΩP=UI≈0.57W，亮度≈42%曲线斜率 ΔI/ΔU 逐渐减小，说明 R 逐渐增大额定电压 3.0V，超过后不能继续加压",
+            "通过：当前点可记录到 I-U 图像；灯泡越亮，电阻越大。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "ee4bdcd1",
+          "readout_hash": "f729d29f",
+          "physical_readout_hash": "f729d29f",
+          "readout": [
+            "灯泡两端电压 U/V：0.2",
+            "额定电压/V：3.0",
+            "冷态电阻 R0/Ω：3.0",
+            "温度效应：120%",
+            "读数误差：2%",
+            "U=0.24V，I读≈0.079AR=U/I≈3.09ΩP=UI≈0.02W，亮度≈1%曲线斜率 ΔI/ΔU 逐渐减小，说明 R 逐渐增大额定电压 3.0V，超过后不能继续加压",
+            "通过：当前点可记录到 I-U 图像；灯泡越亮，电阻越大。"
+          ],
+          "physical_readout": [
+            "灯泡两端电压 U/V：0.2",
+            "额定电压/V：3.0",
+            "冷态电阻 R0/Ω：3.0",
+            "温度效应：120%",
+            "读数误差：2%",
+            "U=0.24V，I读≈0.079AR=U/I≈3.09ΩP=UI≈0.02W，亮度≈1%曲线斜率 ΔI/ΔU 逐渐减小，说明 R 逐渐增大额定电压 3.0V，超过后不能继续加压",
+            "通过：当前点可记录到 I-U 图像；灯泡越亮，电阻越大。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "71176f3e",
+          "readout_hash": "dcde3ac9",
+          "physical_readout_hash": "dcde3ac9",
+          "readout": [
+            "灯泡两端电压 U/V：0.3",
+            "额定电压/V：3.0",
+            "冷态电阻 R0/Ω：3.0",
+            "温度效应：120%",
+            "读数误差：2%",
+            "U=0.30V，I读≈0.097AR=U/I≈3.10ΩP=UI≈0.03W，亮度≈2%曲线斜率 ΔI/ΔU 逐渐减小，说明 R 逐渐增大额定电压 3.0V，超过后不能继续加压",
+            "通过：当前点可记录到 I-U 图像；灯泡越亮，电阻越大。"
+          ],
+          "physical_readout": [
+            "灯泡两端电压 U/V：0.3",
+            "额定电压/V：3.0",
+            "冷态电阻 R0/Ω：3.0",
+            "温度效应：120%",
+            "读数误差：2%",
+            "U=0.30V，I读≈0.097AR=U/I≈3.10ΩP=UI≈0.03W，亮度≈2%曲线斜率 ΔI/ΔU 逐渐减小，说明 R 逐渐增大额定电压 3.0V，超过后不能继续加压",
+            "通过：当前点可记录到 I-U 图像；灯泡越亮，电阻越大。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "71176f3e",
+          "readout_hash": "dcde3ac9",
+          "physical_readout_hash": "dcde3ac9",
+          "readout": [
+            "灯泡两端电压 U/V：0.3",
+            "额定电压/V：3.0",
+            "冷态电阻 R0/Ω：3.0",
+            "温度效应：120%",
+            "读数误差：2%",
+            "U=0.30V，I读≈0.097AR=U/I≈3.10ΩP=UI≈0.03W，亮度≈2%曲线斜率 ΔI/ΔU 逐渐减小，说明 R 逐渐增大额定电压 3.0V，超过后不能继续加压",
+            "通过：当前点可记录到 I-U 图像；灯泡越亮，电阻越大。"
+          ],
+          "physical_readout": [
+            "灯泡两端电压 U/V：0.3",
+            "额定电压/V：3.0",
+            "冷态电阻 R0/Ω：3.0",
+            "温度效应：120%",
+            "读数误差：2%",
+            "U=0.30V，I读≈0.097AR=U/I≈3.10ΩP=UI≈0.03W，亮度≈2%曲线斜率 ΔI/ΔU 逐渐减小，说明 R 逐渐增大额定电压 3.0V，超过后不能继续加压",
+            "通过：当前点可记录到 I-U 图像；灯泡越亮，电阻越大。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "灯泡两端电压 U/V：#|额定电压/V：#|冷态电阻 R#/Ω：#|温度效应：#%|读数误差：#%|U=#V，I读≈#AR=U/I≈#ΩP=UI≈#W，亮度≈#%曲线斜率 ΔI/ΔU 逐渐减小，说明 R 逐渐增大额定电压 #V，超过后不能继续加压|通过：当前点可记录到 I-U 图像；灯泡越亮，电阻越大。",
+          "controls": [
+            {
+              "id": "voltage",
+              "value": "1.5",
+              "checked": false
+            },
+            {
+              "id": "rated",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "coldR",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "heat",
+              "value": "120",
+              "checked": false
+            },
+            {
+              "id": "error",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "灯泡两端电压 U/V：#|额定电压/V：#|冷态电阻 R#/Ω：#|温度效应：#%|读数误差：#%|U=#V，I读≈#AR=U/I≈#ΩP=UI≈#W，亮度≈#%曲线斜率 ΔI/ΔU 逐渐减小，说明 R 逐渐增大额定电压 #V，超过后不能继续加压|通过：当前点可记录到 I-U 图像；灯泡越亮，电阻越大。",
+          "controls": [
+            {
+              "id": "voltage",
+              "value": "1.5",
+              "checked": false
+            },
+            {
+              "id": "rated",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "coldR",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "heat",
+              "value": "120",
+              "checked": false
+            },
+            {
+              "id": "error",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/exp/multimeter-practice-lab.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#mode",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#range",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#value",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#zero",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#power",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#recordBtn",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.32,
+          "py": 0.82
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "946c8835",
+          "readout_hash": "ad14a99d",
+          "physical_readout_hash": "ad14a99d",
+          "readout": [
+            "测量模式：电阻 Ω",
+            "量程/倍率：×10",
+            "被测量旋钮：470Ω",
+            "欧姆调零：100%",
+            "被测电路带电：否",
+            "模式=电阻 Ω，量程/倍率=×10表针位置≈53% 满偏接法=断开电源，红黑表笔接被测电阻两端读数结果：47.0×10=470Ω倍率和调零合适。",
+            "通过：挡位、接法和读数条件合格。"
+          ],
+          "physical_readout": [
+            "测量模式：电阻 Ω",
+            "量程/倍率：×10",
+            "被测量旋钮：470Ω",
+            "欧姆调零：100%",
+            "被测电路带电：否",
+            "模式=电阻 Ω，量程/倍率=×10表针位置≈53% 满偏接法=断开电源，红黑表笔接被测电阻两端读数结果：47.0×10=470Ω倍率和调零合适。",
+            "通过：挡位、接法和读数条件合格。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "1aeddd33",
+          "readout_hash": "6f4c8a04",
+          "physical_readout_hash": "6f4c8a04",
+          "readout": [
+            "测量模式：电阻 Ω",
+            "量程/倍率：×10",
+            "被测量旋钮：470Ω",
+            "欧姆调零：100%",
+            "被测电路带电：否",
+            "模式=电阻 Ω，量程/倍率=×10表针位置≈56% 满偏接法=断开电源，红黑表笔接被测电阻两端读数结果：47.0×10=470Ω倍率和调零合适。",
+            "通过：挡位、接法和读数条件合格。"
+          ],
+          "physical_readout": [
+            "测量模式：电阻 Ω",
+            "量程/倍率：×10",
+            "被测量旋钮：470Ω",
+            "欧姆调零：100%",
+            "被测电路带电：否",
+            "模式=电阻 Ω，量程/倍率=×10表针位置≈56% 满偏接法=断开电源，红黑表笔接被测电阻两端读数结果：47.0×10=470Ω倍率和调零合适。",
+            "通过：挡位、接法和读数条件合格。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "946c8835",
+          "readout_hash": "ad14a99d",
+          "physical_readout_hash": "ad14a99d",
+          "readout": [
+            "测量模式：电阻 Ω",
+            "量程/倍率：×10",
+            "被测量旋钮：470Ω",
+            "欧姆调零：100%",
+            "被测电路带电：否",
+            "模式=电阻 Ω，量程/倍率=×10表针位置≈53% 满偏接法=断开电源，红黑表笔接被测电阻两端读数结果：47.0×10=470Ω倍率和调零合适。",
+            "通过：挡位、接法和读数条件合格。"
+          ],
+          "physical_readout": [
+            "测量模式：电阻 Ω",
+            "量程/倍率：×10",
+            "被测量旋钮：470Ω",
+            "欧姆调零：100%",
+            "被测电路带电：否",
+            "模式=电阻 Ω，量程/倍率=×10表针位置≈53% 满偏接法=断开电源，红黑表笔接被测电阻两端读数结果：47.0×10=470Ω倍率和调零合适。",
+            "通过：挡位、接法和读数条件合格。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "946c8835",
+          "readout_hash": "ad14a99d",
+          "physical_readout_hash": "ad14a99d",
+          "readout": [
+            "测量模式：电阻 Ω",
+            "量程/倍率：×10",
+            "被测量旋钮：470Ω",
+            "欧姆调零：100%",
+            "被测电路带电：否",
+            "模式=电阻 Ω，量程/倍率=×10表针位置≈53% 满偏接法=断开电源，红黑表笔接被测电阻两端读数结果：47.0×10=470Ω倍率和调零合适。",
+            "通过：挡位、接法和读数条件合格。"
+          ],
+          "physical_readout": [
+            "测量模式：电阻 Ω",
+            "量程/倍率：×10",
+            "被测量旋钮：470Ω",
+            "欧姆调零：100%",
+            "被测电路带电：否",
+            "模式=电阻 Ω，量程/倍率=×10表针位置≈53% 满偏接法=断开电源，红黑表笔接被测电阻两端读数结果：47.0×10=470Ω倍率和调零合适。",
+            "通过：挡位、接法和读数条件合格。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "测量模式：电阻 Ω|量程/倍率：×#|被测量旋钮：#Ω|欧姆调零：#%|被测电路带电：否|模式=电阻 Ω，量程/倍率=×#表针位置≈#% 满偏接法=断开电源，红黑表笔接被测电阻两端读数结果：#×#=#Ω倍率和调零合适。|通过：挡位、接法和读数条件合格。",
+          "controls": [
+            {
+              "id": "mode",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "range",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "value",
+              "value": "47",
+              "checked": false
+            },
+            {
+              "id": "zero",
+              "value": "100",
+              "checked": false
+            },
+            {
+              "id": "power",
+              "value": "0",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "测量模式：电阻 Ω|量程/倍率：×#|被测量旋钮：#Ω|欧姆调零：#%|被测电路带电：否|模式=电阻 Ω，量程/倍率=×#表针位置≈#% 满偏接法=断开电源，红黑表笔接被测电阻两端读数结果：#×#=#Ω倍率和调零合适。|通过：挡位、接法和读数条件合格。",
+          "controls": [
+            {
+              "id": "mode",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "range",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "value",
+              "value": "47",
+              "checked": false
+            },
+            {
+              "id": "zero",
+              "value": "100",
+              "checked": false
+            },
+            {
+              "id": "power",
+              "value": "0",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}
