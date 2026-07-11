@@ -61,18 +61,19 @@ function drawCircuit(){
   ctx.fillStyle='#102a43';ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillText(`I=ε/(R+r)=${I().toFixed(2)}A，U=IR=${U().toFixed(2)}V`,95,345);
 }
 function drawGraph(){
-  const gx=430,gy=340,gw=245,gh=245,Is=E/r;
+  const gx=430,gy=340,gw=245,gh=245,Imax=12,Umax=12,Is=E/r;
   ctx.strokeStyle='#334e68';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(gx,gy-gh);ctx.lineTo(gx,gy);ctx.lineTo(gx+gw,gy);ctx.stroke();
   ctx.fillStyle='#52677a';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText('I/A',gx+gw+18,gy+4);ctx.fillText('U/V',gx-12,gy-gh-8);
-  ctx.strokeStyle='#2c7be5';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(gx,gy-gh);ctx.lineTo(gx+gw,gy);ctx.stroke();
-  const px=gx+I()/Is*gw,py=gy-U()/E*gh;ctx.fillStyle='#2c7be5';ctx.beginPath();ctx.arc(px,py,9,0,7);ctx.fill();ctx.strokeStyle='#102a43';ctx.lineWidth=1.5;ctx.stroke();
+  for(let n=0;n<=12;n+=3){const x=gx+n/Imax*gw,y=gy-n/Umax*gh;ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,gy);ctx.lineTo(x,gy+4);ctx.moveTo(gx-4,y);ctx.lineTo(gx,y);ctx.stroke();ctx.fillStyle='#52677a';ctx.font='10px system-ui';ctx.fillText(n,x,gy+15);ctx.fillText(n,gx-16,y+3)}
+  const endI=Math.min(Imax,Is),endU=Math.max(0,E-r*endI);ctx.strokeStyle='#2c7be5';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(gx,gy-E/Umax*gh);ctx.lineTo(gx+endI/Imax*gw,gy-endU/Umax*gh);ctx.stroke();
+  const px=gx+I()/Imax*gw,py=gy-U()/Umax*gh;ctx.fillStyle='#2c7be5';ctx.beginPath();ctx.arc(px,py,9,0,7);ctx.fill();ctx.strokeStyle='#102a43';ctx.lineWidth=1.5;ctx.stroke();
   ctx.strokeStyle='rgba(21,154,107,.6)';ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(gx,py);ctx.lineTo(px,py);ctx.lineTo(px,gy);ctx.stroke();ctx.setLineDash([]);
-  ctx.fillStyle='#102a43';ctx.font='12px system-ui';ctx.textAlign='left';ctx.fillText('拖工作点',px+12,py-10);ctx.fillText('U=ε-Ir',gx+48,gy-gh+24);
+  ctx.fillStyle='#102a43';ctx.font='12px system-ui';ctx.textAlign='left';ctx.fillText('拖工作点',px+12,py-10);ctx.fillText('截距 ε='+E.toFixed(1)+'V；斜率 −r=−'+r.toFixed(1)+'V/A',gx+12,gy-gh+20);
 }
 function update(){els.ev.textContent=E.toFixed(1);els.rv.textContent=r.toFixed(1);els.Rv.textContent=R.toFixed(1);els.iv.textContent=I().toFixed(2);els.uv.textContent=U().toFixed(2);els.irv.textContent=(I()*r).toFixed(2)}
 function draw(){ctx.clearRect(0,0,cv.width,cv.height);const bg=ctx.createLinearGradient(0,0,0,cv.height);bg.addColorStop(0,'#f8fbff');bg.addColorStop(1,'#edf3f8');ctx.fillStyle=bg;ctx.fillRect(0,0,cv.width,cv.height);ctx.strokeStyle='rgba(16,42,67,.06)';for(let x=0;x<cv.width;x+=36){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,cv.height);ctx.stroke()}for(let y=0;y<cv.height;y+=36){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(cv.width,y);ctx.stroke()}drawCircuit();drawGraph();ctx.fillStyle='#102a43';ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillText(`U=ε-Ir=${E.toFixed(1)}-${I().toFixed(2)}×${r.toFixed(1)}=${U().toFixed(2)}V；短路电流 ε/r=${(E/r).toFixed(2)}A`,24,34);update()}
-cv.addEventListener('pointerdown',e=>{const p=pos(e),rx=230+(R-1)/19*120,ey=280-(E-2)/10*115,rkx=115+(360-(360-(r-.2)/4.8*120))/120*135;const gx=430,gy=340,gw=245,gh=245,px=gx+I()/(E/r)*gw,py=gy-U()/E*gh;if(Math.hypot(p.x-rx,p.y-105)<24)drag='R';else if(Math.hypot(p.x-60,p.y-ey)<24)drag='E';else if(Math.hypot(p.x-rkx,p.y-360)<24)drag='r';else if(Math.hypot(p.x-px,p.y-py)<24)drag='point'});
-cv.addEventListener('pointermove',e=>{if(!drag)return;const p=pos(e);if(drag==='R')R=clamp(1+(p.x-230)/120*19,1,20);if(drag==='E')E=clamp(2+(280-p.y)/115*10,2,12);if(drag==='r')r=clamp(.2+(p.x-115)/135*4.8,.2,5);if(drag==='point'){const Is=E/r;const ii=clamp((p.x-430)/245*Is,.02,Is*.98);R=clamp((E-r*ii)/ii,1,20)}draw()});
+cv.addEventListener('pointerdown',e=>{const p=pos(e),rx=230+(R-1)/19*120,ey=280-(E-2)/10*115,rkx=115+(360-(360-(r-.2)/4.8*120))/120*135;const gx=430,gy=340,gw=245,gh=245,px=gx+I()/12*gw,py=gy-U()/12*gh;if(Math.hypot(p.x-rx,p.y-105)<24)drag='R';else if(Math.hypot(p.x-60,p.y-ey)<24)drag='E';else if(Math.hypot(p.x-rkx,p.y-360)<24)drag='r';else if(Math.hypot(p.x-px,p.y-py)<24)drag='point'});
+cv.addEventListener('pointermove',e=>{if(!drag)return;const p=pos(e);if(drag==='R')R=clamp(1+(p.x-230)/120*19,1,20);if(drag==='E')E=clamp(2+(280-p.y)/115*10,2,12);if(drag==='r')r=clamp(.2+(p.x-115)/135*4.8,.2,5);if(drag==='point'){const ii=clamp((p.x-430)/245*12,.02,Math.min(12,E/r*.98));R=clamp((E-r*ii)/ii,1,20)}draw()});
 window.addEventListener('pointerup',()=>drag=null);
 function loop(now){if(window.__paused){requestAnimationFrame(loop);return;}const dt=Math.min((now-last)/1000,.05);last=now;phase+=I()*55*dt;draw();requestAnimationFrame(loop)}
 draw();requestAnimationFrame(loop);
