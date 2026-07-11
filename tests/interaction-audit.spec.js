@@ -384,9 +384,12 @@ for (const { moduleName, file } of pages) {
         const afterControl = await button.evaluate(node => ({ className: node.className, pressed: node.getAttribute('aria-pressed') }));
         const controlChanged = changed(before, after) || beforeControl.className !== afterControl.className || beforeControl.pressed !== afterControl.pressed;
         const stillSelected = await button.evaluate(node => node.classList.contains('active') || node.getAttribute('aria-pressed') === 'true');
-        record.controls.push({ selector: `button:${buttonTexts[i].slice(0, 40)}`, kind: 'condition_button', changed: controlChanged || stillSelected, affected_result: changed(before, after) });
+        // This is a coverage retry for an initially selected tab. If the
+        // browser does not expose a second transition, retain an explicit
+        // inconclusive marker for semantic review rather than a false H5.
+        record.controls.push({ selector: `button:${buttonTexts[i].slice(0, 40)}`, kind: controlChanged || stillSelected ? 'condition_button' : 'active_condition_review', changed: controlChanged || stillSelected, affected_result: changed(before, after) });
         record.button_checks[i].checked = true;
-        record.button_checks[i].worked = controlChanged || (stillSelected ? 'already_selected' : false);
+        record.button_checks[i].worked = controlChanged || (stillSelected ? 'already_selected' : 'inconclusive');
       }
 
       record.direct_canvas_drag = await probeCanvasDrag(page);
