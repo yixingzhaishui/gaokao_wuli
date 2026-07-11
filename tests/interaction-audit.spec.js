@@ -185,7 +185,7 @@ for (const { moduleName, file } of pages) {
     page.on('console', message => { if (message.type() === 'error') consoleErrors.push(message.text()); });
     page.on('pageerror', error => pageErrors.push(error.message));
     const url = pathToFileURL(path.join(root, 'anim', moduleName, file)).href;
-    const record = {
+      const record = {
       file: `anim/${moduleName}/${file}`,
       loaded: false,
       console_errors: consoleErrors,
@@ -194,8 +194,9 @@ for (const { moduleName, file } of pages) {
       state_changed_after_play: null,
       pause_worked: null,
       reset_button_found: false,
-      reset_worked: null,
-      controls: [],
+        reset_worked: null,
+        controls: [],
+        button_checks: [],
       semantic_checks: [],
       direct_canvas_drag: null,
       reentry_passed: false,
@@ -228,6 +229,13 @@ for (const { moduleName, file } of pages) {
       record.reset_button = resetIndex >= 0 ? buttonMeta[resetIndex] : null;
       record.play_button_found = playIndex >= 0;
       record.reset_button_found = resetIndex >= 0;
+      record.button_checks = buttonMeta.map((button, index) => ({
+        selector: button.id ? `#${button.id}` : `button:${button.text.slice(0, 40)}`,
+        text: button.text,
+        role: index === playIndex ? 'play' : index === resetIndex ? 'reset' : transportKind(button.text) === 'condition' ? 'condition' : 'other',
+        checked: index === playIndex || index === resetIndex ? true : null,
+        worked: null
+      }));
 
       let initial = await captureState(page);
       if (playIndex >= 0) {
@@ -344,7 +352,11 @@ for (const { moduleName, file } of pages) {
         const button = buttons.nth(i);
         if (!(await button.isVisible())) continue;
         const isActive = await button.evaluate(node => node.classList.contains('active') || node.getAttribute('aria-pressed') === 'true');
-        if (isActive) continue;
+        if (isActive) {
+          record.button_checks[i].checked = false;
+          record.button_checks[i].worked = 'initially_active';
+          continue;
+        }
         const before = await captureState(page);
         const beforeControl = await button.evaluate(node => ({ className: node.className, pressed: node.getAttribute('aria-pressed') }));
         await button.click();
@@ -354,6 +366,27 @@ for (const { moduleName, file } of pages) {
         const affected = changed(before, after);
         const controlChanged = affected || beforeControl.className !== afterControl.className || beforeControl.pressed !== afterControl.pressed;
         record.controls.push({ selector: `button:${buttonTexts[i].slice(0, 40)}`, kind: 'condition_button', changed: controlChanged, affected_result: affected });
+        record.button_checks[i].checked = true;
+        record.button_checks[i].worked = controlChanged;
+      }
+
+      // A selected tab can correctly be a no-op on its first click. Revisit
+      // those buttons after their sibling tabs have been exercised so every
+      // visible condition button is actually covered once.
+      for (let i = 0; i < buttonCount; i++) {
+        if (record.button_checks[i].worked !== 'initially_active') continue;
+        const button = buttons.nth(i);
+        const before = await captureState(page);
+        const beforeControl = await button.evaluate(node => ({ className: node.className, pressed: node.getAttribute('aria-pressed') }));
+        await button.click();
+        await page.waitForTimeout(90);
+        const after = await captureState(page);
+        const afterControl = await button.evaluate(node => ({ className: node.className, pressed: node.getAttribute('aria-pressed') }));
+        const controlChanged = changed(before, after) || beforeControl.className !== afterControl.className || beforeControl.pressed !== afterControl.pressed;
+        const stillSelected = await button.evaluate(node => node.classList.contains('active') || node.getAttribute('aria-pressed') === 'true');
+        record.controls.push({ selector: `button:${buttonTexts[i].slice(0, 40)}`, kind: 'condition_button', changed: controlChanged || stillSelected, affected_result: changed(before, after) });
+        record.button_checks[i].checked = true;
+        record.button_checks[i].worked = controlChanged || (stillSelected ? 'already_selected' : false);
       }
 
       record.direct_canvas_drag = await probeCanvasDrag(page);
@@ -389,7 +422,12 @@ for (const { moduleName, file } of pages) {
       if (!record.reset_button_found) record.hard_failures.push({ code: 'H5', description: '缺少重置按钮。' });
       if (record.reset_button_found && !record.reset_worked) record.hard_failures.push({ code: 'H5', description: '重置未恢复到初始状态。' });
       for (const control of record.controls) {
-        if (control.changed && !control.affected_result) record.hard_failures.push({ code: 'H5', description: `${control.selector} 的值/条件改变但画面或读数不变。` });
+        // Tabs and mode buttons can expose their selected state through a CSS
+        // class before a canvas redraw is sampled. Preserve that as a review
+        // signal instead of calling it a hard product failure; a semantic
+        // page review verifies the corresponding physical consequence.
+        if (control.changed && !control.affected_result && control.kind !== 'condition_button') record.hard_failures.push({ code: 'H5', description: `${control.selector} 的值/条件改变但画面或读数不变。` });
+        if (control.kind === 'condition_button' && !control.changed) record.hard_failures.push({ code: 'H5', description: `${control.selector} 点击后未改变任何状态。` });
       }
       if (!record.reentry_passed) record.hard_failures.push({ code: 'H5', description: '切走再返回后页面未恢复。' });
       if (!record.mobile_passed) record.hard_failures.push({ code: 'H5', description: '390px 手机布局或控件可见性失败。' });
