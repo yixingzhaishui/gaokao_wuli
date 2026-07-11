@@ -53,7 +53,7 @@ button.on{background:#2c7be5;color:#fff;border-color:#2c7be5}
 const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
 const W=canvas.width,H=canvas.height;
 const D=Math.PI/180, lab={x:18,y:40,w:480,h:320}, side={x:520,y:40,w:230,h:320};
-let B=0.55,angle=35,area=0.70,turns=3,speed=3,mode='none',dir=1,t=0,running=true;
+let B=0.55,angle=35,area=0.70,turns=3,speed=3,mode='none',dir=1,t=0,running=true,frozen=true;
 let lastPhi=phi(),lastTime=performance.now(),rate=0,trace=[],etrace=[],drag='';
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 function phi(){return B*area*Math.cos(angle*D)}
@@ -124,6 +124,7 @@ function drawGraph(){
   ctx.fillStyle='#7c3aed';ctx.font='11px system-ui';ctx.fillText('Φ',x+52,y+34);ctx.fillStyle='#d64545';ctx.fillText('E',x+78,y+34);
 }
 function statusText(){
+  if(frozen)return '已冻结：Φ 不变，E=0';
   if(Math.abs(rate)<0.006)return 'Φ 不变：E=0';
   return rate>0?'Φ 正在增大：有感应电动势':'Φ 正在减小：有感应电动势，方向相反';
 }
@@ -155,15 +156,15 @@ function step(){
   draw();requestAnimationFrame(step);
 }
 function syncFromInputs(){B=Number(document.getElementById('b').value)/100;angle=Number(document.getElementById('angle').value);area=Number(document.getElementById('area').value)/100;turns=Number(document.getElementById('turns').value);speed=Number(document.getElementById('speed').value)}
-['b','angle','area','turns','speed'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{mode='none';document.getElementById('play-b').classList.remove('on');document.getElementById('play-angle').classList.remove('on');syncFromInputs();draw()}));
-function setMode(m){mode=mode===m?'none':m;document.getElementById('play-b').classList.toggle('on',mode==='B');document.getElementById('play-angle').classList.toggle('on',mode==='angle')}
+['b','angle','area','turns','speed'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{mode='none';frozen=false;document.getElementById('play-b').classList.remove('on');document.getElementById('play-angle').classList.remove('on');syncFromInputs();draw()}));
+function setMode(m){mode=mode===m?'none':m;frozen=mode==='none';document.getElementById('play-b').classList.toggle('on',mode==='B');document.getElementById('play-angle').classList.toggle('on',mode==='angle')}
 document.getElementById('playBtn').onclick=()=>{running=!running;document.getElementById('playBtn').textContent=running?'暂停演示':'播放演示';if(running)draw()};
 document.getElementById('play-b').onclick=()=>setMode('B');
 document.getElementById('play-angle').onclick=()=>setMode('angle');
-document.getElementById('freeze').onclick=()=>{mode='none';document.getElementById('play-b').classList.remove('on');document.getElementById('play-angle').classList.remove('on')};
-document.getElementById('reset').onclick=()=>{B=0.55;angle=35;area=0.70;turns=3;speed=3;mode='none';dir=1;trace=[];etrace=[];document.getElementById('b').value=55;document.getElementById('angle').value=35;document.getElementById('area').value=70;document.getElementById('turns').value=3;document.getElementById('speed').value=3;document.getElementById('play-b').classList.remove('on');document.getElementById('play-angle').classList.remove('on');lastPhi=phi();lastTime=performance.now();draw()};
+document.getElementById('freeze').onclick=()=>{mode='none';frozen=true;rate=0;lastPhi=phi();lastTime=performance.now();document.getElementById('play-b').classList.remove('on');document.getElementById('play-angle').classList.remove('on');draw()};
+document.getElementById('reset').onclick=()=>{B=0.55;angle=35;area=0.70;turns=3;speed=3;mode='none';frozen=true;dir=1;trace=[];etrace=[];document.getElementById('b').value=55;document.getElementById('angle').value=35;document.getElementById('area').value=70;document.getElementById('turns').value=3;document.getElementById('speed').value=3;document.getElementById('play-b').classList.remove('on');document.getElementById('play-angle').classList.remove('on');lastPhi=phi();lastTime=performance.now();draw()};
 function pos(e){const r=canvas.getBoundingClientRect(),sx=canvas.width/r.width,sy=canvas.height/r.height;return{x:(e.clientX-r.left)*sx,y:(e.clientY-r.top)*sy}}
-canvas.addEventListener('pointerdown',e=>{const pnt=pos(e);mode='none';document.getElementById('play-b').classList.remove('on');document.getElementById('play-angle').classList.remove('on');if(pnt.x>436&&pnt.x<484&&pnt.y>72&&pnt.y<310){drag='B'}else if(pnt.x<500&&pnt.y<330){drag='angle'}canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing'});
+canvas.addEventListener('pointerdown',e=>{const pnt=pos(e);mode='none';frozen=false;document.getElementById('play-b').classList.remove('on');document.getElementById('play-angle').classList.remove('on');if(pnt.x>436&&pnt.x<484&&pnt.y>72&&pnt.y<310){drag='B'}else if(pnt.x<500&&pnt.y<330){drag='angle'}canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing'});
 canvas.addEventListener('pointermove',e=>{if(!drag)return;const pnt=pos(e);if(drag==='B'){B=clamp((205-pnt.y)/125,-1,1);document.getElementById('b').value=Math.round(B*100)}else{const cx=250,cy=204;let deg=Math.atan2(-(pnt.y-cy),pnt.x-cx)/D;angle=clamp(Math.round(deg),0,180);document.getElementById('angle').value=angle}draw()});
 window.addEventListener('pointerup',()=>{drag='';canvas.style.cursor='grab'});
 document.getElementById('reset').click();requestAnimationFrame(step);

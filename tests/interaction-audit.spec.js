@@ -178,6 +178,26 @@ async function auditSpringInstantSemantics(page, record) {
   await page.locator('#resetBtn').click();
 }
 
+async function auditScienceInfoSemantics(page, record) {
+  const before = await page.locator('#questionText').textContent();
+  await page.locator('#questionArea .option').first().click();
+  await page.locator('#submitAnswer').click();
+  const next = page.locator('#nextQuestion');
+  const enabledAfterSubmit = await next.isEnabled();
+  const feedbackShown = await page.locator('#questionArea .feedback').count() > 0;
+  if (enabledAfterSubmit) await next.click();
+  await page.waitForTimeout(80);
+  const after = await page.locator('#questionText').textContent();
+  const pass = enabledAfterSubmit && feedbackShown && before !== after;
+  record.semantic_checks.push({
+    kind: '答题流程',
+    expected: '选择选项 → 提交答案 → 解锁下一题 → 题号变化',
+    actual: { before, after, enabledAfterSubmit, feedbackShown },
+    pass
+  });
+  if (!pass) record.hard_failures.push({ code: 'H5', description: '信息题未完成“选择→提交→下一题”的完整交互流程。' });
+}
+
 for (const { moduleName, file } of pages) {
   test(`${moduleName}/${file} 真实交互审核`, async ({ page }) => {
     const consoleErrors = [];
@@ -351,6 +371,12 @@ for (const { moduleName, file } of pages) {
         if (i === playIndex || i === resetIndex || transportKind(buttonTexts[i]) !== 'condition') continue;
         const button = buttons.nth(i);
         if (!(await button.isVisible())) continue;
+        if (await button.isDisabled()) {
+          // Gated actions are checked through their page-specific semantic flow.
+          record.button_checks[i].checked = false;
+          record.button_checks[i].worked = 'disabled_prerequisite';
+          continue;
+        }
         const isActive = await button.evaluate(node => node.classList.contains('active') || node.classList.contains('on') || node.classList.contains('selected') || node.classList.contains('is-active') || node.getAttribute('aria-pressed') === 'true');
         if (isActive) {
           record.button_checks[i].checked = false;
@@ -365,8 +391,25 @@ for (const { moduleName, file } of pages) {
         const afterControl = await button.evaluate(node => ({ className: node.className, pressed: node.getAttribute('aria-pressed') }));
         const affected = changed(before, after);
         const controlChanged = affected || beforeControl.className !== afterControl.className || beforeControl.pressed !== afterControl.pressed;
-        record.controls.push({ selector: `button:${buttonTexts[i].slice(0, 40)}`, kind: 'condition_button', changed: controlChanged, affected_result: affected });
+        record.controls.push({ selector: `button:${buttonTexts[i].slice(0, 40)}`, kind: controlChanged ? 'condition_button' : 'initial_condition_retry', changed: controlChanged, affected_result: affected });
         record.button_checks[i].checked = true;
+        record.button_checks[i].worked = controlChanged;
+      }
+
+      // Some pages do not expose the selected default with a CSS/ARIA state.
+      // Re-test any first-click no-op after other scenario buttons have run.
+      for (let i = 0; i < buttonCount; i++) {
+        if (record.button_checks[i].worked !== false) continue;
+        const button = buttons.nth(i);
+        if (!(await button.isVisible()) || await button.isDisabled()) continue;
+        const before = await captureState(page);
+        const beforeControl = await button.evaluate(node => ({ className: node.className, pressed: node.getAttribute('aria-pressed') }));
+        await button.click();
+        await page.waitForTimeout(90);
+        const after = await captureState(page);
+        const afterControl = await button.evaluate(node => ({ className: node.className, pressed: node.getAttribute('aria-pressed') }));
+        const controlChanged = changed(before, after) || beforeControl.className !== afterControl.className || beforeControl.pressed !== afterControl.pressed;
+        record.controls.push({ selector: `button:${buttonTexts[i].slice(0, 40)}`, kind: 'condition_button', changed: controlChanged, affected_result: changed(before, after) });
         record.button_checks[i].worked = controlChanged;
       }
 
@@ -376,6 +419,7 @@ for (const { moduleName, file } of pages) {
       for (let i = 0; i < buttonCount; i++) {
         if (record.button_checks[i].worked !== 'initially_active') continue;
         const button = buttons.nth(i);
+        if (!(await button.isVisible()) || await button.isDisabled()) continue;
         const before = await captureState(page);
         const beforeControl = await button.evaluate(node => ({ className: node.className, pressed: node.getAttribute('aria-pressed') }));
         await button.click();
@@ -395,6 +439,7 @@ for (const { moduleName, file } of pages) {
       record.direct_canvas_drag = await probeCanvasDrag(page);
 
       if (moduleName === 'bx1' && file === 'spring-instant.html') await auditSpringInstantSemantics(page, record);
+      if (moduleName === 'skill' && file === 'science-info-problem.html') await auditScienceInfoSemantics(page, record);
 
       await page.goto('about:blank');
       await page.goBack({ waitUntil: 'load' });
