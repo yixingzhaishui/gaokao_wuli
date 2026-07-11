@@ -1,0 +1,1817 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-11T15:51:50.713Z",
+  "commit": "8e6e0aafe6c901a36c381f2e24fc54b4350d50be",
+  "module": "xb3",
+  "modules": [
+    "xb3"
+  ],
+  "summary": {
+    "total": 7,
+    "score": 100,
+    "pass": 7,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/xb3/capillary.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#radius",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#theta",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#sigma",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录数据",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录数据",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.82
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "5f970084",
+          "readout_hash": "b5cba83",
+          "physical_readout_hash": "b5cba83",
+          "readout": [
+            "管半径 r 0.50 mm",
+            "0.50 mm",
+            "接触角 θ 35°",
+            "35°",
+            "表面张力 σ 0.072 N/m",
+            "0.072 N/m",
+            "当前液柱 h(t)：0.8 cm平衡高度 h∞：2.4 cmcosθ：0.82判断：浸润上升趋势：r 越小 |h| 越大",
+            "0.50352.4上升",
+            "接触角小于 90°，液体浸润管壁，细管中液面上升。"
+          ],
+          "physical_readout": [
+            "管半径 r 0.50 mm",
+            "0.50 mm",
+            "接触角 θ 35°",
+            "35°",
+            "表面张力 σ 0.072 N/m",
+            "0.072 N/m",
+            "当前液柱 h(t)：0.8 cm平衡高度 h∞：2.4 cmcosθ：0.82判断：浸润上升趋势：r 越小 |h| 越大",
+            "0.50352.4上升",
+            "接触角小于 90°，液体浸润管壁，细管中液面上升。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "b9ef0a1d",
+          "readout_hash": "1cbd4e51",
+          "physical_readout_hash": "1cbd4e51",
+          "readout": [
+            "管半径 r 0.50 mm",
+            "0.50 mm",
+            "接触角 θ 35°",
+            "35°",
+            "表面张力 σ 0.072 N/m",
+            "0.072 N/m",
+            "当前液柱 h(t)：1.7 cm平衡高度 h∞：2.4 cmcosθ：0.82判断：浸润上升趋势：r 越小 |h| 越大",
+            "0.50352.4上升",
+            "接触角小于 90°，液体浸润管壁，细管中液面上升。"
+          ],
+          "physical_readout": [
+            "管半径 r 0.50 mm",
+            "0.50 mm",
+            "接触角 θ 35°",
+            "35°",
+            "表面张力 σ 0.072 N/m",
+            "0.072 N/m",
+            "当前液柱 h(t)：1.7 cm平衡高度 h∞：2.4 cmcosθ：0.82判断：浸润上升趋势：r 越小 |h| 越大",
+            "0.50352.4上升",
+            "接触角小于 90°，液体浸润管壁，细管中液面上升。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "38f5e1df",
+          "readout_hash": "8b631656",
+          "physical_readout_hash": "8b631656",
+          "readout": [
+            "管半径 r 0.50 mm",
+            "0.50 mm",
+            "接触角 θ 35°",
+            "35°",
+            "表面张力 σ 0.072 N/m",
+            "0.072 N/m",
+            "当前液柱 h(t)：1.8 cm平衡高度 h∞：2.4 cmcosθ：0.82判断：浸润上升趋势：r 越小 |h| 越大",
+            "0.50352.4上升",
+            "接触角小于 90°，液体浸润管壁，细管中液面上升。"
+          ],
+          "physical_readout": [
+            "管半径 r 0.50 mm",
+            "0.50 mm",
+            "接触角 θ 35°",
+            "35°",
+            "表面张力 σ 0.072 N/m",
+            "0.072 N/m",
+            "当前液柱 h(t)：1.8 cm平衡高度 h∞：2.4 cmcosθ：0.82判断：浸润上升趋势：r 越小 |h| 越大",
+            "0.50352.4上升",
+            "接触角小于 90°，液体浸润管壁，细管中液面上升。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "38f5e1df",
+          "readout_hash": "8b631656",
+          "physical_readout_hash": "8b631656",
+          "readout": [
+            "管半径 r 0.50 mm",
+            "0.50 mm",
+            "接触角 θ 35°",
+            "35°",
+            "表面张力 σ 0.072 N/m",
+            "0.072 N/m",
+            "当前液柱 h(t)：1.8 cm平衡高度 h∞：2.4 cmcosθ：0.82判断：浸润上升趋势：r 越小 |h| 越大",
+            "0.50352.4上升",
+            "接触角小于 90°，液体浸润管壁，细管中液面上升。"
+          ],
+          "physical_readout": [
+            "管半径 r 0.50 mm",
+            "0.50 mm",
+            "接触角 θ 35°",
+            "35°",
+            "表面张力 σ 0.072 N/m",
+            "0.072 N/m",
+            "当前液柱 h(t)：1.8 cm平衡高度 h∞：2.4 cmcosθ：0.82判断：浸润上升趋势：r 越小 |h| 越大",
+            "0.50352.4上升",
+            "接触角小于 90°，液体浸润管壁，细管中液面上升。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "管半径 r # mm|# mm|接触角 θ #°|#°|表面张力 σ # N/m|# N/m|当前液柱 h(t)：# cm平衡高度 h∞：# cmcosθ：#判断：浸润上升趋势：r 越小 |h| 越大|接触角小于 #°，液体浸润管壁，细管中液面上升。",
+          "controls": [
+            {
+              "id": "radius",
+              "value": "0.5",
+              "checked": false
+            },
+            {
+              "id": "theta",
+              "value": "35",
+              "checked": false
+            },
+            {
+              "id": "sigma",
+              "value": "0.072",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "管半径 r # mm|# mm|接触角 θ #°|#°|表面张力 σ # N/m|# N/m|当前液柱 h(t)：# cm平衡高度 h∞：# cmcosθ：#判断：浸润上升趋势：r 越小 |h| 越大|接触角小于 #°，液体浸润管壁，细管中液面上升。",
+          "controls": [
+            {
+              "id": "radius",
+              "value": "0.5",
+              "checked": false
+            },
+            {
+              "id": "theta",
+              "value": "35",
+              "checked": false
+            },
+            {
+              "id": "sigma",
+              "value": "0.072",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb3/diffusion-brownian.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#temp",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#radius",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#conc",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录状态",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录状态",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "b112b714",
+          "readout_hash": "32981c53",
+          "physical_readout_hash": "32981c53",
+          "readout": [
+            "温度 T 300 K",
+            "300 K",
+            "花粉半径 r 3.0 μm",
+            "3.0 μm",
+            "染料浓度差 80%",
+            "80%",
+            "扩散快慢：0.27布朗抖动：0.58花粉轨迹点：22微观原因：无规则碰撞",
+            "3003.00.270.58",
+            "低温时分子热运动较弱，扩散和布朗运动都较缓。"
+          ],
+          "physical_readout": [
+            "温度 T 300 K",
+            "300 K",
+            "花粉半径 r 3.0 μm",
+            "3.0 μm",
+            "染料浓度差 80%",
+            "80%",
+            "扩散快慢：0.27布朗抖动：0.58花粉轨迹点：22微观原因：无规则碰撞",
+            "3003.00.270.58",
+            "低温时分子热运动较弱，扩散和布朗运动都较缓。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "52fe2bd5",
+          "readout_hash": "e19c79e2",
+          "physical_readout_hash": "e19c79e2",
+          "readout": [
+            "温度 T 300 K",
+            "300 K",
+            "花粉半径 r 3.0 μm",
+            "3.0 μm",
+            "染料浓度差 80%",
+            "80%",
+            "扩散快慢：0.27布朗抖动：0.58花粉轨迹点：65微观原因：无规则碰撞",
+            "3003.00.270.58",
+            "低温时分子热运动较弱，扩散和布朗运动都较缓。"
+          ],
+          "physical_readout": [
+            "温度 T 300 K",
+            "300 K",
+            "花粉半径 r 3.0 μm",
+            "3.0 μm",
+            "染料浓度差 80%",
+            "80%",
+            "扩散快慢：0.27布朗抖动：0.58花粉轨迹点：65微观原因：无规则碰撞",
+            "3003.00.270.58",
+            "低温时分子热运动较弱，扩散和布朗运动都较缓。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "d0b1394",
+          "readout_hash": "11f3bd34",
+          "physical_readout_hash": "11f3bd34",
+          "readout": [
+            "温度 T 300 K",
+            "300 K",
+            "花粉半径 r 3.0 μm",
+            "3.0 μm",
+            "染料浓度差 80%",
+            "80%",
+            "扩散快慢：0.27布朗抖动：0.58花粉轨迹点：67微观原因：无规则碰撞",
+            "3003.00.270.58",
+            "低温时分子热运动较弱，扩散和布朗运动都较缓。"
+          ],
+          "physical_readout": [
+            "温度 T 300 K",
+            "300 K",
+            "花粉半径 r 3.0 μm",
+            "3.0 μm",
+            "染料浓度差 80%",
+            "80%",
+            "扩散快慢：0.27布朗抖动：0.58花粉轨迹点：67微观原因：无规则碰撞",
+            "3003.00.270.58",
+            "低温时分子热运动较弱，扩散和布朗运动都较缓。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "d0b1394",
+          "readout_hash": "11f3bd34",
+          "physical_readout_hash": "11f3bd34",
+          "readout": [
+            "温度 T 300 K",
+            "300 K",
+            "花粉半径 r 3.0 μm",
+            "3.0 μm",
+            "染料浓度差 80%",
+            "80%",
+            "扩散快慢：0.27布朗抖动：0.58花粉轨迹点：67微观原因：无规则碰撞",
+            "3003.00.270.58",
+            "低温时分子热运动较弱，扩散和布朗运动都较缓。"
+          ],
+          "physical_readout": [
+            "温度 T 300 K",
+            "300 K",
+            "花粉半径 r 3.0 μm",
+            "3.0 μm",
+            "染料浓度差 80%",
+            "80%",
+            "扩散快慢：0.27布朗抖动：0.58花粉轨迹点：67微观原因：无规则碰撞",
+            "3003.00.270.58",
+            "低温时分子热运动较弱，扩散和布朗运动都较缓。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "温度 T # K|# K|花粉半径 r # μm|# μm|染料浓度差 #%|#%|扩散快慢：#布朗抖动：#花粉轨迹点：#微观原因：无规则碰撞|低温时分子热运动较弱，扩散和布朗运动都较缓。",
+          "controls": [
+            {
+              "id": "temp",
+              "value": "300",
+              "checked": false
+            },
+            {
+              "id": "radius",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "conc",
+              "value": "80",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "温度 T # K|# K|花粉半径 r # μm|# μm|染料浓度差 #%|#%|扩散快慢：#布朗抖动：#花粉轨迹点：#微观原因：无规则碰撞|低温时分子热运动较弱，扩散和布朗运动都较缓。",
+          "controls": [
+            {
+              "id": "temp",
+              "value": "300",
+              "checked": false
+            },
+            {
+              "id": "radius",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "conc",
+              "value": "80",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb3/fundamental-interactions.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#scale",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#charge",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录判断",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录判断",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "c332cad0",
+          "readout_hash": "84016a0b",
+          "physical_readout_hash": "84016a0b",
+          "readout": [
+            "尺度 log10(m) -15",
+            "-15",
+            "电荷/质量情境 60%",
+            "60%",
+            "当前主导：强相互作用作用对象：夸克/核子作用范围：原子核尺度尺度：10^-15 m",
+            "10^-15强夸克/核子原子核尺度",
+            "判断相互作用时先看对象和尺度：宏观天体看引力，带电粒子看电磁，原子核内部看强相互作用，β 衰变等看弱相互作用。"
+          ],
+          "physical_readout": [
+            "尺度 log10(m) -15",
+            "-15",
+            "电荷/质量情境 60%",
+            "60%",
+            "当前主导：强相互作用作用对象：夸克/核子作用范围：原子核尺度尺度：10^-15 m",
+            "10^-15强夸克/核子原子核尺度",
+            "判断相互作用时先看对象和尺度：宏观天体看引力，带电粒子看电磁，原子核内部看强相互作用，β 衰变等看弱相互作用。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "61730c52",
+          "readout_hash": "3c8e73d4",
+          "physical_readout_hash": "3c8e73d4",
+          "readout": [
+            "尺度 log10(m) -14",
+            "-14",
+            "电荷/质量情境 60%",
+            "60%",
+            "当前主导：电磁相互作用作用对象：带电粒子/原子分子作用范围：长程尺度：10^-14 m",
+            "10^-15强夸克/核子原子核尺度",
+            "判断相互作用时先看对象和尺度：宏观天体看引力，带电粒子看电磁，原子核内部看强相互作用，β 衰变等看弱相互作用。"
+          ],
+          "physical_readout": [
+            "尺度 log10(m) -14",
+            "-14",
+            "电荷/质量情境 60%",
+            "60%",
+            "当前主导：电磁相互作用作用对象：带电粒子/原子分子作用范围：长程尺度：10^-14 m",
+            "10^-15强夸克/核子原子核尺度",
+            "判断相互作用时先看对象和尺度：宏观天体看引力，带电粒子看电磁，原子核内部看强相互作用，β 衰变等看弱相互作用。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "61730c52",
+          "readout_hash": "3c8e73d4",
+          "physical_readout_hash": "3c8e73d4",
+          "readout": [
+            "尺度 log10(m) -14",
+            "-14",
+            "电荷/质量情境 60%",
+            "60%",
+            "当前主导：电磁相互作用作用对象：带电粒子/原子分子作用范围：长程尺度：10^-14 m",
+            "10^-15强夸克/核子原子核尺度",
+            "判断相互作用时先看对象和尺度：宏观天体看引力，带电粒子看电磁，原子核内部看强相互作用，β 衰变等看弱相互作用。"
+          ],
+          "physical_readout": [
+            "尺度 log10(m) -14",
+            "-14",
+            "电荷/质量情境 60%",
+            "60%",
+            "当前主导：电磁相互作用作用对象：带电粒子/原子分子作用范围：长程尺度：10^-14 m",
+            "10^-15强夸克/核子原子核尺度",
+            "判断相互作用时先看对象和尺度：宏观天体看引力，带电粒子看电磁，原子核内部看强相互作用，β 衰变等看弱相互作用。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "61730c52",
+          "readout_hash": "3c8e73d4",
+          "physical_readout_hash": "3c8e73d4",
+          "readout": [
+            "尺度 log10(m) -14",
+            "-14",
+            "电荷/质量情境 60%",
+            "60%",
+            "当前主导：电磁相互作用作用对象：带电粒子/原子分子作用范围：长程尺度：10^-14 m",
+            "10^-15强夸克/核子原子核尺度",
+            "判断相互作用时先看对象和尺度：宏观天体看引力，带电粒子看电磁，原子核内部看强相互作用，β 衰变等看弱相互作用。"
+          ],
+          "physical_readout": [
+            "尺度 log10(m) -14",
+            "-14",
+            "电荷/质量情境 60%",
+            "60%",
+            "当前主导：电磁相互作用作用对象：带电粒子/原子分子作用范围：长程尺度：10^-14 m",
+            "10^-15强夸克/核子原子核尺度",
+            "判断相互作用时先看对象和尺度：宏观天体看引力，带电粒子看电磁，原子核内部看强相互作用，β 衰变等看弱相互作用。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "尺度 log#(m) #|#|电荷/质量情境 #%|#%|当前主导：强相互作用作用对象：夸克/核子作用范围：原子核尺度尺度：#^# m|判断相互作用时先看对象和尺度：宏观天体看引力，带电粒子看电磁，原子核内部看强相互作用，β 衰变等看弱相互作用。",
+          "controls": [
+            {
+              "id": "scale",
+              "value": "-15",
+              "checked": false
+            },
+            {
+              "id": "charge",
+              "value": "60",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "尺度 log#(m) #|#|电荷/质量情境 #%|#%|当前主导：强相互作用作用对象：夸克/核子作用范围：原子核尺度尺度：#^# m|判断相互作用时先看对象和尺度：宏观天体看引力，带电粒子看电磁，原子核内部看强相互作用，β 衰变等看弱相互作用。",
+          "controls": [
+            {
+              "id": "scale",
+              "value": "-15",
+              "checked": false
+            },
+            {
+              "id": "charge",
+              "value": "60",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb3/materials-microstructure.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#field",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#temp",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#size",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:半导体",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:纳米",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录状态",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:液晶",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#lc",
+          "text": "液晶",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#semi",
+          "text": "半导体",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#nano",
+          "text": "纳米",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录状态",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.82
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "d90a1bb2",
+          "readout_hash": "381f48d1",
+          "physical_readout_hash": "29a793ff",
+          "readout": [
+            "外场/电压 56%",
+            "56%",
+            "温度 300 K",
+            "300 K",
+            "掺杂/尺寸 56%",
+            "56%",
+            "取向程度：56%透光率：57%宏观应用：显示器像素结构参数滑块：30演示时间：0.16 s",
+            "液晶45%49%结构控性质",
+            "液晶分子在外电场下取向改变，透光状态随之改变。"
+          ],
+          "physical_readout": [
+            "外场/电压 56%",
+            "56%",
+            "温度 300 K",
+            "300 K",
+            "掺杂/尺寸 56%",
+            "56%",
+            "取向程度：56%透光率：57%宏观应用：显示器像素结构参数滑块：30",
+            "液晶45%49%结构控性质",
+            "液晶分子在外电场下取向改变，透光状态随之改变。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "be4351da",
+          "readout_hash": "d17b5b03",
+          "physical_readout_hash": "5d1fc242",
+          "readout": [
+            "外场/电压 69%",
+            "69%",
+            "温度 300 K",
+            "300 K",
+            "掺杂/尺寸 69%",
+            "69%",
+            "取向程度：69%透光率：67%宏观应用：显示器像素结构参数滑块：30演示时间：0.51 s",
+            "液晶45%49%结构控性质",
+            "液晶分子在外电场下取向改变，透光状态随之改变。"
+          ],
+          "physical_readout": [
+            "外场/电压 69%",
+            "69%",
+            "温度 300 K",
+            "300 K",
+            "掺杂/尺寸 69%",
+            "69%",
+            "取向程度：69%透光率：67%宏观应用：显示器像素结构参数滑块：30",
+            "液晶45%49%结构控性质",
+            "液晶分子在外电场下取向改变，透光状态随之改变。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "357d95e3",
+          "readout_hash": "77541c15",
+          "physical_readout_hash": "384c8d59",
+          "readout": [
+            "外场/电压 70%",
+            "70%",
+            "温度 300 K",
+            "300 K",
+            "掺杂/尺寸 70%",
+            "70%",
+            "取向程度：70%透光率：68%宏观应用：显示器像素结构参数滑块：30演示时间：0.54 s",
+            "液晶45%49%结构控性质",
+            "液晶分子在外电场下取向改变，透光状态随之改变。"
+          ],
+          "physical_readout": [
+            "外场/电压 70%",
+            "70%",
+            "温度 300 K",
+            "300 K",
+            "掺杂/尺寸 70%",
+            "70%",
+            "取向程度：70%透光率：68%宏观应用：显示器像素结构参数滑块：30",
+            "液晶45%49%结构控性质",
+            "液晶分子在外电场下取向改变，透光状态随之改变。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "357d95e3",
+          "readout_hash": "77541c15",
+          "physical_readout_hash": "384c8d59",
+          "readout": [
+            "外场/电压 70%",
+            "70%",
+            "温度 300 K",
+            "300 K",
+            "掺杂/尺寸 70%",
+            "70%",
+            "取向程度：70%透光率：68%宏观应用：显示器像素结构参数滑块：30演示时间：0.54 s",
+            "液晶45%49%结构控性质",
+            "液晶分子在外电场下取向改变，透光状态随之改变。"
+          ],
+          "physical_readout": [
+            "外场/电压 70%",
+            "70%",
+            "温度 300 K",
+            "300 K",
+            "掺杂/尺寸 70%",
+            "70%",
+            "取向程度：70%透光率：68%宏观应用：显示器像素结构参数滑块：30",
+            "液晶45%49%结构控性质",
+            "液晶分子在外电场下取向改变，透光状态随之改变。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "外场/电压 #%|#%|温度 # K|# K|掺杂/尺寸 #%|#%|取向程度：#%透光率：#%宏观应用：显示器像素结构参数滑块：#演示时间：# s|液晶分子在外电场下取向改变，透光状态随之改变。",
+          "controls": [
+            {
+              "id": "field",
+              "value": "56",
+              "checked": false
+            },
+            {
+              "id": "temp",
+              "value": "300",
+              "checked": false
+            },
+            {
+              "id": "size",
+              "value": "30",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "外场/电压 #%|#%|温度 # K|# K|掺杂/尺寸 #%|#%|取向程度：#%透光率：#%宏观应用：显示器像素结构参数滑块：#演示时间：# s|液晶分子在外电场下取向改变，透光状态随之改变。",
+          "controls": [
+            {
+              "id": "field",
+              "value": "56",
+              "checked": false
+            },
+            {
+              "id": "temp",
+              "value": "300",
+              "checked": false
+            },
+            {
+              "id": "size",
+              "value": "30",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb3/molecular-speed-distribution.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#temp",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#mass",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#count",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录当前曲线",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "暂停分子运动",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录当前曲线",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停分子运动"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "3f8cf4e9",
+          "readout_hash": "16471f04",
+          "physical_readout_hash": "16471f04",
+          "readout": [
+            "温度 T 300 K",
+            "300 K",
+            "分子质量 m 28 u",
+            "28 u",
+            "样本数 N 160",
+            "160",
+            "最概然速率 vp：213平均速率 v̄：240宽度参数 a：151曲线面积（数值）：1.000样本中 v＞v̄：42.5%",
+            "3002132401.000",
+            "基准状态：用它和低温、高温虚线曲线比较，不把每个分子都当成同一速率。"
+          ],
+          "physical_readout": [
+            "温度 T 300 K",
+            "300 K",
+            "分子质量 m 28 u",
+            "28 u",
+            "样本数 N 160",
+            "160",
+            "最概然速率 vp：213平均速率 v̄：240宽度参数 a：151曲线面积（数值）：1.000样本中 v＞v̄：42.5%",
+            "3002132401.000",
+            "基准状态：用它和低温、高温虚线曲线比较，不把每个分子都当成同一速率。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "364c1351",
+          "readout_hash": "16471f04",
+          "physical_readout_hash": "16471f04",
+          "readout": [
+            "温度 T 300 K",
+            "300 K",
+            "分子质量 m 28 u",
+            "28 u",
+            "样本数 N 160",
+            "160",
+            "最概然速率 vp：213平均速率 v̄：240宽度参数 a：151曲线面积（数值）：1.000样本中 v＞v̄：42.5%",
+            "3002132401.000",
+            "基准状态：用它和低温、高温虚线曲线比较，不把每个分子都当成同一速率。"
+          ],
+          "physical_readout": [
+            "温度 T 300 K",
+            "300 K",
+            "分子质量 m 28 u",
+            "28 u",
+            "样本数 N 160",
+            "160",
+            "最概然速率 vp：213平均速率 v̄：240宽度参数 a：151曲线面积（数值）：1.000样本中 v＞v̄：42.5%",
+            "3002132401.000",
+            "基准状态：用它和低温、高温虚线曲线比较，不把每个分子都当成同一速率。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "76e2a8e1",
+          "readout_hash": "16471f04",
+          "physical_readout_hash": "16471f04",
+          "readout": [
+            "温度 T 300 K",
+            "300 K",
+            "分子质量 m 28 u",
+            "28 u",
+            "样本数 N 160",
+            "160",
+            "最概然速率 vp：213平均速率 v̄：240宽度参数 a：151曲线面积（数值）：1.000样本中 v＞v̄：42.5%",
+            "3002132401.000",
+            "基准状态：用它和低温、高温虚线曲线比较，不把每个分子都当成同一速率。"
+          ],
+          "physical_readout": [
+            "温度 T 300 K",
+            "300 K",
+            "分子质量 m 28 u",
+            "28 u",
+            "样本数 N 160",
+            "160",
+            "最概然速率 vp：213平均速率 v̄：240宽度参数 a：151曲线面积（数值）：1.000样本中 v＞v̄：42.5%",
+            "3002132401.000",
+            "基准状态：用它和低温、高温虚线曲线比较，不把每个分子都当成同一速率。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "76e2a8e1",
+          "readout_hash": "16471f04",
+          "physical_readout_hash": "16471f04",
+          "readout": [
+            "温度 T 300 K",
+            "300 K",
+            "分子质量 m 28 u",
+            "28 u",
+            "样本数 N 160",
+            "160",
+            "最概然速率 vp：213平均速率 v̄：240宽度参数 a：151曲线面积（数值）：1.000样本中 v＞v̄：42.5%",
+            "3002132401.000",
+            "基准状态：用它和低温、高温虚线曲线比较，不把每个分子都当成同一速率。"
+          ],
+          "physical_readout": [
+            "温度 T 300 K",
+            "300 K",
+            "分子质量 m 28 u",
+            "28 u",
+            "样本数 N 160",
+            "160",
+            "最概然速率 vp：213平均速率 v̄：240宽度参数 a：151曲线面积（数值）：1.000样本中 v＞v̄：42.5%",
+            "3002132401.000",
+            "基准状态：用它和低温、高温虚线曲线比较，不把每个分子都当成同一速率。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "温度 T # K|# K|分子质量 m # u|# u|样本数 N #|#|最概然速率 vp：#平均速率 v̄：#宽度参数 a：#曲线面积（数值）：#样本中 v＞v̄：#%|基准状态：用它和低温、高温虚线曲线比较，不把每个分子都当成同一速率。",
+          "controls": [
+            {
+              "id": "temp",
+              "value": "300",
+              "checked": false
+            },
+            {
+              "id": "mass",
+              "value": "28",
+              "checked": false
+            },
+            {
+              "id": "count",
+              "value": "160",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "温度 T # K|# K|分子质量 m # u|# u|样本数 N #|#|最概然速率 vp：#平均速率 v̄：#宽度参数 a：#曲线面积（数值）：#样本中 v＞v̄：#%|基准状态：用它和低温、高温虚线曲线比较，不把每个分子都当成同一速率。",
+          "controls": [
+            {
+              "id": "temp",
+              "value": "300",
+              "checked": false
+            },
+            {
+              "id": "mass",
+              "value": "28",
+              "checked": false
+            },
+            {
+              "id": "count",
+              "value": "160",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb3/radiation-protection.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#dist",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#thick",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#time",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:β",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:γ",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录方案",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:α",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#alpha",
+          "text": "α",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#beta",
+          "text": "β",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#gamma",
+          "text": "γ",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录方案",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.82
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "98124e9c",
+          "readout_hash": "c4017e47",
+          "physical_readout_hash": "c4017e47",
+          "readout": [
+            "距离 d 2.0 m",
+            "2.0 m",
+            "屏蔽厚度 x 2.0 mm",
+            "2.0 mm",
+            "暴露时间 t 11 min",
+            "11 min",
+            "累计暴露：11 min相对剂量：0.004穿透能力：18%电离能力：100%屏蔽建议：纸/皮肤即可显著阻挡",
+            "α2.02.00.004",
+            "当前防护较好：时间较短、距离较远或屏蔽较强。"
+          ],
+          "physical_readout": [
+            "距离 d 2.0 m",
+            "2.0 m",
+            "屏蔽厚度 x 2.0 mm",
+            "2.0 mm",
+            "暴露时间 t 11 min",
+            "11 min",
+            "累计暴露：11 min相对剂量：0.004穿透能力：18%电离能力：100%屏蔽建议：纸/皮肤即可显著阻挡",
+            "α2.02.00.004",
+            "当前防护较好：时间较短、距离较远或屏蔽较强。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "98124e9c",
+          "readout_hash": "16815eb1",
+          "physical_readout_hash": "16815eb1",
+          "readout": [
+            "距离 d 2.0 m",
+            "2.0 m",
+            "屏蔽厚度 x 2.0 mm",
+            "2.0 mm",
+            "暴露时间 t 14 min",
+            "14 min",
+            "累计暴露：14 min相对剂量：0.005穿透能力：18%电离能力：100%屏蔽建议：纸/皮肤即可显著阻挡",
+            "α2.02.00.004",
+            "当前防护较好：时间较短、距离较远或屏蔽较强。"
+          ],
+          "physical_readout": [
+            "距离 d 2.0 m",
+            "2.0 m",
+            "屏蔽厚度 x 2.0 mm",
+            "2.0 mm",
+            "暴露时间 t 14 min",
+            "14 min",
+            "累计暴露：14 min相对剂量：0.005穿透能力：18%电离能力：100%屏蔽建议：纸/皮肤即可显著阻挡",
+            "α2.02.00.004",
+            "当前防护较好：时间较短、距离较远或屏蔽较强。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": false,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "98124e9c",
+          "readout_hash": "16815eb1",
+          "physical_readout_hash": "16815eb1",
+          "readout": [
+            "距离 d 2.0 m",
+            "2.0 m",
+            "屏蔽厚度 x 2.0 mm",
+            "2.0 mm",
+            "暴露时间 t 14 min",
+            "14 min",
+            "累计暴露：14 min相对剂量：0.005穿透能力：18%电离能力：100%屏蔽建议：纸/皮肤即可显著阻挡",
+            "α2.02.00.004",
+            "当前防护较好：时间较短、距离较远或屏蔽较强。"
+          ],
+          "physical_readout": [
+            "距离 d 2.0 m",
+            "2.0 m",
+            "屏蔽厚度 x 2.0 mm",
+            "2.0 mm",
+            "暴露时间 t 14 min",
+            "14 min",
+            "累计暴露：14 min相对剂量：0.005穿透能力：18%电离能力：100%屏蔽建议：纸/皮肤即可显著阻挡",
+            "α2.02.00.004",
+            "当前防护较好：时间较短、距离较远或屏蔽较强。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "98124e9c",
+          "readout_hash": "16815eb1",
+          "physical_readout_hash": "16815eb1",
+          "readout": [
+            "距离 d 2.0 m",
+            "2.0 m",
+            "屏蔽厚度 x 2.0 mm",
+            "2.0 mm",
+            "暴露时间 t 14 min",
+            "14 min",
+            "累计暴露：14 min相对剂量：0.005穿透能力：18%电离能力：100%屏蔽建议：纸/皮肤即可显著阻挡",
+            "α2.02.00.004",
+            "当前防护较好：时间较短、距离较远或屏蔽较强。"
+          ],
+          "physical_readout": [
+            "距离 d 2.0 m",
+            "2.0 m",
+            "屏蔽厚度 x 2.0 mm",
+            "2.0 mm",
+            "暴露时间 t 14 min",
+            "14 min",
+            "累计暴露：14 min相对剂量：0.005穿透能力：18%电离能力：100%屏蔽建议：纸/皮肤即可显著阻挡",
+            "α2.02.00.004",
+            "当前防护较好：时间较短、距离较远或屏蔽较强。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "距离 d # m|# m|屏蔽厚度 x # mm|# mm|暴露时间 t # min|# min|累计暴露：# min相对剂量：#穿透能力：#%电离能力：#%屏蔽建议：纸/皮肤即可显著阻挡|当前防护较好：时间较短、距离较远或屏蔽较强。",
+          "controls": [
+            {
+              "id": "dist",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "thick",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "time",
+              "value": "11",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "距离 d # m|# m|屏蔽厚度 x # mm|# mm|暴露时间 t # min|# min|累计暴露：# min相对剂量：#穿透能力：#%电离能力：#%屏蔽建议：纸/皮肤即可显著阻挡|当前防护较好：时间较短、距离较远或屏蔽较强。",
+          "controls": [
+            {
+              "id": "dist",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "thick",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "time",
+              "value": "11",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb3/radioisotope-applications.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#half",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#time",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#shield",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:探伤",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:测年",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录选择",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:医学",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#med",
+          "text": "医学",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#ind",
+          "text": "探伤",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#arch",
+          "text": "测年",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录选择",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.82
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "a05583df",
+          "readout_hash": "89583ff4",
+          "physical_readout_hash": "58c4bfde",
+          "readout": [
+            "半衰期 T 6 h",
+            "6 h",
+            "时间 t 6 h",
+            "6 h",
+            "屏蔽/厚度 30%",
+            "30%",
+            "剩余比例：50%推荐射线：β/γ应用目标：示踪定位探测器位置：690演示时间：0.16 s",
+            "医学650%β/γ",
+            "医学示踪要求能被探测、剂量可控，半衰期不能过长也不能过短。"
+          ],
+          "physical_readout": [
+            "半衰期 T 6 h",
+            "6 h",
+            "时间 t 6 h",
+            "6 h",
+            "屏蔽/厚度 30%",
+            "30%",
+            "剩余比例：50%推荐射线：β/γ应用目标：示踪定位探测器位置：690",
+            "医学650%β/γ",
+            "医学示踪要求能被探测、剂量可控，半衰期不能过长也不能过短。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "6648eb26",
+          "readout_hash": "1f6a8944",
+          "physical_readout_hash": "5e96684c",
+          "readout": [
+            "半衰期 T 6 h",
+            "6 h",
+            "时间 t 7 h",
+            "7 h",
+            "屏蔽/厚度 30%",
+            "30%",
+            "剩余比例：45%推荐射线：β/γ应用目标：示踪定位探测器位置：690演示时间：0.21 s",
+            "医学650%β/γ",
+            "医学示踪要求能被探测、剂量可控，半衰期不能过长也不能过短。"
+          ],
+          "physical_readout": [
+            "半衰期 T 6 h",
+            "6 h",
+            "时间 t 7 h",
+            "7 h",
+            "屏蔽/厚度 30%",
+            "30%",
+            "剩余比例：45%推荐射线：β/γ应用目标：示踪定位探测器位置：690",
+            "医学650%β/γ",
+            "医学示踪要求能被探测、剂量可控，半衰期不能过长也不能过短。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "6648eb26",
+          "readout_hash": "c3c51e16",
+          "physical_readout_hash": "5e96684c",
+          "readout": [
+            "半衰期 T 6 h",
+            "6 h",
+            "时间 t 7 h",
+            "7 h",
+            "屏蔽/厚度 30%",
+            "30%",
+            "剩余比例：45%推荐射线：β/γ应用目标：示踪定位探测器位置：690演示时间：0.23 s",
+            "医学650%β/γ",
+            "医学示踪要求能被探测、剂量可控，半衰期不能过长也不能过短。"
+          ],
+          "physical_readout": [
+            "半衰期 T 6 h",
+            "6 h",
+            "时间 t 7 h",
+            "7 h",
+            "屏蔽/厚度 30%",
+            "30%",
+            "剩余比例：45%推荐射线：β/γ应用目标：示踪定位探测器位置：690",
+            "医学650%β/γ",
+            "医学示踪要求能被探测、剂量可控，半衰期不能过长也不能过短。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "6648eb26",
+          "readout_hash": "c3c51e16",
+          "physical_readout_hash": "5e96684c",
+          "readout": [
+            "半衰期 T 6 h",
+            "6 h",
+            "时间 t 7 h",
+            "7 h",
+            "屏蔽/厚度 30%",
+            "30%",
+            "剩余比例：45%推荐射线：β/γ应用目标：示踪定位探测器位置：690演示时间：0.23 s",
+            "医学650%β/γ",
+            "医学示踪要求能被探测、剂量可控，半衰期不能过长也不能过短。"
+          ],
+          "physical_readout": [
+            "半衰期 T 6 h",
+            "6 h",
+            "时间 t 7 h",
+            "7 h",
+            "屏蔽/厚度 30%",
+            "30%",
+            "剩余比例：45%推荐射线：β/γ应用目标：示踪定位探测器位置：690",
+            "医学650%β/γ",
+            "医学示踪要求能被探测、剂量可控，半衰期不能过长也不能过短。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "半衰期 T # h|# h|时间 t # h|# h|屏蔽/厚度 #%|#%|剩余比例：#%推荐射线：β/γ应用目标：示踪定位探测器位置：#演示时间：# s|医学示踪要求能被探测、剂量可控，半衰期不能过长也不能过短。",
+          "controls": [
+            {
+              "id": "half",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "time",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "shield",
+              "value": "30",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "半衰期 T # h|# h|时间 t # h|# h|屏蔽/厚度 #%|#%|剩余比例：#%推荐射线：β/γ应用目标：示踪定位探测器位置：#演示时间：# s|医学示踪要求能被探测、剂量可控，半衰期不能过长也不能过短。",
+          "controls": [
+            {
+              "id": "half",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "time",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "shield",
+              "value": "30",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}
