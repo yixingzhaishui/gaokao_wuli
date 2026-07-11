@@ -35,8 +35,8 @@ canvas{display:block;width:100%;max-width:720px;background:#0e1a2b;border-radius
     <span class="chip">拖动曲线探针读数：t=<b id="probeT">—</b> s，U=<b id="probeU">—</b> V</span>
   </div>
   <div class="ctrls">
-    <button class="btn on" id="charge">▶ 充电</button>
-    <button class="btn" id="discharge">▶ 放电</button>
+    <button class="btn on" id="charge">▶ 充电并播放</button>
+    <button class="btn" id="discharge">▶ 放电并播放</button>
     <button class="btn" id="open">断开</button>
     <button class="btn" id="playBtn">播放演示</button>
     <label>电源 E = <span id="El">6</span> V<input type="range" id="E" min="2" max="10" step="1" value="6"></label>
@@ -117,11 +117,17 @@ function draw(){
   document.getElementById('q').textContent=q.toFixed(0);
   document.getElementById('i').textContent=iMA.toFixed(2);
   document.getElementById('w').textContent=(0.5*C*Uc*Uc).toFixed(0);
-  document.getElementById('statev').textContent=mode==='charge'?'正在充电':(mode==='discharge'?'正在放电':'断开（临界：电荷保持不变）');
+  document.getElementById('statev').textContent=mode==='charge'?(running?'正在充电':'充电已暂停'):(mode==='discharge'?(running?'正在放电':'放电已暂停'):'断开（临界：电荷保持不变）');
   document.getElementById('probeT').textContent=probeVal?probeVal.t.toFixed(2):'—';
   document.getElementById('probeU').textContent=probeVal?probeVal.u.toFixed(2):'—';
 }
-function setMode(m,btn){mode=m;t=0;hist=[];document.querySelectorAll('.btn').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');}
+function setMode(m,btn){
+  mode=m;t=0;hist=[];
+  running=m!=='open';
+  document.getElementById('playBtn').textContent=running?'暂停演示':'播放演示';
+  document.querySelectorAll('.btn').forEach(b=>b.classList.remove('on'));
+  if(btn)btn.classList.add('on');
+}
 document.getElementById('charge').onclick=function(){setMode('charge',this);};
 document.getElementById('discharge').onclick=function(){setMode('discharge',this);};
 document.getElementById('open').onclick=function(){setMode('open',this);};

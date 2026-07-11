@@ -368,7 +368,10 @@ for (const { moduleName, file } of pages) {
       }
 
       for (let i = 0; i < buttonCount; i++) {
-        if (i === playIndex || i === resetIndex || transportKind(buttonTexts[i]) !== 'condition') continue;
+        // A page may have more than one action that starts a physical process
+        // (for example charge and discharge). Only the designated transport
+        // control is exempt here; every other visible button is exercised.
+        if (i === playIndex || i === resetIndex) continue;
         const button = buttons.nth(i);
         if (!(await button.isVisible())) continue;
         if (await button.isDisabled()) {
@@ -384,13 +387,13 @@ for (const { moduleName, file } of pages) {
           continue;
         }
         const before = await captureState(page);
-        const beforeControl = await button.evaluate(node => ({ className: node.className, pressed: node.getAttribute('aria-pressed') }));
+        const beforeControl = await button.evaluate(node => ({ className: node.className, pressed: node.getAttribute('aria-pressed'), text: node.textContent.replace(/\s+/g, ' ').trim() }));
         await button.click();
         await page.waitForTimeout(90);
         const after = await captureState(page);
-        const afterControl = await button.evaluate(node => ({ className: node.className, pressed: node.getAttribute('aria-pressed') }));
+        const afterControl = await button.evaluate(node => ({ className: node.className, pressed: node.getAttribute('aria-pressed'), text: node.textContent.replace(/\s+/g, ' ').trim() }));
         const affected = changed(before, after);
-        const controlChanged = affected || beforeControl.className !== afterControl.className || beforeControl.pressed !== afterControl.pressed;
+        const controlChanged = affected || beforeControl.className !== afterControl.className || beforeControl.pressed !== afterControl.pressed || beforeControl.text !== afterControl.text;
         record.controls.push({ selector: `button:${buttonTexts[i].slice(0, 40)}`, kind: controlChanged ? 'condition_button' : 'initial_condition_retry', changed: controlChanged, affected_result: affected });
         record.button_checks[i].checked = true;
         record.button_checks[i].worked = controlChanged;
@@ -403,12 +406,12 @@ for (const { moduleName, file } of pages) {
         const button = buttons.nth(i);
         if (!(await button.isVisible()) || await button.isDisabled()) continue;
         const before = await captureState(page);
-        const beforeControl = await button.evaluate(node => ({ className: node.className, pressed: node.getAttribute('aria-pressed') }));
+        const beforeControl = await button.evaluate(node => ({ className: node.className, pressed: node.getAttribute('aria-pressed'), text: node.textContent.replace(/\s+/g, ' ').trim() }));
         await button.click();
         await page.waitForTimeout(90);
         const after = await captureState(page);
-        const afterControl = await button.evaluate(node => ({ className: node.className, pressed: node.getAttribute('aria-pressed') }));
-        const controlChanged = changed(before, after) || beforeControl.className !== afterControl.className || beforeControl.pressed !== afterControl.pressed;
+        const afterControl = await button.evaluate(node => ({ className: node.className, pressed: node.getAttribute('aria-pressed'), text: node.textContent.replace(/\s+/g, ' ').trim() }));
+        const controlChanged = changed(before, after) || beforeControl.className !== afterControl.className || beforeControl.pressed !== afterControl.pressed || beforeControl.text !== afterControl.text;
         record.controls.push({ selector: `button:${buttonTexts[i].slice(0, 40)}`, kind: 'condition_button', changed: controlChanged, affected_result: changed(before, after) });
         record.button_checks[i].worked = controlChanged;
       }
@@ -421,12 +424,12 @@ for (const { moduleName, file } of pages) {
         const button = buttons.nth(i);
         if (!(await button.isVisible()) || await button.isDisabled()) continue;
         const before = await captureState(page);
-        const beforeControl = await button.evaluate(node => ({ className: node.className, pressed: node.getAttribute('aria-pressed') }));
+        const beforeControl = await button.evaluate(node => ({ className: node.className, pressed: node.getAttribute('aria-pressed'), text: node.textContent.replace(/\s+/g, ' ').trim() }));
         await button.click();
         await page.waitForTimeout(90);
         const after = await captureState(page);
-        const afterControl = await button.evaluate(node => ({ className: node.className, pressed: node.getAttribute('aria-pressed') }));
-        const controlChanged = changed(before, after) || beforeControl.className !== afterControl.className || beforeControl.pressed !== afterControl.pressed;
+        const afterControl = await button.evaluate(node => ({ className: node.className, pressed: node.getAttribute('aria-pressed'), text: node.textContent.replace(/\s+/g, ' ').trim() }));
+        const controlChanged = changed(before, after) || beforeControl.className !== afterControl.className || beforeControl.pressed !== afterControl.pressed || beforeControl.text !== afterControl.text;
         const stillSelected = await button.evaluate(node => node.classList.contains('active') || node.classList.contains('on') || node.classList.contains('selected') || node.classList.contains('is-active') || node.getAttribute('aria-pressed') === 'true');
         // This is a coverage retry for an initially selected tab. If the
         // browser does not expose a second transition, retain an explicit
