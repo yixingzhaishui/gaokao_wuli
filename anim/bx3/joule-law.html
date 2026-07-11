@@ -37,9 +37,10 @@ button.on{background:#2c7be5;color:#fff}
       <div class="read">
         <div class="chip">电流 I = <b id="iv">2.0</b> A</div>
         <div class="chip">电阻 R = <b id="rv">5.0</b> Ω</div>
-        <div class="chip">时间 t = <b id="tv">10</b> s</div>
-        <div class="chip">电热 Q = I²Rt = <b id="qv">200</b> J</div>
-        <div class="chip">输入电能 W = <b id="wv">200</b> J</div>
+        <div class="chip">设定终止时间 t目标 = <b id="tv">10</b> s</div>
+        <div class="chip">已累计时间 t = <b id="etv">0.0</b> s</div>
+        <div class="chip">电热 Q = I²Rt = <b id="qv">0</b> J</div>
+        <div class="chip">输入电能 W = <b id="wv">0</b> J</div>
         <div class="chip">其他能量 = <b id="ov">0</b> J</div>
         <div class="chip">发热状态：<b id="statev">静止</b></div>
       </div>
@@ -52,14 +53,13 @@ button.on{background:#2c7be5;color:#fff}
 (function(){
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 let mode='pure',I=2,R=5,t=10,drag=null,playing=false,elapsed=0;
-const els={iv:id('iv'),rv:id('rv'),tv:id('tv'),qv:id('qv'),wv:id('wv'),ov:id('ov'),statev:id('statev')};
+const els={iv:id('iv'),rv:id('rv'),tv:id('tv'),etv:id('etv'),qv:id('qv'),wv:id('wv'),ov:id('ov'),statev:id('statev')};
 function id(s){return document.getElementById(s)}
 function clamp(x,a,b){return Math.max(a,Math.min(b,x))}
-function Qnow(){return I*I*R*(playing?elapsed:t)}
-function Q(){return I*I*R*t}
+function Qnow(){return I*I*R*elapsed}
 function U(){return mode==='pure'?I*R:220}
-function W(){return U()*I*t}
-function other(){return Math.max(0,W()-Q())}
+function Wnow(){return U()*I*elapsed}
+function other(){return Math.max(0,Wnow()-Qnow())}
 function pos(e){const r=cv.getBoundingClientRect(),s=cv.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s}}
 function drawKnob(x,y,label,val,color){ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,11,0,7);ctx.fill();ctx.fillStyle=color;ctx.font='700 13px system-ui';ctx.textAlign='center';ctx.fillText(label+' '+val,x,y-18)}
 function draw(){
@@ -70,15 +70,15 @@ function draw(){
   ctx.strokeStyle='#f0a500';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(180,110);for(let i=0;i<10;i++)ctx.lineTo(180+i*12,110+(i%2?10:-10));ctx.stroke();ctx.fillStyle='#8a5a00';ctx.font='13px system-ui';ctx.textAlign='center';ctx.fillText(mode==='pure'?'纯电阻发热':'电机线圈发热',240,88);
   if(mode==='motor'){ctx.strokeStyle='#159a6b';ctx.lineWidth=3;ctx.beginPath();ctx.arc(300,190,32,0,7);ctx.stroke();ctx.fillStyle='#159a6b';ctx.fillText('机械输出',300,236)}
   const ix=90+I/5*210,rx=90+R/12*210,tx=90+t/30*210;ctx.strokeStyle='#ccd6e0';ctx.lineWidth=6;[['I',350,ix,'#e03131'],['R',380,rx,'#f0a500'],['t',410,tx,'#2c7be5']].forEach(([lab,y,x,col])=>{ctx.strokeStyle='#ccd6e0';ctx.beginPath();ctx.moveTo(90,y);ctx.lineTo(300,y);ctx.stroke();drawKnob(x,y,lab,lab==='I'?I.toFixed(1):lab==='R'?R.toFixed(1):t.toFixed(0),col)});
-  const base=342,scale=220/Math.max(W(),Q(),200);[['Q热',Qnow(),'#e03131',455],['W电',W(),'#2c7be5',520],['其他',other(),'#159a6b',585]].forEach(([lab,val,col,x])=>{const h=val*scale;ctx.fillStyle=col;ctx.fillRect(x,base-h,34,h);ctx.fillStyle='#334e68';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText(lab,x+17,base+20);ctx.fillText(val.toFixed(0)+'J',x+17,base-h-8)});
-  ctx.fillStyle='#102a43';ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillText(`Q=I²Rt=${I.toFixed(1)}²×${R.toFixed(1)}×${(playing?elapsed:t).toFixed(1)}=${Qnow().toFixed(0)}J；${mode==='pure'?'纯电阻 W=Q':'电动机 W=UIt，Q 只是线圈热'}`,24,34);
+  const base=342,scale=220/Math.max(Wnow(),Qnow(),200);[['Q热',Qnow(),'#e03131',455],['W电',Wnow(),'#2c7be5',520],['其他',other(),'#159a6b',585]].forEach(([lab,val,col,x])=>{const h=val*scale;ctx.fillStyle=col;ctx.fillRect(x,base-h,34,h);ctx.fillStyle='#334e68';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText(lab,x+17,base+20);ctx.fillText(val.toFixed(0)+'J',x+17,base-h-8)});
+  ctx.fillStyle='#102a43';ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillText(`Q=I²Rt=${I.toFixed(1)}²×${R.toFixed(1)}×${elapsed.toFixed(1)}=${Qnow().toFixed(0)}J；${mode==='pure'?'纯电阻 W=Q':'电动机 W=UIt，Q 只是线圈热'}`,24,34);
   update();
 }
-function update(){els.iv.textContent=I.toFixed(1);els.rv.textContent=R.toFixed(1);els.tv.textContent=t.toFixed(0);els.qv.textContent=Q().toFixed(0);els.wv.textContent=W().toFixed(0);els.ov.textContent=other().toFixed(0);els.statev.textContent=playing?'累积中 t='+elapsed.toFixed(1)+'s':(elapsed>0?'已播完，Q 累积完成':'静止')}
+function update(){els.iv.textContent=I.toFixed(1);els.rv.textContent=R.toFixed(1);els.tv.textContent=t.toFixed(0);els.etv.textContent=elapsed.toFixed(1);els.qv.textContent=Qnow().toFixed(0);els.wv.textContent=Wnow().toFixed(0);els.ov.textContent=other().toFixed(0);els.statev.textContent=playing?'累积中（可暂停续播）':(elapsed>=t&&t>0?'已累计到设定终止时间':'等待播放')}
 cv.addEventListener('pointerdown',e=>{const p=pos(e);const tests=[['I',90+I/5*210,350],['R',90+R/12*210,380],['t',90+t/30*210,410]];for(const a of tests)if(Math.hypot(p.x-a[1],p.y-a[2])<24){drag=a[0];return}});
-cv.addEventListener('pointermove',e=>{if(!drag)return;const p=pos(e),x=clamp(p.x,90,300);if(drag==='I')I=(x-90)/210*5;if(drag==='R')R=(x-90)/210*12;if(drag==='t')t=(x-90)/210*30;draw()});
+cv.addEventListener('pointermove',e=>{if(!drag)return;const p=pos(e),x=clamp(p.x,90,300);if(drag==='I')I=(x-90)/210*5;if(drag==='R')R=(x-90)/210*12;if(drag==='t')t=(x-90)/210*30;elapsed=0;playing=false;id('playBtn').textContent='▶ 播放：随时间累积发热';draw()});
 window.addEventListener('pointerup',()=>drag=null);
-document.querySelectorAll('#mode button').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;document.querySelectorAll('#mode button').forEach(x=>x.classList.toggle('on',x===b));draw()});
+document.querySelectorAll('#mode button').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;elapsed=0;playing=false;id('playBtn').textContent='▶ 播放：随时间累积发热';document.querySelectorAll('#mode button').forEach(x=>x.classList.toggle('on',x===b));draw()});
 function animate(){
   if(!playing)return;
   elapsed+=t/180;
@@ -88,7 +88,7 @@ function animate(){
 }
 id('playBtn').onclick=()=>{
   if(playing){playing=false;id('playBtn').textContent='▶ 播放：随时间累积发热';draw();return}
-  elapsed=0;playing=true;id('playBtn').textContent='⏸ 暂停';animate();
+  if(elapsed>=t)elapsed=0;playing=true;id('playBtn').textContent='⏸ 暂停';animate();
 };
 draw();
 })();
