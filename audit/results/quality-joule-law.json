@@ -1,0 +1,215 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-11T07:14:10.410Z",
+  "commit": "8285116b1245a58d90b476096814fc1677455e09",
+  "module": "bx3",
+  "modules": [
+    "bx3"
+  ],
+  "summary": {
+    "total": 1,
+    "score": 100,
+    "pass": 1,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/bx3/joule-law.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:电动机",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:纯电阻",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "▶ 播放：随时间累积发热",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:纯电阻",
+          "text": "纯电阻",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:电动机",
+          "text": "电动机",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "▶ 播放：随时间累积发热"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "8592e906",
+          "readout_hash": "2a0ef4f4",
+          "physical_readout_hash": "1361d01b",
+          "readout": [
+            "电流 I = 2.0 A",
+            "电阻 R = 5.0 Ω",
+            "设定终止时间 t目标 = 10 s",
+            "已累计时间 t = 0.0 s",
+            "电热 Q = I²Rt = 0 J",
+            "输入电能 W = 0 J",
+            "其他能量 = 0 J",
+            "发热状态：等待播放"
+          ],
+          "physical_readout": [
+            "电流 I = 2.0 A",
+            "电阻 R = 5.0 Ω",
+            "设定终止时间 t目标 = 10 s",
+            "已累计时间 t = 0.0 s",
+            "电热 Q = I²Rt = 0 J",
+            "输入电能 W = 0 J",
+            "其他能量 = 0 J",
+            "发热状态：等待"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "fd25f67",
+          "readout_hash": "f2bffb96",
+          "physical_readout_hash": "e9edf908",
+          "readout": [
+            "电流 I = 2.0 A",
+            "电阻 R = 5.0 Ω",
+            "设定终止时间 t目标 = 10 s",
+            "已累计时间 t = 2.6 s",
+            "电热 Q = I²Rt = 51 J",
+            "输入电能 W = 51 J",
+            "其他能量 = 0 J",
+            "发热状态：累积中（可暂停续播）"
+          ],
+          "physical_readout": [
+            "电流 I = 2.0 A",
+            "电阻 R = 5.0 Ω",
+            "设定终止时间 t目标 = 10 s",
+            "已累计时间 t = 2.6 s",
+            "电热 Q = I²Rt = 51 J",
+            "输入电能 W = 51 J",
+            "其他能量 = 0 J",
+            "发热状态：累积中（可续播）"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "869775fe",
+          "readout_hash": "167712b",
+          "physical_readout_hash": "6483de0",
+          "readout": [
+            "电流 I = 2.0 A",
+            "电阻 R = 5.0 Ω",
+            "设定终止时间 t目标 = 10 s",
+            "已累计时间 t = 2.7 s",
+            "电热 Q = I²Rt = 54 J",
+            "输入电能 W = 54 J",
+            "其他能量 = 0 J",
+            "发热状态：等待播放"
+          ],
+          "physical_readout": [
+            "电流 I = 2.0 A",
+            "电阻 R = 5.0 Ω",
+            "设定终止时间 t目标 = 10 s",
+            "已累计时间 t = 2.7 s",
+            "电热 Q = I²Rt = 54 J",
+            "输入电能 W = 54 J",
+            "其他能量 = 0 J",
+            "发热状态：等待"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "869775fe",
+          "readout_hash": "167712b",
+          "physical_readout_hash": "6483de0",
+          "readout": [
+            "电流 I = 2.0 A",
+            "电阻 R = 5.0 Ω",
+            "设定终止时间 t目标 = 10 s",
+            "已累计时间 t = 2.7 s",
+            "电热 Q = I²Rt = 54 J",
+            "输入电能 W = 54 J",
+            "其他能量 = 0 J",
+            "发热状态：等待播放"
+          ],
+          "physical_readout": [
+            "电流 I = 2.0 A",
+            "电阻 R = 5.0 Ω",
+            "设定终止时间 t目标 = 10 s",
+            "已累计时间 t = 2.7 s",
+            "电热 Q = I²Rt = 54 J",
+            "输入电能 W = 54 J",
+            "其他能量 = 0 J",
+            "发热状态：等待"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "电流 I = # A|电阻 R = # Ω|设定终止时间 t目标 = # s|已累计时间 t = # s|电热 Q = I²Rt = # J|输入电能 W = # J|其他能量 = # J|发热状态：等待播放",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "电流 I = # A|电阻 R = # Ω|设定终止时间 t目标 = # s|已累计时间 t = # s|电热 Q = I²Rt = # J|输入电能 W = # J|其他能量 = # J|发热状态：等待播放",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

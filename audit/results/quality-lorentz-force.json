@@ -1,0 +1,288 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-11T07:02:37.467Z",
+  "commit": "da4ad7f03ef6340ef676a5a5025172a1891dc6ca",
+  "module": "xb2",
+  "modules": [
+    "xb2"
+  ],
+  "summary": {
+    "total": 1,
+    "score": 100,
+    "pass": 1,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/xb2/lorentz-force.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#v",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#bf",
+          "kind": "range",
+          "changed": false,
+          "affected_result": true
+        },
+        {
+          "selector": "#q",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#th",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:负电荷",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:正电荷",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play-btn",
+          "text": "播放三维轨迹",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset-btn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:正电荷",
+          "text": "正电荷",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:负电荷",
+          "text": "负电荷",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "other",
+          "checked": null,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放三维轨迹"
+      },
+      "reset_button": {
+        "id": "reset-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "91a29b5c",
+          "readout_hash": "6d5249b7",
+          "physical_readout_hash": "6d5249b7",
+          "readout": [
+            "速度 v = 2.0×10⁶ m/s",
+            "磁感应强度 B = 1.0 T",
+            "电荷 q = +1 e",
+            "夹角 θ(v,B) = 60°",
+            "v∥ = 1.00×10⁶ m/s",
+            "v⊥ = 1.73×10⁶ m/s",
+            "F = 2.77×10⁻¹³ N",
+            "状态：已显示 v∥ 与 v⊥"
+          ],
+          "physical_readout": [
+            "速度 v = 2.0×10⁶ m/s",
+            "磁感应强度 B = 1.0 T",
+            "电荷 q = +1 e",
+            "夹角 θ(v,B) = 60°",
+            "v∥ = 1.00×10⁶ m/s",
+            "v⊥ = 1.73×10⁶ m/s",
+            "F = 2.77×10⁻¹³ N",
+            "状态：已显示 v∥ 与 v⊥"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "a16ffb19",
+          "readout_hash": "e4c4fa58",
+          "physical_readout_hash": "e4c4fa58",
+          "readout": [
+            "速度 v = 2.0×10⁶ m/s",
+            "磁感应强度 B = 1.0 T",
+            "电荷 q = +1 e",
+            "夹角 θ(v,B) = 60°",
+            "v∥ = 1.00×10⁶ m/s",
+            "v⊥ = 1.73×10⁶ m/s",
+            "F = 2.77×10⁻¹³ N",
+            "状态：沿 B 轴螺旋，速率不变"
+          ],
+          "physical_readout": [
+            "速度 v = 2.0×10⁶ m/s",
+            "磁感应强度 B = 1.0 T",
+            "电荷 q = +1 e",
+            "夹角 θ(v,B) = 60°",
+            "v∥ = 1.00×10⁶ m/s",
+            "v⊥ = 1.73×10⁶ m/s",
+            "F = 2.77×10⁻¹³ N",
+            "状态：沿 B 轴螺旋，速率不变"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "91a29b5c",
+          "readout_hash": "6d5249b7",
+          "physical_readout_hash": "6d5249b7",
+          "readout": [
+            "速度 v = 2.0×10⁶ m/s",
+            "磁感应强度 B = 1.0 T",
+            "电荷 q = +1 e",
+            "夹角 θ(v,B) = 60°",
+            "v∥ = 1.00×10⁶ m/s",
+            "v⊥ = 1.73×10⁶ m/s",
+            "F = 2.77×10⁻¹³ N",
+            "状态：已显示 v∥ 与 v⊥"
+          ],
+          "physical_readout": [
+            "速度 v = 2.0×10⁶ m/s",
+            "磁感应强度 B = 1.0 T",
+            "电荷 q = +1 e",
+            "夹角 θ(v,B) = 60°",
+            "v∥ = 1.00×10⁶ m/s",
+            "v⊥ = 1.73×10⁶ m/s",
+            "F = 2.77×10⁻¹³ N",
+            "状态：已显示 v∥ 与 v⊥"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "91a29b5c",
+          "readout_hash": "6d5249b7",
+          "physical_readout_hash": "6d5249b7",
+          "readout": [
+            "速度 v = 2.0×10⁶ m/s",
+            "磁感应强度 B = 1.0 T",
+            "电荷 q = +1 e",
+            "夹角 θ(v,B) = 60°",
+            "v∥ = 1.00×10⁶ m/s",
+            "v⊥ = 1.73×10⁶ m/s",
+            "F = 2.77×10⁻¹³ N",
+            "状态：已显示 v∥ 与 v⊥"
+          ],
+          "physical_readout": [
+            "速度 v = 2.0×10⁶ m/s",
+            "磁感应强度 B = 1.0 T",
+            "电荷 q = +1 e",
+            "夹角 θ(v,B) = 60°",
+            "v∥ = 1.00×10⁶ m/s",
+            "v⊥ = 1.73×10⁶ m/s",
+            "F = 2.77×10⁻¹³ N",
+            "状态：已显示 v∥ 与 v⊥"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "速度 v = #×#⁶ m/s|磁感应强度 B = # T|电荷 q = # e|夹角 θ(v,B) = #°|v∥ = #×#⁶ m/s|v⊥ = #×#⁶ m/s|F = #×#⁻¹³ N|状态：已显示 v∥ 与 v⊥",
+          "controls": [
+            {
+              "id": "v",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "bf",
+              "value": "1.6",
+              "checked": false
+            },
+            {
+              "id": "q",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "th",
+              "value": "60",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "速度 v = #×#⁶ m/s|磁感应强度 B = # T|电荷 q = # e|夹角 θ(v,B) = #°|v∥ = #×#⁶ m/s|v⊥ = #×#⁶ m/s|F = #×#⁻¹³ N|状态：已显示 v∥ 与 v⊥",
+          "controls": [
+            {
+              "id": "v",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "bf",
+              "value": "1.6",
+              "checked": false
+            },
+            {
+              "id": "q",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "th",
+              "value": "60",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}
