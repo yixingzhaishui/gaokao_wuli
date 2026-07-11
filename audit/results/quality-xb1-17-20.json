@@ -1,0 +1,996 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-11T15:46:12.202Z",
+  "commit": "d93bcced360f7c2e3f6061c5e8f61ed2d5799427",
+  "module": "xb1",
+  "modules": [
+    "xb1"
+  ],
+  "summary": {
+    "total": 4,
+    "score": 100,
+    "pass": 4,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/xb1/fiber-optic.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#n1",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#n2",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#angle",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#bend",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录读数",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录读数",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "d98b2ee",
+          "readout_hash": "e61315ba",
+          "physical_readout_hash": "e61315ba",
+          "readout": [
+            "芯层折射率 n₁ 1.50",
+            "1.50",
+            "包层折射率 n₂ 1.46",
+            "1.46",
+            "入射角 i 78°",
+            "78°",
+            "弯曲程度 20%",
+            "20%",
+            "临界角 C：76.7°入射角 i：78°全反射条件：n₁>n₂ 且 i≥C估计损耗：5%",
+            "78°76.7°全反射5%",
+            "满足全反射：光脉冲被限制在芯层内，多次反射后仍可向前传播。"
+          ],
+          "physical_readout": [
+            "芯层折射率 n₁ 1.50",
+            "1.50",
+            "包层折射率 n₂ 1.46",
+            "1.46",
+            "入射角 i 78°",
+            "78°",
+            "弯曲程度 20%",
+            "20%",
+            "临界角 C：76.7°入射角 i：78°全反射条件：n₁>n₂ 且 i≥C估计损耗：5%",
+            "78°76.7°全反射5%",
+            "满足全反射：光脉冲被限制在芯层内，多次反射后仍可向前传播。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "74f1115d",
+          "readout_hash": "e61315ba",
+          "physical_readout_hash": "e61315ba",
+          "readout": [
+            "芯层折射率 n₁ 1.50",
+            "1.50",
+            "包层折射率 n₂ 1.46",
+            "1.46",
+            "入射角 i 78°",
+            "78°",
+            "弯曲程度 20%",
+            "20%",
+            "临界角 C：76.7°入射角 i：78°全反射条件：n₁>n₂ 且 i≥C估计损耗：5%",
+            "78°76.7°全反射5%",
+            "满足全反射：光脉冲被限制在芯层内，多次反射后仍可向前传播。"
+          ],
+          "physical_readout": [
+            "芯层折射率 n₁ 1.50",
+            "1.50",
+            "包层折射率 n₂ 1.46",
+            "1.46",
+            "入射角 i 78°",
+            "78°",
+            "弯曲程度 20%",
+            "20%",
+            "临界角 C：76.7°入射角 i：78°全反射条件：n₁>n₂ 且 i≥C估计损耗：5%",
+            "78°76.7°全反射5%",
+            "满足全反射：光脉冲被限制在芯层内，多次反射后仍可向前传播。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "aed6d586",
+          "readout_hash": "e61315ba",
+          "physical_readout_hash": "e61315ba",
+          "readout": [
+            "芯层折射率 n₁ 1.50",
+            "1.50",
+            "包层折射率 n₂ 1.46",
+            "1.46",
+            "入射角 i 78°",
+            "78°",
+            "弯曲程度 20%",
+            "20%",
+            "临界角 C：76.7°入射角 i：78°全反射条件：n₁>n₂ 且 i≥C估计损耗：5%",
+            "78°76.7°全反射5%",
+            "满足全反射：光脉冲被限制在芯层内，多次反射后仍可向前传播。"
+          ],
+          "physical_readout": [
+            "芯层折射率 n₁ 1.50",
+            "1.50",
+            "包层折射率 n₂ 1.46",
+            "1.46",
+            "入射角 i 78°",
+            "78°",
+            "弯曲程度 20%",
+            "20%",
+            "临界角 C：76.7°入射角 i：78°全反射条件：n₁>n₂ 且 i≥C估计损耗：5%",
+            "78°76.7°全反射5%",
+            "满足全反射：光脉冲被限制在芯层内，多次反射后仍可向前传播。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "aed6d586",
+          "readout_hash": "e61315ba",
+          "physical_readout_hash": "e61315ba",
+          "readout": [
+            "芯层折射率 n₁ 1.50",
+            "1.50",
+            "包层折射率 n₂ 1.46",
+            "1.46",
+            "入射角 i 78°",
+            "78°",
+            "弯曲程度 20%",
+            "20%",
+            "临界角 C：76.7°入射角 i：78°全反射条件：n₁>n₂ 且 i≥C估计损耗：5%",
+            "78°76.7°全反射5%",
+            "满足全反射：光脉冲被限制在芯层内，多次反射后仍可向前传播。"
+          ],
+          "physical_readout": [
+            "芯层折射率 n₁ 1.50",
+            "1.50",
+            "包层折射率 n₂ 1.46",
+            "1.46",
+            "入射角 i 78°",
+            "78°",
+            "弯曲程度 20%",
+            "20%",
+            "临界角 C：76.7°入射角 i：78°全反射条件：n₁>n₂ 且 i≥C估计损耗：5%",
+            "78°76.7°全反射5%",
+            "满足全反射：光脉冲被限制在芯层内，多次反射后仍可向前传播。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "芯层折射率 n₁ #|#|包层折射率 n₂ #|#|入射角 i #°|#°|弯曲程度 #%|#%|临界角 C：#°入射角 i：#°全反射条件：n₁>n₂ 且 i≥C估计损耗：#%|满足全反射：光脉冲被限制在芯层内，多次反射后仍可向前传播。",
+          "controls": [
+            {
+              "id": "n1",
+              "value": "1.5",
+              "checked": false
+            },
+            {
+              "id": "n2",
+              "value": "1.46",
+              "checked": false
+            },
+            {
+              "id": "angle",
+              "value": "78",
+              "checked": false
+            },
+            {
+              "id": "bend",
+              "value": "20",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "芯层折射率 n₁ #|#|包层折射率 n₂ #|#|入射角 i #°|#°|弯曲程度 #%|#%|临界角 C：#°入射角 i：#°全反射条件：n₁>n₂ 且 i≥C估计损耗：#%|满足全反射：光脉冲被限制在芯层内，多次反射后仍可向前传播。",
+          "controls": [
+            {
+              "id": "n1",
+              "value": "1.5",
+              "checked": false
+            },
+            {
+              "id": "n2",
+              "value": "1.46",
+              "checked": false
+            },
+            {
+              "id": "angle",
+              "value": "78",
+              "checked": false
+            },
+            {
+              "id": "bend",
+              "value": "20",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb1/laser.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#divergence",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#coherence",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#power",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#lambda",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录读数",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录读数",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "74d30a14",
+          "readout_hash": "a242b388",
+          "physical_readout_hash": "a242b388",
+          "readout": [
+            "发散角 θ 2.0 mrad",
+            "2.0 mrad",
+            "相干性 85%",
+            "85%",
+            "功率 P 5.0 mW",
+            "5.0 mW",
+            "波长 λ 650 nm",
+            "650 nm",
+            "远处 L=1000 m激光光斑半径 r≈Lθ：2.00 m光子能量 E=hc/λ：1.91 eV相干性：85%",
+            "测距/通信2.00 m1.91",
+            "发散角小：方向性强，远处光斑仍小，适合测距和准直。"
+          ],
+          "physical_readout": [
+            "发散角 θ 2.0 mrad",
+            "2.0 mrad",
+            "相干性 85%",
+            "85%",
+            "功率 P 5.0 mW",
+            "5.0 mW",
+            "波长 λ 650 nm",
+            "650 nm",
+            "远处 L=1000 m激光光斑半径 r≈Lθ：2.00 m光子能量 E=hc/λ：1.91 eV相干性：85%",
+            "测距/通信2.00 m1.91",
+            "发散角小：方向性强，远处光斑仍小，适合测距和准直。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "604c4a93",
+          "readout_hash": "a242b388",
+          "physical_readout_hash": "a242b388",
+          "readout": [
+            "发散角 θ 2.0 mrad",
+            "2.0 mrad",
+            "相干性 85%",
+            "85%",
+            "功率 P 5.0 mW",
+            "5.0 mW",
+            "波长 λ 650 nm",
+            "650 nm",
+            "远处 L=1000 m激光光斑半径 r≈Lθ：2.00 m光子能量 E=hc/λ：1.91 eV相干性：85%",
+            "测距/通信2.00 m1.91",
+            "发散角小：方向性强，远处光斑仍小，适合测距和准直。"
+          ],
+          "physical_readout": [
+            "发散角 θ 2.0 mrad",
+            "2.0 mrad",
+            "相干性 85%",
+            "85%",
+            "功率 P 5.0 mW",
+            "5.0 mW",
+            "波长 λ 650 nm",
+            "650 nm",
+            "远处 L=1000 m激光光斑半径 r≈Lθ：2.00 m光子能量 E=hc/λ：1.91 eV相干性：85%",
+            "测距/通信2.00 m1.91",
+            "发散角小：方向性强，远处光斑仍小，适合测距和准直。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "d749de1e",
+          "readout_hash": "a242b388",
+          "physical_readout_hash": "a242b388",
+          "readout": [
+            "发散角 θ 2.0 mrad",
+            "2.0 mrad",
+            "相干性 85%",
+            "85%",
+            "功率 P 5.0 mW",
+            "5.0 mW",
+            "波长 λ 650 nm",
+            "650 nm",
+            "远处 L=1000 m激光光斑半径 r≈Lθ：2.00 m光子能量 E=hc/λ：1.91 eV相干性：85%",
+            "测距/通信2.00 m1.91",
+            "发散角小：方向性强，远处光斑仍小，适合测距和准直。"
+          ],
+          "physical_readout": [
+            "发散角 θ 2.0 mrad",
+            "2.0 mrad",
+            "相干性 85%",
+            "85%",
+            "功率 P 5.0 mW",
+            "5.0 mW",
+            "波长 λ 650 nm",
+            "650 nm",
+            "远处 L=1000 m激光光斑半径 r≈Lθ：2.00 m光子能量 E=hc/λ：1.91 eV相干性：85%",
+            "测距/通信2.00 m1.91",
+            "发散角小：方向性强，远处光斑仍小，适合测距和准直。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "d749de1e",
+          "readout_hash": "a242b388",
+          "physical_readout_hash": "a242b388",
+          "readout": [
+            "发散角 θ 2.0 mrad",
+            "2.0 mrad",
+            "相干性 85%",
+            "85%",
+            "功率 P 5.0 mW",
+            "5.0 mW",
+            "波长 λ 650 nm",
+            "650 nm",
+            "远处 L=1000 m激光光斑半径 r≈Lθ：2.00 m光子能量 E=hc/λ：1.91 eV相干性：85%",
+            "测距/通信2.00 m1.91",
+            "发散角小：方向性强，远处光斑仍小，适合测距和准直。"
+          ],
+          "physical_readout": [
+            "发散角 θ 2.0 mrad",
+            "2.0 mrad",
+            "相干性 85%",
+            "85%",
+            "功率 P 5.0 mW",
+            "5.0 mW",
+            "波长 λ 650 nm",
+            "650 nm",
+            "远处 L=1000 m激光光斑半径 r≈Lθ：2.00 m光子能量 E=hc/λ：1.91 eV相干性：85%",
+            "测距/通信2.00 m1.91",
+            "发散角小：方向性强，远处光斑仍小，适合测距和准直。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "发散角 θ # mrad|# mrad|相干性 #%|#%|功率 P # mW|# mW|波长 λ # nm|# nm|远处 L=# m激光光斑半径 r≈Lθ：# m光子能量 E=hc/λ：# eV相干性：#%|发散角小：方向性强，远处光斑仍小，适合测距和准直。",
+          "controls": [
+            {
+              "id": "divergence",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "coherence",
+              "value": "85",
+              "checked": false
+            },
+            {
+              "id": "power",
+              "value": "5",
+              "checked": false
+            },
+            {
+              "id": "lambda",
+              "value": "650",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "发散角 θ # mrad|# mrad|相干性 #%|#%|功率 P # mW|# mW|波长 λ # nm|# nm|远处 L=# m激光光斑半径 r≈Lθ：# m光子能量 E=hc/λ：# eV相干性：#%|发散角小：方向性强，远处光斑仍小，适合测距和准直。",
+          "controls": [
+            {
+              "id": "divergence",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "coherence",
+              "value": "85",
+              "checked": false
+            },
+            {
+              "id": "power",
+              "value": "5",
+              "checked": false
+            },
+            {
+              "id": "lambda",
+              "value": "650",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb1/photoelectric.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#nu",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#w",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#int",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play-btn",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset-btn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "reset-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "705c7aed",
+          "readout_hash": "b8e37316",
+          "physical_readout_hash": "b8e37316",
+          "readout": [
+            "频率 ν = 7.0 ×10¹⁴ Hz",
+            "逸出功 W₀ = 2.3 eV",
+            "截止频率 ν₀ = 5.56 ×10¹⁴ Hz",
+            "最大初动能 Eₖ = 0.60 eV",
+            "状态：发射电子",
+            "光频率 ν = 7.0 ×10¹⁴ Hz",
+            "7.0",
+            "逸出功 W₀ = 2.3 eV",
+            "2.3",
+            "光强 = 中",
+            "中"
+          ],
+          "physical_readout": [
+            "频率 ν = 7.0 ×10¹⁴ Hz",
+            "逸出功 W₀ = 2.3 eV",
+            "截止频率 ν₀ = 5.56 ×10¹⁴ Hz",
+            "最大初动能 Eₖ = 0.60 eV",
+            "状态：发射电子",
+            "光频率 ν = 7.0 ×10¹⁴ Hz",
+            "7.0",
+            "逸出功 W₀ = 2.3 eV",
+            "2.3",
+            "光强 = 中",
+            "中"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "6fd1a7c8",
+          "readout_hash": "b8e37316",
+          "physical_readout_hash": "b8e37316",
+          "readout": [
+            "频率 ν = 7.0 ×10¹⁴ Hz",
+            "逸出功 W₀ = 2.3 eV",
+            "截止频率 ν₀ = 5.56 ×10¹⁴ Hz",
+            "最大初动能 Eₖ = 0.60 eV",
+            "状态：发射电子",
+            "光频率 ν = 7.0 ×10¹⁴ Hz",
+            "7.0",
+            "逸出功 W₀ = 2.3 eV",
+            "2.3",
+            "光强 = 中",
+            "中"
+          ],
+          "physical_readout": [
+            "频率 ν = 7.0 ×10¹⁴ Hz",
+            "逸出功 W₀ = 2.3 eV",
+            "截止频率 ν₀ = 5.56 ×10¹⁴ Hz",
+            "最大初动能 Eₖ = 0.60 eV",
+            "状态：发射电子",
+            "光频率 ν = 7.0 ×10¹⁴ Hz",
+            "7.0",
+            "逸出功 W₀ = 2.3 eV",
+            "2.3",
+            "光强 = 中",
+            "中"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "496306f7",
+          "readout_hash": "b8e37316",
+          "physical_readout_hash": "b8e37316",
+          "readout": [
+            "频率 ν = 7.0 ×10¹⁴ Hz",
+            "逸出功 W₀ = 2.3 eV",
+            "截止频率 ν₀ = 5.56 ×10¹⁴ Hz",
+            "最大初动能 Eₖ = 0.60 eV",
+            "状态：发射电子",
+            "光频率 ν = 7.0 ×10¹⁴ Hz",
+            "7.0",
+            "逸出功 W₀ = 2.3 eV",
+            "2.3",
+            "光强 = 中",
+            "中"
+          ],
+          "physical_readout": [
+            "频率 ν = 7.0 ×10¹⁴ Hz",
+            "逸出功 W₀ = 2.3 eV",
+            "截止频率 ν₀ = 5.56 ×10¹⁴ Hz",
+            "最大初动能 Eₖ = 0.60 eV",
+            "状态：发射电子",
+            "光频率 ν = 7.0 ×10¹⁴ Hz",
+            "7.0",
+            "逸出功 W₀ = 2.3 eV",
+            "2.3",
+            "光强 = 中",
+            "中"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "496306f7",
+          "readout_hash": "b8e37316",
+          "physical_readout_hash": "b8e37316",
+          "readout": [
+            "频率 ν = 7.0 ×10¹⁴ Hz",
+            "逸出功 W₀ = 2.3 eV",
+            "截止频率 ν₀ = 5.56 ×10¹⁴ Hz",
+            "最大初动能 Eₖ = 0.60 eV",
+            "状态：发射电子",
+            "光频率 ν = 7.0 ×10¹⁴ Hz",
+            "7.0",
+            "逸出功 W₀ = 2.3 eV",
+            "2.3",
+            "光强 = 中",
+            "中"
+          ],
+          "physical_readout": [
+            "频率 ν = 7.0 ×10¹⁴ Hz",
+            "逸出功 W₀ = 2.3 eV",
+            "截止频率 ν₀ = 5.56 ×10¹⁴ Hz",
+            "最大初动能 Eₖ = 0.60 eV",
+            "状态：发射电子",
+            "光频率 ν = 7.0 ×10¹⁴ Hz",
+            "7.0",
+            "逸出功 W₀ = 2.3 eV",
+            "2.3",
+            "光强 = 中",
+            "中"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "频率 ν = # ×#¹⁴ Hz|逸出功 W₀ = # eV|截止频率 ν₀ = # ×#¹⁴ Hz|最大初动能 Eₖ = # eV|状态：发射电子|光频率 ν = # ×#¹⁴ Hz|#|逸出功 W₀ = # eV|#|光强 = 中|中",
+          "controls": [
+            {
+              "id": "nu",
+              "value": "7",
+              "checked": false
+            },
+            {
+              "id": "w",
+              "value": "2.3",
+              "checked": false
+            },
+            {
+              "id": "int",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "频率 ν = # ×#¹⁴ Hz|逸出功 W₀ = # eV|截止频率 ν₀ = # ×#¹⁴ Hz|最大初动能 Eₖ = # eV|状态：发射电子|光频率 ν = # ×#¹⁴ Hz|#|逸出功 W₀ = # eV|#|光强 = 中|中",
+          "controls": [
+            {
+              "id": "nu",
+              "value": "7",
+              "checked": false
+            },
+            {
+              "id": "w",
+              "value": "2.3",
+              "checked": false
+            },
+            {
+              "id": "int",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb1/polarization.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#th",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play-btn",
+          "text": "⏸ 暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset-btn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.5,
+          "py": 0.32
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "⏸ 暂停"
+      },
+      "reset_button": {
+        "id": "reset-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "7fc4f45a",
+          "readout_hash": "4f913b62",
+          "physical_readout_hash": "4f913b62",
+          "readout": [
+            "两偏振片夹角 θ = 30°",
+            "cos²θ = 0.750",
+            "出射光强 I = 0.750 I₀",
+            "状态：部分透过",
+            "检偏器角度 θ = 30°",
+            "30"
+          ],
+          "physical_readout": [
+            "两偏振片夹角 θ = 30°",
+            "cos²θ = 0.750",
+            "出射光强 I = 0.750 I₀",
+            "状态：部分透过",
+            "检偏器角度 θ = 30°",
+            "30"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "afffe495",
+          "readout_hash": "4f913b62",
+          "physical_readout_hash": "4f913b62",
+          "readout": [
+            "两偏振片夹角 θ = 30°",
+            "cos²θ = 0.750",
+            "出射光强 I = 0.750 I₀",
+            "状态：部分透过",
+            "检偏器角度 θ = 30°",
+            "30"
+          ],
+          "physical_readout": [
+            "两偏振片夹角 θ = 30°",
+            "cos²θ = 0.750",
+            "出射光强 I = 0.750 I₀",
+            "状态：部分透过",
+            "检偏器角度 θ = 30°",
+            "30"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "1529ad20",
+          "readout_hash": "4f913b62",
+          "physical_readout_hash": "4f913b62",
+          "readout": [
+            "两偏振片夹角 θ = 30°",
+            "cos²θ = 0.750",
+            "出射光强 I = 0.750 I₀",
+            "状态：部分透过",
+            "检偏器角度 θ = 30°",
+            "30"
+          ],
+          "physical_readout": [
+            "两偏振片夹角 θ = 30°",
+            "cos²θ = 0.750",
+            "出射光强 I = 0.750 I₀",
+            "状态：部分透过",
+            "检偏器角度 θ = 30°",
+            "30"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "1529ad20",
+          "readout_hash": "4f913b62",
+          "physical_readout_hash": "4f913b62",
+          "readout": [
+            "两偏振片夹角 θ = 30°",
+            "cos²θ = 0.750",
+            "出射光强 I = 0.750 I₀",
+            "状态：部分透过",
+            "检偏器角度 θ = 30°",
+            "30"
+          ],
+          "physical_readout": [
+            "两偏振片夹角 θ = 30°",
+            "cos²θ = 0.750",
+            "出射光强 I = 0.750 I₀",
+            "状态：部分透过",
+            "检偏器角度 θ = 30°",
+            "30"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "两偏振片夹角 θ = #°|cos²θ = #|出射光强 I = # I₀|状态：部分透过|检偏器角度 θ = #°|#",
+          "controls": [
+            {
+              "id": "th",
+              "value": "30",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "两偏振片夹角 θ = #°|cos²θ = #|出射光强 I = # I₀|状态：部分透过|检偏器角度 θ = #°|#",
+          "controls": [
+            {
+              "id": "th",
+              "value": "30",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}
