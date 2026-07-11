@@ -1,0 +1,937 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-11T15:41:16.744Z",
+  "commit": "ca2e48510553355999ff262c6d0767c1639e703e",
+  "module": "bx2",
+  "modules": [
+    "bx2"
+  ],
+  "summary": {
+    "total": 5,
+    "score": 100,
+    "pass": 5,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/bx2/circular-basics.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:基础",
+          "kind": "initial_condition_retry",
+          "changed": false,
+          "affected_result": false
+        },
+        {
+          "selector": "button:外圈点",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:转得快",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:半圈",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:基础",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:基础",
+          "text": "基础",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:外圈点",
+          "text": "外圈点",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:转得快",
+          "text": "转得快",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:半圈",
+          "text": "半圈",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "1928ee26",
+          "readout_hash": "da05c011",
+          "physical_readout_hash": "da05c011",
+          "readout": [
+            "频率 f0.25 Hz 角速度 ω1.57 rad/s 线速度 v3.14 m/s 弧长 s4.19 m",
+            "同一转盘上 ω 相同；r 越大，v=ωr 越大。弧长由 s=rθ 决定。"
+          ],
+          "physical_readout": [
+            "频率 f0.25 Hz 角速度 ω1.57 rad/s 线速度 v3.14 m/s 弧长 s4.19 m",
+            "同一转盘上 ω 相同；r 越大，v=ωr 越大。弧长由 s=rθ 决定。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "7632102c",
+          "readout_hash": "da05c011",
+          "physical_readout_hash": "da05c011",
+          "readout": [
+            "频率 f0.25 Hz 角速度 ω1.57 rad/s 线速度 v3.14 m/s 弧长 s4.19 m",
+            "同一转盘上 ω 相同；r 越大，v=ωr 越大。弧长由 s=rθ 决定。"
+          ],
+          "physical_readout": [
+            "频率 f0.25 Hz 角速度 ω1.57 rad/s 线速度 v3.14 m/s 弧长 s4.19 m",
+            "同一转盘上 ω 相同；r 越大，v=ωr 越大。弧长由 s=rθ 决定。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "1928ee26",
+          "readout_hash": "da05c011",
+          "physical_readout_hash": "da05c011",
+          "readout": [
+            "频率 f0.25 Hz 角速度 ω1.57 rad/s 线速度 v3.14 m/s 弧长 s4.19 m",
+            "同一转盘上 ω 相同；r 越大，v=ωr 越大。弧长由 s=rθ 决定。"
+          ],
+          "physical_readout": [
+            "频率 f0.25 Hz 角速度 ω1.57 rad/s 线速度 v3.14 m/s 弧长 s4.19 m",
+            "同一转盘上 ω 相同；r 越大，v=ωr 越大。弧长由 s=rθ 决定。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "1928ee26",
+          "readout_hash": "da05c011",
+          "physical_readout_hash": "da05c011",
+          "readout": [
+            "频率 f0.25 Hz 角速度 ω1.57 rad/s 线速度 v3.14 m/s 弧长 s4.19 m",
+            "同一转盘上 ω 相同；r 越大，v=ωr 越大。弧长由 s=rθ 决定。"
+          ],
+          "physical_readout": [
+            "频率 f0.25 Hz 角速度 ω1.57 rad/s 线速度 v3.14 m/s 弧长 s4.19 m",
+            "同一转盘上 ω 相同；r 越大，v=ωr 越大。弧长由 s=rθ 决定。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "频率 f# Hz 角速度 ω# rad/s 线速度 v# m/s 弧长 s# m|同一转盘上 ω 相同；r 越大，v=ωr 越大。弧长由 s=rθ 决定。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "频率 f# Hz 角速度 ω# rad/s 线速度 v# m/s 弧长 s# m|同一转盘上 ω 相同；r 越大，v=ωr 越大。弧长由 s=rθ 决定。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx2/curved-condition.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:直线加速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:只拐弯",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:直线减速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:无合力",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:直线加速",
+          "text": "直线加速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:只拐弯",
+          "text": "只拐弯",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:直线减速",
+          "text": "直线减速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:无合力",
+          "text": "无合力",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "c9b64efd",
+          "readout_hash": "3d6dee89",
+          "physical_readout_hash": "3d6dee89",
+          "readout": [
+            "沿速度分量 F∥15.0 N 垂直分量 F⊥26.0 N 夹角 α60° 运动判断曲线",
+            "合力与速度不共线：速度方向改变，轨迹弯向 F⊥ 一侧。"
+          ],
+          "physical_readout": [
+            "沿速度分量 F∥15.0 N 垂直分量 F⊥26.0 N 夹角 α60° 运动判断曲线",
+            "合力与速度不共线：速度方向改变，轨迹弯向 F⊥ 一侧。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "19023969",
+          "readout_hash": "3d6dee89",
+          "physical_readout_hash": "3d6dee89",
+          "readout": [
+            "沿速度分量 F∥15.0 N 垂直分量 F⊥26.0 N 夹角 α60° 运动判断曲线",
+            "合力与速度不共线：速度方向改变，轨迹弯向 F⊥ 一侧。"
+          ],
+          "physical_readout": [
+            "沿速度分量 F∥15.0 N 垂直分量 F⊥26.0 N 夹角 α60° 运动判断曲线",
+            "合力与速度不共线：速度方向改变，轨迹弯向 F⊥ 一侧。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "c9b64efd",
+          "readout_hash": "3d6dee89",
+          "physical_readout_hash": "3d6dee89",
+          "readout": [
+            "沿速度分量 F∥15.0 N 垂直分量 F⊥26.0 N 夹角 α60° 运动判断曲线",
+            "合力与速度不共线：速度方向改变，轨迹弯向 F⊥ 一侧。"
+          ],
+          "physical_readout": [
+            "沿速度分量 F∥15.0 N 垂直分量 F⊥26.0 N 夹角 α60° 运动判断曲线",
+            "合力与速度不共线：速度方向改变，轨迹弯向 F⊥ 一侧。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "c9b64efd",
+          "readout_hash": "3d6dee89",
+          "physical_readout_hash": "3d6dee89",
+          "readout": [
+            "沿速度分量 F∥15.0 N 垂直分量 F⊥26.0 N 夹角 α60° 运动判断曲线",
+            "合力与速度不共线：速度方向改变，轨迹弯向 F⊥ 一侧。"
+          ],
+          "physical_readout": [
+            "沿速度分量 F∥15.0 N 垂直分量 F⊥26.0 N 夹角 α60° 运动判断曲线",
+            "合力与速度不共线：速度方向改变，轨迹弯向 F⊥ 一侧。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "沿速度分量 F∥# N 垂直分量 F⊥# N 夹角 α#° 运动判断曲线|合力与速度不共线：速度方向改变，轨迹弯向 F⊥ 一侧。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "沿速度分量 F∥# N 垂直分量 F⊥# N 夹角 α#° 运动判断曲线|合力与速度不共线：速度方向改变，轨迹弯向 F⊥ 一侧。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx2/motion-composition.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:垂直划",
+          "kind": "initial_condition_retry",
+          "changed": false,
+          "affected_result": false
+        },
+        {
+          "selector": "button:正对到达",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:水更快",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:河更宽",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:垂直划",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:垂直划",
+          "text": "垂直划",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:正对到达",
+          "text": "正对到达",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:水更快",
+          "text": "水更快",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:河更宽",
+          "text": "河更宽",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "24889de2",
+          "readout_hash": "f3772886",
+          "physical_readout_hash": "f3772886",
+          "readout": [
+            "沿河分量 vx2.00 m/s 过河分量 vy4.00 m/s 过河时间 t20.0 s 下游偏移 x40.0 m",
+            "垂直河岸分量决定时间，沿河分量决定偏移。"
+          ],
+          "physical_readout": [
+            "沿河分量 vx2.00 m/s 过河分量 vy4.00 m/s 过河时间 t20.0 s 下游偏移 x40.0 m",
+            "垂直河岸分量决定时间，沿河分量决定偏移。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "8869e8ae",
+          "readout_hash": "f3772886",
+          "physical_readout_hash": "f3772886",
+          "readout": [
+            "沿河分量 vx2.00 m/s 过河分量 vy4.00 m/s 过河时间 t20.0 s 下游偏移 x40.0 m",
+            "垂直河岸分量决定时间，沿河分量决定偏移。"
+          ],
+          "physical_readout": [
+            "沿河分量 vx2.00 m/s 过河分量 vy4.00 m/s 过河时间 t20.0 s 下游偏移 x40.0 m",
+            "垂直河岸分量决定时间，沿河分量决定偏移。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "24889de2",
+          "readout_hash": "f3772886",
+          "physical_readout_hash": "f3772886",
+          "readout": [
+            "沿河分量 vx2.00 m/s 过河分量 vy4.00 m/s 过河时间 t20.0 s 下游偏移 x40.0 m",
+            "垂直河岸分量决定时间，沿河分量决定偏移。"
+          ],
+          "physical_readout": [
+            "沿河分量 vx2.00 m/s 过河分量 vy4.00 m/s 过河时间 t20.0 s 下游偏移 x40.0 m",
+            "垂直河岸分量决定时间，沿河分量决定偏移。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "24889de2",
+          "readout_hash": "f3772886",
+          "physical_readout_hash": "f3772886",
+          "readout": [
+            "沿河分量 vx2.00 m/s 过河分量 vy4.00 m/s 过河时间 t20.0 s 下游偏移 x40.0 m",
+            "垂直河岸分量决定时间，沿河分量决定偏移。"
+          ],
+          "physical_readout": [
+            "沿河分量 vx2.00 m/s 过河分量 vy4.00 m/s 过河时间 t20.0 s 下游偏移 x40.0 m",
+            "垂直河岸分量决定时间，沿河分量决定偏移。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "沿河分量 vx# m/s 过河分量 vy# m/s 过河时间 t# s 下游偏移 x# m|垂直河岸分量决定时间，沿河分量决定偏移。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "沿河分量 vx# m/s 过河分量 vy# m/s 过河时间 t# s 下游偏移 x# m|垂直河岸分量决定时间，沿河分量决定偏移。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx2/oblique-throw.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:45°",
+          "kind": "initial_condition_retry",
+          "changed": false,
+          "affected_result": false
+        },
+        {
+          "selector": "button:类平抛",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:大角度",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:有高度",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:45°",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:45°",
+          "text": "45°",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:类平抛",
+          "text": "类平抛",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:大角度",
+          "text": "大角度",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:有高度",
+          "text": "有高度",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "89265812",
+          "readout_hash": "24e07e3d",
+          "physical_readout_hash": "24e07e3d",
+          "readout": [
+            "水平分量 v0x14.1 m/s 竖直分量 v0y14.1 m/s 飞行时间 T2.83 s 射程 R40.0 m",
+            "最高点只表示 vy=0，水平速度 vx 仍然存在。"
+          ],
+          "physical_readout": [
+            "水平分量 v0x14.1 m/s 竖直分量 v0y14.1 m/s 飞行时间 T2.83 s 射程 R40.0 m",
+            "最高点只表示 vy=0，水平速度 vx 仍然存在。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "89f29929",
+          "readout_hash": "24e07e3d",
+          "physical_readout_hash": "24e07e3d",
+          "readout": [
+            "水平分量 v0x14.1 m/s 竖直分量 v0y14.1 m/s 飞行时间 T2.83 s 射程 R40.0 m",
+            "最高点只表示 vy=0，水平速度 vx 仍然存在。"
+          ],
+          "physical_readout": [
+            "水平分量 v0x14.1 m/s 竖直分量 v0y14.1 m/s 飞行时间 T2.83 s 射程 R40.0 m",
+            "最高点只表示 vy=0，水平速度 vx 仍然存在。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "d1085e03",
+          "readout_hash": "24e07e3d",
+          "physical_readout_hash": "24e07e3d",
+          "readout": [
+            "水平分量 v0x14.1 m/s 竖直分量 v0y14.1 m/s 飞行时间 T2.83 s 射程 R40.0 m",
+            "最高点只表示 vy=0，水平速度 vx 仍然存在。"
+          ],
+          "physical_readout": [
+            "水平分量 v0x14.1 m/s 竖直分量 v0y14.1 m/s 飞行时间 T2.83 s 射程 R40.0 m",
+            "最高点只表示 vy=0，水平速度 vx 仍然存在。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "d1085e03",
+          "readout_hash": "24e07e3d",
+          "physical_readout_hash": "24e07e3d",
+          "readout": [
+            "水平分量 v0x14.1 m/s 竖直分量 v0y14.1 m/s 飞行时间 T2.83 s 射程 R40.0 m",
+            "最高点只表示 vy=0，水平速度 vx 仍然存在。"
+          ],
+          "physical_readout": [
+            "水平分量 v0x14.1 m/s 竖直分量 v0y14.1 m/s 飞行时间 T2.83 s 射程 R40.0 m",
+            "最高点只表示 vy=0，水平速度 vx 仍然存在。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "水平分量 v#x# m/s 竖直分量 v#y# m/s 飞行时间 T# s 射程 R# m|最高点只表示 vy=#，水平速度 vx 仍然存在。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "水平分量 v#x# m/s 竖直分量 v#y# m/s 飞行时间 T# s 射程 R# m|最高点只表示 vy=#，水平速度 vx 仍然存在。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx2/projectile.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:电场类平抛",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:标准平抛",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:大初速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:正电偏转",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:负电偏转",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:重力平抛",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#gravityMode",
+          "text": "重力平抛",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#electricMode",
+          "text": "电场类平抛",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:标准平抛",
+          "text": "标准平抛",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:大初速",
+          "text": "大初速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:正电偏转",
+          "text": "正电偏转",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:负电偏转",
+          "text": "负电偏转",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "d7cbc00d",
+          "readout_hash": "b3508473",
+          "physical_readout_hash": "b3508473",
+          "readout": [
+            "x / y5.00 / 1.25 m vx / vy10.0 / 5.00 偏角 tanθ0.50 (26.6°) 加速度 a10.00 m/s²",
+            "平抛：水平方向无力，x=v0t；竖直方向受重力，y=1/2gt²。"
+          ],
+          "physical_readout": [
+            "x / y5.00 / 1.25 m vx / vy10.0 / 5.00 偏角 tanθ0.50 (26.6°) 加速度 a10.00 m/s²",
+            "平抛：水平方向无力，x=v0t；竖直方向受重力，y=1/2gt²。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "a5a9483d",
+          "readout_hash": "25bc75c2",
+          "physical_readout_hash": "25bc75c2",
+          "readout": [
+            "x / y10.74 / 5.77 m vx / vy10.0 / 10.74 偏角 tanθ1.07 (47.0°) 加速度 a10.00 m/s²",
+            "平抛：水平方向无力，x=v0t；竖直方向受重力，y=1/2gt²。"
+          ],
+          "physical_readout": [
+            "x / y10.74 / 5.77 m vx / vy10.0 / 10.74 偏角 tanθ1.07 (47.0°) 加速度 a10.00 m/s²",
+            "平抛：水平方向无力，x=v0t；竖直方向受重力，y=1/2gt²。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "bcda26a4",
+          "readout_hash": "be0cb19e",
+          "physical_readout_hash": "be0cb19e",
+          "readout": [
+            "x / y11.16 / 6.23 m vx / vy10.0 / 11.16 偏角 tanθ1.12 (48.1°) 加速度 a10.00 m/s²",
+            "平抛：水平方向无力，x=v0t；竖直方向受重力，y=1/2gt²。"
+          ],
+          "physical_readout": [
+            "x / y11.16 / 6.23 m vx / vy10.0 / 11.16 偏角 tanθ1.12 (48.1°) 加速度 a10.00 m/s²",
+            "平抛：水平方向无力，x=v0t；竖直方向受重力，y=1/2gt²。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "bcda26a4",
+          "readout_hash": "be0cb19e",
+          "physical_readout_hash": "be0cb19e",
+          "readout": [
+            "x / y11.16 / 6.23 m vx / vy10.0 / 11.16 偏角 tanθ1.12 (48.1°) 加速度 a10.00 m/s²",
+            "平抛：水平方向无力，x=v0t；竖直方向受重力，y=1/2gt²。"
+          ],
+          "physical_readout": [
+            "x / y11.16 / 6.23 m vx / vy10.0 / 11.16 偏角 tanθ1.12 (48.1°) 加速度 a10.00 m/s²",
+            "平抛：水平方向无力，x=v0t；竖直方向受重力，y=1/2gt²。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "x / y# / # m vx / vy# / # 偏角 tanθ# (#°) 加速度 a# m/s²|平抛：水平方向无力，x=v#t；竖直方向受重力，y=#/#gt²。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "x / y# / # m vx / vy# / # 偏角 tanθ# (#°) 加速度 a# m/s²|平抛：水平方向无力，x=v#t；竖直方向受重力，y=#/#gt²。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}
