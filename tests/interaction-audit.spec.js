@@ -52,7 +52,7 @@ async function captureState(page) {
       }
     });
     const svg = [...document.querySelectorAll('svg')].map(node => hash(node.outerHTML));
-    const readout = [...document.querySelectorAll('.readout, .r, [id*="readout"], [id*="status"], .status, .param, label, .chip, .model-btn, .score, .option.selected, [id$="Label"], [id$="-d"], [aria-pressed]')]
+    const readout = [...document.querySelectorAll('.readout, .r, [id*="readout"], [id*="status"], .status, .param, label, .chip, .model-btn, .score, .option.selected, [id$="Label"], [id$="-d"], [aria-pressed], tbody')]
       .map(node => node.textContent.replace(/\s+/g, ' ').trim())
       .filter(Boolean);
     // A clock, a generic “playing” label, or a button-state flip is not
