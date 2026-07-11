@@ -351,7 +351,7 @@ for (const { moduleName, file } of pages) {
         if (i === playIndex || i === resetIndex || transportKind(buttonTexts[i]) !== 'condition') continue;
         const button = buttons.nth(i);
         if (!(await button.isVisible())) continue;
-        const isActive = await button.evaluate(node => node.classList.contains('active') || node.getAttribute('aria-pressed') === 'true');
+        const isActive = await button.evaluate(node => node.classList.contains('active') || node.classList.contains('on') || node.classList.contains('selected') || node.classList.contains('is-active') || node.getAttribute('aria-pressed') === 'true');
         if (isActive) {
           record.button_checks[i].checked = false;
           record.button_checks[i].worked = 'initially_active';
@@ -383,7 +383,7 @@ for (const { moduleName, file } of pages) {
         const after = await captureState(page);
         const afterControl = await button.evaluate(node => ({ className: node.className, pressed: node.getAttribute('aria-pressed') }));
         const controlChanged = changed(before, after) || beforeControl.className !== afterControl.className || beforeControl.pressed !== afterControl.pressed;
-        const stillSelected = await button.evaluate(node => node.classList.contains('active') || node.getAttribute('aria-pressed') === 'true');
+        const stillSelected = await button.evaluate(node => node.classList.contains('active') || node.classList.contains('on') || node.classList.contains('selected') || node.classList.contains('is-active') || node.getAttribute('aria-pressed') === 'true');
         // This is a coverage retry for an initially selected tab. If the
         // browser does not expose a second transition, retain an explicit
         // inconclusive marker for semantic review rather than a false H5.
