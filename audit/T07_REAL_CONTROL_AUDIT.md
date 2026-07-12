@@ -87,3 +87,14 @@ AUDIT_MODULE=xb2 AUDIT_REPORT=real-control-xb2-full-fixed.json \
 ```
 
 结果：`22/22 PASS`、`0 BLOCKED`、评分 `100`。这关闭 XB2 的交互功能与移动端复审；全站任务仍进行中。
+
+## XB1 全模块复审结论（21/21）
+
+完成动量、振动、波动、光学全部 21 页的真实控件逐页审核后，执行：
+
+```sh
+AUDIT_MODULE=xb1 AUDIT_REPORT=real-control-xb1-full.json \
+  npx playwright test tests/interaction-audit.spec.js --workers=1
+```
+
+结果：`21/21 PASS`、`0 BLOCKED`、评分 `100`。范围控件、模式按钮、播放/暂停、重置、重入和 390px 均已覆盖；全站任务仍进行中。
