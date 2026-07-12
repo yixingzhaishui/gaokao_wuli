@@ -130,3 +130,18 @@ AUDIT_MODULE=xb1 AUDIT_REPORT=real-control-xb1-full.json \
 ## MODEL 全模块复审结论（3/3）
 
 修复审核器下拉选项的真实选择路径后，执行 `AUDIT_MODULE=model AUDIT_REPORT=real-control-model-full.json npx playwright test tests/interaction-audit.spec.js --workers=1`，结果为 `3/3 PASS`、`0 BLOCKED`。下拉模型、参数、记录、播放/重置和手机端均已实际操作。
+
+## SKILL 综合专题全模块复审结论（11/11）
+
+G-07 至 G-12 相关技能页全部以真实浏览器输入逐页执行：`multi-process-motion`、`energy-momentum-combo`、`electromagnetic-induction-combo`、`real-world-modeling`、`science-info-problem`，以及电路实验设计、误差分析、数据处理、极值临界、图像斜率面积、仪器读数。G-12 额外覆盖“选项 → 提交 → 下一题”的完整作答流。
+
+在 `graph-slope-area` 中发现并修复了真实缺陷：点 B 拖到点 A 左侧时，页面仅在内部临时替换坐标，导致学生拖动 B 后可见读数没有变化。现改为同步修正实际的另一探针位置，确保 A、B 始终有明确顺序且每次拖动都更新图像、斜率、面积和读数。
+
+修复后执行：
+
+```sh
+AUDIT_MODULE=skill AUDIT_REPORT=real-control-skill-full-fixed.json \
+  npx playwright test tests/interaction-audit.spec.js --workers=1
+```
+
+结果：`11/11 PASS`、`0 BLOCKED`、评分 `100`。至此所有模块的真实控件复审记录累计为 `203/203`；最终发布版验收仍单列进行。
