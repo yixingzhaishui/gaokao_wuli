@@ -171,7 +171,7 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
     mode=b.dataset.m;document.querySelectorAll('#mode button').forEach(x=>x.classList.remove('on'));b.classList.add('on');draw();
   }));
   document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
-  document.getElementById('reset-btn').addEventListener('click',()=>{t=0;draw();});
+  document.getElementById('reset-btn').addEventListener('click',()=>{lam=120;f=1;t=0;mode='wave';markX=x0+200;running=true;document.getElementById('lam').value=lam;document.getElementById('f').value=f;document.getElementById('lam-d').textContent=lam;document.getElementById('f-d').textContent=f.toFixed(1);document.querySelectorAll('#mode button').forEach(b=>b.classList.toggle('on',b.dataset.m==='wave'));document.getElementById('play-btn').textContent='暂停';draw();});
   function pointerPos(e){const r=canvas.getBoundingClientRect(),s=canvas.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s};}
   canvas.addEventListener('pointerdown',e=>{
     if(mode!=='wave')return;

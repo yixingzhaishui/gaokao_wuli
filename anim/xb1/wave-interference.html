@@ -133,7 +133,7 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
   bind('lam',v=>{lam=v;document.getElementById('lam-d').textContent=v;});
   bind('d',v=>{d=v;document.getElementById('d-d').textContent=v;});
   document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
-  document.getElementById('reset-btn').addEventListener('click',()=>{testX=cx+90;testY=60;draw();});
+  document.getElementById('reset-btn').addEventListener('click',()=>{lam=40;d=120;t=0;running=true;testX=cx+90;testY=60;document.getElementById('lam').value=lam;document.getElementById('d').value=d;document.getElementById('lam-d').textContent=lam;document.getElementById('d-d').textContent=d;document.getElementById('play-btn').textContent='暂停';draw();});
   let last=performance.now();
   function loop(now){const dt=Math.min((now-last)/1000,0.03);last=now;if(running)t+=dt;draw();requestAnimationFrame(loop);}
   draw();requestAnimationFrame(loop);

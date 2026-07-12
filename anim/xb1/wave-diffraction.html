@@ -144,7 +144,7 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
   });
   window.addEventListener('pointerup',()=>{dragA=false;canvas.style.cursor='grab';});
   document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
-  document.getElementById('reset-btn').addEventListener('click',()=>{t=0;draw();});
+  document.getElementById('reset-btn').addEventListener('click',()=>{lam=40;a=80;t=0;running=true;document.getElementById('lam').value=lam;document.getElementById('a').value=a;document.getElementById('lam-d').textContent=lam;document.getElementById('a-d').textContent=a;document.getElementById('play-btn').textContent='暂停';draw();});
   let last=performance.now();
   function loop(now){const dt=Math.min((now-last)/1000,0.03);last=now;if(running)t+=dt;draw();requestAnimationFrame(loop);}
   draw();requestAnimationFrame(loop);
