@@ -321,7 +321,9 @@ els.playBtn.addEventListener('click', () => {
 els.resetBtn.addEventListener('click', () => {
   state.running = false;
   state.time = 2.6;
+  state.records = [];
   setValues({ ratio: 500, drops: 1, dropVolume: 0.05, filmArea: 5, areaError: 2 });
+  renderRecords();
   draw();
 });
 els.recordBtn.addEventListener('click', () => {

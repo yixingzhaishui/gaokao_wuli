@@ -70,7 +70,7 @@
   el.play.onclick=()=>{state.playing=!state.playing;el.play.textContent=state.playing?'暂停':'播放'};
   document.getElementById('disturb').onclick=()=>{el.light.value=Math.max(0,Math.min(100,+el.light.value+(Math.random()-.5)*38));draw()};
   document.getElementById('record').onclick=()=>{const x=v(),out=logic(x);state.records.push({...x,...out,mode:state.mode});draw()};
-  document.getElementById('reset').onclick=()=>{el.light.value=45;el.threshold.value=50;el.hys.value=6;state.on=false;state.records=[];state.history=[];draw()};
+  document.getElementById('reset').onclick=()=>{el.light.value=45;el.threshold.value=50;el.hys.value=6;state.mode='dark';state.on=false;state.playing=false;state.t=0;state.records=[];state.history=[];el.play.textContent='播放';document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode==='dark'));draw()};
   function loop(){if(state.playing){state.t+=0.04;el.light.value=Math.round(50+38*Math.sin(state.t));}draw();requestAnimationFrame(loop)}
   draw();requestAnimationFrame(loop);
 })();

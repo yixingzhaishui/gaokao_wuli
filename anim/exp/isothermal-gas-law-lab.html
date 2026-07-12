@@ -66,7 +66,7 @@
   [el.vol,el.temp,el.err].forEach(x=>x.addEventListener('input',draw));
   el.play.onclick=()=>{state.playing=!state.playing;el.play.textContent=state.playing?'暂停':'播放'};
   document.getElementById('record').onclick=()=>{state.records.push(val());draw()};
-  document.getElementById('reset').onclick=()=>{el.vol.value=40;el.temp.value=300;el.err.value=0;state.records=[];draw()};
+  document.getElementById('reset').onclick=()=>{el.vol.value=40;el.temp.value=300;el.err.value=0;state.playing=false;state.t=0;state.records=[];el.play.textContent='播放';draw()};
   function loop(){if(state.playing){state.t+=0.04;el.vol.value=Math.round(50+25*Math.sin(state.t));}draw();requestAnimationFrame(loop)}
   draw();requestAnimationFrame(loop);
 })();
