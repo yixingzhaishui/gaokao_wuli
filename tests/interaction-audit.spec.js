@@ -135,8 +135,8 @@ async function probeCanvasDrag(page) {
 // healthy, because it bypasses the pointer/touch path a student uses.
 async function operateValueControl(page, control, meta) {
   if (meta.tag === 'select') {
-    const next = meta.options.find(option => option.value !== meta.value);
-    if (next) await control.selectOption(next.value);
+    const next = meta.options.find(option => option !== meta.value);
+    if (next) await control.selectOption(next);
     return;
   }
 

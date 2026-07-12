@@ -126,3 +126,7 @@ AUDIT_MODULE=xb1 AUDIT_REPORT=real-control-xb1-full.json \
 ## EXP 全模块复审结论（26/26）
 
 执行 `AUDIT_MODULE=exp AUDIT_REPORT=real-control-exp-full.json npx playwright test tests/interaction-audit.spec.js --workers=1` 后，结果为 `26/26 PASS`、`0 BLOCKED`、评分 `100`。这关闭实验模块的交互功能与移动端复审；全站任务仍进行中。
+
+## MODEL 全模块复审结论（3/3）
+
+修复审核器下拉选项的真实选择路径后，执行 `AUDIT_MODULE=model AUDIT_REPORT=real-control-model-full.json npx playwright test tests/interaction-audit.spec.js --workers=1`，结果为 `3/3 PASS`、`0 BLOCKED`。下拉模型、参数、记录、播放/重置和手机端均已实际操作。
