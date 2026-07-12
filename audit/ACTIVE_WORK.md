@@ -6,11 +6,11 @@
 
 - `T01`：已完成；`T02`—`T08`：进行中，按新的真实控件规则重新取证。
 - 已完成的旧模块报告只能作为覆盖清单，不能再单独证明滑块、单选或下拉控件可用：旧审核器会直接写入 DOM 值。
-- 本轮已用真实浏览器输入复核 B3 第一批 20 页，结果均为 `PASS`；完整列表见 `audit/T07_REAL_CONTROL_AUDIT.md`。
+- 本轮已用真实浏览器输入完成 B3 全模块 25 页复核，结果为 `25/25 PASS`、`0 BLOCKED`；完整列表见 `audit/T07_REAL_CONTROL_AUDIT.md`。
 
 ## 最近真实提交
 
-`8976bfd test: require real control interactions in audit`
+`4852f75 docs: record first real-control audit batch`
 
 ## 本轮已验证的发布/浏览器路径
 
@@ -28,4 +28,4 @@
 
 ## 下一条具体动作
 
-用新审核器逐页重审 `anim/bx3` 余下 5 页：`household-circuit`、`joule-law`、`ohm-law`、`potential-difference`、`resistance-law`。完成 B3 后继续下一模块；每累计 20 个独立页面完成后运行严格检查、提交并推送。只提交审核器、归属账本和必要的页面修复，绝不混入题库资料。
+用新审核器逐页重审 `anim/xb2`，优先 `lorentz-force`、`magnetic-circle`、`mutual-induction`、`lenz-law`、`faraday-law`、`rail-rod`、`self-induction`、`transformer`、`ac-generation`。每累计 20 个独立页面完成后运行严格检查、提交并推送。只提交审核器、归属账本和必要的页面修复，绝不混入题库资料。

@@ -39,6 +39,19 @@ AUDIT_MODULE=bx3 AUDIT_REPORT=series-parallel-real-controls.json \
 
 其中 `charge-electrification` 的动态分步按钮“接地 → 移开带电体”已作为专项语义流程核对；`series-parallel` 同时在独立 Chromium 桌面鼠标与 390×844 触摸配置中验证 R1、R2、U 三个真实拖拽。
 
+## B3 全模块复审结论（25/25）
+
+首批 20 页后，余下 `household-circuit`、`joule-law`、`ohm-law`、`potential-difference`、`resistance-law` 亦按同一规则逐页通过。
+
+随后执行全模块串行复审：
+
+```sh
+AUDIT_MODULE=bx3 AUDIT_REPORT=real-control-bx3-full.json \
+  npx playwright test tests/interaction-audit.spec.js --workers=1
+```
+
+结果：`25/25 PASS`、`0 BLOCKED`、评分 `100`。这仅关闭 B3 的**交互功能与移动端**复审；全站 T06/T07/T08 仍然进行中，不能据此声称全部网站完成。
+
 ## 下一批
 
-继续 `anim/bx3` 余下 5 页：`household-circuit`、`joule-law`、`ohm-law`、`potential-difference`、`resistance-law`。完成 B3 全模块后再更新模块状态，不提前宣布全量任务完成。
+继续 `anim/xb2`：带电粒子磁场、互感、楞次/法拉第、变压器和交流电页面按同一真实控件规则逐页复审。
