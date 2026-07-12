@@ -152,10 +152,15 @@ async function operateValueControl(page, control, meta) {
     // track so every browser emits pointer, input and change events.
     const ratio = Math.max(0, Math.min(1, (value - min) / (max - min)));
     const targetRatio = ratio < 0.5 ? 0.985 : 0.015;
+    // A native range thumb cannot be grabbed at the element's outer edge.
+    // Keep both endpoints inside the thumb/track geometry, including when
+    // the current value is exactly min or max.
+    const inset = Math.min(10, Math.max(0, box.width / 2 - 1));
+    const xForRatio = currentRatio => box.x + inset + (box.width - inset * 2) * currentRatio;
     const y = box.y + box.height / 2;
-    await page.mouse.move(box.x + box.width * ratio, y);
+    await page.mouse.move(xForRatio(ratio), y);
     await page.mouse.down();
-    await page.mouse.move(box.x + box.width * targetRatio, y, { steps: 12 });
+    await page.mouse.move(xForRatio(targetRatio), y, { steps: 12 });
     await page.mouse.up();
     return;
   }
