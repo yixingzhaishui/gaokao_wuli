@@ -98,3 +98,9 @@ AUDIT_MODULE=xb1 AUDIT_REPORT=real-control-xb1-full.json \
 ```
 
 结果：`21/21 PASS`、`0 BLOCKED`、评分 `100`。范围控件、模式按钮、播放/暂停、重置、重入和 390px 均已覆盖；全站任务仍进行中。
+
+## BX2 第一批重新审核（20/27）
+
+已逐页通过：`projectile`、`oblique-throw`、`circular-basics`、`centripetal`、`vertical-circle`、`work-energy-relation`、`mechanical-energy`、`energy-conservation`、`gravitation`、`kepler-law`、`cosmic-velocity`、`satellite`、`geostationary`、`orbit-transfer`、`binary-star`、`centrifugal-phenomenon`、`power`、`kinetic-energy`、`elastic-potential`、`work`。
+
+每页均在真实拖拽、全部可见按钮、播放/暂停、重置、重入和 390px 条件下通过。余下 7 页后执行 BX2 全模块复审。
