@@ -441,25 +441,25 @@
       if (!window.matchMedia('(max-width: 760px)').matches) return;
       document.querySelectorAll('.sidebar a[href^="#/"]').forEach(function(link) {
         const route = link.getAttribute('href');
-        const form = document.createElement('form');
-        form.className = 'mobile-route-form';
-        form.method = 'get';
-        form.action = location.origin + location.pathname + route;
         const button = document.createElement('button');
-        button.type = 'submit';
+        button.type = 'button';
         button.className = 'mobile-route-button';
         button.dataset.mobileRouteBound = 'true';
+        button.dataset.mobileRoute = route;
         button.textContent = link.textContent;
         if (link.title) button.title = link.title;
-        form.addEventListener('submit', function(event) {
+        button.addEventListener('click', function(event) {
           event.preventDefault();
           document.body.classList.remove('mobile-nav-open');
           const toggle = document.getElementById('mobile-nav-toggle');
           if (toggle) toggle.setAttribute('aria-expanded', 'false');
-          location.assign(form.action);
+          // Route directly through Docsify's hash router.  Native form submit
+          // is inconsistent in mobile webviews and could leave the pressed
+          // directory item on screen without actually changing the lesson.
+          if (location.hash === route) syncRouteAnchor();
+          else location.hash = route;
         });
-        form.append(button);
-        link.replaceWith(form);
+        link.replaceWith(button);
       });
     }
 
