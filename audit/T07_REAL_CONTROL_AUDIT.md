@@ -26,3 +26,19 @@ AUDIT_MODULE=bx3 AUDIT_REPORT=series-parallel-real-controls.json \
 ```
 
 这两个报告均为 `PASS`，无硬失败。后续页面必须以同一真实控件规则复审；本文件不把旧报告自动升级为最终通过。
+
+## B3 第一批重新审核（20 页）
+
+以下页面均已在新规则下逐页运行，所有暴露的滑块由真实拖拽改变；所有可见按钮逐一点击；播放、暂停、重置、重入和 390px 布局均已检查。结果均为 `PASS`、无硬失败：
+
+- `capacitor-lab`、`capacitor`、`charge-electrification`、`charges-field`
+- `closed-circuit-law`、`closed-circuit`、`coulomb`、`current`、`dc-circuit`
+- `electric-field`、`electric-potential-energy`、`electric-work`、`electrostatic-induction`
+- `em-wave-applications`、`em-wave`、`emf`、`energy-sustainability`
+- `equipotential`、`field-lines`、`series-parallel`
+
+其中 `charge-electrification` 的动态分步按钮“接地 → 移开带电体”已作为专项语义流程核对；`series-parallel` 同时在独立 Chromium 桌面鼠标与 390×844 触摸配置中验证 R1、R2、U 三个真实拖拽。
+
+## 下一批
+
+继续 `anim/bx3` 余下 5 页：`household-circuit`、`joule-law`、`ohm-law`、`potential-difference`、`resistance-law`。完成 B3 全模块后再更新模块状态，不提前宣布全量任务完成。
