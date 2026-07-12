@@ -419,6 +419,14 @@
       });
       scrim.addEventListener('click', close);
       document.addEventListener('click', function(event) {
+        const link = event.target.closest('.sidebar a[href]');
+        const href = link && link.getAttribute('href');
+        if (!href || !href.startsWith('#/')) return;
+        event.preventDefault();
+        close();
+        if (location.hash !== href) location.hash = href.slice(1);
+      }, true);
+      document.addEventListener('click', function(event) {
         if (event.target.closest('.sidebar a')) close();
       });
       window.addEventListener('hashchange', function() {
