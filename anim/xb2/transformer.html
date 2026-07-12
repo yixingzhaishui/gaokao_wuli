@@ -156,7 +156,7 @@ canvas{display:block;width:100%;max-width:700px;background:#fff;border:1px solid
   document.getElementById('u1').addEventListener('input',e=>{U1=parseFloat(e.target.value);draw();});
   document.getElementById('load-r').addEventListener('input',e=>{loadR=parseFloat(e.target.value);draw();});
   document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
-  document.getElementById('reset-btn').addEventListener('click',()=>{n1=1000;n2=100;U1=220;loadR=11;t=0;document.getElementById('n1').value=n1;document.getElementById('n2').value=n2;document.getElementById('u1').value=U1;document.getElementById('load-r').value=loadR;draw();});
+  document.getElementById('reset-btn').addEventListener('click',()=>{n1=1000;n2=100;U1=220;loadR=11;t=0;running=true;document.getElementById('n1').value=n1;document.getElementById('n2').value=n2;document.getElementById('u1').value=U1;document.getElementById('load-r').value=loadR;document.getElementById('play-btn').textContent='暂停';draw();});
   draw();
   function loop(){draw();requestAnimationFrame(loop)}
   requestAnimationFrame(loop);
