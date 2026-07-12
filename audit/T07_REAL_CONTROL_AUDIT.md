@@ -122,3 +122,7 @@ AUDIT_MODULE=xb1 AUDIT_REPORT=real-control-xb1-full.json \
 ## EXP 第一批重新审核（20/26）
 
 已逐页通过电磁感应、变压器、库仑、电容、闭合电路、等势线、力合成、胡克定律、机械能、动量、牛顿第二定律、单摆、平抛、电阻率、灯泡伏安、双缝、打点计时器、匀变速、长度测量、玻璃折射实验。所有滑块、记录按钮、模式、播放/重置、重入和 390px 均为真实操作证据；余下 6 页后进行 EXP 全模块复审。
+
+## EXP 全模块复审结论（26/26）
+
+执行 `AUDIT_MODULE=exp AUDIT_REPORT=real-control-exp-full.json npx playwright test tests/interaction-audit.spec.js --workers=1` 后，结果为 `26/26 PASS`、`0 BLOCKED`、评分 `100`。这关闭实验模块的交互功能与移动端复审；全站任务仍进行中。
