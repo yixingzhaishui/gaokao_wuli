@@ -1,0 +1,927 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T07:05:37.680Z",
+  "commit": "6f851eefec89368c9d8af90c6011063f69668706",
+  "module": "bx1",
+  "modules": [
+    "bx1"
+  ],
+  "summary": {
+    "total": 5,
+    "score": 100,
+    "pass": 5,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/bx1/equilibrium.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:绳更平",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:左侧更平",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:重物加重",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:对称 45°",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "▶ 播放：α β 同步放平",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:对称 45°",
+          "text": "对称 45°",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:绳更平",
+          "text": "绳更平",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:左侧更平",
+          "text": "左侧更平",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重物加重",
+          "text": "重物加重",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "▶ 播放：α β 同步放平"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "bd959180",
+          "readout_hash": "f0b4b9ed",
+          "physical_readout_hash": "f0b4b9ed",
+          "readout": [
+            "左绳 T114.1 N 右绳 T214.1 N 水平合力 ΣFx0.00 N 竖直合力 ΣFy0.00 N",
+            "左右对称：T1=T2；若两边一起变平，T 会明显变大。"
+          ],
+          "physical_readout": [
+            "左绳 T114.1 N 右绳 T214.1 N 水平合力 ΣFx0.00 N 竖直合力 ΣFy0.00 N",
+            "左右对称：T1=T2；若两边一起变平，T 会明显变大。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "739cb4d1",
+          "readout_hash": "c271f50b",
+          "physical_readout_hash": "8daa0a3b",
+          "readout": [
+            "左绳 T122.0 N 右绳 T222.0 N 水平合力 ΣFx0.00 N 竖直合力 ΣFy0.00 N",
+            "左右对称：T1=T2；若两边一起变平，T 会明显变大。（播放中：角度正在自动变化）"
+          ],
+          "physical_readout": [
+            "左绳 T122.0 N 右绳 T222.0 N 水平合力 ΣFx0.00 N 竖直合力 ΣFy0.00 N",
+            "左右对称：T1=T2；若两边一起变平，T 会明显变大。（：角度正在自动变化）"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "615318bb",
+          "readout_hash": "1d6971ad",
+          "physical_readout_hash": "1d6971ad",
+          "readout": [
+            "左绳 T123.0 N 右绳 T223.0 N 水平合力 ΣFx0.00 N 竖直合力 ΣFy0.00 N",
+            "左右对称：T1=T2；若两边一起变平，T 会明显变大。"
+          ],
+          "physical_readout": [
+            "左绳 T123.0 N 右绳 T223.0 N 水平合力 ΣFx0.00 N 竖直合力 ΣFy0.00 N",
+            "左右对称：T1=T2；若两边一起变平，T 会明显变大。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "615318bb",
+          "readout_hash": "1d6971ad",
+          "physical_readout_hash": "1d6971ad",
+          "readout": [
+            "左绳 T123.0 N 右绳 T223.0 N 水平合力 ΣFx0.00 N 竖直合力 ΣFy0.00 N",
+            "左右对称：T1=T2；若两边一起变平，T 会明显变大。"
+          ],
+          "physical_readout": [
+            "左绳 T123.0 N 右绳 T223.0 N 水平合力 ΣFx0.00 N 竖直合力 ΣFy0.00 N",
+            "左右对称：T1=T2；若两边一起变平，T 会明显变大。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "左绳 T# N 右绳 T# N 水平合力 ΣFx# N 竖直合力 ΣFy# N|左右对称：T#=T#；若两边一起变平，T 会明显变大。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "左绳 T# N 右绳 T# N 水平合力 ΣFx# N 竖直合力 ΣFy# N|左右对称：T#=T#；若两边一起变平，T 会明显变大。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx1/force-composition.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:垂直",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:反向",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:自由拖动",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:同向",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#mSame",
+          "text": "同向",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mRight",
+          "text": "垂直",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mOpp",
+          "text": "反向",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mFree",
+          "text": "自由拖动",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "▶ 旋转 F2",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "▶ 旋转 F2"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "1366da3f",
+          "readout_hash": "30789d34",
+          "physical_readout_hash": "30789d34",
+          "readout": [
+            "模式=sameF1=7.00 NF2=5.00 Nθ=0.0°F合=12.00 N方向=0.0°",
+            "两力同向：合力最大，F合=F1+F2。"
+          ],
+          "physical_readout": [
+            "模式=sameF1=7.00 NF2=5.00 Nθ=0.0°F合=12.00 N方向=0.0°",
+            "两力同向：合力最大，F合=F1+F2。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "65e2df1b",
+          "readout_hash": "2486c4a7",
+          "physical_readout_hash": "2486c4a7",
+          "readout": [
+            "模式=freeF1=7.00 NF2=5.04 Nθ=19.7°F合=11.86 N方向=8.2°",
+            "自由拖动：拖动 F1/F2 端点观察夹角与合力。"
+          ],
+          "physical_readout": [
+            "模式=freeF1=7.00 NF2=5.04 Nθ=19.7°F合=11.86 N方向=8.2°",
+            "自由拖动：拖动 F1/F2 端点观察夹角与合力。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "5c8ae108",
+          "readout_hash": "fc214c2",
+          "physical_readout_hash": "fc214c2",
+          "readout": [
+            "模式=freeF1=7.00 NF2=5.04 Nθ=20.7°F合=11.85 N方向=8.6°",
+            "自由拖动：拖动 F1/F2 端点观察夹角与合力。"
+          ],
+          "physical_readout": [
+            "模式=freeF1=7.00 NF2=5.04 Nθ=20.7°F合=11.85 N方向=8.6°",
+            "自由拖动：拖动 F1/F2 端点观察夹角与合力。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "5c8ae108",
+          "readout_hash": "fc214c2",
+          "physical_readout_hash": "fc214c2",
+          "readout": [
+            "模式=freeF1=7.00 NF2=5.04 Nθ=20.7°F合=11.85 N方向=8.6°",
+            "自由拖动：拖动 F1/F2 端点观察夹角与合力。"
+          ],
+          "physical_readout": [
+            "模式=freeF1=7.00 NF2=5.04 Nθ=20.7°F合=11.85 N方向=8.6°",
+            "自由拖动：拖动 F1/F2 端点观察夹角与合力。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "模式=sameF#=# NF#=# Nθ=#°F合=# N方向=#°|两力同向：合力最大，F合=F#+F#。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "模式=sameF#=# NF#=# Nθ=#°F合=# N方向=#°|两力同向：合力最大，F合=F#+F#。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx1/force-decomposition.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:0° 平面",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:30° 典型",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:45° 对比",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:60° 陡坡",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "▶ 播放：θ 自动扫描",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:0° 平面",
+          "text": "0° 平面",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:30° 典型",
+          "text": "30° 典型",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:45° 对比",
+          "text": "45° 对比",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:60° 陡坡",
+          "text": "60° 陡坡",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.32,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "▶ 播放：θ 自动扫描"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "d9be2f45",
+          "readout_hash": "92eb9cbd",
+          "physical_readout_hash": "92eb9cbd",
+          "readout": [
+            "斜面角 θ30° 重力 G=mg20.0 N 沿斜面 G∥10.0 N 垂直斜面 G⊥17.3 N",
+            "分解后列方程时，G 与 G∥、G⊥ 不要重复计入。"
+          ],
+          "physical_readout": [
+            "斜面角 θ30° 重力 G=mg20.0 N 沿斜面 G∥10.0 N 垂直斜面 G⊥17.3 N",
+            "分解后列方程时，G 与 G∥、G⊥ 不要重复计入。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "f91a5af",
+          "readout_hash": "ce895215",
+          "physical_readout_hash": "54df4c17",
+          "readout": [
+            "斜面角 θ52° 重力 G=mg20.0 N 沿斜面 G∥15.7 N 垂直斜面 G⊥12.5 N",
+            "分解后列方程时，G 与 G∥、G⊥ 不要重复计入。（播放中：θ 自动变化）"
+          ],
+          "physical_readout": [
+            "斜面角 θ52° 重力 G=mg20.0 N 沿斜面 G∥15.7 N 垂直斜面 G⊥12.5 N",
+            "分解后列方程时，G 与 G∥、G⊥ 不要重复计入。（：θ 自动变化）"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "85b07dba",
+          "readout_hash": "67192036",
+          "physical_readout_hash": "67192036",
+          "readout": [
+            "斜面角 θ53° 重力 G=mg20.0 N 沿斜面 G∥15.9 N 垂直斜面 G⊥12.2 N",
+            "分解后列方程时，G 与 G∥、G⊥ 不要重复计入。"
+          ],
+          "physical_readout": [
+            "斜面角 θ53° 重力 G=mg20.0 N 沿斜面 G∥15.9 N 垂直斜面 G⊥12.2 N",
+            "分解后列方程时，G 与 G∥、G⊥ 不要重复计入。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "85b07dba",
+          "readout_hash": "67192036",
+          "physical_readout_hash": "67192036",
+          "readout": [
+            "斜面角 θ53° 重力 G=mg20.0 N 沿斜面 G∥15.9 N 垂直斜面 G⊥12.2 N",
+            "分解后列方程时，G 与 G∥、G⊥ 不要重复计入。"
+          ],
+          "physical_readout": [
+            "斜面角 θ53° 重力 G=mg20.0 N 沿斜面 G∥15.9 N 垂直斜面 G⊥12.2 N",
+            "分解后列方程时，G 与 G∥、G⊥ 不要重复计入。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "斜面角 θ#° 重力 G=mg# N 沿斜面 G∥# N 垂直斜面 G⊥# N|分解后列方程时，G 与 G∥、G⊥ 不要重复计入。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "斜面角 θ#° 重力 G=mg# N 沿斜面 G∥# N 垂直斜面 G⊥# N|分解后列方程时，G 与 G∥、G⊥ 不要重复计入。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx1/galileo-ideal-experiment.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#angle",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#fric",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#height",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "释放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.32,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "释放"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "15c35844",
+          "readout_hash": "6f33a48e",
+          "physical_readout_hash": "6f33a48e",
+          "readout": [
+            "右斜面角度 25°",
+            "摩擦强度 20%",
+            "释放高度 120",
+            "右斜面角度：25°摩擦强度：20%可回升高度：96.0右侧路程：227.2方法：控制变量 + 极限推理",
+            "继续减小摩擦或右斜面角度，观察结论怎样逼近惯性思想。"
+          ],
+          "physical_readout": [
+            "右斜面角度 25°",
+            "摩擦强度 20%",
+            "释放高度 120",
+            "右斜面角度：25°摩擦强度：20%可回升高度：96.0右侧路程：227.2方法：控制变量 + 极限推理",
+            "继续减小摩擦或右斜面角度，观察结论怎样逼近惯性思想。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "f8e7d1e3",
+          "readout_hash": "6f33a48e",
+          "physical_readout_hash": "6f33a48e",
+          "readout": [
+            "右斜面角度 25°",
+            "摩擦强度 20%",
+            "释放高度 120",
+            "右斜面角度：25°摩擦强度：20%可回升高度：96.0右侧路程：227.2方法：控制变量 + 极限推理",
+            "继续减小摩擦或右斜面角度，观察结论怎样逼近惯性思想。"
+          ],
+          "physical_readout": [
+            "右斜面角度 25°",
+            "摩擦强度 20%",
+            "释放高度 120",
+            "右斜面角度：25°摩擦强度：20%可回升高度：96.0右侧路程：227.2方法：控制变量 + 极限推理",
+            "继续减小摩擦或右斜面角度，观察结论怎样逼近惯性思想。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "a271032a",
+          "readout_hash": "6f33a48e",
+          "physical_readout_hash": "6f33a48e",
+          "readout": [
+            "右斜面角度 25°",
+            "摩擦强度 20%",
+            "释放高度 120",
+            "右斜面角度：25°摩擦强度：20%可回升高度：96.0右侧路程：227.2方法：控制变量 + 极限推理",
+            "继续减小摩擦或右斜面角度，观察结论怎样逼近惯性思想。"
+          ],
+          "physical_readout": [
+            "右斜面角度 25°",
+            "摩擦强度 20%",
+            "释放高度 120",
+            "右斜面角度：25°摩擦强度：20%可回升高度：96.0右侧路程：227.2方法：控制变量 + 极限推理",
+            "继续减小摩擦或右斜面角度，观察结论怎样逼近惯性思想。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "a271032a",
+          "readout_hash": "6f33a48e",
+          "physical_readout_hash": "6f33a48e",
+          "readout": [
+            "右斜面角度 25°",
+            "摩擦强度 20%",
+            "释放高度 120",
+            "右斜面角度：25°摩擦强度：20%可回升高度：96.0右侧路程：227.2方法：控制变量 + 极限推理",
+            "继续减小摩擦或右斜面角度，观察结论怎样逼近惯性思想。"
+          ],
+          "physical_readout": [
+            "右斜面角度 25°",
+            "摩擦强度 20%",
+            "释放高度 120",
+            "右斜面角度：25°摩擦强度：20%可回升高度：96.0右侧路程：227.2方法：控制变量 + 极限推理",
+            "继续减小摩擦或右斜面角度，观察结论怎样逼近惯性思想。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "右斜面角度 #°|摩擦强度 #%|释放高度 #|右斜面角度：#°摩擦强度：#%可回升高度：#右侧路程：#方法：控制变量 + 极限推理|继续减小摩擦或右斜面角度，观察结论怎样逼近惯性思想。",
+          "controls": [
+            {
+              "id": "angle",
+              "value": "25",
+              "checked": false
+            },
+            {
+              "id": "fric",
+              "value": "20",
+              "checked": false
+            },
+            {
+              "id": "height",
+              "value": "120",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "右斜面角度 #°|摩擦强度 #%|释放高度 #|右斜面角度：#°摩擦强度：#%可回升高度：#右侧路程：#方法：控制变量 + 极限推理|继续减小摩擦或右斜面角度，观察结论怎样逼近惯性思想。",
+          "controls": [
+            {
+              "id": "angle",
+              "value": "25",
+              "checked": false
+            },
+            {
+              "id": "fric",
+              "value": "20",
+              "checked": false
+            },
+            {
+              "id": "height",
+              "value": "120",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx1/gravity.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:月球",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:木星",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:自定义",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:地球",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#mEarth",
+          "text": "地球",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mMoon",
+          "text": "月球",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mJupiter",
+          "text": "木星",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mCustom",
+          "text": "自定义",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "▶ 释放下滑",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "▶ 释放下滑"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "9773c6ae",
+          "readout_hash": "cf9aaa5",
+          "physical_readout_hash": "cf9aaa5",
+          "readout": [
+            "地点=earthm=2.0 kgg=9.8 N/kgG=mg=19.60 Nθ=25°G∥=8.28 NG⊥=17.76 N",
+            "质量 m 是物体属性；换地点时 m 不变，g 变，所以重力大小 G 变。方向仍竖直向下。"
+          ],
+          "physical_readout": [
+            "地点=earthm=2.0 kgg=9.8 N/kgG=mg=19.60 Nθ=25°G∥=8.28 NG⊥=17.76 N",
+            "质量 m 是物体属性；换地点时 m 不变，g 变，所以重力大小 G 变。方向仍竖直向下。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "ab87222b",
+          "readout_hash": "cf9aaa5",
+          "physical_readout_hash": "cf9aaa5",
+          "readout": [
+            "地点=earthm=2.0 kgg=9.8 N/kgG=mg=19.60 Nθ=25°G∥=8.28 NG⊥=17.76 N",
+            "质量 m 是物体属性；换地点时 m 不变，g 变，所以重力大小 G 变。方向仍竖直向下。"
+          ],
+          "physical_readout": [
+            "地点=earthm=2.0 kgg=9.8 N/kgG=mg=19.60 Nθ=25°G∥=8.28 NG⊥=17.76 N",
+            "质量 m 是物体属性；换地点时 m 不变，g 变，所以重力大小 G 变。方向仍竖直向下。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "ed280d95",
+          "readout_hash": "cf9aaa5",
+          "physical_readout_hash": "cf9aaa5",
+          "readout": [
+            "地点=earthm=2.0 kgg=9.8 N/kgG=mg=19.60 Nθ=25°G∥=8.28 NG⊥=17.76 N",
+            "质量 m 是物体属性；换地点时 m 不变，g 变，所以重力大小 G 变。方向仍竖直向下。"
+          ],
+          "physical_readout": [
+            "地点=earthm=2.0 kgg=9.8 N/kgG=mg=19.60 Nθ=25°G∥=8.28 NG⊥=17.76 N",
+            "质量 m 是物体属性；换地点时 m 不变，g 变，所以重力大小 G 变。方向仍竖直向下。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "ed280d95",
+          "readout_hash": "cf9aaa5",
+          "physical_readout_hash": "cf9aaa5",
+          "readout": [
+            "地点=earthm=2.0 kgg=9.8 N/kgG=mg=19.60 Nθ=25°G∥=8.28 NG⊥=17.76 N",
+            "质量 m 是物体属性；换地点时 m 不变，g 变，所以重力大小 G 变。方向仍竖直向下。"
+          ],
+          "physical_readout": [
+            "地点=earthm=2.0 kgg=9.8 N/kgG=mg=19.60 Nθ=25°G∥=8.28 NG⊥=17.76 N",
+            "质量 m 是物体属性；换地点时 m 不变，g 变，所以重力大小 G 变。方向仍竖直向下。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "地点=earthm=# kgg=# N/kgG=mg=# Nθ=#°G∥=# NG⊥=# N|质量 m 是物体属性；换地点时 m 不变，g 变，所以重力大小 G 变。方向仍竖直向下。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "地点=earthm=# kgg=# N/kgG=mg=# Nθ=#°G∥=# NG⊥=# N|质量 m 是物体属性；换地点时 m 不变，g 变，所以重力大小 G 变。方向仍竖直向下。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

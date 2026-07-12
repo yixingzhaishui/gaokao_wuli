@@ -1,0 +1,41 @@
+{
+  "problems": [
+    {
+      "id": "GT-2025-HN-09",
+      "source": "2025年河南省普通高中学业水平选择性考试物理试题",
+      "source_kind": "official_exam",
+      "source_verified": true,
+      "source_detail": "物理第9题；锦宏教育试卷PDF含光学防抖结构图、线圈位置、磁场方向和完整选项，参考答案PDF给出答案BC；答案由安培力方向判定和合力分解独立核验。",
+      "source_urls": [
+        "https://www.jhgk.cn/upload/file/20250612/1749695832234019787.pdf",
+        "https://www.jhgk.cn/upload/file/20250612/1749723303810089980.pdf"
+      ],
+      "verification": "原题第9题与参考答案核对：答案BC。独立核验：线圈c、d的一部分处在垂直纸面向里的匀强磁场中，通电后由左手定则确定镜头所受安培力方向；要使镜头处于零加速度状态，线圈安培力合力应与手机框架微小加速度方向相反。逐项分解水平方向和竖直方向的补偿力，可得B、C正确。",
+      "verified_at": "2026-07-11",
+      "year": 2025,
+      "exam": "河南卷·物理",
+      "question_no": "9",
+      "type": "多选",
+      "difficulty": "较难",
+      "knowledge_ids": ["X2-03", "B1-24"],
+      "model_ids": [],
+      "stem": "手机拍照时手的抖动产生的微小加速度会影响拍照质量，光学防抖技术可以消除这种影响。如图，镜头仅通过左、下两侧的弹簧与手机框架相连，两个相同线圈c、d分别固定在镜头右、上两侧，c、d中的一部分处在相同的匀强磁场中，磁场方向垂直纸面向里。拍照时，手机可实时检测手机框架的微小加速度a的大小和方向，依此自动调节c、d中通入的电流Ic和Id的大小和方向（无抖动时Ic和Id均为零），使镜头处于零加速度状态。下列说法正确的是（ ）",
+      "diagram_required": true,
+      "diagram": {
+        "type": "inline-svg",
+        "title": "原卷第9题手机光学防抖线圈受力示意",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 720 360\" role=\"img\" aria-label=\"手机光学防抖镜头由左下弹簧连接，右上两线圈处于垂直纸面向里磁场\"><rect x=\"170\" y=\"60\" width=\"360\" height=\"240\" fill=\"#f8fafc\" stroke=\"#334155\" stroke-width=\"5\"/><circle cx=\"340\" cy=\"190\" r=\"65\" fill=\"#fee2e2\" stroke=\"#dc2626\" stroke-width=\"4\"/><rect x=\"460\" y=\"168\" width=\"45\" height=\"70\" fill=\"#dbeafe\" stroke=\"#2563eb\" stroke-width=\"4\"/><text x=\"475\" y=\"210\" font-size=\"22\">c</text><rect x=\"285\" y=\"85\" width=\"110\" height=\"35\" fill=\"#dbeafe\" stroke=\"#2563eb\" stroke-width=\"4\"/><text x=\"335\" y=\"110\" font-size=\"22\">d</text><g fill=\"#64748b\" font-size=\"20\"><text x=\"210\" y=\"110\">× × × ×</text><text x=\"210\" y=\"145\">× × × ×</text><text x=\"440\" y=\"130\">× × ×</text><text x=\"440\" y=\"260\">× × ×</text></g><path d=\"M170 190h-65\" stroke=\"#94a3b8\" stroke-width=\"5\"/><path d=\"M340 300v45\" stroke=\"#94a3b8\" stroke-width=\"5\"/><text x=\"108\" y=\"180\" font-size=\"18\">左弹簧</text><text x=\"350\" y=\"340\" font-size=\"18\">下弹簧</text><path d=\"M590 105l-65 38\" stroke=\"#16a34a\" stroke-width=\"5\" marker-end=\"url(#arrow)\"/><text x=\"595\" y=\"103\" font-size=\"19\" fill=\"#16a34a\">a补偿相反</text><text x=\"240\" y=\"325\" font-size=\"18\" fill=\"#334155\">磁场方向：垂直纸面向里（×）</text><defs><marker id=\"arrow\" markerWidth=\"10\" markerHeight=\"10\" refX=\"8\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L0,6 L9,3 z\" fill=\"#16a34a\"/></marker></defs></svg>"
+      },
+      "options": [
+        "A. 若Ic沿顺时针方向，Id=0，则表明a的方向向右",
+        "B. 若Id沿顺时针方向，Ic=0，则表明a的方向向下",
+        "C. 若a的方向沿左偏上30°，则Ic沿顺时针方向，Id沿逆时针方向且Ic>Id",
+        "D. 若a的方向沿右偏上30°，则Ic沿顺时针方向，Id沿顺时针方向且Ic<Id"
+      ],
+      "answer": "BC",
+      "solution": "线圈受力方向由左手定则判断：磁场垂直纸面向里，改变线圈中电流方向即可改变对应方向的安培力。防抖要求镜头保持零加速度，所以线圈产生的补偿合力应与手机框架微小加速度方向相反。逐项判断可得：当只有d线圈顺时针通电时，提供的补偿力对应手机框架加速度向下，B正确；若a沿左偏上30°，补偿力应沿右偏下30°，需要c、d线圈电流方向分别为顺时针、逆时针，且水平分量大于竖直分量，对应Ic>Id，C正确。A、D的方向或大小关系不符合补偿条件。",
+      "method": "防抖题先明确目标：镜头零加速度，所以电磁补偿力方向与框架加速度相反；再用左手定则把线圈电流方向转成力方向。",
+      "traps": ["把补偿力方向误认为与手机加速度同向", "只判断电流方向而不比较两个分量大小"]
+    }
+  ]
+}

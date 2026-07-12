@@ -1,0 +1,467 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T07:11:00.550Z",
+  "commit": "31cf0327ac01646e6995720f34b871fb11246b24",
+  "module": "bx2",
+  "modules": [
+    "bx2"
+  ],
+  "summary": {
+    "total": 2,
+    "score": 100,
+    "pass": 2,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/bx2/orbit-transfer.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:低圆",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:转移",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:高圆",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:小升轨",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:到同步轨",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:大升轨",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:低圆",
+          "text": "低圆",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:转移",
+          "text": "转移",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:高圆",
+          "text": "高圆",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:小升轨",
+          "text": "小升轨",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:到同步轨",
+          "text": "到同步轨",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:大升轨",
+          "text": "大升轨",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "5956e3f",
+          "readout_hash": "1cf16dff",
+          "physical_readout_hash": "1cf16dff",
+          "readout": [
+            "低圆 v16.81 km/s 近地点 vt18.77 km/s 远地点 vt21.79 km/s 高圆 v23.07 km/s 第一次 Δv11.97 km/s 第二次 Δv21.28 km/s",
+            "转移椭圆：不能套圆轨速度公式，近地点快、远地点慢。"
+          ],
+          "physical_readout": [
+            "低圆 v16.81 km/s 近地点 vt18.77 km/s 远地点 vt21.79 km/s 高圆 v23.07 km/s 第一次 Δv11.97 km/s 第二次 Δv21.28 km/s",
+            "转移椭圆：不能套圆轨速度公式，近地点快、远地点慢。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "4cc95362",
+          "readout_hash": "1cf16dff",
+          "physical_readout_hash": "1cf16dff",
+          "readout": [
+            "低圆 v16.81 km/s 近地点 vt18.77 km/s 远地点 vt21.79 km/s 高圆 v23.07 km/s 第一次 Δv11.97 km/s 第二次 Δv21.28 km/s",
+            "转移椭圆：不能套圆轨速度公式，近地点快、远地点慢。"
+          ],
+          "physical_readout": [
+            "低圆 v16.81 km/s 近地点 vt18.77 km/s 远地点 vt21.79 km/s 高圆 v23.07 km/s 第一次 Δv11.97 km/s 第二次 Δv21.28 km/s",
+            "转移椭圆：不能套圆轨速度公式，近地点快、远地点慢。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "7c2df3e2",
+          "readout_hash": "1cf16dff",
+          "physical_readout_hash": "1cf16dff",
+          "readout": [
+            "低圆 v16.81 km/s 近地点 vt18.77 km/s 远地点 vt21.79 km/s 高圆 v23.07 km/s 第一次 Δv11.97 km/s 第二次 Δv21.28 km/s",
+            "转移椭圆：不能套圆轨速度公式，近地点快、远地点慢。"
+          ],
+          "physical_readout": [
+            "低圆 v16.81 km/s 近地点 vt18.77 km/s 远地点 vt21.79 km/s 高圆 v23.07 km/s 第一次 Δv11.97 km/s 第二次 Δv21.28 km/s",
+            "转移椭圆：不能套圆轨速度公式，近地点快、远地点慢。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "7c2df3e2",
+          "readout_hash": "1cf16dff",
+          "physical_readout_hash": "1cf16dff",
+          "readout": [
+            "低圆 v16.81 km/s 近地点 vt18.77 km/s 远地点 vt21.79 km/s 高圆 v23.07 km/s 第一次 Δv11.97 km/s 第二次 Δv21.28 km/s",
+            "转移椭圆：不能套圆轨速度公式，近地点快、远地点慢。"
+          ],
+          "physical_readout": [
+            "低圆 v16.81 km/s 近地点 vt18.77 km/s 远地点 vt21.79 km/s 高圆 v23.07 km/s 第一次 Δv11.97 km/s 第二次 Δv21.28 km/s",
+            "转移椭圆：不能套圆轨速度公式，近地点快、远地点慢。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "低圆 v# km/s 近地点 vt# km/s 远地点 vt# km/s 高圆 v# km/s 第一次 Δv# km/s 第二次 Δv# km/s|转移椭圆：不能套圆轨速度公式，近地点快、远地点慢。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "低圆 v# km/s 近地点 vt# km/s 远地点 vt# km/s 高圆 v# km/s 第一次 Δv# km/s 第二次 Δv# km/s|转移椭圆：不能套圆轨速度公式，近地点快、远地点慢。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx2/relativity.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#beta",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#time0",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#length0",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:低速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:高速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#reset",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:低速",
+          "text": "低速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:高速",
+          "text": "高速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.82,
+          "py": 0.68
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "74b3fa41",
+          "readout_hash": "5c266802",
+          "physical_readout_hash": "5c266802",
+          "readout": [
+            "速度 β=v/c 0.60",
+            "固有时间 Δt0 1.0 s",
+            "固有长度 L0 10.0 m",
+            "速度表读数 β = 0.60cγ 表盘读数 = 1.250光钟时间读数 Δt = 1.25 s侧视长度读数 L = 8.00 m",
+            "暂无记录",
+            "高速：时间膨胀和长度收缩开始明显。"
+          ],
+          "physical_readout": [
+            "速度 β=v/c 0.60",
+            "固有时间 Δt0 1.0 s",
+            "固有长度 L0 10.0 m",
+            "速度表读数 β = 0.60cγ 表盘读数 = 1.250光钟时间读数 Δt = 1.25 s侧视长度读数 L = 8.00 m",
+            "暂无记录",
+            "高速：时间膨胀和长度收缩开始明显。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "c76cefc4",
+          "readout_hash": "5c266802",
+          "physical_readout_hash": "5c266802",
+          "readout": [
+            "速度 β=v/c 0.60",
+            "固有时间 Δt0 1.0 s",
+            "固有长度 L0 10.0 m",
+            "速度表读数 β = 0.60cγ 表盘读数 = 1.250光钟时间读数 Δt = 1.25 s侧视长度读数 L = 8.00 m",
+            "暂无记录",
+            "高速：时间膨胀和长度收缩开始明显。"
+          ],
+          "physical_readout": [
+            "速度 β=v/c 0.60",
+            "固有时间 Δt0 1.0 s",
+            "固有长度 L0 10.0 m",
+            "速度表读数 β = 0.60cγ 表盘读数 = 1.250光钟时间读数 Δt = 1.25 s侧视长度读数 L = 8.00 m",
+            "暂无记录",
+            "高速：时间膨胀和长度收缩开始明显。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "5a1532fa",
+          "readout_hash": "5c266802",
+          "physical_readout_hash": "5c266802",
+          "readout": [
+            "速度 β=v/c 0.60",
+            "固有时间 Δt0 1.0 s",
+            "固有长度 L0 10.0 m",
+            "速度表读数 β = 0.60cγ 表盘读数 = 1.250光钟时间读数 Δt = 1.25 s侧视长度读数 L = 8.00 m",
+            "暂无记录",
+            "高速：时间膨胀和长度收缩开始明显。"
+          ],
+          "physical_readout": [
+            "速度 β=v/c 0.60",
+            "固有时间 Δt0 1.0 s",
+            "固有长度 L0 10.0 m",
+            "速度表读数 β = 0.60cγ 表盘读数 = 1.250光钟时间读数 Δt = 1.25 s侧视长度读数 L = 8.00 m",
+            "暂无记录",
+            "高速：时间膨胀和长度收缩开始明显。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "5a1532fa",
+          "readout_hash": "5c266802",
+          "physical_readout_hash": "5c266802",
+          "readout": [
+            "速度 β=v/c 0.60",
+            "固有时间 Δt0 1.0 s",
+            "固有长度 L0 10.0 m",
+            "速度表读数 β = 0.60cγ 表盘读数 = 1.250光钟时间读数 Δt = 1.25 s侧视长度读数 L = 8.00 m",
+            "暂无记录",
+            "高速：时间膨胀和长度收缩开始明显。"
+          ],
+          "physical_readout": [
+            "速度 β=v/c 0.60",
+            "固有时间 Δt0 1.0 s",
+            "固有长度 L0 10.0 m",
+            "速度表读数 β = 0.60cγ 表盘读数 = 1.250光钟时间读数 Δt = 1.25 s侧视长度读数 L = 8.00 m",
+            "暂无记录",
+            "高速：时间膨胀和长度收缩开始明显。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "速度 β=v/c #|固有时间 Δt# # s|固有长度 L# # m|速度表读数 β = #cγ 表盘读数 = #光钟时间读数 Δt = # s侧视长度读数 L = # m|高速：时间膨胀和长度收缩开始明显。",
+          "controls": [
+            {
+              "id": "beta",
+              "value": "0.6",
+              "checked": false
+            },
+            {
+              "id": "time0",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "length0",
+              "value": "10",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "速度 β=v/c #|固有时间 Δt# # s|固有长度 L# # m|速度表读数 β = #cγ 表盘读数 = #光钟时间读数 Δt = # s侧视长度读数 L = # m|高速：时间膨胀和长度收缩开始明显。",
+          "controls": [
+            {
+              "id": "beta",
+              "value": "0.6",
+              "checked": false
+            },
+            {
+              "id": "time0",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "length0",
+              "value": "10",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

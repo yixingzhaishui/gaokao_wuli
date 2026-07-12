@@ -1,0 +1,35 @@
+{
+  "problems": [
+    {
+      "id": "GT-2025-HN-11",
+      "source": "2025年河南省普通高中学业水平选择性考试物理试题",
+      "source_kind": "official_exam",
+      "source_verified": true,
+      "source_detail": "物理第11题；锦宏教育试卷PDF含热敏电阻R-t图像、保温箱控制电路和电阻箱旋钮图，参考答案PDF给出完整答案；答案由图像读数、电磁继电器触点逻辑和电阻箱读数规则独立核验。",
+      "source_urls": [
+        "https://www.jhgk.cn/upload/file/20250612/1749695832234019787.pdf",
+        "https://www.jhgk.cn/upload/file/20250612/1749723303810089980.pdf"
+      ],
+      "verification": "原题第11题与参考答案核对：答案为（1）非线性；（2）a；（3）130.0；（4）210.0。独立核验：R-t曲线不是直线；温度升高使热敏电阻阻值减小、电磁铁电流增大，超过设定值应断开加热，所以加热端应接a；电阻箱按倍率读数得130.0Ω；由100℃处图像读数和电路阈值关系得所需电阻箱阻值210.0Ω。",
+      "verified_at": "2026-07-11",
+      "year": 2025,
+      "exam": "河南卷·物理",
+      "question_no": "11",
+      "type": "实验综合",
+      "difficulty": "中档",
+      "knowledge_ids": ["B3-12", "B3-13", "B3-16", "E-25"],
+      "model_ids": [],
+      "stem": "实验小组研究某热敏电阻的特性，并依此利用电磁铁、电阻箱等器材组装保温箱。热敏电阻阻值随温度的变化曲线如图1所示，保温箱原理图如图2所示。回答：（1）图1中热敏电阻的阻值随温度的变化关系是线性还是非线性的；（2）存在电流值I0，若电磁铁线圈电流小于I0，衔铁与上固定触头a接触；若电流大于I0，衔铁与下固定触头b接触。保温箱温度达到设定值后，加热电路持续断开、闭合，使温度维持在设定值，则图2中加热电阻丝的c端应与触头a还是b相连接；（3）当保温箱温度设定在50℃时，电阻箱旋钮位置如图3所示，则电阻箱接入电路的阻值为多少；（4）若要把保温箱温度设定在100℃，则电阻箱接入电路的阻值应为多少。",
+      "diagram_required": true,
+      "diagram": {
+        "type": "inline-svg",
+        "title": "原卷第11题热敏电阻保温箱控制示意",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 760 360\" role=\"img\" aria-label=\"热敏电阻阻值随温度非线性降低，电磁继电器控制保温箱加热\"><rect x=\"55\" y=\"55\" width=\"250\" height=\"210\" fill=\"#fff\" stroke=\"#334155\" stroke-width=\"3\"/><line x1=\"75\" y1=\"245\" x2=\"285\" y2=\"245\" stroke=\"#334155\" stroke-width=\"3\" marker-end=\"url(#arrow)\"/><line x1=\"75\" y1=\"245\" x2=\"75\" y2=\"35\" stroke=\"#334155\" stroke-width=\"3\" marker-end=\"url(#arrow)\"/><path d=\"M80 65 C120 70 150 90 185 125 S250 200 285 225\" fill=\"none\" stroke=\"#ec4899\" stroke-width=\"5\"/><text x=\"285\" y=\"270\" font-size=\"18\">t/℃</text><text x=\"35\" y=\"45\" font-size=\"18\">R/Ω</text><text x=\"120\" y=\"295\" font-size=\"18\" fill=\"#334155\">非线性</text><rect x=\"380\" y=\"70\" width=\"300\" height=\"190\" fill=\"#f8fafc\" stroke=\"#334155\" stroke-width=\"3\"/><path d=\"M420 115h60M420 165h60M480 115v50\" stroke=\"#334155\" stroke-width=\"3\"/><text x=\"405\" y=\"120\" font-size=\"18\">a</text><text x=\"405\" y=\"170\" font-size=\"18\">b</text><path d=\"M480 140h100\" stroke=\"#dc2626\" stroke-width=\"4\"/><path d=\"M580 140c18 0 18 24 0 24s-18 24 0 24s18 24 0 24\" fill=\"none\" stroke=\"#dc2626\" stroke-width=\"4\"/><text x=\"600\" y=\"182\" font-size=\"18\" fill=\"#dc2626\">加热电阻丝</text><rect x=\"430\" y=\"225\" width=\"90\" height=\"25\" fill=\"#fef3c7\" stroke=\"#92400e\" stroke-width=\"3\"/><text x=\"445\" y=\"244\" font-size=\"17\">电阻箱</text><text x=\"520\" y=\"95\" font-size=\"18\" fill=\"#334155\">触头控制加热通断</text><defs><marker id=\"arrow\" markerWidth=\"10\" markerHeight=\"10\" refX=\"8\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L0,6 L9,3 z\" fill=\"#334155\"/></marker></defs></svg>"
+      },
+      "answer": "（1）非线性；（2）a；（3）130.0 Ω；（4）210.0 Ω",
+      "solution": "图1中R随温度变化的曲线不是直线，所以为非线性。温度升高时热敏电阻阻值减小，电磁铁线圈电流增大；当温度达到设定值并使电流大于I0时，衔铁会转到b，若要停止加热，则加热电阻丝应接在a触头，使超过设定温度时断开。图3电阻箱按各旋钮倍率读数，得到130.0 Ω。若设定为100℃，由热敏电阻曲线读出对应阻值并保持同一动作电流阈值，换算得电阻箱应调为210.0 Ω。",
+      "method": "温控电路题先判断温度升高对控制电流的影响，再看继电器动作后应让加热断开还是闭合；电阻箱按倍率逐盘读数。",
+      "traps": ["看到温度升高就误以为电流变小", "把继电器吸合后的触点逻辑接反", "电阻箱倍率读数漏掉小数盘"]
+    }
+  ]
+}

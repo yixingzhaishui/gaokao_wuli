@@ -1,0 +1,502 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T06:59:07.488Z",
+  "commit": "4c4a131d0c44f23bc04f4ae684d98e8be5e31fb4",
+  "module": "exp",
+  "modules": [
+    "exp"
+  ],
+  "summary": {
+    "total": 2,
+    "score": 100,
+    "pass": 2,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/exp/double-slit-wavelength-lab.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#lambda",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#slit",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#screenDistance",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#count",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#error",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#recordBtn",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "9376b11c",
+          "readout_hash": "47f404f5",
+          "physical_readout_hash": "47f404f5",
+          "readout": [
+            "真实波长 λ/nm：550",
+            "双缝间距 d/mm：0.25",
+            "屏距 L/m：1.0",
+            "测量条纹数 N：5",
+            "读数误差：1%",
+            "理论 Δx=Lλ/d≈2.200mm测得 NΔx≈11.110mm，Δx≈2.222mmλ测=dΔx/L≈556nm真实 λ=550nm，相对误差≈1.0%d 变大条纹变窄；L 变大条纹变宽",
+            "通过：由条纹间距反算的波长在误差范围内合理。"
+          ],
+          "physical_readout": [
+            "真实波长 λ/nm：550",
+            "双缝间距 d/mm：0.25",
+            "屏距 L/m：1.0",
+            "测量条纹数 N：5",
+            "读数误差：1%",
+            "理论 Δx=Lλ/d≈2.200mm测得 NΔx≈11.110mm，Δx≈2.222mmλ测=dΔx/L≈556nm真实 λ=550nm，相对误差≈1.0%d 变大条纹变窄；L 变大条纹变宽",
+            "通过：由条纹间距反算的波长在误差范围内合理。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "428f5a94",
+          "readout_hash": "47f404f5",
+          "physical_readout_hash": "47f404f5",
+          "readout": [
+            "真实波长 λ/nm：550",
+            "双缝间距 d/mm：0.25",
+            "屏距 L/m：1.0",
+            "测量条纹数 N：5",
+            "读数误差：1%",
+            "理论 Δx=Lλ/d≈2.200mm测得 NΔx≈11.110mm，Δx≈2.222mmλ测=dΔx/L≈556nm真实 λ=550nm，相对误差≈1.0%d 变大条纹变窄；L 变大条纹变宽",
+            "通过：由条纹间距反算的波长在误差范围内合理。"
+          ],
+          "physical_readout": [
+            "真实波长 λ/nm：550",
+            "双缝间距 d/mm：0.25",
+            "屏距 L/m：1.0",
+            "测量条纹数 N：5",
+            "读数误差：1%",
+            "理论 Δx=Lλ/d≈2.200mm测得 NΔx≈11.110mm，Δx≈2.222mmλ测=dΔx/L≈556nm真实 λ=550nm，相对误差≈1.0%d 变大条纹变窄；L 变大条纹变宽",
+            "通过：由条纹间距反算的波长在误差范围内合理。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "9376b11c",
+          "readout_hash": "47f404f5",
+          "physical_readout_hash": "47f404f5",
+          "readout": [
+            "真实波长 λ/nm：550",
+            "双缝间距 d/mm：0.25",
+            "屏距 L/m：1.0",
+            "测量条纹数 N：5",
+            "读数误差：1%",
+            "理论 Δx=Lλ/d≈2.200mm测得 NΔx≈11.110mm，Δx≈2.222mmλ测=dΔx/L≈556nm真实 λ=550nm，相对误差≈1.0%d 变大条纹变窄；L 变大条纹变宽",
+            "通过：由条纹间距反算的波长在误差范围内合理。"
+          ],
+          "physical_readout": [
+            "真实波长 λ/nm：550",
+            "双缝间距 d/mm：0.25",
+            "屏距 L/m：1.0",
+            "测量条纹数 N：5",
+            "读数误差：1%",
+            "理论 Δx=Lλ/d≈2.200mm测得 NΔx≈11.110mm，Δx≈2.222mmλ测=dΔx/L≈556nm真实 λ=550nm，相对误差≈1.0%d 变大条纹变窄；L 变大条纹变宽",
+            "通过：由条纹间距反算的波长在误差范围内合理。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "9376b11c",
+          "readout_hash": "47f404f5",
+          "physical_readout_hash": "47f404f5",
+          "readout": [
+            "真实波长 λ/nm：550",
+            "双缝间距 d/mm：0.25",
+            "屏距 L/m：1.0",
+            "测量条纹数 N：5",
+            "读数误差：1%",
+            "理论 Δx=Lλ/d≈2.200mm测得 NΔx≈11.110mm，Δx≈2.222mmλ测=dΔx/L≈556nm真实 λ=550nm，相对误差≈1.0%d 变大条纹变窄；L 变大条纹变宽",
+            "通过：由条纹间距反算的波长在误差范围内合理。"
+          ],
+          "physical_readout": [
+            "真实波长 λ/nm：550",
+            "双缝间距 d/mm：0.25",
+            "屏距 L/m：1.0",
+            "测量条纹数 N：5",
+            "读数误差：1%",
+            "理论 Δx=Lλ/d≈2.200mm测得 NΔx≈11.110mm，Δx≈2.222mmλ测=dΔx/L≈556nm真实 λ=550nm，相对误差≈1.0%d 变大条纹变窄；L 变大条纹变宽",
+            "通过：由条纹间距反算的波长在误差范围内合理。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "真实波长 λ/nm：#|双缝间距 d/mm：#|屏距 L/m：#|测量条纹数 N：#|读数误差：#%|理论 Δx=Lλ/d≈#mm测得 NΔx≈#mm，Δx≈#mmλ测=dΔx/L≈#nm真实 λ=#nm，相对误差≈#%d 变大条纹变窄；L 变大条纹变宽|通过：由条纹间距反算的波长在误差范围内合理。",
+          "controls": [
+            {
+              "id": "lambda",
+              "value": "550",
+              "checked": false
+            },
+            {
+              "id": "slit",
+              "value": "0.25",
+              "checked": false
+            },
+            {
+              "id": "screenDistance",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "count",
+              "value": "5",
+              "checked": false
+            },
+            {
+              "id": "error",
+              "value": "1",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "真实波长 λ/nm：#|双缝间距 d/mm：#|屏距 L/m：#|测量条纹数 N：#|读数误差：#%|理论 Δx=Lλ/d≈#mm测得 NΔx≈#mm，Δx≈#mmλ测=dΔx/L≈#nm真实 λ=#nm，相对误差≈#%d 变大条纹变窄；L 变大条纹变宽|通过：由条纹间距反算的波长在误差范围内合理。",
+          "controls": [
+            {
+              "id": "lambda",
+              "value": "550",
+              "checked": false
+            },
+            {
+              "id": "slit",
+              "value": "0.25",
+              "checked": false
+            },
+            {
+              "id": "screenDistance",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "count",
+              "value": "5",
+              "checked": false
+            },
+            {
+              "id": "error",
+              "value": "1",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/exp/glass-refraction-lab.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#incident",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#ntrue",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#error",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#pin",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#recordBtn",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "4bddbc86",
+          "readout_hash": "25e0418b",
+          "physical_readout_hash": "25e0418b",
+          "readout": [
+            "入射角 i/°：45",
+            "玻璃真实 n：1.50",
+            "角度读数误差/°：1.0",
+            "插针间距/cm：6",
+            "测得 i≈46.0°，r≈27.5°n=sin i/sin r≈1.557真实 n≈1.500，相对误差≈3.8%判定=能用"
+          ],
+          "physical_readout": [
+            "入射角 i/°：45",
+            "玻璃真实 n：1.50",
+            "角度读数误差/°：1.0",
+            "插针间距/cm：6",
+            "测得 i≈46.0°，r≈27.5°n=sin i/sin r≈1.557真实 n≈1.500，相对误差≈3.8%判定=能用"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "76ee4861",
+          "readout_hash": "25e0418b",
+          "physical_readout_hash": "25e0418b",
+          "readout": [
+            "入射角 i/°：45",
+            "玻璃真实 n：1.50",
+            "角度读数误差/°：1.0",
+            "插针间距/cm：6",
+            "测得 i≈46.0°，r≈27.5°n=sin i/sin r≈1.557真实 n≈1.500，相对误差≈3.8%判定=能用"
+          ],
+          "physical_readout": [
+            "入射角 i/°：45",
+            "玻璃真实 n：1.50",
+            "角度读数误差/°：1.0",
+            "插针间距/cm：6",
+            "测得 i≈46.0°，r≈27.5°n=sin i/sin r≈1.557真实 n≈1.500，相对误差≈3.8%判定=能用"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "4bddbc86",
+          "readout_hash": "25e0418b",
+          "physical_readout_hash": "25e0418b",
+          "readout": [
+            "入射角 i/°：45",
+            "玻璃真实 n：1.50",
+            "角度读数误差/°：1.0",
+            "插针间距/cm：6",
+            "测得 i≈46.0°，r≈27.5°n=sin i/sin r≈1.557真实 n≈1.500，相对误差≈3.8%判定=能用"
+          ],
+          "physical_readout": [
+            "入射角 i/°：45",
+            "玻璃真实 n：1.50",
+            "角度读数误差/°：1.0",
+            "插针间距/cm：6",
+            "测得 i≈46.0°，r≈27.5°n=sin i/sin r≈1.557真实 n≈1.500，相对误差≈3.8%判定=能用"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "4bddbc86",
+          "readout_hash": "25e0418b",
+          "physical_readout_hash": "25e0418b",
+          "readout": [
+            "入射角 i/°：45",
+            "玻璃真实 n：1.50",
+            "角度读数误差/°：1.0",
+            "插针间距/cm：6",
+            "测得 i≈46.0°，r≈27.5°n=sin i/sin r≈1.557真实 n≈1.500，相对误差≈3.8%判定=能用"
+          ],
+          "physical_readout": [
+            "入射角 i/°：45",
+            "玻璃真实 n：1.50",
+            "角度读数误差/°：1.0",
+            "插针间距/cm：6",
+            "测得 i≈46.0°，r≈27.5°n=sin i/sin r≈1.557真实 n≈1.500，相对误差≈3.8%判定=能用"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "入射角 i/°：#|玻璃真实 n：#|角度读数误差/°：#|插针间距/cm：#|测得 i≈#°，r≈#°n=sin i/sin r≈#真实 n≈#，相对误差≈#%判定=能用",
+          "controls": [
+            {
+              "id": "incident",
+              "value": "45",
+              "checked": false
+            },
+            {
+              "id": "ntrue",
+              "value": "1.5",
+              "checked": false
+            },
+            {
+              "id": "error",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "pin",
+              "value": "6",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "入射角 i/°：#|玻璃真实 n：#|角度读数误差/°：#|插针间距/cm：#|测得 i≈#°，r≈#°n=sin i/sin r≈#真实 n≈#，相对误差≈#%判定=能用",
+          "controls": [
+            {
+              "id": "incident",
+              "value": "45",
+              "checked": false
+            },
+            {
+              "id": "ntrue",
+              "value": "1.5",
+              "checked": false
+            },
+            {
+              "id": "error",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "pin",
+              "value": "6",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

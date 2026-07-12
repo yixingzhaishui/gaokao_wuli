@@ -1,0 +1,1279 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T06:58:18.420Z",
+  "commit": "d910611b26f89768aa624e80aaeac8b910ae518e",
+  "module": "exp",
+  "modules": [
+    "exp"
+  ],
+  "summary": {
+    "total": 5,
+    "score": 100,
+    "pass": 5,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/exp/gravitational-constant-lab.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#bigM",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#smallM",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#dist",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#kappa",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#error",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#recordBtn",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "2b8b8d97",
+          "readout_hash": "c238805b",
+          "physical_readout_hash": "c238805b",
+          "readout": [
+            "大球质量 M/kg：1.5",
+            "小球质量 m/kg：0.020",
+            "球心距离 r/m：0.050",
+            "扭转系数 κ/(10^-7 N·m/rad)：1.0",
+            "读数误差：2%",
+            "F=GMm/r²≈8.00×10^-10 N力矩平衡：κθ=2FL，L=0.10 mθ读≈0.00 mrad，平衡值≈1.63 mradG测≈0.00×10^-11 N·m²/kg²相对误差≈100.0%",
+            "状态：扭秤还在靠近平衡，等待光点稳定后再读 θ。"
+          ],
+          "physical_readout": [
+            "大球质量 M/kg：1.5",
+            "小球质量 m/kg：0.020",
+            "球心距离 r/m：0.050",
+            "扭转系数 κ/(10^-7 N·m/rad)：1.0",
+            "读数误差：2%",
+            "F=GMm/r²≈8.00×10^-10 N力矩平衡：κθ=2FL，L=0.10 mθ读≈0.00 mrad，平衡值≈1.63 mradG测≈0.00×10^-11 N·m²/kg²相对误差≈100.0%",
+            "状态：扭秤还在靠近平衡，等待光点稳定后再读 θ。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "56747964",
+          "readout_hash": "cf264086",
+          "physical_readout_hash": "cf264086",
+          "readout": [
+            "大球质量 M/kg：1.5",
+            "小球质量 m/kg：0.020",
+            "球心距离 r/m：0.050",
+            "扭转系数 κ/(10^-7 N·m/rad)：1.0",
+            "读数误差：2%",
+            "F=GMm/r²≈8.00×10^-10 N力矩平衡：κθ=2FL，L=0.10 mθ读≈1.09 mrad，平衡值≈1.63 mradG测≈4.54×10^-11 N·m²/kg²相对误差≈32.0%",
+            "状态：扭秤还在靠近平衡，等待光点稳定后再读 θ。"
+          ],
+          "physical_readout": [
+            "大球质量 M/kg：1.5",
+            "小球质量 m/kg：0.020",
+            "球心距离 r/m：0.050",
+            "扭转系数 κ/(10^-7 N·m/rad)：1.0",
+            "读数误差：2%",
+            "F=GMm/r²≈8.00×10^-10 N力矩平衡：κθ=2FL，L=0.10 mθ读≈1.09 mrad，平衡值≈1.63 mradG测≈4.54×10^-11 N·m²/kg²相对误差≈32.0%",
+            "状态：扭秤还在靠近平衡，等待光点稳定后再读 θ。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "75a594e8",
+          "readout_hash": "db322ad",
+          "physical_readout_hash": "db322ad",
+          "readout": [
+            "大球质量 M/kg：1.5",
+            "小球质量 m/kg：0.020",
+            "球心距离 r/m：0.050",
+            "扭转系数 κ/(10^-7 N·m/rad)：1.0",
+            "读数误差：2%",
+            "F=GMm/r²≈8.00×10^-10 N力矩平衡：κθ=2FL，L=0.10 mθ读≈1.17 mrad，平衡值≈1.63 mradG测≈4.88×10^-11 N·m²/kg²相对误差≈26.8%",
+            "状态：扭秤还在靠近平衡，等待光点稳定后再读 θ。"
+          ],
+          "physical_readout": [
+            "大球质量 M/kg：1.5",
+            "小球质量 m/kg：0.020",
+            "球心距离 r/m：0.050",
+            "扭转系数 κ/(10^-7 N·m/rad)：1.0",
+            "读数误差：2%",
+            "F=GMm/r²≈8.00×10^-10 N力矩平衡：κθ=2FL，L=0.10 mθ读≈1.17 mrad，平衡值≈1.63 mradG测≈4.88×10^-11 N·m²/kg²相对误差≈26.8%",
+            "状态：扭秤还在靠近平衡，等待光点稳定后再读 θ。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "75a594e8",
+          "readout_hash": "db322ad",
+          "physical_readout_hash": "db322ad",
+          "readout": [
+            "大球质量 M/kg：1.5",
+            "小球质量 m/kg：0.020",
+            "球心距离 r/m：0.050",
+            "扭转系数 κ/(10^-7 N·m/rad)：1.0",
+            "读数误差：2%",
+            "F=GMm/r²≈8.00×10^-10 N力矩平衡：κθ=2FL，L=0.10 mθ读≈1.17 mrad，平衡值≈1.63 mradG测≈4.88×10^-11 N·m²/kg²相对误差≈26.8%",
+            "状态：扭秤还在靠近平衡，等待光点稳定后再读 θ。"
+          ],
+          "physical_readout": [
+            "大球质量 M/kg：1.5",
+            "小球质量 m/kg：0.020",
+            "球心距离 r/m：0.050",
+            "扭转系数 κ/(10^-7 N·m/rad)：1.0",
+            "读数误差：2%",
+            "F=GMm/r²≈8.00×10^-10 N力矩平衡：κθ=2FL，L=0.10 mθ读≈1.17 mrad，平衡值≈1.63 mradG测≈4.88×10^-11 N·m²/kg²相对误差≈26.8%",
+            "状态：扭秤还在靠近平衡，等待光点稳定后再读 θ。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "大球质量 M/kg：#|小球质量 m/kg：#|球心距离 r/m：#|扭转系数 κ/(#^# N·m/rad)：#|读数误差：#%|F=GMm/r²≈#×#^# N力矩平衡：κθ=#FL，L=# mθ读≈# mrad，平衡值≈# mradG测≈#×#^# N·m²/kg²相对误差≈#%|状态：扭秤还在靠近平衡，等待光点稳定后再读 θ。",
+          "controls": [
+            {
+              "id": "bigM",
+              "value": "1.5",
+              "checked": false
+            },
+            {
+              "id": "smallM",
+              "value": "0.02",
+              "checked": false
+            },
+            {
+              "id": "dist",
+              "value": "0.05",
+              "checked": false
+            },
+            {
+              "id": "kappa",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "error",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "大球质量 M/kg：#|小球质量 m/kg：#|球心距离 r/m：#|扭转系数 κ/(#^# N·m/rad)：#|读数误差：#%|F=GMm/r²≈#×#^# N力矩平衡：κθ=#FL，L=# mθ读≈# mrad，平衡值≈# mradG测≈#×#^# N·m²/kg²相对误差≈#%|状态：扭秤还在靠近平衡，等待光点稳定后再读 θ。",
+          "controls": [
+            {
+              "id": "bigM",
+              "value": "1.5",
+              "checked": false
+            },
+            {
+              "id": "smallM",
+              "value": "0.02",
+              "checked": false
+            },
+            {
+              "id": "dist",
+              "value": "0.05",
+              "checked": false
+            },
+            {
+              "id": "kappa",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "error",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/exp/mechanical-energy-lab.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#height",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#mass",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#point",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#loss",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "▶ 自动扫描测量点",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "▶ 自动扫描测量点"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "998d9b4a",
+          "readout_hash": "c3dffece",
+          "physical_readout_hash": "c3dffece",
+          "readout": [
+            "释放高度 h/m：1.2",
+            "重物质量 m/kg：0.10",
+            "测量点 n：8",
+            "阻力损失：2%",
+            "纸带周期 T=0.04s，测点 n=8v_n≈(y_{n+1}-y_{n-1})/(2T)=3.07m/sΔEp=mgy=0.482JΔEk=1/2mv²=0.472J相对误差≈2.0%",
+            "通过：ΔEk 与 ΔEp 接近，说明阻力较小时机械能近似守恒。"
+          ],
+          "physical_readout": [
+            "释放高度 h/m：1.2",
+            "重物质量 m/kg：0.10",
+            "测量点 n：8",
+            "阻力损失：2%",
+            "纸带周期 T=0.04s，测点 n=8v_n≈(y_{n+1}-y_{n-1})/(2T)=3.07m/sΔEp=mgy=0.482JΔEk=1/2mv²=0.472J相对误差≈2.0%",
+            "通过：ΔEk 与 ΔEp 接近，说明阻力较小时机械能近似守恒。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "1eb2d23",
+          "readout_hash": "d794ef6b",
+          "physical_readout_hash": "d794ef6b",
+          "readout": [
+            "释放高度 h/m：1.2",
+            "重物质量 m/kg：0.10",
+            "测量点 n：9",
+            "阻力损失：2%",
+            "纸带周期 T=0.04s，测点 n=9v_n≈(y_{n+1}-y_{n-1})/(2T)=3.46m/sΔEp=mgy=0.610JΔEk=1/2mv²=0.598J相对误差≈2.0%",
+            "通过：ΔEk 与 ΔEp 接近，说明阻力较小时机械能近似守恒。"
+          ],
+          "physical_readout": [
+            "释放高度 h/m：1.2",
+            "重物质量 m/kg：0.10",
+            "测量点 n：9",
+            "阻力损失：2%",
+            "纸带周期 T=0.04s，测点 n=9v_n≈(y_{n+1}-y_{n-1})/(2T)=3.46m/sΔEp=mgy=0.610JΔEk=1/2mv²=0.598J相对误差≈2.0%",
+            "通过：ΔEk 与 ΔEp 接近，说明阻力较小时机械能近似守恒。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "1eb2d23",
+          "readout_hash": "d794ef6b",
+          "physical_readout_hash": "d794ef6b",
+          "readout": [
+            "释放高度 h/m：1.2",
+            "重物质量 m/kg：0.10",
+            "测量点 n：9",
+            "阻力损失：2%",
+            "纸带周期 T=0.04s，测点 n=9v_n≈(y_{n+1}-y_{n-1})/(2T)=3.46m/sΔEp=mgy=0.610JΔEk=1/2mv²=0.598J相对误差≈2.0%",
+            "通过：ΔEk 与 ΔEp 接近，说明阻力较小时机械能近似守恒。"
+          ],
+          "physical_readout": [
+            "释放高度 h/m：1.2",
+            "重物质量 m/kg：0.10",
+            "测量点 n：9",
+            "阻力损失：2%",
+            "纸带周期 T=0.04s，测点 n=9v_n≈(y_{n+1}-y_{n-1})/(2T)=3.46m/sΔEp=mgy=0.610JΔEk=1/2mv²=0.598J相对误差≈2.0%",
+            "通过：ΔEk 与 ΔEp 接近，说明阻力较小时机械能近似守恒。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "1eb2d23",
+          "readout_hash": "d794ef6b",
+          "physical_readout_hash": "d794ef6b",
+          "readout": [
+            "释放高度 h/m：1.2",
+            "重物质量 m/kg：0.10",
+            "测量点 n：9",
+            "阻力损失：2%",
+            "纸带周期 T=0.04s，测点 n=9v_n≈(y_{n+1}-y_{n-1})/(2T)=3.46m/sΔEp=mgy=0.610JΔEk=1/2mv²=0.598J相对误差≈2.0%",
+            "通过：ΔEk 与 ΔEp 接近，说明阻力较小时机械能近似守恒。"
+          ],
+          "physical_readout": [
+            "释放高度 h/m：1.2",
+            "重物质量 m/kg：0.10",
+            "测量点 n：9",
+            "阻力损失：2%",
+            "纸带周期 T=0.04s，测点 n=9v_n≈(y_{n+1}-y_{n-1})/(2T)=3.46m/sΔEp=mgy=0.610JΔEk=1/2mv²=0.598J相对误差≈2.0%",
+            "通过：ΔEk 与 ΔEp 接近，说明阻力较小时机械能近似守恒。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "释放高度 h/m：#|重物质量 m/kg：#|测量点 n：#|阻力损失：#%|纸带周期 T=#s，测点 n=#v_n≈(y_{n#}-y_{n#})/(#T)=#m/sΔEp=mgy=#JΔEk=#/#mv²=#J相对误差≈#%|通过：ΔEk 与 ΔEp 接近，说明阻力较小时机械能近似守恒。",
+          "controls": [
+            {
+              "id": "height",
+              "value": "1.2",
+              "checked": false
+            },
+            {
+              "id": "mass",
+              "value": "0.1",
+              "checked": false
+            },
+            {
+              "id": "point",
+              "value": "8",
+              "checked": false
+            },
+            {
+              "id": "loss",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "释放高度 h/m：#|重物质量 m/kg：#|测量点 n：#|阻力损失：#%|纸带周期 T=#s，测点 n=#v_n≈(y_{n#}-y_{n#})/(#T)=#m/sΔEp=mgy=#JΔEk=#/#mv²=#J相对误差≈#%|通过：ΔEk 与 ΔEp 接近，说明阻力较小时机械能近似守恒。",
+          "controls": [
+            {
+              "id": "height",
+              "value": "1.2",
+              "checked": false
+            },
+            {
+              "id": "mass",
+              "value": "0.1",
+              "checked": false
+            },
+            {
+              "id": "point",
+              "value": "8",
+              "checked": false
+            },
+            {
+              "id": "loss",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/exp/momentum-conservation-lab.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#mode",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#m1",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#m2",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#v1",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#v2",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#loss",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#recordBtn",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "1ba7ae21",
+          "readout_hash": "d0ebbd61",
+          "physical_readout_hash": "d0ebbd61",
+          "readout": [
+            "碰撞类型：弹性",
+            "小车1质量 m1/kg：0.6",
+            "小车2质量 m2/kg：0.8",
+            "碰前 v1/(m/s)：2.0",
+            "碰前 v2/(m/s)：0.0",
+            "外界误差/摩擦/%：2",
+            "p前=1.200kg·m/sp后=1.176kg·m/s相对差≈2.0%Ek前=1.200J，Ek后=1.152J判定=能用"
+          ],
+          "physical_readout": [
+            "碰撞类型：弹性",
+            "小车1质量 m1/kg：0.6",
+            "小车2质量 m2/kg：0.8",
+            "碰前 v1/(m/s)：2.0",
+            "碰前 v2/(m/s)：0.0",
+            "外界误差/摩擦/%：2",
+            "p前=1.200kg·m/sp后=1.176kg·m/s相对差≈2.0%Ek前=1.200J，Ek后=1.152J判定=能用"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "5b8c9011",
+          "readout_hash": "d0ebbd61",
+          "physical_readout_hash": "d0ebbd61",
+          "readout": [
+            "碰撞类型：弹性",
+            "小车1质量 m1/kg：0.6",
+            "小车2质量 m2/kg：0.8",
+            "碰前 v1/(m/s)：2.0",
+            "碰前 v2/(m/s)：0.0",
+            "外界误差/摩擦/%：2",
+            "p前=1.200kg·m/sp后=1.176kg·m/s相对差≈2.0%Ek前=1.200J，Ek后=1.152J判定=能用"
+          ],
+          "physical_readout": [
+            "碰撞类型：弹性",
+            "小车1质量 m1/kg：0.6",
+            "小车2质量 m2/kg：0.8",
+            "碰前 v1/(m/s)：2.0",
+            "碰前 v2/(m/s)：0.0",
+            "外界误差/摩擦/%：2",
+            "p前=1.200kg·m/sp后=1.176kg·m/s相对差≈2.0%Ek前=1.200J，Ek后=1.152J判定=能用"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "1ba7ae21",
+          "readout_hash": "d0ebbd61",
+          "physical_readout_hash": "d0ebbd61",
+          "readout": [
+            "碰撞类型：弹性",
+            "小车1质量 m1/kg：0.6",
+            "小车2质量 m2/kg：0.8",
+            "碰前 v1/(m/s)：2.0",
+            "碰前 v2/(m/s)：0.0",
+            "外界误差/摩擦/%：2",
+            "p前=1.200kg·m/sp后=1.176kg·m/s相对差≈2.0%Ek前=1.200J，Ek后=1.152J判定=能用"
+          ],
+          "physical_readout": [
+            "碰撞类型：弹性",
+            "小车1质量 m1/kg：0.6",
+            "小车2质量 m2/kg：0.8",
+            "碰前 v1/(m/s)：2.0",
+            "碰前 v2/(m/s)：0.0",
+            "外界误差/摩擦/%：2",
+            "p前=1.200kg·m/sp后=1.176kg·m/s相对差≈2.0%Ek前=1.200J，Ek后=1.152J判定=能用"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "1ba7ae21",
+          "readout_hash": "d0ebbd61",
+          "physical_readout_hash": "d0ebbd61",
+          "readout": [
+            "碰撞类型：弹性",
+            "小车1质量 m1/kg：0.6",
+            "小车2质量 m2/kg：0.8",
+            "碰前 v1/(m/s)：2.0",
+            "碰前 v2/(m/s)：0.0",
+            "外界误差/摩擦/%：2",
+            "p前=1.200kg·m/sp后=1.176kg·m/s相对差≈2.0%Ek前=1.200J，Ek后=1.152J判定=能用"
+          ],
+          "physical_readout": [
+            "碰撞类型：弹性",
+            "小车1质量 m1/kg：0.6",
+            "小车2质量 m2/kg：0.8",
+            "碰前 v1/(m/s)：2.0",
+            "碰前 v2/(m/s)：0.0",
+            "外界误差/摩擦/%：2",
+            "p前=1.200kg·m/sp后=1.176kg·m/s相对差≈2.0%Ek前=1.200J，Ek后=1.152J判定=能用"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "碰撞类型：弹性|小车#质量 m#/kg：#|小车#质量 m#/kg：#|碰前 v#/(m/s)：#|碰前 v#/(m/s)：#|外界误差/摩擦/%：#|p前=#kg·m/sp后=#kg·m/s相对差≈#%Ek前=#J，Ek后=#J判定=能用",
+          "controls": [
+            {
+              "id": "mode",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "m1",
+              "value": "0.6",
+              "checked": false
+            },
+            {
+              "id": "m2",
+              "value": "0.8",
+              "checked": false
+            },
+            {
+              "id": "v1",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "v2",
+              "value": "0",
+              "checked": false
+            },
+            {
+              "id": "loss",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "碰撞类型：弹性|小车#质量 m#/kg：#|小车#质量 m#/kg：#|碰前 v#/(m/s)：#|碰前 v#/(m/s)：#|外界误差/摩擦/%：#|p前=#kg·m/sp后=#kg·m/s相对差≈#%Ek前=#J，Ek后=#J判定=能用",
+          "controls": [
+            {
+              "id": "mode",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "m1",
+              "value": "0.6",
+              "checked": false
+            },
+            {
+              "id": "m2",
+              "value": "0.8",
+              "checked": false
+            },
+            {
+              "id": "v1",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "v2",
+              "value": "0",
+              "checked": false
+            },
+            {
+              "id": "loss",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/exp/projectile-motion-lab.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#speed",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#height",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#dt",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#point",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#tilt",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#recordBtn",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "e3e681a1",
+          "readout_hash": "d99a375d",
+          "physical_readout_hash": "d99a375d",
+          "readout": [
+            "水平初速度 v0/(m/s)：4.0",
+            "桌面高度 h/m：1.8",
+            "闪光时间 Δt/s：0.10",
+            "测点 n：4",
+            "发射口调平误差 θ/°：0.0",
+            "t=nΔt=0.40sx=v0t≈1.60m，x/t≈4.00m/sy≈0.78m，自由落体 y0≈0.78m2y/t²≈9.80m/s²判定=能用"
+          ],
+          "physical_readout": [
+            "水平初速度 v0/(m/s)：4.0",
+            "桌面高度 h/m：1.8",
+            "闪光时间 Δt/s：0.10",
+            "测点 n：4",
+            "发射口调平误差 θ/°：0.0",
+            "t=nΔt=0.40sx=v0t≈1.60m，x/t≈4.00m/sy≈0.78m，自由落体 y0≈0.78m2y/t²≈9.80m/s²判定=能用"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "2571ce87",
+          "readout_hash": "d99a375d",
+          "physical_readout_hash": "d99a375d",
+          "readout": [
+            "水平初速度 v0/(m/s)：4.0",
+            "桌面高度 h/m：1.8",
+            "闪光时间 Δt/s：0.10",
+            "测点 n：4",
+            "发射口调平误差 θ/°：0.0",
+            "t=nΔt=0.40sx=v0t≈1.60m，x/t≈4.00m/sy≈0.78m，自由落体 y0≈0.78m2y/t²≈9.80m/s²判定=能用"
+          ],
+          "physical_readout": [
+            "水平初速度 v0/(m/s)：4.0",
+            "桌面高度 h/m：1.8",
+            "闪光时间 Δt/s：0.10",
+            "测点 n：4",
+            "发射口调平误差 θ/°：0.0",
+            "t=nΔt=0.40sx=v0t≈1.60m，x/t≈4.00m/sy≈0.78m，自由落体 y0≈0.78m2y/t²≈9.80m/s²判定=能用"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "e3e681a1",
+          "readout_hash": "d99a375d",
+          "physical_readout_hash": "d99a375d",
+          "readout": [
+            "水平初速度 v0/(m/s)：4.0",
+            "桌面高度 h/m：1.8",
+            "闪光时间 Δt/s：0.10",
+            "测点 n：4",
+            "发射口调平误差 θ/°：0.0",
+            "t=nΔt=0.40sx=v0t≈1.60m，x/t≈4.00m/sy≈0.78m，自由落体 y0≈0.78m2y/t²≈9.80m/s²判定=能用"
+          ],
+          "physical_readout": [
+            "水平初速度 v0/(m/s)：4.0",
+            "桌面高度 h/m：1.8",
+            "闪光时间 Δt/s：0.10",
+            "测点 n：4",
+            "发射口调平误差 θ/°：0.0",
+            "t=nΔt=0.40sx=v0t≈1.60m，x/t≈4.00m/sy≈0.78m，自由落体 y0≈0.78m2y/t²≈9.80m/s²判定=能用"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "e3e681a1",
+          "readout_hash": "d99a375d",
+          "physical_readout_hash": "d99a375d",
+          "readout": [
+            "水平初速度 v0/(m/s)：4.0",
+            "桌面高度 h/m：1.8",
+            "闪光时间 Δt/s：0.10",
+            "测点 n：4",
+            "发射口调平误差 θ/°：0.0",
+            "t=nΔt=0.40sx=v0t≈1.60m，x/t≈4.00m/sy≈0.78m，自由落体 y0≈0.78m2y/t²≈9.80m/s²判定=能用"
+          ],
+          "physical_readout": [
+            "水平初速度 v0/(m/s)：4.0",
+            "桌面高度 h/m：1.8",
+            "闪光时间 Δt/s：0.10",
+            "测点 n：4",
+            "发射口调平误差 θ/°：0.0",
+            "t=nΔt=0.40sx=v0t≈1.60m，x/t≈4.00m/sy≈0.78m，自由落体 y0≈0.78m2y/t²≈9.80m/s²判定=能用"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "水平初速度 v#/(m/s)：#|桌面高度 h/m：#|闪光时间 Δt/s：#|测点 n：#|发射口调平误差 θ/°：#|t=nΔt=#sx=v#t≈#m，x/t≈#m/sy≈#m，自由落体 y#≈#m#y/t²≈#m/s²判定=能用",
+          "controls": [
+            {
+              "id": "speed",
+              "value": "4",
+              "checked": false
+            },
+            {
+              "id": "height",
+              "value": "1.8",
+              "checked": false
+            },
+            {
+              "id": "dt",
+              "value": "0.1",
+              "checked": false
+            },
+            {
+              "id": "point",
+              "value": "4",
+              "checked": false
+            },
+            {
+              "id": "tilt",
+              "value": "0",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "水平初速度 v#/(m/s)：#|桌面高度 h/m：#|闪光时间 Δt/s：#|测点 n：#|发射口调平误差 θ/°：#|t=nΔt=#sx=v#t≈#m，x/t≈#m/sy≈#m，自由落体 y#≈#m#y/t²≈#m/s²判定=能用",
+          "controls": [
+            {
+              "id": "speed",
+              "value": "4",
+              "checked": false
+            },
+            {
+              "id": "height",
+              "value": "1.8",
+              "checked": false
+            },
+            {
+              "id": "dt",
+              "value": "0.1",
+              "checked": false
+            },
+            {
+              "id": "point",
+              "value": "4",
+              "checked": false
+            },
+            {
+              "id": "tilt",
+              "value": "0",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/exp/resistivity-lab.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#length",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#diameter",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#voltage",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#rho",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#heat",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#recordBtn",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "de489716",
+          "readout_hash": "7819ccdf",
+          "physical_readout_hash": "7819ccdf",
+          "readout": [
+            "接入长度 L/cm：60",
+            "直径读数 d/mm：0.40",
+            "电压 U/V：1.2",
+            "真实电阻率 ρ/(10^-6 Ω·m)：0.50",
+            "温升误差/%：3",
+            "R=U/I≈2.46ΩS=πd²/4≈0.1257mm²ρ=RS/L≈0.515×10^-6Ω·m电流 I≈0.488A，误差≈3.0%累积焦耳热 W=I²Rt≈0.000J判定=能用"
+          ],
+          "physical_readout": [
+            "接入长度 L/cm：60",
+            "直径读数 d/mm：0.40",
+            "电压 U/V：1.2",
+            "真实电阻率 ρ/(10^-6 Ω·m)：0.50",
+            "温升误差/%：3",
+            "R=U/I≈2.46ΩS=πd²/4≈0.1257mm²ρ=RS/L≈0.515×10^-6Ω·m电流 I≈0.488A，误差≈3.0%累积焦耳热 W=I²Rt≈0.000J判定=能用"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "de489716",
+          "readout_hash": "e04e8391",
+          "physical_readout_hash": "e04e8391",
+          "readout": [
+            "接入长度 L/cm：60",
+            "直径读数 d/mm：0.40",
+            "电压 U/V：1.2",
+            "真实电阻率 ρ/(10^-6 Ω·m)：0.50",
+            "温升误差/%：3",
+            "R=U/I≈2.46ΩS=πd²/4≈0.1257mm²ρ=RS/L≈0.515×10^-6Ω·m电流 I≈0.488A，误差≈3.0%累积焦耳热 W=I²Rt≈0.200J判定=能用"
+          ],
+          "physical_readout": [
+            "接入长度 L/cm：60",
+            "直径读数 d/mm：0.40",
+            "电压 U/V：1.2",
+            "真实电阻率 ρ/(10^-6 Ω·m)：0.50",
+            "温升误差/%：3",
+            "R=U/I≈2.46ΩS=πd²/4≈0.1257mm²ρ=RS/L≈0.515×10^-6Ω·m电流 I≈0.488A，误差≈3.0%累积焦耳热 W=I²Rt≈0.200J判定=能用"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": false,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "de489716",
+          "readout_hash": "4160f59f",
+          "physical_readout_hash": "4160f59f",
+          "readout": [
+            "接入长度 L/cm：60",
+            "直径读数 d/mm：0.40",
+            "电压 U/V：1.2",
+            "真实电阻率 ρ/(10^-6 Ω·m)：0.50",
+            "温升误差/%：3",
+            "R=U/I≈2.46ΩS=πd²/4≈0.1257mm²ρ=RS/L≈0.515×10^-6Ω·m电流 I≈0.488A，误差≈3.0%累积焦耳热 W=I²Rt≈0.215J判定=能用"
+          ],
+          "physical_readout": [
+            "接入长度 L/cm：60",
+            "直径读数 d/mm：0.40",
+            "电压 U/V：1.2",
+            "真实电阻率 ρ/(10^-6 Ω·m)：0.50",
+            "温升误差/%：3",
+            "R=U/I≈2.46ΩS=πd²/4≈0.1257mm²ρ=RS/L≈0.515×10^-6Ω·m电流 I≈0.488A，误差≈3.0%累积焦耳热 W=I²Rt≈0.215J判定=能用"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "de489716",
+          "readout_hash": "4160f59f",
+          "physical_readout_hash": "4160f59f",
+          "readout": [
+            "接入长度 L/cm：60",
+            "直径读数 d/mm：0.40",
+            "电压 U/V：1.2",
+            "真实电阻率 ρ/(10^-6 Ω·m)：0.50",
+            "温升误差/%：3",
+            "R=U/I≈2.46ΩS=πd²/4≈0.1257mm²ρ=RS/L≈0.515×10^-6Ω·m电流 I≈0.488A，误差≈3.0%累积焦耳热 W=I²Rt≈0.215J判定=能用"
+          ],
+          "physical_readout": [
+            "接入长度 L/cm：60",
+            "直径读数 d/mm：0.40",
+            "电压 U/V：1.2",
+            "真实电阻率 ρ/(10^-6 Ω·m)：0.50",
+            "温升误差/%：3",
+            "R=U/I≈2.46ΩS=πd²/4≈0.1257mm²ρ=RS/L≈0.515×10^-6Ω·m电流 I≈0.488A，误差≈3.0%累积焦耳热 W=I²Rt≈0.215J判定=能用"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "接入长度 L/cm：#|直径读数 d/mm：#|电压 U/V：#|真实电阻率 ρ/(#^# Ω·m)：#|温升误差/%：#|R=U/I≈#ΩS=πd²/#≈#mm²ρ=RS/L≈#×#^#Ω·m电流 I≈#A，误差≈#%累积焦耳热 W=I²Rt≈#J判定=能用",
+          "controls": [
+            {
+              "id": "length",
+              "value": "60",
+              "checked": false
+            },
+            {
+              "id": "diameter",
+              "value": "0.4",
+              "checked": false
+            },
+            {
+              "id": "voltage",
+              "value": "1.2",
+              "checked": false
+            },
+            {
+              "id": "rho",
+              "value": "0.5",
+              "checked": false
+            },
+            {
+              "id": "heat",
+              "value": "3",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "接入长度 L/cm：#|直径读数 d/mm：#|电压 U/V：#|真实电阻率 ρ/(#^# Ω·m)：#|温升误差/%：#|R=U/I≈#ΩS=πd²/#≈#mm²ρ=RS/L≈#×#^#Ω·m电流 I≈#A，误差≈#%累积焦耳热 W=I²Rt≈#J判定=能用",
+          "controls": [
+            {
+              "id": "length",
+              "value": "60",
+              "checked": false
+            },
+            {
+              "id": "diameter",
+              "value": "0.4",
+              "checked": false
+            },
+            {
+              "id": "voltage",
+              "value": "1.2",
+              "checked": false
+            },
+            {
+              "id": "rho",
+              "value": "0.5",
+              "checked": false
+            },
+            {
+              "id": "heat",
+              "value": "3",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

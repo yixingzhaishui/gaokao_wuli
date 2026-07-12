@@ -1,0 +1,917 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T06:31:19.947Z",
+  "commit": "b40ed78efd4194e984f507b15d8ba31a47997dfd",
+  "module": "bx1",
+  "modules": [
+    "bx1"
+  ],
+  "summary": {
+    "total": 5,
+    "score": 100,
+    "pass": 5,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/bx1/acceleration.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:同向加速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:刹车减速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:反向加速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:v=0,a≠0",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#speedUpBtn",
+          "text": "同向加速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#brakeBtn",
+          "text": "刹车减速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#reverseBtn",
+          "text": "反向加速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#zeroBtn",
+          "text": "v=0,a≠0",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#playBtn",
+          "text": "▶ 播放：按 a 匀变速运动",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置播放",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "▶ 播放：按 a 匀变速运动"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置播放"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "49223ab8",
+          "readout_hash": "c37a5d3c",
+          "physical_readout_hash": "a73ecb12",
+          "readout": [
+            "v1=4.0 m/sv2=10.0 m/sΔv=v2-v1=6.0 m/sΔt=3.0 sa=Δv/Δt=2.00 m/s²播放中瞬时速度 v=— m/s",
+            "当前时刻 a 与 v2 同向：速率正在增大，是加速。"
+          ],
+          "physical_readout": [
+            "v1=4.0 m/sv2=10.0 m/sΔv=v2-v1=6.0 m/sΔt=3.0 sa=Δv/Δt=2.00 m/s²瞬时速度 v=— m/s",
+            "当前时刻 a 与 v2 同向：速率正在增大，是加速。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "357fed1a",
+          "readout_hash": "e51b0403",
+          "physical_readout_hash": "ff55a0d",
+          "readout": [
+            "v1=4.0 m/sv2=10.0 m/sΔv=v2-v1=6.0 m/sΔt=3.0 sa=Δv/Δt=2.00 m/s²播放中瞬时速度 v=6.7 m/s",
+            "当前时刻 a 与 v2 同向：速率正在增大，是加速。"
+          ],
+          "physical_readout": [
+            "v1=4.0 m/sv2=10.0 m/sΔv=v2-v1=6.0 m/sΔt=3.0 sa=Δv/Δt=2.00 m/s²瞬时速度 v=6.7 m/s",
+            "当前时刻 a 与 v2 同向：速率正在增大，是加速。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "49223ab8",
+          "readout_hash": "c37a5d3c",
+          "physical_readout_hash": "a73ecb12",
+          "readout": [
+            "v1=4.0 m/sv2=10.0 m/sΔv=v2-v1=6.0 m/sΔt=3.0 sa=Δv/Δt=2.00 m/s²播放中瞬时速度 v=— m/s",
+            "当前时刻 a 与 v2 同向：速率正在增大，是加速。"
+          ],
+          "physical_readout": [
+            "v1=4.0 m/sv2=10.0 m/sΔv=v2-v1=6.0 m/sΔt=3.0 sa=Δv/Δt=2.00 m/s²瞬时速度 v=— m/s",
+            "当前时刻 a 与 v2 同向：速率正在增大，是加速。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "49223ab8",
+          "readout_hash": "c37a5d3c",
+          "physical_readout_hash": "a73ecb12",
+          "readout": [
+            "v1=4.0 m/sv2=10.0 m/sΔv=v2-v1=6.0 m/sΔt=3.0 sa=Δv/Δt=2.00 m/s²播放中瞬时速度 v=— m/s",
+            "当前时刻 a 与 v2 同向：速率正在增大，是加速。"
+          ],
+          "physical_readout": [
+            "v1=4.0 m/sv2=10.0 m/sΔv=v2-v1=6.0 m/sΔt=3.0 sa=Δv/Δt=2.00 m/s²瞬时速度 v=— m/s",
+            "当前时刻 a 与 v2 同向：速率正在增大，是加速。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "v#=# m/sv#=# m/sΔv=v#-v#=# m/sΔt=# sa=Δv/Δt=# m/s²播放中瞬时速度 v=— m/s|当前时刻 a 与 v# 同向：速率正在增大，是加速。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "v#=# m/sv#=# m/sΔv=v#-v#=# m/sΔt=# sa=Δv/Δt=# m/s²播放中瞬时速度 v=— m/s|当前时刻 a 与 v# 同向：速率正在增大，是加速。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx1/uniform-acceleration.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:匀减速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:反向加速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:由静止开始",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:匀加速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#mAccel",
+          "text": "匀加速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mBrake",
+          "text": "匀减速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mReverse",
+          "text": "反向加速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mZero",
+          "text": "由静止开始",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "▶ 播放运动",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "▶ 播放运动"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "9672f453",
+          "readout_hash": "ffa4fc95",
+          "physical_readout_hash": "ffa4fc95",
+          "readout": [
+            "v0=2.0 m/sa=1.40 m/s²t=4.00 sv=7.60 m/sx=19.20 mv²-v0²=53.76，2ax=53.76",
+            "匀变速的关键不是速度相等，而是速度每秒改变量相等；频闪表现为相邻位移差恒定。"
+          ],
+          "physical_readout": [
+            "v0=2.0 m/sa=1.40 m/s²t=4.00 sv=7.60 m/sx=19.20 mv²-v0²=53.76，2ax=53.76",
+            "匀变速的关键不是速度相等，而是速度每秒改变量相等；频闪表现为相邻位移差恒定。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "5b13ee1c",
+          "readout_hash": "e8746ca0",
+          "physical_readout_hash": "e8746ca0",
+          "readout": [
+            "v0=2.0 m/sa=1.40 m/s²t=4.35 sv=8.09 m/sx=21.95 mv²-v0²=61.45，2ax=61.45",
+            "匀变速的关键不是速度相等，而是速度每秒改变量相等；频闪表现为相邻位移差恒定。"
+          ],
+          "physical_readout": [
+            "v0=2.0 m/sa=1.40 m/s²t=4.35 sv=8.09 m/sx=21.95 mv²-v0²=61.45，2ax=61.45",
+            "匀变速的关键不是速度相等，而是速度每秒改变量相等；频闪表现为相邻位移差恒定。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "cd6e662",
+          "readout_hash": "9ec22039",
+          "physical_readout_hash": "9ec22039",
+          "readout": [
+            "v0=2.0 m/sa=1.40 m/s²t=4.38 sv=8.13 m/sx=22.15 mv²-v0²=62.02，2ax=62.02",
+            "匀变速的关键不是速度相等，而是速度每秒改变量相等；频闪表现为相邻位移差恒定。"
+          ],
+          "physical_readout": [
+            "v0=2.0 m/sa=1.40 m/s²t=4.38 sv=8.13 m/sx=22.15 mv²-v0²=62.02，2ax=62.02",
+            "匀变速的关键不是速度相等，而是速度每秒改变量相等；频闪表现为相邻位移差恒定。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "cd6e662",
+          "readout_hash": "9ec22039",
+          "physical_readout_hash": "9ec22039",
+          "readout": [
+            "v0=2.0 m/sa=1.40 m/s²t=4.38 sv=8.13 m/sx=22.15 mv²-v0²=62.02，2ax=62.02",
+            "匀变速的关键不是速度相等，而是速度每秒改变量相等；频闪表现为相邻位移差恒定。"
+          ],
+          "physical_readout": [
+            "v0=2.0 m/sa=1.40 m/s²t=4.38 sv=8.13 m/sx=22.15 mv²-v0²=62.02，2ax=62.02",
+            "匀变速的关键不是速度相等，而是速度每秒改变量相等；频闪表现为相邻位移差恒定。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "v#=# m/sa=# m/s²t=# sv=# m/sx=# mv²-v#²=#，#ax=#|匀变速的关键不是速度相等，而是速度每秒改变量相等；频闪表现为相邻位移差恒定。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "v#=# m/sa=# m/s²t=# sv=# m/sx=# mv²-v#²=#，#ax=#|匀变速的关键不是速度相等，而是速度每秒改变量相等；频闪表现为相邻位移差恒定。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx1/velocity.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#v0Slider",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#aSlider",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:缩小 Δt",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:设为匀速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#shrinkBtn",
+          "text": "缩小 Δt",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#uniformBtn",
+          "text": "设为匀速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#playBtn",
+          "text": "▶ 播放：Δt 自动逼近0",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置播放",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "▶ 播放：Δt 自动逼近0"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置播放"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "22fcf151",
+          "readout_hash": "372553ff",
+          "physical_readout_hash": "5714c86d",
+          "readout": [
+            "初速度 v0 2.0 m/s",
+            "加速度 a 1.5 m/s²",
+            "t=3.00 sΔt=1.50 s平均速度 v̄=7.625 m/s瞬时速度 v=6.500 m/s差值=1.125 m/s播放状态：暂停",
+            "平均速度描述一段过程；瞬时速度描述 P 点这一刻。拖 Q 靠近 P 再观察。"
+          ],
+          "physical_readout": [
+            "初速度 v0 2.0 m/s",
+            "加速度 a 1.5 m/s²",
+            "t=3.00 sΔt=1.50 s平均速度 v̄=7.625 m/s瞬时速度 v=6.500 m/s差值=1.125 m/s",
+            "平均速度描述一段过程；瞬时速度描述 P 点这一刻。拖 Q 靠近 P 再观察。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "8727a1e6",
+          "readout_hash": "88d91a44",
+          "physical_readout_hash": "e0dbb1dd",
+          "readout": [
+            "初速度 v0 2.0 m/s",
+            "加速度 a 1.5 m/s²",
+            "t=3.00 sΔt=0.29 s平均速度 v̄=6.718 m/s瞬时速度 v=6.500 m/s差值=0.218 m/s播放状态：逼近中",
+            "平均速度描述一段过程；瞬时速度描述 P 点这一刻。拖 Q 靠近 P 再观察。"
+          ],
+          "physical_readout": [
+            "初速度 v0 2.0 m/s",
+            "加速度 a 1.5 m/s²",
+            "t=3.00 sΔt=0.29 s平均速度 v̄=6.718 m/s瞬时速度 v=6.500 m/s差值=0.218 m/s状态：逼近中",
+            "平均速度描述一段过程；瞬时速度描述 P 点这一刻。拖 Q 靠近 P 再观察。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "1e1c21a3",
+          "readout_hash": "9588138",
+          "physical_readout_hash": "b4460960",
+          "readout": [
+            "初速度 v0 2.0 m/s",
+            "加速度 a 1.5 m/s²",
+            "t=3.00 sΔt=0.27 s平均速度 v̄=6.703 m/s瞬时速度 v=6.500 m/s差值=0.203 m/s播放状态：暂停",
+            "平均速度描述一段过程；瞬时速度描述 P 点这一刻。拖 Q 靠近 P 再观察。"
+          ],
+          "physical_readout": [
+            "初速度 v0 2.0 m/s",
+            "加速度 a 1.5 m/s²",
+            "t=3.00 sΔt=0.27 s平均速度 v̄=6.703 m/s瞬时速度 v=6.500 m/s差值=0.203 m/s",
+            "平均速度描述一段过程；瞬时速度描述 P 点这一刻。拖 Q 靠近 P 再观察。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "1e1c21a3",
+          "readout_hash": "9588138",
+          "physical_readout_hash": "b4460960",
+          "readout": [
+            "初速度 v0 2.0 m/s",
+            "加速度 a 1.5 m/s²",
+            "t=3.00 sΔt=0.27 s平均速度 v̄=6.703 m/s瞬时速度 v=6.500 m/s差值=0.203 m/s播放状态：暂停",
+            "平均速度描述一段过程；瞬时速度描述 P 点这一刻。拖 Q 靠近 P 再观察。"
+          ],
+          "physical_readout": [
+            "初速度 v0 2.0 m/s",
+            "加速度 a 1.5 m/s²",
+            "t=3.00 sΔt=0.27 s平均速度 v̄=6.703 m/s瞬时速度 v=6.500 m/s差值=0.203 m/s",
+            "平均速度描述一段过程；瞬时速度描述 P 点这一刻。拖 Q 靠近 P 再观察。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "初速度 v# # m/s|加速度 a # m/s²|t=# sΔt=# s平均速度 v̄=# m/s瞬时速度 v=# m/s差值=# m/s播放状态：暂停|平均速度描述一段过程；瞬时速度描述 P 点这一刻。拖 Q 靠近 P 再观察。",
+          "controls": [
+            {
+              "id": "v0Slider",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "aSlider",
+              "value": "1.5",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "初速度 v# # m/s|加速度 a # m/s²|t=# sΔt=# s平均速度 v̄=# m/s瞬时速度 v=# m/s差值=# m/s播放状态：暂停|平均速度描述一段过程；瞬时速度描述 P 点这一刻。拖 Q 靠近 P 再观察。",
+          "controls": [
+            {
+              "id": "v0Slider",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "aSlider",
+              "value": "1.5",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx1/vt-graph.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:刹车到反向",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:匀速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:负向运动",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:正向加速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#mAccel",
+          "text": "正向加速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mBrake",
+          "text": "刹车到反向",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mUniform",
+          "text": "匀速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mReverse",
+          "text": "负向运动",
+          "role": "other",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "▶ 播放运动",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "▶ 播放运动"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "c9a9c825",
+          "readout_hash": "e1836f11",
+          "physical_readout_hash": "e1836f11",
+          "readout": [
+            "v0=2.0 m/sv(6s)=8.0 m/sa=1.00 m/s²t=4.00 s，v=6.00 m/s位移 x=16.00 m路程 s=16.00 m",
+            "看斜率，不看线长：v-t 图线越陡，加速度大小越大；下方面积才是位移。"
+          ],
+          "physical_readout": [
+            "v0=2.0 m/sv(6s)=8.0 m/sa=1.00 m/s²t=4.00 s，v=6.00 m/s位移 x=16.00 m路程 s=16.00 m",
+            "看斜率，不看线长：v-t 图线越陡，加速度大小越大；下方面积才是位移。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "42993737",
+          "readout_hash": "38035515",
+          "physical_readout_hash": "38035515",
+          "readout": [
+            "v0=2.0 m/sv(6s)=8.0 m/sa=1.00 m/s²t=4.35 s，v=6.35 m/s位移 x=18.17 m路程 s=18.17 m",
+            "看斜率，不看线长：v-t 图线越陡，加速度大小越大；下方面积才是位移。"
+          ],
+          "physical_readout": [
+            "v0=2.0 m/sv(6s)=8.0 m/sa=1.00 m/s²t=4.35 s，v=6.35 m/s位移 x=18.17 m路程 s=18.17 m",
+            "看斜率，不看线长：v-t 图线越陡，加速度大小越大；下方面积才是位移。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "3f3505e2",
+          "readout_hash": "f3fd4299",
+          "physical_readout_hash": "f3fd4299",
+          "readout": [
+            "v0=2.0 m/sv(6s)=8.0 m/sa=1.00 m/s²t=4.37 s，v=6.37 m/s位移 x=18.32 m路程 s=18.32 m",
+            "看斜率，不看线长：v-t 图线越陡，加速度大小越大；下方面积才是位移。"
+          ],
+          "physical_readout": [
+            "v0=2.0 m/sv(6s)=8.0 m/sa=1.00 m/s²t=4.37 s，v=6.37 m/s位移 x=18.32 m路程 s=18.32 m",
+            "看斜率，不看线长：v-t 图线越陡，加速度大小越大；下方面积才是位移。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "3f3505e2",
+          "readout_hash": "f3fd4299",
+          "physical_readout_hash": "f3fd4299",
+          "readout": [
+            "v0=2.0 m/sv(6s)=8.0 m/sa=1.00 m/s²t=4.37 s，v=6.37 m/s位移 x=18.32 m路程 s=18.32 m",
+            "看斜率，不看线长：v-t 图线越陡，加速度大小越大；下方面积才是位移。"
+          ],
+          "physical_readout": [
+            "v0=2.0 m/sv(6s)=8.0 m/sa=1.00 m/s²t=4.37 s，v=6.37 m/s位移 x=18.32 m路程 s=18.32 m",
+            "看斜率，不看线长：v-t 图线越陡，加速度大小越大；下方面积才是位移。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "v#=# m/sv(#s)=# m/sa=# m/s²t=# s，v=# m/s位移 x=# m路程 s=# m|看斜率，不看线长：v-t 图线越陡，加速度大小越大；下方面积才是位移。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "v#=# m/sv(#s)=# m/sa=# m/s²t=# s，v=# m/s位移 x=# m路程 s=# m|看斜率，不看线长：v-t 图线越陡，加速度大小越大；下方面积才是位移。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx1/xt-graph.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:加速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:减速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:静止",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:匀速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#mUniform",
+          "text": "匀速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mAccel",
+          "text": "加速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mDecel",
+          "text": "减速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mStill",
+          "text": "静止",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#playBtn",
+          "text": "▶ 播放：小车随时间运动",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置播放",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "▶ 播放：小车随时间运动"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置播放"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "48b5b8ec",
+          "readout_hash": "90c22976",
+          "physical_readout_hash": "b0c792e6",
+          "readout": [
+            "运动类型=匀速直线t=3.00 sx=12.00 m割线斜率=4.00 m/s切线斜率 v=4.00 m/s播放状态：暂停",
+            "x-t 图的斜率表示速度；交点才表示同一时刻同一位置，图线形状不是空间路线。"
+          ],
+          "physical_readout": [
+            "运动类型=匀速直线t=3.00 sx=12.00 m割线斜率=4.00 m/s切线斜率 v=4.00 m/s",
+            "x-t 图的斜率表示速度；交点才表示同一时刻同一位置，图线形状不是空间路线。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "60964951",
+          "readout_hash": "63671ccc",
+          "physical_readout_hash": "908e5f2a",
+          "readout": [
+            "运动类型=匀速直线t=3.92 sx=15.68 m割线斜率=4.00 m/s切线斜率 v=4.00 m/s播放状态：播放中",
+            "x-t 图的斜率表示速度；交点才表示同一时刻同一位置，图线形状不是空间路线。"
+          ],
+          "physical_readout": [
+            "运动类型=匀速直线t=3.92 sx=15.68 m割线斜率=4.00 m/s切线斜率 v=4.00 m/s",
+            "x-t 图的斜率表示速度；交点才表示同一时刻同一位置，图线形状不是空间路线。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "50300420",
+          "readout_hash": "8e3152d8",
+          "physical_readout_hash": "d08b52a4",
+          "readout": [
+            "运动类型=匀速直线t=3.96 sx=15.84 m割线斜率=4.00 m/s切线斜率 v=4.00 m/s播放状态：暂停",
+            "x-t 图的斜率表示速度；交点才表示同一时刻同一位置，图线形状不是空间路线。"
+          ],
+          "physical_readout": [
+            "运动类型=匀速直线t=3.96 sx=15.84 m割线斜率=4.00 m/s切线斜率 v=4.00 m/s",
+            "x-t 图的斜率表示速度；交点才表示同一时刻同一位置，图线形状不是空间路线。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "50300420",
+          "readout_hash": "8e3152d8",
+          "physical_readout_hash": "d08b52a4",
+          "readout": [
+            "运动类型=匀速直线t=3.96 sx=15.84 m割线斜率=4.00 m/s切线斜率 v=4.00 m/s播放状态：暂停",
+            "x-t 图的斜率表示速度；交点才表示同一时刻同一位置，图线形状不是空间路线。"
+          ],
+          "physical_readout": [
+            "运动类型=匀速直线t=3.96 sx=15.84 m割线斜率=4.00 m/s切线斜率 v=4.00 m/s",
+            "x-t 图的斜率表示速度；交点才表示同一时刻同一位置，图线形状不是空间路线。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "运动类型=匀速直线t=# sx=# m割线斜率=# m/s切线斜率 v=# m/s播放状态：暂停|x-t 图的斜率表示速度；交点才表示同一时刻同一位置，图线形状不是空间路线。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "运动类型=匀速直线t=# sx=# m割线斜率=# m/s切线斜率 v=# m/s播放状态：暂停|x-t 图的斜率表示速度；交点才表示同一时刻同一位置，图线形状不是空间路线。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

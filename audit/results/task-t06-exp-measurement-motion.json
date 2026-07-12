@@ -1,0 +1,1207 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T06:57:03.601Z",
+  "commit": "72c1d09661a56f1b345faf474f3c4249bd9eb6f9",
+  "module": "exp",
+  "modules": [
+    "exp"
+  ],
+  "summary": {
+    "total": 5,
+    "score": 100,
+    "pass": 5,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/exp/centripetal-force-lab.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#mode",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#mass",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#radius",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#omega",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#error",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#recordBtn",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "e454079e",
+          "readout_hash": "b1654dbc",
+          "physical_readout_hash": "b1654dbc",
+          "readout": [
+            "图像横轴：改变 ω²",
+            "小球质量 m/kg：0.10",
+            "转动半径 r/m：0.30",
+            "角速度 ω/(rad/s)：5.0",
+            "读数误差：2%",
+            "F理论=mω²r=0.75N测力计 F读≈0.73Nv=ωr=1.50m/s，a=ω²r=7.50m/s²F/ω²≈0.029N·s²控制变量：改变 ω²",
+            "通过：测力计读数与 m、r、ω² 的乘积同步增大。"
+          ],
+          "physical_readout": [
+            "图像横轴：改变 ω²",
+            "小球质量 m/kg：0.10",
+            "转动半径 r/m：0.30",
+            "角速度 ω/(rad/s)：5.0",
+            "读数误差：2%",
+            "F理论=mω²r=0.75N测力计 F读≈0.73Nv=ωr=1.50m/s，a=ω²r=7.50m/s²F/ω²≈0.029N·s²控制变量：改变 ω²",
+            "通过：测力计读数与 m、r、ω² 的乘积同步增大。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "f21eeba1",
+          "readout_hash": "b1654dbc",
+          "physical_readout_hash": "b1654dbc",
+          "readout": [
+            "图像横轴：改变 ω²",
+            "小球质量 m/kg：0.10",
+            "转动半径 r/m：0.30",
+            "角速度 ω/(rad/s)：5.0",
+            "读数误差：2%",
+            "F理论=mω²r=0.75N测力计 F读≈0.73Nv=ωr=1.50m/s，a=ω²r=7.50m/s²F/ω²≈0.029N·s²控制变量：改变 ω²",
+            "通过：测力计读数与 m、r、ω² 的乘积同步增大。"
+          ],
+          "physical_readout": [
+            "图像横轴：改变 ω²",
+            "小球质量 m/kg：0.10",
+            "转动半径 r/m：0.30",
+            "角速度 ω/(rad/s)：5.0",
+            "读数误差：2%",
+            "F理论=mω²r=0.75N测力计 F读≈0.73Nv=ωr=1.50m/s，a=ω²r=7.50m/s²F/ω²≈0.029N·s²控制变量：改变 ω²",
+            "通过：测力计读数与 m、r、ω² 的乘积同步增大。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "e454079e",
+          "readout_hash": "b1654dbc",
+          "physical_readout_hash": "b1654dbc",
+          "readout": [
+            "图像横轴：改变 ω²",
+            "小球质量 m/kg：0.10",
+            "转动半径 r/m：0.30",
+            "角速度 ω/(rad/s)：5.0",
+            "读数误差：2%",
+            "F理论=mω²r=0.75N测力计 F读≈0.73Nv=ωr=1.50m/s，a=ω²r=7.50m/s²F/ω²≈0.029N·s²控制变量：改变 ω²",
+            "通过：测力计读数与 m、r、ω² 的乘积同步增大。"
+          ],
+          "physical_readout": [
+            "图像横轴：改变 ω²",
+            "小球质量 m/kg：0.10",
+            "转动半径 r/m：0.30",
+            "角速度 ω/(rad/s)：5.0",
+            "读数误差：2%",
+            "F理论=mω²r=0.75N测力计 F读≈0.73Nv=ωr=1.50m/s，a=ω²r=7.50m/s²F/ω²≈0.029N·s²控制变量：改变 ω²",
+            "通过：测力计读数与 m、r、ω² 的乘积同步增大。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "e454079e",
+          "readout_hash": "b1654dbc",
+          "physical_readout_hash": "b1654dbc",
+          "readout": [
+            "图像横轴：改变 ω²",
+            "小球质量 m/kg：0.10",
+            "转动半径 r/m：0.30",
+            "角速度 ω/(rad/s)：5.0",
+            "读数误差：2%",
+            "F理论=mω²r=0.75N测力计 F读≈0.73Nv=ωr=1.50m/s，a=ω²r=7.50m/s²F/ω²≈0.029N·s²控制变量：改变 ω²",
+            "通过：测力计读数与 m、r、ω² 的乘积同步增大。"
+          ],
+          "physical_readout": [
+            "图像横轴：改变 ω²",
+            "小球质量 m/kg：0.10",
+            "转动半径 r/m：0.30",
+            "角速度 ω/(rad/s)：5.0",
+            "读数误差：2%",
+            "F理论=mω²r=0.75N测力计 F读≈0.73Nv=ωr=1.50m/s，a=ω²r=7.50m/s²F/ω²≈0.029N·s²控制变量：改变 ω²",
+            "通过：测力计读数与 m、r、ω² 的乘积同步增大。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "图像横轴：改变 ω²|小球质量 m/kg：#|转动半径 r/m：#|角速度 ω/(rad/s)：#|读数误差：#%|F理论=mω²r=#N测力计 F读≈#Nv=ωr=#m/s，a=ω²r=#m/s²F/ω²≈#N·s²控制变量：改变 ω²|通过：测力计读数与 m、r、ω² 的乘积同步增大。",
+          "controls": [
+            {
+              "id": "mode",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "mass",
+              "value": "0.1",
+              "checked": false
+            },
+            {
+              "id": "radius",
+              "value": "0.3",
+              "checked": false
+            },
+            {
+              "id": "omega",
+              "value": "5",
+              "checked": false
+            },
+            {
+              "id": "error",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "图像横轴：改变 ω²|小球质量 m/kg：#|转动半径 r/m：#|角速度 ω/(rad/s)：#|读数误差：#%|F理论=mω²r=#N测力计 F读≈#Nv=ωr=#m/s，a=ω²r=#m/s²F/ω²≈#N·s²控制变量：改变 ω²|通过：测力计读数与 m、r、ω² 的乘积同步增大。",
+          "controls": [
+            {
+              "id": "mode",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "mass",
+              "value": "0.1",
+              "checked": false
+            },
+            {
+              "id": "radius",
+              "value": "0.3",
+              "checked": false
+            },
+            {
+              "id": "omega",
+              "value": "5",
+              "checked": false
+            },
+            {
+              "id": "error",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/exp/force-parallelogram-lab.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#f1",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#f2",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#theta",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#error",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#recordBtn",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "5b99bfdb",
+          "readout_hash": "ae394fac",
+          "physical_readout_hash": "d6b653ae",
+          "readout": [
+            "F1/N：4.0",
+            "F2/N：5.0",
+            "夹角 θ/°：70",
+            "读数/作图误差：1",
+            "F1=4.0N，F2=5.0N，θ=70°F作=√(F1²+F2²+2F1F2cosθ)=7.39NF实=7.48N，方向差=1.4°误差=1.2%实验进度=0%：两只测力计共同拉到 O演示时间=0.00s"
+          ],
+          "physical_readout": [
+            "F1/N：4.0",
+            "F2/N：5.0",
+            "夹角 θ/°：70",
+            "读数/作图误差：1",
+            "F1=4.0N，F2=5.0N，θ=70°F作=√(F1²+F2²+2F1F2cosθ)=7.39NF实=7.48N，方向差=1.4°误差=1.2%实验进度=0%：两只测力计共同拉到 O"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "5b99bfdb",
+          "readout_hash": "7b89fdf0",
+          "physical_readout_hash": "702f4593",
+          "readout": [
+            "F1/N：4.0",
+            "F2/N：5.0",
+            "夹角 θ/°：70",
+            "读数/作图误差：1",
+            "F1=4.0N，F2=5.0N，θ=70°F作=√(F1²+F2²+2F1F2cosθ)=7.39NF实=7.48N，方向差=1.4°误差=1.2%实验进度=84%：单只测力计复现合力到同一 O演示时间=0.34s"
+          ],
+          "physical_readout": [
+            "F1/N：4.0",
+            "F2/N：5.0",
+            "夹角 θ/°：70",
+            "读数/作图误差：1",
+            "F1=4.0N，F2=5.0N，θ=70°F作=√(F1²+F2²+2F1F2cosθ)=7.39NF实=7.48N，方向差=1.4°误差=1.2%实验进度=84%：单只测力计复现合力到同一 O"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": false,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "5b99bfdb",
+          "readout_hash": "6f340bae",
+          "physical_readout_hash": "d6b653ae",
+          "readout": [
+            "F1/N：4.0",
+            "F2/N：5.0",
+            "夹角 θ/°：70",
+            "读数/作图误差：1",
+            "F1=4.0N，F2=5.0N，θ=70°F作=√(F1²+F2²+2F1F2cosθ)=7.39NF实=7.48N，方向差=1.4°误差=1.2%实验进度=0%：两只测力计共同拉到 O演示时间=0.37s"
+          ],
+          "physical_readout": [
+            "F1/N：4.0",
+            "F2/N：5.0",
+            "夹角 θ/°：70",
+            "读数/作图误差：1",
+            "F1=4.0N，F2=5.0N，θ=70°F作=√(F1²+F2²+2F1F2cosθ)=7.39NF实=7.48N，方向差=1.4°误差=1.2%实验进度=0%：两只测力计共同拉到 O"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "5b99bfdb",
+          "readout_hash": "6f340bae",
+          "physical_readout_hash": "d6b653ae",
+          "readout": [
+            "F1/N：4.0",
+            "F2/N：5.0",
+            "夹角 θ/°：70",
+            "读数/作图误差：1",
+            "F1=4.0N，F2=5.0N，θ=70°F作=√(F1²+F2²+2F1F2cosθ)=7.39NF实=7.48N，方向差=1.4°误差=1.2%实验进度=0%：两只测力计共同拉到 O演示时间=0.37s"
+          ],
+          "physical_readout": [
+            "F1/N：4.0",
+            "F2/N：5.0",
+            "夹角 θ/°：70",
+            "读数/作图误差：1",
+            "F1=4.0N，F2=5.0N，θ=70°F作=√(F1²+F2²+2F1F2cosθ)=7.39NF实=7.48N，方向差=1.4°误差=1.2%实验进度=0%：两只测力计共同拉到 O"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "F#/N：#|F#/N：#|夹角 θ/°：#|读数/作图误差：#|F#=#N，F#=#N，θ=#°F作=√(F#²+F#²#F#F#cosθ)=#NF实=#N，方向差=#°误差=#%实验进度=#%：两只测力计共同拉到 O演示时间=#s",
+          "controls": [
+            {
+              "id": "f1",
+              "value": "4",
+              "checked": false
+            },
+            {
+              "id": "f2",
+              "value": "5",
+              "checked": false
+            },
+            {
+              "id": "theta",
+              "value": "70",
+              "checked": false
+            },
+            {
+              "id": "error",
+              "value": "1",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "F#/N：#|F#/N：#|夹角 θ/°：#|读数/作图误差：#|F#=#N，F#=#N，θ=#°F作=√(F#²+F#²#F#F#cosθ)=#NF实=#N，方向差=#°误差=#%实验进度=#%：两只测力计共同拉到 O演示时间=#s",
+          "controls": [
+            {
+              "id": "f1",
+              "value": "4",
+              "checked": false
+            },
+            {
+              "id": "f2",
+              "value": "5",
+              "checked": false
+            },
+            {
+              "id": "theta",
+              "value": "70",
+              "checked": false
+            },
+            {
+              "id": "error",
+              "value": "1",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/exp/length-measurement-lab.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#length",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#zero",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:游标卡尺",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:螺旋测微器",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:刻度尺",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "button:刻度尺",
+          "text": "刻度尺",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:游标卡尺",
+          "text": "游标卡尺",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:螺旋测微器",
+          "text": "螺旋测微器",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#reset",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "c7b5876c",
+          "readout_hash": "1c8ee564",
+          "physical_readout_hash": "1c8ee564",
+          "readout": [
+            "被测长度/直径 32.4 mm",
+            "32.4 mm",
+            "零误差 +0.00 mm",
+            "+0.00 mm",
+            "工具：刻度尺原读数：32.40 mm零误差：+0.00 mm修正读数：32.40 mm",
+            "暂无记录",
+            "1 mm刻度，估读0.1 mm；读数时先读主尺或固定刻度，再读副尺，最后做零误差修正。"
+          ],
+          "physical_readout": [
+            "被测长度/直径 32.4 mm",
+            "32.4 mm",
+            "零误差 +0.00 mm",
+            "+0.00 mm",
+            "工具：刻度尺原读数：32.40 mm零误差：+0.00 mm修正读数：32.40 mm",
+            "暂无记录",
+            "1 mm刻度，估读0.1 mm；读数时先读主尺或固定刻度，再读副尺，最后做零误差修正。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "74bf0d24",
+          "readout_hash": "4b252142",
+          "physical_readout_hash": "4b252142",
+          "readout": [
+            "被测长度/直径 49.1 mm",
+            "49.1 mm",
+            "零误差 +0.00 mm",
+            "+0.00 mm",
+            "工具：刻度尺原读数：49.10 mm零误差：+0.00 mm修正读数：49.10 mm",
+            "暂无记录",
+            "1 mm刻度，估读0.1 mm；读数时先读主尺或固定刻度，再读副尺，最后做零误差修正。"
+          ],
+          "physical_readout": [
+            "被测长度/直径 49.1 mm",
+            "49.1 mm",
+            "零误差 +0.00 mm",
+            "+0.00 mm",
+            "工具：刻度尺原读数：49.10 mm零误差：+0.00 mm修正读数：49.10 mm",
+            "暂无记录",
+            "1 mm刻度，估读0.1 mm；读数时先读主尺或固定刻度，再读副尺，最后做零误差修正。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "70860f56",
+          "readout_hash": "130d4ac0",
+          "physical_readout_hash": "130d4ac0",
+          "readout": [
+            "被测长度/直径 49.4 mm",
+            "49.4 mm",
+            "零误差 +0.00 mm",
+            "+0.00 mm",
+            "工具：刻度尺原读数：49.40 mm零误差：+0.00 mm修正读数：49.40 mm",
+            "暂无记录",
+            "1 mm刻度，估读0.1 mm；读数时先读主尺或固定刻度，再读副尺，最后做零误差修正。"
+          ],
+          "physical_readout": [
+            "被测长度/直径 49.4 mm",
+            "49.4 mm",
+            "零误差 +0.00 mm",
+            "+0.00 mm",
+            "工具：刻度尺原读数：49.40 mm零误差：+0.00 mm修正读数：49.40 mm",
+            "暂无记录",
+            "1 mm刻度，估读0.1 mm；读数时先读主尺或固定刻度，再读副尺，最后做零误差修正。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "70860f56",
+          "readout_hash": "130d4ac0",
+          "physical_readout_hash": "130d4ac0",
+          "readout": [
+            "被测长度/直径 49.4 mm",
+            "49.4 mm",
+            "零误差 +0.00 mm",
+            "+0.00 mm",
+            "工具：刻度尺原读数：49.40 mm零误差：+0.00 mm修正读数：49.40 mm",
+            "暂无记录",
+            "1 mm刻度，估读0.1 mm；读数时先读主尺或固定刻度，再读副尺，最后做零误差修正。"
+          ],
+          "physical_readout": [
+            "被测长度/直径 49.4 mm",
+            "49.4 mm",
+            "零误差 +0.00 mm",
+            "+0.00 mm",
+            "工具：刻度尺原读数：49.40 mm零误差：+0.00 mm修正读数：49.40 mm",
+            "暂无记录",
+            "1 mm刻度，估读0.1 mm；读数时先读主尺或固定刻度，再读副尺，最后做零误差修正。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "被测长度/直径 # mm|# mm|零误差 # mm|# mm|工具：刻度尺原读数：# mm零误差：# mm修正读数：# mm|# mm刻度，估读# mm；读数时先读主尺或固定刻度，再读副尺，最后做零误差修正。",
+          "controls": [
+            {
+              "id": "length",
+              "value": "32.4",
+              "checked": false
+            },
+            {
+              "id": "zero",
+              "value": "0",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "被测长度/直径 # mm|# mm|零误差 # mm|# mm|工具：刻度尺原读数：# mm零误差：# mm修正读数：# mm|# mm刻度，估读# mm；读数时先读主尺或固定刻度，再读副尺，最后做零误差修正。",
+          "controls": [
+            {
+              "id": "length",
+              "value": "32.4",
+              "checked": false
+            },
+            {
+              "id": "zero",
+              "value": "0",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/exp/ticker-tape-speed.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#period",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#v0",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#acc",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#index",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#recordBtn",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "97ce159c",
+          "readout_hash": "8ba022a",
+          "physical_readout_hash": "8ba022a",
+          "readout": [
+            "打点周期 T/s：0.02",
+            "初速度 v0/(m/s)：0.80",
+            "加速度 a/(m/s²)：1.20",
+            "测量点 i：5",
+            "T=0.02s，v0=0.80m/s，a=1.20m/s²选中点 i=5，时间 ti=0.10sx4=0.068m，x6=0.105mvi≈(x6-x4)/(2T)=0.92m/s"
+          ],
+          "physical_readout": [
+            "打点周期 T/s：0.02",
+            "初速度 v0/(m/s)：0.80",
+            "加速度 a/(m/s²)：1.20",
+            "测量点 i：5",
+            "T=0.02s，v0=0.80m/s，a=1.20m/s²选中点 i=5，时间 ti=0.10sx4=0.068m，x6=0.105mvi≈(x6-x4)/(2T)=0.92m/s"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "436512ce",
+          "readout_hash": "8ba022a",
+          "physical_readout_hash": "8ba022a",
+          "readout": [
+            "打点周期 T/s：0.02",
+            "初速度 v0/(m/s)：0.80",
+            "加速度 a/(m/s²)：1.20",
+            "测量点 i：5",
+            "T=0.02s，v0=0.80m/s，a=1.20m/s²选中点 i=5，时间 ti=0.10sx4=0.068m，x6=0.105mvi≈(x6-x4)/(2T)=0.92m/s"
+          ],
+          "physical_readout": [
+            "打点周期 T/s：0.02",
+            "初速度 v0/(m/s)：0.80",
+            "加速度 a/(m/s²)：1.20",
+            "测量点 i：5",
+            "T=0.02s，v0=0.80m/s，a=1.20m/s²选中点 i=5，时间 ti=0.10sx4=0.068m，x6=0.105mvi≈(x6-x4)/(2T)=0.92m/s"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "2eeba2b2",
+          "readout_hash": "8ba022a",
+          "physical_readout_hash": "8ba022a",
+          "readout": [
+            "打点周期 T/s：0.02",
+            "初速度 v0/(m/s)：0.80",
+            "加速度 a/(m/s²)：1.20",
+            "测量点 i：5",
+            "T=0.02s，v0=0.80m/s，a=1.20m/s²选中点 i=5，时间 ti=0.10sx4=0.068m，x6=0.105mvi≈(x6-x4)/(2T)=0.92m/s"
+          ],
+          "physical_readout": [
+            "打点周期 T/s：0.02",
+            "初速度 v0/(m/s)：0.80",
+            "加速度 a/(m/s²)：1.20",
+            "测量点 i：5",
+            "T=0.02s，v0=0.80m/s，a=1.20m/s²选中点 i=5，时间 ti=0.10sx4=0.068m，x6=0.105mvi≈(x6-x4)/(2T)=0.92m/s"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "2eeba2b2",
+          "readout_hash": "8ba022a",
+          "physical_readout_hash": "8ba022a",
+          "readout": [
+            "打点周期 T/s：0.02",
+            "初速度 v0/(m/s)：0.80",
+            "加速度 a/(m/s²)：1.20",
+            "测量点 i：5",
+            "T=0.02s，v0=0.80m/s，a=1.20m/s²选中点 i=5，时间 ti=0.10sx4=0.068m，x6=0.105mvi≈(x6-x4)/(2T)=0.92m/s"
+          ],
+          "physical_readout": [
+            "打点周期 T/s：0.02",
+            "初速度 v0/(m/s)：0.80",
+            "加速度 a/(m/s²)：1.20",
+            "测量点 i：5",
+            "T=0.02s，v0=0.80m/s，a=1.20m/s²选中点 i=5，时间 ti=0.10sx4=0.068m，x6=0.105mvi≈(x6-x4)/(2T)=0.92m/s"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "打点周期 T/s：#|初速度 v#/(m/s)：#|加速度 a/(m/s²)：#|测量点 i：#|T=#s，v#=#m/s，a=#m/s²选中点 i=#，时间 ti=#sx#=#m，x#=#mvi≈(x#-x#)/(#T)=#m/s",
+          "controls": [
+            {
+              "id": "period",
+              "value": "0.02",
+              "checked": false
+            },
+            {
+              "id": "v0",
+              "value": "0.8",
+              "checked": false
+            },
+            {
+              "id": "acc",
+              "value": "1.2",
+              "checked": false
+            },
+            {
+              "id": "index",
+              "value": "5",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "打点周期 T/s：#|初速度 v#/(m/s)：#|加速度 a/(m/s²)：#|测量点 i：#|T=#s，v#=#m/s，a=#m/s²选中点 i=#，时间 ti=#sx#=#m，x#=#mvi≈(x#-x#)/(#T)=#m/s",
+          "controls": [
+            {
+              "id": "period",
+              "value": "0.02",
+              "checked": false
+            },
+            {
+              "id": "v0",
+              "value": "0.8",
+              "checked": false
+            },
+            {
+              "id": "acc",
+              "value": "1.2",
+              "checked": false
+            },
+            {
+              "id": "index",
+              "value": "5",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/exp/uniform-acceleration-lab.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#v0",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#acc",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#period",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#noise",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#recordBtn",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "bd551a46",
+          "readout_hash": "25416d5e",
+          "physical_readout_hash": "25416d5e",
+          "readout": [
+            "初速度 v0/(m/s)：0.4",
+            "加速度 a/(m/s²)：1.6",
+            "计数点间隔 Δt/s：0.08",
+            "测量误差等级：1",
+            "理论：v=v0+at，当前 a=1.6m/s²相邻位移差平均≈0.0101m理论 aΔt²=0.0102mv-t 图像斜率≈1.57m/s²"
+          ],
+          "physical_readout": [
+            "初速度 v0/(m/s)：0.4",
+            "加速度 a/(m/s²)：1.6",
+            "计数点间隔 Δt/s：0.08",
+            "测量误差等级：1",
+            "理论：v=v0+at，当前 a=1.6m/s²相邻位移差平均≈0.0101m理论 aΔt²=0.0102mv-t 图像斜率≈1.57m/s²"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "8c79431a",
+          "readout_hash": "25416d5e",
+          "physical_readout_hash": "25416d5e",
+          "readout": [
+            "初速度 v0/(m/s)：0.4",
+            "加速度 a/(m/s²)：1.6",
+            "计数点间隔 Δt/s：0.08",
+            "测量误差等级：1",
+            "理论：v=v0+at，当前 a=1.6m/s²相邻位移差平均≈0.0101m理论 aΔt²=0.0102mv-t 图像斜率≈1.57m/s²"
+          ],
+          "physical_readout": [
+            "初速度 v0/(m/s)：0.4",
+            "加速度 a/(m/s²)：1.6",
+            "计数点间隔 Δt/s：0.08",
+            "测量误差等级：1",
+            "理论：v=v0+at，当前 a=1.6m/s²相邻位移差平均≈0.0101m理论 aΔt²=0.0102mv-t 图像斜率≈1.57m/s²"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "bd551a46",
+          "readout_hash": "25416d5e",
+          "physical_readout_hash": "25416d5e",
+          "readout": [
+            "初速度 v0/(m/s)：0.4",
+            "加速度 a/(m/s²)：1.6",
+            "计数点间隔 Δt/s：0.08",
+            "测量误差等级：1",
+            "理论：v=v0+at，当前 a=1.6m/s²相邻位移差平均≈0.0101m理论 aΔt²=0.0102mv-t 图像斜率≈1.57m/s²"
+          ],
+          "physical_readout": [
+            "初速度 v0/(m/s)：0.4",
+            "加速度 a/(m/s²)：1.6",
+            "计数点间隔 Δt/s：0.08",
+            "测量误差等级：1",
+            "理论：v=v0+at，当前 a=1.6m/s²相邻位移差平均≈0.0101m理论 aΔt²=0.0102mv-t 图像斜率≈1.57m/s²"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "bd551a46",
+          "readout_hash": "25416d5e",
+          "physical_readout_hash": "25416d5e",
+          "readout": [
+            "初速度 v0/(m/s)：0.4",
+            "加速度 a/(m/s²)：1.6",
+            "计数点间隔 Δt/s：0.08",
+            "测量误差等级：1",
+            "理论：v=v0+at，当前 a=1.6m/s²相邻位移差平均≈0.0101m理论 aΔt²=0.0102mv-t 图像斜率≈1.57m/s²"
+          ],
+          "physical_readout": [
+            "初速度 v0/(m/s)：0.4",
+            "加速度 a/(m/s²)：1.6",
+            "计数点间隔 Δt/s：0.08",
+            "测量误差等级：1",
+            "理论：v=v0+at，当前 a=1.6m/s²相邻位移差平均≈0.0101m理论 aΔt²=0.0102mv-t 图像斜率≈1.57m/s²"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "初速度 v#/(m/s)：#|加速度 a/(m/s²)：#|计数点间隔 Δt/s：#|测量误差等级：#|理论：v=v#+at，当前 a=#m/s²相邻位移差平均≈#m理论 aΔt²=#mv-t 图像斜率≈#m/s²",
+          "controls": [
+            {
+              "id": "v0",
+              "value": "0.4",
+              "checked": false
+            },
+            {
+              "id": "acc",
+              "value": "1.6",
+              "checked": false
+            },
+            {
+              "id": "period",
+              "value": "0.08",
+              "checked": false
+            },
+            {
+              "id": "noise",
+              "value": "1",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "初速度 v#/(m/s)：#|加速度 a/(m/s²)：#|计数点间隔 Δt/s：#|测量误差等级：#|理论：v=v#+at，当前 a=#m/s²相邻位移差平均≈#m理论 aΔt²=#mv-t 图像斜率≈#m/s²",
+          "controls": [
+            {
+              "id": "v0",
+              "value": "0.4",
+              "checked": false
+            },
+            {
+              "id": "acc",
+              "value": "1.6",
+              "checked": false
+            },
+            {
+              "id": "period",
+              "value": "0.08",
+              "checked": false
+            },
+            {
+              "id": "noise",
+              "value": "1",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

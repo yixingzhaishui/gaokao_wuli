@@ -1,0 +1,834 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T02:32:04.317Z",
+  "commit": "e355ceafd3f3da33a27b9a455352ea43aa630e5c",
+  "module": "skill",
+  "modules": [
+    "skill"
+  ],
+  "summary": {
+    "total": 3,
+    "score": 100,
+    "pass": 3,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/skill/experiment-data-processing.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#k",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#b",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#noise",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#outlier",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:剔除异常点",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#toggle",
+          "text": "剔除异常点",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.5,
+          "py": 0.32
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "44b96888",
+          "readout_hash": "45ed538d",
+          "physical_readout_hash": "45ed538d",
+          "readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6相对误差：6.8%",
+            "1.03.04记录2.05.44记录3.08.08记录4.010.46记录5.015.06异常点6.015.47记录",
+            "判定：误差偏大，先查异常点、零点、读数和坐标轴选取。"
+          ],
+          "physical_readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6相对误差：6.8%",
+            "1.03.04记录2.05.44记录3.08.08记录4.010.46记录5.015.06异常点6.015.47记录",
+            "判定：误差偏大，先查异常点、零点、读数和坐标轴选取。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "df75b0dd",
+          "readout_hash": "45ed538d",
+          "physical_readout_hash": "45ed538d",
+          "readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6相对误差：6.8%",
+            "1.03.04记录2.05.44记录3.08.08记录4.010.46记录5.015.06异常点6.015.47记录",
+            "判定：误差偏大，先查异常点、零点、读数和坐标轴选取。"
+          ],
+          "physical_readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6相对误差：6.8%",
+            "1.03.04记录2.05.44记录3.08.08记录4.010.46记录5.015.06异常点6.015.47记录",
+            "判定：误差偏大，先查异常点、零点、读数和坐标轴选取。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "4a0de200",
+          "readout_hash": "45ed538d",
+          "physical_readout_hash": "45ed538d",
+          "readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6相对误差：6.8%",
+            "1.03.04记录2.05.44记录3.08.08记录4.010.46记录5.015.06异常点6.015.47记录",
+            "判定：误差偏大，先查异常点、零点、读数和坐标轴选取。"
+          ],
+          "physical_readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6相对误差：6.8%",
+            "1.03.04记录2.05.44记录3.08.08记录4.010.46记录5.015.06异常点6.015.47记录",
+            "判定：误差偏大，先查异常点、零点、读数和坐标轴选取。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "4a0de200",
+          "readout_hash": "45ed538d",
+          "physical_readout_hash": "45ed538d",
+          "readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6相对误差：6.8%",
+            "1.03.04记录2.05.44记录3.08.08记录4.010.46记录5.015.06异常点6.015.47记录",
+            "判定：误差偏大，先查异常点、零点、读数和坐标轴选取。"
+          ],
+          "physical_readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6相对误差：6.8%",
+            "1.03.04记录2.05.44记录3.08.08记录4.010.46记录5.015.06异常点6.015.47记录",
+            "判定：误差偏大，先查异常点、零点、读数和坐标轴选取。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "真实斜率 k #|#|截距 b #|#|随机误差 #|#|异常点偏差 #|#|拟合斜率 k：#截距 b：#参与点数：#相对误差：#%|判定：误差偏大，先查异常点、零点、读数和坐标轴选取。",
+          "controls": [
+            {
+              "id": "k",
+              "value": "2.5",
+              "checked": false
+            },
+            {
+              "id": "b",
+              "value": "0.5",
+              "checked": false
+            },
+            {
+              "id": "noise",
+              "value": "0.35",
+              "checked": false
+            },
+            {
+              "id": "outlier",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "真实斜率 k #|#|截距 b #|#|随机误差 #|#|异常点偏差 #|#|拟合斜率 k：#截距 b：#参与点数：#相对误差：#%|判定：误差偏大，先查异常点、零点、读数和坐标轴选取。",
+          "controls": [
+            {
+              "id": "k",
+              "value": "2.5",
+              "checked": false
+            },
+            {
+              "id": "b",
+              "value": "0.5",
+              "checked": false
+            },
+            {
+              "id": "noise",
+              "value": "0.35",
+              "checked": false
+            },
+            {
+              "id": "outlier",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/skill/graph-slope-area.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#a",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#b",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#c",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:F-x",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:I-U",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录读数",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:v-t",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#vt",
+          "text": "v-t",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#fx",
+          "text": "F-x",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#iu",
+          "text": "I-U",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录读数",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.68,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "6e03d210",
+          "readout_hash": "8802e78f",
+          "physical_readout_hash": "8802e78f",
+          "readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.0",
+            "6.0",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：24.00截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ],
+          "physical_readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.0",
+            "6.0",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：24.00截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "51468af6",
+          "readout_hash": "f17634a9",
+          "physical_readout_hash": "f17634a9",
+          "readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.2",
+            "6.2",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：25.38截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ],
+          "physical_readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.2",
+            "6.2",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：25.38截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "51468af6",
+          "readout_hash": "f17634a9",
+          "physical_readout_hash": "f17634a9",
+          "readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.2",
+            "6.2",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：25.38截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ],
+          "physical_readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.2",
+            "6.2",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：25.38截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "51468af6",
+          "readout_hash": "f17634a9",
+          "physical_readout_hash": "f17634a9",
+          "readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.2",
+            "6.2",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：25.38截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ],
+          "physical_readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.2",
+            "6.2",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：25.38截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "点 A 横坐标 #|#|点 B 横坐标 #|#|截距/初值 #|#|斜率 k：#面积 S：#截距：#坐标轴：v/(m/s) - t/s|读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。",
+          "controls": [
+            {
+              "id": "a",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "b",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "c",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "点 A 横坐标 #|#|点 B 横坐标 #|#|截距/初值 #|#|斜率 k：#面积 S：#截距：#坐标轴：v/(m/s) - t/s|读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。",
+          "controls": [
+            {
+              "id": "a",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "b",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "c",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/skill/instrument-reading.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#value",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#zero",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:测微器",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:电表",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录读数",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:卡尺",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#caliper",
+          "text": "卡尺",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#micrometer",
+          "text": "测微器",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#meter",
+          "text": "电表",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录读数",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "e8bfab19",
+          "readout_hash": "afde7887",
+          "physical_readout_hash": "afde7887",
+          "readout": [
+            "被测量/指针位置 27.20",
+            "27.20",
+            "零误差/倍率 0.00",
+            "0.00",
+            "仪器：游标卡尺原读数：27.20 mm修正/换算后：27.200 mm读数依据：主尺+游标",
+            "卡尺23.4023.400",
+            "判定：读数题先写“量程、精度、估读、零误差”，再计算最终数值。"
+          ],
+          "physical_readout": [
+            "被测量/指针位置 27.20",
+            "27.20",
+            "零误差/倍率 0.00",
+            "0.00",
+            "仪器：游标卡尺原读数：27.20 mm修正/换算后：27.200 mm读数依据：主尺+游标",
+            "卡尺23.4023.400",
+            "判定：读数题先写“量程、精度、估读、零误差”，再计算最终数值。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "1b66606e",
+          "readout_hash": "fc92af0d",
+          "physical_readout_hash": "fc92af0d",
+          "readout": [
+            "被测量/指针位置 31.95",
+            "31.95",
+            "零误差/倍率 0.00",
+            "0.00",
+            "仪器：游标卡尺原读数：31.95 mm修正/换算后：31.950 mm读数依据：主尺+游标",
+            "卡尺23.4023.400",
+            "判定：读数题先写“量程、精度、估读、零误差”，再计算最终数值。"
+          ],
+          "physical_readout": [
+            "被测量/指针位置 31.95",
+            "31.95",
+            "零误差/倍率 0.00",
+            "0.00",
+            "仪器：游标卡尺原读数：31.95 mm修正/换算后：31.950 mm读数依据：主尺+游标",
+            "卡尺23.4023.400",
+            "判定：读数题先写“量程、精度、估读、零误差”，再计算最终数值。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "840fea8",
+          "readout_hash": "7e11eca5",
+          "physical_readout_hash": "7e11eca5",
+          "readout": [
+            "被测量/指针位置 32.25",
+            "32.25",
+            "零误差/倍率 0.00",
+            "0.00",
+            "仪器：游标卡尺原读数：32.25 mm修正/换算后：32.250 mm读数依据：主尺+游标",
+            "卡尺23.4023.400",
+            "判定：读数题先写“量程、精度、估读、零误差”，再计算最终数值。"
+          ],
+          "physical_readout": [
+            "被测量/指针位置 32.25",
+            "32.25",
+            "零误差/倍率 0.00",
+            "0.00",
+            "仪器：游标卡尺原读数：32.25 mm修正/换算后：32.250 mm读数依据：主尺+游标",
+            "卡尺23.4023.400",
+            "判定：读数题先写“量程、精度、估读、零误差”，再计算最终数值。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "840fea8",
+          "readout_hash": "7e11eca5",
+          "physical_readout_hash": "7e11eca5",
+          "readout": [
+            "被测量/指针位置 32.25",
+            "32.25",
+            "零误差/倍率 0.00",
+            "0.00",
+            "仪器：游标卡尺原读数：32.25 mm修正/换算后：32.250 mm读数依据：主尺+游标",
+            "卡尺23.4023.400",
+            "判定：读数题先写“量程、精度、估读、零误差”，再计算最终数值。"
+          ],
+          "physical_readout": [
+            "被测量/指针位置 32.25",
+            "32.25",
+            "零误差/倍率 0.00",
+            "0.00",
+            "仪器：游标卡尺原读数：32.25 mm修正/换算后：32.250 mm读数依据：主尺+游标",
+            "卡尺23.4023.400",
+            "判定：读数题先写“量程、精度、估读、零误差”，再计算最终数值。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "被测量/指针位置 #|#|零误差/倍率 #|#|仪器：游标卡尺原读数：# mm修正/换算后：# mm读数依据：主尺+游标|判定：读数题先写“量程、精度、估读、零误差”，再计算最终数值。",
+          "controls": [
+            {
+              "id": "value",
+              "value": "54.7",
+              "checked": false
+            },
+            {
+              "id": "zero",
+              "value": "0",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "被测量/指针位置 #|#|零误差/倍率 #|#|仪器：游标卡尺原读数：# mm修正/换算后：# mm读数依据：主尺+游标|判定：读数题先写“量程、精度、估读、零误差”，再计算最终数值。",
+          "controls": [
+            {
+              "id": "value",
+              "value": "54.5",
+              "checked": false
+            },
+            {
+              "id": "zero",
+              "value": "0",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

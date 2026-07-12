@@ -1,0 +1,38 @@
+{
+  "problems": [
+    {
+      "id": "GT-2025-SH-13",
+      "source": "2025年上海市普通高中学业水平等级性考试物理试卷",
+      "source_kind": "official_exam",
+      "source_verified": true,
+      "source_detail": "物理第13题；锦宏教育试卷PDF含原题、等效电容器图、LC振荡选项及同PDF答案页；答案由平行板电容影响因素和LC振荡能量转化独立核验。",
+      "source_urls": ["https://www.jhgk.cn/upload/file/20250612/1749695610079025886.pdf"],
+      "verification": "原题第13题与同PDF答案页核对：第13题答案为（1）变大；（2）BC。独立核验：人手靠近天线等效为板间距离减小，电容变大；LC振荡中电容器电荷量为零时电场能、电压为零，电流和磁场能最大。",
+      "verified_at": "2026-07-11",
+      "year": 2025,
+      "exam": "上海等级考·物理",
+      "question_no": "13",
+      "type": "综合填空",
+      "difficulty": "基础",
+      "knowledge_ids": ["B3-09", "B3-10", "X2-20"],
+      "model_ids": [],
+      "stem": "人手与竖直天线构成可视为图示的等效电容器，与自感线圈L构成LC振荡电路。（1）当人手靠近天线时，电容变______（选填“变大”、“不变”、“变小”）。（2）（多选）在电容器电荷量为零的瞬间，（ ）达到最大值。",
+      "diagram_required": true,
+      "diagram": {
+        "type": "inline-svg",
+        "title": "原卷第13题人手与竖直天线等效电容器及LC振荡示意",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 680 260\" role=\"img\" aria-label=\"人手靠近竖直天线形成等效电容并接入LC振荡电路\"><line x1=\"175\" y1=\"50\" x2=\"175\" y2=\"210\" stroke=\"#1d4ed8\" stroke-width=\"8\"/><path d=\"M80 130c30-45 70-45 95-15\" fill=\"none\" stroke=\"#f59e0b\" stroke-width=\"10\" stroke-linecap=\"round\"/><path d=\"M92 138h70\" stroke=\"#f59e0b\" stroke-width=\"10\" stroke-linecap=\"round\"/><path d=\"M110 116h55\" stroke=\"#f59e0b\" stroke-width=\"8\" stroke-linecap=\"round\"/><path d=\"M130 96h40\" stroke=\"#f59e0b\" stroke-width=\"7\" stroke-linecap=\"round\"/><path d=\"M300 70h70M300 190h70M370 70v120M430 70v120M430 70h95\" stroke=\"#334155\" stroke-width=\"4\" fill=\"none\"/><path d=\"M525 70c25 0 25 35 0 35s-25 35 0 35s25 35 0 35\" fill=\"none\" stroke=\"#334155\" stroke-width=\"4\"/><path d=\"M525 175H300V70\" stroke=\"#334155\" stroke-width=\"4\" fill=\"none\"/><text x=\"203\" y=\"132\" font-size=\"18\" fill=\"#334155\">d减小，C变大</text><text x=\"385\" y=\"130\" font-size=\"20\" fill=\"#334155\">C</text><text x=\"555\" y=\"130\" font-size=\"20\" fill=\"#334155\">L</text></svg>"
+      },
+      "options": [
+        "A. 电场能",
+        "B. 电流",
+        "C. 磁场能",
+        "D. 电压"
+      ],
+      "answer": "（1）变大；（2）BC",
+      "solution": "人手靠近竖直天线时，可类比为电容器两极板距离减小；在其他条件近似不变时，电容C随板间距离减小而增大。LC振荡中，电容器电荷量q=0的瞬间，电容器两端电压U=q/C=0，电场能为零；此时能量全部转化为线圈磁场能，回路电流最大，所以选B、C。",
+      "method": "把人手和天线先等效成电容器，再用LC振荡的能量互换：q最大时电场能最大，q为零时电流和磁场能最大。",
+      "traps": ["把靠近天线误认为正对面积减小", "认为电荷量为零时电压最大", "混淆电场能最大和磁场能最大时刻"]
+    }
+  ]
+}

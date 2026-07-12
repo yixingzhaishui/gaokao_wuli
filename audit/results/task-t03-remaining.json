@@ -1,0 +1,542 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T06:28:37.660Z",
+  "commit": "13c102d022e4071c5f5480381211f15d4e70f18e",
+  "module": "xb2",
+  "modules": [
+    "xb2"
+  ],
+  "summary": {
+    "total": 2,
+    "score": 100,
+    "pass": 2,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/xb2/em-wave-transmission.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#carrier",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#tune",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#mod",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#dist",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录状态",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录状态",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "db23ff1c",
+          "readout_hash": "82bde1fe",
+          "physical_readout_hash": "82bde1fe",
+          "readout": [
+            "载波频率 f₀ 100 MHz",
+            "100 MHz",
+            "调谐频率 fᵣ 98 MHz",
+            "98 MHz",
+            "调制深度 60%",
+            "60%",
+            "距离 d 20 km",
+            "20 km",
+            "波长 λ：3.00 m传播延迟：0.067 ms频差 |f₀-fᵣ|：2 MHz接收强度：69%",
+            "1009869%成功",
+            "调谐接近载波频率，接收强，解调输出清晰。"
+          ],
+          "physical_readout": [
+            "载波频率 f₀ 100 MHz",
+            "100 MHz",
+            "调谐频率 fᵣ 98 MHz",
+            "98 MHz",
+            "调制深度 60%",
+            "60%",
+            "距离 d 20 km",
+            "20 km",
+            "波长 λ：3.00 m传播延迟：0.067 ms频差 |f₀-fᵣ|：2 MHz接收强度：69%",
+            "1009869%成功",
+            "调谐接近载波频率，接收强，解调输出清晰。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "bd230db7",
+          "readout_hash": "82bde1fe",
+          "physical_readout_hash": "82bde1fe",
+          "readout": [
+            "载波频率 f₀ 100 MHz",
+            "100 MHz",
+            "调谐频率 fᵣ 98 MHz",
+            "98 MHz",
+            "调制深度 60%",
+            "60%",
+            "距离 d 20 km",
+            "20 km",
+            "波长 λ：3.00 m传播延迟：0.067 ms频差 |f₀-fᵣ|：2 MHz接收强度：69%",
+            "1009869%成功",
+            "调谐接近载波频率，接收强，解调输出清晰。"
+          ],
+          "physical_readout": [
+            "载波频率 f₀ 100 MHz",
+            "100 MHz",
+            "调谐频率 fᵣ 98 MHz",
+            "98 MHz",
+            "调制深度 60%",
+            "60%",
+            "距离 d 20 km",
+            "20 km",
+            "波长 λ：3.00 m传播延迟：0.067 ms频差 |f₀-fᵣ|：2 MHz接收强度：69%",
+            "1009869%成功",
+            "调谐接近载波频率，接收强，解调输出清晰。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "1fd7ef32",
+          "readout_hash": "82bde1fe",
+          "physical_readout_hash": "82bde1fe",
+          "readout": [
+            "载波频率 f₀ 100 MHz",
+            "100 MHz",
+            "调谐频率 fᵣ 98 MHz",
+            "98 MHz",
+            "调制深度 60%",
+            "60%",
+            "距离 d 20 km",
+            "20 km",
+            "波长 λ：3.00 m传播延迟：0.067 ms频差 |f₀-fᵣ|：2 MHz接收强度：69%",
+            "1009869%成功",
+            "调谐接近载波频率，接收强，解调输出清晰。"
+          ],
+          "physical_readout": [
+            "载波频率 f₀ 100 MHz",
+            "100 MHz",
+            "调谐频率 fᵣ 98 MHz",
+            "98 MHz",
+            "调制深度 60%",
+            "60%",
+            "距离 d 20 km",
+            "20 km",
+            "波长 λ：3.00 m传播延迟：0.067 ms频差 |f₀-fᵣ|：2 MHz接收强度：69%",
+            "1009869%成功",
+            "调谐接近载波频率，接收强，解调输出清晰。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "1fd7ef32",
+          "readout_hash": "82bde1fe",
+          "physical_readout_hash": "82bde1fe",
+          "readout": [
+            "载波频率 f₀ 100 MHz",
+            "100 MHz",
+            "调谐频率 fᵣ 98 MHz",
+            "98 MHz",
+            "调制深度 60%",
+            "60%",
+            "距离 d 20 km",
+            "20 km",
+            "波长 λ：3.00 m传播延迟：0.067 ms频差 |f₀-fᵣ|：2 MHz接收强度：69%",
+            "1009869%成功",
+            "调谐接近载波频率，接收强，解调输出清晰。"
+          ],
+          "physical_readout": [
+            "载波频率 f₀ 100 MHz",
+            "100 MHz",
+            "调谐频率 fᵣ 98 MHz",
+            "98 MHz",
+            "调制深度 60%",
+            "60%",
+            "距离 d 20 km",
+            "20 km",
+            "波长 λ：3.00 m传播延迟：0.067 ms频差 |f₀-fᵣ|：2 MHz接收强度：69%",
+            "1009869%成功",
+            "调谐接近载波频率，接收强，解调输出清晰。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "载波频率 f₀ # MHz|# MHz|调谐频率 fᵣ # MHz|# MHz|调制深度 #%|#%|距离 d # km|# km|波长 λ：# m传播延迟：# ms频差 |f₀-fᵣ|：# MHz接收强度：#%|调谐接近载波频率，接收强，解调输出清晰。",
+          "controls": [
+            {
+              "id": "carrier",
+              "value": "100",
+              "checked": false
+            },
+            {
+              "id": "tune",
+              "value": "98",
+              "checked": false
+            },
+            {
+              "id": "mod",
+              "value": "60",
+              "checked": false
+            },
+            {
+              "id": "dist",
+              "value": "20",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "载波频率 f₀ # MHz|# MHz|调谐频率 fᵣ # MHz|# MHz|调制深度 #%|#%|距离 d # km|# km|波长 λ：# m传播延迟：# ms频差 |f₀-fᵣ|：# MHz接收强度：#%|调谐接近载波频率，接收强，解调输出清晰。",
+          "controls": [
+            {
+              "id": "carrier",
+              "value": "100",
+              "checked": false
+            },
+            {
+              "id": "tune",
+              "value": "98",
+              "checked": false
+            },
+            {
+              "id": "mod",
+              "value": "60",
+              "checked": false
+            },
+            {
+              "id": "dist",
+              "value": "20",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb2/maxwell-em-theory.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#f",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#e",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#x",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录状态",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录状态",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "3b2da3e7",
+          "readout_hash": "c63b21b1",
+          "physical_readout_hash": "c63b21b1",
+          "readout": [
+            "振荡频率 f 2.0 Hz",
+            "2.0 Hz",
+            "电场幅度 E₀ 70%",
+            "70%",
+            "相位探针 x 45%",
+            "45%",
+            "探针处 E：0.67探针处 B：0.67关系：E、B 同相且垂直波速：c=λf",
+            "45%0.220.22x",
+            "电磁波不需要介质：变化电场和变化磁场互相激发，能脱离振荡电路向外传播。"
+          ],
+          "physical_readout": [
+            "振荡频率 f 2.0 Hz",
+            "2.0 Hz",
+            "电场幅度 E₀ 70%",
+            "70%",
+            "相位探针 x 45%",
+            "45%",
+            "探针处 E：0.67探针处 B：0.67关系：E、B 同相且垂直波速：c=λf",
+            "45%0.220.22x",
+            "电磁波不需要介质：变化电场和变化磁场互相激发，能脱离振荡电路向外传播。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "e345d1a2",
+          "readout_hash": "a874fe5f",
+          "physical_readout_hash": "a874fe5f",
+          "readout": [
+            "振荡频率 f 2.0 Hz",
+            "2.0 Hz",
+            "电场幅度 E₀ 70%",
+            "70%",
+            "相位探针 x 45%",
+            "45%",
+            "探针处 E：-0.00探针处 B：-0.00关系：E、B 同相且垂直波速：c=λf",
+            "45%0.220.22x",
+            "电磁波不需要介质：变化电场和变化磁场互相激发，能脱离振荡电路向外传播。"
+          ],
+          "physical_readout": [
+            "振荡频率 f 2.0 Hz",
+            "2.0 Hz",
+            "电场幅度 E₀ 70%",
+            "70%",
+            "相位探针 x 45%",
+            "45%",
+            "探针处 E：-0.00探针处 B：-0.00关系：E、B 同相且垂直波速：c=λf",
+            "45%0.220.22x",
+            "电磁波不需要介质：变化电场和变化磁场互相激发，能脱离振荡电路向外传播。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "f21c801",
+          "readout_hash": "289f777f",
+          "physical_readout_hash": "289f777f",
+          "readout": [
+            "振荡频率 f 2.0 Hz",
+            "2.0 Hz",
+            "电场幅度 E₀ 70%",
+            "70%",
+            "相位探针 x 45%",
+            "45%",
+            "探针处 E：-0.13探针处 B：-0.13关系：E、B 同相且垂直波速：c=λf",
+            "45%0.220.22x",
+            "电磁波不需要介质：变化电场和变化磁场互相激发，能脱离振荡电路向外传播。"
+          ],
+          "physical_readout": [
+            "振荡频率 f 2.0 Hz",
+            "2.0 Hz",
+            "电场幅度 E₀ 70%",
+            "70%",
+            "相位探针 x 45%",
+            "45%",
+            "探针处 E：-0.13探针处 B：-0.13关系：E、B 同相且垂直波速：c=λf",
+            "45%0.220.22x",
+            "电磁波不需要介质：变化电场和变化磁场互相激发，能脱离振荡电路向外传播。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "f21c801",
+          "readout_hash": "289f777f",
+          "physical_readout_hash": "289f777f",
+          "readout": [
+            "振荡频率 f 2.0 Hz",
+            "2.0 Hz",
+            "电场幅度 E₀ 70%",
+            "70%",
+            "相位探针 x 45%",
+            "45%",
+            "探针处 E：-0.13探针处 B：-0.13关系：E、B 同相且垂直波速：c=λf",
+            "45%0.220.22x",
+            "电磁波不需要介质：变化电场和变化磁场互相激发，能脱离振荡电路向外传播。"
+          ],
+          "physical_readout": [
+            "振荡频率 f 2.0 Hz",
+            "2.0 Hz",
+            "电场幅度 E₀ 70%",
+            "70%",
+            "相位探针 x 45%",
+            "45%",
+            "探针处 E：-0.13探针处 B：-0.13关系：E、B 同相且垂直波速：c=λf",
+            "45%0.220.22x",
+            "电磁波不需要介质：变化电场和变化磁场互相激发，能脱离振荡电路向外传播。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "振荡频率 f # Hz|# Hz|电场幅度 E₀ #%|#%|相位探针 x #%|#%|探针处 E：#探针处 B：#关系：E、B 同相且垂直波速：c=λf|电磁波不需要介质：变化电场和变化磁场互相激发，能脱离振荡电路向外传播。",
+          "controls": [
+            {
+              "id": "f",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "e",
+              "value": "70",
+              "checked": false
+            },
+            {
+              "id": "x",
+              "value": "45",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "振荡频率 f # Hz|# Hz|电场幅度 E₀ #%|#%|相位探针 x #%|#%|探针处 E：#探针处 B：#关系：E、B 同相且垂直波速：c=λf|电磁波不需要介质：变化电场和变化磁场互相激发，能脱离振荡电路向外传播。",
+          "controls": [
+            {
+              "id": "f",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "e",
+              "value": "70",
+              "checked": false
+            },
+            {
+              "id": "x",
+              "value": "45",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

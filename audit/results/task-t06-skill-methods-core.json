@@ -1,0 +1,1425 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T07:03:57.285Z",
+  "commit": "498e0c8144fd669c949b7723aaff2a4a3385c203",
+  "module": "skill",
+  "modules": [
+    "skill"
+  ],
+  "summary": {
+    "total": 5,
+    "score": 100,
+    "pass": 5,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/skill/circuit-experiment-design.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#rx",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#pos",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#emf",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:内接法",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:外接法",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:限流式",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录方案",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:分压式",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#inner",
+          "text": "内接法",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#outer",
+          "text": "外接法",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#divider",
+          "text": "分压式",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#limiter",
+          "text": "限流式",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录方案",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.32,
+          "py": 0.32
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "68689293",
+          "readout_hash": "db897cd5",
+          "physical_readout_hash": "db897cd5",
+          "readout": [
+            "待测电阻 Rx 20.0 Ω",
+            "20.0 Ω",
+            "滑片位置 0.54",
+            "0.54",
+            "电源电压 6.0 V",
+            "6.0 V",
+            "电压表读数：3.24 V电流表读数：0.164 A测得电阻：19.80 Ω误差方向：偏小",
+            "外接分压19.80",
+            "提示：小电阻常优先考虑电流表外接，减小电流表分压影响。"
+          ],
+          "physical_readout": [
+            "待测电阻 Rx 20.0 Ω",
+            "20.0 Ω",
+            "滑片位置 0.54",
+            "0.54",
+            "电源电压 6.0 V",
+            "6.0 V",
+            "电压表读数：3.24 V电流表读数：0.164 A测得电阻：19.80 Ω误差方向：偏小",
+            "外接分压19.80",
+            "提示：小电阻常优先考虑电流表外接，减小电流表分压影响。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "c421c83c",
+          "readout_hash": "894d1c0c",
+          "physical_readout_hash": "894d1c0c",
+          "readout": [
+            "待测电阻 Rx 20.0 Ω",
+            "20.0 Ω",
+            "滑片位置 0.63",
+            "0.63",
+            "电源电压 6.0 V",
+            "6.0 V",
+            "电压表读数：3.78 V电流表读数：0.191 A测得电阻：19.80 Ω误差方向：偏小",
+            "外接分压19.80",
+            "提示：小电阻常优先考虑电流表外接，减小电流表分压影响。"
+          ],
+          "physical_readout": [
+            "待测电阻 Rx 20.0 Ω",
+            "20.0 Ω",
+            "滑片位置 0.63",
+            "0.63",
+            "电源电压 6.0 V",
+            "6.0 V",
+            "电压表读数：3.78 V电流表读数：0.191 A测得电阻：19.80 Ω误差方向：偏小",
+            "外接分压19.80",
+            "提示：小电阻常优先考虑电流表外接，减小电流表分压影响。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "4dbbb7fe",
+          "readout_hash": "5e46fe38",
+          "physical_readout_hash": "5e46fe38",
+          "readout": [
+            "待测电阻 Rx 20.0 Ω",
+            "20.0 Ω",
+            "滑片位置 0.64",
+            "0.64",
+            "电源电压 6.0 V",
+            "6.0 V",
+            "电压表读数：3.84 V电流表读数：0.194 A测得电阻：19.80 Ω误差方向：偏小",
+            "外接分压19.80",
+            "提示：小电阻常优先考虑电流表外接，减小电流表分压影响。"
+          ],
+          "physical_readout": [
+            "待测电阻 Rx 20.0 Ω",
+            "20.0 Ω",
+            "滑片位置 0.64",
+            "0.64",
+            "电源电压 6.0 V",
+            "6.0 V",
+            "电压表读数：3.84 V电流表读数：0.194 A测得电阻：19.80 Ω误差方向：偏小",
+            "外接分压19.80",
+            "提示：小电阻常优先考虑电流表外接，减小电流表分压影响。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "4dbbb7fe",
+          "readout_hash": "5e46fe38",
+          "physical_readout_hash": "5e46fe38",
+          "readout": [
+            "待测电阻 Rx 20.0 Ω",
+            "20.0 Ω",
+            "滑片位置 0.64",
+            "0.64",
+            "电源电压 6.0 V",
+            "6.0 V",
+            "电压表读数：3.84 V电流表读数：0.194 A测得电阻：19.80 Ω误差方向：偏小",
+            "外接分压19.80",
+            "提示：小电阻常优先考虑电流表外接，减小电流表分压影响。"
+          ],
+          "physical_readout": [
+            "待测电阻 Rx 20.0 Ω",
+            "20.0 Ω",
+            "滑片位置 0.64",
+            "0.64",
+            "电源电压 6.0 V",
+            "6.0 V",
+            "电压表读数：3.84 V电流表读数：0.194 A测得电阻：19.80 Ω误差方向：偏小",
+            "外接分压19.80",
+            "提示：小电阻常优先考虑电流表外接，减小电流表分压影响。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "待测电阻 Rx # Ω|# Ω|滑片位置 #|#|电源电压 # V|# V|电压表读数：# V电流表读数：# A测得电阻：# Ω误差方向：偏小|提示：小电阻常优先考虑电流表外接，减小电流表分压影响。",
+          "controls": [
+            {
+              "id": "rx",
+              "value": "20",
+              "checked": false
+            },
+            {
+              "id": "pos",
+              "value": "0.54",
+              "checked": false
+            },
+            {
+              "id": "emf",
+              "value": "6",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "待测电阻 Rx # Ω|# Ω|滑片位置 #|#|电源电压 # V|# V|电压表读数：# V电流表读数：# A测得电阻：# Ω误差方向：偏小|提示：小电阻常优先考虑电流表外接，减小电流表分压影响。",
+          "controls": [
+            {
+              "id": "rx",
+              "value": "20",
+              "checked": false
+            },
+            {
+              "id": "pos",
+              "value": "0.54",
+              "checked": false
+            },
+            {
+              "id": "emf",
+              "value": "6",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/skill/error-analysis.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#trueValue",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#sys",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#random",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#n",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:零误差修正",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#correct",
+          "text": "零误差修正",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "4927714",
+          "readout_hash": "82bac201",
+          "physical_readout_hash": "82bac201",
+          "readout": [
+            "真实值 10.00",
+            "10.00",
+            "系统误差 0.60",
+            "0.60",
+            "偶然误差幅度 0.45",
+            "0.45",
+            "测量次数 5",
+            "5",
+            "平均值：10.621绝对误差 Δ：0.621相对误差 δ：6.2%当前处理：未修正零误差",
+            "110.290.29210.770.77310.670.67410.500.50510.880.88",
+            "判定：误差偏大，优先检查零点、量程、摩擦、读数视线和环境条件。"
+          ],
+          "physical_readout": [
+            "真实值 10.00",
+            "10.00",
+            "系统误差 0.60",
+            "0.60",
+            "偶然误差幅度 0.45",
+            "0.45",
+            "测量次数 5",
+            "5",
+            "平均值：10.621绝对误差 Δ：0.621相对误差 δ：6.2%当前处理：未修正零误差",
+            "110.290.29210.770.77310.670.67410.500.50510.880.88",
+            "判定：误差偏大，优先检查零点、量程、摩擦、读数视线和环境条件。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "1c110ce5",
+          "readout_hash": "41bbc0ca",
+          "physical_readout_hash": "41bbc0ca",
+          "readout": [
+            "真实值 10.00",
+            "10.00",
+            "系统误差 0.60",
+            "0.60",
+            "偶然误差幅度 0.45",
+            "0.45",
+            "测量次数 5",
+            "5",
+            "平均值：NaN绝对误差 Δ：NaN相对误差 δ：NaN%当前处理：未修正零误差",
+            "1NaNNaN2NaNNaN3NaNNaN4NaNNaN5NaNNaN",
+            "判定：误差偏大，优先检查零点、量程、摩擦、读数视线和环境条件。"
+          ],
+          "physical_readout": [
+            "真实值 10.00",
+            "10.00",
+            "系统误差 0.60",
+            "0.60",
+            "偶然误差幅度 0.45",
+            "0.45",
+            "测量次数 5",
+            "5",
+            "平均值：NaN绝对误差 Δ：NaN相对误差 δ：NaN%当前处理：未修正零误差",
+            "1NaNNaN2NaNNaN3NaNNaN4NaNNaN5NaNNaN",
+            "判定：误差偏大，优先检查零点、量程、摩擦、读数视线和环境条件。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "4927714",
+          "readout_hash": "82bac201",
+          "physical_readout_hash": "82bac201",
+          "readout": [
+            "真实值 10.00",
+            "10.00",
+            "系统误差 0.60",
+            "0.60",
+            "偶然误差幅度 0.45",
+            "0.45",
+            "测量次数 5",
+            "5",
+            "平均值：10.621绝对误差 Δ：0.621相对误差 δ：6.2%当前处理：未修正零误差",
+            "110.290.29210.770.77310.670.67410.500.50510.880.88",
+            "判定：误差偏大，优先检查零点、量程、摩擦、读数视线和环境条件。"
+          ],
+          "physical_readout": [
+            "真实值 10.00",
+            "10.00",
+            "系统误差 0.60",
+            "0.60",
+            "偶然误差幅度 0.45",
+            "0.45",
+            "测量次数 5",
+            "5",
+            "平均值：10.621绝对误差 Δ：0.621相对误差 δ：6.2%当前处理：未修正零误差",
+            "110.290.29210.770.77310.670.67410.500.50510.880.88",
+            "判定：误差偏大，优先检查零点、量程、摩擦、读数视线和环境条件。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "4927714",
+          "readout_hash": "82bac201",
+          "physical_readout_hash": "82bac201",
+          "readout": [
+            "真实值 10.00",
+            "10.00",
+            "系统误差 0.60",
+            "0.60",
+            "偶然误差幅度 0.45",
+            "0.45",
+            "测量次数 5",
+            "5",
+            "平均值：10.621绝对误差 Δ：0.621相对误差 δ：6.2%当前处理：未修正零误差",
+            "110.290.29210.770.77310.670.67410.500.50510.880.88",
+            "判定：误差偏大，优先检查零点、量程、摩擦、读数视线和环境条件。"
+          ],
+          "physical_readout": [
+            "真实值 10.00",
+            "10.00",
+            "系统误差 0.60",
+            "0.60",
+            "偶然误差幅度 0.45",
+            "0.45",
+            "测量次数 5",
+            "5",
+            "平均值：10.621绝对误差 Δ：0.621相对误差 δ：6.2%当前处理：未修正零误差",
+            "110.290.29210.770.77310.670.67410.500.50510.880.88",
+            "判定：误差偏大，优先检查零点、量程、摩擦、读数视线和环境条件。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "真实值 #|#|系统误差 #|#|偶然误差幅度 #|#|测量次数 #|#|平均值：#绝对误差 Δ：#相对误差 δ：#%当前处理：未修正零误差|判定：误差偏大，优先检查零点、量程、摩擦、读数视线和环境条件。",
+          "controls": [
+            {
+              "id": "trueValue",
+              "value": "10",
+              "checked": false
+            },
+            {
+              "id": "sys",
+              "value": "0.6",
+              "checked": false
+            },
+            {
+              "id": "random",
+              "value": "0.45",
+              "checked": false
+            },
+            {
+              "id": "n",
+              "value": "5",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "真实值 #|#|系统误差 #|#|偶然误差幅度 #|#|测量次数 #|#|平均值：#绝对误差 Δ：#相对误差 δ：#%当前处理：未修正零误差|判定：误差偏大，优先检查零点、量程、摩擦、读数视线和环境条件。",
+          "controls": [
+            {
+              "id": "trueValue",
+              "value": "10",
+              "checked": false
+            },
+            {
+              "id": "sys",
+              "value": "0.6",
+              "checked": false
+            },
+            {
+              "id": "random",
+              "value": "0.45",
+              "checked": false
+            },
+            {
+              "id": "n",
+              "value": "5",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/skill/experiment-data-processing.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#k",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#b",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#noise",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#outlier",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:剔除异常点",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#toggle",
+          "text": "剔除异常点",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.5,
+          "py": 0.32
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "ba4a84b",
+          "readout_hash": "45ed538d",
+          "physical_readout_hash": "45ed538d",
+          "readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6相对误差：6.8%",
+            "1.03.04记录2.05.44记录3.08.08记录4.010.46记录5.015.06异常点6.015.47记录",
+            "判定：误差偏大，先查异常点、零点、读数和坐标轴选取。"
+          ],
+          "physical_readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6相对误差：6.8%",
+            "1.03.04记录2.05.44记录3.08.08记录4.010.46记录5.015.06异常点6.015.47记录",
+            "判定：误差偏大，先查异常点、零点、读数和坐标轴选取。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "a1b12d1b",
+          "readout_hash": "45ed538d",
+          "physical_readout_hash": "45ed538d",
+          "readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6相对误差：6.8%",
+            "1.03.04记录2.05.44记录3.08.08记录4.010.46记录5.015.06异常点6.015.47记录",
+            "判定：误差偏大，先查异常点、零点、读数和坐标轴选取。"
+          ],
+          "physical_readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6相对误差：6.8%",
+            "1.03.04记录2.05.44记录3.08.08记录4.010.46记录5.015.06异常点6.015.47记录",
+            "判定：误差偏大，先查异常点、零点、读数和坐标轴选取。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "c9788ce1",
+          "readout_hash": "45ed538d",
+          "physical_readout_hash": "45ed538d",
+          "readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6相对误差：6.8%",
+            "1.03.04记录2.05.44记录3.08.08记录4.010.46记录5.015.06异常点6.015.47记录",
+            "判定：误差偏大，先查异常点、零点、读数和坐标轴选取。"
+          ],
+          "physical_readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6相对误差：6.8%",
+            "1.03.04记录2.05.44记录3.08.08记录4.010.46记录5.015.06异常点6.015.47记录",
+            "判定：误差偏大，先查异常点、零点、读数和坐标轴选取。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "c9788ce1",
+          "readout_hash": "45ed538d",
+          "physical_readout_hash": "45ed538d",
+          "readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6相对误差：6.8%",
+            "1.03.04记录2.05.44记录3.08.08记录4.010.46记录5.015.06异常点6.015.47记录",
+            "判定：误差偏大，先查异常点、零点、读数和坐标轴选取。"
+          ],
+          "physical_readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6相对误差：6.8%",
+            "1.03.04记录2.05.44记录3.08.08记录4.010.46记录5.015.06异常点6.015.47记录",
+            "判定：误差偏大，先查异常点、零点、读数和坐标轴选取。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "真实斜率 k #|#|截距 b #|#|随机误差 #|#|异常点偏差 #|#|拟合斜率 k：#截距 b：#参与点数：#相对误差：#%|判定：误差偏大，先查异常点、零点、读数和坐标轴选取。",
+          "controls": [
+            {
+              "id": "k",
+              "value": "2.5",
+              "checked": false
+            },
+            {
+              "id": "b",
+              "value": "0.5",
+              "checked": false
+            },
+            {
+              "id": "noise",
+              "value": "0.35",
+              "checked": false
+            },
+            {
+              "id": "outlier",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "真实斜率 k #|#|截距 b #|#|随机误差 #|#|异常点偏差 #|#|拟合斜率 k：#截距 b：#参与点数：#相对误差：#%|判定：误差偏大，先查异常点、零点、读数和坐标轴选取。",
+          "controls": [
+            {
+              "id": "k",
+              "value": "2.5",
+              "checked": false
+            },
+            {
+              "id": "b",
+              "value": "0.5",
+              "checked": false
+            },
+            {
+              "id": "noise",
+              "value": "0.35",
+              "checked": false
+            },
+            {
+              "id": "outlier",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/skill/extreme-critical.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#main",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#scale",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#grav",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:射程极值",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录临界",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:圆周临界",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#circle",
+          "text": "圆周临界",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#projectile",
+          "text": "射程极值",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录临界",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "696887aa",
+          "readout_hash": "9394927a",
+          "physical_readout_hash": "9394927a",
+          "readout": [
+            "速度/角度 6.25 m/s",
+            "6.25 m/s",
+            "半径/初速 3.00 m",
+            "3.00 m",
+            "高度/重力 9.8",
+            "9.8",
+            "临界速度：5.42 m/s当前 N/m：3.22 N/kg状态：不脱离判据：N=0",
+            "圆周N=0不脱离",
+            "识别信号：刚好、恰能、最大、最小、临界、至少、至多，通常对应边界条件或函数极值。"
+          ],
+          "physical_readout": [
+            "速度/角度 6.25 m/s",
+            "6.25 m/s",
+            "半径/初速 3.00 m",
+            "3.00 m",
+            "高度/重力 9.8",
+            "9.8",
+            "临界速度：5.42 m/s当前 N/m：3.22 N/kg状态：不脱离判据：N=0",
+            "圆周N=0不脱离",
+            "识别信号：刚好、恰能、最大、最小、临界、至少、至多，通常对应边界条件或函数极值。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "126cd25e",
+          "readout_hash": "f0e03699",
+          "physical_readout_hash": "f0e03699",
+          "readout": [
+            "速度/角度 6.70 m/s",
+            "6.70 m/s",
+            "半径/初速 3.00 m",
+            "3.00 m",
+            "高度/重力 9.8",
+            "9.8",
+            "临界速度：5.42 m/s当前 N/m：5.16 N/kg状态：不脱离判据：N=0",
+            "圆周N=0不脱离",
+            "识别信号：刚好、恰能、最大、最小、临界、至少、至多，通常对应边界条件或函数极值。"
+          ],
+          "physical_readout": [
+            "速度/角度 6.70 m/s",
+            "6.70 m/s",
+            "半径/初速 3.00 m",
+            "3.00 m",
+            "高度/重力 9.8",
+            "9.8",
+            "临界速度：5.42 m/s当前 N/m：5.16 N/kg状态：不脱离判据：N=0",
+            "圆周N=0不脱离",
+            "识别信号：刚好、恰能、最大、最小、临界、至少、至多，通常对应边界条件或函数极值。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "9dfe96b9",
+          "readout_hash": "cf957c96",
+          "physical_readout_hash": "cf957c96",
+          "readout": [
+            "速度/角度 6.75 m/s",
+            "6.75 m/s",
+            "半径/初速 3.00 m",
+            "3.00 m",
+            "高度/重力 9.8",
+            "9.8",
+            "临界速度：5.42 m/s当前 N/m：5.39 N/kg状态：不脱离判据：N=0",
+            "圆周N=0不脱离",
+            "识别信号：刚好、恰能、最大、最小、临界、至少、至多，通常对应边界条件或函数极值。"
+          ],
+          "physical_readout": [
+            "速度/角度 6.75 m/s",
+            "6.75 m/s",
+            "半径/初速 3.00 m",
+            "3.00 m",
+            "高度/重力 9.8",
+            "9.8",
+            "临界速度：5.42 m/s当前 N/m：5.39 N/kg状态：不脱离判据：N=0",
+            "圆周N=0不脱离",
+            "识别信号：刚好、恰能、最大、最小、临界、至少、至多，通常对应边界条件或函数极值。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "9dfe96b9",
+          "readout_hash": "cf957c96",
+          "physical_readout_hash": "cf957c96",
+          "readout": [
+            "速度/角度 6.75 m/s",
+            "6.75 m/s",
+            "半径/初速 3.00 m",
+            "3.00 m",
+            "高度/重力 9.8",
+            "9.8",
+            "临界速度：5.42 m/s当前 N/m：5.39 N/kg状态：不脱离判据：N=0",
+            "圆周N=0不脱离",
+            "识别信号：刚好、恰能、最大、最小、临界、至少、至多，通常对应边界条件或函数极值。"
+          ],
+          "physical_readout": [
+            "速度/角度 6.75 m/s",
+            "6.75 m/s",
+            "半径/初速 3.00 m",
+            "3.00 m",
+            "高度/重力 9.8",
+            "9.8",
+            "临界速度：5.42 m/s当前 N/m：5.39 N/kg状态：不脱离判据：N=0",
+            "圆周N=0不脱离",
+            "识别信号：刚好、恰能、最大、最小、临界、至少、至多，通常对应边界条件或函数极值。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "速度/角度 # m/s|# m/s|半径/初速 # m|# m|高度/重力 #|#|临界速度：# m/s当前 N/m：# N/kg状态：不脱离判据：N=#|识别信号：刚好、恰能、最大、最小、临界、至少、至多，通常对应边界条件或函数极值。",
+          "controls": [
+            {
+              "id": "main",
+              "value": "6.25",
+              "checked": false
+            },
+            {
+              "id": "scale",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "grav",
+              "value": "9.8",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "速度/角度 # m/s|# m/s|半径/初速 # m|# m|高度/重力 #|#|临界速度：# m/s当前 N/m：# N/kg状态：不脱离判据：N=#|识别信号：刚好、恰能、最大、最小、临界、至少、至多，通常对应边界条件或函数极值。",
+          "controls": [
+            {
+              "id": "main",
+              "value": "6.2",
+              "checked": false
+            },
+            {
+              "id": "scale",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "grav",
+              "value": "9.8",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/skill/graph-slope-area.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#a",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#b",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#c",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:F-x",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:I-U",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录读数",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:v-t",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#vt",
+          "text": "v-t",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#fx",
+          "text": "F-x",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#iu",
+          "text": "I-U",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录读数",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.68,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "6e03d210",
+          "readout_hash": "8802e78f",
+          "physical_readout_hash": "8802e78f",
+          "readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.0",
+            "6.0",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：24.00截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ],
+          "physical_readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.0",
+            "6.0",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：24.00截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "51468af6",
+          "readout_hash": "f17634a9",
+          "physical_readout_hash": "f17634a9",
+          "readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.2",
+            "6.2",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：25.38截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ],
+          "physical_readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.2",
+            "6.2",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：25.38截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "51468af6",
+          "readout_hash": "f17634a9",
+          "physical_readout_hash": "f17634a9",
+          "readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.2",
+            "6.2",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：25.38截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ],
+          "physical_readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.2",
+            "6.2",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：25.38截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "51468af6",
+          "readout_hash": "f17634a9",
+          "physical_readout_hash": "f17634a9",
+          "readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.2",
+            "6.2",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：25.38截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ],
+          "physical_readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.2",
+            "6.2",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：25.38截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "点 A 横坐标 #|#|点 B 横坐标 #|#|截距/初值 #|#|斜率 k：#面积 S：#截距：#坐标轴：v/(m/s) - t/s|读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。",
+          "controls": [
+            {
+              "id": "a",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "b",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "c",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "点 A 横坐标 #|#|点 B 横坐标 #|#|截距/初值 #|#|斜率 k：#面积 S：#截距：#坐标轴：v/(m/s) - t/s|读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。",
+          "controls": [
+            {
+              "id": "a",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "b",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "c",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

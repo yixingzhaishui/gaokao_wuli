@@ -1,0 +1,32 @@
+{
+  "problems": [
+    {
+      "id": "GT-2025-SH-16",
+      "source": "2025年上海市普通高中学业水平等级性考试物理试卷",
+      "source_kind": "official_exam",
+      "source_verified": true,
+      "source_detail": "物理第16题；锦宏教育试卷PDF含原题和同PDF答案页；答案由平行板匀强电场E=U/d及带电粒子类平抛运动独立核验。",
+      "source_urls": ["https://www.jhgk.cn/upload/file/20250612/1749695610079025886.pdf"],
+      "verification": "原题第16题与同PDF答案页核对：答案为L=v0 d√(m/(Uq))。独立核验：粒子从中央射入到下极板最右边射出，竖直位移d/2；E=U/d，a=qU/(md)，d/2=1/2 a(L/v0)^2，解得L=v0 d√(m/(Uq))。",
+      "verified_at": "2026-07-11",
+      "year": 2025,
+      "exam": "上海等级考·物理",
+      "question_no": "16",
+      "type": "计算",
+      "difficulty": "中档",
+      "knowledge_ids": ["B2-04", "B3-03", "B3-09"],
+      "model_ids": ["M-05"],
+      "stem": "有一质量为m，电荷量为q的正电荷从电容器左侧中央以速度v0水平射入，恰好从下极板最右边射出，板间距为d，两极板电压为U，求两极板的长度L（电荷的重力不计）。",
+      "diagram_required": true,
+      "diagram": {
+        "type": "inline-svg",
+        "title": "原卷第16题带电粒子在平行板电场中偏转示意",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 660 300\" role=\"img\" aria-label=\"正电荷从平行板电容器左侧中央水平射入并从下极板右端射出\"><line x1=\"130\" y1=\"75\" x2=\"530\" y2=\"75\" stroke=\"#2563eb\" stroke-width=\"7\"/><line x1=\"130\" y1=\"225\" x2=\"530\" y2=\"225\" stroke=\"#2563eb\" stroke-width=\"7\"/><path d=\"M70 150h90\" stroke=\"#dc2626\" stroke-width=\"4\" marker-end=\"url(#arrow)\"/><path d=\"M160 150 C300 150 420 185 530 225\" fill=\"none\" stroke=\"#f97316\" stroke-width=\"5\"/><circle cx=\"160\" cy=\"150\" r=\"8\" fill=\"#dc2626\"/><text x=\"80\" y=\"135\" font-size=\"20\" fill=\"#dc2626\">v₀</text><text x=\"548\" y=\"158\" font-size=\"20\" fill=\"#334155\">L</text><path d=\"M130 250h400\" stroke=\"#334155\" stroke-width=\"3\" marker-end=\"url(#arrow)\"/><text x=\"540\" y=\"76\" font-size=\"20\" fill=\"#2563eb\">上板</text><text x=\"540\" y=\"229\" font-size=\"20\" fill=\"#2563eb\">下板</text><line x1=\"575\" y1=\"75\" x2=\"575\" y2=\"225\" stroke=\"#334155\" stroke-width=\"3\" marker-end=\"url(#arrow)\"/><text x=\"590\" y=\"154\" font-size=\"20\" fill=\"#334155\">d</text><defs><marker id=\"arrow\" markerWidth=\"10\" markerHeight=\"10\" refX=\"8\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L0,6 L9,3 z\" fill=\"currentColor\"/></marker></defs></svg>"
+      },
+      "answer": "L=v0 d√(m/(Uq))",
+      "solution": "平行板间匀强电场强度E=U/d，正电荷的竖直加速度a=qE/m=qU/(md)。粒子水平方向做匀速直线运动，时间t=L/v0；竖直方向初速度为0，从中央到下极板的位移为d/2。由d/2=1/2·a·t²，得d=a(L/v0)²，代入a=qU/(md)，解得L=v0 d√(m/(Uq))。",
+      "method": "带电粒子进平行板电场可按类平抛处理：水平匀速，竖直匀加速；先写位移条件再消去时间。",
+      "traps": ["把竖直位移误用成d而不是d/2", "忘记电场强度E=U/d", "把水平速度也当作变化"]
+    }
+  ]
+}

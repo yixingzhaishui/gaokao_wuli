@@ -1,0 +1,35 @@
+{
+  "problems": [
+    {
+      "id": "GT-2025-HN-14",
+      "source": "2025年河南省普通高中学业水平选择性考试物理试题",
+      "source_kind": "official_exam",
+      "source_verified": true,
+      "source_detail": "物理第14题；锦宏教育试卷PDF含原题、防滑带示意图和数据，参考答案PDF给出答案；答案由碰撞动量守恒、机械能差和分段匀变速运动独立核验。",
+      "source_urls": [
+        "https://www.jhgk.cn/upload/file/20250612/1749695832234019787.pdf",
+        "https://www.jhgk.cn/upload/file/20250612/1749723303810089980.pdf"
+      ],
+      "verification": "原题第14题与参考答案核对：答案为（1）24.5 J；（2）5 s。独立核验：碰撞动量守恒得Q碰后速度3.5 m/s；碰前动能98 J，碰后总动能73.5 J，损失24.5 J。P以7 m/s进入宽2.4 m防滑带，μg=5 m/s²，依次经过防滑带和3 m光滑间隔，速度7→5→1→0，对应时间0.4+0.6+0.8+3.0+0.2=5.0 s。",
+      "verified_at": "2026-07-11",
+      "year": 2025,
+      "exam": "河南卷·物理",
+      "question_no": "14",
+      "type": "计算",
+      "difficulty": "较难",
+      "knowledge_ids": ["X1-04", "X1-06", "B1-10", "B1-18"],
+      "model_ids": ["M-10"],
+      "stem": "如图，在一段水平光滑直道上每间隔L1=3 m铺设有宽度为L2=2.4 m的防滑带。在最左端防滑带的左边缘静止有质量为m1=2 kg的小物块P，另一质量为m2=4 kg的小物块Q以v0=7 m/s的速度向右运动并与P发生正碰，且碰撞时间极短。已知碰撞后瞬间P的速度大小为v=7 m/s，P、Q与防滑带间的动摩擦因数均为μ=0.5，重力加速度大小g=10 m/s²。求：（1）该碰撞过程中损失的机械能；（2）P从开始运动到静止经历的时间。",
+      "diagram_required": true,
+      "diagram": {
+        "type": "inline-svg",
+        "title": "原卷第14题防滑带与碰撞后P分段减速示意",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 760 320\" role=\"img\" aria-label=\"水平光滑直道上间隔3米铺设宽2.4米防滑带，P与Q碰撞后P分段减速\"><line x1=\"70\" y1=\"230\" x2=\"710\" y2=\"230\" stroke=\"#334155\" stroke-width=\"5\"/><g fill=\"#fde68a\" stroke=\"#92400e\" stroke-width=\"2\"><rect x=\"90\" y=\"202\" width=\"115\" height=\"28\"/><rect x=\"350\" y=\"202\" width=\"115\" height=\"28\"/><rect x=\"610\" y=\"202\" width=\"80\" height=\"28\"/></g><text x=\"110\" y=\"196\" font-size=\"18\">防滑带 L₂=2.4m</text><text x=\"238\" y=\"250\" font-size=\"18\">光滑间隔 L₁=3m</text><rect x=\"88\" y=\"170\" width=\"36\" height=\"30\" fill=\"#bfdbfe\" stroke=\"#1d4ed8\" stroke-width=\"3\"/><text x=\"99\" y=\"192\" font-size=\"18\">P</text><rect x=\"8\" y=\"170\" width=\"36\" height=\"30\" fill=\"#fecaca\" stroke=\"#dc2626\" stroke-width=\"3\"/><text x=\"19\" y=\"192\" font-size=\"18\">Q</text><path d=\"M48 184h55\" stroke=\"#dc2626\" stroke-width=\"5\" marker-end=\"url(#arrowRed)\"/><path d=\"M125 184h85\" stroke=\"#16a34a\" stroke-width=\"5\" marker-end=\"url(#arrowGreen)\"/><text x=\"48\" y=\"160\" font-size=\"18\" fill=\"#dc2626\">v₀=7m/s</text><text x=\"140\" y=\"160\" font-size=\"18\" fill=\"#16a34a\">碰后P: 7m/s</text><defs><marker id=\"arrowRed\" markerWidth=\"10\" markerHeight=\"10\" refX=\"8\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L0,6 L9,3 z\" fill=\"#dc2626\"/></marker><marker id=\"arrowGreen\" markerWidth=\"10\" markerHeight=\"10\" refX=\"8\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L0,6 L9,3 z\" fill=\"#16a34a\"/></marker></defs></svg>"
+      },
+      "answer": "（1）24.5 J；（2）5 s",
+      "solution": "碰撞时间极短，水平方向动量守恒。碰前只有Q运动：4×7=2×7+4vQ'，得vQ'=3.5 m/s。碰前动能为1/2×4×7²=98 J，碰后动能为1/2×2×7²+1/2×4×3.5²=49+24.5=73.5 J，所以损失机械能24.5 J。P只在防滑带上受摩擦减速，加速度大小a=μg=5 m/s²；光滑间隔中匀速。第一条防滑带宽2.4 m，使速度平方减少2as=24，P速度由7 m/s变为5 m/s，耗时0.4 s；过3 m光滑间隔耗时3/5=0.6 s；第二条防滑带使速度由5 m/s变为1 m/s，耗时0.8 s；再过3 m光滑间隔耗时3 s；进入下一条防滑带再减速0.2 s停止。总时间5 s。",
+      "method": "先用碰撞动量守恒求碰后速度，再用动能差求损失；后续运动只在防滑带上减速，光滑段速度不变，逐段累计时间。",
+      "traps": ["把防滑带间隔3 m误作防滑带宽度", "碰撞后仍把Q速度当0", "把光滑段也计入摩擦减速"]
+    }
+  ]
+}
