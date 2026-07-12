@@ -157,7 +157,7 @@
   document.getElementById('stepBtn').addEventListener('click',()=>{state.running=false;el.play.textContent='播放';state.phase+=.42;state.trail.push({phase:state.phase});if(state.trail.length>80)state.trail.shift();draw()});
   document.getElementById('resetBtn').addEventListener('click',reset);
   [[el.v,'v'],[el.b,'B'],[el.a,'alpha'],[el.m,'m']].forEach(([input,key])=>input.addEventListener('input',()=>{state[key]=Number(input.value);state.trail=[];draw()}));
-  document.querySelectorAll('[data-sign]').forEach(btn=>btn.addEventListener('click',()=>{state.sign=Number(btn.dataset.sign);state.trail=[];draw()}));
+  document.querySelectorAll('[data-sign]').forEach(btn=>btn.addEventListener('click',()=>{state.sign=Number(btn.dataset.sign);state.trail=[];syncInputs();draw()}));
   document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const kind=btn.dataset.case;if(kind==='circle'){state.v=2;state.B=.5;state.alpha=90;state.m=1}if(kind==='helix'){state.v=2;state.B=.5;state.alpha=35;state.m=1}if(kind==='fast'){state.v=4.5;state.B=.5;state.alpha=90;state.m=1}if(kind==='strongB'){state.v=2;state.B=1.1;state.alpha=90;state.m=1}state.trail=[];syncInputs();draw()}));
   let last=performance.now();function tick(now){const dt=Math.min((now-last)/1000,.05);last=now;if(state.running){const c=calc();state.phase+=state.sign*dt*(2*Math.PI/c.T)*.045;state.trail.push({phase:state.phase});if(state.trail.length>100)state.trail.shift();draw()}requestAnimationFrame(tick)}
   if(window.ResizeObserver)new ResizeObserver(resize).observe(canvas);requestAnimationFrame(resize);requestAnimationFrame(tick);

@@ -157,7 +157,14 @@ window.addEventListener('pointerup',()=>{dragRod=false;canvas.style.cursor='grab
 el('play-btn').onclick=function(){playing=!playing;this.classList.toggle('on',playing);this.textContent=playing?'暂停':'播放'};
 el('reverse-b').onclick=()=>{el('b').value=-raw('b');trail=[];sync();draw()};
 el('reverse-v').onclick=()=>{el('v').value=-raw('v');trail=[];sync();draw()};
-el('reset-btn').onclick=()=>{xRod=.62;trail=[];sync();draw()};
+el('reset-btn').onclick=()=>{
+  // Reset the entire experiment so the visible default state and all numerical
+  // readouts agree; resetting only the rod position left altered controls live.
+  el('v').value=50;el('b').value=60;el('l').value=58;el('r').value=20;el('cam').value=18;
+  xRod=.62;playing=true;trail=[];
+  el('play-btn').classList.add('on');el('play-btn').textContent='暂停';
+  sync();draw();
+};
 function loop(now){const dt=Math.min((now-last)/1000,.05);last=now;update(dt);sync();draw();requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
 })();
