@@ -332,7 +332,9 @@ els.playBtn.addEventListener('click', () => {
 els.resetBtn.addEventListener('click', () => {
   state.running = false;
   state.time = 2.4;
+  state.records = [];
   setValues({ i: 45, n: 1.5, err: 1, pin: 6 });
+  renderRecords();
   draw();
 });
 els.recordBtn.addEventListener('click', () => {
