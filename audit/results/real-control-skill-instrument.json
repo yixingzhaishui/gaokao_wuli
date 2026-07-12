@@ -1,0 +1,271 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T18:29:46.862Z",
+  "commit": "2c478ed208651e04ca3e1934cfce72f6f0296959",
+  "module": "skill",
+  "modules": [
+    "skill"
+  ],
+  "summary": {
+    "total": 1,
+    "score": 100,
+    "pass": 1,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/skill/instrument-reading.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#value",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#zero",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:测微器",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:电表",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录读数",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:卡尺",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#caliper",
+          "text": "卡尺",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#micrometer",
+          "text": "测微器",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#meter",
+          "text": "电表",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录读数",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "f6d96c3a",
+          "readout_hash": "839a7e6d",
+          "physical_readout_hash": "839a7e6d",
+          "readout": [
+            "被测量/指针位置 27.30",
+            "27.30",
+            "零误差/倍率 0.00",
+            "0.00",
+            "仪器：游标卡尺原读数：27.30 mm修正/换算后：27.300 mm读数依据：主尺+游标",
+            "卡尺23.4023.400",
+            "判定：读数题先写“量程、精度、估读、零误差”，再计算最终数值。"
+          ],
+          "physical_readout": [
+            "被测量/指针位置 27.30",
+            "27.30",
+            "零误差/倍率 0.00",
+            "0.00",
+            "仪器：游标卡尺原读数：27.30 mm修正/换算后：27.300 mm读数依据：主尺+游标",
+            "卡尺23.4023.400",
+            "判定：读数题先写“量程、精度、估读、零误差”，再计算最终数值。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "980ab252",
+          "readout_hash": "8764705f",
+          "physical_readout_hash": "8764705f",
+          "readout": [
+            "被测量/指针位置 32.00",
+            "32.00",
+            "零误差/倍率 0.00",
+            "0.00",
+            "仪器：游标卡尺原读数：32.00 mm修正/换算后：32.000 mm读数依据：主尺+游标",
+            "卡尺23.4023.400",
+            "判定：读数题先写“量程、精度、估读、零误差”，再计算最终数值。"
+          ],
+          "physical_readout": [
+            "被测量/指针位置 32.00",
+            "32.00",
+            "零误差/倍率 0.00",
+            "0.00",
+            "仪器：游标卡尺原读数：32.00 mm修正/换算后：32.000 mm读数依据：主尺+游标",
+            "卡尺23.4023.400",
+            "判定：读数题先写“量程、精度、估读、零误差”，再计算最终数值。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "d86fa349",
+          "readout_hash": "16396d77",
+          "physical_readout_hash": "16396d77",
+          "readout": [
+            "被测量/指针位置 32.35",
+            "32.35",
+            "零误差/倍率 0.00",
+            "0.00",
+            "仪器：游标卡尺原读数：32.35 mm修正/换算后：32.350 mm读数依据：主尺+游标",
+            "卡尺23.4023.400",
+            "判定：读数题先写“量程、精度、估读、零误差”，再计算最终数值。"
+          ],
+          "physical_readout": [
+            "被测量/指针位置 32.35",
+            "32.35",
+            "零误差/倍率 0.00",
+            "0.00",
+            "仪器：游标卡尺原读数：32.35 mm修正/换算后：32.350 mm读数依据：主尺+游标",
+            "卡尺23.4023.400",
+            "判定：读数题先写“量程、精度、估读、零误差”，再计算最终数值。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "d86fa349",
+          "readout_hash": "16396d77",
+          "physical_readout_hash": "16396d77",
+          "readout": [
+            "被测量/指针位置 32.35",
+            "32.35",
+            "零误差/倍率 0.00",
+            "0.00",
+            "仪器：游标卡尺原读数：32.35 mm修正/换算后：32.350 mm读数依据：主尺+游标",
+            "卡尺23.4023.400",
+            "判定：读数题先写“量程、精度、估读、零误差”，再计算最终数值。"
+          ],
+          "physical_readout": [
+            "被测量/指针位置 32.35",
+            "32.35",
+            "零误差/倍率 0.00",
+            "0.00",
+            "仪器：游标卡尺原读数：32.35 mm修正/换算后：32.350 mm读数依据：主尺+游标",
+            "卡尺23.4023.400",
+            "判定：读数题先写“量程、精度、估读、零误差”，再计算最终数值。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "被测量/指针位置 #|#|零误差/倍率 #|#|仪器：游标卡尺原读数：# mm修正/换算后：# mm读数依据：主尺+游标|判定：读数题先写“量程、精度、估读、零误差”，再计算最终数值。",
+          "controls": [
+            {
+              "id": "value",
+              "value": "54.9",
+              "checked": false
+            },
+            {
+              "id": "zero",
+              "value": "0",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "被测量/指针位置 #|#|零误差/倍率 #|#|仪器：游标卡尺原读数：# mm修正/换算后：# mm读数依据：主尺+游标|判定：读数题先写“量程、精度、估读、零误差”，再计算最终数值。",
+          "controls": [
+            {
+              "id": "value",
+              "value": "54.7",
+              "checked": false
+            },
+            {
+              "id": "zero",
+              "value": "0",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

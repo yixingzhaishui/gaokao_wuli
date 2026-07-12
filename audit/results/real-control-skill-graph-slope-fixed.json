@@ -1,0 +1,303 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T18:31:32.714Z",
+  "commit": "2c478ed208651e04ca3e1934cfce72f6f0296959",
+  "module": "skill",
+  "modules": [
+    "skill"
+  ],
+  "summary": {
+    "total": 1,
+    "score": 100,
+    "pass": 1,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/skill/graph-slope-area.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#a",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#b",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#c",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:F-x",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:I-U",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录读数",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:v-t",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#vt",
+          "text": "v-t",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#fx",
+          "text": "F-x",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#iu",
+          "text": "I-U",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录读数",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.5
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "6e03d210",
+          "readout_hash": "8802e78f",
+          "physical_readout_hash": "8802e78f",
+          "readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.0",
+            "6.0",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：24.00截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ],
+          "physical_readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.0",
+            "6.0",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：24.00截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "51468af6",
+          "readout_hash": "f17634a9",
+          "physical_readout_hash": "f17634a9",
+          "readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.2",
+            "6.2",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：25.38截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ],
+          "physical_readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.2",
+            "6.2",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：25.38截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "51468af6",
+          "readout_hash": "f17634a9",
+          "physical_readout_hash": "f17634a9",
+          "readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.2",
+            "6.2",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：25.38截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ],
+          "physical_readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.2",
+            "6.2",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：25.38截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "51468af6",
+          "readout_hash": "f17634a9",
+          "physical_readout_hash": "f17634a9",
+          "readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.2",
+            "6.2",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：25.38截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ],
+          "physical_readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.2",
+            "6.2",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：25.38截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "点 A 横坐标 #|#|点 B 横坐标 #|#|截距/初值 #|#|斜率 k：#面积 S：#截距：#坐标轴：v/(m/s) - t/s|读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。",
+          "controls": [
+            {
+              "id": "a",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "b",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "c",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "点 A 横坐标 #|#|点 B 横坐标 #|#|截距/初值 #|#|斜率 k：#面积 S：#截距：#坐标轴：v/(m/s) - t/s|读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。",
+          "controls": [
+            {
+              "id": "a",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "b",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "c",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

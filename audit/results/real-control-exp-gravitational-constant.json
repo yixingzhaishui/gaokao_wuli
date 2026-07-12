@@ -1,0 +1,280 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T18:19:39.611Z",
+  "commit": "cf04ce5c4f55de12b680712b1e039f893ad26ea4",
+  "module": "exp",
+  "modules": [
+    "exp"
+  ],
+  "summary": {
+    "total": 1,
+    "score": 100,
+    "pass": 1,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/exp/gravitational-constant-lab.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#bigM",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#smallM",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#dist",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#kappa",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#error",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#recordBtn",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "2b8b8d97",
+          "readout_hash": "c238805b",
+          "physical_readout_hash": "c238805b",
+          "readout": [
+            "大球质量 M/kg：1.5",
+            "小球质量 m/kg：0.020",
+            "球心距离 r/m：0.050",
+            "扭转系数 κ/(10^-7 N·m/rad)：1.0",
+            "读数误差：2%",
+            "F=GMm/r²≈8.00×10^-10 N力矩平衡：κθ=2FL，L=0.10 mθ读≈0.00 mrad，平衡值≈1.63 mradG测≈0.00×10^-11 N·m²/kg²相对误差≈100.0%",
+            "状态：扭秤还在靠近平衡，等待光点稳定后再读 θ。"
+          ],
+          "physical_readout": [
+            "大球质量 M/kg：1.5",
+            "小球质量 m/kg：0.020",
+            "球心距离 r/m：0.050",
+            "扭转系数 κ/(10^-7 N·m/rad)：1.0",
+            "读数误差：2%",
+            "F=GMm/r²≈8.00×10^-10 N力矩平衡：κθ=2FL，L=0.10 mθ读≈0.00 mrad，平衡值≈1.63 mradG测≈0.00×10^-11 N·m²/kg²相对误差≈100.0%",
+            "状态：扭秤还在靠近平衡，等待光点稳定后再读 θ。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "307f31c1",
+          "readout_hash": "c0131898",
+          "physical_readout_hash": "c0131898",
+          "readout": [
+            "大球质量 M/kg：1.5",
+            "小球质量 m/kg：0.020",
+            "球心距离 r/m：0.050",
+            "扭转系数 κ/(10^-7 N·m/rad)：1.0",
+            "读数误差：2%",
+            "F=GMm/r²≈8.00×10^-10 N力矩平衡：κθ=2FL，L=0.10 mθ读≈1.15 mrad，平衡值≈1.63 mradG测≈4.78×10^-11 N·m²/kg²相对误差≈28.4%",
+            "状态：扭秤还在靠近平衡，等待光点稳定后再读 θ。"
+          ],
+          "physical_readout": [
+            "大球质量 M/kg：1.5",
+            "小球质量 m/kg：0.020",
+            "球心距离 r/m：0.050",
+            "扭转系数 κ/(10^-7 N·m/rad)：1.0",
+            "读数误差：2%",
+            "F=GMm/r²≈8.00×10^-10 N力矩平衡：κθ=2FL，L=0.10 mθ读≈1.15 mrad，平衡值≈1.63 mradG测≈4.78×10^-11 N·m²/kg²相对误差≈28.4%",
+            "状态：扭秤还在靠近平衡，等待光点稳定后再读 θ。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "da130c17",
+          "readout_hash": "30dfb1e2",
+          "physical_readout_hash": "30dfb1e2",
+          "readout": [
+            "大球质量 M/kg：1.5",
+            "小球质量 m/kg：0.020",
+            "球心距离 r/m：0.050",
+            "扭转系数 κ/(10^-7 N·m/rad)：1.0",
+            "读数误差：2%",
+            "F=GMm/r²≈8.00×10^-10 N力矩平衡：κθ=2FL，L=0.10 mθ读≈1.22 mrad，平衡值≈1.63 mradG测≈5.09×10^-11 N·m²/kg²相对误差≈23.6%",
+            "状态：扭秤还在靠近平衡，等待光点稳定后再读 θ。"
+          ],
+          "physical_readout": [
+            "大球质量 M/kg：1.5",
+            "小球质量 m/kg：0.020",
+            "球心距离 r/m：0.050",
+            "扭转系数 κ/(10^-7 N·m/rad)：1.0",
+            "读数误差：2%",
+            "F=GMm/r²≈8.00×10^-10 N力矩平衡：κθ=2FL，L=0.10 mθ读≈1.22 mrad，平衡值≈1.63 mradG测≈5.09×10^-11 N·m²/kg²相对误差≈23.6%",
+            "状态：扭秤还在靠近平衡，等待光点稳定后再读 θ。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "da130c17",
+          "readout_hash": "30dfb1e2",
+          "physical_readout_hash": "30dfb1e2",
+          "readout": [
+            "大球质量 M/kg：1.5",
+            "小球质量 m/kg：0.020",
+            "球心距离 r/m：0.050",
+            "扭转系数 κ/(10^-7 N·m/rad)：1.0",
+            "读数误差：2%",
+            "F=GMm/r²≈8.00×10^-10 N力矩平衡：κθ=2FL，L=0.10 mθ读≈1.22 mrad，平衡值≈1.63 mradG测≈5.09×10^-11 N·m²/kg²相对误差≈23.6%",
+            "状态：扭秤还在靠近平衡，等待光点稳定后再读 θ。"
+          ],
+          "physical_readout": [
+            "大球质量 M/kg：1.5",
+            "小球质量 m/kg：0.020",
+            "球心距离 r/m：0.050",
+            "扭转系数 κ/(10^-7 N·m/rad)：1.0",
+            "读数误差：2%",
+            "F=GMm/r²≈8.00×10^-10 N力矩平衡：κθ=2FL，L=0.10 mθ读≈1.22 mrad，平衡值≈1.63 mradG测≈5.09×10^-11 N·m²/kg²相对误差≈23.6%",
+            "状态：扭秤还在靠近平衡，等待光点稳定后再读 θ。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "大球质量 M/kg：#|小球质量 m/kg：#|球心距离 r/m：#|扭转系数 κ/(#^# N·m/rad)：#|读数误差：#%|F=GMm/r²≈#×#^# N力矩平衡：κθ=#FL，L=# mθ读≈# mrad，平衡值≈# mradG测≈#×#^# N·m²/kg²相对误差≈#%|状态：扭秤还在靠近平衡，等待光点稳定后再读 θ。",
+          "controls": [
+            {
+              "id": "bigM",
+              "value": "1.5",
+              "checked": false
+            },
+            {
+              "id": "smallM",
+              "value": "0.02",
+              "checked": false
+            },
+            {
+              "id": "dist",
+              "value": "0.05",
+              "checked": false
+            },
+            {
+              "id": "kappa",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "error",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "大球质量 M/kg：#|小球质量 m/kg：#|球心距离 r/m：#|扭转系数 κ/(#^# N·m/rad)：#|读数误差：#%|F=GMm/r²≈#×#^# N力矩平衡：κθ=#FL，L=# mθ读≈# mrad，平衡值≈# mradG测≈#×#^# N·m²/kg²相对误差≈#%|状态：扭秤还在靠近平衡，等待光点稳定后再读 θ。",
+          "controls": [
+            {
+              "id": "bigM",
+              "value": "1.5",
+              "checked": false
+            },
+            {
+              "id": "smallM",
+              "value": "0.02",
+              "checked": false
+            },
+            {
+              "id": "dist",
+              "value": "0.05",
+              "checked": false
+            },
+            {
+              "id": "kappa",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "error",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

@@ -1,0 +1,264 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T17:36:07.970Z",
+  "commit": "7b3d39da66c7b6a4560020a47c9a49c0a907148e",
+  "module": "xb2",
+  "modules": [
+    "xb2"
+  ],
+  "summary": {
+    "total": 1,
+    "score": 100,
+    "pass": 1,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/xb2/lc-oscillation.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#l",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#c",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#u",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录状态",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录状态",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "24812912",
+          "readout_hash": "d3f196df",
+          "physical_readout_hash": "d3f196df",
+          "readout": [
+            "电感 L 20 mH",
+            "20 mH",
+            "电容 C 50 μF",
+            "50 μF",
+            "初始电压 U₀ 6.0 V",
+            "6.0 V",
+            "周期 T：6.3 ms电荷 q：-272.2 μC电流 i：126.1 mA总能量：0.90 mJ",
+            "0.00π300.00.00.90",
+            "电容电荷接近最大，电场能最大，电流接近 0。"
+          ],
+          "physical_readout": [
+            "电感 L 20 mH",
+            "20 mH",
+            "电容 C 50 μF",
+            "50 μF",
+            "初始电压 U₀ 6.0 V",
+            "6.0 V",
+            "周期 T：6.3 ms电荷 q：-272.2 μC电流 i：126.1 mA总能量：0.90 mJ",
+            "0.00π300.00.00.90",
+            "电容电荷接近最大，电场能最大，电流接近 0。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "9eb36bc8",
+          "readout_hash": "d2a4aea1",
+          "physical_readout_hash": "d2a4aea1",
+          "readout": [
+            "电感 L 20 mH",
+            "20 mH",
+            "电容 C 50 μF",
+            "50 μF",
+            "初始电压 U₀ 6.0 V",
+            "6.0 V",
+            "周期 T：6.3 ms电荷 q：-297.4 μC电流 i：39.7 mA总能量：0.90 mJ",
+            "0.00π300.00.00.90",
+            "电容电荷接近最大，电场能最大，电流接近 0。"
+          ],
+          "physical_readout": [
+            "电感 L 20 mH",
+            "20 mH",
+            "电容 C 50 μF",
+            "50 μF",
+            "初始电压 U₀ 6.0 V",
+            "6.0 V",
+            "周期 T：6.3 ms电荷 q：-297.4 μC电流 i：39.7 mA总能量：0.90 mJ",
+            "0.00π300.00.00.90",
+            "电容电荷接近最大，电场能最大，电流接近 0。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "32b37be2",
+          "readout_hash": "eb402c6b",
+          "physical_readout_hash": "eb402c6b",
+          "readout": [
+            "电感 L 20 mH",
+            "20 mH",
+            "电容 C 50 μF",
+            "50 μF",
+            "初始电压 U₀ 6.0 V",
+            "6.0 V",
+            "周期 T：6.3 ms电荷 q：159.8 μC电流 i：-253.9 mA总能量：0.90 mJ",
+            "0.00π300.00.00.90",
+            "电场能和磁场能正在相互转化。"
+          ],
+          "physical_readout": [
+            "电感 L 20 mH",
+            "20 mH",
+            "电容 C 50 μF",
+            "50 μF",
+            "初始电压 U₀ 6.0 V",
+            "6.0 V",
+            "周期 T：6.3 ms电荷 q：159.8 μC电流 i：-253.9 mA总能量：0.90 mJ",
+            "0.00π300.00.00.90",
+            "电场能和磁场能正在相互转化。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "32b37be2",
+          "readout_hash": "eb402c6b",
+          "physical_readout_hash": "eb402c6b",
+          "readout": [
+            "电感 L 20 mH",
+            "20 mH",
+            "电容 C 50 μF",
+            "50 μF",
+            "初始电压 U₀ 6.0 V",
+            "6.0 V",
+            "周期 T：6.3 ms电荷 q：159.8 μC电流 i：-253.9 mA总能量：0.90 mJ",
+            "0.00π300.00.00.90",
+            "电场能和磁场能正在相互转化。"
+          ],
+          "physical_readout": [
+            "电感 L 20 mH",
+            "20 mH",
+            "电容 C 50 μF",
+            "50 μF",
+            "初始电压 U₀ 6.0 V",
+            "6.0 V",
+            "周期 T：6.3 ms电荷 q：159.8 μC电流 i：-253.9 mA总能量：0.90 mJ",
+            "0.00π300.00.00.90",
+            "电场能和磁场能正在相互转化。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "电感 L # mH|# mH|电容 C # μF|# μF|初始电压 U₀ # V|# V|周期 T：# ms电荷 q：# μC电流 i：# mA总能量：# mJ|电容电荷接近最大，电场能最大，电流接近 #。",
+          "controls": [
+            {
+              "id": "l",
+              "value": "20",
+              "checked": false
+            },
+            {
+              "id": "c",
+              "value": "50",
+              "checked": false
+            },
+            {
+              "id": "u",
+              "value": "6",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "电感 L # mH|# mH|电容 C # μF|# μF|初始电压 U₀ # V|# V|周期 T：# ms电荷 q：# μC电流 i：# mA总能量：# mJ|电容电荷接近最大，电场能最大，电流接近 #。",
+          "controls": [
+            {
+              "id": "l",
+              "value": "20",
+              "checked": false
+            },
+            {
+              "id": "c",
+              "value": "50",
+              "checked": false
+            },
+            {
+              "id": "u",
+              "value": "6",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

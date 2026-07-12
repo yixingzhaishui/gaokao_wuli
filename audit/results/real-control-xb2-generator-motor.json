@@ -1,0 +1,322 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T17:35:56.627Z",
+  "commit": "7b3d39da66c7b6a4560020a47c9a49c0a907148e",
+  "module": "xb2",
+  "modules": [
+    "xb2"
+  ],
+  "summary": {
+    "total": 1,
+    "score": 100,
+    "pass": 1,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/xb2/generator-motor.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#b",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#w",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#i",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#load",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:电动机",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录状态",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:发电机",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#gen",
+          "text": "发电机",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mot",
+          "text": "电动机",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录状态",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "4fade650",
+          "readout_hash": "503b4c3b",
+          "physical_readout_hash": "503b4c3b",
+          "readout": [
+            "磁感应强度 B 0.60 T",
+            "0.60 T",
+            "角速度 ω 2.0 rad/s",
+            "2.0 rad/s",
+            "线圈电流 I 4.0 A",
+            "4.0 A",
+            "负载/阻力 45%",
+            "45%",
+            "峰值电动势 Eₘ：2.88 V瞬时电动势 e：0.00 V相位 θ：0.00 rad当前线圈电流 I：4.0 A（切换电动机观察安培力）负载后输出：0.00判据：ω、B 越大，Eₘ 越大",
+            "发电0.602.00.0",
+            "发电机把外力做功输入的机械能，经电磁感应转化为电能。"
+          ],
+          "physical_readout": [
+            "磁感应强度 B 0.60 T",
+            "0.60 T",
+            "角速度 ω 2.0 rad/s",
+            "2.0 rad/s",
+            "线圈电流 I 4.0 A",
+            "4.0 A",
+            "负载/阻力 45%",
+            "45%",
+            "峰值电动势 Eₘ：2.88 V瞬时电动势 e：0.00 V相位 θ：0.00 rad当前线圈电流 I：4.0 A（切换电动机观察安培力）负载后输出：0.00判据：ω、B 越大，Eₘ 越大",
+            "发电0.602.00.0",
+            "发电机把外力做功输入的机械能，经电磁感应转化为电能。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "b201bdef",
+          "readout_hash": "21d3fbe3",
+          "physical_readout_hash": "21d3fbe3",
+          "readout": [
+            "磁感应强度 B 0.60 T",
+            "0.60 T",
+            "角速度 ω 2.0 rad/s",
+            "2.0 rad/s",
+            "线圈电流 I 4.0 A",
+            "4.0 A",
+            "负载/阻力 45%",
+            "45%",
+            "峰值电动势 Eₘ：2.88 V瞬时电动势 e：1.96 V相位 θ：0.75 rad当前线圈电流 I：4.0 A（切换电动机观察安培力）负载后输出：1.56判据：ω、B 越大，Eₘ 越大",
+            "发电0.602.00.0",
+            "发电机把外力做功输入的机械能，经电磁感应转化为电能。"
+          ],
+          "physical_readout": [
+            "磁感应强度 B 0.60 T",
+            "0.60 T",
+            "角速度 ω 2.0 rad/s",
+            "2.0 rad/s",
+            "线圈电流 I 4.0 A",
+            "4.0 A",
+            "负载/阻力 45%",
+            "45%",
+            "峰值电动势 Eₘ：2.88 V瞬时电动势 e：1.96 V相位 θ：0.75 rad当前线圈电流 I：4.0 A（切换电动机观察安培力）负载后输出：1.56判据：ω、B 越大，Eₘ 越大",
+            "发电0.602.00.0",
+            "发电机把外力做功输入的机械能，经电磁感应转化为电能。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "a9ffad42",
+          "readout_hash": "3514cafb",
+          "physical_readout_hash": "3514cafb",
+          "readout": [
+            "磁感应强度 B 0.60 T",
+            "0.60 T",
+            "角速度 ω 2.0 rad/s",
+            "2.0 rad/s",
+            "线圈电流 I 4.0 A",
+            "4.0 A",
+            "负载/阻力 45%",
+            "45%",
+            "峰值电动势 Eₘ：2.88 V瞬时电动势 e：2.06 V相位 θ：0.80 rad当前线圈电流 I：4.0 A（切换电动机观察安培力）负载后输出：1.65判据：ω、B 越大，Eₘ 越大",
+            "发电0.602.00.0",
+            "发电机把外力做功输入的机械能，经电磁感应转化为电能。"
+          ],
+          "physical_readout": [
+            "磁感应强度 B 0.60 T",
+            "0.60 T",
+            "角速度 ω 2.0 rad/s",
+            "2.0 rad/s",
+            "线圈电流 I 4.0 A",
+            "4.0 A",
+            "负载/阻力 45%",
+            "45%",
+            "峰值电动势 Eₘ：2.88 V瞬时电动势 e：2.06 V相位 θ：0.80 rad当前线圈电流 I：4.0 A（切换电动机观察安培力）负载后输出：1.65判据：ω、B 越大，Eₘ 越大",
+            "发电0.602.00.0",
+            "发电机把外力做功输入的机械能，经电磁感应转化为电能。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "a9ffad42",
+          "readout_hash": "3514cafb",
+          "physical_readout_hash": "3514cafb",
+          "readout": [
+            "磁感应强度 B 0.60 T",
+            "0.60 T",
+            "角速度 ω 2.0 rad/s",
+            "2.0 rad/s",
+            "线圈电流 I 4.0 A",
+            "4.0 A",
+            "负载/阻力 45%",
+            "45%",
+            "峰值电动势 Eₘ：2.88 V瞬时电动势 e：2.06 V相位 θ：0.80 rad当前线圈电流 I：4.0 A（切换电动机观察安培力）负载后输出：1.65判据：ω、B 越大，Eₘ 越大",
+            "发电0.602.00.0",
+            "发电机把外力做功输入的机械能，经电磁感应转化为电能。"
+          ],
+          "physical_readout": [
+            "磁感应强度 B 0.60 T",
+            "0.60 T",
+            "角速度 ω 2.0 rad/s",
+            "2.0 rad/s",
+            "线圈电流 I 4.0 A",
+            "4.0 A",
+            "负载/阻力 45%",
+            "45%",
+            "峰值电动势 Eₘ：2.88 V瞬时电动势 e：2.06 V相位 θ：0.80 rad当前线圈电流 I：4.0 A（切换电动机观察安培力）负载后输出：1.65判据：ω、B 越大，Eₘ 越大",
+            "发电0.602.00.0",
+            "发电机把外力做功输入的机械能，经电磁感应转化为电能。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "磁感应强度 B # T|# T|角速度 ω # rad/s|# rad/s|线圈电流 I # A|# A|负载/阻力 #%|#%|峰值电动势 Eₘ：# V瞬时电动势 e：# V相位 θ：# rad当前线圈电流 I：# A（切换电动机观察安培力）负载后输出：#判据：ω、B 越大，Eₘ 越大|发电机把外力做功输入的机械能，经电磁感应转化为电能。",
+          "controls": [
+            {
+              "id": "b",
+              "value": "0.6",
+              "checked": false
+            },
+            {
+              "id": "w",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "i",
+              "value": "4",
+              "checked": false
+            },
+            {
+              "id": "load",
+              "value": "45",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "磁感应强度 B # T|# T|角速度 ω # rad/s|# rad/s|线圈电流 I # A|# A|负载/阻力 #%|#%|峰值电动势 Eₘ：# V瞬时电动势 e：# V相位 θ：# rad当前线圈电流 I：# A（切换电动机观察安培力）负载后输出：#判据：ω、B 越大，Eₘ 越大|发电机把外力做功输入的机械能，经电磁感应转化为电能。",
+          "controls": [
+            {
+              "id": "b",
+              "value": "0.6",
+              "checked": false
+            },
+            {
+              "id": "w",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "i",
+              "value": "4",
+              "checked": false
+            },
+            {
+              "id": "load",
+              "value": "45",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

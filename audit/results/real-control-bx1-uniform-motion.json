@@ -1,0 +1,197 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T18:03:14.807Z",
+  "commit": "77b88de2496355353cfe9b77cb1d5e989ac848d7",
+  "module": "bx1",
+  "modules": [
+    "bx1"
+  ],
+  "summary": {
+    "total": 1,
+    "score": 100,
+    "pass": 1,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/bx1/uniform-motion.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:负向匀速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:静止",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:对比匀加速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:正向匀速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#mForward",
+          "text": "正向匀速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mBackward",
+          "text": "负向匀速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mStill",
+          "text": "静止",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mCompare",
+          "text": "对比匀加速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "▶ 播放运动",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.32,
+          "py": 0.32
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "▶ 播放运动"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "ddf922f",
+          "readout_hash": "8443a604",
+          "physical_readout_hash": "8443a604",
+          "readout": [
+            "模式=forwardx0=-8.0 mt=4.00 sx=8.00 mv=4.00 m/sa=0.00 m/s²每 0.5 s 间距=2.00 m",
+            "判断匀速看“相同时间内位移相同”：频闪等间距、x-t 直线、v-t 水平线三者一致。"
+          ],
+          "physical_readout": [
+            "模式=forwardx0=-8.0 mt=4.00 sx=8.00 mv=4.00 m/sa=0.00 m/s²每 0.5 s 间距=2.00 m",
+            "判断匀速看“相同时间内位移相同”：频闪等间距、x-t 直线、v-t 水平线三者一致。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "6610b857",
+          "readout_hash": "9d39464d",
+          "physical_readout_hash": "9d39464d",
+          "readout": [
+            "模式=forwardx0=-8.0 mt=4.38 sx=9.54 mv=4.00 m/sa=0.00 m/s²每 0.5 s 间距=2.00 m",
+            "判断匀速看“相同时间内位移相同”：频闪等间距、x-t 直线、v-t 水平线三者一致。"
+          ],
+          "physical_readout": [
+            "模式=forwardx0=-8.0 mt=4.38 sx=9.54 mv=4.00 m/sa=0.00 m/s²每 0.5 s 间距=2.00 m",
+            "判断匀速看“相同时间内位移相同”：频闪等间距、x-t 直线、v-t 水平线三者一致。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "b81f02ea",
+          "readout_hash": "d12ea3f8",
+          "physical_readout_hash": "d12ea3f8",
+          "readout": [
+            "模式=forwardx0=-8.0 mt=4.41 sx=9.64 mv=4.00 m/sa=0.00 m/s²每 0.5 s 间距=2.00 m",
+            "判断匀速看“相同时间内位移相同”：频闪等间距、x-t 直线、v-t 水平线三者一致。"
+          ],
+          "physical_readout": [
+            "模式=forwardx0=-8.0 mt=4.41 sx=9.64 mv=4.00 m/sa=0.00 m/s²每 0.5 s 间距=2.00 m",
+            "判断匀速看“相同时间内位移相同”：频闪等间距、x-t 直线、v-t 水平线三者一致。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "b81f02ea",
+          "readout_hash": "d12ea3f8",
+          "physical_readout_hash": "d12ea3f8",
+          "readout": [
+            "模式=forwardx0=-8.0 mt=4.41 sx=9.64 mv=4.00 m/sa=0.00 m/s²每 0.5 s 间距=2.00 m",
+            "判断匀速看“相同时间内位移相同”：频闪等间距、x-t 直线、v-t 水平线三者一致。"
+          ],
+          "physical_readout": [
+            "模式=forwardx0=-8.0 mt=4.41 sx=9.64 mv=4.00 m/sa=0.00 m/s²每 0.5 s 间距=2.00 m",
+            "判断匀速看“相同时间内位移相同”：频闪等间距、x-t 直线、v-t 水平线三者一致。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "模式=forwardx#=# mt=# sx=# mv=# m/sa=# m/s²每 # s 间距=# m|判断匀速看“相同时间内位移相同”：频闪等间距、x-t 直线、v-t 水平线三者一致。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "模式=forwardx#=# mt=# sx=# mv=# m/sa=# m/s²每 # s 间距=# m|判断匀速看“相同时间内位移相同”：频闪等间距、x-t 直线、v-t 水平线三者一致。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}
