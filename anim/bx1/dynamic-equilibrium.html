@@ -284,7 +284,7 @@
     playBtn.textContent=state.playing?'⏸ 暂停':'▶ 播放：θ 自动放平';
     if(state.playing){state.playDir=-1;animate();}else draw();
   });
-  document.getElementById('resetBtn').addEventListener('click',()=>{state.playing=false;state.theta=45;playBtn.textContent='▶ 播放：θ 自动放平';draw();});
+  document.getElementById('resetBtn').addEventListener('click',()=>{state.playing=false;state.theta=45;state.G=20;playBtn.textContent='▶ 播放：θ 自动放平';draw();});
   draw();
 })();
 </script>
