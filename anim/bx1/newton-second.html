@@ -127,7 +127,7 @@
   const playBtn=document.getElementById('playBtn');
   function animate(){if(!state.playing)return;state.playT+=0.03;draw();if(state.playT>2.5){state.playing=false;playBtn.textContent='▶ 播放：按 a 匀加速滑动';draw();return}requestAnimationFrame(animate)}
   playBtn.addEventListener('click',()=>{state.playing=!state.playing;playBtn.textContent=state.playing?'⏸ 暂停':'▶ 播放：按 a 匀加速滑动';if(state.playing){state.playT=0;animate()}else draw()});
-  document.getElementById('resetBtn').addEventListener('click',()=>{state.playing=false;state.playT=0;playBtn.textContent='▶ 播放：按 a 匀加速滑动';draw()});
+  document.getElementById('resetBtn').addEventListener('click',()=>{state.F=12;state.m=3;state.mu=.1;state.playing=false;state.playT=0;playBtn.textContent='▶ 播放：按 a 匀加速滑动';draw()});
   draw();
 })();
 </script>

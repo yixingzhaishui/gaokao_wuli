@@ -301,7 +301,7 @@
     playBtn.textContent=state.playing?'⏸ 暂停':'▶ 播放：α β 同步放平';
     if(state.playing){state.playDir=-1;animate();}else draw();
   });
-  document.getElementById('resetBtn').addEventListener('click',()=>{state.playing=false;state.alpha=45;state.beta=45;playBtn.textContent='▶ 播放：α β 同步放平';draw();});
+  document.getElementById('resetBtn').addEventListener('click',()=>{state.playing=false;state.alpha=45;state.beta=45;state.G=20;playBtn.textContent='▶ 播放：α β 同步放平';draw();});
   draw();
 })();
 </script>

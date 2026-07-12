@@ -191,7 +191,7 @@
   const playBtn=document.getElementById('playBtn');
   function animate(){if(!state.playing)return;state.playT+=0.03;draw();if(state.playT>2.2){state.playing=false;playBtn.textContent='▶ 播放：两车分开加速';draw();return}requestAnimationFrame(animate)}
   playBtn.addEventListener('click',()=>{state.playing=!state.playing;playBtn.textContent=state.playing?'⏸ 暂停':'▶ 播放：两车分开加速';if(state.playing){state.playT=0;animate()}else draw()});
-  document.getElementById('resetBtn').addEventListener('click',()=>{state.playing=false;state.playT=0;playBtn.textContent='▶ 播放：两车分开加速';draw()});
+  document.getElementById('resetBtn').addEventListener('click',()=>{state.m1=2;state.m2=4;state.F=12;state.playing=false;state.playT=0;playBtn.textContent='▶ 播放：两车分开加速';draw()});
   draw();
 })();
 </script>

@@ -317,7 +317,7 @@
     el.dispatchEvent(new Event('input',{bubbles:true}));
   }));
   playBtn.onclick=()=>{running=!running;playBtn.textContent=running?'暂停':'播放';last=performance.now();draw();};
-  document.getElementById('resetBtn').onclick=()=>{progress=0;running=false;playBtn.textContent='播放';draw();};
+  document.getElementById('resetBtn').onclick=()=>{progress=0;running=false;els.len.value=4;els.dist.value=400;setMode('path');playBtn.textContent='播放';draw();};
   document.getElementById('modePath').onclick=()=>setMode('path');
   document.getElementById('modePass').onclick=()=>setMode('pass');
   document.getElementById('modeTurn').onclick=()=>setMode('turn');
