@@ -272,6 +272,41 @@ async function auditChargeElectrificationSemantics(page, record) {
   if (!pass) record.hard_failures.push({ code: 'H5', description: '静电感应的“接地 → 移开带电体”分步流程未产生真实状态变化。' });
 }
 
+async function auditReferenceFrameSemantics(page, record) {
+  await page.locator('#tabLine').click();
+  await page.waitForTimeout(80);
+  const outcomes = [];
+  // Ground is initially active; test it last so its click is a real return
+  // transition rather than a harmless first-click no-op.
+  for (const selector of ['#fA', '#fB', '#fGround']) {
+    const control = page.locator(selector);
+    if (!(await control.isVisible())) {
+      outcomes.push({ selector, visible: false, changed: false });
+      continue;
+    }
+    const before = await captureState(page);
+    await control.click();
+    await page.waitForTimeout(90);
+    const after = await captureState(page);
+    outcomes.push({ selector, visible: true, changed: changed(before, after) });
+  }
+  const pass = outcomes.length === 3 && outcomes.every(item => item.visible && item.changed);
+  record.semantic_checks.push({
+    kind: '两车一维参考系切换',
+    expected: '地面、车A、车B三个参考系均可切换并改变速度/轨迹读数',
+    actual: outcomes,
+    pass
+  });
+  for (const item of outcomes) {
+    const check = record.button_checks.find(button => button.selector === item.selector);
+    if (check) {
+      check.checked = item.visible;
+      check.worked = item.changed;
+    }
+  }
+  if (!pass) record.hard_failures.push({ code: 'H5', description: '两车一维中的地面、车A、车B参考系未全部产生真实状态变化。' });
+}
+
 for (const { moduleName, file } of pages) {
   test(`${moduleName}/${file} 真实交互审核`, async ({ page }) => {
     const consoleErrors = [];
@@ -504,6 +539,7 @@ for (const { moduleName, file } of pages) {
       record.direct_canvas_drag = await probeCanvasDrag(page);
 
       if (moduleName === 'bx1' && file === 'spring-instant.html') await auditSpringInstantSemantics(page, record);
+      if (moduleName === 'bx1' && file === 'reference-frame.html') await auditReferenceFrameSemantics(page, record);
       if (moduleName === 'skill' && file === 'science-info-problem.html') await auditScienceInfoSemantics(page, record);
       if (moduleName === 'bx3' && file === 'charge-electrification.html') await auditChargeElectrificationSemantics(page, record);
 

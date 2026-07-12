@@ -114,3 +114,7 @@ AUDIT_MODULE=xb1 AUDIT_REPORT=real-control-xb1-full.json \
 已逐页通过：`spring-instant`、`connecting-body`、`elastic-force`、`hooke-law`、`friction`、`newton-second`、`newton-third`、`free-fall`、`acceleration`、`uniform-motion`、`uniform-acceleration`、`vt-graph`、`xt-graph`、`time-instant`、`vertical-throw`、`braking`、`displacement`、`dynamic-equilibrium`、`equilibrium`、`force-composition`。
 
 其中 `spring-instant` 另行核对了剪下绳、剪弹簧、撤支撑以及质量/劲度变化后的受力、合力、加速度语义。余下 12 页后执行 BX1 全模块复审。
+
+## BX1 全模块复审结论（32/32）
+
+执行 `AUDIT_MODULE=bx1 AUDIT_REPORT=real-control-bx1-full.json npx playwright test tests/interaction-audit.spec.js --workers=1` 后，结果为 `32/32 PASS`、`0 BLOCKED`、评分 `100`。该运行包含弹簧瞬时专项物理语义，以及两车一维的地面/车A/车B动态参考系切换。全站任务仍进行中。
