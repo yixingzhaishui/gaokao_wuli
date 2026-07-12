@@ -228,7 +228,7 @@ function animate(now){
   render();
   requestAnimationFrame(animate);
 }
-function reset(){t=0;playing=false;last=0;els.playBtn.textContent='播放';render();}
+function reset(){t=0;playing=false;last=0;records=[];els.charge.value='1';els.electric.value='4';els.magnetic.value='0.8';els.speed.value='5';els.mass.value='2';els.playBtn.textContent='播放';els.recordBody.innerHTML='<tr><td colspan="4">点击“记录”保存一组速度选择数据</td></tr>';render();}
 function syncSpeedFromHandle(clientX){
   const rect=canvas.getBoundingClientRect();
   const x=(clientX-rect.left)*canvas.width/rect.width;

@@ -219,7 +219,7 @@ function record(){
 }
 function reset(){
   const tpl=templates[els.template.value];
-  els.dm.value=tpl.baseDm;els.count.value=12;els.binding.value=els.template.value==='fusion'?7.1:8.45;els.probeA.value=els.template.value==='fission'?56:4;t=0;
+  els.dm.value=tpl.baseDm;els.count.value=12;els.binding.value=els.template.value==='fusion'?7.1:8.45;els.probeA.value=els.template.value==='fission'?56:4;t=0;playing=false;last=0;records=[];els.playBtn.textContent='播放';els.recordBody.innerHTML='<tr><td colspan="4">点击“记录”保存一次核反应估算</td></tr>';
 }
 function pointerPos(e){
   const r=canvas.getBoundingClientRect();
