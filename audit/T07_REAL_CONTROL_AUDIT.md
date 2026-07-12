@@ -65,3 +65,14 @@ AUDIT_MODULE=bx3 AUDIT_REPORT=real-control-bx3-full.json \
 审核器同时新增硬门禁：范围滑块、下拉框或复选框若不能通过真实浏览器操作改变自身控件值，必须判为 `H5`，不能仅因画面发生其它变化而通过。
 
 圆周运动页 `magnetic-circle` 的入射角初值恰在范围上端。审核器曾从控件外沿抓取原生手柄，形成假失败；现改为从手柄/轨道内侧抓取并重测，α 与 v、B、m 都真实改变并联动，所有模式按钮、单步、播放、重置、画布拖拽和 390px 均通过。该几何修正适用于所有处于滑块端点的页面。
+
+## XB2 第二批重新审核（20/22）
+
+以下 20 页均已用新门禁逐页复审，结果均为 `PASS`、无硬失败：
+
+- `ac-generation`、`ac-values`、`ampere-force`、`eddy-current`
+- `em-spectrum`、`em-wave-transmission`、`faraday-law`、`generator-motor`、`lc-oscillation`
+- `lenz-law`、`lorentz-force`、`magnetic-circle`、`magnetic-critical`、`magnetic-field`、`magnetic-flux`、`maxwell-em-theory`
+- `mutual-induction`、`rail-rod`、`self-induction`、`transformer`
+
+每页均覆盖真实滑块拖拽、可见按钮、播放/暂停、重置、重新进入和 390px 布局；有直接画布操作的页面还执行了拖拽。余下 `power-transmission` 与 `sensor` 后进入 XB2 全模块复审。
