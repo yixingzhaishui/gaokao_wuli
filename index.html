@@ -423,8 +423,11 @@
         const href = link && link.getAttribute('href');
         if (!href || !href.startsWith('#/')) return;
         event.preventDefault();
+        event.stopImmediatePropagation();
         close();
-        if (location.hash !== href) location.hash = href.slice(1);
+        // Docsify 的移动侧栏事件在部分 WebKit 浏览器会吞掉 hashchange。
+        // 用完整地址重新载入目标路由，目录项不再依赖那条不稳定的事件链。
+        location.assign(location.pathname + href);
       }, true);
       document.addEventListener('click', function(event) {
         if (event.target.closest('.sidebar a')) close();
