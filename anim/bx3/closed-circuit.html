@@ -212,7 +212,20 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
   document.getElementById('emf').addEventListener('input',e=>{emf=parseFloat(e.target.value);document.getElementById('emf-display').textContent=emf.toFixed(1);updateReadouts();draw();});
   document.getElementById('ri').addEventListener('input',e=>{ri=parseFloat(e.target.value);document.getElementById('ri-display').textContent=ri.toFixed(1);updateReadouts();draw();});
   document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
-  document.getElementById('reset-btn').addEventListener('click',()=>{running=false;t=0;document.getElementById('play-btn').textContent='播放';updateReadouts();draw();});
+  document.getElementById('reset-btn').addEventListener('click',()=>{
+    // A reset must restore the experiment, not merely stop its clock.  Keeping
+    // altered R, ε or r here made the button contradict the displayed initial
+    // state and prevented students from repeating the same comparison.
+    R=10;emf=6;ri=2;running=false;t=0;
+    document.getElementById('r').value=R;
+    document.getElementById('emf').value=emf;
+    document.getElementById('ri').value=ri;
+    document.getElementById('r-display').textContent=R.toFixed(1);
+    document.getElementById('emf-display').textContent=emf.toFixed(1);
+    document.getElementById('ri-display').textContent=ri.toFixed(1);
+    document.getElementById('play-btn').textContent='播放';
+    updateReadouts();draw();
+  });
 
   let lastTime=performance.now();
   function loop(now){const dt=Math.min((now-lastTime)/1000,0.05);lastTime=now;step(dt);requestAnimationFrame(loop);}
