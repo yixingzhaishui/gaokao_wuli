@@ -446,7 +446,7 @@
       new MutationObserver(function() {
         bindMobileSidebarRoutes();
       }).observe(document.body, { childList: true, subtree: true });
-      document.addEventListener('pointerup', function(event) {
+      const routeMobileSidebarLink = function(event) {
         if (!window.matchMedia('(max-width: 760px)').matches) return;
         const link = event.target.closest('.sidebar a[data-mobile-route-bound="true"]');
         if (!link) return;
@@ -456,7 +456,10 @@
         const toggle = document.getElementById('mobile-nav-toggle');
         if (toggle) toggle.setAttribute('aria-expanded', 'false');
         location.assign(link.href);
-      }, true);
+      };
+      document.addEventListener('pointerup', routeMobileSidebarLink, true);
+      document.addEventListener('mouseup', routeMobileSidebarLink, true);
+      document.addEventListener('click', routeMobileSidebarLink, true);
       bindMobileSidebarRoutes();
     }
 
