@@ -188,7 +188,7 @@ window.addEventListener('pointerup',()=>{drag='';canvas.style.cursor='grab'});
 function bind(id,fn){document.getElementById(id).addEventListener('input',e=>{fn(parseFloat(e.target.value));sync();draw()})}
 bind('b',v=>B=v);bind('i',v=>I=v);bind('l',v=>L=v);bind('th',v=>theta=v);
 document.getElementById('play-btn').onclick=function(){running=!running;this.textContent=running?'暂停电流':'播放电流'};
-document.getElementById('reset-btn').onclick=()=>{B=0.5;I=4;L=0.5;theta=90;t=0;sync();draw()};
+document.getElementById('reset-btn').onclick=()=>{B=0.5;I=4;L=0.5;theta=90;t=0;running=true;document.getElementById('play-btn').textContent='暂停电流';sync();draw()};
 let last=performance.now();
 function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;if(running)t+=dt;draw();requestAnimationFrame(loop)}
 sync();requestAnimationFrame(loop);

@@ -89,7 +89,7 @@ cv.addEventListener('pointerup',()=>drag='');cv.addEventListener('pointercancel'
 document.getElementById('rr').addEventListener('input',e=>{R=parseFloat(e.target.value);sync();draw()});
 document.getElementById('lr').addEventListener('input',e=>{L=parseFloat(e.target.value);sync();draw()});
 document.getElementById('play').onclick=function(){running=!running;this.textContent=running?'⏸ 暂停':'▶ 播放';};
-document.getElementById('reset').onclick=()=>{R=9;L=9;t=0;sync();draw()};
+document.getElementById('reset').onclick=()=>{R=9;L=9;t=0;running=true;document.getElementById('play').textContent='⏸ 暂停';sync();draw()};
 let last=performance.now();
 function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;if(running)t+=dt;draw();requestAnimationFrame(loop);}
 sync();requestAnimationFrame(loop);
