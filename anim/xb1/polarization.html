@@ -108,7 +108,7 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
   canvas.addEventListener('pointercancel',()=>{dragP2=false;});
   document.getElementById('th').addEventListener('input',e=>{th=parseInt(e.target.value);sync();draw();});
   document.getElementById('play-btn').addEventListener('click',e=>{running=!running;e.currentTarget.textContent=running?'⏸ 暂停':'▶ 播放';});
-  document.getElementById('reset-btn').addEventListener('click',()=>{th=30;t=0;sync();draw();});
+  document.getElementById('reset-btn').addEventListener('click',()=>{th=30;t=0;running=true;document.getElementById('play-btn').textContent='⏸ 暂停';sync();draw();});
   let last=performance.now();
   function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;if(running)t+=dt;draw();requestAnimationFrame(loop);}
   sync();requestAnimationFrame(loop);

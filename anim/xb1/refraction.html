@@ -106,7 +106,7 @@ cv.addEventListener('pointerdown',e=>{const p=pos(e);if(p.y<oy&&Math.hypot(p.x-o
 cv.addEventListener('pointermove',e=>{if(!dragRay)return;const p=pos(e);const ang=Math.atan2(ox-p.x,oy-p.y);i=Math.max(0,Math.min(85,Math.round(ang/D)));document.getElementById('ir').value=i;document.getElementById('il').textContent=i;});
 window.addEventListener('pointerup',()=>dragRay=false);
 document.getElementById('play').onclick=function(){playing=!playing;this.classList.toggle('on',playing);this.textContent=playing?'⏸ 暂停':'▶ 播放';};
-document.getElementById('reset').onclick=function(){i=45;n=1.5;t=0;playing=false;pulses=[];document.getElementById('ir').value=45;document.getElementById('nr').value=1.5;document.getElementById('il').textContent=45;document.getElementById('nl').textContent='1.50';this.textContent='重置';document.getElementById('play').textContent='▶ 播放';render();};
+document.getElementById('reset').onclick=function(){i=45;n=1.5;t=0;playing=true;pulses=[];document.getElementById('ir').value=45;document.getElementById('nr').value=1.5;document.getElementById('il').textContent=45;document.getElementById('nl').textContent='1.50';this.textContent='重置';document.getElementById('play').classList.add('on');document.getElementById('play').textContent='⏸ 暂停';render();};
 document.getElementById('ir').addEventListener('input',e=>{i=parseInt(e.target.value);document.getElementById('il').textContent=i;});
 document.getElementById('nr').addEventListener('input',e=>{n=parseFloat(e.target.value);document.getElementById('nl').textContent=n.toFixed(2);});
 let last=performance.now();

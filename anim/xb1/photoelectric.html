@@ -138,7 +138,7 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
   bind('w',v=>{w=v;document.getElementById('w-d').textContent=v.toFixed(1);});
   bind('int',v=>{inten=v;document.getElementById('int-d').textContent=['','低','中','高'][v];});
   document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
-  document.getElementById('reset-btn').addEventListener('click',()=>{electrons=[];t=0;nu=7.0;w=2.3;inten=2;sync();draw();});
+  document.getElementById('reset-btn').addEventListener('click',()=>{electrons=[];t=0;nu=7.0;w=2.3;inten=2;running=true;document.getElementById('play-btn').textContent='暂停';sync();draw();});
   let last=performance.now();
   function loop(now){const dt=Math.min((now-last)/1000,0.03);last=now;if(running)step(dt);draw();requestAnimationFrame(loop);}
   sync();draw();requestAnimationFrame(loop);
