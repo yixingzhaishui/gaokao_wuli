@@ -104,3 +104,7 @@ AUDIT_MODULE=xb1 AUDIT_REPORT=real-control-xb1-full.json \
 已逐页通过：`projectile`、`oblique-throw`、`circular-basics`、`centripetal`、`vertical-circle`、`work-energy-relation`、`mechanical-energy`、`energy-conservation`、`gravitation`、`kepler-law`、`cosmic-velocity`、`satellite`、`geostationary`、`orbit-transfer`、`binary-star`、`centrifugal-phenomenon`、`power`、`kinetic-energy`、`elastic-potential`、`work`。
 
 每页均在真实拖拽、全部可见按钮、播放/暂停、重置、重入和 390px 条件下通过。余下 7 页后执行 BX2 全模块复审。
+
+## BX2 全模块复审结论（27/27）
+
+执行 `AUDIT_MODULE=bx2 AUDIT_REPORT=real-control-bx2-full.json npx playwright test tests/interaction-audit.spec.js --workers=1` 后，结果为 `27/27 PASS`、`0 BLOCKED`、评分 `100`。这关闭 BX2 的交互功能与移动端复审；全站任务仍进行中。
