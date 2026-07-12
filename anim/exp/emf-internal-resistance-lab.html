@@ -208,7 +208,7 @@ c.addEventListener('pointerdown',e=>{const p=pos(e),R=Number(els.outer.value);if
 c.addEventListener('pointermove',e=>{const p=pos(e);if(!state.drag){c.style.cursor='grab';return;}if(state.drag==='R')els.outer.value=Math.max(1,Math.min(20,(p.x-330)/132*20)).toFixed(1);draw();});
 c.addEventListener('pointerup',e=>{state.drag=null;try{c.releasePointerCapture(e.pointerId)}catch(err){}});c.addEventListener('pointercancel',()=>{state.drag=null;});
 els.playBtn.addEventListener('click',()=>{state.running=!state.running;state.last=0;draw();});
-els.resetBtn.addEventListener('click',()=>{state.running=false;state.time=0;els.emf.value=3;els.inner.value=1;els.outer.value=5;els.spread.value=6;els.error.value=1;draw();});
+els.resetBtn.addEventListener('click',()=>{state.running=false;state.time=0;state.records=[];els.emf.value=3;els.inner.value=1;els.outer.value=5;els.spread.value=6;els.error.value=1;els.records.innerHTML='';draw();});
 els.recordBtn.addEventListener('click',()=>{const E=Number(els.emf.value),r=Number(els.inner.value),R=Number(els.outer.value),err=Number(els.error.value)/100,q=calc(E,r,R,err);state.records.unshift({I:q.I,U:q.Uread,R});state.records=state.records.slice(0,4);els.records.innerHTML=state.records.map((q,i)=>`<tr><td style="text-align:left;border-bottom:1px solid #d9e2ec">${i+1}</td><td style="border-bottom:1px solid #d9e2ec">${q.I.toFixed(3)}</td><td style="border-bottom:1px solid #d9e2ec">${q.U.toFixed(2)}</td><td style="border-bottom:1px solid #d9e2ec">${q.R.toFixed(1)}</td></tr>`).join('');});
 function loop(now){if(!state.last)state.last=now;const dt=Math.min(.04,(now-state.last)/1000);state.last=now;if(state.running)state.time+=dt;draw();requestAnimationFrame(loop);}
 requestAnimationFrame(loop);

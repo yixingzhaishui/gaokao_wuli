@@ -255,7 +255,7 @@
   canvas.addEventListener('pointercancel', () => { state.drag=null; });
   [els.r,els.c,els.e].forEach(el => el.addEventListener('input', draw));
   els.play.addEventListener('click', () => { state.running=!state.running; els.play.textContent=state.running?'暂停':'播放'; });
-  document.getElementById('reset').addEventListener('click', () => { state.mode='charge'; state.t=0; state.Uc=0; state.I=0; state.history=[]; state.records=[]; draw(); });
+  document.getElementById('reset').addEventListener('click', () => { state.mode='charge'; state.running=true; state.t=0; state.Uc=0; state.I=0; state.probe=null; state.history=[]; state.records=[]; els.r.value=20; els.c.value=100; els.e.value=6; els.play.textContent='暂停'; draw(); });
   document.getElementById('record').addEventListener('click', () => {
     state.records.push({ mode: state.mode==='charge'?'充电':state.mode==='open'?'断开':'放电', t: state.t, U: state.Uc, I: state.I });
     if (state.records.length>8) state.records.shift();
