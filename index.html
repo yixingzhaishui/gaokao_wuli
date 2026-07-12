@@ -81,6 +81,7 @@
       font: inherit;
       cursor: pointer;
     }
+    .sidebar .mobile-route-form { margin: 0; }
     .sidebar-nav a:hover,
     .sidebar .mobile-route-button:hover,
     .sidebar-nav .active > a {
@@ -440,19 +441,18 @@
       if (!window.matchMedia('(max-width: 760px)').matches) return;
       document.querySelectorAll('.sidebar a[href^="#/"]').forEach(function(link) {
         const route = link.getAttribute('href');
+        const form = document.createElement('form');
+        form.className = 'mobile-route-form';
+        form.method = 'get';
+        form.action = location.origin + location.pathname + route;
         const button = document.createElement('button');
-        button.type = 'button';
+        button.type = 'submit';
         button.className = 'mobile-route-button';
         button.dataset.mobileRouteBound = 'true';
         button.textContent = link.textContent;
         if (link.title) button.title = link.title;
-        button.addEventListener('click', function() {
-          document.body.classList.remove('mobile-nav-open');
-          const toggle = document.getElementById('mobile-nav-toggle');
-          if (toggle) toggle.setAttribute('aria-expanded', 'false');
-          window.open(location.origin + location.pathname + route, '_self');
-        });
-        link.replaceWith(button);
+        form.append(button);
+        link.replaceWith(form);
       });
     }
 
