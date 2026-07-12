@@ -142,7 +142,7 @@ cv.addEventListener('pointermove',e=>{
 });
 window.addEventListener('pointerup',()=>{drag=null;cv.style.cursor='grab'});
 id('play').onclick=function(){running=!running;this.textContent=running?'⏸ 暂停运动':'▶ 继续运动';};
-id('reset').onclick=()=>{m=2;v=3;cartX=150;trace=[];draw()};
+id('reset').onclick=()=>{m=2;v=3;cartX=150;trace=[];running=true;id('play').textContent='⏸ 暂停运动';draw()};
 function loop(now){
   const dt=Math.min((now-last)/1000,.05);last=now;
   if(running)cartX+=v*28*dt;
