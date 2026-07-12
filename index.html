@@ -336,7 +336,7 @@
       }
       .mobile-nav-scrim {
         position: fixed;
-        inset: 0;
+        inset: 0 0 0 var(--sidebar-width);
         z-index: 19;
         background: rgba(16,42,67,.35);
       }
@@ -451,6 +451,13 @@
         button.dataset.mobileRouteBound = 'true';
         button.textContent = link.textContent;
         if (link.title) button.title = link.title;
+        form.addEventListener('submit', function(event) {
+          event.preventDefault();
+          document.body.classList.remove('mobile-nav-open');
+          const toggle = document.getElementById('mobile-nav-toggle');
+          if (toggle) toggle.setAttribute('aria-expanded', 'false');
+          location.assign(form.action);
+        });
         form.append(button);
         link.replaceWith(form);
       });
