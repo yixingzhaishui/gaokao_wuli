@@ -196,7 +196,7 @@
   document.querySelectorAll('[data-tool]').forEach(btn=>btn.addEventListener('click',()=>{state.tool=btn.dataset.tool;document.querySelectorAll('[data-tool]').forEach(b=>b.classList.toggle('active',b===btn));draw();}));
   [els.length,els.zero].forEach(el=>el.addEventListener('input',draw));
   document.getElementById('record').addEventListener('click',()=>{const q=v(),r=reading();state.records.push({tool:{ruler:'刻度尺',vernier:'游标卡尺',micrometer:'螺旋测微器'}[state.tool],raw:r.raw,zero:q.z,corrected:r.corrected});draw();});
-  document.getElementById('reset').addEventListener('click',()=>{els.length.value='32.4';els.zero.value='0';state.records=[];draw();});
+  document.getElementById('reset').addEventListener('click',()=>{els.length.value='32.4';els.zero.value='0';state.tool='ruler';state.running=false;state.phase=0;state.records=[];els.play.textContent='播放';document.querySelectorAll('[data-tool]').forEach(b=>b.classList.toggle('active',b.dataset.tool==='ruler'));draw();});
   els.play.addEventListener('click',()=>{state.running=!state.running;els.play.textContent=state.running?'暂停':'播放';});
   function loop(){if(state.running){state.phase+=0.03;els.length.value=String((32+18*Math.sin(state.phase)).toFixed(1));}draw();requestAnimationFrame(loop);}
   draw(); requestAnimationFrame(loop);
