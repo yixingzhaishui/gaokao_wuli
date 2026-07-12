@@ -79,7 +79,7 @@ document.getElementById('br').addEventListener('input',e=>{B=parseFloat(e.target
 document.getElementById('sr').addEventListener('input',e=>{S=parseFloat(e.target.value);draw()});
 document.getElementById('tr').addEventListener('input',e=>{theta=parseInt(e.target.value);draw()});
 document.getElementById('play').onclick=function(){running=!running;this.textContent=running?'⏸ 暂停':'▶ 自动转动';};
-document.getElementById('reset').onclick=()=>{B=0.5;S=0.02;theta=0;running=false;document.getElementById('play').textContent='▶ 自动转动';draw()};
+document.getElementById('reset').onclick=()=>{B=0.5;S=0.02;theta=0;tdir=1;running=false;document.getElementById('br').value=B;document.getElementById('sr').value=S;document.getElementById('tr').value=theta;document.getElementById('play').textContent='▶ 自动转动';draw()};
 let last=performance.now();
 function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;if(running&&!drag){theta+=tdir*40*dt;if(theta>=90){theta=90;tdir=-1;}if(theta<=0){theta=0;tdir=1;}theta=Math.round(theta);}draw();requestAnimationFrame(loop);}
 requestAnimationFrame(loop);
