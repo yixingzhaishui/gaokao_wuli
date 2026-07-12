@@ -76,3 +76,14 @@ AUDIT_MODULE=bx3 AUDIT_REPORT=real-control-bx3-full.json \
 - `mutual-induction`、`rail-rod`、`self-induction`、`transformer`
 
 每页均覆盖真实滑块拖拽、可见按钮、播放/暂停、重置、重新进入和 390px 布局；有直接画布操作的页面还执行了拖拽。余下 `power-transmission` 与 `sensor` 后进入 XB2 全模块复审。
+
+## XB2 全模块复审结论（22/22）
+
+`power-transmission` 的重置曾在下一帧自动演示中把 U 从默认 10kV 改写为非默认值。已改为“重置后暂停在 100kW、10kV、10Ω”，再执行完整模块复审：
+
+```sh
+AUDIT_MODULE=xb2 AUDIT_REPORT=real-control-xb2-full-fixed.json \
+  npx playwright test tests/interaction-audit.spec.js --workers=1
+```
+
+结果：`22/22 PASS`、`0 BLOCKED`、评分 `100`。这关闭 XB2 的交互功能与移动端复审；全站任务仍进行中。
