@@ -367,6 +367,7 @@
             setTimeout(hideUnverifiedExercises, 0);
             setTimeout(syncRouteAnchor, 0);
             initMobileNavigation();
+            setTimeout(bindMobileSidebarRoutes, 0);
             if (location.hash.indexOf('/graph') !== -1) {
               renderKnowledgeGraph();
             }
@@ -419,22 +420,27 @@
       });
       scrim.addEventListener('click', close);
       document.addEventListener('click', function(event) {
-        const link = event.target.closest('.sidebar a[href]');
-        const href = link && link.getAttribute('href');
-        if (!href || !href.startsWith('#/')) return;
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        close();
-        // Docsify 的移动侧栏事件在部分 WebKit 浏览器会吞掉 hashchange。
-        // 用完整地址重新载入目标路由，目录项不再依赖那条不稳定的事件链。
-        location.assign(location.pathname + href);
-      }, true);
-      document.addEventListener('click', function(event) {
         if (event.target.closest('.sidebar a')) close();
       });
       window.addEventListener('hashchange', function() {
         close();
         setTimeout(syncRouteAnchor, 0);
+      });
+    }
+
+    function bindMobileSidebarRoutes() {
+      document.querySelectorAll('.sidebar a[href^="#/"]').forEach(function(link) {
+        if (link.dataset.mobileRouteBound === 'true') return;
+        link.dataset.mobileRouteBound = 'true';
+        link.addEventListener('click', function(event) {
+          if (!window.matchMedia('(max-width: 760px)').matches) return;
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          document.body.classList.remove('mobile-nav-open');
+          const toggle = document.getElementById('mobile-nav-toggle');
+          if (toggle) toggle.setAttribute('aria-expanded', 'false');
+          location.assign(link.href);
+        });
       });
     }
 
