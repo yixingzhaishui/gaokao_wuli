@@ -102,7 +102,7 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
   bind('th',v=>{th0=v*Math.PI/180;document.getElementById('th-d').textContent=v;});
   bind('g',v=>{g=v;document.getElementById('g-d').textContent=v.toFixed(1);});
   document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
-  document.getElementById('reset-btn').addEventListener('click',()=>{t=0;draw();});
+  document.getElementById('reset-btn').addEventListener('click',()=>{L=1;theta=10;g=9.8;t=0;running=true;document.getElementById('l').value=L;document.getElementById('th').value=theta;document.getElementById('g').value=g;document.getElementById('l-d').textContent=L.toFixed(1);document.getElementById('th-d').textContent=theta;document.getElementById('g-d').textContent=g.toFixed(1);document.getElementById('play-btn').textContent='暂停';draw();});
   function pointerPos(e){const r=canvas.getBoundingClientRect(),s=canvas.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s};}
   canvas.addEventListener('pointerdown',e=>{
     const p=pointerPos(e),th=angle(t),len=L*pxPerM,bx=pivotX+len*Math.sin(th),by=pivotY+len*Math.cos(th);
