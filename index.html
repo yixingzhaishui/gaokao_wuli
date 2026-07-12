@@ -464,15 +464,19 @@
     }
 
     function watchMobileSidebarRoutes() {
-      if (document.body.dataset.mobileRouteWatcher === 'true') {
+      if (document.documentElement.dataset.mobileRouteWatcher === 'true') {
         bindMobileSidebarRoutes();
         return;
       }
-      document.body.dataset.mobileRouteWatcher = 'true';
-      new MutationObserver(function() {
+      document.documentElement.dataset.mobileRouteWatcher = 'true';
+      let attempts = 0;
+      const bindWhenSidebarIsReady = function() {
         bindMobileSidebarRoutes();
-      }).observe(document.body, { childList: true, subtree: true });
-      bindMobileSidebarRoutes();
+        if (document.querySelector('.sidebar .mobile-route-button') || attempts >= 20) return;
+        attempts += 1;
+        setTimeout(bindWhenSidebarIsReady, 50);
+      };
+      bindWhenSidebarIsReady();
     }
 
     function escapeHtml(value) {
