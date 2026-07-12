@@ -450,7 +450,7 @@
           document.body.classList.remove('mobile-nav-open');
           const toggle = document.getElementById('mobile-nav-toggle');
           if (toggle) toggle.setAttribute('aria-expanded', 'false');
-          location.assign(location.origin + location.pathname + route);
+          window.open(location.origin + location.pathname + route, '_self');
         });
         link.replaceWith(button);
       });
