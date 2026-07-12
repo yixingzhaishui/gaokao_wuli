@@ -130,6 +130,46 @@ async function probeCanvasDrag(page) {
   return { tested: true, affected_result: false };
 }
 
+// A value control only counts when a browser-level user action changes it.
+// Setting node.value and dispatching events can make a broken slider look
+// healthy, because it bypasses the pointer/touch path a student uses.
+async function operateValueControl(page, control, meta) {
+  if (meta.tag === 'select') {
+    const next = meta.options.find(option => option.value !== meta.value);
+    if (next) await control.selectOption(next.value);
+    return;
+  }
+
+  if (meta.type === 'range') {
+    await control.scrollIntoViewIfNeeded();
+    const box = await control.boundingBox();
+    const value = Number(meta.value);
+    const min = Number(meta.min);
+    const max = Number(meta.max);
+    if (!box || !Number.isFinite(value) || !Number.isFinite(min) || !Number.isFinite(max) || max <= min) return;
+
+    // Drag the native thumb to the opposite end, staying just inside the
+    // track so every browser emits pointer, input and change events.
+    const ratio = Math.max(0, Math.min(1, (value - min) / (max - min)));
+    const targetRatio = ratio < 0.5 ? 0.985 : 0.015;
+    const y = box.y + box.height / 2;
+    await page.mouse.move(box.x + box.width * ratio, y);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width * targetRatio, y, { steps: 12 });
+    await page.mouse.up();
+    return;
+  }
+
+  if (meta.type === 'checkbox') {
+    await control.setChecked(!meta.checked);
+    return;
+  }
+
+  if (meta.type === 'radio' && !meta.checked) {
+    await control.check();
+  }
+}
+
 async function auditSpringInstantSemantics(page, record) {
   const targetCases = [
     { value: 'rope', label: '剪下绳', force: '30.0 N', balance: '0.0 N', acceleration: '5.0 / -10.0' },
@@ -196,6 +236,35 @@ async function auditScienceInfoSemantics(page, record) {
     pass
   });
   if (!pass) record.hard_failures.push({ code: 'H5', description: '信息题未完成“选择→提交→下一题”的完整交互流程。' });
+}
+
+async function auditChargeElectrificationSemantics(page, record) {
+  await page.getByRole('button', { name: '静电感应', exact: true }).click();
+  await page.waitForTimeout(80);
+  const step = page.locator('#inductionStep');
+  const phases = [];
+  for (let i = 0; i < 2; i++) {
+    if (!(await step.isVisible())) break;
+    const label = ((await step.textContent()) || '').trim();
+    const before = await captureState(page);
+    await step.click();
+    await page.waitForTimeout(100);
+    const after = await captureState(page);
+    phases.push({ label, changed: changed(before, after) });
+  }
+  const pass = phases.length === 2 && phases.every(phase => phase.changed);
+  record.semantic_checks.push({
+    kind: '静电感应分步流程',
+    expected: '进入静电感应后依次完成“接地 → 移开带电体”，每步改变画面或物理读数',
+    actual: phases,
+    pass
+  });
+  const stepCheck = record.button_checks.find(item => item.selector === '#inductionStep');
+  if (stepCheck) {
+    stepCheck.checked = true;
+    stepCheck.worked = pass;
+  }
+  if (!pass) record.hard_failures.push({ code: 'H5', description: '静电感应的“接地 → 移开带电体”分步流程未产生真实状态变化。' });
 }
 
 for (const { moduleName, file } of pages) {
@@ -348,19 +417,7 @@ for (const { moduleName, file } of pages) {
           min: node.min, max: node.max, checked: node.checked, options: node.options ? [...node.options].map(option => option.value) : []
         }), i);
         const before = await captureState(page);
-        await control.evaluate((node) => {
-          if (node.tagName === 'SELECT') {
-            const options = [...node.options];
-            const next = options.find(option => option.value !== node.value);
-            if (next) node.value = next.value;
-          } else if (node.type === 'range') {
-            node.value = node.value === node.max ? node.min : node.max;
-          } else {
-            node.checked = !node.checked;
-          }
-          node.dispatchEvent(new Event('input', { bubbles: true }));
-          node.dispatchEvent(new Event('change', { bubbles: true }));
-        });
+        await operateValueControl(page, control, meta);
         await page.waitForTimeout(90);
         const after = await captureState(page);
         const current = await control.evaluate(node => ({ value: node.value, checked: node.checked }));
@@ -443,6 +500,7 @@ for (const { moduleName, file } of pages) {
 
       if (moduleName === 'bx1' && file === 'spring-instant.html') await auditSpringInstantSemantics(page, record);
       if (moduleName === 'skill' && file === 'science-info-problem.html') await auditScienceInfoSemantics(page, record);
+      if (moduleName === 'bx3' && file === 'charge-electrification.html') await auditChargeElectrificationSemantics(page, record);
 
       await page.goto('about:blank');
       await page.goBack({ waitUntil: 'load' });
