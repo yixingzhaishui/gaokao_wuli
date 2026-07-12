@@ -717,7 +717,7 @@
           '  <div class="graph-stage"><svg role="img" aria-label="四川高考物理知识图谱"></svg></div>',
           '  <aside class="graph-panel">',
           '    <h3>知识图谱</h3>',
-          '    <p>点击节点跳到对应知识点；悬停查看模块、完成状态和前后关系。</p>',
+          '    <p>点击节点跳到对应知识点；悬停查看模块、完成状态和前后关系。图谱排版完成后会自动静止，只有拖动节点时才会短暂重新排列。</p>',
           '    <div class="graph-chip"><span class="graph-dot" style="background:#2c7be5"></span>done</div>',
           '    <div class="graph-chip"><span class="graph-dot" style="background:#f0a500"></span>partial</div>',
           '    <div class="graph-chip"><span class="graph-dot" style="background:#9fb3c8"></span>pending</div>',
@@ -770,6 +770,11 @@
           .force('x', d3.forceX(d => moduleX(d.module)).strength(0.42))
           .force('y', d3.forceY(height / 2).strength(0.06))
           .force('collide', d3.forceCollide(34));
+        // A knowledge map is a reference diagram, not a decorative animation.
+        // Cap each force-layout pass so it settles quickly and then stays still.
+        let layoutTicks = 0;
+        const maxLayoutTicks = 90;
+        let draggingNode = false;
 
         const link = svg.append('g')
           .attr('stroke-linecap', 'round')
@@ -815,7 +820,11 @@
           })
           .call(d3.drag()
             .on('start', (event, d) => {
-              if (!event.active) simulation.alphaTarget(0.25).restart();
+              if (!event.active) {
+                layoutTicks = 0;
+                simulation.alpha(0.32).alphaTarget(0.18).restart();
+              }
+              draggingNode = true;
               d.fx = d.x;
               d.fy = d.y;
             })
@@ -825,6 +834,7 @@
             })
             .on('end', (event, d) => {
               if (!event.active) simulation.alphaTarget(0);
+              draggingNode = false;
               d.fx = null;
               d.fy = null;
             }));
@@ -864,6 +874,8 @@
           });
           node.attr('transform', d => 'translate(' + d.x + ',' + d.y + ')');
           moduleLabels.attr('x', d => moduleX(d));
+          layoutTicks += 1;
+          if (!draggingNode && layoutTicks >= maxLayoutTicks) simulation.stop();
         });
       } catch (err) {
         mount.innerHTML = '<div class="graph-error">知识图谱加载失败：' + err.message + '</div>';
