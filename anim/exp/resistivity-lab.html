@@ -67,7 +67,7 @@ canvas.addEventListener('pointerdown',e=>{const h=hit(pos(e));if(h){state.drag=h
 canvas.addEventListener('pointermove',e=>{const p=pos(e);if(!state.drag){canvas.style.cursor=hit(p)?'grab':'default';return;}if(state.drag==='L')setValues({L:(p.x-340)/190*100});if(state.drag==='U')setValues({U:(p.x-435)/34*3});if(state.drag==='d')setValues({d:(p.x-120)/96*.8});draw();});
 canvas.addEventListener('pointerup',e=>{state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}});canvas.addEventListener('pointercancel',()=>{state.drag=null;});
 els.playBtn.addEventListener('click',()=>{state.running=!state.running;state.last=0;draw();});
-els.resetBtn.addEventListener('click',()=>{state.running=false;state.time=0;setValues({L:60,d:.4,U:1.2,rho:.5,heat:3});draw();});
+els.resetBtn.addEventListener('click',()=>{state.running=false;state.time=0;state.records=[];setValues({L:60,d:.4,U:1.2,rho:.5,heat:3});renderRecords();draw();});
 els.recordBtn.addEventListener('click',()=>{const q=model();state.records.unshift({R:q.R,d:q.dmm,rho:q.rho/1e-6});state.records=state.records.slice(0,4);renderRecords();});
 function renderRecords(){els.records.innerHTML=state.records.map((r,i)=>`<tr><td>${i+1}</td><td>${r.R.toFixed(2)}</td><td>${r.d.toFixed(2)}</td><td>${r.rho.toFixed(3)}</td></tr>`).join('');}
 for(const id of ['length','diameter','voltage','rho','heat'])els[id].addEventListener('input',draw);
