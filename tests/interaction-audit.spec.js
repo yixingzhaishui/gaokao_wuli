@@ -531,6 +531,9 @@ for (const { moduleName, file } of pages) {
       if (!record.reset_button_found) record.hard_failures.push({ code: 'H5', description: '缺少重置按钮。' });
       if (record.reset_button_found && !record.reset_worked) record.hard_failures.push({ code: 'H5', description: '重置未恢复到初始状态。' });
       for (const control of record.controls) {
+        if (!control.changed && ['range', 'checkbox', 'select'].includes(control.kind)) {
+          record.hard_failures.push({ code: 'H5', description: `${control.selector} 未能通过真实浏览器操作改变控件值。` });
+        }
         // Tabs and mode buttons can expose their selected state through a CSS
         // class before a canvas redraw is sampled. Preserve that as a review
         // signal instead of calling it a hard product failure; a semantic

@@ -18,6 +18,7 @@
 - B3-01 电荷与起电：真实范围拖拽、全部可见模式按钮、播放与重置均通过；进入静电感应后，“接地 → 移开带电体”两个动态出现的步骤都实际改变画面或物理读数。
 - 串并联电路：在真实 Chromium 鼠标拖拽及 390×844 触摸配置中，R1、R2、U 均可改变；R1=12Ω、R2=1Ω、U=24V 时串联读数为 `R=13Ω, I=1.85A, U1=22.2V, U2=1.8V`，切换并联后为 `R≈0.92Ω, I=26A, I1=2A, I2=24A`。
 - 内置浏览器的原生 range 交互不可靠，曾显示假失败；独立 Chromium 鼠标/触摸复现用于最终判定。
+- XB2 洛伦兹力的 B 滑块真实故障已修：错误的回写键名会让手柄跳回；现已用真实拖拽复测通过。
 
 ## 当前审核门禁
 
@@ -28,4 +29,4 @@
 
 ## 下一条具体动作
 
-用新审核器逐页重审 `anim/xb2`，优先 `lorentz-force`、`magnetic-circle`、`mutual-induction`、`lenz-law`、`faraday-law`、`rail-rod`、`self-induction`、`transformer`、`ac-generation`。每累计 20 个独立页面完成后运行严格检查、提交并推送。只提交审核器、归属账本和必要的页面修复，绝不混入题库资料。
+继续用新审核器逐页重审 `anim/xb2`：下一页 `magnetic-circle`，随后 `mutual-induction`、`lenz-law`、`faraday-law`、`rail-rod`、`self-induction`、`transformer`、`ac-generation`。每累计 20 个独立页面完成后运行严格检查、提交并推送。只提交审核器、归属账本和必要的页面修复，绝不混入题库资料。
