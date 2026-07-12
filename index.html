@@ -45,6 +45,10 @@
     .sidebar-toggle {
       display: none !important;
     }
+    .mobile-nav-toggle,
+    .mobile-nav-scrim {
+      display: none;
+    }
     .sidebar .app-name {
       margin: 0 18px 14px !important;
       padding-bottom: 12px;
@@ -289,6 +293,45 @@
     .verified-bank-link a { font-weight: 700; }
     @media (max-width: 760px) {
       :root { --sidebar-width: 270px; }
+      .sidebar {
+        transform: translateX(-100%) !important;
+        transition: transform .2s ease !important;
+        box-shadow: none;
+      }
+      body.mobile-nav-open .sidebar {
+        transform: translateX(0) !important;
+        box-shadow: 8px 0 24px rgba(16,42,67,.22);
+      }
+      .content {
+        margin-left: 0 !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+      }
+      .mobile-nav-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        left: 12px;
+        bottom: 14px;
+        z-index: 31;
+        min-width: 52px;
+        min-height: 44px;
+        padding: 8px 12px;
+        border: 1px solid #1e5fa8;
+        border-radius: 999px;
+        background: #2c7be5;
+        color: #fff;
+        box-shadow: 0 6px 16px rgba(16,42,67,.25);
+        font: 700 14px -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      }
+      .mobile-nav-scrim {
+        position: fixed;
+        inset: 0;
+        z-index: 19;
+        background: rgba(16,42,67,.35);
+      }
+      body.mobile-nav-open .mobile-nav-scrim { display: block; }
       .markdown-section { padding: 24px 18px 70px !important; }
       .graph-shell { grid-template-columns: 1fr; }
       .graph-panel { border-left: 0; border-top: 1px solid #d9e2ec; }
@@ -322,6 +365,8 @@
         function(hook, vm) {
           hook.doneEach(function() {
             setTimeout(hideUnverifiedExercises, 0);
+            setTimeout(syncRouteAnchor, 0);
+            initMobileNavigation();
             if (location.hash.indexOf('/graph') !== -1) {
               renderKnowledgeGraph();
             }
@@ -335,6 +380,52 @@
         }
       ]
     };
+
+    function routeAnchorId() {
+      const match = location.hash.match(/[?&]id=([^&]+)/);
+      return match ? decodeURIComponent(match[1]) : '';
+    }
+
+    function syncRouteAnchor() {
+      const id = routeAnchorId();
+      if (!id) return;
+      const target = document.getElementById(id);
+      if (!target) return;
+      requestAnimationFrame(function() {
+        target.scrollIntoView({ block: 'start', behavior: 'auto' });
+      });
+    }
+
+    function initMobileNavigation() {
+      if (document.getElementById('mobile-nav-toggle')) return;
+      const toggle = document.createElement('button');
+      const scrim = document.createElement('div');
+      toggle.id = 'mobile-nav-toggle';
+      toggle.className = 'mobile-nav-toggle';
+      toggle.type = 'button';
+      toggle.setAttribute('aria-label', '打开学习目录');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.textContent = '目录';
+      scrim.className = 'mobile-nav-scrim';
+      document.body.append(scrim, toggle);
+      const close = function() {
+        document.body.classList.remove('mobile-nav-open');
+        toggle.setAttribute('aria-expanded', 'false');
+      };
+      toggle.addEventListener('click', function() {
+        const open = !document.body.classList.contains('mobile-nav-open');
+        document.body.classList.toggle('mobile-nav-open', open);
+        toggle.setAttribute('aria-expanded', String(open));
+      });
+      scrim.addEventListener('click', close);
+      document.addEventListener('click', function(event) {
+        if (event.target.closest('.sidebar a')) close();
+      });
+      window.addEventListener('hashchange', function() {
+        close();
+        setTimeout(syncRouteAnchor, 0);
+      });
+    }
 
     function escapeHtml(value) {
       return String(value == null ? '' : value)
