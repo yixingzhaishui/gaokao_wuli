@@ -40,9 +40,10 @@ function toLatex(src) {
        .replace(/≠/g, '\\ne ').replace(/±/g, '\\pm ').replace(/∞/g, '\\infty ').replace(/→/g, '\\to ')
        .replace(/∈/g, '\\in ').replace(/°/g, '^{\\circ}').replace(/∫/g, '\\int ').replace(/∑/g, '\\sum ');
   // 5. 独立中文（前面不是拉丁字母）→ \text{}，入栈保护
-  t = t.replace(/(?<![A-Za-z])([一-龥][一-龥，、：？]*)/g, (m) => keep('\\text{' + m + '}'));
-  // 6. 中文下标（v物、t停、x物/地）
+  // 5. 中文下标（v物、t停、x物/地）——先于独立中文，保住斜杠形下标
   t = t.replace(/([A-Za-z])([一-龥]+(?:\/[一-龥]+)?)/g, (m, a, b) => a + '_{' + keep('\\text{' + b + '}') + '}');
+  // 6. 独立中文 → \\text{}
+  t = t.replace(/(?<![A-Za-z])([一-龥][一-龥，、：？]*)/g, (m) => keep('\\text{' + m + '}'));
   // 7. 三角/对数函数名
   t = t.replace(/\b(sin|cos|tan|cot|arcsin|arccos|arctan|ln|lg|log)\b/g, '\\$1 ')
        .replace(/\\lg /g, '\\lg ').replace(/\\arcsin /g, '\\arcsin ');

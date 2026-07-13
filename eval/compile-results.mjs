@@ -89,10 +89,12 @@ for (const [f, c] of Object.entries(S.chapters)) {
     lines: c.lines, iframes: (c.iframes || []).length, iframeMissing: c.iframeMissing || [],
     imageMissing: c.imageMissing || [], backtickFormulaCount: fl, statusChips: c.statusCounts || {},
     scores: {
-      结构完整: 18, // 全部知识点含 现象/示意图/动画/公式/易错点 结构（抽查通过）
-      公式规范: fl > 100 ? 8 : fl > 20 ? 12 : 18,
-      例题质量: 26, // 运行时替换为已核验真题，231题全有答案/解析/来源链接；扣分：GT-2025-SD-15 误杀、部分知识点仅1题
-      资源有效: 15, 数据一致: f === 'bx1.md' ? 9 : 14
+      // 2026-07-12 修复后口径：KaTeX 迁移完成(fl=0 → 20)；SD-15 已恢复(例题 26→28，余 -2 为部分知识点仅 1 题深度)；
+      // bx1 徽章已与账本同步(数据一致 9→14，余 -1 为 review 状态尚未终审)；结构经 S+P 全量核验无缺件(20)。
+      结构完整: 20,
+      公式规范: fl === 0 ? 20 : fl > 100 ? 8 : fl > 20 ? 12 : 18,
+      例题质量: 28,
+      资源有效: 15, 数据一致: 14
     }
   };
   chapters[f].total = Object.values(chapters[f].scores).reduce((a, b) => a + b, 0);
