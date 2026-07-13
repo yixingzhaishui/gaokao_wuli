@@ -49,5 +49,25 @@ function record(){const q=p();state.records.push({m:modeName(),e:fmt(q.eddy,1),d
 const playBtn=document.getElementById('playBtn');playBtn.addEventListener('click',()=>{state.running=!state.running;playBtn.textContent=state.running?'暂停演示':'播放演示';if(state.running)draw()});buttons.forEach(b=>b.addEventListener('click',()=>{state.mode=b.dataset.mode;buttons.forEach(x=>x.classList.toggle('active',x===b));record();draw()}));[els.b,els.v,els.rho,els.slot].forEach(el=>el.addEventListener('input',()=>{draw();update()}));els.record.addEventListener('click',record);canvas.addEventListener('pointerdown',e=>{state.drag=true;canvas.setPointerCapture(e.pointerId)});canvas.addEventListener('pointermove',e=>{if(!state.drag)return;const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width;els.v.value=Math.max(.2,Math.min(4,(x-100)/160));draw()});canvas.addEventListener('pointerup',e=>{state.drag=false;record();try{canvas.releasePointerCapture(e.pointerId)}catch(_){}});function loop(){if(state.running){state.t+=.035;draw()}requestAnimationFrame(loop)}record();loop();
 })();
 </script>
-<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script></body>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script>
+<script>/* GKWL: unified full reset (2026-07-12 review remediation) */
+(function(){
+  var btns=[].slice.call(document.querySelectorAll('button'));
+  var resets=btns.filter(function(b){return /重置|复位/.test(b.textContent)});
+  if(!resets.length)return;
+  var scoped=/播放|时间|回放/;
+  var primary=resets[0];
+  if(scoped.test(primary.textContent)){
+    var nb=document.createElement('button');
+    nb.textContent='全部重置';
+    nb.className=primary.className;
+    nb.setAttribute('data-gkwl-full-reset','1');
+    nb.addEventListener('click',function(){location.reload()});
+    primary.parentNode.insertBefore(nb,primary.nextSibling);
+  }else{
+    resets.forEach(function(b){b.addEventListener('click',function(){setTimeout(function(){location.reload()},60)})});
+  }
+})();
+</script>
+</body>
 </html>

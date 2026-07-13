@@ -46,5 +46,25 @@ function dragChip(clientX){const r=canvas.getBoundingClientRect(),x=(clientX-r.l
 canvas.addEventListener('pointerdown',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.height;if(Math.abs(x-chip.x)<70&&y>270&&y<360){dragging=true;canvas.setPointerCapture(e.pointerId);dragChip(e.clientX)}});canvas.addEventListener('pointermove',e=>{if(dragging)dragChip(e.clientX)});canvas.addEventListener('pointerup',e=>{dragging=false;try{canvas.releasePointerCapture(e.pointerId)}catch{}});canvas.addEventListener('pointercancel',()=>dragging=false);
 els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textContent=playing?'暂停':'播放'});els.resetBtn.addEventListener('click',()=>{playing=false;t=0;chip.x=318;els.playBtn.textContent='播放';render()});els.recordBtn.addEventListener('click',()=>{const p=params();records.unshift({dm:p.dm,e:p.e1,release:p.release});records=records.slice(0,5);els.recordBody.innerHTML=records.map((r,i)=>`<tr><td>${i+1}</td><td>${r.dm.toFixed(2)}</td><td>${r.e.toFixed(1)}</td><td>${r.release?'放能':'吸能'}</td></tr>`).join('')});[els.dm,els.count,els.type].forEach(el=>el.addEventListener('input',render));render();requestAnimationFrame(animate);
 </script>
+
+<script>/* GKWL: unified full reset (2026-07-12 review remediation) */
+(function(){
+  var btns=[].slice.call(document.querySelectorAll('button'));
+  var resets=btns.filter(function(b){return /重置|复位/.test(b.textContent)});
+  if(!resets.length)return;
+  var scoped=/播放|时间|回放/;
+  var primary=resets[0];
+  if(scoped.test(primary.textContent)){
+    var nb=document.createElement('button');
+    nb.textContent='全部重置';
+    nb.className=primary.className;
+    nb.setAttribute('data-gkwl-full-reset','1');
+    nb.addEventListener('click',function(){location.reload()});
+    primary.parentNode.insertBefore(nb,primary.nextSibling);
+  }else{
+    resets.forEach(function(b){b.addEventListener('click',function(){setTimeout(function(){location.reload()},60)})});
+  }
+})();
+</script>
 </body>
 </html>

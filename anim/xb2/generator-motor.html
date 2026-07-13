@@ -50,5 +50,25 @@ function record(){const q=val();S.records.push({m:S.mode==='gen'?'发电':'电�
 function setMode(m){S.mode=m;record();draw()}els.gen.onclick=()=>setMode('gen');els.mot.onclick=()=>setMode('mot');[els.b,els.w,els.i,els.load].forEach(el=>el.addEventListener('input',draw));els.play.onclick=()=>{S.run=!S.run;els.play.textContent=S.run?'暂停':'播放'};els.record.onclick=record;canvas.addEventListener('pointerdown',e=>{S.drag=true;canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing'});canvas.addEventListener('pointermove',e=>{if(!S.drag)return;const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.height;S.t=Math.atan2(250-y,x-304)/(+els.w.value||1);draw()});canvas.addEventListener('pointerup',e=>{S.drag=false;canvas.style.cursor='grab';try{canvas.releasePointerCapture(e.pointerId)}catch(_){}record()});let last=performance.now();function loop(now){if(!Number.isFinite(now))now=performance.now();const dt=Math.min(Math.max(0,now-last)/1000,.04);last=now;if(S.run)S.t+=dt;draw();requestAnimationFrame(loop)}record();loop(performance.now());
 })();
 </script>
-<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script></body>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script>
+<script>/* GKWL: unified full reset (2026-07-12 review remediation) */
+(function(){
+  var btns=[].slice.call(document.querySelectorAll('button'));
+  var resets=btns.filter(function(b){return /重置|复位/.test(b.textContent)});
+  if(!resets.length)return;
+  var scoped=/播放|时间|回放/;
+  var primary=resets[0];
+  if(scoped.test(primary.textContent)){
+    var nb=document.createElement('button');
+    nb.textContent='全部重置';
+    nb.className=primary.className;
+    nb.setAttribute('data-gkwl-full-reset','1');
+    nb.addEventListener('click',function(){location.reload()});
+    primary.parentNode.insertBefore(nb,primary.nextSibling);
+  }else{
+    resets.forEach(function(b){b.addEventListener('click',function(){setTimeout(function(){location.reload()},60)})});
+  }
+})();
+</script>
+</body>
 </html>

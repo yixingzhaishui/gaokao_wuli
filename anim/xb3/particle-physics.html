@@ -63,5 +63,25 @@ function dragCard(clientX,clientY){const r=canvas.getBoundingClientRect(),x=(cli
 canvas.addEventListener('pointerdown',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.height;if(Math.abs(x-card.x)<70&&Math.abs(y-card.y)<55){dragging=true;canvas.setPointerCapture(e.pointerId);dragCard(e.clientX,e.clientY)}});canvas.addEventListener('pointermove',e=>{if(dragging)dragCard(e.clientX,e.clientY)});canvas.addEventListener('pointerup',e=>{dragging=false;try{canvas.releasePointerCapture(e.pointerId)}catch{}});canvas.addEventListener('pointercancel',()=>dragging=false);
 els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textContent=playing?'暂停':'播放'});els.resetBtn.addEventListener('click',()=>{playing=false;t=0;card={x:145,y:172};els.playBtn.textContent='播放';render()});els.recordBtn.addEventListener('click',()=>{const p=params();records.unshift({name:(p.anti?'反':'')+p.base.name,q:p.q,d:p.diff});records=records.slice(0,5);els.recordBody.innerHTML=records.map((r,i)=>`<tr><td>${i+1}</td><td>${r.name}</td><td>${r.q.toFixed(2)}</td><td>${r.d.toFixed(2)}</td></tr>`).join('')});[els.particle,els.anti,els.reaction].forEach(el=>el.addEventListener('input',render));render();requestAnimationFrame(animate);
 </script>
+
+<script>/* GKWL: unified full reset (2026-07-12 review remediation) */
+(function(){
+  var btns=[].slice.call(document.querySelectorAll('button'));
+  var resets=btns.filter(function(b){return /重置|复位/.test(b.textContent)});
+  if(!resets.length)return;
+  var scoped=/播放|时间|回放/;
+  var primary=resets[0];
+  if(scoped.test(primary.textContent)){
+    var nb=document.createElement('button');
+    nb.textContent='全部重置';
+    nb.className=primary.className;
+    nb.setAttribute('data-gkwl-full-reset','1');
+    nb.addEventListener('click',function(){location.reload()});
+    primary.parentNode.insertBefore(nb,primary.nextSibling);
+  }else{
+    resets.forEach(function(b){b.addEventListener('click',function(){setTimeout(function(){location.reload()},60)})});
+  }
+})();
+</script>
 </body>
 </html>

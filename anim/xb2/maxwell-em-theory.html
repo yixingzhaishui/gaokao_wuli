@@ -43,5 +43,25 @@ function record(){const q=p();S.records.push({x:Math.round(q.xp*100)+'%',e:fmt(q
 [els.f,els.e,els.x].forEach(el=>el.addEventListener('input',()=>{draw();update()}));els.play.addEventListener('click',()=>{S.run=!S.run;els.play.textContent=S.run?'暂停':'播放'});els.record.addEventListener('click',record);canvas.addEventListener('pointerdown',e=>{S.drag=true;canvas.setPointerCapture(e.pointerId)});canvas.addEventListener('pointermove',e=>{if(!S.drag)return;const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width;els.x.value=Math.max(0,Math.min(100,(x-120)/410*100));draw()});canvas.addEventListener('pointerup',e=>{S.drag=false;record();try{canvas.releasePointerCapture(e.pointerId)}catch(_){}});function loop(){if(S.run)S.t+=.016;draw();requestAnimationFrame(loop)}record();loop();
 })();
 </script>
-<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script></body>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script>
+<script>/* GKWL: unified full reset (2026-07-12 review remediation) */
+(function(){
+  var btns=[].slice.call(document.querySelectorAll('button'));
+  var resets=btns.filter(function(b){return /重置|复位/.test(b.textContent)});
+  if(!resets.length)return;
+  var scoped=/播放|时间|回放/;
+  var primary=resets[0];
+  if(scoped.test(primary.textContent)){
+    var nb=document.createElement('button');
+    nb.textContent='全部重置';
+    nb.className=primary.className;
+    nb.setAttribute('data-gkwl-full-reset','1');
+    nb.addEventListener('click',function(){location.reload()});
+    primary.parentNode.insertBefore(nb,primary.nextSibling);
+  }else{
+    resets.forEach(function(b){b.addEventListener('click',function(){setTimeout(function(){location.reload()},60)})});
+  }
+})();
+</script>
+</body>
 </html>

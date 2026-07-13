@@ -47,5 +47,25 @@ function record(){const q=p();S.records.push({r:q.name,d:q.d.toFixed(1),x:q.x.to
 function ray(r){S.ray=r;record();draw()}els.alpha.onclick=()=>ray('alpha');els.beta.onclick=()=>ray('beta');els.gamma.onclick=()=>ray('gamma');[els.dist,els.thick].forEach(el=>el.addEventListener('input',draw));els.time.addEventListener('input',()=>{S.exposure=+els.time.value;draw()});els.play.onclick=()=>{S.run=!S.run;els.play.textContent=S.run?'暂停':'播放'};els.record.onclick=record;function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}function setByPointer(p0){if(S.drag==='distance-handle')els.dist.value=(.5+Math.max(0,Math.min(168,p0.x-150))/168*5.5).toFixed(1);if(S.drag==='shield-handle')els.thick.value=(Math.max(0,Math.min(140,p0.x-360))/14).toFixed(1);draw()}canvas.addEventListener('pointerdown',e=>{const p0=pos(e),q=p(),detX=170+q.d/6*360;if(Math.abs(p0.x-detX)<34&&p0.y>170&&p0.y<330)S.drag='detector-handle';else if(p0.y>474&&p0.y<514&&p0.x>132&&p0.x<335)S.drag='distance-handle';else if(p0.y>474&&p0.y<514&&p0.x>340&&p0.x<520)S.drag='shield-handle';if(S.drag){canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing';if(S.drag!=='detector-handle')setByPointer(p0)}});canvas.addEventListener('pointermove',e=>{if(!S.drag)return;const p0=pos(e);if(S.drag==='detector-handle'){els.dist.value=(Math.max(.5,Math.min(6,(p0.x-170)/360*6))).toFixed(1);draw()}else setByPointer(p0)});canvas.addEventListener('pointerup',e=>{if(S.drag)record();S.drag=null;canvas.style.cursor='grab';try{canvas.releasePointerCapture(e.pointerId)}catch(_){}});canvas.addEventListener('pointercancel',()=>{S.drag=null});let last=performance.now();function loop(now){const dt=Math.min((now-last)/1000,.04);last=now;if(S.run){S.t+=dt;if(!S.drag){S.exposure=Math.min(60,S.exposure+dt*8);els.time.value=Math.round(S.exposure)}}draw();requestAnimationFrame(loop)}record();requestAnimationFrame(loop);
 })();
 </script>
-<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script></body>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script>
+<script>/* GKWL: unified full reset (2026-07-12 review remediation) */
+(function(){
+  var btns=[].slice.call(document.querySelectorAll('button'));
+  var resets=btns.filter(function(b){return /重置|复位/.test(b.textContent)});
+  if(!resets.length)return;
+  var scoped=/播放|时间|回放/;
+  var primary=resets[0];
+  if(scoped.test(primary.textContent)){
+    var nb=document.createElement('button');
+    nb.textContent='全部重置';
+    nb.className=primary.className;
+    nb.setAttribute('data-gkwl-full-reset','1');
+    nb.addEventListener('click',function(){location.reload()});
+    primary.parentNode.insertBefore(nb,primary.nextSibling);
+  }else{
+    resets.forEach(function(b){b.addEventListener('click',function(){setTimeout(function(){location.reload()},60)})});
+  }
+})();
+</script>
+</body>
 </html>

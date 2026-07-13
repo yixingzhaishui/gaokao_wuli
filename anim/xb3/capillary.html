@@ -46,5 +46,25 @@ function record(){const q=p();S.records.push({r:q.r.toFixed(2),t:q.theta,h:q.cm.
 function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}function restartRise(){S.level=0}[els.radius,els.theta,els.sigma].forEach(el=>el.addEventListener('input',()=>{restartRise();draw()}));function setByPointer(p0){if(S.drag==='radius-handle')els.radius.value=(.15+Math.max(0,Math.min(154,p0.x-154))/154*1.35).toFixed(2);if(S.drag==='theta-handle')els.theta.value=Math.round((10+Math.max(0,Math.min(144,p0.x-350))/144*140)/5)*5;restartRise();draw()}els.play.onclick=()=>{S.run=!S.run;els.play.textContent=S.run?'暂停':'播放'};els.record.onclick=record;canvas.addEventListener('pointerdown',e=>{const p0=pos(e);if(p0.y>488&&p0.y<526&&p0.x>135&&p0.x<328)S.drag='radius-handle';else if(p0.y>488&&p0.y<526&&p0.x>332&&p0.x<514)S.drag='theta-handle';if(S.drag){canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing';setByPointer(p0)}});canvas.addEventListener('pointermove',e=>{if(S.drag)setByPointer(pos(e))});canvas.addEventListener('pointerup',e=>{if(S.drag)record();S.drag=null;canvas.style.cursor='grab';try{canvas.releasePointerCapture(e.pointerId)}catch(_){}});canvas.addEventListener('pointercancel',()=>{S.drag=null});let last=performance.now();function loop(now){const dt=Math.min((now-last)/1000,.04);last=now;if(S.run){S.t+=dt;S.level+=(p().cm-S.level)*Math.min(1,dt*2.4)}draw();requestAnimationFrame(loop)}record();requestAnimationFrame(loop);
 })();
 </script>
-<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script></body>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script>
+<script>/* GKWL: unified full reset (2026-07-12 review remediation) */
+(function(){
+  var btns=[].slice.call(document.querySelectorAll('button'));
+  var resets=btns.filter(function(b){return /重置|复位/.test(b.textContent)});
+  if(!resets.length)return;
+  var scoped=/播放|时间|回放/;
+  var primary=resets[0];
+  if(scoped.test(primary.textContent)){
+    var nb=document.createElement('button');
+    nb.textContent='全部重置';
+    nb.className=primary.className;
+    nb.setAttribute('data-gkwl-full-reset','1');
+    nb.addEventListener('click',function(){location.reload()});
+    primary.parentNode.insertBefore(nb,primary.nextSibling);
+  }else{
+    resets.forEach(function(b){b.addEventListener('click',function(){setTimeout(function(){location.reload()},60)})});
+  }
+})();
+</script>
+</body>
 </html>

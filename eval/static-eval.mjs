@@ -140,3 +140,21 @@ writeFileSync(join(ROOT, 'eval/results/static.json'), JSON.stringify(out, null, 
 const bySev = {};
 out.issues.forEach(i => bySev[i.sev] = (bySev[i.sev] || 0) + 1);
 console.log(`pages=${Object.keys(out.pages).length} chapters=${Object.keys(out.chapters).length} issues=${out.issues.length}`, bySev);
+
+// ---------- gate mode (npm run check) ----------
+// 拦截 P0/P1/P1?；P2 仅警告；P3（公式 lint 属系统性迁移事项）不拦截；白名单排除已核实误报。
+if (process.argv.includes('--gate')) {
+  const WHITELIST = [
+    (i) => i.file === 'bx1.md' && /疑似缺图 L3146/.test(i.msg), // 人工核实：一般性规则陈述，非题干引用图示
+  ];
+  const blocking = out.issues.filter(i =>
+    ['P0', 'P1', 'P1?'].includes(i.sev) && !WHITELIST.some(w => w(i)));
+  const warns = out.issues.filter(i => i.sev === 'P2');
+  warns.forEach(i => console.warn('  [warn P2]', i.file, i.msg));
+  if (blocking.length) {
+    console.error(`GATE FAIL: ${blocking.length} blocking issue(s):`);
+    blocking.forEach(i => console.error('  [' + i.sev + ']', i.file, i.msg, i.detail || ''));
+    process.exit(1);
+  }
+  console.log('GATE PASS (P0/P1 clean; P3 formula-lint excluded pending KaTeX migration)');
+}
