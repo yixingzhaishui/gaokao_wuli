@@ -1,0 +1,1322 @@
+
+===== anim/bx2/binary-star.html (240 lines, kept 56) =====
+37: <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="双星模型交互实验台：轨道俯视装置、质量柱状图和数据记录"></canvas></div>
+39: <div class="card task"><b>观察任务：</b>抓任一颗星向外拖，看轨道俯视装置、质量图像和实时数据记录怎样一起变化。</div>
+40: <button id="playBtn" class="primary">播放</button>
+42: <div class="title">快速情境</div>
+44: <button data-case="equal">等质量</button>
+45: <button data-case="heavy1">星1更重</button>
+46: <button data-case="heavy2">星2更重</button>
+47: <button data-case="wide">距离变大</button>
+51: <div class="title">实时读数</div>
+53: <div class="meter"><span>星1半径 r1</span><b id="r1Text">1.43 R</b></div>
+54: <div class="meter"><span>星2半径 r2</span><b id="r2Text">3.57 R</b></div>
+55: <div class="meter"><span>角速度 ω</span><b id="omegaText">0.237</b></div>
+56: <div class="meter"><span>周期 T</span><b id="periodText">26.5</b></div>
+57: <div class="meter"><span>星1速度 v1</span><b id="v1Text">0.34</b></div>
+58: <div class="meter"><span>星2速度 v2</span><b id="v2Text">0.85</b></div>
+62: <div><span>质心关系</span><b>m1r1=m2r2</b></div>
+63: <div><span>两星距离</span><b>r1+r2=L</b></div>
+64: <div><span>周期</span><b>T=2π√[L³/G(m1+m2)]</b></div>
+66: <div class="card small"><b>可直接操作：</b>抓星体改距离和相位；拖底部 m1、m2、L、相位手柄。紫色箭头表示两星引力大小相等、方向相反。</div>
+67: <div class="status" id="status">m1 更大，所以 r1 更小；两星角速度和周期相同。</div>
+74: const state={m1:5,m2:2,L:5,phase:0.35,running:false,drag:null};
+81: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+82: const fmt=(v,d=2)=>Math.abs(v)<1e-8?(0).toFixed(d):v.toFixed(d);
+84: const sum=state.m1+state.m2,r1=state.m2/sum*state.L,r2=state.m1/sum*state.L;
+85: const omega=Math.sqrt(sum/(state.L*state.L*state.L)),T=2*Math.PI/omega,F=state.m1*state.m2/(state.L*state.L);
+97: const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);
+99: ctx.lineTo(x2-12*Math.cos(a-.42),y2-12*Math.sin(a-.42));
+100: ctx.lineTo(x2-12*Math.cos(a+.42),y2-12*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore();
+108: for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}
+118: const p1={x:O.x-v.r1*s*Math.cos(a),y:O.y-v.r1*s*Math.sin(a)};
+119: const p2={x:O.x+v.r2*s*Math.cos(a),y:O.y+v.r2*s*Math.sin(a)};
+131: const g=geom(),a=state.phase,tx=-Math.sin(a),ty=Math.cos(a);
+137: ctx.fillStyle=colors.red;ctx.beginPath();ctx.arc(g.O.x,g.O.y,6,0,Math.PI*2);ctx.fill();
+159: const y=140+i*45,w=112*row[1]/max;
+169: const h=handles();
+177D: els.r1.textContent=`${fmt(g.r1)} R`;els.r2.textContent=`${fmt(g.r2)} R`;
+178D: els.omega.textContent=fmt(g.omega,3);els.period.textContent=fmt(g.T,1);
+179D: els.v1.textContent=fmt(g.v1,2);els.v2.textContent=fmt(g.v2,2);els.play.textContent=state.running?'暂停':'播放';
+180D: els.status.textContent=Math.abs(state.m1-state.m2)<.12?'质量相等：共同质心在中点，两星半径相等。':(state.m1>state.m2?'m1 更大，所以 r1 更小；两星角速度和周期相同。':'m2 更大，所以 r2 更小；两星角速度和周期相同。');
+183: const g=geom();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=
+187: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+188: function near(a,b,rad=28){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+202: const p=pos(e),g=geom(),dx=p.x-g.O.x,dy=p.y-g.O.y,dist=Math.hypot(dx,dy);
+203: if(state.drag==='m1')state.m1=clamp(1+(p.x-86)/150*7,1,8);
+204: if(state.drag==='m2')state.m2=clamp(1+(p.x-292)/150*7,1,8);
+205: if(state.drag==='L')state.L=clamp(2.2+(p.x-500)/150*5.8,2.2,8);
+206: if(state.drag==='phase')state.phase=clamp((p.x-720)/120*Math.PI*2,0,Math.PI*2);
+208: state.phase=Math.atan2(dy,dx)+Math.PI;
+209: const factor=(state.m1+state.m2)/state.m2;
+210: state.L=clamp(dist/g.s*factor,2.2,8);
+213: state.phase=Math.atan2(dy,dx);
+214: const factor=(state.m1+state.m2)/state.m1;
+215: state.L=clamp(dist/g.s*factor,2.2,8);
+224: const c=btn.dataset.case;
+232: if(state.running){state.phase=(state.phase+values().omega*.018)%(Math.PI*2)}
+238: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/bx2/centrifugal-phenomenon.html (29 lines, kept 11) =====
+13: <div class="root"><div class="stage"><canvas id="canvas" width="900" height="600" aria-label="离心现象实验台：转盘俯视、汽车弯道侧视、力箭头、临界速度图像和状态记录"></canvas></div><div class="pa
+14: <div class="card task"><b>观察任务：</b>调速度、半径和摩擦因数；看所需向心力超过最大静摩擦时，物体为什么沿切线方向偏离圆周。</div>
+15: <div class="card"><div class="title">弯道参数</div><label class="param"><span>速度 v <b id="vLab">12 m/s</b></span><input id="speed" type="range" min="2" max="32" ste
+16: <div class="readout" id="readout"></div><div class="card formula"><div class="title">公式绑定</div><div>需要向心力：F_n = mv²/r。</div><div>水平弯道最大静摩擦：f_max = μmg，临界速度 v_ma
+16D: <div class="readout" id="readout"></div><div class="card formula"><div class="title">公式绑定</div><div>需要向心力：F_n = mv²/r。</div><div>水平弯道最大静摩擦：f_max = μmg，临界速度 v_max=√(μgr)。</div></div><div class="status"
+19: (function(){'use strict';const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');const el={speed:id('speed'),radius:id('radius'),mu:id('mu'),
+20: function drawScene(x){box(42,72,810,286,'#fff');text('弯道/转盘俯视：离心不是多出一个离心力，而是向心力不足',447,100,colors.ink,'center',16,'900');const cx=302,cy=224,rr=x.r*2.2;ctx.stro
+21: function drawGraph(x){box(42,388,810,144,'#fff');text('速度-临界图像：v 超过 v_max 就会离心偏离',447,414,colors.ink,'center',15,'900');const gx=108,gy=500,gw=650,gh=70;line(gx
+22: function update(x){el.vLab.textContent=fmt(x.v,0)+' m/s';el.rLab.textContent=fmt(x.r,0)+' m';el.muLab.textContent=fmt(x.mu,2);el.readout.innerHTML='所需向心加速度：<b>'
+23: function draw(){const x=vals();ctx.clearRect(0,0,900,600);const bg=ctx.createLinearGradient(0,0,0,600);bg.addColorStop(0,'#fbfdff');bg.addColorStop(1,'#edf3f8')
+24D: id('reset').onclick=()=>{el.speed.value=12;el.radius.value=40;el.mu.value=.4;state.playing=false;state.t=0;el.play.textContent='播放';draw()};
+
+===== anim/bx2/centripetal.html (120 lines, kept 41) =====
+36: <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="向心加速度与向心力交互实验台：圆周俯视装置、受力图像和数据记录"></canvas></div>
+38: <div class="card task"><b>观察任务：</b>抓蓝色速度箭头端点把 v 调大，对照圆周俯视装置、受力图像和数据记录，看 F向 是否按 v² 增大。</div>
+39: <button id="playBtn" class="primary">播放</button>
+41: <div class="title">快速情境</div>
+43: <button data-case="base">基础</button>
+44: <button data-case="fast">速度加倍</button>
+45: <button data-case="outer">半径变大</button>
+46: <button data-case="heavy">质量变大</button>
+50: <div class="title">实时读数</div>
+52: <div class="meter"><span>向心加速度 a</span><b id="aText">10.0 m/s²</b></div>
+53: <div class="meter"><span>向心力 F向</span><b id="fText">5.0 N</b></div>
+54: <div class="meter"><span>角速度 ω</span><b id="wText">5.0 rad/s</b></div>
+55: <div class="meter"><span>周期 T</span><b id="tText">1.26 s</b></div>
+59: <div><span>向心加速度</span><b>a=v²/r=ω²r</b></div>
+60: <div><span>向心力</span><b>F向=ma=mv²/r</b></div>
+61: <div><span>周期</span><b>T=2πr/v</b></div>
+63: <div class="card small"><b>可直接操作：</b>抓小球改半径，抓蓝色 v 箭头端点改速度，或拖底部 m、v、r、角位置四个手柄。</div>
+64: <div class="status" id="status">向心力不是新性质的力，是指向圆心的合力效果。</div>
+71: const state={m:.5,v:2,r:.4,angle:0,running:false,drag:null};
+74: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+75: const fmt=(v,d=1)=>Math.abs(v)<1e-6?(0).toFixed(d):v.toFixed(d);
+76: function values(){const a=state.v*state.v/state.r,F=state.m*a,w=state.v/state.r,T=2*Math.PI/w;return{a,F,w,T}}
+79: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(
+81: function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-
+82: function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(
+84: function bodyPoint(){const cx=316,cy=252,R=state.r*138;return{cx,cy,R,x:cx+R*Math.cos(state.angle),y:cy+R*Math.sin(state.angle)}}
+85: function vectorEnds(p){const tx=-Math.sin(state.angle),ty=Math.cos(state.angle),radx=-Math.cos(state.angle),rady=-Math.sin(state.angle),vLen=40+state.v*12,F=val
+89: ctx.save();ctx.strokeStyle='#94a3b8';ctx.setLineDash([6,4]);ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.cx,p.cy,p.R,0,Math.PI*2);ctx.stroke();ctx.restore();
+90: line(p.cx,p.cy,p.x,p.y,'#475569',3);text(`r=${fmt(state.r,2)}m`,(p.cx+p.x)/2+16,(p.cy+p.y)/2,'#475569','left',12,'900');
+91: ctx.fillStyle='#0f172a';ctx.beginPath();ctx.arc(p.cx,p.cy,4,0,Math.PI*2);ctx.fill();text('圆心',p.cx,p.cy+20,'#475569','center',12,'900');
+92: ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(p.x,p.y,12,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();
+93: ctx.save();ctx.fillStyle=state.drag==='ball'?'#fde68a':'#fff';ctx.strokeStyle=state.drag==='ball'?'#d97706':colors.blue;ctx.lineWidth=3;ctx.beginPath();ctx.arc(
+94: arrow(p.x,p.y,e.v.x,e.v.y,colors.blue,4);text(`v=${fmt(state.v)}m/s`,e.v.x+12,e.v.y,colors.blue,'left',13,'900');
+95: ctx.save();ctx.fillStyle=state.drag==='vVector'?'#fde68a':'#fff';ctx.strokeStyle=state.drag==='vVector'?'#d97706':colors.blue;ctx.lineWidth=3;ctx.beginPath();ct
+104: function update(){const v=values();els.a.textContent=`${fmt(v.a)} m/s²`;els.f.textContent=`${fmt(v.F)} N`;els.w.textContent=`${fmt(v.w)} rad/s`;els.t.textConten
+106: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+107: function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+109: function move(e){if(!state.drag)return;const p=pos(e);if(state.drag==='m')state.m=clamp(.1+(p.x-100)/150*4.9,.1,5);if(state.drag==='v')state.v=clamp(.5+(p.x-306
+113: document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='base'){state.m=.5;state.v=2;state.r=.4}
+114: function tick(){if(state.running){state.angle+=values().w*.016;if(state.angle>Math.PI*2)state.angle-=Math.PI*2}draw();requestAnimationFrame(tick)}
+118: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/bx2/circular-basics.html (115 lines, kept 41) =====
+36: <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="圆周运动基本量交互实验台：圆轨道俯视装置、角量图像和数据记录"></canvas></div>
+38: <div class="card task"><b>观察任务：</b>抓蓝点向外拖，对照圆轨道俯视装置、角量图像和数据记录，看 ω 不变时 v=ωr 变大。</div>
+39: <button id="playBtn" class="primary">播放</button>
+41: <div class="title">快速情境</div>
+43: <button data-case="base">基础</button>
+44: <button data-case="outer">外圈点</button>
+45: <button data-case="fast">转得快</button>
+46: <button data-case="half">半圈</button>
+50: <div class="title">实时读数</div>
+52: <div class="meter"><span>频率 f</span><b id="fText">0.25 Hz</b></div>
+53: <div class="meter"><span>角速度 ω</span><b id="wText">1.57 rad/s</b></div>
+54: <div class="meter"><span>线速度 v</span><b id="vText">3.14 m/s</b></div>
+55: <div class="meter"><span>弧长 s</span><b id="sText">4.19 m</b></div>
+59: <div><span>频率</span><b>f=1/T</b></div>
+61: <div><span>线速度/弧长</span><b>v=ωr, s=rθ</b></div>
+63: <div class="card small"><b>可直接操作：</b>抓蓝点改半径和转角，或拖底部 r、T、θ 三个手柄。绿色速度箭头始终沿切线。</div>
+64: <div class="status" id="status">角量描述转动快慢，线量描述圆周上走得快慢。</div>
+71: const state={r:2,T:4,theta:120,running:false,spin:120,drag:null};
+74: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+75: const fmt=(v,d=2)=>Math.abs(v)<1e-6?(0).toFixed(d):v.toFixed(d);
+76: function values(){const f=1/state.T,w=2*Math.PI/state.T,rad=(state.running?state.spin:state.theta)*Math.PI/180,s=state.r*(state.theta*Math.PI/180),v=w*state.r;r
+79: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(
+81: function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-
+82: function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(
+84: function point(v){const cx=306,cy=255,R=state.r*42;return{cx,cy,R,x:cx+R*Math.cos(-v.rad),y:cy+R*Math.sin(-v.rad)}}
+87: const p=point(v);line(p.cx,p.cy,p.x,p.y,'#475569',3);text(`r=${fmt(state.r,1)}m`,(p.cx+p.x)/2+16,(p.cy+p.y)/2,'#475569','left',12,'900');
+88: ctx.save();ctx.strokeStyle='#94a3b8';ctx.setLineDash([6,4]);ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.cx,p.cy,p.R,0,Math.PI*2);ctx.stroke();ctx.restore();
+89: ctx.save();ctx.strokeStyle=colors.orange;ctx.lineWidth=5;ctx.beginPath();ctx.arc(p.cx,p.cy,p.R,0,-state.theta*Math.PI/180,true);ctx.stroke();ctx.restore();
+90: ctx.save();ctx.strokeStyle=colors.purple;ctx.lineWidth=3;ctx.beginPath();ctx.arc(p.cx,p.cy,48,0,-state.theta*Math.PI/180,true);ctx.stroke();ctx.restore();
+91: ctx.fillStyle='#0f172a';ctx.beginPath();ctx.arc(p.cx,p.cy,4,0,Math.PI*2);ctx.fill();
+92: ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(p.x,p.y,12,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();
+93: ctx.save();ctx.fillStyle=state.drag==='point'?'#fde68a':'#fff';ctx.strokeStyle=state.drag==='point'?'#d97706':colors.blue;ctx.lineWidth=3;ctx.beginPath();ctx.ar
+94: const tx=Math.sin(-v.rad),ty=-Math.cos(-v.rad);arrow(p.x,p.y,p.x+tx*76,p.y+ty*76,colors.green,4);text('v 沿切线',p.x+tx*90,p.y+ty*90,colors.green,'center',13,'900'
+98: function drawExplain(v){roundRect(632,90,230,118,8,'#f8fafc','#d7dee8');text('角量',747,118,'#0f172a','center',15,'900');text(`T=${fmt(state.T,1)}s, f=${fmt(v.f)}
+99: function update(v){els.f.textContent=`${fmt(v.f)} Hz`;els.w.textContent=`${fmt(v.w)} rad/s`;els.v.textContent=`${fmt(v.v)} m/s`;els.s.textContent=`${fmt(v.s)} m
+101: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+102: function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+104: function move(e){if(!state.drag)return;const p=pos(e);if(state.drag==='r')state.r=clamp(.5+(p.x-122)/180*4.5,.5,5);if(state.drag==='T')state.T=clamp(1+(p.x-390)
+108: document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='base'){state.r=2;state.T=4;state.theta=
+109: function tick(){if(state.running){state.spin+=360/60/state.T;if(state.spin>360)state.spin-=360}draw();requestAnimationFrame(tick)}
+113: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/bx2/conical-pendulum.html (125 lines, kept 41) =====
+37: <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="水平圆周与圆锥摆交互实验台"></canvas></div>
+39: <div class="card task"><b>观察任务：</b>抓侧视图小球向外拖，看 θ、r、Tsinθ 和速度同时变大；再换大质量，看周期是否改变。</div>
+40: <button id="playBtn" class="primary">播放</button>
+42: <div class="title">快速情境</div>
+44: <button data-case="base">基础</button>
+45: <button data-case="largeAngle">大摆角</button>
+46: <button data-case="long">长绳</button>
+47: <button data-case="heavy">大质量</button>
+51: <div class="title">实时读数</div>
+53: <div class="meter"><span>半径 r</span><b id="rText">0.57 m</b></div>
+54: <div class="meter"><span>速度 v</span><b id="vText">1.40 m/s</b></div>
+55: <div class="meter"><span>绳拉力 T</span><b id="tensionText">6.0 N</b></div>
+56: <div class="meter"><span>周期</span><b id="periodText">2.56 s</b></div>
+62: <div><span>几何</span><b>r=Lsinθ</b></div>
+64: <div class="card small"><b>可直接操作：</b>抓侧视图小球改变 L 和 θ，或拖底部 m、L、θ、位置四个手柄。向心力是 T 的水平分力，不是第三个力。</div>
+65: <div class="status" id="status">竖直方向平衡，水平方向的合力提供向心力。</div>
+71: const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'),G=9.8;
+72: const state={m:.5,L:1,theta:35,phase:.25,running:false,drag:null};
+75: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+76: const fmt=(v,d=2)=>Math.abs(v)<1e-6?(0).toFixed(d):v.toFixed(d);
+77: function values(){const th=state.theta*Math.PI/180,sin=Math.sin(th),cos=Math.cos(th),tan=Math.tan(th),r=state.L*sin,omega=Math.sqrt(G/(state.L*cos)),v=omega*r,t
+80: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(
+82: function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-
+83: function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(
+85: function sideGeom(v){const pivot={x:214,y:96},scale=132,bob={x:pivot.x+state.L*v.sin*scale,y:pivot.y+state.L*v.cos*scale};return{pivot,scale,bob}}
+88: const g=sideGeom(v),p=g.pivot,b=g.bob,rr=state.L*v.sin*g.scale;
+90: ctx.save();ctx.strokeStyle='#94a3b8';ctx.setLineDash([5,4]);ctx.beginPath();ctx.ellipse(p.x,b.y,rr,15,0,0,Math.PI*2);ctx.stroke();ctx.restore();
+94: line(p.x,b.y,b.x,b.y,'#64748b',2);text(`r=${fmt(v.r)}m`,p.x+rr/2,b.y+28,'#475569','center',12,'900');
+95: ctx.strokeStyle=colors.orange;ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x,p.y+38,32,Math.PI/2-v.th,Math.PI/2);ctx.stroke();text(`θ=${fmt(state.theta,0)}°`,p.x+5
+96: ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(b.x,b.y,12,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();
+97: ctx.save();ctx.fillStyle=state.drag==='bob'?'#fde68a':'#fff';ctx.strokeStyle=state.drag==='bob'?'#d97706':colors.blue;ctx.lineWidth=3;ctx.beginPath();ctx.arc(b.
+102: const c={x:676,y:254},R=clamp(v.r*155,44,154),bx=c.x+R*Math.cos(state.phase),by=c.y+R*Math.sin(state.phase),tx=-Math.sin(state.phase),ty=Math.cos(state.phase);
+103: ctx.save();ctx.strokeStyle='#94a3b8';ctx.setLineDash([6,5]);ctx.beginPath();ctx.arc(c.x,c.y,R,0,Math.PI*2);ctx.stroke();ctx.restore();
+106: ctx.fillStyle='#0f172a';ctx.beginPath();ctx.arc(c.x,c.y,4,0,Math.PI*2);ctx.fill();ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(bx,by,11,0,Math.PI*2);ctx.fi
+109: function update(v){els.r.textContent=`${fmt(v.r)} m`;els.v.textContent=`${fmt(v.v)} m/s`;els.tension.textContent=`${fmt(v.tension,1)} N`;els.period.textContent=
+111: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+112: function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+114: function move(e){if(!state.drag)return;const p=pos(e);if(state.drag==='m')state.m=clamp(.1+(p.x-92)/150*1.9,.1,2);if(state.drag==='L')state.L=clamp(.4+(p.x-296)
+118: document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='base'){state.m=.5;state.L=1;state.theta
+119: function tick(){if(state.running){state.phase=(state.phase+values().omega*.016)%(Math.PI*2)}draw();requestAnimationFrame(tick)}
+123: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/bx2/cosmic-velocity.html (28 lines, kept 9) =====
+13: <div class="root"><div class="stage"><canvas id="canvas" width="900" height="600" aria-label="宇宙速度实验台：牛顿大炮侧视、地球轨道俯视、速度能量图像和轨迹记录"></canvas></div><div class="pane
+14: <div class="card task"><b>观察任务：</b>拖动发射速度；看炮弹从落地、环绕、椭圆到逃逸的变化，区分第一、第二、第三宇宙速度的含义。</div>
+15: <div class="card"><div class="title">发射条件</div><label class="param"><span>初速度 v <b id="vLab">7.9 km/s</b></span><input id="speed" type="range" min="2" max="18" 
+16: <div class="readout" id="readout"></div><div class="card formula"><div class="title">公式绑定</div><div>近地第一宇宙速度：v1=√(GM/R)≈7.9 km/s。</div><div>逃逸速度：v2=√(2GM/R)≈11.
+19: (function(){'use strict';const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');const el={speed:id('speed'),height:id('height'),vLab:id('vLa
+20: function pathPoint(x){const cx=330,cy=250,R=116,alt=x.h/1200*32,r=R+alt,t=state.t;const ratio=x.v/x.v1;if(x.kind==='落地'){const a=-Math.PI/2+t*1.9;const rr=r-38*
+21: function drawGraph(x){box(42,400,810,128,'#fff');text('速度分区图像',447,426,colors.ink,'center',15,'900');const gx=108,gy=492,gw=650;line(gx,gy,gx+gw,gy,colors.ink,3
+22: function update(x){el.vLab.textContent=fmt(x.v,1)+' km/s';el.hLab.textContent=fmt(x.h,0)+' km';el.readout.innerHTML='当前速度：<b>'+fmt(x.v,1)+' km/s</b><br>第一宇宙速度：<
+23: function draw(){const x=vals();ctx.clearRect(0,0,900,600);const bg=ctx.createLinearGradient(0,0,0,600);bg.addColorStop(0,'#fbfdff');bg.addColorStop(1,'#edf3f8')
+
+===== anim/bx2/curved-condition.html (130 lines, kept 35) =====
+37: <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="曲线运动条件交互实验台：轨迹俯视装置、分解图像和数据记录"></canvas></div>
+39: <div class="card task"><b>观察任务：</b>抓住红色合力箭头端点拖动，对照轨迹俯视装置、分解图像和数据记录，看 F⊥ 出现时轨迹怎样弯曲。</div>
+40: <button id="playBtn" class="primary">播放</button>
+42: <div class="title">快速情境</div>
+44: <button data-case="straight">直线加速</button>
+45: <button data-case="turn">只拐弯</button>
+46: <button data-case="brake">直线减速</button>
+47: <button data-case="zero">无合力</button>
+51: <div class="title">实时读数</div>
+53: <div class="meter"><span>沿速度分量 F∥</span><b id="fpText">15.0 N</b></div>
+54: <div class="meter"><span>垂直分量 F⊥</span><b id="fnText">26.0 N</b></div>
+55: <div class="meter"><span>夹角 α</span><b id="angleText">60°</b></div>
+56: <div class="meter"><span>运动判断</span><b id="typeText">曲线</b></div>
+64: <div class="card small"><b>可直接操作：</b>抓红色合力箭头端点，或拖底部 F、v、α 三个手柄。蓝箭头始终是速度切线方向。</div>
+65: <div class="status" id="status">合力与速度不共线：速度方向改变，轨迹弯向 F⊥ 一侧。</div>
+73: const state={F:30,v:8,angle:60,phase:.48,running:false,drag:null};
+76: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+77: const fmt=(v,d=1)=>Math.abs(v)<1e-6?(0).toFixed(d):v.toFixed(d);
+78: function values(){const rad=state.angle*Math.PI/180,Fp=state.F*Math.cos(rad),Fn=state.F*Math.sin(rad);return{rad,Fp,Fn,curve:Math.abs(Fn)>.25}}
+81: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(
+83: function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-
+84: function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(
+86: function pointAt(t,v){const x=96+t*415,y=360-v.Fn/30*t*t*185;return{x,y}}
+87: function tangentAt(t,v){const slope=-v.Fn/30*370*t/415;const norm=Math.hypot(1,slope);return{x:1/norm,y:slope/norm}}
+88: function forceEnd(p,v){const len=38+state.F*1.8;return{x:p.x+len*Math.cos(v.rad),y:p.y-len*Math.sin(v.rad)}}
+92: ctx.save();ctx.strokeStyle='#334155';ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=120;i++){const p=pointAt(i/120,v);if(i===0)ctx.moveTo(p.x,p.y);else ctx.line
+94: ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(p.x,p.y,13,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();
+97: ctx.save();ctx.fillStyle=state.drag==='forceVector'?'#fde68a':'#fff';ctx.strokeStyle=state.drag==='forceVector'?'#d97706':colors.red;ctx.lineWidth=3;ctx.beginPa
+108: rows.forEach((r,i)=>{const y=128+i*32;text(r[0],670,y,colors.ink,'center',12,'900');text(r[1],760,y,'#475569','center',12,'700')});
+116: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+117: function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+119: function move(e){if(!state.drag)return;const p=pos(e);if(state.drag==='F')state.F=clamp((p.x-112)/170*60,0,60);if(state.drag==='v')state.v=clamp(2+(p.x-350)/170
+123: document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='straight'){state.F=32;state.angle=0}if(
+124: function tick(){if(state.running){state.phase+=.004+state.v*.0007;if(state.phase>1)state.phase=0}draw();requestAnimationFrame(tick)}
+128: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/bx2/elastic-potential.html (631 lines, kept 70) =====
+105: <canvas id="canvas" width="920" height="540" aria-label="弹性势能实验台：弹簧侧视装置、Ep-x图像和数据记录"></canvas>
+106: <div class="hint">可直接拖动滑块、x1点、x2点；图像点和弹簧同步变化</div>
+113: <div class="title">实验控制</div>
+114: <label class="param"><span>劲度系数 k <b id="kText">200 N/m</b></span><input id="k" type="range" min="50" max="800" step="10" value="200"></label>
+115: <label class="param"><span>初形变量 x1 <b id="x1Text">0.40 m</b></span><input id="x1" type="range" min="-0.8" max="0.8" step="0.01" value="0.40"></label>
+116: <label class="param"><span>末形变量 x2 <b id="x2Text">0.10 m</b></span><input id="x2" type="range" min="-0.8" max="0.8" step="0.01" value="0.10"></label>
+117: <label class="param"><span>过程游标 <b id="tText">0%</b></span><input id="t" type="range" min="0" max="1" step="0.01" value="0"></label>
+119: <button class="primary" id="play">播放</button>
+120: <button id="reset">重置</button>
+121: <button data-case="near">拉回原长</button>
+122: <button data-case="far">远离原长</button>
+123: <button data-case="mirror">压缩对称</button>
+124: <button data-case="same">同势能</button>
+128: Ep1=<b id="ep1Text">16.0 J</b>　Ep2=<b id="ep2Text">1.0 J</b><br>
+129: ΔEp=<b id="depText">-15.0 J</b>　W弹=<b id="workText">15.0 J</b><br>
+130: 当前 x=<b id="xText">0.40 m</b>　F弹=<b id="forceText">-80 N</b>
+133: <div class="title">公式对照</div>
+134: <div>x = 现长 - 原长，对应蓝色尺子读数。</div>
+136: <div>Ep = 1/2 kx²，对应抛物线高度和能量柱。</div>
+137: <div>W弹 = Ep1 - Ep2 = -ΔEp，对应底部账本。</div>
+139: <div class="status" id="status">靠近原长：弹力做正功，弹性势能减少。</div>
+169: const state = {
+181: const v = Math.abs(n) < 0.0005 ? 0 : n;
+195: const x = q.x1 + (q.x2 - q.x1) * q.t;
+196: const ep1 = 0.5 * q.k * q.x1 * q.x1;
+197: const ep2 = 0.5 * q.k * q.x2 * q.x2;
+198: const ep = 0.5 * q.k * x * x;
+201: const force = -q.k * x;
+248: const a = Math.atan2(y2 - y1, x2 - x1);
+259: ctx.lineTo(x2 - 10 * Math.cos(a - 0.45), y2 - 10 * Math.sin(a - 0.45));
+260: ctx.lineTo(x2 - 10 * Math.cos(a + 0.45), y2 - 10 * Math.sin(a + 0.45));
+282: const len = Math.max(38, x1 - x0);
+288: for (let i = 1; i < turns * 2; i++) {
+289: const x = x0 + len * i / (turns * 2);
+304: const endX = naturalX + r.x * scale;
+321: text('x = ' + fmt(r.x, 2) + ' m', (naturalX + endX) / 2, 280, '#2c7be5', 'center', 13, '700');
+323: const fLen = Math.min(132, 24 + Math.abs(r.force) / 4);
+324: const fEnd = endX + blockW / 2 + (r.force >= 0 ? fLen : -fLen);
+330: const px = naturalX + xv * scale + blockW / 2;
+342: const midX = gx + gw / 2;
+345: const px = midX + x / 0.8 * (gw / 2 - 24);
+346: const py = baseY - Math.min(1, ep / 260) * (baseY - topY);
+370: const x = -0.8 + 1.6 * i / 160;
+371: const ep = 0.5 * q.k * x * x;
+405: const maxAbs = Math.max(12, ...items.map(item => Math.abs(item.value)));
+408: const x = 180 + i * 170;
+409: const h = Math.abs(item.value) / maxAbs * 56;
+419: const compare = Math.abs(q.x2) < Math.abs(q.x1)
+426: ui.kText.textContent = fmt(q.k, 0) + ' N/m';
+426D: ui.kText.textContent = fmt(q.k, 0) + ' N/m';
+427D: ui.x1Text.textContent = fmt(q.x1, 2) + ' m';
+428D: ui.x2Text.textContent = fmt(q.x2, 2) + ' m';
+429: ui.tText.textContent = Math.round(q.t * 100) + '%';
+429D: ui.tText.textContent = Math.round(q.t * 100) + '%';
+430D: ui.ep1Text.textContent = fmt(r.ep1, 1) + ' J';
+431D: ui.ep2Text.textContent = fmt(r.ep2, 1) + ' J';
+432D: ui.depText.textContent = fmt(r.dep, 1) + ' J';
+433D: ui.workText.textContent = fmt(r.work, 1) + ' J';
+434D: ui.xText.textContent = fmt(r.x, 2) + ' m';
+435D: ui.forceText.textContent = fmt(r.force, 0) + ' N';
+447D: ui.status.textContent = '同势能：初末 |x| 相同，ΔEp 与 W弹 都为 0。';
+455: const q = p();
+476: return Math.hypot(a.x - x, a.y - y);
+480: const h = state.hot.block;
+485: const g = state.hot.graph;
+497: const q = p();
+541: const q = p();
+583D: ui.play.textContent = state.running ? '暂停' : '播放';
+615: const dt = Math.min(0.035, (now - state.lastTime) / 1000 || 0.016);
+617: let next = Number(els.t.value) + dt * 0.55;
+
+===== anim/bx2/energy-conservation.html (214 lines, kept 54) =====
+39: <canvas id="canvas" width="920" height="540" aria-label="能量守恒实验台：侧视轨道、能量图像、内能剖面和数据记录"></canvas>
+40: <div class="hint">侧视轨道 + 能量图像 + 内能剖面 + 数据记录；可直接拖动滑块改变位置，拖动橙色高度手柄改变初始能量</div>
+43: <div class="card task"><b>观察任务：</b>拖动滑块时盯住橙色总能量柱：机械能可以变少，但 `Ep+Ek+E内` 必须始终等于初始 `mgh`。</div>
+45: <div class="title">实验控制</div>
+46: <label class="param"><span>质量 m <b id="mText">2.0 kg</b></span><input id="m" type="range" min="0.5" max="8" step="0.1" value="2"></label>
+47: <label class="param"><span>初始高度 h <b id="hText">5.0 m</b></span><input id="h" type="range" min="1" max="8" step="0.1" value="5"></label>
+48: <label class="param"><span>摩擦因数 μ <b id="muText">0.20</b></span><input id="mu" type="range" min="0" max="0.45" step="0.01" value="0.2"></label>
+49: <label class="param"><span>过程位置 <b id="uText">65%</b></span><input id="u" type="range" min="0" max="1" step="0.01" value="0.65"></label>
+51: <button class="primary" id="play">播放</button>
+52: <button id="reset">重置</button>
+53: <button data-case="smooth">无摩擦</button>
+54: <button data-case="rough">有摩擦</button>
+55: <button data-case="heat">多生热</button>
+56: <button data-case="high">增高</button>
+60: Ep=<b id="epText">35.0 J</b>　Ek=<b id="ekText">41.0 J</b><br>
+61: E内=<b id="eintText">24.0 J</b>　E机=<b id="emText">76.0 J</b><br>
+62: E总=<b id="etotText">100.0 J</b>　E0=<b id="e0Text">100.0 J</b>
+65: <div class="title">公式对照</div>
+66: <div>E0 = mgh，对应橙色高度尺。</div>
+71: <div class="status" id="status">有摩擦：机械能减少，但减少量进入内能，总能量守恒。</div>
+80: const g = 10;
+81: const theta = 32 * Math.PI / 180;
+88: const state = { running:false, drag:null, hot:{}, lastTime:0 };
+91: function fmt(n,d){ const v = Math.abs(n) < 0.0005 ? 0 : n; return v.toFixed(d == null ? 1 : d); }
+94D: function stopRun(){ state.running = false; ui.play.textContent = '播放'; }
+97: const path = q.h / Math.sin(theta);
+98: const hNow = q.h * (1 - q.u);
+99: const e0 = q.m * g * q.h;
+100: const ep = q.m * g * hNow;
+101: const eint = q.mu * q.m * g * Math.cos(theta) * path * q.u;
+102: const ek = Math.max(0, e0 - ep - eint);
+105: const v = Math.sqrt(Math.max(0, 2 * ek / q.m));
+117: const a = Math.atan2(y2-y1,x2-x1);
+119: ctx.beginPath(); ctx.moveTo(x2,y2); ctx.lineTo(x2-10*Math.cos(a-.45), y2-10*Math.sin(a-.45)); ctx.lineTo(x2-10*Math.cos(a+.45), y2-10*Math.sin(a+.45)); ctx.clos
+125: const hPx = q.h * scaleY;
+126: const pathPx = hPx / Math.sin(theta);
+127: const top = { x:bottom.x + pathPx * Math.cos(theta), y:bottom.y - hPx };
+128: const block = { x:top.x + (bottom.x - top.x) * q.u, y:top.y + (bottom.y - top.y) * q.u };
+142: text('h=' + fmt(q.h,1) + 'm', geo.bottom.x-38, (geo.bottom.y+geo.top.y)/2, '#f08c00', 'center', 13, '700');
+143: ctx.fillStyle = '#fff7e6'; ctx.strokeStyle = '#f08c00'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(geo.top.x+36, geo.top.y, 8, 0, Math.PI*2); ctx.fill(); ctx.s
+150: if(r.v > .05){ arrow(geo.block.x+20, geo.block.y-16, geo.block.x+20+Math.min(76,r.v*9)*Math.cos(theta), geo.block.y-16+Math.min(76,r.v*9)*Math.sin(theta), '#2c7
+177: const base=430, maxE=Math.max(1,r.e0);
+180: const x=150+i*135; const h=Math.max(2,item.value/maxE*62);
+188: ui.mText.textContent=fmt(q.m,1)+' kg'; ui.hText.textContent=fmt(q.h,1)+' m'; ui.muText.textContent=fmt(q.mu,2); ui.uText.textContent=Math.round(q.u*100)+'%';
+188D: ui.mText.textContent=fmt(q.m,1)+' kg'; ui.hText.textContent=fmt(q.h,1)+' m'; ui.muText.textContent=fmt(q.mu,2); ui.uText.textContent=Math.round(q.u*100)+'%';
+190D: if(q.mu < .005){ ui.status.textContent='无摩擦：机械能守恒，总能量也守恒。'; ui.status.style.background='#e6fffa'; ui.status.style.color='#087f5b'; ui.status.style.borderColor='#38b2ac'; }
+191D: else { ui.status.textContent='有摩擦：机械能减少，但减少量进入内能，总能量守恒。'; ui.status.style.background='#fff7e6'; ui.status.style.color='#9a6700'; ui.status.style.borderColor='#f0a500'; }
+194: function draw(){ const q=p(); const r=calc(q); ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle='#f7f9fc'; ctx.fillRect(0,0,canvas.width,canvas.heig
+195: function eventPos(ev){ const src=ev.touches&&ev.touches.length?ev.touches[0]:(ev.changedTouches&&ev.changedTouches.length?ev.changedTouches[0]:ev); const rect=c
+196: function dist(a,x,y){ return Math.hypot(a.x-x,a.y-y); }
+197: function setProgressFromPoint(pos){ const geo=state.hot.block.geo; const vx=geo.bottom.x-geo.top.x, vy=geo.bottom.y-geo.top.y; const wx=pos.x-geo.top.x, wy=pos.
+198: function setHeightFromPoint(pos){ const geo=state.hot.height.geo; setValue('h',(geo.bottom.y-pos.y)/geo.scaleY); }
+205D: ui.play.addEventListener('click',()=>{ state.running=!state.running; ui.play.textContent=state.running?'暂停':'播放'; state.lastTime=performance.now(); });
+208: function tick(now){ if(state.running){ const dt=Math.min(.035,(now-state.lastTime)/1000||.016); state.lastTime=now; let next=Number(els.u.value)+dt*.35; if(next
+
+===== anim/bx2/geostationary.html (243 lines, kept 65) =====
+38: <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="同步卫星交互实验台：地球轨道俯视装置、条件图像和数据记录"></canvas></div>
+40: <div class="card task"><b>观察任务：</b>抓卫星向内外拖，对照地球轨道俯视装置、条件图像和数据记录，看 T 是否仍为 24h。</div>
+41: <button id="playBtn" class="primary">播放</button>
+43: <div class="title">快速情境</div>
+45: <button data-case="sync">静止卫星</button>
+46: <button data-case="low">低轨快跑</button>
+47: <button data-case="inclined">倾斜同步</button>
+48: <button data-case="reverse">反向同步</button>
+52: <div class="title">实时读数</div>
+54: <div class="meter"><span>周期 T</span><b id="periodText">24.0 h</b></div>
+55: <div class="meter"><span>离地高度 h</span><b id="heightText">35786 km</b></div>
+56: <div class="meter"><span>线速度 v</span><b id="speedText">3.07 km/s</b></div>
+57: <div class="meter"><span>经度漂移</span><b id="driftText">0°/日</b></div>
+62: <div><span>同步条件</span><b>T=24h</b></div>
+65: <div class="card small"><b>可直接操作：</b>拖卫星改半径和经度；拖底部 r、i、经度手柄；点“反向同步”看周期相同但方向错误时仍不静止。</div>
+66: <div class="status" id="status">同步、赤道、同向同时满足：卫星固定在同一经度上空。</div>
+74: const state={rR:rSync/Re,inc:0,phase:0,earth:0,running:false,direction:1,drag:null};
+81: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+82: const fmt=(v,d=1)=>Math.abs(v)<1e-8?(0).toFixed(d):v.toFixed(d);
+84: const r=state.rR*Re,T=24*Math.pow(r/rSync,1.5),h=r-Re,v=Math.sqrt(mu/r);
+85: const omegaRatio=state.direction*24/T,drift=360*(omegaRatio-1),periodOk=Math.abs(T-24)<0.35;
+98: const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);
+100: ctx.lineTo(x2-12*Math.cos(a-.42),y2-12*Math.sin(a-.42));
+101: ctx.lineTo(x2-12*Math.cos(a+.42),y2-12*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore();
+109: for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}
+126: const O={x:304,y:252},earth=46,scale=(state.rR-3.2)/(8.4-3.2),Rpx=116+scale*112;
+127: const theta=state.earth*v.omegaRatio+state.phase;
+128: const flatten=Math.cos(state.inc*Math.PI/180),sx=O.x+Rpx*Math.cos(theta),sy=O.y+Rpx*Math.sin(theta)*flatten;
+129: const groundTheta=state.earth+state.phase,gx=O.x+earth*Math.cos(groundTheta),gy=O.y+earth*Math.sin(groundTheta)*.32;
+133: ctx.fillStyle='#dbeafe';ctx.beginPath();ctx.arc(g.O.x,g.O.y,g.earth,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#334155';ctx.stroke();
+134: ctx.strokeStyle='#0f766e';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(g.O.x,g.O.y,g.earth,g.earth*.32,0,0,Math.PI*2);ctx.stroke();
+136: ctx.fillStyle=colors.red;ctx.beginPath();ctx.arc(g.ground.x,g.ground.y,5,0,Math.PI*2);ctx.fill();
+141: const g=orbitGeom(v);
+146: const tx=-Math.sin(g.theta),ty=Math.cos(g.theta)*g.flatten,dir=state.direction;
+149: ctx.fillStyle=v.stationary?colors.blue:'#f59e0b';ctx.beginPath();ctx.arc(g.sat.x,g.sat.y,10,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#0f172a';ctx.stroke();
+150: ctx.save();ctx.strokeStyle=state.drag==='sat'?'#d97706':colors.orange;ctx.lineWidth=3;ctx.beginPath();ctx.arc(g.sat.x,g.sat.y,20,0,Math.PI*2);ctx.stroke();ctx.r
+152: text(`r=${fmt(state.rR,2)}R`,(g.O.x+g.sat.x)/2,(g.O.y+g.sat.y)/2-16,'#475569','center',12,'900');
+153: const groundLon=(state.phase*180/Math.PI+360)%360;
+164: const y=137+k*60;roundRect(668,y,162,38,7,row[1]?'#ecfdf5':'#fff7ed',row[1]?'#14b8a6':'#f59e0b');
+172D: els.period.textContent=`${fmt(v.T,1)} h`;
+173D: els.height.textContent=`${fmt(v.h,0)} km`;
+174: els.speed.textContent=`${fmt(v.v,2)} km/s`;
+174D: els.speed.textContent=`${fmt(v.v,2)} km/s`;
+175: els.drift.textContent=`${fmt(v.drift,0)}°/日`;
+175D: els.drift.textContent=`${fmt(v.drift,0)}°/日`;
+177D: els.status.textContent=v.stationary?'同步、赤道、同向同时满足：卫星固定在同一经度上空。':(!v.periodOk?'半径改变后 T 不再等于 24h，卫星相对地面产生东西向漂移。':(!v.equatorOk?'周期同步但轨道倾斜，地面投影会上下摆动，不是静止卫星。':'周期同步但方向相反，相对地面快速掠过。'));
+178D: els.play.textContent=state.running?'暂停':'播放';
+184: text('公式：T = 2π√(r³/GM)，同步卫星 T=24h 唯一确定 r≈6.6R（必在赤道上空）',460,448,'#334e68','center',13,'700');
+184D: text('公式：T = 2π√(r³/GM)，同步卫星 T=24h 唯一确定 r≈6.6R（必在赤道上空）',460,448,'#334e68','center',13,'700');
+192: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+193: function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+208: if(state.drag==='r')state.rR=clamp(3.2+(p.x-90)/190*(8.4-3.2),3.2,8.4);
+209: if(state.drag==='inc')state.inc=clamp((p.x-340)/160*45,0,45);
+210: if(state.drag==='phase')state.phase=clamp((p.x-586)/145*Math.PI*2-Math.PI,-Math.PI,Math.PI);
+212: const dx=p.x-og.O.x,dy=p.y-og.O.y,dist=Math.hypot(dx,dy),scale=clamp((dist-116)/112,0,1);
+213: state.rR=3.2+scale*(8.4-3.2);
+214: state.phase=Math.atan2(dy/Math.max(.12,Math.cos(state.inc*Math.PI/180)),dx)-state.earth*v.omegaRatio;
+215: while(state.phase>Math.PI)state.phase-=Math.PI*2;
+216: while(state.phase<-Math.PI)state.phase+=Math.PI*2;
+227: const c=btn.dataset.case;
+228: if(c==='sync'){state.rR=rSync/Re;state.inc=0;state.direction=1;state.phase=0}
+230: if(c==='inclined'){state.rR=rSync/Re;state.inc=28;state.direction=1;state.phase=.35}
+231: if(c==='reverse'){state.rR=rSync/Re;state.inc=0;state.direction=-1;state.phase=0}
+235: if(state.running)state.earth=(state.earth+0.014)%(Math.PI*2);
+241: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/bx2/gravitation.html (122 lines, kept 40) =====
+36: <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="万有引力定律交互实验台：两天体俯视装置、F-r图像和数据记录"></canvas></div>
+38: <div class="card task"><b>观察任务：</b>抓右侧蓝色天体水平拖动，对照两天体俯视装置、F-r 图像和数据记录，观察 r 翻倍时 F 是否约变为 1/4。</div>
+40: <div class="title">快速情境</div>
+42: <button data-case="base">地月量级</button>
+43: <button data-case="doubleR">距离翻倍</button>
+44: <button data-case="doubleM">质量翻倍</button>
+45: <button data-case="near">距离更近</button>
+48: <div class="card"><button id="playBtn" type="button">暂停演示</button></div>
+50: <div class="title">实时读数</div>
+52: <div class="meter"><span>当前引力 F</span><b id="fText">7.13e19 N</b></div>
+53: <div class="meter"><span>2r 时引力</span><b id="f2Text">1.78e19 N</b></div>
+54: <div class="meter"><span>质心距离 r</span><b id="rText">6.4e7 m</b></div>
+55: <div class="meter"><span>比例判断</span><b id="ratioText">1/4</b></div>
+59: <div><span>大小</span><b>F=GMm/r²</b></div>
+63: <div class="card small"><b>可直接操作：</b>抓右侧天体改变质心距离，或拖底部 M、m、r 手柄。半径外观只帮助感知质量，公式里的 r 是质心距离。</div>
+64: <div class="status" id="status">两物体受到的引力大小相等、方向相反，沿质心连线。</div>
+70: const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'),G=6.67e-11;
+71: const state={M:6,m:7.3,r:6.4,drag:null,pulse:0,running:true};
+74: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+75: function values(){const M=state.M*1e24,m=state.m*1e22,r=state.r*1e7,F=G*M*m/(r*r);return{M,m,r,F,F2:F/4}}
+76: function sci(n,d=2){if(!isFinite(n)||n===0)return'0';const e=Math.floor(Math.log10(Math.abs(n)));const a=n/Math.pow(10,e);return `${a.toFixed(d)}e${e}`}
+79: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(
+81: function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-
+82: function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(
+84: function bodyGeom(){const x1=150,y=230,sep=170+(state.r-2)/10*310,x2=x1+sep,R1=25+state.M*3.2,R2=16+state.m*1.6;return{x1,x2,y,R1,R2}}
+87: const b=bodyGeom(),len=clamp(22+Math.log10(v.F/1e18+1)*18,28,112);
+89: ctx.fillStyle='#dbe4ee';ctx.beginPath();ctx.arc(b.x1,b.y,b.R1,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#334155';ctx.stroke();text('M',b.x1,b.y,'#102a43','center
+90: ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(b.x2,b.y,b.R2,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();text('m',b.x2,b.y,'#fff','center'
+91: ctx.save();ctx.fillStyle=state.drag==='body'?'#fde68a':'#fff';ctx.strokeStyle=state.drag==='body'?'#d97706':colors.blue;ctx.lineWidth=3;ctx.beginPath();ctx.arc(
+100: ctx.save();ctx.strokeStyle=colors.blue;ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=120;i++){const rr=2+i/120*10,ff=1/(rr*rr),x=gx+i/120*gw,y=gy+gh-(ff-1/144)
+101: const px=gx+(state.r-2)/10*gw,ff=1/(state.r*state.r),py=gy+gh-(ff-1/144)/(1/4-1/144)*(gh-14);
+102: ctx.fillStyle=colors.red;ctx.beginPath();ctx.arc(px,py,6+Math.sin(state.pulse)*1.2,0,Math.PI*2);ctx.fill();text('当前',px,py-14,colors.red,'center',12,'900');
+105: function update(v){els.f.textContent=`${sci(v.F)} N`;els.f2.textContent=`${sci(v.F2)} N`;els.r.textContent=`${sci(v.r)} m`;els.ratio.textContent='1/4';els.statu
+107: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+108: function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+110: function move(e){if(!state.drag)return;const p=pos(e);if(state.drag==='M')state.M=clamp(1+(p.x-108)/160*7,1,8);if(state.drag==='m')state.m=clamp(1+(p.x-350)/160
+113: document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='base'){state.M=6;state.m=7.3;state.r=6.
+115D: playBtn.addEventListener('click',()=>{state.running=!state.running;playBtn.textContent=state.running?'暂停演示':'播放演示';if(state.running)draw()});
+116: function tick(){if(state.running){state.pulse=(state.pulse+.05)%(Math.PI*2);draw()}requestAnimationFrame(tick)}
+120: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/bx2/gravitational-potential.html (128 lines, kept 41) =====
+38: <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="重力势能交互实验台：高度侧视装置、势能柱状图像和数据记录"></canvas></div>
+40: <div class="card task"><b>观察任务：</b>拖橙色参考面，对照高度侧视装置、势能柱状图像和数据记录，看 Ep1、Ep2 怎样一起变。</div>
+41: <button id="playBtn" class="primary">播放</button>
+43: <div class="title">快速情境</div>
+45: <button data-case="drop">下降</button>
+46: <button data-case="rise">上升</button>
+47: <button data-case="same">等高</button>
+48: <button data-case="shift">换参考面</button>
+52: <div class="title">实时读数</div>
+54: <div class="meter"><span>初势能 Ep1</span><b id="ep1Text">140.0 J</b></div>
+55: <div class="meter"><span>末势能 Ep2</span><b id="ep2Text">40.0 J</b></div>
+56: <div class="meter"><span>势能变化 ΔEp</span><b id="depText">-100.0 J</b></div>
+57: <div class="meter"><span>重力做功 WG</span><b id="wgText">100.0 J</b></div>
+58: <div class="meter"><span>高度差 h1-h2</span><b id="dhText">5.0 m</b></div>
+59: <div class="meter"><span>参考面 h0</span><b id="h0Text">0.0 m</b></div>
+63: <div><span>势能</span><b>Ep=mg(h-h0)</b></div>
+64: <div><span>变化</span><b>ΔEp=Ep2-Ep1</b></div>
+65: <div><span>重力功</span><b>WG=-ΔEp</b></div>
+67: <div class="card small"><b>可直接操作：</b>拖 A 点、B 点改变初末高度；拖橙色参考面改零势能面；底部手柄可精调 m、h1、h2、h0。</div>
+68: <div class="status" id="status">物体下降：重力做正功，重力势能减少。</div>
+75: const g=10,state={m:2,h1:7,h2:2,h0:0,u:0,running:false,drag:null};
+78: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+79: const fmt=(v,d=1)=>Math.abs(v)<.05?(0).toFixed(d):v.toFixed(d);
+80: function calc(){const Ep1=state.m*g*(state.h1-state.h0),Ep2=state.m*g*(state.h2-state.h0),dEp=Ep2-Ep1,WG=-dEp;return{Ep1,Ep2,dEp,WG,dh:state.h1-state.h2}}
+83: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(
+85: function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-
+86: function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(
+89: function geom(){const A={x:230,y:yFor(state.h1)},B={x:400,y:yFor(state.h2)},h0Y=yFor(state.h0),body={x:A.x+(B.x-A.x)*state.u,y:A.y+(B.y-A.y)*state.u};return{A,B
+91: function point(x,y,c,label,active){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x
+95: for(let h=-2;h<=10;h+=2){const y=yFor(h);line(112,y,500,y,'#e2e8f0',1);text(`${h}m`,104,y,'#64748b','right',11,'700')}
+99: ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(gm.body.x,gm.body.y,15,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#0f172a';ctx.stroke();arrow(gm.body.x,gm.body.
+105: const max=Math.max(20,...rows.map(x=>Math.abs(x[1]))),base=270;
+107: rows.forEach((row,i)=>{const x=628+i*52,h=Math.abs(row[1])/max*118,c=row[1]>=0?row[2]:colors.red;ctx.fillStyle=c;if(row[1]>=0)ctx.fillRect(x,base-h,30,h);else c
+111: function bottom(){const h=handles();roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(82,494,232,'m',colors.green);handle(h.m.x,h.m.y,`m=${fmt(state.m)}`,state.
+112: function update(r){els.ep1.textContent=`${fmt(r.Ep1)} J`;els.ep2.textContent=`${fmt(r.Ep2)} J`;els.dep.textContent=`${fmt(r.dEp)} J`;els.wg.textContent=`${fmt(r
+114: function pos(e){const b=canvas.getBoundingClientRect();return{x:(e.clientX-b.left)*canvas.width/b.width,y:(e.clientY-b.top)*canvas.height/b.height}}
+115: function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+116: function pointerDown(e){const p=pos(e),gm=geom(),h=handles();if(near(p,gm.A,28))state.drag='A';else if(near(p,gm.B,28))state.drag='B';else if(Math.abs(p.y-gm.h0
+117: function pointerMove(e){if(!state.drag)return;const p=pos(e);if(state.drag==='A')state.h1=heightFor(p.y);if(state.drag==='B')state.h2=heightFor(p.y);if(state.dr
+121: document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='drop'){state.h1=7;state.h2=2;state.h0=0
+126: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/bx2/kepler-law.html (126 lines, kept 39) =====
+36: <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="开普勒定律交互实验台：椭圆轨道俯视装置、T2-a3图像和数据记录"></canvas></div>
+38: <div class="card task"><b>观察任务：</b>拖太阳改变偏心率 e，对照椭圆轨道俯视装置、T²/a³ 图像和数据记录，看太阳是否始终在焦点。</div>
+39: <button id="playBtn" class="primary">播放</button>
+41: <div class="title">快速情境</div>
+43: <button data-case="circle">近圆轨道</button>
+44: <button data-case="ellipse">偏心较大</button>
+45: <button data-case="largeA">大半长轴</button>
+46: <button data-case="heavy">大中心质量</button>
+50: <div class="title">实时读数</div>
+52: <div class="meter"><span>近日距</span><b id="rpText">0.70 AU</b></div>
+53: <div class="meter"><span>远日距</span><b id="raText">1.30 AU</b></div>
+54: <div class="meter"><span>周期 T</span><b id="periodText">1.00 年</b></div>
+55: <div class="meter"><span>T²/a³</span><b id="kText">1.00</b></div>
+63: <div class="card small"><b>可直接操作：</b>拖太阳改变 e，拖椭圆右端改变 a，拖行星改变观察位置，或拖底部 a、e、M 手柄。</div>
+64: <div class="status" id="status">偏心率越大，近日点越近、速度越快；太阳在焦点，不在椭圆中心。</div>
+71: const state={a:1,e:.3,mu:1,M:.5,running:false,drag:null};
+74: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+75: const fmt=(v,d=2)=>Math.abs(v)<1e-6?(0).toFixed(d):v.toFixed(d);
+76: function solveE(M,e){let E=M;for(let i=0;i<8;i++)E=E-(E-e*Math.sin(E)-M)/(1-e*Math.cos(E));return E}
+77: function values(){const T=Math.sqrt(state.a*state.a*state.a/state.mu),rp=state.a*(1-state.e),ra=state.a*(1+state.e),ratio=(1+state.e)/(1-state.e),K=1/state.mu,E
+78: function layout(){const cx=318,cy=252,scale=118/Math.max(state.a,1.05),A=state.a*scale,B=state.a*Math.sqrt(1-state.e*state.e)*scale,C=state.a*state.e*scale;retu
+79: function orbitPoint(E,L=layout()){return{x:L.cx+L.A*Math.cos(E),y:L.cy+L.B*Math.sin(E)}}
+82: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(
+84: function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-
+85: function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(
+90: ctx.strokeStyle='#334155';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(L.cx,L.cy,L.A,L.B,0,0,Math.PI*2);ctx.stroke();
+92: const planet=orbitPoint(v.E,L),sun=L.sun,near=orbitPoint(Math.PI,L),far=orbitPoint(0,L);
+95: ctx.fillStyle=colors.orange;ctx.beginPath();ctx.arc(sun.x,sun.y,12,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#9a6700';ctx.stroke();
+96: ctx.save();ctx.fillStyle=state.drag==='sun'?'#fde68a':'#fff';ctx.strokeStyle=state.drag==='sun'?'#d97706':colors.orange;ctx.lineWidth=3;ctx.beginPath();ctx.arc(
+98: ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(planet.x,planet.y,9,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();
+99: ctx.save();ctx.fillStyle=state.drag==='planet'?'#fde68a':'#fff';ctx.strokeStyle=state.drag==='planet'?'#d97706':colors.blue;ctx.lineWidth=3;ctx.beginPath();ctx.
+107: const base=330,max=158;[[1,'a=1'],[state.a,'当前'],[2,'a=2']].forEach((it,i)=>{const T=Math.sqrt(it[0]*it[0]*it[0]/state.mu),h=Math.min(max,T/Math.sqrt(8/state.mu
+111: function draw(){const v=values(),L=layout(),g0=geom();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.a
+112: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+113: function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+115: function move(e){if(!state.drag)return;const p=pos(e),L=layout();if(state.drag==='a')state.a=clamp(.6+(p.x-100)/170*2.4,.6,3);if(state.drag==='e')state.e=clamp(
+119: document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='circle'){state.a=1;state.e=0;state.mu=1
+120: function tick(){if(state.running){state.M=(state.M+.018/values().T)%(Math.PI*2)}draw();requestAnimationFrame(tick)}
+124: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/bx2/kinetic-energy.html (126 lines, kept 39) =====
+37: <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="动能定理交互实验台：斜面侧视装置、功-能账本图像和数据记录"></canvas></div>
+39: <div class="card task"><b>观察任务：</b>抓斜面顶点 A 改高度和角度，对照斜面侧视装置、功-能账本图像和数据记录，看重力做功与摩擦负功如何进入账本。</div>
+40: <button id="playBtn" class="primary">播放</button>
+42: <div class="title">快速情境</div>
+44: <button data-case="smooth">无摩擦</button>
+45: <button data-case="rough">粗糙面</button>
+46: <button data-case="steep">更陡</button>
+47: <button data-case="stuck">到不了底</button>
+51: <div class="title">实时读数</div>
+53: <div class="meter"><span>重力功 WG</span><b id="wgText">100.0 J</b></div>
+54: <div class="meter"><span>摩擦功 Wf</span><b id="wfText">-69.3 J</b></div>
+55: <div class="meter"><span>合力总功</span><b id="wtText">30.7 J</b></div>
+56: <div class="meter"><span>动能变化</span><b id="deText">30.7 J</b></div>
+57: <div class="meter"><span>末速度 v2</span><b id="v2Text">5.5 m/s</b></div>
+58: <div class="meter"><span>斜面路程 s</span><b id="pathText">10.0 m</b></div>
+63: <div><span>动能变化</span><b>ΔEk=Ek2-Ek1</b></div>
+66: <div class="card small"><b>可直接操作：</b>拖 A 点改 h 和 θ；拖滑块看过程位置；底部手柄可调 m、v1、h、μ、θ。</div>
+67: <div class="status" id="status">通过：W合 = ΔEk，做功账本和动能变化对上了。</div>
+74: const g=10,state={m:2,v1:0,h:5,mu:.2,theta:30,u:0,running:false,drag:null};
+77: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+78: const fmt=(v,d=1)=>Math.abs(v)<.05?(0).toFixed(d):v.toFixed(d);
+79: function calc(){const rad=state.theta*Math.PI/180,s=state.h/Math.sin(rad),WG=state.m*g*state.h,Wf=-state.mu*state.m*g*Math.cos(rad)*s,WN=0,Wt=WG+Wf,Ek1=.5*state
+82: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(
+84: function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-
+85: function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(
+86: function geom(){const B={x:90,y:385},scale=22,dy=state.h*scale,dx=dy/Math.tan(state.theta*Math.PI/180),A={x:B.x+dx,y:B.y-dy},block={x:A.x+(B.x-A.x)*state.u,y:A.
+88: function point(x,y,c,label,active){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x
+92: line(g0.A.x,g0.A.y,g0.A.x,g0.B.y,colors.orange,1.6,[5,4]);text(`h=${fmt(state.h)}m`,g0.A.x+26,(g0.A.y+g0.B.y)/2,colors.orange,'left',12,'900');
+94: const b=g0.block,dir={x:(g0.B.x-g0.A.x),y:(g0.B.y-g0.A.y)},L=Math.hypot(dir.x,dir.y)||1;dir.x/=L;dir.y/=L;
+95: ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(b.x,b.y-12,13,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#0f172a';ctx.stroke();point(b.x,b.y-12,colors.red,'滑块',
+104: const max=Math.max(1,...rows.map(x=>Math.abs(x[1]))),base=258;
+106: rows.forEach((row,i)=>{const x=614+i*48,h=Math.abs(row[1])/max*110;ctx.fillStyle=row[2];if(row[1]>=0)ctx.fillRect(x,base-h,28,h);else ctx.fillRect(x,base,28,h);
+109: function bottom(){const h=handles();roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(76,494,196,'m',colors.green);handle(h.m.x,h.m.y,`m=${fmt(state.m)}`,state.
+110: function update(r){els.wg.textContent=`${fmt(r.WG)} J`;els.wf.textContent=`${fmt(r.Wf)} J`;els.wt.textContent=`${fmt(r.Wt)} J`;els.de.textContent=`${fmt(r.dEk)}
+112: function pos(e){const b=canvas.getBoundingClientRect();return{x:(e.clientX-b.left)*canvas.width/b.width,y:(e.clientY-b.top)*canvas.height/b.height}}
+113: function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+115: function pointerMove(e){if(!state.drag)return;const p=pos(e),g0=geom();if(state.drag==='A'){const dy=clamp(g0.B.y-p.y,22,264),dx=clamp(p.x-g0.B.x,80,500);state.
+119: document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='smooth'){state.mu=0;state.h=5;state.the
+124: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/bx2/mechanical-energy.html (552 lines, kept 68) =====
+105: <canvas id="canvas" width="920" height="540" aria-label="机械能守恒实验台：轨道侧视装置、能量图像和数据记录"></canvas>
+106: <div class="hint">可直接拖动小球改变位置，拖动橙色高度手柄改变初始高度</div>
+113: <div class="title">实验控制</div>
+114: <label class="param"><span>质量 m <b id="mText">2.0 kg</b></span><input id="m" type="range" min="0.5" max="8" step="0.1" value="2"></label>
+115: <label class="param"><span>初始高度 h <b id="hText">5.0 m</b></span><input id="h" type="range" min="1" max="8" step="0.1" value="5"></label>
+116: <label class="param"><span>摩擦因数 μ <b id="muText">0.00</b></span><input id="mu" type="range" min="0" max="0.45" step="0.01" value="0"></label>
+117: <label class="param"><span>过程位置 <b id="uText">0%</b></span><input id="u" type="range" min="0" max="1" step="0.01" value="0"></label>
+119: <button class="primary" id="play">播放</button>
+120: <button id="reset">重置</button>
+121: <button data-case="smooth">光滑守恒</button>
+122: <button data-case="rough">粗糙失守</button>
+123: <button data-case="high">增大高度</button>
+124: <button data-case="mass">质量变大</button>
+128: Ek=<b id="ekText">0.0 J</b>　Ep=<b id="epText">100.0 J</b><br>
+129: E机=<b id="emText">100.0 J</b>　E内=<b id="eintText">0.0 J</b><br>
+130: E总=<b id="etotText">100.0 J</b>　v=<b id="vText">0.0 m/s</b>
+133: <div class="title">公式对照</div>
+139: <div class="status" id="status">机械能守恒：只有重力做功，E机保持不变。</div>
+149: const g = 10;
+150: const theta = 32 * Math.PI / 180;
+171: const state = { running: false, drag: null, hot: {}, lastTime: 0 };
+178: const v = Math.abs(n) < 0.0005 ? 0 : n;
+202: const path = q.h / Math.sin(theta);
+203: const hNow = q.h * (1 - q.u);
+204: const ep = q.m * g * hNow;
+205: const loss = q.mu * q.m * g * Math.cos(theta) * path * q.u;
+206: const ekRaw = q.m * g * q.h * q.u - loss;
+207: const ek = Math.max(0, ekRaw);
+208: const eint = q.m * g * q.h - ep - ek;
+211: const v = Math.sqrt(Math.max(0, 2 * ek / q.m));
+248: const a = Math.atan2(y2 - y1, x2 - x1);
+259: ctx.lineTo(x2 - 10 * Math.cos(a - 0.45), y2 - 10 * Math.sin(a - 0.45));
+260: ctx.lineTo(x2 - 10 * Math.cos(a + 0.45), y2 - 10 * Math.sin(a + 0.45));
+269: const hPx = q.h * scaleY;
+270: const pathPx = hPx / Math.sin(theta);
+271: const top = { x: bottom.x + pathPx * Math.cos(theta), y: bottom.y - hPx };
+290: text('h=' + fmt(q.h, 1) + 'm', geo.bottom.x - 38, (geo.bottom.y + geo.top.y) / 2, '#f08c00', 'center', 13, '700');
+315: arrow(geo.ball.x + 14, geo.ball.y - 12, geo.ball.x + 14 + Math.min(80, r.v * 9) * Math.cos(theta), geo.ball.y - 12 + Math.min(80, r.v * 9) * Math.sin(theta), '#
+316: text('v=' + fmt(r.v, 1) + 'm/s', geo.ball.x + 78, geo.ball.y + 16, '#e03131', 'center', 12, '700');
+327: const maxE = q.m * g * q.h;
+339: const u = i / 100;
+340: const c = calc({ m: q.m, h: q.h, mu: q.mu, u });
+341: const x = gx + gw * u;
+353: const xNow = gx + gw * q.u;
+373: const maxE = q.m * g * q.h;
+376: const x = 150 + i * 135;
+377: const h = Math.max(2, item.value / maxE * 62);
+389D: ui.mText.textContent = fmt(q.m, 1) + ' kg';
+390D: ui.hText.textContent = fmt(q.h, 1) + ' m';
+391D: ui.muText.textContent = fmt(q.mu, 2);
+392: ui.uText.textContent = Math.round(q.u * 100) + '%';
+392D: ui.uText.textContent = Math.round(q.u * 100) + '%';
+393D: ui.ekText.textContent = fmt(r.ek, 1) + ' J';
+394D: ui.epText.textContent = fmt(r.ep, 1) + ' J';
+395D: ui.emText.textContent = fmt(r.em, 1) + ' J';
+396D: ui.eintText.textContent = fmt(r.eint, 1) + ' J';
+397D: ui.etotText.textContent = fmt(r.etot, 1) + ' J';
+398: ui.vText.textContent = fmt(r.v, 1) + ' m/s';
+398D: ui.vText.textContent = fmt(r.v, 1) + ' m/s';
+400D: ui.status.textContent = '机械能守恒：只有重力做功，E机保持不变。';
+405D: ui.status.textContent = '机械能不守恒：摩擦做负功，E机减少并转化为内能。';
+413: const q = p();
+434: return Math.hypot(a.x - x, a.y - y);
+443: const u = (wx * vx + wy * vy) / (vx * vx + vy * vy);
+449: const h = (geo.bottom.y - pos.y) / geo.scaleY;
+504D: ui.play.textContent = state.running ? '暂停' : '播放';
+536: const dt = Math.min(0.035, (now - state.lastTime) / 1000 || 0.016);
+538: let next = Number(els.u.value) + dt * 0.35;
+
+===== anim/bx2/motion-composition.html (125 lines, kept 34) =====
+37: <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="小船过河运动合成交互实验台：河面俯视装置、矢量图像和数据记录"></canvas></div>
+39: <div class="card task"><b>观察任务：</b>抓绿色船头速度箭头，对照河面俯视装置、矢量图像和数据记录，看它为什么不是实际航向。</div>
+40: <button id="playBtn" class="primary">播放</button>
+42: <div class="title">快速情境</div>
+44: <button data-case="cross">垂直划</button>
+45: <button data-case="aim">正对到达</button>
+46: <button data-case="fastWater">水更快</button>
+47: <button data-case="wide">河更宽</button>
+51: <div class="title">实时读数</div>
+53: <div class="meter"><span>沿河分量 vx</span><b id="vxText">2.00 m/s</b></div>
+54: <div class="meter"><span>过河分量 vy</span><b id="vyText">4.00 m/s</b></div>
+55: <div class="meter"><span>过河时间 t</span><b id="timeText">20.0 s</b></div>
+56: <div class="meter"><span>下游偏移 x</span><b id="driftText">40.0 m</b></div>
+61: <div><span>过河时间</span><b>t=d/vy</b></div>
+62: <div><span>下游偏移</span><b>x=vx t</b></div>
+64: <div class="card small"><b>可直接操作：</b>抓绿色船速箭头端点、紫色水流箭头端点，或拖底部 v船、v水、θ、d 手柄。</div>
+65: <div class="status" id="status">垂直河岸分量决定时间，沿河分量决定偏移。</div>
+73: const state={vb:4,vw:2,theta:90,d:80,t:.55,running:false,drag:null};
+76: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+77: const fmt=(v,d=1)=>Math.abs(v)<1e-6?(0).toFixed(d):v.toFixed(d);
+78: function values(){const a=state.theta*Math.PI/180,bx=state.vb*Math.cos(a),by=state.vb*Math.sin(a),vx=state.vw+bx,vy=Math.max(.05,by),speed=Math.hypot(vx,vy),tim
+81: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(
+83: function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-
+84: function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(
+86: function boatPoint(v){const left=104,bottom=404,top=102,scaleY=(bottom-top)/state.d,progress=state.running?state.t:.55,endX=left+v.drift*scaleY;return{x:left+(e
+88: function vectorEnds(p,v){const s=23;return{boat:{x:p.x+v.bx*s,y:p.y-v.by*s},water:{x:p.x+state.vw*s,y:p.y},result:{x:p.x+v.vx*s,y:p.y-v.vy*s}}}
+102: ['boat','water'].forEach(key=>{const e=ends[key];ctx.save();ctx.fillStyle=state.drag===key?'#fde68a':'#fff';ctx.strokeStyle=state.drag===key?'#d97706':(key==='b
+103: text(`下游偏移 x=${fmt(v.drift,1)}m`,(left+p.endX)/2,bottom+22,Math.abs(v.drift)<1?colors.green:colors.orange,'center',13,'900');
+109: function update(v){els.vx.textContent=`${fmt(v.vx,2)} m/s`;els.vy.textContent=`${fmt(v.vy,2)} m/s`;els.time.textContent=`${fmt(v.time,1)} s`;els.drift.textConte
+111: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+112: function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+114: function move(e){if(!state.drag)return;const p=pos(e),v=values(),bp=boatPoint(v),s=23;if(state.drag==='vb')state.vb=clamp(1+(p.x-94)/150*7,1,8);if(state.drag===
+118: document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='cross'){state.vb=4;state.vw=2;state.the
+123: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/bx2/newtonian-limit.html (29 lines, kept 10) =====
+13: <div class="root"><div class="stage"><canvas id="canvas" width="900" height="600" aria-label="牛顿力学边界实验台：速度尺度侧视、相对论因子图像、强引力和微观边界记录"></canvas></div><div class="pa
+14: <div class="card task"><b>观察任务：</b>把速度从日常低速拖到接近光速；看 γ 因子、运动钟、长度和适用理论区域怎样变化。</div>
+15: <div class="card"><div class="title">边界参数</div><div class="buttons"><button data-domain="speed" class="active">高速</button><button data-domain="gravity">强引力</but
+16: <div class="readout" id="readout"></div><div class="card formula"><div class="title">公式绑定</div><div>狭义相对论：γ=1/√(1-β²)，Δt=γΔt0，L=L0/γ。</div><div>牛顿力学适合低速、弱引力、宏观尺
+16D: <div class="readout" id="readout"></div><div class="card formula"><div class="title">公式绑定</div><div>狭义相对论：γ=1/√(1-β²)，Δt=γΔt0，L=L0/γ。</div><div>牛顿力学适合低速、弱引力、宏观尺度。</div></div><div class="status" id="st
+19: (function(){'use strict';const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');const el={beta:id('beta'),grav:id('grav'),betaLab:id('betaLa
+20: function drawMap(x){box(42,72,810,286,'#fff');text('理论适用地图：低速弱引力宏观用牛顿，越过边界要换理论',447,100,colors.ink,'center',16,'900');const zones=[['低速宏观',150,150,150,90,colors
+21: function drawRelativity(x){box(42,390,810,138,'#fff');text('γ 因子图像与钟尺读数',447,416,colors.ink,'center',15,'900');const gx=96,gy=500,gw=330,gh=72;line(gx,gy,gx+gw,
+22: function update(x){el.betaLab.textContent=fmt(x.b,2);el.gLab.textContent=Math.round(x.G)+'%';const domain={speed:'高速',gravity:'强引力',micro:'微观',cosmos:'宇宙观'}[sta
+23: function draw(){const x=vals();ctx.clearRect(0,0,900,600);const bg=ctx.createLinearGradient(0,0,0,600);bg.addColorStop(0,'#fbfdff');bg.addColorStop(1,'#edf3f8')
+
+===== anim/bx2/oblique-throw.html (120 lines, kept 41) =====
+36: <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="斜抛运动交互实验台"></canvas></div>
+38: <div class="card task"><b>观察任务：</b>抓红色 v0 箭头端点拖动，看绿色 v0x 和紫色 v0y 此消彼长；最高点只有 vy=0，vx 仍存在。</div>
+39: <button id="playBtn" class="primary">播放</button>
+41: <div class="title">快速情境</div>
+43: <button data-case="base">45°</button>
+44: <button data-case="flat">类平抛</button>
+45: <button data-case="steep">大角度</button>
+46: <button data-case="height">有高度</button>
+50: <div class="title">实时读数</div>
+52: <div class="meter"><span>水平分量 v0x</span><b id="vxText">14.1 m/s</b></div>
+53: <div class="meter"><span>竖直分量 v0y</span><b id="vy0Text">14.1 m/s</b></div>
+54: <div class="meter"><span>飞行时间 T</span><b id="timeText">2.83 s</b></div>
+55: <div class="meter"><span>射程 R</span><b id="rangeText">40.0 m</b></div>
+59: <div><span>分解</span><b>v0x=v0cosθ</b></div>
+60: <div><span>竖直</span><b>vy=v0y-gt</b></div>
+61: <div><span>轨迹</span><b>y=h+v0yt-1/2gt²</b></div>
+63: <div class="card small"><b>可直接操作：</b>抓红色 v0 箭头端点、初始高度手柄，或拖底部 v0、θ、h、g、t 手柄。多视角：左侧是侧视抛体轨迹，右侧是速度分解图像记录和读数。</div>
+64: <div class="status" id="status">斜抛就是把初速度分解后分别列水平和竖直运动。</div>
+71: const state={v0:20,theta:45,h:0,g:10,t:0,running:false,drag:null};
+74: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+75: const fmt=(v,d=1)=>Math.abs(v)<1e-6?(0).toFixed(d):v.toFixed(d);
+76: function values(){const a=state.theta*Math.PI/180,vx=state.v0*Math.cos(a),vy0=state.v0*Math.sin(a),disc=vy0*vy0+2*state.g*state.h,T=(vy0+Math.sqrt(disc))/state.
+77: function layout(v){const baseY=398,originX=98,scale=Math.min(440/Math.max(v.R,1),280/Math.max(v.H,8),26),originY=baseY-state.h*scale;return{baseY,originX,origin
+80: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(
+82: function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-
+83: function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(
+89: ctx.save();ctx.strokeStyle='#334155';ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=140;i++){const p=pointAt(v.T*i/140,v,L);if(i===0)ctx.moveTo(p.x,p.y);else ct
+90: for(let i=0;i<=8;i++){const p=pointAt(v.T*i/8,v,L);ctx.fillStyle=colors.red;ctx.beginPath();ctx.arc(p.x,p.y,3.5,0,Math.PI*2);ctx.fill()}
+92: ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(p.x,p.y,10,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();
+93: const vxLen=v.vx*2.4,vyLen=v.vy0*2.4,end={x:L.originX+vxLen,y:L.originY-vyLen};
+96: arrow(L.originX,L.originY,end.x,end.y,colors.red,4);text(`v0=${fmt(state.v0)}m/s`,end.x+12,end.y-8,colors.red,'left',13,'900');
+97: ctx.save();ctx.fillStyle=state.drag==='v0Direct'?'#fde68a':'#fff';ctx.strokeStyle=state.drag==='v0Direct'?'#d97706':colors.red;ctx.lineWidth=3;ctx.beginPath();c
+100: text(`R=${fmt(v.R)}m`,L.originX+v.R*L.scale/2,L.baseY+22,colors.orange,'center',13,'900');
+102: function drawExplain(v){roundRect(640,84,220,110,8,'#f8fafc','#d7dee8');text('速度分解',750,112,'#0f172a','center',15,'900');text(`v0x=${fmt(v.vx)}m/s`,750,146,colo
+103: function update(v){els.vx.textContent=`${fmt(v.vx)} m/s`;els.vy0.textContent=`${fmt(v.vy0)} m/s`;els.time.textContent=`${fmt(v.T,2)} s`;els.range.textContent=`$
+105: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+106: function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+107: function direct(){const v=values(),L=layout(v),end={x:L.originX+v.vx*2.4,y:L.originY-v.vy0*2.4};return{v,L,end,height:{x:L.originX,y:L.originY}}}
+109: function move(e){if(!state.drag)return;const p=pos(e),d=direct();if(state.drag==='v0')state.v0=clamp(4+(p.x-86)/120*36,4,40);if(state.drag==='theta')state.theta
+113: document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='base'){state.v0=20;state.theta=45;state
+118: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/bx2/orbit-transfer.html (260 lines, kept 69) =====
+38: <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="卫星变轨交互实验台：轨道俯视装置、速度柱状图像和数据记录"></canvas></div>
+40: <div class="card task"><b>观察任务：</b>拖右侧第一次点火点或左侧第二次点火点，对照轨道俯视装置、速度柱状图像和数据记录，比较 v1、vt1、vt2、v2。</div>
+41: <button id="playBtn" class="primary">播放</button>
+43: <div class="title">阶段</div>
+45: <button data-stage="0">低圆</button>
+46: <button data-stage="1">转移</button>
+47: <button data-stage="2">高圆</button>
+51: <div class="title">快速情境</div>
+53: <button data-case="small">小升轨</button>
+54: <button data-case="sync">到同步轨</button>
+55: <button data-case="large">大升轨</button>
+56: <button data-case="reset">重置</button>
+60: <div class="title">实时读数</div>
+62: <div class="meter"><span>低圆 v1</span><b id="v1Text">6.89 km/s</b></div>
+63: <div class="meter"><span>近地点 vt1</span><b id="vt1Text">8.51 km/s</b></div>
+64: <div class="meter"><span>远地点 vt2</span><b id="vt2Text">1.68 km/s</b></div>
+65: <div class="meter"><span>高圆 v2</span><b id="v2Text">3.07 km/s</b></div>
+66: <div class="meter"><span>第一次 Δv1</span><b id="dv1Text">1.62 km/s</b></div>
+67: <div class="meter"><span>第二次 Δv2</span><b id="dv2Text">1.39 km/s</b></div>
+71: <div><span>圆轨速度</span><b>v=√(GM/r)</b></div>
+72: <div><span>椭圆速度</span><b>v=√[GM(2/r-1/a)]</b></div>
+73: <div><span>半长轴</span><b>a=(r1+r2)/2</b></div>
+75: <div class="card small"><b>可直接操作：</b>抓橙色第一次点火点改 r1，抓紫色第二次点火点改 r2，抓红色卫星沿转移轨道看当前位置速度。</div>
+76: <div class="status" id="status">转移椭圆：同一点速度从 v1 变为 vt1，轨道立刻改变。</div>
+84: const state={r1:1.35,r2:6.62,stage:1,u:0.28,running:false,drag:null};
+91: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+92: const fmt=(v,d=2)=>Math.abs(v)<1e-8?(0).toFixed(d):v.toFixed(d);
+95: const r1=state.r1*Re,r2=state.r2*Re,a=(r1+r2)/2;
+96: const v1=Math.sqrt(mu/r1),v2=Math.sqrt(mu/r2),vt1=Math.sqrt(mu*(2/r1-1/a)),vt2=Math.sqrt(mu*(2/r2-1/a));
+108: const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);
+110: ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));
+111: ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore();
+119: for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}
+129: const O={x:315,y:253},s=scaleFor(),R1=state.r1*s,R2=state.r2*s,a=(state.r1+state.r2)/2*s,b=Math.sqrt(state.r1*state.r2)*s,c=(state.r2-state.r1)/2*s,C={x:O.x-c,y
+130: const E=state.u*Math.PI;
+131: const transferSat={x:C.x+a*Math.cos(E),y:C.y+b*Math.sin(E)};
+132: const lowA=state.u*Math.PI*2,highA=Math.PI+state.u*Math.PI*2;
+133: const lowSat={x:O.x+R1*Math.cos(lowA),y:O.y+R1*Math.sin(lowA)};
+134: const highSat={x:O.x+R2*Math.cos(highA),y:O.y+R2*Math.sin(highA)};
+138: const g=geom();
+139: if(state.stage===0){const A=state.u*Math.PI*2;return{p:g.lowSat,t:{x:-Math.sin(A),y:Math.cos(A)},label:'v1'}}
+140: if(state.stage===2){const A=Math.PI+state.u*Math.PI*2;return{p:g.highSat,t:{x:-Math.sin(A),y:Math.cos(A)},label:'v2'}}
+141: const dx=-g.a*Math.sin(g.E),dy=g.b*Math.cos(g.E),L=Math.hypot(dx,dy)||1;
+146: const g=geom(),sg=satGeom();
+150: ctx.save();ctx.strokeStyle=colors.blue;ctx.lineWidth=2.8;ctx.beginPath();ctx.ellipse(g.C.x,g.C.y,g.a,g.b,0,0,Math.PI*2);ctx.stroke();ctx.restore();
+151: ctx.fillStyle='#dbeafe';ctx.beginPath();ctx.arc(g.O.x,g.O.y,28,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#334155';ctx.stroke();
+158: ctx.fillStyle=colors.red;ctx.beginPath();ctx.arc(sg.p.x,sg.p.y,9,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#0f172a';ctx.stroke();
+159: ctx.save();ctx.strokeStyle=state.drag==='sat'?'#d97706':colors.red;ctx.lineWidth=3;ctx.beginPath();ctx.arc(sg.p.x,sg.p.y,19,0,Math.PI*2);ctx.stroke();ctx.restor
+165: ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,7,0,Math.PI*2);ctx.fill();
+175: const y=134+i*45,w=110*r[1]/max;
+181: text(`总 Δv=${fmt(v.total)} km/s`,749,374,'#0f172a','center',15,'900');
+185: const h=handles();
+199: els.v1.textContent=`${fmt(v.v1)} km/s`;els.vt1.textContent=`${fmt(v.vt1)} km/s`;
+199D: els.v1.textContent=`${fmt(v.v1)} km/s`;els.vt1.textContent=`${fmt(v.vt1)} km/s`;
+200: els.vt2.textContent=`${fmt(v.vt2)} km/s`;els.v2.textContent=`${fmt(v.v2)} km/s`;
+200D: els.vt2.textContent=`${fmt(v.vt2)} km/s`;els.v2.textContent=`${fmt(v.v2)} km/s`;
+201: els.dv1.textContent=`${fmt(v.dv1)} km/s`;els.dv2.textContent=`${fmt(v.dv2)} km/s`;
+201D: els.dv1.textContent=`${fmt(v.dv1)} km/s`;els.dv2.textContent=`${fmt(v.dv2)} km/s`;
+203D: els.play.textContent=state.running?'暂停':'播放';
+204D: els.status.textContent=state.stage===0?'低圆轨道：速度等于 v1；在同一点若加速到 vt1，就进入转移椭圆。':(state.stage===1?'转移椭圆：不能套圆轨速度公式，近地点快、远地点慢。':'高圆轨道：第二次加速到 v2 后，才稳定在高圆轨道。');
+211: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+212: function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+227: if(state.drag==='r1'||state.drag==='per')state.r1=clamp((p.x-g.O.x)/g.s,1,Math.min(3,state.r2-.5));
+228: if(state.drag==='r2'||state.drag==='apo')state.r2=clamp((g.O.x-p.x)/g.s,Math.max(2.2,state.r1+.5),8.2);
+229: if(state.drag==='u')state.u=clamp((p.x-646)/180,0,1);
+232: const t=Math.atan2((p.y-g.C.y)/Math.max(1,g.b),(p.x-g.C.x)/Math.max(1,g.a));
+233: let E=t;if(E<0)E+=Math.PI*2;if(E>Math.PI)E=Math.PI;
+234: state.u=clamp(E/Math.PI,0,1);
+243: const c=btn.dataset.case;
+
+===== anim/bx2/power.html (135 lines, kept 43) =====
+39: <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="功率交互实验台"></canvas></div>
+41: <div class="card task"><b>观察任务：</b>拖 W-t 图像上的蓝点，看斜率 P=W/t 怎样变化；再拖速度端点和红色力端点，看瞬时功率是否只看速度方向投影。</div>
+42: <button id="playBtn" class="primary">播放</button>
+44: <div class="title">快速情境</div>
+46: <button data-case="fast">同功快做</button>
+47: <button data-case="slow">同功慢做</button>
+48: <button data-case="zero">垂直零功率</button>
+49: <button data-case="negative">阻力负功率</button>
+53: <div class="title">实时读数</div>
+55: <div class="meter"><span>做功 W</span><b id="workText">120 J</b></div>
+56: <div class="meter"><span>用时 t</span><b id="timeText">4.0 s</b></div>
+57: <div class="meter"><span>平均功率</span><b id="avgText">30.0 W</b></div>
+58: <div class="meter"><span>投影 F∥</span><b id="parallelText">30.0 N</b></div>
+59: <div class="meter"><span>速度 v</span><b id="speedText">3.0 m/s</b></div>
+60: <div class="meter"><span>瞬时功率</span><b id="instText">90.0 W</b></div>
+64: <div><span>平均功率</span><b>P=W/t</b></div>
+65: <div><span>瞬时功率</span><b>P=Fvcosα</b></div>
+68: <div class="card small"><b>可直接操作：</b>拖左侧蓝点改 W 和 t；拖蓝色速度端点改 v；拖红色力端点改 F 和 α；底部手柄可精调。</div>
+69: <div class="status" id="status">正功率：力的投影与速度同向，正在给物体输入能量。</div>
+76: const state={W:120,t:4,F:30,v:3,alpha:0,running:false,phase:0,drag:null};
+79: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+80: const fmt=(v,d=1)=>Math.abs(v)<1e-8?(0).toFixed(d):v.toFixed(d);
+81: function calc(){const rad=state.alpha*Math.PI/180,cos=Math.cos(rad),Pavg=state.W/state.t,Fp=state.F*cos,Pinst=Fp*state.v;return{rad,cos,Pavg,Fp,Pinst}}
+87: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(
+89: function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-
+90: function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(
+91: function graphGeom(){const left=80,bottom=338,right=392,top=94;return{left,bottom,right,top,point:{x:left+state.t/12*(right-left),y:bottom-state.W/300*(bottom-t
+92: function motionGeom(r){const base={x:660+(state.running?42*Math.sin(state.phase):0),y:274},vTip={x:base.x+state.v*17,y:base.y+56},len=42+state.F*1.55,tip={x:bas
+94: function point(x,y,c,label,active){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x
+97: const g=graphGeom();line(g.left,g.bottom,g.right,g.bottom,'#475569',1.5);line(g.left,g.bottom,g.left,g.top,'#475569',1.5);
+99: for(let i=0;i<=4;i++){const x=g.left+i/4*(g.right-g.left);line(x,g.bottom-4,x,g.bottom+4,'#94a3b8',1);text(String(i*3),x,g.bottom+18,'#64748b','center',10,'700'
+100: for(let i=1;i<=3;i++){const y=g.bottom-i/3*(g.bottom-g.top);line(g.left-4,y,g.left+4,y,'#94a3b8',1);text(String(i*100),g.left-14,y,'#64748b','right',10,'700')}
+108: const g=motionGeom(r);line(520,g.base.y+74,838,g.base.y+74,'#334155',3);
+113: const fpEnd={x:g.base.x+r.Fp*3,y:g.base.y-16};
+118: function bottom(){const h=handles();roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(80,494,230,'W',colors.blue);handle(h.W.x,h.W.y,`${fmt(state.W,0)}J`,state.
+119: function update(r){els.W.textContent=`${fmt(state.W,0)} J`;els.t.textContent=`${fmt(state.t,1)} s`;els.avg.textContent=`${fmt(r.Pavg,1)} W`;els.parallel.textCon
+120: function draw(){const r=calc();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7"
+121: function pos(e){const b=canvas.getBoundingClientRect();return{x:(e.clientX-b.left)*canvas.width/b.width,y:(e.clientY-b.top)*canvas.height/b.height}}
+122: function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+124: function pointerMove(e){if(!state.drag)return;const p=pos(e),r=calc(),gg=graphGeom(),mg=motionGeom(r);if(state.drag==='graph'){state.t=clamp((p.x-gg.left)/(gg.r
+128: document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='fast'){state.W=120;state.t=2;state.F=30
+129: function tick(){if(state.running)state.phase=(state.phase+.035)%(Math.PI*2);draw();requestAnimationFrame(tick)}
+133: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/bx2/projectile.html (244 lines, kept 76) =====
+38: <div class="stage"><canvas id="canvas" width="960" height="760" aria-label="平抛与类平抛交互实验台"></canvas></div>
+40: <div class="card task"><b>观察任务：</b>切换平抛/电场偏转，拖 `v0` 看匀速方向只改变 x；拖 `g` 或 `q/E/m` 看加速方向如何改变 y、vy 和偏角。</div>
+41: <div class="chips"><button id="playBtn">播放</button><button id="resetBtn">重置</button></div>
+43: <div class="title">模型模式</div>
+45: <button id="gravityMode" class="active">重力平抛</button>
+46: <button id="electricMode">电场类平抛</button>
+50: <div class="title">快速情境</div>
+52: <button data-case="base">标准平抛</button>
+53: <button data-case="fast">大初速</button>
+54: <button data-case="positive">正电偏转</button>
+55: <button data-case="negative">负电偏转</button>
+59: <div class="title">实时读数</div>
+61: <div class="meter"><span>x / y</span><b id="xyText">5.0 / 1.3 m</b></div>
+62: <div class="meter"><span>vx / vy</span><b id="vText">10.0 / 5.0</b></div>
+63: <div class="meter"><span>偏角 tanθ</span><b id="thetaText">0.50</b></div>
+64: <div class="meter"><span>加速度 a</span><b id="aText">10.0 m/s²</b></div>
+68: <div><span>匀速方向</span><b>x=v0t</b></div>
+69: <div><span>加速方向</span><b>y=1/2at²</b></div>
+70: <div><span>速度分解</span><b>vy=at</b></div>
+72: <div><span>电偏转</span><b>a=qE/m</b></div>
+74: <div class="card small"><b>三视图：</b>左侧是侧视实物轨迹；右侧是 x-t、y-t 图像记录；速度箭头把公式和当前点绑定。底部可拖 `v0,h,g,q,m,E,plate_length`。</div>
+75: <div class="status" id="status">平抛：水平方向匀速，竖直方向自由落体。</div>
+83: const state={mode:'gravity',v0:10,h:8,g:10,q:1.0,m:1.0,E:4.0,plate:8,t:.5,running:false,drag:null};
+88: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+92: const a=accel(),limitT=state.mode==='gravity'?Math.sqrt(2*state.h/Math.max(.1,Math.abs(a))):state.plate/state.v0;
+93: const tc=clamp(state.t,0,Math.max(.1,limitT)),x=state.v0*tc,y=.5*a*tc*tc,vy=a*tc,vx=state.v0,tan=vy/vx,theta=Math.atan(tan)*180/Math.PI;
+98: function arrow(x1,y1,x2,y2,c,w=3){if(Math.hypot(x2-x1,y2-y1)<2)return;const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.begin
+101: const left=74,top=92,w=500,h=360,axisY=state.mode==='gravity'?top+74:top+h/2;
+102: const xScale=Math.min((w-78)/Math.max(v.range,state.plate,1),42);
+103: const yMax=Math.max(state.h,Math.abs(v.endY),Math.abs(v.y),1);
+104: const yScale=(state.mode==='gravity'?(h-110):140)/yMax;
+107: function pointAt(t,L){const a=accel();return{x:L.left+52+state.v0*t*L.xScale,y:L.axisY+.5*a*t*t*L.yScale}}
+111: const tableTop=L.axisY,ground=L.axisY+state.h*L.yScale;
+113: line(64,tableTop,64,ground,colors.orange,3);text(`h=${fmt(state.h)}m`,82,(tableTop+ground)/2,colors.orange,'left',12,'900');
+115: text('红轨迹：x=v0t 与 y=1/2gt² 同时生成',310,472,colors.muted,'center',13,'900');
+120: const x0=L.left+52,x1=x0+state.plate*L.xScale,mid=L.axisY,plateGap=Math.max(90,state.h*16);
+123: for(let i=0;i<=6;i++){const x=x0+(x1-x0)*i/6;arrow(x,mid-plateGap/2+18,x,mid+plateGap/2-18,colors.cyan,2)}
+124: text(`plate_length=${fmt(state.plate)}m`,(x0+x1)/2,mid+plateGap/2+22,colors.cyan,'center',12,'900');
+125: text(`E=${fmt(state.E)}kN/C，q=${fmt(state.q)}μC`,(x0+x1)/2,mid-plateGap/2-22,colors.cyan,'center',12,'900');
+131: for(let i=0;i<=120;i++){const p=pointAt(v.limitT*i/120,L);if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y)}
+133: for(let i=0;i<=6;i++){const tt=v.limitT*i/6,p=pointAt(tt,L);ctx.fillStyle=colors.red;ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fill();ctx.fillStyle=col
+135: ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(p.x,p.y,11,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();
+136: const launch=pointAt(0,L),v0End={x:launch.x+44+state.v0*3.2,y:launch.y};
+137: arrow(launch.x,launch.y,v0End.x,v0End.y,colors.blue,4);text(`v0=${fmt(state.v0)}m/s`,v0End.x+10,v0End.y-12,colors.blue,'left',12,'900');
+138: arrow(p.x,p.y,p.x+state.v0*3.2,p.y,colors.blue,3);text('vx=v0',p.x+state.v0*3.2+8,p.y,colors.blue,'left',12,'900');
+139: arrow(p.x,p.y,p.x,p.y+clamp(v.vy*8,-96,96),colors.purple,3);text('vy=at',p.x-10,p.y+clamp(v.vy*4,-70,70),colors.purple,'right',12,'900');
+146: ctx.beginPath();for(let i=0;i<=80;i++){const t=v.limitT*i/80,x=gx+gw*i/80,y=234-(i/80)*88;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.strokeStyle=colors.b
+147: ctx.beginPath();for(let i=0;i<=80;i++){const t=v.limitT*i/80,r=(t/v.limitT);const x=gx+gw*i/80,y=234-r*r*88;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.st
+148: const tx=gx+gw*v.tc/v.limitT;line(tx,238,tx,116,colors.orange,2,[4,4]);text('x-t',875,134,colors.blue,'right',12,'900');text('y-t',875,154,colors.purple,'right'
+151: text(`y=1/2at²=${fmt(v.y,2)}m`,626,374,colors.purple,'left',13,'900');
+152: text(`vy=at=${fmt(v.vy,2)}m/s`,626,402,colors.purple,'left',13,'900');
+156: line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=5;i++){const x=x1+(x2-x1)*i/5;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-18,c,'center',12,'900');
+157: ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#b45309':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(hx,y,10,0,Math.PI*2);ctx.fill();ctx.
+184: els.xy.textContent=`${fmt(v.x,2)} / ${fmt(v.y,2)} m`;
+184D: els.xy.textContent=`${fmt(v.x,2)} / ${fmt(v.y,2)} m`;
+185: els.v.textContent=`${fmt(v.vx,1)} / ${fmt(v.vy,2)}`;
+185D: els.v.textContent=`${fmt(v.vx,1)} / ${fmt(v.vy,2)}`;
+186D: els.theta.textContent=`${fmt(v.tan,2)} (${fmt(v.theta,1)}°)`;
+187: els.a.textContent=`${fmt(v.a,2)} m/s²`;
+187D: els.a.textContent=`${fmt(v.a,2)} m/s²`;
+188: els.status.className='status'+(state.mode==='electric'&&Math.abs(state.q)<.05?' warn':'');
+189D: els.status.textContent=state.mode==='gravity'
+190: ?'平抛：水平方向无力，x=v0t；竖直方向受重力，y=1/2gt²。'
+191: :`电场类平抛：加速度 a=qE/m=${fmt(v.a,2)}m/s²，q 的正负决定偏转方向；出电场后不再继续电加速。`;
+192D: els.play.textContent=state.running?'暂停':'播放';
+202: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+203: function near(p,h,rad=25){return Math.hypot(p.x-h.x,p.y-h.y)<=rad}
+213: if(state.drag==='v0')state.v0=clamp(2+(p.x-60)/132*28,2,30);
+214: if(state.drag==='h')state.h=clamp(2+(p.x-218)/132*18,2,20);
+215: if(state.drag==='g')state.g=clamp(1+(p.x-376)/132*19,1,20);
+216: if(state.drag==='q')state.q=clamp(-3+(p.x-534)/132*6,-3,3);
+217: if(state.drag==='m')state.m=clamp(.2+(p.x-692)/132*4.8,.2,5);
+218: if(state.drag==='E')state.E=clamp(1+(p.x-60)/132*9,1,10);
+219: if(state.drag==='plate')state.plate=clamp(4+(p.x-218)/132*12,4,16);
+220: if(state.drag==='t')state.t=clamp((p.x-376)/132*v.limitT,0,v.limitT);
+231: const c=btn.dataset.case;
+
+===== anim/bx2/relativity.html (387 lines, kept 45) =====
+8: <link rel="stylesheet" href="../common/controls.css">
+38: <div class="stage"><canvas id="canvas" width="820" height="540" aria-label="相对论实验台：飞船侧视、光钟侧视、γ-β图像和数据记录"></canvas></div>
+40: <div class="card task"><b>观察任务：</b>拖动速度 β=v/c，从 0.1 拖到 0.9：看实验台侧视图、光钟读数和 γ-β 图像如何一起变化。</div>
+42: <div class="title">参数</div>
+43: <label class="param"><span>速度 β=v/c <b id="betaText">0.60</b></span><input id="beta" type="range" min="0" max="0.98" step="0.01" value="0.60"></label>
+44: <label class="param"><span>固有时间 Δt0 <b id="timeText">1.0 s</b></span><input id="time0" type="range" min="0.2" max="5" step="0.1" value="1"></label>
+45: <label class="param"><span>固有长度 L0 <b id="lengthText">10.0 m</b></span><input id="length0" type="range" min="2" max="30" step="0.5" value="10"></label>
+46: <div class="buttons"><button id="play">播放</button><button id="record">记录</button><button id="reset">重置</button><button data-case="low">低速</button><button data-c
+48: <div class="readout" id="readout"></div>
+48D: <div class="readout" id="readout"></div>
+50: <div class="title">数据记录</div>
+53: <tbody id="recordRows"></tbody>
+55: <div class="note">拖动红点后点“记录”，比较同一个实验台中速度、时间读数和长度读数的变化。</div>
+58: <div class="title">公式对照</div>
+60: <div>时间膨胀：Δt = γΔt0</div>
+61: <div>长度收缩：L = L0/γ</div>
+63: <div class="status" id="status"></div>
+72: const state = { running: false, phase: 0, drag: null, hot: {}, records: [] };
+89: const gamma = 1 / Math.sqrt(1 - q.beta * q.beta);
+94: const v = Math.abs(n) < 0.0001 ? 0 : n;
+107: const a = Math.atan2(y2 - y1, x2 - x1);
+118: ctx.lineTo(x2 - 10 * Math.cos(a - 0.45), y2 - 10 * Math.sin(a - 0.45));
+119: ctx.lineTo(x2 - 10 * Math.cos(a + 0.45), y2 - 10 * Math.sin(a + 0.45));
+141: const contracted = full / r.gamma;
+144: text('静止测得 L0=' + fmt(q.L0, 1) + 'm', x0 + full / 2, y - 32, '#102a43', 'center', 13, '700');
+146: text('运动方向收缩 L=' + fmt(r.L, 1) + 'm', x0 + contracted / 2, y + 42, '#087f5b', 'center', 13, '700');
+149: const shipX = x0 + 25 + (state.running ? 80 * state.phase : 0);
+172: const y = top + (bottom - top) * (0.5 - 0.5 * Math.cos(state.phase * Math.PI * 2));
+198: const beta = i / 100;
+199: const gamma = 1 / Math.sqrt(1 - beta * beta);
+200: const x = left + beta / 0.98 * (right - left);
+201: const y = bottom - Math.min(gamma, 5) / 5 * (bottom - top);
+206: const px = left + q.beta / 0.98 * (right - left);
+207: const py = bottom - Math.min(r.gamma, 5) / 5 * (bottom - top);
+223D: els.recordRows.innerHTML = rows.join('') || '<tr><td colspan="4">暂无记录</td></tr>';
+227D: document.getElementById('betaText').textContent = fmt(q.beta, 2);
+228D: document.getElementById('timeText').textContent = fmt(q.t0, 1) + ' s';
+229D: document.getElementById('lengthText').textContent = fmt(q.L0, 1) + ' m';
+233: '光钟时间读数 Δt = <b>' + fmt(r.t, 2) + ' s</b><br>' +
+234: '侧视长度读数 L = <b>' + fmt(r.L, 2) + ' m</b>';
+238D: status.textContent = '低速：γ 接近 1，相对论效应极小，日常运动可用经典力学。';
+269: state.phase += 0.01 + parseFloat(els.beta.value) * 0.018;
+285D: this.textContent = state.running ? '暂停' : '播放';
+331: return Math.hypot(a.x - x, a.y - y);
+336: const beta = Math.max(0, Math.min(0.98, (x - axis.left) / (axis.right - axis.left) * 0.98));
+
+===== anim/bx2/satellite.html (171 lines, kept 58) =====
+38: <div class="stage"><canvas id="canvas" width="960" height="760" aria-label="天体运动模型交互实验台"></canvas></div>
+40: <div class="card task"><b>观察任务：</b>拖卫星改变 `r=R_earth+h`，看高轨速度变小、周期变长；切同步卫星，看为何必须唯一高度。</div>
+41: <div class="chips"><button id="playBtn">播放</button><button id="resetBtn">重置</button></div>
+43: <div class="title">satellite_type</div>
+45: <button data-type="near" class="active">近地卫星</button>
+46: <button data-type="geo">同步卫星</button>
+47: <button data-type="high">高轨比较</button>
+48: <button data-type="transfer">椭圆变轨</button>
+52: <div class="title">实时读数</div>
+54: <div class="meter"><span>r / h</span><b id="rText">6.9 / 0.5</b></div>
+55: <div class="meter"><span>v</span><b id="vText">7.6 km/s</b></div>
+56: <div class="meter"><span>T</span><b id="tText">96 min</b></div>
+57: <div class="meter"><span>g'</span><b id="gText">8.7 m/s²</b></div>
+62: <div><span>圆轨速度</span><b>v=√(GM/r)</b></div>
+63: <div><span>周期</span><b>T=2π√(r³/GM)</b></div>
+66: <div class="card small"><b>三视图：</b>左侧俯视圆轨道；右侧是 v/T/g' 随 r 的图像记录和椭圆变轨示意。底部可拖 `M,r,R_earth,h,G`。</div>
+67: <div class="status" id="status">r 是地心到卫星距离，不是离地高度 h。</div>
+74: const state={G:6.67,M:6.0,R:6.4,h:.5,type:'near',angle:.6,running:false,drag:null};
+77: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+81: const r=rVal(),mu=state.G*state.M;
+82: const v=Math.sqrt(mu/r*10);
+83: const T=2*Math.PI*Math.sqrt((r*r*r/mu)*1e5)/60;
+84: const gp=mu/(r*r)*10;
+85: const geoR=Math.cbrt(mu*1e5*Math.pow(24*60*60/(2*Math.PI),2))/100;
+90: function arrow(x1,y1,x2,y2,c,w=3){if(Math.hypot(x2-x1,y2-y1)<2)return;const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.begin
+93: const O={x:300,y:292},earth=34+clamp((state.R-5)/3*22,0,30);
+94: const maxRatio=8,Rpx=earth+clamp((v.ratio-1)/(maxRatio-1),0,1)*210;
+95: const sat={x:O.x+Rpx*Math.cos(state.angle),y:O.y+Rpx*Math.sin(state.angle)};
+100: const g=orbitGeom(v),O=g.O,s=g.sat,tx=-Math.sin(state.angle),ty=Math.cos(state.angle);
+102: ctx.fillStyle=earthGrad;ctx.beginPath();ctx.arc(O.x,O.y,g.earth,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();text('中心天体',O.x,O.y,'#fff','cente
+103: ctx.strokeStyle='#94a3b8';ctx.lineWidth=2;ctx.beginPath();ctx.arc(O.x,O.y,g.Rpx,0,Math.PI*2);ctx.stroke();
+104: const geoPx=g.earth+clamp((v.geoR/state.R-1)/7,0,1)*210;ctx.strokeStyle=colors.orange;ctx.setLineDash([6,5]);ctx.beginPath();ctx.arc(O.x,O.y,geoPx,0,Math.PI*2);
+105: if(state.type==='transfer'){ctx.save();ctx.strokeStyle=colors.purple;ctx.lineWidth=3;ctx.setLineDash([7,4]);ctx.beginPath();ctx.ellipse(O.x,O.y,Math.max(g.Rpx,g
+106: ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(s.x,s.y,11,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();
+114: function curve(fn,c){ctx.beginPath();for(let i=0;i<=80;i++){const rr=state.R+(42*i/80),val=fn(rr),x=gx+gw*i/80,y=gy-val*gh;if(i===0)ctx.moveTo(x,y);else ctx.lin
+115: const maxV=Math.sqrt(state.G*state.M/state.R*10),maxT=2*Math.PI*Math.sqrt(Math.pow(state.R+42,3)/(state.G*state.M)*1e5)/60,maxA=state.G*state.M/(state.R*state.R
+116: curve(rr=>Math.sqrt(state.G*state.M/rr*10)/maxV,colors.green);
+117: curve(rr=>(2*Math.PI*Math.sqrt(Math.pow(rr,3)/(state.G*state.M)*1e5)/60)/maxT,colors.orange);
+118: curve(rr=>(state.G*state.M/(rr*rr)*10)/maxA,colors.purple);
+119: const px=gx+gw*state.h/42;line(px,gy,px,gy-gh,colors.red,2,[4,4]);
+127: function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#b45309':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(
+128: function ruler(x1,y,x2,label,c,hx,txt,active){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=5;i++){const x=x1+(x2-x1)*i/5;line(x,y-5,x,y+5,'#0f172a',1)}text(label,
+145: els.r.textContent=`${fmt(v.r,1)} / ${fmt(state.h,1)} ×10⁶m`;
+145D: els.r.textContent=`${fmt(v.r,1)} / ${fmt(state.h,1)} ×10⁶m`;
+146: els.v.textContent=`${fmt(v.v,2)} km/s`;
+146D: els.v.textContent=`${fmt(v.v,2)} km/s`;
+147: els.t.textContent=v.T>180?`${fmt(v.T/60,1)} h`:`${fmt(v.T,1)} min`;
+147D: els.t.textContent=v.T>180?`${fmt(v.T/60,1)} h`:`${fmt(v.T,1)} min`;
+148: els.g.textContent=`${fmt(v.gp,2)} m/s²`;
+148D: els.g.textContent=`${fmt(v.gp,2)} m/s²`;
+150: const warn=state.type==='geo'&&Math.abs(v.T-1440)>50;
+152D: els.status.textContent=warn?'同步卫星不是任意高度：T 必须等于 24h，且还要赤道同向。':'高轨低速长周期；卫星质量 m 在圆轨方程中约掉。';
+153D: els.play.textContent=state.running?'暂停':'播放';
+156: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+157: function near(p,h,rad=25){return Math.hypot(p.x-h.x,p.y-h.y)<=rad}
+159: function move(e){if(!state.drag)return;const p=pos(e),v=calc(),og=orbitGeom(v);if(state.drag==='M')state.M=clamp(1+(p.x-58)/132*9,1,10);if(state.drag==='R'){sta
+164: document.getElementById('resetBtn').addEventListener('click',()=>{Object.assign(state,{G:6.67,M:6,R:6.4,h:.5,type:'near',angle:.6,running:false});draw()});
+165: function tick(){if(state.running){const v=calc();state.angle=(state.angle+Math.max(.001,2*Math.PI/(v.T*60))*16)%(Math.PI*2)}draw();requestAnimationFrame(tick)}
+
+===== anim/bx2/vehicle-start.html (147 lines, kept 55) =====
+37: <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="机车启动交互实验台"></canvas></div>
+39: <div class="card task"><b>观察任务：</b>拖 F-v 图像上的黑点或车下速度端点，看恒功率时 F、a 如何变小；切换恒牵引力，找 v1 后怎样进入恒功率。</div>
+40: <button id="playBtn" class="primary">播放</button>
+42: <div class="title">启动方式</div>
+43: <div class="chips"><button data-mode="power">恒功率</button><button data-mode="force">先恒牵引力</button></div>
+46: <div class="title">快速情境</div>
+48: <button data-case="nearMax">接近最大</button>
+49: <button data-case="highDrag">阻力增大</button>
+50: <button data-case="beforeV1">临界前</button>
+51: <button data-case="afterV1">临界后</button>
+55: <div class="title">实时读数</div>
+57: <div class="meter"><span>牵引力 F</span><b id="forceText">7500 N</b></div>
+58: <div class="meter"><span>输出功率 P</span><b id="powerText">60.0 kW</b></div>
+59: <div class="meter"><span>加速度 a</span><b id="accText">4.58 m/s²</b></div>
+60: <div class="meter"><span>最大速度</span><b id="vmaxText">30.0 m/s</b></div>
+61: <div class="meter"><span>临界速度 v1</span><b id="v1Text">12.0 m/s</b></div>
+62: <div class="meter"><span>当前速度 v</span><b id="speedText">8.0 m/s</b></div>
+66: <div><span>功率</span><b>P=Fv</b></div>
+67: <div><span>动力学</span><b>F-f=ma</b></div>
+68: <div><span>最大速度</span><b>vmax=P额/f</b></div>
+70: <div class="card small"><b>可直接操作：</b>拖 F-v 图当前点或速度端点改 v；底部手柄可改 P额、f、m、F0、v。多视角：左侧是 F-v 图像记录，右侧/下方是侧视机车、速度端点和实时读数。</div>
+71: <div class="status" id="status">恒功率阶段：v 变大使 F=P/v 变小，合力和加速度逐渐减小。</div>
+78: const state={mode:'power',Pr:60000,f:2000,m:1200,F0:5000,v:8,running:false,phase:0,drag:null};
+81: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+82: const fmt=(v,d=1)=>Math.abs(v)<1e-8?(0).toFixed(d):v.toFixed(d);
+84: const vmax=state.Pr/state.f,v1=state.Pr/state.F0;
+86: if(state.mode==='power'){F=state.Pr/Math.max(state.v,.5);Pout=state.Pr;stage='恒功率阶段'}
+87: else if(state.v<=v1){F=state.F0;Pout=state.F0*state.v;stage='恒牵引力匀加速阶段'}
+88: else{F=state.Pr/Math.max(state.v,.5);Pout=state.Pr;stage='达到额定功率后的变加速阶段'}
+89: const a=(F-state.f)/state.m;
+94: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(
+96: function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-
+97: function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(
+98: function axisGeom(r){const left=76,bottom=420,right=474,top=95,maxV=Math.max(40,r.vmax*1.18,r.v1*1.25),maxF=Math.max(state.F0,state.Pr/1,state.f)*1.08;return{le
+99: function carGeom(){return{base:{x:680+(state.running?34*Math.sin(state.phase):0),y:246},vTip:{x:680+state.v*6,y:326}}}
+101: function point(x,y,c,label,active){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x
+104: const g=axisGeom(r);line(g.left,g.bottom,g.right,g.bottom,'#475569',1.5);line(g.left,g.bottom,g.left,g.top,'#475569',1.5);text('v',g.right+12,g.bottom+14,'#4755
+106: if(state.mode==='force'){const yF0=g.bottom-state.F0/g.maxF*(g.bottom-g.top);ctx.moveTo(g.left,yF0);ctx.lineTo(g.xv1,yF0);for(let i=0;i<=100;i++){const v=r.v1+(
+107: else{for(let i=0;i<=120;i++){const v=1+(g.maxV-1)*i/120,x=g.left+v/g.maxV*(g.right-g.left),y=g.bottom-(state.Pr/v)/g.maxF*(g.bottom-g.top);if(i===0)ctx.moveTo(x
+112: ctx.fillStyle='#0f172a';ctx.beginPath();ctx.arc(g.px,g.py,7,0,Math.PI*2);ctx.fill();point(g.px,g.py,'#0f172a','拖 v',state.drag==='graph');
+113: text(`F=${fmt(r.F,0)}N, a=${fmt(r.a,2)}m/s²`,282,426,r.a>.03?colors.green:colors.orange,'center',14,'900');
+117: const g=carGeom(),roadY=g.base.y+62;line(590,roadY,838,roadY,'#334155',3);
+118: roundRect(g.base.x-46,g.base.y-22,92,42,7,'#dbeafe','#334155');ctx.fillStyle='#0f172a';ctx.beginPath();ctx.arc(g.base.x-25,g.base.y+22,8,0,Math.PI*2);ctx.arc(g.
+121: arrow(g.base.x-5,g.base.y+80,g.vTip.x,g.vTip.y,colors.blue,3);point(g.vTip.x,g.vTip.y,colors.blue,'v',state.drag==='vtip');text(`v=${fmt(state.v,1)}m/s`,g.base.
+122: roundRect(592,360,240,50,8,r.a>.03?'#ecfdf5':'#fff7ed',r.a>.03?'#14b8a6':'#f59e0b');text(r.stage,712,380,r.a>.03?colors.green:colors.orange,'center',13,'900');t
+124: function bottom(){const h=handles();roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(82,494,212,'P额',colors.red);handle(h.P.x,h.P.y,`${fmt(state.Pr/1000,0)}kW`
+126: els.force.textContent=`${fmt(r.F,0)} N`;els.power.textContent=`${fmt(r.Pout/1000,1)} kW`;els.acc.textContent=`${fmt(r.a,2)} m/s²`;els.vmax.textContent=`${fmt(r.
+129: els.status.textContent=state.v>=r.vmax*.95||r.a<=.08?'接近最大速度：F≈f，合力接近 0，加速度接近 0。':(state.mode==='force'&&state.v<=r.v1?'恒牵引力阶段：F 不变，a 不变；P=Fv 正在增大。':'恒功率阶段：v 变大
+129D: els.status.textContent=state.v>=r.vmax*.95||r.a<=.08?'接近最大速度：F≈f，合力接近 0，加速度接近 0。':(state.mode==='force'&&state.v<=r.v1?'恒牵引力阶段：F 不变，a 不变；P=Fv 正在增大。':'恒功率阶段：v 变大使 F=P/v 变小，合力和加速度逐渐减小。');
+132: function pos(e){const b=canvas.getBoundingClientRect();return{x:(e.clientX-b.left)*canvas.width/b.width,y:(e.clientY-b.top)*canvas.height/b.height}}
+133: function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+135: function pointerMove(e){if(!state.drag)return;const p=pos(e),r=calc(),ag=axisGeom(r),cg=carGeom();if(state.drag==='graph')state.v=clamp((p.x-ag.left)/(ag.right-
+140: document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='nearMax'){state.mode='power';state.Pr=6
+141: function tick(){if(state.running){const r=calc();state.v=clamp(state.v+Math.max(0,r.a)*.045,1,r.vmax);state.phase=(state.phase+.04)%(Math.PI*2)}draw();requestAn
+145: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/bx2/vertical-circle.html (204 lines, kept 63) =====
+38: <div class="stage"><canvas id="canvas" width="960" height="760" aria-label="圆周临界模型交互实验台"></canvas></div>
+40: <div class="card task"><b>观察任务：</b>拖 `position_angle` 到最高点，比较绳/杆；再拖 `v` 和 `g`，看约束力何时为 0。磁场迁移看 `r=mv/qB`。</div>
+41: <div class="chips"><button id="playBtn">播放</button><button id="resetBtn">重置</button></div>
+43: <div class="title">type_rope_or_rod</div>
+44: <div class="mode"><button id="ropeBtn" class="active">绳模型</button><button id="rodBtn">杆/圆管模型</button></div>
+47: <div class="title">快速情境</div>
+49: <button data-case="critical">最高点临界</button>
+50: <button data-case="fast">速度更大</button>
+51: <button data-case="slow">杆低速过顶</button>
+52: <button data-case="bridge">拱桥顶端</button>
+56: <div class="title">实时读数</div>
+58: <div class="meter"><span>ΣF径 / mv²/r</span><b id="radialText">5.0 / 5.0 N</b></div>
+59: <div class="meter"><span>约束力</span><b id="forceText">0.0 N</b></div>
+60: <div class="meter"><span>v_min / 最低点N</span><b id="critText">3.1 / 29.8</b></div>
+61: <div class="meter"><span>磁场半径</span><b id="magText">r=mv/qB</b></div>
+66: <div><span>绳最高点</span><b>v_min=√(gr)</b></div>
+67: <div><span>最低点</span><b>N-mg=mv²/r</b></div>
+68: <div><span>磁场迁移</span><b>r=mv/qB</b></div>
+70: <div class="card small"><b>三视图：</b>左侧是侧视圆周轨道；右侧是受力图和临界图像记录；底部可拖 `m,r,v,g,position_angle`。</div>
+71: <div class="status" id="status">先找圆心方向，再沿径向列方程。</div>
+78: const state={m:.5,r:1,v:3.13,g:9.8,type:'rope',angle:0,running:false,drag:null};
+81: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+82: const fmt=(v,d=2)=>Number.isFinite(v)?(Math.abs(v)<1e-9?0:v).toFixed(d):'--';
+84: const radNeed=state.m*state.v*state.v/state.r;
+85: const mgIn=state.m*state.g*Math.cos(state.angle);
+87: const topCrit=Math.sqrt(state.g*state.r);
+88: const bottomN=state.m*(state.g+state.v*state.v/state.r);
+89: const canTrack=state.type==='rod'||constraint>=-1e-9||Math.abs(state.angle)>0.08;
+90: const magR=state.m*state.v/1;
+95: function arrow(x1,y1,x2,y2,c,w=3){if(Math.hypot(x2-x1,y2-y1)<2)return;const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.begin
+97: function circleGeom(){const O={x:298,y:292},R=clamp(state.r*126,58,196);return{O,R}}
+98: function massPoint(g){return{x:g.O.x+g.R*Math.sin(state.angle),y:g.O.y-g.R*Math.cos(state.angle)}}
+101: const g=circleGeom(),O=g.O,R=g.R,p=massPoint(g),inward={x:O.x-p.x,y:O.y-p.y},len=Math.hypot(inward.x,inward.y),ux=inward.x/len,uy=inward.y/len,tx=uy,ty=-ux;
+102: ctx.save();ctx.strokeStyle=state.type==='rope'?'#94a3b8':'#334155';ctx.lineWidth=state.type==='rope'?2:5;if(state.type==='rope')ctx.setLineDash([7,5]);ctx.begin
+109: ctx.fillStyle=vs.canTrack?colors.blue:colors.orange;ctx.beginPath();ctx.arc(p.x,p.y,12,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();
+110: const top={x:O.x,y:O.y-R};arrow(top.x,top.y,top.x+54+state.v*14,top.y,colors.blue,4);text(`v=${fmt(state.v,1)}m/s`,top.x+72+state.v*14,top.y-12,colors.blue,'lef
+114: function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#b45309':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(
+117: const x=760,y=146;ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(x,y,12,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();
+125: const critX=650+230*vs.topCrit/8,lineX=650+230*state.v/8;
+132: text('磁场圆周迁移：r=mv/qB',761,492,'#0f172a','center',14,'900');
+136: line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=5;i++){const x=x1+(x2-x1)*i/5;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-18,c,'center',12,'900');handle(hx,
+152: ruler(418,646,568,'v',colors.blue,g0.v,`v=${fmt(state.v,1)}m/s`,state.drag==='v');
+157: els.radial.textContent=`${fmt(vs.mgIn+vs.constraint,2)} / ${fmt(vs.radNeed,2)} N`;
+157D: els.radial.textContent=`${fmt(vs.mgIn+vs.constraint,2)} / ${fmt(vs.radNeed,2)} N`;
+158D: els.force.textContent=`${fmt(vs.constraint,2)} N`;
+159: els.crit.textContent=`${fmt(vs.topCrit,2)} / ${fmt(vs.bottomN,1)} N`;
+159D: els.crit.textContent=`${fmt(vs.topCrit,2)} / ${fmt(vs.bottomN,1)} N`;
+160D: els.mag.textContent=`${fmt(vs.magR,2)} m`;
+162: const warn=state.type==='rope'&&Math.abs(state.angle)<0.08&&vs.constraint<0;
+164: els.status.textContent=warn?'绳最高点速度不足：约束力需要为负，绳会松弛。':state.type==='rod'&&vs.constraint<0?'杆/圆管可提供向外约束，低速过顶不必套 √gr。':'径向合力满足 mv²/r，按当前位置的圆心方向列式。';
+164D: els.status.textContent=warn?'绳最高点速度不足：约束力需要为负，绳会松弛。':state.type==='rod'&&vs.constraint<0?'杆/圆管可提供向外约束，低速过顶不必套 √gr。':'径向合力满足 mv²/r，按当前位置的圆心方向列式。';
+165D: els.play.textContent=state.running?'暂停':'播放';
+174: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+175: function near(p,h,rad=25){return Math.hypot(p.x-h.x,p.y-h.y)<=rad}
+184: if(state.drag==='m')state.m=clamp(.2+(p.x-58)/150*1.8,.2,2);
+185: if(state.drag==='r')state.r=clamp(.3+(p.x-238)/150*1.7,.3,2);
+186: if(state.drag==='v')state.v=clamp((p.x-418)/150*8,0,8);
+187: if(state.drag==='g')state.g=clamp(2+(p.x-598)/150*13,2,15);
+188: if(state.drag==='angle')state.angle=clamp((p.x-778)/150*Math.PI*2,0,Math.PI*2);
+189: if(state.drag==='radiusDirect')state.r=clamp((p.x-cg.O.x)/126,.3,2);
+196: document.getElementById('resetBtn').addEventListener('click',()=>{Object.assign(state,{m:.5,r:1,v:Math.sqrt(9.8),g:9.8,type:'rope',angle:0,running:false});draw(
+197: document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='critical'){state.r=1;state.g=9.8;state.
+198: function tick(){if(state.running){state.angle=(state.angle+Math.max(.35,state.v/state.r)*.014)%(Math.PI*2)}draw();requestAnimationFrame(tick)}
+
+===== anim/bx2/work-energy-relation.html (597 lines, kept 67) =====
+105: <canvas id="canvas" width="920" height="540" aria-label="功能关系实验台：侧视轨道、能量图像、账本读数和数据记录"></canvas>
+106: <div class="hint">侧视轨道 + 能量图像 + 账本读数 + 数据记录；可直接拖动小球改变过程，拖动橙色高度手柄改变高度</div>
+113: <div class="title">实验控制</div>
+114: <label class="param"><span>质量 m <b id="mText">2.0 kg</b></span><input id="m" type="range" min="0.5" max="8" step="0.1" value="2"></label>
+115: <label class="param"><span>高度 h <b id="hText">5.0 m</b></span><input id="h" type="range" min="1" max="8" step="0.1" value="5"></label>
+116: <label class="param"><span>摩擦因数 μ <b id="muText">0.00</b></span><input id="mu" type="range" min="0" max="0.45" step="0.01" value="0"></label>
+117: <label class="param"><span>过程位置 <b id="uText">0%</b></span><input id="u" type="range" min="0" max="1" step="0.01" value="0"></label>
+119: <button class="primary" id="play">播放</button>
+120: <button id="reset">重置</button>
+121: <button data-case="smooth">光滑下滑</button>
+122: <button data-case="rough">增大摩擦</button>
+123: <button data-case="high">增高</button>
+124: <button data-case="mass">大质量</button>
+128: W合=<b id="wtText">0.0 J</b>　ΔEk=<b id="dekText">0.0 J</b><br>
+129: WG=<b id="wgText">0.0 J</b>　-ΔEp=<b id="depText">0.0 J</b><br>
+130: Wf=<b id="wfText">0.0 J</b>　ΔE机=<b id="demText">0.0 J</b>
+133: <div class="title">公式对照</div>
+135: <div>WG = -ΔEp：看高度减少和紫色势能减少。</div>
+136: <div>Wf = ΔE机：看摩擦负功和绿色机械能减少。</div>
+139: <div class="status" id="status">光滑：Wf=0，机械能不变；但 W合 与 WG 仍分别对应自己的能量变化。</div>
+149: const g = 10;
+150: const theta = 32 * Math.PI / 180;
+171: const state = { running: false, drag: null, hot: {}, lastTime: 0, caseName: '光滑下滑', pulse: 0, note: '光滑：机械能守恒，Wf=0。' };
+178: const v = Math.abs(n) < 0.0005 ? 0 : n;
+208: const path = q.h / Math.sin(theta);
+209: const sNow = path * q.u;
+210: const wg = q.m * g * q.h * q.u;
+211: const wf = -q.mu * q.m * g * Math.cos(theta) * sNow;
+216: const ek = Math.max(0, dek);
+219: const v = Math.sqrt(Math.max(0, 2 * ek / q.m));
+256: const a = Math.atan2(y2 - y1, x2 - x1);
+267: ctx.lineTo(x2 - 10 * Math.cos(a - 0.45), y2 - 10 * Math.sin(a - 0.45));
+268: ctx.lineTo(x2 - 10 * Math.cos(a + 0.45), y2 - 10 * Math.sin(a + 0.45));
+277: const hPx = q.h * scaleY;
+278: const pathPx = hPx / Math.sin(theta);
+279: const top = { x: bottom.x + pathPx * Math.cos(theta), y: bottom.y - hPx };
+299: text('h=' + fmt(q.h, 1) + 'm', geo.bottom.x - 38, (geo.bottom.y + geo.top.y) / 2, '#f08c00', 'center', 13, '700');
+311: const x = geo.bottom.x + 38 + i * 28;
+330: arrow(geo.ball.x - 2, geo.ball.y - 12, geo.ball.x - 2 - 48 * Math.cos(theta), geo.ball.y - 12 - 48 * Math.sin(theta), '#c92a2a', 2.6);
+334: arrow(geo.ball.x + 18, geo.ball.y - 8, geo.ball.x + 18 + Math.min(78, r.v * 9) * Math.cos(theta), geo.ball.y - 8 + Math.min(78, r.v * 9) * Math.sin(theta), '#e0
+341: ctx.globalAlpha = Math.min(0.75, state.pulse);
+376: const maxAbs = Math.max(10, q.m * g * q.h);
+379: const pulseAlpha = Math.max(0, Math.min(1, state.pulse));
+381: const x = 122 + i * 121;
+382: const h = Math.abs(item.value) / maxAbs * 60;
+386: ctx.globalAlpha = 0.12 * pulseAlpha;
+403D: ui.mText.textContent = fmt(q.m, 1) + ' kg';
+404D: ui.hText.textContent = fmt(q.h, 1) + ' m';
+405D: ui.muText.textContent = fmt(q.mu, 2);
+406: ui.uText.textContent = Math.round(q.u * 100) + '%';
+406D: ui.uText.textContent = Math.round(q.u * 100) + '%';
+407D: ui.wtText.textContent = fmt(r.wt, 1) + ' J';
+408D: ui.dekText.textContent = fmt(r.dek, 1) + ' J';
+409D: ui.wgText.textContent = fmt(r.wg, 1) + ' J';
+410D: ui.depText.textContent = fmt(r.dep, 1) + ' J';
+411D: ui.wfText.textContent = fmt(r.wf, 1) + ' J';
+412D: ui.demText.textContent = fmt(r.dem, 1) + ' J';
+414D: ui.status.textContent = '光滑：Wf=0，机械能不变；但 W合 与 WG 仍分别对应自己的能量变化。';
+419D: ui.status.textContent = '粗糙：摩擦负功让 ΔE机<0；求动能变化仍要看 W合。';
+427: const q = p();
+451: state.pulse = Math.max(0, state.pulse - 0.035);
+464: return Math.hypot(a.x - x, a.y - y);
+473: const u = (wx * vx + wy * vy) / (vx * vx + vy * vy);
+479: const h = (geo.bottom.y - pos.y) / geo.scaleY;
+535D: ui.play.textContent = state.running ? '暂停' : '播放';
+578: const dt = Math.min(0.035, (now - state.lastTime) / 1000 || 0.016);
+580: let next = Number(els.u.value) + dt * 0.35;
+
+===== anim/bx2/work.html (234 lines, kept 57) =====
+39: <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="功的定义交互实验台"></canvas></div>
+41: <div class="card task"><b>观察任务：</b>抓红色力箭头端点绕着箱子转，看投影 F∥ 怎样变短、变零、反向；抓蓝色位移终点，看 W 是否随 s 成正比。</div>
+42: <button id="playBtn" class="primary">播放</button>
+44: <div class="title">快速情境</div>
+46: <button data-case="positive">正功</button>
+47: <button data-case="zero">零功</button>
+48: <button data-case="negative">负功</button>
+49: <button data-case="none">无位移</button>
+53: <div class="title">实时读数</div>
+55: <div class="meter"><span>力 F</span><b id="forceText">20 N</b></div>
+56: <div class="meter"><span>位移 s</span><b id="sText">5.0 m</b></div>
+57: <div class="meter"><span>夹角 α</span><b id="alphaText">37°</b></div>
+58: <div class="meter"><span>cosα</span><b id="cosText">0.80</b></div>
+59: <div class="meter"><span>投影 F∥</span><b id="parallelText">16.0 N</b></div>
+60: <div class="meter"><span>功 W</span><b id="workText">79.9 J</b></div>
+65: <div><span>功</span><b>W=F∥s=Fscosα</b></div>
+66: <div><span>单位</span><b>1 J=1 N·m</b></div>
+68: <div class="card small"><b>可直接操作：</b>拖红色力箭头端点改 F 和 α；拖蓝色 B 点改位移 s；底部手柄可精调 F、s、α。</div>
+69: <div class="status" id="status">正功：F∥ 与位移同向，力在推动物体沿位移方向运动。</div>
+76: const state={F:20,s:5,alpha:37,running:false,t:0,drag:null};
+83: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+84: const fmt=(v,d=1)=>Math.abs(v)<1e-8?(0).toFixed(d):v.toFixed(d);
+85: function calc(){const rad=state.alpha*Math.PI/180,cos=Math.cos(rad),Fp=state.F*cos,W=Fp*state.s;return{rad,cos,Fp,W}}
+98: const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);
+100: ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));
+101: ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore();
+109: for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}
+118: const A={x:90,y:320},scaleS=34,boxX=A.x+state.s*scaleS*(state.running?(.5+.5*Math.sin(state.t)):0.72);
+119: const anchor={x:boxX+28,y:A.y-45},len=42+state.F*2.4,rad=state.alpha*Math.PI/180;
+120: const tip={x:anchor.x+len*Math.cos(rad),y:anchor.y-len*Math.sin(rad)};
+131: const g=geom();
+138: text(`s=${fmt(state.s,1)}m`,(g.A.x+g.B.x)/2,g.B.y+26,colors.blue,'center',13,'900');
+145: const fpEnd={x:g.anchor.x+r.Fp*5.2,y:g.anchor.y};
+150: text('α',g.anchor.x+43*Math.cos(r.rad/2),g.anchor.y-43*Math.sin(r.rad/2),colors.orange,'center',14,'900');
+158: const x=642,y=76,w=214,h=180,left=x+28,right=x+w-18,mid=y+96,top=y+44,bottom=y+h-28,max=Math.max(1,state.F*state.s);
+164: for(let a=0;a<=180;a+=2){const px=left+a/180*(right-left),py=mid-Math.cos(a*Math.PI/180)*(bottom-top)/2;if(a===0)ctx.moveTo(px,py);else ctx.lineTo(px,py)}
+166: const px=left+state.alpha/180*(right-left),py=mid-r.W/max*(bottom-top)/2;
+167: ctx.fillStyle=signColor(r.W);ctx.beginPath();ctx.arc(px,py,6,0,Math.PI*2);ctx.fill();text('当前',px,py-16,signColor(r.W),'center',12,'900');
+174: const h=handles();
+181D: els.F.textContent=`${fmt(state.F,0)} N`;els.s.textContent=`${fmt(state.s,1)} m`;els.alpha.textContent=`${fmt(state.alpha,0)}°`;
+182D: els.cos.textContent=fmt(r.cos,2);els.parallel.textContent=`${fmt(r.Fp,1)} N`;els.work.textContent=`${fmt(r.W,1)} J`;
+183D: els.play.textContent=state.running?'暂停':'播放';
+185D: if(state.F<.05||state.s<.05)els.status.textContent='没有力或没有位移，功为 0；有力但没有位移也不做功。';
+186D: else if(Math.abs(r.W)<.05)els.status.textContent='零功：力垂直于位移，投影 F∥ 为 0，例如支持力对水平位移不做功。';
+187D: else if(r.W>0)els.status.textContent='正功：F∥ 与位移同向，力在推动物体沿位移方向运动。';
+188D: else els.status.textContent='负功：F∥ 与位移反向，力在阻碍物体沿位移方向运动。';
+191: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+192: function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+206: if(state.drag==='F')state.F=clamp((p.x-94)/170*60,0,60);
+207: if(state.drag==='s'||state.drag==='B')state.s=clamp((p.x-g.A.x)/g.scaleS,0,10);
+208: if(state.drag==='alpha')state.alpha=clamp((p.x-604)/220*180,0,180);
+210: const dx=p.x-g.anchor.x,dy=p.y-g.anchor.y,dist=Math.hypot(dx,dy);
+211: state.F=clamp((dist-42)/2.4,0,60);
+212: state.alpha=clamp(Math.atan2(-dy,dx)*180/Math.PI,0,180);
+221: const c=btn.dataset.case;
+228: function tick(){if(state.running)state.t=(state.t+.035)%(Math.PI*2);draw();requestAnimationFrame(tick)}
+232: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au

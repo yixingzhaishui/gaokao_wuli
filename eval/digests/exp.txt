@@ -1,0 +1,1300 @@
+
+===== anim/exp/capacitor-charge-discharge-lab.html (276 lines, kept 53) =====
+38: <canvas id="canvas" width="900" height="620" aria-label="电容器充放电实验台：电路俯视装置、极板侧视、U-t/I-t图像和数据记录"></canvas>
+41: <div class="card task"><b>观察任务：</b>拖动画面内三挡开关到“充电/断开/放电”，看电压表、电流表、灯泡亮度和 U-t/I-t 图像怎样同步变化；记录多组点后判断时间常数 τ=RC。</div>
+43: <div class="title">调仪器</div>
+44: <label class="param"><span>电阻 R <b id="rLabel">20 kΩ</b></span><input id="r" type="range" min="5" max="80" step="1" value="20"></label>
+45: <label class="param"><span>电容 C <b id="cLabel">100 μF</b></span><input id="c" type="range" min="20" max="300" step="5" value="100"></label>
+46: <label class="param"><span>电源电压 E <b id="eLabel">6.0 V</b></span><input id="e" type="range" min="3" max="12" step="0.5" value="6"></label>
+47: <div class="buttons"><button id="play">暂停</button><button id="record">记录点</button><button id="reset">重置</button></div>
+49: <div class="readout" id="readout"></div>
+49D: <div class="readout" id="readout"></div>
+51: <div class="title">数据记录</div>
+54: <tbody id="rows"></tbody>
+58: <div class="title">公式与图像</div>
+59: <div>充电：Uc = E(1-e<sup>-t/RC</sup>)，I = (E/R)e<sup>-t/RC</sup></div>
+60: <div>放电：Uc = U0e<sup>-t/RC</sup>，I = -(U0/R)e<sup>-t/RC</sup></div>
+63: <div class="status" id="status"></div>
+77: const state = { mode: 'charge', running: true, t: 0, Uc: 0, I: 0, drag: null, probe: null, history: [], records: [] };
+87: function fmt(n, d=2) { return Math.abs(n) < 1e-9 ? (0).toFixed(d) : n.toFixed(d); }
+100: const a = Math.atan2(y2-y1,x2-x1);
+103: ctx.lineTo(x2-10*Math.cos(a-.45), y2-10*Math.sin(a-.45));
+104: ctx.lineTo(x2-10*Math.cos(a+.45), y2-10*Math.sin(a+.45));
+125: const qDots = Math.round(Math.max(0, state.Uc / Math.max(0.1, param().E)) * 7);
+131: const x = 150 + i*75;
+136: ctx.fillStyle = colors.purple; ctx.beginPath(); ctx.arc(sw.x, sw.y+48, 11, 0, Math.PI*2); ctx.fill();
+138: const bright = Math.min(1, Math.abs(state.I) / Math.max(0.0001, param().E / (param().Rk*1000)));
+140: ctx.shadowColor = `rgba(240,165,0,${0.25+0.6*bright})`; ctx.shadowBlur = 22*bright;
+141: ctx.fillStyle = `rgba(240,165,0,${0.15+0.75*bright})`; ctx.beginPath(); ctx.arc(405,170,20,0,Math.PI*2); ctx.fill();
+149: const vH = 150 * state.Uc / Math.max(1,p.E);
+152: const iMax = p.E/(p.Rk*1000);
+153: const iRatio = Math.min(1, Math.abs(state.I)/Math.max(0.00001,iMax));
+167: for (let k=1;k<=4;k++) line(gx,gy-gh*k/4,gx+gw,gy-gh*k/4,'#e8eef5',1);
+169: const maxT = Math.max(3*tau(), 1);
+173: const im = p.E/(p.Rk*1000);
+184: const x=px(latest.t), y=pyU(latest.U); ctx.fillStyle=colors.blue; ctx.beginPath(); ctx.arc(x,y,5,0,Math.PI*2); ctx.fill();
+186: const idx = Math.max(0, Math.min(state.history.length-1, Math.round(state.probe * (state.history.length-1))));
+187: const h = state.history[idx]; const qx = px(h.t);
+189: text('探针 t='+fmt(h.t,2)+'s U='+fmt(h.U,2)+'V I='+fmt(h.I*1000,2)+'mA', qx, gy-gh-36, colors.purple, 'center', 12, '900');
+195D: els.rLabel.textContent = p.Rk.toFixed(0)+' kΩ';
+196D: els.cLabel.textContent = p.Cu.toFixed(0)+' μF';
+197D: els.eLabel.textContent = p.E.toFixed(1)+' V';
+203D: els.rows.innerHTML = state.records.slice(-6).map(r =>
+206D: if (state.mode === 'charge') els.status.textContent = '充电：Uc 上升，I 逐渐衰减；约 t=RC 时 Uc≈0.632E。';
+207D: else if (state.mode === 'discharge') els.status.textContent = '放电：Uc 和灯泡亮度都衰减，电流方向与充电相反。';
+208D: else els.status.textContent = '断开：理想电容器电压近似保持，电路电流为 0。';
+214: const du = (p.E - state.Uc) * (1 - Math.exp(-dt/T));
+216: state.I = (p.E - state.Uc) / (p.Rk*1000);
+219: state.Uc *= Math.exp(-dt/T);
+220: state.I = -(old - state.Uc) / (p.Rk*1000*Math.max(dt,0.001));
+236: function pos(ev){ const r=canvas.getBoundingClientRect(); return {x:(ev.clientX-r.left)*canvas.width/r.width, y:(ev.clientY-r.top)*canvas.height/r.height}; }
+240: if (Math.hypot(p.x-sw.x,p.y-(sw.y+48))<32 || (p.y>95&&p.y<165&&p.x>115&&p.x<335)) {
+244: state.drag='probe'; state.probe=(p.x-86)/700; canvas.setPointerCapture(ev.pointerId); draw(); ev.preventDefault();
+251: if (state.drag==='probe') state.probe=Math.max(0,Math.min(1,(p.x-86)/700));
+257D: els.play.addEventListener('click', () => { state.running=!state.running; els.play.textContent=state.running?'暂停':'播放'; });
+266: const dt=Math.min(0.04,(now-last)/1000); last=now;
+
+===== anim/exp/centripetal-force-lab.html (223 lines, kept 49) =====
+29: <canvas id="c" width="700" height="470" aria-label="向心力实验"></canvas>
+31: <div class="row"><button id="playBtn" class="primary" type="button">播放</button><button id="resetBtn" type="button">重置</button><button id="recordBtn" type="butto
+32: <label for="mode">图像横轴：<span id="modeVal"></span></label>
+38: <label for="omega">角速度 ω/(rad/s)：<span id="omegaVal"></span></label>
+42: <div id="readout" class="readout"></div>
+42D: <div id="readout" class="readout"></div>
+43: <table style="width:100%;margin-top:10px;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;border-bottom:1px solid #d9e2ec">记录</th>
+44: <div id="status" class="status"></div>
+45: <div class="hint">观察任务：固定两个量，只改变一个量，看测力计读数和图像斜率怎样支持 F=mω²r。</div>
+50: const c = document.getElementById('c');
+70: const state={running:false,time:0,last:0,drag:null,records:[]};
+95: if (mode === 0) mm = 0.04 + i * 0.035;
+96: if (mode === 1) rr = 0.06 + i * 0.055;
+97: if (mode === 2) ww = 1.5 + i * 1.0;
+98: const F = mm * ww * ww * rr * (1 - err / 100);
+99: const xVal = mode === 0 ? mm / 0.32 : mode === 1 ? rr / 0.55 : (ww * ww) / 100;
+100: const px = x0 + Math.min(1, xVal) * w;
+101: const py = y0 - Math.min(1, F / 8) * h;
+113: const F = m * omega * omega * r;
+114: const Fread = F * (1 - err / 100);
+115: const v = omega * r;
+116: const a = omega * omega * r;
+118D: els.modeVal.textContent = modes[mode];
+119D: els.massVal.textContent = m.toFixed(2);
+120D: els.radiusVal.textContent = r.toFixed(2);
+121D: els.omegaVal.textContent = omega.toFixed(1);
+122D: els.errorVal.textContent = err + '%';
+132: const R = r * 360;
+133: const angle = state.running ? state.time * omega : -0.75;
+134: const bx = cx + R * Math.cos(angle);
+135: const by = cy + R * Math.sin(angle);
+171: ctx.lineTo(bx - Math.sin(angle) * 70, by + Math.cos(angle) * 70);
+174: ctx.fillText('v 切线', bx - Math.sin(angle) * 76, by + Math.cos(angle) * 76);
+187: ctx.fillStyle = '#0f9f6e'; ctx.beginPath(); ctx.arc(bx, by, 12, 0, Math.PI*2); ctx.fill(); ctx.fillStyle='#fff'; ctx.font='700 10px system-ui'; ctx.fillText('r'
+188: ctx.fillStyle = '#e03131'; ctx.beginPath(); ctx.arc(96 + omega*20, 350, 11, 0, Math.PI*2); ctx.fill(); ctx.fillStyle='#fff'; ctx.fillText('ω', 96+omega*20, 353)
+189: ctx.fillStyle = '#7b2cbf'; ctx.beginPath(); ctx.arc(96 + m*700, 322, 11, 0, Math.PI*2); ctx.fill(); ctx.fillStyle='#fff'; ctx.fillText('m', 96+m*700, 325);
+196: `<div id="r1">F理论=mω²r=${F.toFixed(2)}N</div>`,
+197: `<div id="r2">测力计 F读≈${Fread.toFixed(2)}N</div>`,
+198: `<div id="r3">v=ωr=${v.toFixed(2)}m/s，a=ω²r=${a.toFixed(2)}m/s²</div>`,
+199: `<div id="r4">${mode === 0 ? `F/m≈${(Fread/m).toFixed(2)}N/kg` : mode === 1 ? `F/r≈${(Fread/r).toFixed(2)}N/m` : `F/ω²≈${(Fread/(omega*omega)).toFixed(3)}N·s²`}
+200: `<div id="r5">控制变量：${modes[mode]}</div>`
+203D: els.status.textContent = Fread <= 8
+206D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+211: function pos(e){const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height};}
+212: c.addEventListener('pointerdown',e=>{const p=pos(e),m=Number(els.mass.value),r=Number(els.radius.value),omega=Number(els.omega.value),cx=230,cy=235,R=r*360,angl
+213: c.addEventListener('pointermove',e=>{const p=pos(e);if(!state.drag){c.style.cursor='grab';return;}if(state.drag==='r'){const d=Math.hypot(p.x-230,p.y-235);els.r
+216D: els.resetBtn.addEventListener('click',()=>{state.running=false;state.time=0;state.records=[];els.mode.value=2;els.mass.value=.1;els.radius.value=.3;els.omega.value=5;els.error.value=2;els.records.inne
+217: els.recordBtn.addEventListener('click',()=>{const m=Number(els.mass.value),r=Number(els.radius.value),omega=Number(els.omega.value),err=Number(els.error.value),
+218: function loop(now){if(!state.last)state.last=now;const dt=Math.min(.04,(now-state.last)/1000);state.last=now;if(state.running)state.time+=dt;draw();requestAnima
+
+===== anim/exp/coulomb-force-lab.html (298 lines, kept 46) =====
+33: <canvas id="c" width="740" height="540" aria-label="库仑扭秤实验台：带电小球俯视、扭秤读数、F-1/r²图像和数据记录"></canvas>
+36: <button id="playBtn" class="primary" type="button">播放</button>
+37: <button id="recordBtn" type="button">记录</button>
+38: <button id="resetBtn" type="button">重置</button>
+44: <label for="dist">球心距离 r/m：<span id="distVal"></span></label>
+46: <label for="mode">图像横轴：<span id="modeVal"></span></label>
+50: <div id="readout" class="readout"></div>
+50D: <div id="readout" class="readout"></div>
+51: <div id="status" class="status"></div>
+52: <div class="hint">观察任务：直接拖动右侧小球改变 r；点“播放”看扭秤读数逐渐偏转，记录多组点后比较 F 与 1/r² 是否成正比。</div>
+55: <tbody id="recordRows"></tbody>
+61: const c = document.getElementById('c');
+82: const state = { running: false, last: 0, time: 0, meter: 0, drag: null, records: [] };
+93: const Fread = F * (1 - leak / 100);
+94: const kMeas = Math.abs(q1 * q2) > 0 ? Fread * r * r / Math.abs(q1 * 1e-9 * q2 * 1e-9) : 0;
+95: const rel = Math.abs(kMeas - k0) / k0 * 100;
+96: const relation = q1 * q2 > 0 ? '同号相斥' : q1 * q2 < 0 ? '异号相吸' : '有一球不带电';
+131: const xVal = v.mode === 0 ? Math.abs(p.q1 * p.q2) / 2500 : (1 / (p.r * p.r) - 15) / 270;
+132: const yVal = p.F / 0.004;
+138: const xVal = v.mode === 0 ? Math.abs(v.q1 * v.q2) / 2500 : (1 / (v.r * v.r) - 15) / 270;
+139: const yVal = v.Fread / 0.004;
+150: const x1 = 160, y = 220, x2 = 160 + v.r * 1250;
+176: ctx.fillText('r=' + v.r.toFixed(2) + 'm', (x1 + x2) / 2, y + 105);
+177: const attract = v.q1 * v.q2 < 0;
+178: const len = clamp(v.Fread / 0.004 * 72, 8, 72) * state.meter;
+204D: els.q1Val.textContent = v.q1;
+205D: els.q2Val.textContent = v.q2;
+206D: els.distVal.textContent = v.r.toFixed(2);
+207: els.modeVal.textContent = v.mode === 0 ? '|q1q2|' : '1/r²';
+207D: els.modeVal.textContent = v.mode === 0 ? '|q1q2|' : '1/r²';
+208D: els.leakVal.textContent = v.leak + '%';
+219: `<div id="r1">方向：${v.relation}</div>`,
+220: `<div id="r2">F理论=k|q1q2|/r²≈${fmtF(v.F)}N</div>`,
+221: `<div id="r3">F读≈${fmtF(v.Fread * state.meter)}N</div>`,
+222: `<div id="r4">F·r²/|q1q2|≈${(v.kMeas / 1e9).toFixed(2)}×10^9</div>`,
+223: `<div id="r5">相对误差≈${v.rel.toFixed(1)}%</div>`
+225: els.status.className = v.rel < 5 && v.q1 * v.q2 !== 0 ? 'status' : 'status bad';
+226: els.status.textContent = v.q1 * v.q2 === 0 ? '不通过：有电荷为 0，无法验证库仑力关系。' : (v.rel < 5 ? '通过：反查的静电力常量接近 9.0×10^9。' : '不通过：漏电或读数误差使实验点明显偏离库仑定律。');
+226D: els.status.textContent = v.q1 * v.q2 === 0 ? '不通过：有电荷为 0，无法验证库仑力关系。' : (v.rel < 5 ? '通过：反查的静电力常量接近 9.0×10^9。' : '不通过：漏电或读数误差使实验点明显偏离库仑定律。');
+229D: els.recordRows.innerHTML = state.records.slice(-5).map((p, i) =>
+235: const x = (ev.clientX - rect.left) * c.width / rect.width;
+236: const r = clamp((x - 160) / 1250, 0.06, 0.24);
+243: const dt = Math.min(0.05, (ts - state.last) / 1000);
+247: state.meter += (1 - state.meter) * dt * 2.8;
+249: state.meter = Math.max(state.meter, 1);
+260D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+
+===== anim/exp/double-slit-wavelength-lab.html (110 lines, kept 44) =====
+29: <canvas id="c" width="700" height="470" aria-label="双缝干涉测波长实验"></canvas>
+31: <div class="row"><button id="playBtn" class="primary" type="button">播放</button><button id="resetBtn" type="button">重置</button><button id="recordBtn" type="butto
+32: <label for="lambda">真实波长 λ/nm：<span id="lambdaVal"></span></label>
+34: <label for="slit">双缝间距 d/mm：<span id="slitVal"></span></label>
+36: <label for="screenDistance">屏距 L/m：<span id="screenVal"></span></label>
+38: <label for="count">测量条纹数 N：<span id="countVal"></span></label>
+42: <div id="readout" class="readout"></div>
+42D: <div id="readout" class="readout"></div>
+43: <table style="width:100%;margin-top:10px;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;border-bottom:1px solid #d9e2ec">记录</th>
+44: <div id="status" class="status"></div>
+45: <div class="hint">观察任务：改变 d 和 L，看条纹间距 Δx 如何变化；测多条条纹再除以 N 可减小误差。</div>
+50: const c=document.getElementById('c'),ctx=c.getContext('2d');
+52: const state={running:false,time:0,last:0,drag:null,records:[]};
+54: const lam=+els.lambda.value,dmm=+els.slit.value,L=+els.screenDistance.value,N=+els.count.value,err=+els.error.value/100;
+55: const dx=L*lam*1e-9/(dmm*1e-3); // m
+56: const width=N*dx*(1+err);
+57: const dxMeasured=width/N;
+58: const lamMeasured=dxMeasured*(dmm*1e-3)/L;
+59: const rel=Math.abs(lamMeasured-lam*1e-9)/(lam*1e-9)*100;
+60: els.lambdaVal.textContent=lam.toFixed(0);els.slitVal.textContent=dmm.toFixed(2);els.screenVal.textContent=L.toFixed(1);els.countVal.textContent=N;els.errorVal.t
+60D: els.lambdaVal.textContent=lam.toFixed(0);els.slitVal.textContent=dmm.toFixed(2);els.screenVal.textContent=L.toFixed(1);els.countVal.textContent=N;els.errorVal.textContent=Math.round(err*100)+'%';
+67: for(let k=-8;k<=8;k++){
+68: const y=cy+k*dx*9000;
+70: const bright=Math.max(0.18,1-Math.abs(k)/10);
+76: if(state.running){ctx.strokeStyle='rgba(44,123,229,.35)';ctx.lineWidth=1.5;for(let k=0;k<7;k++){ctx.beginPath();ctx.arc(slitX,cy,(state.time*80+k*28)%210,-.55,.
+77: const y1=cy, y2=cy+N*dx*9000*(1+err);
+79: ctx.fillStyle='#7b2cbf';ctx.font='700 13px system-ui';ctx.fillText('NΔx='+(width*1000).toFixed(2)+'mm',screenX+80,(y1+y2)/2);
+80: ctx.fillStyle='#0f9f6e';ctx.beginPath();ctx.arc(slitX,235,12,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.font='700 10px system-ui';ctx.fillText('d',slitX,2
+81: ctx.fillStyle='#e03131';ctx.beginPath();ctx.arc(screenX,408,12,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.fillText('L',screenX,412);
+83: ctx.fillStyle='#102a43';ctx.font='700 13px system-ui';ctx.fillText('相邻条纹间距 Δx≈'+(dxMeasured*1000).toFixed(3)+'mm',210,416);
+86: `<div id="r1">理论 Δx=Lλ/d≈${(dx*1000).toFixed(3)}mm</div>`,
+87: `<div id="r2">测得 NΔx≈${(width*1000).toFixed(3)}mm，Δx≈${(dxMeasured*1000).toFixed(3)}mm</div>`,
+88: `<div id="r3">λ测=dΔx/L≈${(lamMeasured*1e9).toFixed(0)}nm</div>`,
+89: `<div id="r4">真实 λ=${lam.toFixed(0)}nm，相对误差≈${rel.toFixed(1)}%</div>`,
+90: `<div id="r5">d 变大条纹变窄；L 变大条纹变宽</div>`
+92: const ok=rel<5 && dx*1000>0.5;
+94: els.status.textContent=dx*1000<=0.5?'不通过：条纹太密，读数困难，应增大 L 或减小 d。':rel<5?'通过：由条纹间距反算的波长在误差范围内合理。':'不通过：读数误差偏大，应测多条条纹并取平均。';
+94D: els.status.textContent=dx*1000<=0.5?'不通过：条纹太密，读数困难，应增大 L 或减小 d。':rel<5?'通过：由条纹间距反算的波长在误差范围内合理。':'不通过：读数误差偏大，应测多条条纹并取平均。';
+95D: els.playBtn.textContent=state.running?'暂停':'播放';
+98: function pos(e){const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height};}
+99: c.addEventListener('pointerdown',e=>{const p=pos(e);if(Math.hypot(p.x-150,p.y-235)<24){state.drag='d';c.setPointerCapture(e.pointerId);}else if(Math.hypot(p.x-5
+100: c.addEventListener('pointermove',e=>{const p=pos(e);if(!state.drag){c.style.cursor='grab';return;}if(state.drag==='d')els.slit.value=Math.max(.1,Math.min(.5,(p.
+104: els.recordBtn.addEventListener('click',()=>{const lam=+els.lambda.value,dmm=+els.slit.value,L=+els.screenDistance.value,N=+els.count.value,err=+els.error.value/
+105: function loop(now){if(!state.last)state.last=now;const dt=Math.min(.04,(now-state.last)/1000);state.last=now;if(state.running)state.time+=dt;draw();requestAnima
+
+===== anim/exp/emf-internal-resistance-lab.html (218 lines, kept 42) =====
+29: <canvas id="c" width="700" height="470" aria-label="测电源电动势和内阻实验"></canvas>
+31: <div class="row"><button id="playBtn" class="primary" type="button">播放</button><button id="resetBtn" type="button">重置</button><button id="recordBtn" type="butto
+32: <label for="emf">电动势 E/V：<span id="emfVal"></span></label>
+42: <div id="readout" class="readout"></div>
+42D: <div id="readout" class="readout"></div>
+43: <table style="width:100%;margin-top:10px;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;border-bottom:1px solid #d9e2ec">记录</th>
+44: <div id="status" class="status"></div>
+45: <div class="hint">观察任务：改变外阻 R，观察 U-I 点沿直线移动；看纵截距和斜率如何读出 E、r。</div>
+50: const c = document.getElementById('c');
+70: const state={running:false,time:0,last:0,drag:null,records:[]};
+72: const I = E / (R + r);
+73: const U = I * R;
+100: const E = Number(els.emf.value);
+102: let R = Number(els.outer.value);
+103: if(state.running){R = 2 + (Math.sin(state.time*1.2)+1)/2*16; els.outer.value=R.toFixed(1);}
+105: const err = Number(els.error.value) / 100;
+106: const q = calc(E, r, R, err);
+107: const Imax = E / r;
+108D: els.emfVal.textContent = E.toFixed(1);
+109D: els.innerVal.textContent = r.toFixed(1);
+110D: els.outerVal.textContent = R.toFixed(1);
+111D: els.spreadVal.textContent = n;
+112: els.errorVal.textContent = Math.round(err*100) + '%';
+112D: els.errorVal.textContent = Math.round(err*100) + '%';
+133: ctx.fillStyle='#e03131';ctx.beginPath();ctx.arc(330+R/20*132,205,11,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.font='700 10px system-ui';ctx.fillText('R',
+165: const Ri = 2 + i * 18 / Math.max(1,n-1);
+167: const px = gx + Math.min(1, qi.I / Imax) * gw;
+168: const py = gy - Math.min(1, qi.Uread / E) * gh;
+188D: ctx.fillText('公式绑定：U=E-Ir。图像向右下倾斜，说明电流越大，内阻压降 Ir 越大。',350,452);
+189D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+192: `<div id="r1">I=E/(R+r)≈${q.I.toFixed(3)}A</div>`,
+193: `<div id="r2">U=E-Ir≈${q.U.toFixed(2)}V，U读≈${q.Uread.toFixed(2)}V</div>`,
+194: `<div id="r3">U-I 图像纵截距≈E=${E.toFixed(2)}V</div>`,
+195: `<div id="r4">斜率≈-r=-${r.toFixed(2)}Ω</div>`,
+196: `<div id="r5">内阻消耗功率 I²r≈${(q.I*q.I*r).toFixed(2)}W</div>`
+199D: els.status.textContent = q.I < 1.2
+206: function pos(e){const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height};}
+207: c.addEventListener('pointerdown',e=>{const p=pos(e),R=Number(els.outer.value);if(Math.hypot(p.x-(330+R/20*132),p.y-205)<22){state.drag='R';c.setPointerCapture(e
+208: c.addEventListener('pointermove',e=>{const p=pos(e);if(!state.drag){c.style.cursor='grab';return;}if(state.drag==='R')els.outer.value=Math.max(1,Math.min(20,(p.
+211D: els.resetBtn.addEventListener('click',()=>{state.running=false;state.time=0;state.records=[];els.emf.value=3;els.inner.value=1;els.outer.value=5;els.spread.value=6;els.error.value=1;els.records.innerH
+212: els.recordBtn.addEventListener('click',()=>{const E=Number(els.emf.value),r=Number(els.inner.value),R=Number(els.outer.value),err=Number(els.error.value)/100,q=
+213: function loop(now){if(!state.last)state.last=now;const dt=Math.min(.04,(now-state.last)/1000);state.last=now;if(state.running)state.time+=dt;draw();requestAnima
+
+===== anim/exp/equipotential-line-lab.html (421 lines, kept 68) =====
+32: <canvas id="c" width="740" height="540" aria-label="导电纸俯视实验台、电压表读数、φ-x图像和等势点数据记录"></canvas>
+35: <button id="playBtn" class="primary" type="button">播放</button>
+36: <button id="markBtn" type="button">描点</button>
+37: <button id="resetBtn" type="button">重置</button>
+39: <label for="voltage">电源电压 U/V：<span id="voltageVal"></span></label>
+43: <label for="target">目标电势 φ/V：<span id="targetVal"></span></label>
+45: <label for="probeX">探针横坐标 x/cm：<span id="probeXVal"></span></label>
+47: <label for="probeY">探针纵坐标 y/cm：<span id="probeYVal"></span></label>
+49: <div id="readout" class="readout"></div>
+49D: <div id="readout" class="readout"></div>
+50: <div id="status" class="status"></div>
+51: <div class="hint">观察任务：直接拖动探针，让电压表读数接近目标 φ；点“描点”留下同电势点，观察这些点连成的等势线如何与电场线垂直。</div>
+54: <tbody id="markRows"></tbody>
+60: const c = document.getElementById('c');
+80: const state = {
+91: const target = Math.min(Number(els.target.value), U - 0.5);
+94: const phi = U * (1 - x / d);
+95: const targetX = d * (1 - target / U);
+96: const diff = Math.abs(phi - target);
+97: const E = U / (d / 100);
+110: const a = Math.atan2(y2 - y1, x2 - x1);
+120: ctx.lineTo(x2 - 10 * Math.cos(a - 0.45), y2 - 10 * Math.sin(a - 0.45));
+121: ctx.lineTo(x2 - 10 * Math.cos(a + 0.45), y2 - 10 * Math.sin(a + 0.45));
+137: const a = Math.PI - i * Math.PI / 10;
+141: ctx.moveTo(cx + r1 * Math.cos(a), cy - r1 * Math.sin(a));
+142: ctx.lineTo(cx + r2 * Math.cos(a), cy - r2 * Math.sin(a));
+146: const a = Math.PI - clamp(val / U, 0, 1) * Math.PI;
+147: ctx.strokeStyle = Math.abs(val - target) <= 0.2 ? '#087f5b' : '#e03131';
+151: ctx.lineTo(cx + 46 * Math.cos(a), cy + 16 - 46 * Math.sin(a));
+173: const px = x0 + clamp(v.x / v.d, 0, 1) * w;
+174: const py = y0 - clamp(v.phi / v.U, 0, 1) * h;
+179: const targetY = y0 - clamp(v.target / v.U, 0, 1) * h;
+195: const grouped = state.marks.filter(p => Math.abs(p.target - v.target) < 0.01 && Math.abs(p.U - v.U) < 0.01);
+198: const x = g.ox + clamp(p.x, 0, v.d) * g.sx;
+199: const y = g.oy + g.h / 2 - p.y * g.sy;
+209: const x = g.ox + clamp(p.x, 0, v.d) * g.sx;
+210: const y = g.oy + g.h / 2 - p.y * g.sy;
+220: els.target.max = String(Math.max(1, v.U - 0.5));
+221D: els.voltageVal.textContent = v.U.toFixed(0);
+222D: els.spacingVal.textContent = v.d.toFixed(0);
+223D: els.targetVal.textContent = v.target.toFixed(1);
+224D: els.probeXVal.textContent = v.x.toFixed(1);
+225D: els.probeYVal.textContent = v.y.toFixed(1);
+227: const g = paperGeom(v);
+247: const x = g.ox + i * g.sx;
+256: const y = g.oy + g.h / 2 - j * g.sy;
+273: const lineX = g.ox + v.d * (1 - p) * g.sx;
+286: const tx = g.ox + v.targetX * g.sx;
+297: const y = g.oy + 44 + j * 48;
+305: const px = g.ox + clamp(v.x, 0, v.d) * g.sx;
+306: const py = g.oy + g.h / 2 - v.y * g.sy;
+337: `<div id="r1">探针电势 φ≈${v.phi.toFixed(2)} V</div>`,
+338: `<div id="r2">目标电势 φ0=${v.target.toFixed(2)} V，差值≈${v.diff.toFixed(2)} V</div>`,
+339: `<div id="r3">等势线位置 x=d(1-φ0/U)≈${v.targetX.toFixed(1)} cm</div>`,
+340: `<div id="r4">场强估计 E≈U/d=${v.E.toFixed(0)} V/m</div>`,
+341: `<div id="r5">沿等势线移动：UAB=0，W=qUAB=0</div>`,
+342: `<div id="r6">演示时间 t=${state.time.toFixed(2)} s</div>`
+345D: els.status.textContent = match
+350D: els.markRows.innerHTML = state.marks.slice(-5).map((p, i) =>
+356: const g = paperGeom(v);
+358: const x = (ev.clientX - rect.left) * c.width / rect.width;
+359: const y = (ev.clientY - rect.top) * c.height / rect.height;
+360: const xCm = (x - g.ox) / g.sx;
+361: const yCm = (g.oy + g.h / 2 - y) / g.sy;
+366: const dt = Math.min(0.05, (ts - state.last) / 1000);
+371: const y = 6.4 * Math.sin(state.time * 1.25);
+372: const nextX = Number(els.probeX.value) + (v.targetX - Number(els.probeX.value)) * Math.min(1, dt * 1.8);
+383D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+
+===== anim/exp/force-parallelogram-lab.html (364 lines, kept 53) =====
+30: <canvas id="c" width="790" height="560" aria-label="验证平行四边形定则实验台：俯视木板、弹簧测力计、作图图像和数据记录"></canvas>
+33: <button id="playBtn" class="primary" type="button">播放</button>
+34: <button id="resetBtn" type="button">重置</button>
+35: <button id="recordBtn" type="button">记录</button>
+41: <label for="theta">夹角 θ/°：<span id="thetaVal"></span></label>
+45: <div id="readout" class="readout"></div>
+45D: <div id="readout" class="readout"></div>
+48: <tbody id="records"></tbody>
+50: <div class="hint">观察任务：拖动画面内两只蓝色测力计端点改变分力，播放看“两力拉到 O”和“单力拉到同一 O”两步是否等效。</div>
+72: const state = { running: false, time: 0, last: 0, drag: null, records: [] };
+81: if (next.theta !== undefined) els.theta.value = Math.round(clamp(next.theta, 15, 165));
+82: if (next.error !== undefined) els.error.value = Math.round(clamp(next.error, 0, 5));
+87: const theta = val('theta') * Math.PI / 180;
+90: const b = { x: F2 * Math.cos(theta), y: -F2 * Math.sin(theta) };
+92: const R = Math.hypot(r.x, r.y);
+93: const dir = Math.atan2(-r.y, r.x);
+94: const expR = R * (1 + error * 0.012);
+95: const expDir = dir + error * Math.PI / 180 * 1.4;
+96: const magErr = Math.abs(expR - R) / R * 100;
+97: const dirErr = Math.abs(expDir - dir) * 180 / Math.PI;
+130: const a = Math.atan2(y2 - y1, x2 - x1);
+140: ctx.lineTo(x2 - 12 * Math.cos(a - 0.45), y2 - 12 * Math.sin(a - 0.45));
+141: ctx.lineTo(x2 - 12 * Math.cos(a + 0.45), y2 - 12 * Math.sin(a + 0.45));
+146: const a = Math.atan2(y2 - y1, x2 - x1);
+147: const len = Math.hypot(x2 - x1, y2 - y1);
+171: const a = Math.PI - d * Math.PI / 180;
+174: ctx.moveTo(cx + Math.cos(a) * r1, cy - Math.sin(a) * r1);
+175: ctx.lineTo(cx + Math.cos(a) * 74, cy - Math.sin(a) * 74);
+182: const B = pt(q.b);
+183: const E = { x: O.x + Math.cos(q.expDir) * q.expR * scale, y: O.y - Math.sin(q.expDir) * q.expR * scale };
+191: const progress = state.running ? (Math.sin(state.time * 2.2) + 1) / 2 : 1;
+193: const expEnd = { x: O.x + Math.cos(q.expDir) * q.expR * scale, y: O.y - Math.sin(q.expDir) * q.expR * scale };
+254: const q = model();
+266D: els.f1Val.textContent = q.F1.toFixed(1);
+267D: els.f2Val.textContent = q.F2.toFixed(1);
+268: els.thetaVal.textContent = (q.theta * 180 / Math.PI).toFixed(0);
+268D: els.thetaVal.textContent = (q.theta * 180 / Math.PI).toFixed(0);
+269D: els.errorVal.textContent = q.error.toFixed(0);
+270D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+271: const process = state.running ? (Math.sin(state.time * 2.2) + 1) / 2 : 0;
+273: `F1=<b>${q.F1.toFixed(1)}N</b>，F2=<b>${q.F2.toFixed(1)}N</b>，θ=<b>${(q.theta * 180 / Math.PI).toFixed(0)}°</b>`,
+283: const dt = Math.min(0.04, (now - state.last) / 1000);
+297: return handles(model()).find(h => Math.hypot(p.x - h.x, p.y - h.y) <= h.r + 8);
+300: const h = hit(pos(evt));
+312: const dx = (p.x - O.x) / scale;
+313: const dy = -(p.y - O.y) / scale;
+315: setValues({ F1: Math.hypot(dx, dy) });
+318: const F2 = Math.hypot(dx, dy);
+319: const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+323: const q = model();
+324: const err = clamp(Math.abs(Math.hypot(dx, dy) - q.R) / q.R / 0.012, 0, 5);
+348: const q = model();
+354D: els.records.innerHTML = state.records.map((r, idx) =>
+
+===== anim/exp/glass-refraction-lab.html (357 lines, kept 46) =====
+30: <canvas id="c" width="790" height="560" aria-label="测玻璃折射率实验台：俯视玻璃砖、插针光路、量角器、sin图像和数据记录"></canvas>
+33: <button id="playBtn" class="primary" type="button">播放</button>
+34: <button id="resetBtn" type="button">重置</button>
+35: <button id="recordBtn" type="button">记录</button>
+37: <label for="incident">入射角 i/°：<span id="incidentVal"></span></label>
+39: <label for="ntrue">玻璃真实 n：<span id="ntrueVal"></span></label>
+45: <div id="readout" class="readout"></div>
+45D: <div id="readout" class="readout"></div>
+48: <tbody id="records"></tbody>
+50: <div class="hint">观察任务：先播放看光线穿过玻璃砖，再拖红色入射针改变 i，拖紫色针距把手看为什么针距太近会让方向读数变差。</div>
+72: const state = { running: false, time: 2.4, last: 0, drag: null, records: [] };
+74: const O = { x: glass.x + glass.w / 2, y: glass.y };
+81: if (next.i !== undefined) els.incident.value = Math.round(clamp(next.i, 10, 70));
+84: if (next.pin !== undefined) els.pin.value = Math.round(clamp(next.pin, 2, 10));
+91: const r = deg(Math.asin(Math.sin(rad(i)) / n));
+93: const rmeas = r - err * 0.6;
+94: const nmeas = Math.sin(rad(imeas)) / Math.sin(rad(rmeas));
+95: const rel = Math.abs(nmeas - n) / n * 100;
+128: const a = Math.atan2(y2 - y1, x2 - x1);
+135: ctx.lineTo(x2 - 11 * Math.cos(a - 0.45), y2 - 11 * Math.sin(a - 0.45));
+136: ctx.lineTo(x2 - 11 * Math.cos(a + 0.45), y2 - 11 * Math.sin(a + 0.45));
+141: const inStart = { x: O.x - len * Math.sin(rad(q.i)), y: O.y - len * Math.cos(rad(q.i)) };
+142: const insideEnd = { x: O.x + len * Math.sin(rad(q.r)), y: O.y + len * Math.cos(rad(q.r)) };
+144: const outEnd = { x: exitPoint.x + 95 * Math.sin(rad(q.i)), y: exitPoint.y + 95 * Math.cos(rad(q.i)) };
+160: const a = -Math.PI / 2 + rad(d);
+163: ctx.moveTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1);
+164: ctx.lineTo(cx + Math.cos(a) * 70, cy + Math.sin(a) * 70);
+170: const progress = state.running ? clamp(state.time / 2.4, 0, 1) : 1;
+192: const gap = q.pin * 7;
+230: const px = x + w * Math.sin(rad(q.imeas));
+231: const py = y + h - h * Math.sin(rad(q.rmeas));
+246: text(`n=sin i/sin r=${q.nmeas.toFixed(3)}，真实 n=${q.n.toFixed(3)}，相对误差=${q.rel.toFixed(1)}%`, 78, 490, '#102a43', 13, '700', 'left');
+251: const q = model();
+258: text('测玻璃折射率：描光路，量 i 和 r，算 n=sin i/sin r', 395, 34, '#102a43', 18, '700');
+263D: els.incidentVal.textContent = q.i.toFixed(0);
+264D: els.ntrueVal.textContent = q.n.toFixed(2);
+265D: els.errorVal.textContent = q.err.toFixed(1);
+266D: els.pinVal.textContent = q.pin.toFixed(0);
+267D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+270: `n=sin i/sin r≈<b>${q.nmeas.toFixed(3)}</b>`,
+277: const dt = Math.min(0.04, (now - state.last) / 1000);
+297: return handles(model()).find(h => Math.hypot(p.x - h.x, p.y - h.y) <= h.r + 8);
+300: const h = hit(pos(evt));
+315: setValues({ i: deg(Math.atan2(dx, dy)) });
+341: const q = model();
+347D: els.records.innerHTML = state.records.map((r, idx) =>
+
+===== anim/exp/gravitational-constant-lab.html (406 lines, kept 72) =====
+33: <canvas id="c" width="740" height="540" aria-label="卡文迪许扭秤俯视实验台、光点尺读数、θ-1/r²图像和数据记录"></canvas>
+36: <button id="playBtn" class="primary" type="button">播放</button>
+37: <button id="recordBtn" type="button">记录</button>
+38: <button id="resetBtn" type="button">重置</button>
+44: <label for="dist">球心距离 r/m：<span id="distVal"></span></label>
+46: <label for="kappa">扭转系数 κ/(10^-7 N·m/rad)：<span id="kappaVal"></span></label>
+50: <div id="readout" class="readout"></div>
+50D: <div id="readout" class="readout"></div>
+51: <div id="status" class="status"></div>
+52: <div class="hint">观察任务：拖动画面里的蓝色大球改变 r，点“播放”看轻杆缓慢偏转、光点尺放大 θ；记录几组点后看 θ-1/r² 图线是否接近直线。</div>
+55: <tbody id="recordRows"></tbody>
+61: const c = document.getElementById('c');
+81: const G0 = 6.67e-11;
+82: const L = 0.10;
+83: const state = {
+99: const kappa = Number(els.kappa.value) * 1e-7;
+100: const err = Number(els.error.value) / 100;
+101: const F = G0 * M * m / (r * r);
+102: const thetaIdeal = 2 * F * L / kappa;
+103: const thetaRead = state.theta * (1 + err);
+104: const thetaEquilRead = thetaIdeal * (1 + err);
+105: const Gmeas = kappa * thetaRead * r * r / (2 * M * m * L);
+106: const rel = Math.abs(Gmeas - G0) / G0 * 100;
+113: const a = Math.atan2(y2 - y1, x2 - x1);
+123: ctx.lineTo(x2 - 10 * Math.cos(a - 0.45), y2 - 10 * Math.sin(a - 0.45));
+124: ctx.lineTo(x2 - 10 * Math.cos(a + 0.45), y2 - 10 * Math.sin(a + 0.45));
+156: const xVal = (1 / (p.r * p.r) - 60) / 570;
+157: const yVal = p.theta / 0.006;
+158: const px = x0 + clamp(xVal, 0, 1) * w;
+159: const py = y0 - clamp(yVal, 0, 1) * h;
+164: const nowX = x0 + clamp((1 / (v.r * v.r) - 60) / 570, 0, 1) * w;
+165: const nowY = y0 - clamp(v.thetaRead / 0.006, 0, 1) * h;
+179: const yy = y + 14 + i * 9;
+187: const spotY = clamp(y + 52 + theta * 18000, y + 12, y + 92);
+197D: els.bigMVal.textContent = v.M.toFixed(1);
+198D: els.smallMVal.textContent = v.m.toFixed(3);
+199D: els.distVal.textContent = v.r.toFixed(3);
+200D: els.kappaVal.textContent = Number(els.kappa.value).toFixed(1);
+201: els.errorVal.textContent = Math.round(v.err * 100) + '%';
+201D: els.errorVal.textContent = Math.round(v.err * 100) + '%';
+212: const scaleTheta = v.thetaRead * 3500;
+215: const x1 = cx + rod * Math.cos(ang);
+216: const y1 = cy + rod * Math.sin(ang);
+217: const x2 = cx - rod * Math.cos(ang);
+218: const y2 = cy - rod * Math.sin(ang);
+219: const gap = 32 + (v.r - 0.04) / 0.08 * 72;
+221: const by1 = y1 - gap * 0.58;
+223: const by2 = y2 + gap * 0.58;
+274: ctx.fillText('F=GMm/r²', x1 + 32, y1 - 40);
+291: const barTheta = clamp(Math.abs(v.thetaRead) / 0.006, 0, 1);
+292: const barForce = clamp(v.F / 1.5e-10, 0, 1);
+306: `<div id="r1">F=GMm/r²≈${sci(v.F)} N</div>`,
+307: `<div id="r2">力矩平衡：κθ=2FL，L=${L.toFixed(2)} m</div>`,
+308: `<div id="r3">θ读≈${(v.thetaRead * 1000).toFixed(2)} mrad，平衡值≈${(v.thetaEquilRead * 1000).toFixed(2)} mrad</div>`,
+309: `<div id="r4">G测≈${(v.Gmeas / 1e-11).toFixed(2)}×10^-11 N·m²/kg²</div>`,
+310: `<div id="r5">相对误差≈${v.rel.toFixed(1)}%</div>`
+312: els.status.className = v.rel < 5 && Math.abs(state.theta - v.thetaIdeal) < v.thetaIdeal * 0.08 ? 'status' : 'status bad';
+313: els.status.textContent = Math.abs(state.theta - v.thetaIdeal) > v.thetaIdeal * 0.08
+313D: els.status.textContent = Math.abs(state.theta - v.thetaIdeal) > v.thetaIdeal * 0.08
+318D: els.recordRows.innerHTML = state.records.slice(-5).map((p, i) =>
+324: const x = (ev.clientX - rect.left) * c.width / rect.width;
+325: const y = (ev.clientY - rect.top) * c.height / rect.height;
+326: const dx = Math.abs(x - 224);
+327: const dy = Math.abs(y - 242);
+328: const d = clamp((dx + dy) * 0.00052, 0.04, 0.12);
+333: const x = (ev.clientX - rect.left) * c.width / rect.width;
+334: const y = (ev.clientY - rect.top) * c.height / rect.height;
+353: const dt = Math.min(0.05, (ts - state.last) / 1000);
+358: const accel = (v.thetaIdeal - state.theta) * 22 - state.omega * 5.6;
+359: state.omega += accel * dt;
+360: state.theta += state.omega * dt;
+375D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+
+===== anim/exp/hooke-law-lab.html (193 lines, kept 46) =====
+27: <canvas id="c" width="700" height="460" aria-label="胡克定律虚拟实验"></canvas>
+29: <div class="row"><button id="playBtn" class="primary" type="button">播放</button><button id="resetBtn" type="button">重置</button><button id="recordBtn" type="butto
+34: <label for="count">钩码个数：<span id="countVal"></span></label>
+36: <label for="limit">弹性限度 x/cm：<span id="limitVal"></span></label>
+38: <div id="readout" class="readout"></div>
+38D: <div id="readout" class="readout"></div>
+39: <table style="width:100%;margin-top:10px;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;border-bottom:1px solid #d9e2ec">记录</th>
+40: <div class="hint">观察任务：只用线性段求斜率；超过弹性限度后，图像会偏离直线。</div>
+45: const c = document.getElementById('c');
+62: const state = { running:false, time:0, last:0, drag:null, records:[] };
+69: for (let i = 1; i <= turns * 2; i++) {
+70: const yy = y1 + (y2 - y1) * i / (turns * 2);
+78: const k = Number(els.k.value);
+79: const m = Number(els.mass.value) / 1000;
+81: const limit = Number(els.limit.value) / 100;
+82: const g = 9.8;
+83: const liveCount = state.running ? Math.max(1, Math.min(count, Math.ceil(state.time * 1.8))) : count;
+84: const F = m * liveCount * g;
+85: let x = F / k;
+87: const shownX = beyond ? limit + (x - limit) * 0.35 : x;
+88D: els.kVal.textContent = k;
+89: els.massVal.textContent = Math.round(m * 1000);
+89D: els.massVal.textContent = Math.round(m * 1000);
+90D: els.countVal.textContent = count;
+91: els.limitVal.textContent = Math.round(limit * 100);
+91D: els.limitVal.textContent = Math.round(limit * 100);
+106: const yEnd = y0 + shownX * 900;
+151: const ff = m * n * g;
+152: const idealX = ff / k;
+153: const actualX = idealX > limit ? limit + (idealX - limit) * 0.35 : idealX;
+154: const px = ox + Math.min(gw, actualX / maxX * gw);
+155: const py = oy - Math.min(gh, ff / maxF * gh);
+166: ctx.strokeStyle='#829ab1';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(246,y0);ctx.lineTo(246,y0+limit*900);ctx.stroke();
+167: ctx.fillStyle='#0f9f6e';ctx.beginPath();ctx.arc(170,yEnd+liveCount*16+10,12,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.font='700 10px system-ui';ctx.fillT
+168: ctx.fillStyle='#e03131';ctx.beginPath();ctx.arc(300+k*2,78,11,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.fillText('k',300+k*2,82);
+169D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+172: `F=mg=${(m*1000).toFixed(0)}g×${liveCount}×9.8≈${F.toFixed(2)}N`,
+173: `弹性限度内 x=F/k≈${x.toFixed(3)}m`,
+175: beyond ? '状态：超过弹性限度，不能用该点求 k' : `状态：线性段，k=F/x≈${(F/shownX).toFixed(1)}N/m`
+181: function pos(e){const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height};}
+182: c.addEventListener('pointerdown',e=>{const p=pos(e),k=Number(els.k.value),count=Number(els.count.value),m=Number(els.mass.value)/1000,F=m*count*9.8,x=F/k,limit=
+183: c.addEventListener('pointermove',e=>{const p=pos(e);if(!state.drag){c.style.cursor='grab';return;}if(state.drag==='count')els.count.value=Math.round(Math.max(1,
+185: els.playBtn.addEventListener('click',()=>{state.running=!state.running;state.last=0;if(state.time>Number(els.count.value)/1.8)state.time=0;draw();});
+186D: els.resetBtn.addEventListener('click',()=>{state.running=false;state.time=0;state.records=[];els.k.value=30;els.mass.value=50;els.count.value=4;els.limit.value=14;els.records.innerHTML='';draw();});
+187: els.recordBtn.addEventListener('click',()=>{const k=Number(els.k.value),m=Number(els.mass.value)/1000,count=Number(els.count.value),F=m*count*9.8,x=F/k;state.re
+188: function loop(now){if(!state.last)state.last=now;const dt=Math.min(.04,(now-state.last)/1000);state.last=now;if(state.running){state.time+=dt;if(state.time>Numb
+
+===== anim/exp/induced-current-direction-lab.html (80 lines, kept 33) =====
+27: <div class="stage"><canvas id="canvas" width="900" height="620" aria-label="感应电流方向实验台：磁铁线圈侧视装置、Φ-t/e-t图像、电流计和数据记录"></canvas></div>
+29: <div class="card task"><b>观察任务：</b>先点“预测左偏/右偏”，再拖动磁铁进出线圈；看磁通量变化、感应电动势、电流计偏转和线圈电流方向是否符合楞次定律。</div>
+31: <div class="title">实验条件</div>
+32: <div class="buttons"><button data-pole="N" class="active">N 极朝线圈</button><button data-pole="S">S 极朝线圈</button><button id="flip">反向运动</button></div>
+33: <label class="param"><span>线圈匝数 N <b id="turnLabel">60</b></span><input id="turns" type="range" min="20" max="120" step="10" value="60"></label>
+34: <label class="param"><span>拖动速度 <b id="speedLabel">1.0</b></span><input id="speed" type="range" min="0.3" max="2.5" step="0.1" value="1"></label>
+35: <div class="buttons"><button id="play">暂停演示</button><button id="left">预测左偏</button><button id="right">预测右偏</button></div>
+36: <div class="buttons"><button id="record">记录</button><button id="flip2">反向验证</button><button id="zero">回到零位</button></div>
+38: <div class="readout" id="readout"></div>
+38D: <div class="readout" id="readout"></div>
+39: <div class="card"><div class="title">数据记录</div><table><thead><tr><th>动作</th><th>ΔΦ</th><th>e</th><th>偏转</th></tr></thead><tbody id="rows"></tbody></table></div>
+40: <div class="card formula"><div class="title">规律</div><div>e = -N ΔΦ/Δt，负号表示“阻碍磁通量变化”。</div><div>判断方向：先看 Φ 增/减，再让感应电流的磁场去阻碍这种变化。</div></div>
+41: <div class="status" id="status"></div>
+49: const state={pole:'N',x:205,v:1,dir:1,drag:null,pred:null,history:[],records:[],t:0,playing:true};
+51: function id(s){return document.getElementById(s)} function fmt(n,d=2){return(Math.abs(n)<1e-9?0:n).toFixed(d)}
+55: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(
+56: function fluxAt(x){const d=(455-x)/115;const sign=state.pole==='N'?1:-1;return sign*Math.exp(-d*d)}
+57: function calc(){const N=+els.turns.value, speed=+els.speed.value, phi=fluxAt(state.x), prev=state.history[state.history.length-1];const oldPhi=prev?prev.phi:phi
+58: function drawCoil(){box(365,105,230,220,'#fbfdff');text('线圈侧视装置',480,132,colors.ink,'center',15,'900');for(let i=0;i<9;i++){ctx.strokeStyle=colors.blue;ctx.line
+59: function drawMagnet(){const x=state.x,y=225;const grad=ctx.createLinearGradient(x-70,y,x+70,y);if(state.pole==='N'){grad.addColorStop(0,'#e03131');grad.addColor
+60: function drawField(c){for(let i=0;i<7;i++){const y=155+i*23;arrow(state.x+65,y,405,y,state.pole==='N'?colors.red:colors.blue,1.5)}const induced=c.e>0?'逆时针':'顺时针
+61: function drawGraphs(){box(42,360,810,210,'#fff');text('Φ-t / e-t 图像 + 数据记录',447,386,colors.ink,'center',15,'900');const gx=86,gy=535,gw=700,gh=120;line(gx,gy,gx
+62: function updatePanel(c){els.turnLabel.textContent=c.N;els.speedLabel.textContent=fmt(c.speed,1);els.readout.innerHTML='动作：<b>'+c.motion+'</b><br>磁极：<b>'+state.p
+63: function draw(){const c=calc();ctx.clearRect(0,0,900,620);const bg=ctx.createLinearGradient(0,0,0,620);bg.addColorStop(0,'#fbfdff');bg.addColorStop(1,'#edf3f8')
+64: function push(){const c=calc();state.t+=0.04;state.history.push({phi:c.phi,e:c.e});if(state.history.length>220)state.history.shift()}
+65: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+66: canvas.addEventListener('pointerdown',e=>{const p=pos(e);if(Math.hypot(p.x-state.x,p.y-283)<42||Math.abs(p.x-state.x)<90&&p.y>170&&p.y<280){state.drag='magnet';
+67: canvas.addEventListener('pointermove',move);function move(e){if(!state.drag)return;const p=pos(e);const old=state.x;state.x=Math.max(120,Math.min(575,p.x));stat
+70D: id('play').onclick=()=>{state.playing=!state.playing;id('play').textContent=state.playing?'暂停演示':'播放演示';draw()};
+71: id('flip').onclick=()=>{state.dir*=-1};id('flip2').onclick=()=>{state.dir*=-1;draw()};id('zero').onclick=()=>{state.x=250;state.history=[];push();draw()};
+73: id('record').onclick=()=>{const c=calc();state.records.push(c);draw()};[els.turns,els.speed].forEach(e=>e.addEventListener('input',draw));
+74: function loop(){if(state.playing&&!state.drag){state.x+=state.dir*(0.8+ +els.speed.value);if(state.x>575){state.x=575;state.dir=-1}if(state.x<120){state.x=120;s
+78: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/exp/isothermal-gas-law-lab.html (76 lines, kept 27) =====
+26: <div class="stage"><canvas id="canvas" width="900" height="620" aria-label="等温气体实验台：注射器侧视装置、压力表、P-V图像、P-1/V图线和数据记录"></canvas></div>
+28: <div class="card task"><b>观察任务：</b>拖动活塞改变气体体积；保持恒温后读压强表，记录多组 P、V，再比较 P-V 曲线和 P-1/V 直线。</div>
+30: <div class="title">实验条件</div>
+31: <label class="param"><span>体积 V <b id="vLabel">40.0 mL</b></span><input id="vol" type="range" min="20" max="80" step="1" value="40"></label>
+32: <label class="param"><span>温度 T <b id="tLabel">300 K</b></span><input id="temp" type="range" min="290" max="320" step="1" value="300"></label>
+33: <label class="param"><span>摩擦/漏气误差 <b id="errLabel">0%</b></span><input id="err" type="range" min="0" max="8" step="1" value="0"></label>
+34: <div class="buttons"><button id="play">播放</button><button id="record">记录</button><button id="reset">重置</button></div>
+36: <div class="readout" id="readout"></div>
+36D: <div class="readout" id="readout"></div>
+37: <div class="card"><div class="title">数据记录</div><table><thead><tr><th>V/mL</th><th>1/V</th><th>P/kPa</th><th>PV</th></tr></thead><tbody id="rows"></tbody></table
+38: <div class="card formula"><div class="title">公式绑定</div><div>等温：PV = C，P = C · 1/V。</div><div>P-1/V 图像斜率 C 约等于 PV 的平均值。</div></div>
+38D: <div class="card formula"><div class="title">公式绑定</div><div>等温：PV = C，P = C · 1/V。</div><div>P-1/V 图像斜率 C 约等于 PV 的平均值。</div></div>
+39: <div class="status" id="status"></div>
+48: const state={playing:false,t:0,drag:null,records:[]};
+51: function val(){const V=+el.vol.value,T=+el.temp.value,E=+el.err.value;const ideal=C0*T/300/V;const drift=1+E/100*Math.sin(V/7+state.t);const P=ideal*drift;retur
+52: function fmt(n,d=2){return(Math.abs(n)<1e-9?0:n).toFixed(d)}
+56: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(
+57: function gauge(x,y,P){box(x-58,y-48,116,96,'#fbfdff');text('压强表',x,y-28,colors.muted,'center',12,'900');ctx.save();ctx.translate(x,y+12);ctx.strokeStyle='#334e6
+58: function drawApparatus(v){box(42,72,810,260,'#fff');text('注射器侧视装置：恒温水浴 + 活塞 + 压强表',447,100,colors.ink,'center',16,'900');box(120,150,500,96,'#e6fffa','#38b2ac')
+59: function drawGraphs(v){box(42,356,810,210,'#fff');text('P-V 曲线与 P-1/V 直线作图',447,382,colors.ink,'center',15,'900');const g1={x:82,y:526,w:320,h:112},g2={x:506,y:
+60: function update(v){el.vLabel.textContent=fmt(v.V,1)+' mL';el.tLabel.textContent=fmt(v.T,0)+' K';el.errLabel.textContent=fmt(v.E,0)+'%';el.readout.innerHTML='体积 
+61: function draw(){const x=val();ctx.clearRect(0,0,900,620);const bg=ctx.createLinearGradient(0,0,0,620);bg.addColorStop(0,'#fbfdff');bg.addColorStop(1,'#edf3f8');
+62: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+64: canvas.addEventListener('pointermove',move);function move(e){if(state.drag!=='piston')return;const p=pos(e);let V=20+(550-p.x)/300*60;el.vol.value=Math.max(20,M
+67D: el.play.onclick=()=>{state.playing=!state.playing;el.play.textContent=state.playing?'暂停':'播放'};
+69D: document.getElementById('reset').onclick=()=>{el.vol.value=40;el.temp.value=300;el.err.value=0;state.playing=false;state.t=0;state.records=[];el.play.textContent='播放';draw()};
+70: function loop(){if(state.playing){state.t+=0.04;el.vol.value=Math.round(50+25*Math.sin(state.t));}draw();requestAnimationFrame(loop)}
+
+===== anim/exp/lamp-iv-lab.html (231 lines, kept 46) =====
+29: <canvas id="c" width="700" height="470" aria-label="小灯泡伏安特性实验"></canvas>
+31: <div class="row"><button id="playBtn" class="primary" type="button">播放</button><button id="resetBtn" type="button">重置</button><button id="recordBtn" type="butto
+32: <label for="voltage">灯泡两端电压 U/V：<span id="voltageVal"></span></label>
+34: <label for="rated">额定电压/V：<span id="ratedVal"></span></label>
+38: <label for="heat">温度效应：<span id="heatVal"></span></label>
+42: <div id="readout" class="readout"></div>
+42D: <div id="readout" class="readout"></div>
+43: <table style="width:100%;margin-top:10px;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;border-bottom:1px solid #d9e2ec">记录</th>
+44: <div id="status" class="status"></div>
+45: <div class="hint">观察任务：逐步升高 U，看灯泡变亮时电阻 R=U/I 如何变大，I-U 曲线为何向下弯。</div>
+50: const c = document.getElementById('c');
+70: const state={running:false,time:0,last:0,drag:null,records:[]};
+72: const ratio = rated > 0 ? U / rated : 0;
+73: const R = R0 * (1 + heat * ratio * ratio);
+101: if(state.running){U=Math.min(Number(els.rated.value),state.time*0.7);els.voltage.value=U.toFixed(1);}
+104: const heat = Number(els.heat.value) / 100;
+105: const err = Number(els.error.value) / 100;
+106: const q = lamp(U, rated, R0, heat);
+107: const Iread = q.I * (1 - err);
+108: const Rmeas = Iread > 0 ? U / Iread : 0;
+109: const bright = Math.min(1, q.P / (rated*rated/(R0*(1+heat))));
+110D: els.voltageVal.textContent = U.toFixed(1);
+111D: els.ratedVal.textContent = rated.toFixed(1);
+112D: els.coldRVal.textContent = R0.toFixed(1);
+113: els.heatVal.textContent = Math.round(heat*100) + '%';
+113D: els.heatVal.textContent = Math.round(heat*100) + '%';
+114: els.errorVal.textContent = Math.round(err*100) + '%';
+114D: els.errorVal.textContent = Math.round(err*100) + '%';
+127: ctx.fillStyle = `rgba(240,165,0,${0.12 + bright*0.68})`;
+155: ctx.fillStyle='#e03131';ctx.beginPath();ctx.arc(410+U/rated*40,100,11,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.font='700 10px system-ui';ctx.fillText('U
+172: const u = rated * i / 30;
+174: const px = gx + u / rated * gw;
+175: const py = gy - Math.min(1, qi.I / (rated/R0)) * gh;
+202D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+205: `<div id="r1">U=${U.toFixed(2)}V，I读≈${Iread.toFixed(3)}A</div>`,
+206: `<div id="r2">R=U/I≈${Rmeas.toFixed(2)}Ω</div>`,
+207: `<div id="r3">P=UI≈${(U*Iread).toFixed(2)}W，亮度≈${Math.round(bright*100)}%</div>`,
+208: `<div id="r4">曲线斜率 ΔI/ΔU 逐渐减小，说明 R 逐渐增大</div>`,
+209: `<div id="r5">额定电压 ${rated.toFixed(1)}V，超过后不能继续加压</div>`
+212D: els.status.textContent = U <= rated
+219: function pos(e){const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height};}
+220: c.addEventListener('pointerdown',e=>{const p=pos(e),U=Number(els.voltage.value),rated=Number(els.rated.value);if(Math.hypot(p.x-(410+U/rated*40),p.y-100)<22){st
+221: c.addEventListener('pointermove',e=>{const p=pos(e);if(!state.drag){c.style.cursor='grab';return;}if(state.drag==='U'){const rated=Number(els.rated.value);els.v
+223: els.playBtn.addEventListener('click',()=>{state.running=!state.running;state.last=0;if(state.time>Number(els.rated.value)/.7)state.time=0;draw();});
+225: els.recordBtn.addEventListener('click',()=>{const U=Number(els.voltage.value),rated=Number(els.rated.value),R0=Number(els.coldR.value),heat=Number(els.heat.valu
+226: function loop(now){if(!state.last)state.last=now;const dt=Math.min(.04,(now-state.last)/1000);state.last=now;if(state.running){state.time+=dt;if(state.time>Numb
+
+===== anim/exp/length-measurement-lab.html (207 lines, kept 55) =====
+37: <div class="stage"><canvas id="canvas" width="900" height="620" aria-label="长度测量实验台：测量工具侧视装置、刻度读数图像和数据记录"></canvas></div>
+39: <div class="card task"><b>观察任务：</b>切换刻度尺、游标卡尺、螺旋测微器，拖动量爪或旋钮夹住物体；看主尺、游标、旋钮刻度、零误差修正和有效数字怎样进入最终读数。</div>
+41: <div class="title">工具选择</div>
+43: <button data-tool="ruler" class="active">刻度尺</button>
+44: <button data-tool="vernier">游标卡尺</button>
+45: <button data-tool="micrometer">螺旋测微器</button>
+47: <label class="param"><span>被测长度/直径 <b id="lenLabel">32.4 mm</b></span><input id="length" type="range" min="8" max="86" step="0.1" value="32.4"></label>
+48: <label class="param"><span>零误差 <b id="zeroLabel">+0.00 mm</b></span><input id="zero" type="range" min="-0.20" max="0.20" step="0.01" value="0"></label>
+49: <div class="buttons"><button id="play">播放</button><button id="record">记录</button><button id="reset">重置</button></div>
+51: <div class="readout" id="readout"></div>
+51D: <div class="readout" id="readout"></div>
+53: <div class="title">数据记录</div>
+54: <table><thead><tr><th>工具</th><th>原读数/mm</th><th>零误差/mm</th><th>修正/mm</th></tr></thead><tbody id="rows"></tbody></table>
+57: <div class="title">读数公式</div>
+58: <div>游标卡尺：L = 主尺读数 + 对齐格数 × 精度 - 零误差</div>
+59: <div>螺旋测微器：d = 固定刻度 + 可动刻度 × 0.01 mm - 零误差</div>
+62: <div class="status" id="status"></div>
+76: const state={tool:'ruler',drag:null,running:false,phase:0,records:[]};
+79: function fmt(n,d=2){return (Math.abs(n)<1e-9?0:n).toFixed(d);}
+83: function handle(x,y,label){ctx.save();ctx.fillStyle='#fff';ctx.strokeStyle=colors.purple;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,11,0,Math.PI*2);ctx.fill();
+87: const px=x+mm*scale;
+88: const h=mm%major===0?22:(mm%5===0?15:9);
+94: const q=v();
+96: const raw=Math.round(q.L*10)/10;
+100: const raw=Math.round(q.L*20)/20;
+102: const sub=Math.round((raw-main)/0.05);
+105: const raw=Math.round(q.L*100)/100;
+106: const main=Math.floor(raw/0.5)*0.5;
+107: const sub=Math.round((raw-main)/0.01);
+115: const objX=x+40, objW=q.L*scale;
+127: const jawX=x+q.L*scale;
+132: for(let i=0;i<=10;i++){const px=jawX+i*24;line(px,y+42,px,y+20,'#fff',1.5);if(i%5===0)text(String(i),px,y+58,colors.blue,'center',11,'900');}
+143: const gap=Math.min(220,q.L*4.2);
+146: for(let i=0;i<=50;i+=5){const yy=y-84+i*2.2;line(x+360,yy,x+392,yy,colors.ink,1);if(i%10===0)text(String(i),x+404,yy,colors.muted,'left',11,'700');}
+147: const subLine=y-84+(r.sub%50)*2.2;line(x+344,subLine,x+418,subLine,colors.red,2);
+159: tools.forEach((it,i)=>{const x=80+i*260;box(x,410,230,68,it[2]?'#e0f2fe':'#f8fafc',it[2]?'#2c7be5':'#d9e2ec');text(it[0],x+115,432,it[2]?colors.blue:colors.ink,
+161D: text('修正公式：修正读数 = 原读数 - 零误差 = '+fmt(raw,2)+' - ('+fmt(q.z,2)+') = '+fmt(corrected,2)+' mm',447,516,colors.purple,'center',15,'900');
+164: const q=v(), r=reading();
+165D: els.lenLabel.textContent=fmt(q.L,1)+' mm';
+166D: els.zeroLabel.textContent=(q.z>=0?'+':'')+fmt(q.z,2)+' mm';
+167: els.readout.innerHTML='工具：<b>'+({ruler:'刻度尺',vernier:'游标卡尺',micrometer:'螺旋测微器'}[state.tool])+'</b><br>'+
+167D: els.readout.innerHTML='工具：<b>'+({ruler:'刻度尺',vernier:'游标卡尺',micrometer:'螺旋测微器'}[state.tool])+'</b><br>'+
+171: els.rows.innerHTML=state.records.slice(-6).map(x=>'<tr><td>'+x.tool+'</td><td>'+fmt(x.raw,2)+'</td><td>'+fmt(x.zero,2)+'</td><td>'+fmt(x.corrected,2)+'</td></tr
+171D: els.rows.innerHTML=state.records.slice(-6).map(x=>'<tr><td>'+x.tool+'</td><td>'+fmt(x.raw,2)+'</td><td>'+fmt(x.zero,2)+'</td><td>'+fmt(x.corrected,2)+'</td></tr>').join('')||'<tr><td colspan="4">暂无记录<
+172D: els.status.textContent = r.precision + '；读数时先读主尺或固定刻度，再读副尺，最后做零误差修正。';
+175: const q=v(), r=reading();
+182: function pos(e){const rc=canvas.getBoundingClientRect();return{x:(e.clientX-rc.left)*canvas.width/rc.width,y:(e.clientY-rc.top)*canvas.height/rc.height};}
+188: let L=+els.length.value;
+189: if(state.tool==='ruler')L=Math.max(8,Math.min(86,(p.x-96-40)/7.8));
+190: else if(state.tool==='vernier')L=Math.max(8,Math.min(86,(p.x-110)/6.6));
+191: else L=Math.max(8,Math.min(86,(p.x-280)/4.2));
+192: els.length.value=String(Math.round(L*10)/10); draw(); e.preventDefault();
+198: document.getElementById('record').addEventListener('click',()=>{const q=v(),r=reading();state.records.push({tool:{ruler:'刻度尺',vernier:'游标卡尺',micrometer:'螺旋测微器'}
+200D: els.play.addEventListener('click',()=>{state.running=!state.running;els.play.textContent=state.running?'暂停':'播放';});
+201: function loop(){if(state.running){state.phase+=0.03;els.length.value=String((32+18*Math.sin(state.phase)).toFixed(1));}draw();requestAnimationFrame(loop);}
+
+===== anim/exp/mechanical-energy-lab.html (291 lines, kept 49) =====
+28: <canvas id="c" width="700" height="470" aria-label="验证机械能守恒实验台：侧视纸带、能量柱、ΔEk-ΔEp图像和数据记录"></canvas>
+31: <label for="height">释放高度 h/m：<span id="heightVal"></span></label>
+35: <label for="point">测量点 n：<span id="pointVal"></span></label>
+39: <div id="readout" class="readout"></div>
+39D: <div id="readout" class="readout"></div>
+40: <div id="status" class="status"></div>
+41: <div class="hint">观察任务：调大阻力损失，看 ΔEk 是否小于 ΔEp；移动测量点，看速度是由前后两点间距算出的。</div>
+46: const c = document.getElementById('c');
+61: const g = 9.8;
+62: const T = 0.04;
+68: return 0.5 * g * Math.pow(n * T, 2) * (1 - loss);
+75: const bh = Math.max(0, Math.min(h, value / max * h));
+108: const v = (yAt(n + 1, loss) - yAt(n - 1, loss)) / (2 * T);
+109: const dep = m * g * y;
+110: const dek = 0.5 * m * v * v;
+112: const px = x0 + Math.min(1, dep / max) * w;
+113: const py = y0 - Math.min(1, dek / max) * h;
+120: const h = Number(els.height.value);
+123: const loss = Number(els.loss.value) / 100;
+127: const v = (yNext - yPrev) / (2 * T);
+128: const dep = m * g * y;
+129: const dek = 0.5 * m * v * v;
+130: const rel = dep > 0 ? Math.abs(dep - dek) / dep * 100 : 0;
+132D: els.heightVal.textContent = h.toFixed(1);
+133D: els.massVal.textContent = m.toFixed(2);
+134D: els.pointVal.textContent = n;
+135: els.lossVal.textContent = Math.round(loss * 100) + '%';
+135D: els.lossVal.textContent = Math.round(loss * 100) + '%';
+166: const scale = 250 / h;
+168: const yy = 118 + yAt(i, loss) * scale;
+181: const massY = Math.min(388, 118 + y * scale);
+198: ctx.fillText('下落高度 y=' + y.toFixed(3) + 'm', 332, 130 + y * scale / 2);
+200: const maxE = Math.max(dep, dek, 0.2);
+202: drawBar(500, 105, 78, 190, dek, maxE, '#2c7be5', 'ΔEk=1/2mv²');
+213: `<div id="r1">纸带周期 T=${T.toFixed(2)}s，测点 n=${n}</div>`,
+214: `<div id="r2">v_n≈(y_{n+1}-y_{n-1})/(2T)=${v.toFixed(2)}m/s</div>`,
+215: `<div id="r3">ΔEp=mgy=${dep.toFixed(3)}J</div>`,
+216: `<div id="r4">ΔEk=1/2mv²=${dek.toFixed(3)}J</div>`,
+217: `<div id="r5">相对误差≈${rel.toFixed(1)}%</div>`
+220D: els.status.textContent = !valid
+232: const y = (ev.clientY - rect.top) * c.height / rect.height;
+233: const h = Number(els.height.value);
+234: const loss = Number(els.loss.value) / 100;
+235: const scale = 250 / h;
+239: const yy = 118 + yAt(i, loss) * scale;
+240: const d = Math.abs(y - yy);
+254: els.point.value = Math.max(5, Math.min(13, next));
+268D: els.play.textContent = autoScan ? '⏸ 暂停扫描测量点' : '▶ 自动扫描测量点';
+289: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/exp/momentum-conservation-lab.html (288 lines, kept 43) =====
+30: <canvas id="c" width="790" height="560" aria-label="验证动量守恒实验台：侧视气垫导轨、光电门、速度箭头、动量图像和数据记录"></canvas>
+33: <button id="playBtn" class="primary" type="button">播放</button>
+34: <button id="resetBtn" type="button">重置</button>
+35: <button id="recordBtn" type="button">记录</button>
+37: <label for="mode">碰撞类型：<span id="modeVal"></span></label>
+49: <div id="readout" class="readout"></div>
+49D: <div id="readout" class="readout"></div>
+52: <tbody id="records"></tbody>
+54: <div class="hint">观察任务：先播放看碰撞前后两次光电门测速；再拖小车速度箭头和质量把手，比较 p前 与 p后 是否接近。</div>
+80: const state = { running: false, time: 0, last: 0, drag: null, records: [] };
+85: if (next.mode !== undefined) els.mode.value = Math.round(clamp(next.mode, 0, 1));
+90: if (next.loss !== undefined) els.loss.value = Math.round(clamp(next.loss, 0, 10));
+96: const v = (m1 * v1 + m2 * v2) / (m1 + m2);
+102: const factor = 1 - loss / 100;
+104: const p0 = m1 * v1 + m2 * v2;
+105: const p1 = m1 * u1 + m2 * u2;
+106: const k0 = 0.5 * m1 * v1 * v1 + 0.5 * m2 * v2 * v2;
+107: const k1 = 0.5 * m1 * u1 * u1 + 0.5 * m2 * u2 * u2;
+108: const rel = Math.abs(p1 - p0) / Math.max(0.05, Math.abs(p0)) * 100;
+122: const a = Math.atan2(y2 - y1, x2 - x1);
+125: ctx.beginPath(); ctx.moveTo(x2, y2); ctx.lineTo(x2 - 11 * Math.cos(a - 0.45), y2 - 11 * Math.sin(a - 0.45)); ctx.lineTo(x2 - 11 * Math.cos(a + 0.45), y2 - 11 * 
+128: const w = 58 + m * 34;
+140: const s = before ? t / 2 : Math.min(1, (t - 2) / 1.8);
+141: const x1pre = 180 + q.v1 * 35 * s;
+142: const x2pre = 450 + q.v2 * 35 * s;
+143: let x1post = 300 + q.u1 * 42 * s;
+144: let x2post = q.mode === 0 ? x1post + 72 : 390 + q.u2 * 42 * s;
+178: const max = Math.max(1, Math.abs(q.p0), Math.abs(q.p1));
+182: const len = val / max * 70;
+194: text(`p前=m1v1+m2v2=${q.p0.toFixed(3)} kg·m/s`, 78, 442, '#486581', 13, '700', 'left');
+200: const q = calc();
+210D: els.modeVal.textContent = q.mode === 0 ? '完全非弹性' : '弹性';
+211D: els.m1Val.textContent = q.m1.toFixed(1);
+212D: els.m2Val.textContent = q.m2.toFixed(1);
+213D: els.v1Val.textContent = q.v1.toFixed(1);
+214D: els.v2Val.textContent = q.v2.toFixed(1);
+215D: els.lossVal.textContent = q.loss.toFixed(0);
+216D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+227: const dt = Math.min(0.04, (now - state.last) / 1000);
+241: return handles(calc()).find(h => Math.hypot(p.x - h.x, p.y - h.y) <= h.r + 8);
+244: const h = hit(pos(evt));
+272: const q = calc();
+278D: els.records.innerHTML = state.records.map((r, idx) =>
+
+===== anim/exp/multimeter-practice-lab.html (264 lines, kept 56) =====
+29: <canvas id="c" width="700" height="470" aria-label="多用电表练习"></canvas>
+31: <div class="row"><button id="playBtn" class="primary" type="button">播放</button><button id="resetBtn" type="button">重置</button><button id="recordBtn" type="butto
+32: <label for="mode">测量模式：<span id="modeVal"></span></label>
+34: <label for="range">量程/倍率：<span id="rangeVal"></span></label>
+36: <label for="value">被测量旋钮：<span id="valueVal"></span></label>
+42: <div id="readout" class="readout"></div>
+42D: <div id="readout" class="readout"></div>
+43: <table style="width:100%;margin-top:10px;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;border-bottom:1px solid #d9e2ec">记录</th>
+44: <div id="status" class="status"></div>
+45: <div class="hint">观察任务：测电阻时先断电、选倍率、短接表笔调零，再读表盘数并乘倍率。</div>
+50: const c = document.getElementById('c');
+70: const state={running:false,time:0,last:0,drag:null,records:[]};
+76: const start = Math.PI * 0.82;
+77: const end = Math.PI * 0.18;
+78: const t = Math.max(0, Math.min(1, ratio));
+79: const ang = ohmMode ? start + (1-t) * (end-start) : start + t * (end-start);
+84: ctx.lineTo(cx + radius*Math.cos(ang), cy - radius*Math.sin(ang));
+101: const t = i/10;
+102: const ang = Math.PI*0.82 + t*(Math.PI*0.18 - Math.PI*0.82);
+103: const x1 = cx + (radius-8)*Math.cos(ang);
+104: const y1 = cy - (radius-8)*Math.sin(ang);
+105: const x2 = cx + radius*Math.cos(ang);
+106: const y2 = cy - radius*Math.sin(ang);
+114: const label = ohmMode ? (i===0 ? '∞' : String((10-i)*10)) : String(i*10);
+115: ctx.fillText(label, cx + (radius+18)*Math.cos(ang), cy - (radius+18)*Math.sin(ang)+4);
+127: const V = raw / 10;
+129: ratio = V / range;
+137: const A = raw / 100;
+139: ratio = A / range;
+147: const R = raw * 10;
+149: const scale = R / mul;
+150: const zeroFactor = zero / 100;
+151: ratio = Math.max(0, Math.min(1, 1 - scale / 100)) * zeroFactor;
+155: const readScale = scale / Math.max(0.2, zeroFactor);
+156: result = readScale.toFixed(1) + '×' + mul + '=' + (readScale*mul).toFixed(0) + 'Ω';
+160D: els.modeVal.textContent = modes[mode];
+161D: els.rangeVal.textContent = rangeText;
+162D: els.valueVal.textContent = trueText;
+163D: els.zeroVal.textContent = zero + '%';
+164D: els.powerVal.textContent = powered ? '是' : '否';
+172: if(state.running){ratio = Math.max(0, Math.min(1, ratio + Math.sin(state.time*6)*0.03));}
+196: ctx.fillStyle='#2c7be5';ctx.beginPath();ctx.arc(236,382,17,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.font='700 10px system-ui';ctx.fillText('挡',236,386);
+197: ctx.fillStyle='#0f9f6e';ctx.beginPath();ctx.arc(530,204,12,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.fillText('值',530,208);
+239: `<div id="r1">模式=${modes[mode]}，量程/倍率=${rangeText}</div>`,
+240: `<div id="r2">表针位置≈${Math.round(ratio*100)}% 满偏</div>`,
+241: `<div id="r3">接法=${connection}</div>`,
+242: `<div id="r4">读数结果：${result}</div>`,
+243: `<div id="r5">${problem}</div>`
+246D: els.status.textContent = ok ? '通过：挡位、接法和读数条件合格。' : '不通过：' + problem;
+247D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+252: function pos(e){const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height};}
+253: c.addEventListener('pointerdown',e=>{const p=pos(e);if(Math.hypot(p.x-236,p.y-382)<28){state.drag='mode';c.setPointerCapture(e.pointerId);}else if(Math.hypot(p.
+254: c.addEventListener('pointermove',e=>{const p=pos(e);if(!state.drag){c.style.cursor='grab';return;}if(state.drag==='mode')els.mode.value=Math.round(Math.max(0,Ma
+257D: els.resetBtn.addEventListener('click',()=>{state.running=false;state.time=0;state.records=[];els.mode.value=2;els.range.value=1;els.value.value=47;els.zero.value=100;els.power.value=0;els.records.inne
+258: els.recordBtn.addEventListener('click',()=>{const mode=Number(els.mode.value),rangeIndex=Number(els.range.value),raw=Number(els.value.value),zero=Number(els.zer
+259: function loop(now){if(!state.last)state.last=now;const dt=Math.min(.04,(now-state.last)/1000);state.last=now;if(state.running)state.time+=dt;draw();requestAnima
+
+===== anim/exp/newton-second-lab.html (181 lines, kept 43) =====
+27: <canvas id="c" width="700" height="460" aria-label="牛顿第二定律实验"></canvas>
+29: <div class="row"><button id="playBtn" class="primary" type="button">播放</button><button id="resetBtn" type="button">重置</button><button id="recordBtn" type="butto
+30: <label for="mode">实验模式：<span id="modeVal"></span></label>
+32: <label for="force">拉力 F/N：<span id="forceVal"></span></label>
+38: <div id="readout" class="readout"></div>
+38D: <div id="readout" class="readout"></div>
+39: <table style="width:100%;margin-top:10px;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;border-bottom:1px solid #d9e2ec">记录</th>
+40: <div class="hint">观察任务：补偿充分时图像接近过原点；补偿不足时 a-F 图像会出现横截距。</div>
+45: const c = document.getElementById('c');
+62: const state={running:false,time:0,last:0,drag:null,records:[]};
+82: const f = i * 0.5;
+83: const a = Math.max(0, (f - (1-comp)*0.8) / m);
+84: const px = x0 + f / 4 * w;
+85: const py = y0 - Math.min(1, a / 5) * h;
+90: const inv = 0.3 + i * 0.28;
+91: const a = Math.max(0, F * inv - (1-comp)*0.4);
+92: const px = x0 + (inv-0.3) / 2.24 * w;
+93: const py = y0 - Math.min(1, a / 5) * h;
+103: const comp = Number(els.friction.value) / 100;
+104: const fLoss = (1 - comp) * 0.8;
+105: const a = Math.max(0, (F - fLoss) / m);
+106: els.modeVal.textContent = mode === 0 ? 'a-F' : 'a-1/m';
+106D: els.modeVal.textContent = mode === 0 ? 'a-F' : 'a-1/m';
+107D: els.forceVal.textContent = F.toFixed(1);
+108D: els.massVal.textContent = m.toFixed(1);
+109: els.frictionVal.textContent = Math.round(comp*100) + '%';
+109D: els.frictionVal.textContent = Math.round(comp*100) + '%';
+122: const runOffset = state.running ? Math.min(190, 0.5 * a * state.time * state.time * 70) : 0;
+143: ctx.fillText(`a=${a.toFixed(2)}m/s²`, carX+56, 96);
+149: ctx.fillStyle = '#fff'; ctx.font = '700 10px system-ui'; ctx.fillText('F', 430, 236 + (4-F)*10);
+156: ctx.fillText('公式读数：F合 = F - 未补偿摩擦，a=F合/m；拖红色 F、绿色 m，把手会同步改图像。', 350, 420);
+156D: ctx.fillText('公式读数：F合 = F - 未补偿摩擦，a=F合/m；拖红色 F、绿色 m，把手会同步改图像。', 350, 420);
+157D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+159: `<div id="r1">模式=${mode === 0 ? '固定 m，改变 F' : '固定 F，改变 m'}</div>`,
+160: `<div id="r2">补偿后合力≈F-${fLoss.toFixed(2)}=${Math.max(0,F-fLoss).toFixed(2)}N</div>`,
+161: `<div id="r3">a=F合/m≈${a.toFixed(2)}m/s²</div>`,
+162: `<div id="r4">${mode === 0 ? `a-F 图像斜率≈1/m=${(1/m).toFixed(2)}` : `a-1/m 图像斜率≈F=${F.toFixed(1)}N`}</div>`
+168: function pos(e){const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height};}
+170: c.addEventListener('pointerdown',e=>{const p=pos(e),F=Number(els.force.value),m=Number(els.mass.value),comp=Number(els.friction.value)/100,fLoss=(1-comp)*0.8,a=
+171: c.addEventListener('pointermove',e=>{const p=pos(e);if(!state.drag){c.style.cursor='grab';return;}if(state.drag==='F')setVal('force',Math.max(.2,Math.min(4,4-(p
+174D: els.resetBtn.addEventListener('click',()=>{state.running=false;state.time=0;state.records=[];els.mode.value=0;els.force.value=2;els.mass.value=1;els.friction.value=90;els.records.innerHTML='';draw();}
+175: els.recordBtn.addEventListener('click',()=>{const F=Number(els.force.value),m=Number(els.mass.value),comp=Number(els.friction.value)/100,Fnet=Math.max(0,F-(1-co
+176: function loop(now){if(!state.last)state.last=now;const dt=Math.min(.04,(now-state.last)/1000);state.last=now;if(state.running){state.time+=dt;if(state.time>2.8)
+
+===== anim/exp/oil-film-molecule-lab.html (346 lines, kept 55) =====
+30: <canvas id="c" width="790" height="560" aria-label="油膜法实验台：俯视水槽、方格图像、单分子层剖面和数据记录"></canvas>
+33: <button id="playBtn" class="primary" type="button">播放</button>
+34: <button id="resetBtn" type="button">重置</button>
+35: <button id="recordBtn" type="button">记录</button>
+41: <label for="dropVolume">每滴体积/mL：<span id="dropVolumeVal"></span></label>
+43: <label for="filmArea">油膜面积/(10³cm²)：<span id="filmAreaVal"></span></label>
+47: <div id="readout" class="readout"></div>
+47D: <div id="readout" class="readout"></div>
+50: <tbody id="records"></tbody>
+52: <div class="hint">观察任务：先播放看液滴铺展成单分子油膜；再拖动蓝色油膜边界和紫色滴管，看 S、V、d=V/S 如何同时变。</div>
+76: const state = { running: false, time: 2.6, last: 0, drag: null, records: [] };
+81: if (next.ratio !== undefined) els.ratio.value = Math.round(clamp(next.ratio, 300, 800) / 50) * 50;
+82: if (next.drops !== undefined) els.drops.value = Math.round(clamp(next.drops, 1, 5));
+85: if (next.areaError !== undefined) els.areaError.value = Math.round(clamp(next.areaError, -12, 12));
+92: const err = val('areaError') / 100;
+93: const pureMl = drops * dropMl / ratio;
+94: const pureM3 = pureMl * 1e-6;
+95: const trueArea = areaUnit * 1000 * 1e-4;
+96: const measuredArea = trueArea * (1 + err);
+97: const d = pureM3 / measuredArea;
+98: const trueD = pureM3 / trueArea;
+99: const rel = Math.abs(d - trueD) / trueD * 100;
+132: const a = Math.atan2(y2 - y1, x2 - x1);
+142: ctx.lineTo(x2 - 10 * Math.cos(a - 0.45), y2 - 10 * Math.sin(a - 0.45));
+143: ctx.lineTo(x2 - 10 * Math.cos(a + 0.45), y2 - 10 * Math.sin(a + 0.45));
+147: function filmRadius(q) { return Math.sqrt(q.trueArea / 0.5) * 116; }
+166: const r = filmRadius(q) * progress;
+172: const a = Math.PI * 2 * i / 80;
+173: const wobble = 1 + 0.08 * Math.sin(5 * a) + 0.05 * Math.cos(9 * a);
+174: const x = 260 + Math.cos(a) * r * wobble;
+175: const y = 226 + Math.sin(a) * r * 0.66 * wobble;
+182: const dropY = 62 + Math.min(1, state.time / 0.9) * 72;
+206: const x = 560 + i * 10;
+229: text(`纯油酸体积 V = nV滴/稀释倍数 = ${q.pureM3.toExponential(2)} m³`, 78, 456, '#486581', 13, '700', 'left');
+231: text(`分子直径 d = V/S = ${q.d.toExponential(2)} m = ${(q.d * 1e10).toFixed(2)}×10⁻¹⁰ m`, 78, 512, '#102a43', 13, '700', 'left');
+235: const q = model();
+236: const progress = state.running ? clamp((state.time - 0.55) / 1.75, 0, 1) : 1;
+244: text('俯视水槽 + 方格图像 + 剖面视图 + 数据记录：用 S 和 V 读出 d=V/S。', 395, 62, '#486581', 13);
+250D: els.ratioVal.textContent = q.ratio.toFixed(0);
+251D: els.dropsVal.textContent = q.drops.toFixed(0);
+252D: els.dropVolumeVal.textContent = q.dropMl.toFixed(2);
+253D: els.filmAreaVal.textContent = q.areaUnit.toFixed(1);
+254: els.areaErrorVal.textContent = (q.err * 100).toFixed(0);
+254D: els.areaErrorVal.textContent = (q.err * 100).toFixed(0);
+255D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+257: `V=nV滴/稀释倍数=<b>${q.pureM3.toExponential(2)}m³</b>`,
+258: `S=<b>${q.measuredArea.toFixed(3)}m²</b>`,
+259: `d=V/S=<b>${q.d.toExponential(2)}m</b>`,
+266: const dt = Math.min(0.04, (now - state.last) / 1000);
+286: return handles(model()).find(h => Math.hypot(p.x - h.x, p.y - h.y) <= h.r + 8);
+289: const h = hit(pos(evt));
+302: const r = Math.max(45, Math.abs(p.x - 260));
+303: const areaM2 = Math.pow(r / 116, 2) * 0.5;
+330: const q = model();
+336D: els.records.innerHTML = state.records.map((r, idx) =>
+
+===== anim/exp/pendulum-period-lab.html (300 lines, kept 64) =====
+33: <canvas id="c" width="740" height="540" aria-label="用单摆测量重力加速度实验台：摆动侧视、秒表、T²-L图像、斜率求g和数据记录"></canvas>
+36: <button id="playBtn" class="primary" type="button">播放</button>
+37: <button id="recordBtn" type="button">记录</button>
+38: <button id="resetBtn" type="button">重置</button>
+42: <label for="angle">初始摆角 θ/°：<span id="angleVal"></span></label>
+46: <label for="gravity">当地 g/(m/s²)：<span id="gravityVal"></span></label>
+47: <input id="gravity" type="range" min="8.0" max="10.5" value="9.8" step="0.1">
+50: <div id="readout" class="readout"></div>
+50D: <div id="readout" class="readout"></div>
+51: <div id="status" class="status"></div>
+52: <div class="hint">观察任务：直接拖动摆球改变摆长和摆角；点“播放”看多次全振动计时，记录几组点后看 T²-L 图像是否近似直线。</div>
+55: <tbody id="recordRows"></tbody>
+61: const c = document.getElementById('c');
+81: const state = { running: false, last: 0, time: 0, drag: null, records: [] };
+84: const small = 2 * Math.PI * Math.sqrt(L / g);
+85: const rad = deg * Math.PI / 180;
+89: const L = Number(els.length.value);
+92: const g = Number(els.gravity.value);
+93: const err = Number(els.error.value) / 100;
+94: const T = period(L, g, deg);
+95: const total = N * T * (1 + err);
+96: const Tmeas = total / N;
+97: const gCalc = 4 * Math.PI * Math.PI * L / (Tmeas * Tmeas);
+98: const rel = Math.abs(gCalc - g) / g * 100;
+115: const L = 0.3 + i * 0.12;
+116: const T2 = 4 * Math.PI * Math.PI * L / v.g;
+117: const x = x0 + (L - 0.3) / 1.2 * w;
+118: const y = y0 - clamp(T2 / 6, 0, 1) * h;
+124: const x = x0 + (p.L - 0.3) / 1.2 * w;
+125: const y = y0 - clamp((p.T * p.T) / 6, 0, 1) * h;
+131: const px = x0 + (v.L - 0.3) / 1.2 * w;
+132: const py = y0 - clamp(v.Tmeas * v.Tmeas / 6, 0, 1) * h;
+140: ctx.fillText('T²-L 图像/数据记录：斜率k=4π²/g，故g=4π²/k', x0 + w / 2, y0 + 28);
+143: const px = 224, py = 82, scale = 224 / 1.5;
+144: const len = v.L * scale;
+145: const amp = v.deg * Math.PI / 180;
+146: const theta = state.running ? amp * Math.cos(2 * Math.PI * state.time / v.T) : amp;
+147: const bx = px + len * Math.sin(theta);
+148: const by = py + len * Math.cos(theta);
+196: const phaseCycles = state.running ? (state.time / v.T) % v.N : 0;
+197: const elapsed = state.running ? Math.min(v.total, state.time) : v.total;
+200: ctx.fillText('T=t/N≈' + v.Tmeas.toFixed(3) + ' s', 555, 148);
+204D: els.lengthVal.textContent = v.L.toFixed(2);
+205D: els.angleVal.textContent = v.deg.toFixed(0);
+206D: els.cyclesVal.textContent = v.N;
+207D: els.gravityVal.textContent = v.g.toFixed(1);
+208: els.errorVal.textContent = Math.round(v.err * 100) + '%';
+208D: els.errorVal.textContent = Math.round(v.err * 100) + '%';
+220: `<div id="r1">T理论≈2π√(L/g)=${(2 * Math.PI * Math.sqrt(v.L / v.g)).toFixed(3)} s</div>`,
+221: `<div id="r2">计时 t=${v.total.toFixed(2)} s，T=t/N=${v.Tmeas.toFixed(3)} s</div>`,
+222: `<div id="r3">T²/L≈${(v.Tmeas * v.Tmeas / v.L).toFixed(3)} s²/m</div>`,
+223: `<div id="r4">g测=4π²L/T²≈${v.gCalc.toFixed(2)} m/s²</div>`,
+224: `<div id="r5">相对误差≈${v.rel.toFixed(1)}%</div>`
+228D: els.status.textContent = v.deg > 10
+233D: els.recordRows.innerHTML = state.records.slice(-5).map((p, i) =>
+239: const x = (ev.clientX - rect.left) * c.width / rect.width;
+240: const y = (ev.clientY - rect.top) * c.height / rect.height;
+243: const L = clamp(Math.sqrt(dx * dx + dy * dy) / (224 / 1.5), 0.3, 1.5);
+244: const deg = clamp(Math.abs(Math.atan2(dx, dy)) * 180 / Math.PI, 2, 25);
+245: els.length.value = (Math.round(L / 0.05) * 0.05).toFixed(2);
+246: els.angle.value = String(Math.round(deg));
+252: const dt = Math.min(0.05, (ts - state.last) / 1000);
+263D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+277: els.gravity.value = '9.8';
+
+===== anim/exp/projectile-motion-lab.html (402 lines, kept 73) =====
+30: <canvas id="c" width="790" height="560" aria-label="平抛运动实验台：侧视轨迹、频闪坐标、x-t图像、y-t平方图像和数据记录"></canvas>
+33: <button id="playBtn" class="primary" type="button">播放</button>
+34: <button id="resetBtn" type="button">重置</button>
+35: <button id="recordBtn" type="button">记录</button>
+39: <label for="height">桌面高度 h/m：<span id="heightVal"></span></label>
+41: <label for="dt">闪光时间 Δt/s：<span id="dtVal"></span></label>
+43: <label for="point">测点 n：<span id="pointVal"></span></label>
+45: <label for="tilt">发射口调平误差 θ/°：<span id="tiltVal"></span></label>
+47: <div id="readout" class="readout"></div>
+47D: <div id="readout" class="readout"></div>
+50: <tbody id="records"></tbody>
+52: <div class="hint">观察任务：先播放看频闪点如何形成；再拖蓝色速度箭头、绿色测点和红色桌高标尺，看水平与竖直分运动是否各自满足规律。</div>
+59: const g = 9.8;
+77: const state = { running: false, time: 0, last: 0, drag: null, records: [] };
+87: if (next.n !== undefined) els.point.value = Math.round(clamp(next.n, 2, 8));
+91: const rad = deg * Math.PI / 180;
+92: const vx = v0 * Math.cos(rad);
+93: const vy0 = v0 * Math.sin(rad);
+94: return { t, x: vx * t, y: 0.5 * g * t * t + vy0 * t, vx, vy0 };
+98: const h = val('height');
+99: const dt = val('dt');
+102: const p = pointAt(v0, n * dt, tilt);
+103: const freeY = 0.5 * g * p.t * p.t;
+104: const xt = p.x / p.t;
+105: const gy = 2 * p.y / (p.t * p.t);
+107: const ok = valid && Math.abs(tilt) < 0.6 && Math.abs(gy - g) < 0.5;
+108: const tFall = Math.sqrt(2 * h / g);
+140: const a = Math.atan2(y2 - y1, x2 - x1);
+150: ctx.lineTo(x2 - 10 * Math.cos(a - 0.45), y2 - 10 * Math.sin(a - 0.45));
+151: ctx.lineTo(x2 - 10 * Math.cos(a + 0.45), y2 - 10 * Math.sin(a + 0.45));
+158: const vHandle = { name: 'v0', x: origin.x + 62 + q.v0 * 18, y: origin.y - 34, r: 14 };
+159: const hHandle = { name: 'h', x: 512, y: origin.y + q.h * sy, r: 14 };
+166: for (let i = 0; i <= nx; i++) { const xx = x + w * i / nx; ctx.beginPath(); ctx.moveTo(xx, y); ctx.lineTo(xx, y + h); ctx.stroke(); }
+167: for (let i = 0; i <= ny; i++) { const yy = y + h * i / ny; ctx.beginPath(); ctx.moveTo(x, yy); ctx.lineTo(x + w, yy); ctx.stroke(); }
+190: text(`h=${q.h.toFixed(1)}m`, 530, origin.y + q.h * sy / 2, '#d64545', 12, '700', 'left');
+199: const t = q.tFall * i / 80;
+205: const maxVisible = state.running ? Math.floor(state.time / q.dt) : 8;
+207: const pp = pointAt(q.v0, i * q.dt, q.tilt);
+209: const fy = origin.y + 0.5 * g * Math.pow(i * q.dt, 2) * sy;
+232: text(`测点 n=${q.n}`, Math.min(500, cp.x + 46), Math.min(350, cp.y - 12), '#0f9f6e', 12, '700');
+250: const t = q.tFall * i / 50;
+252: const px = x1 + w * t / q.tFall;
+253: const py = y1 + h - h * p.x / Math.max(q.v0 * q.tFall, 0.1);
+257: const px1 = x1 + w * q.p.t / q.tFall;
+258: const py1 = y1 + h - h * q.p.x / Math.max(q.v0 * q.tFall, 0.1);
+259: ctx.fillStyle = '#0f9f6e'; ctx.beginPath(); ctx.arc(px1, py1, 5, 0, Math.PI * 2); ctx.fill();
+268: const t = q.tFall * i / 50;
+270: const px = x2 + w * (t * t) / (q.tFall * q.tFall);
+271: const py = y2 + h - h * p.y / q.h;
+275: const px2 = x2 + w * (q.p.t * q.p.t) / (q.tFall * q.tFall);
+276: const py2 = y2 + h - h * q.p.y / q.h;
+277: ctx.fillStyle = '#0f9f6e'; ctx.beginPath(); ctx.arc(px2, py2, 5, 0, Math.PI * 2); ctx.fill();
+282: text(`t=nΔt=${q.p.t.toFixed(2)}s，x=v0t=${q.p.x.toFixed(2)}m，x/t=${q.xt.toFixed(2)}m/s`, 78, 458, '#486581', 13, '700', 'left');
+283: text(`y=1/2gt²=${q.freeY.toFixed(2)}m，对照读数 y=${q.p.y.toFixed(2)}m，2y/t²=${q.gy.toFixed(2)}m/s²`, 78, 486, '#486581', 13, '700', 'left');
+284: const msg = !q.valid ? '需重做，测点已落地' : Math.abs(q.tilt) >= 0.6 ? '需重做，发射口未调平' : '能用，水平匀速且竖直近似自由落体';
+288: const q = model();
+300D: els.speedVal.textContent = q.v0.toFixed(1);
+301D: els.heightVal.textContent = q.h.toFixed(1);
+302D: els.dtVal.textContent = q.dt.toFixed(2);
+303D: els.pointVal.textContent = q.n;
+304D: els.tiltVal.textContent = q.tilt.toFixed(1);
+305D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+307: `t=nΔt=<b>${q.p.t.toFixed(2)}s</b>`,
+308: `x=v0t≈<b>${q.p.x.toFixed(2)}m</b>，x/t≈<b>${q.xt.toFixed(2)}m/s</b>`,
+316: const dt = Math.min(0.04, (now - state.last) / 1000);
+320: const q = model();
+337: return handles(model()).find(h => Math.hypot(p.x - h.x, p.y - h.y) <= h.r + 8);
+340: const h = hit(pos(evt));
+355: const q = model();
+358: const cp = toCanvas(pointAt(q.v0, i * q.dt, q.tilt));
+359: const d = Math.hypot(p.x - cp.x, p.y - cp.y);
+386: const q = model();
+392D: els.records.innerHTML = state.records.map((r, idx) =>
+
+===== anim/exp/resistivity-lab.html (78 lines, kept 28) =====
+30: <canvas id="c" width="790" height="560" aria-label="测电阻率实验台：电路俯视图、螺旋测微器剖面、I-U图像和数据记录"></canvas>
+32: <div class="row"><button id="playBtn" class="primary" type="button">播放</button><button id="resetBtn" type="button">重置</button><button id="recordBtn" type="butto
+33: <label for="length">接入长度 L/cm：<span id="lengthVal"></span></label><input id="length" type="range" min="30" max="100" value="60" step="5">
+34: <label for="diameter">直径读数 d/mm：<span id="diameterVal"></span></label><input id="diameter" type="range" min="0.20" max="0.80" value="0.40" step="0.01">
+35: <label for="voltage">电压 U/V：<span id="voltageVal"></span></label><input id="voltage" type="range" min="0.2" max="3.0" value="1.2" step="0.1">
+36: <label for="rho">真实电阻率 ρ/(10^-6 Ω·m)：<span id="rhoVal"></span></label><input id="rho" type="range" min="0.30" max="1.50" value="0.50" step="0.05">
+37: <label for="heat">温升误差/%：<span id="heatVal"></span></label><input id="heat" type="range" min="0" max="12" value="3" step="1">
+38: <div id="readout" class="readout"></div>
+38D: <div id="readout" class="readout"></div>
+39: <table><thead><tr><th>记录</th><th>R/Ω</th><th>d/mm</th><th>ρ</th></tr></thead><tbody id="records"></tbody></table>
+40: <div class="hint">观察任务：拖金属丝接线夹改变 L，拖电压旋钮改变 U，拖测微器测砧改变 d；看 d 的微小误差如何经 S=πd²/4 放大到 ρ。</div>
+47: const state={running:false,time:0,last:0,drag:null,records:[]};
+49: function setValues(o){if(o.L!==undefined)els.length.value=Math.round(clamp(o.L,30,100)/5)*5;if(o.d!==undefined)els.diameter.value=clamp(o.d,.2,.8).toFixed(2);if
+50: function model(){const Lcm=val('length'),dmm=val('diameter'),U=val('voltage'),rhoTrue=val('rho')*1e-6,heat=val('heat')/100,L=Lcm/100,d=dmm/1000,S=Math.PI*d*d/4,
+55: function meter(x,y,label,value,color='#2c7be5'){ctx.fillStyle='#eef4ff';ctx.strokeStyle=color;ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,34,0,Math.PI*2);ctx.fi
+58: if(state.running){ctx.fillStyle='#e03131';for(let i=0;i<8;i++){const t=(state.time*.8+i/8)%1;let x=82+528*t,y=330;if(t<.32){x=82+528*t;y=238;}else if(t<.55){x=2
+59: for(const h of handles(q)){ctx.fillStyle=h.name==='L'?'#0f9f6e':h.name==='U'?'#e03131':'#7b2cbf';ctx.beginPath();ctx.arc(h.x,h.y,h.r,0,Math.PI*2);ctx.fill();tex
+60: function drawMicrometer(q){box(60,388,250,102,'#f7f9fc');text('螺旋测微器剖面：多点测 d',185,408,'#102a43',14,'700');ctx.fillStyle='#334e68';ctx.fillRect(92,446,140,16);ct
+61: function drawGraph(q){box(350,388,390,102,'#f7f9fc');const gx=388,gy=460,gw=210,gh=56;ctx.strokeStyle='#334e68';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(gx,gy
+62: function draw(){const q=model(),joule=q.I*q.I*q.R*state.time;ctx.clearRect(0,0,canvas.width,canvas.height);const bg=ctx.createLinearGradient(0,0,canvas.width,ca
+63: function loop(now){if(!state.last)state.last=now;const dt=Math.min(.04,(now-state.last)/1000);state.last=now;if(state.running)state.time+=dt;draw();requestAnima
+64: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
+65: function hit(p){return handles(model()).find(h=>Math.hypot(p.x-h.x,p.y-h.y)<=h.r+8);}
+66: canvas.addEventListener('pointerdown',e=>{const h=hit(pos(e));if(h){state.drag=h.name;canvas.setPointerCapture(e.pointerId);}});
+67: canvas.addEventListener('pointermove',e=>{const p=pos(e);if(!state.drag){canvas.style.cursor=hit(p)?'grab':'default';return;}if(state.drag==='L')setValues({L:(p
+71: els.recordBtn.addEventListener('click',()=>{const q=model();state.records.unshift({R:q.R,d:q.dmm,rho:q.rho/1e-6});state.records=state.records.slice(0,4);renderR
+72: function renderRecords(){els.records.innerHTML=state.records.map((r,i)=>`<tr><td>${i+1}</td><td>${r.R.toFixed(2)}</td><td>${r.d.toFixed(2)}</td><td>${r.rho.toFi
+72D: function renderRecords(){els.records.innerHTML=state.records.map((r,i)=>`<tr><td>${i+1}</td><td>${r.R.toFixed(2)}</td><td>${r.d.toFixed(2)}</td><td>${r.rho.toFixed(3)}</td></tr>`).join('');}
+
+===== anim/exp/sensor-auto-control-lab.html (80 lines, kept 28) =====
+27: <div class="stage"><canvas id="canvas" width="900" height="620" aria-label="传感器自动控制实验台：光控电路侧视装置、比较器表盘、数据图像和记录表"></canvas></div>
+29: <div class="card task"><b>观察任务：</b>拖动画面中的光源或调节阈值；看传感器电压、参考电压、比较器输出和继电器开关怎样共同决定灯泡/风扇是否工作。</div>
+31: <div class="title">控制参数</div>
+32: <div class="buttons"><button data-mode="dark" class="active">暗时开灯</button><button data-mode="bright">亮时开风扇</button><button id="disturb">扰动</button></div>
+33: <label class="param"><span>环境光照 <b id="lightLabel">45%</b></span><input id="light" type="range" min="0" max="100" step="1" value="45"></label>
+34: <label class="param"><span>阈值设定 <b id="thLabel">50%</b></span><input id="threshold" type="range" min="10" max="90" step="1" value="50"></label>
+35: <label class="param"><span>滞回宽度 <b id="hysLabel">6%</b></span><input id="hys" type="range" min="0" max="20" step="1" value="6"></label>
+36: <div class="buttons"><button id="play">播放</button><button id="record">记录</button><button id="reset">重置</button></div>
+38: <div class="readout" id="readout"></div>
+38D: <div class="readout" id="readout"></div>
+39: <div class="card"><div class="title">数据记录</div><table><thead><tr><th>模式</th><th>光照/%</th><th>阈值/%</th><th>输出</th></tr></thead><tbody id="rows"></tbody></table><
+40: <div class="card formula"><div class="title">控制公式</div><div>分压：U_s = U·R_s/(R_s+R_0)。</div><div>比较：U_s 与 U_ref 比较，输出控制继电器；滞回可防止临界点反复跳变。</div></div>
+40D: <div class="card formula"><div class="title">控制公式</div><div>分压：U_s = U·R_s/(R_s+R_0)。</div><div>比较：U_s 与 U_ref 比较，输出控制继电器；滞回可防止临界点反复跳变。</div></div>
+41: <div class="status" id="status"></div>
+50: const state={mode:'dark',on:false,playing:false,t:0,drag:null,records:[],history:[]};
+52: function v(){const L=+el.light.value,T=+el.threshold.value,H=+el.hys.value,Us=5*(100-L)/100,Uref=5*T/100;return{L,T,H,Us,Uref};}
+53: function logic(x){const dark=x.L<x.T,bright=x.L>x.T;if(state.mode==='dark'){if(!state.on&&x.L<x.T-x.H/2)state.on=true;if(state.on&&x.L>x.T+x.H/2)state.on=false;
+54: function fmt(n,d=1){return(Math.abs(n)<1e-9?0:n).toFixed(d)}
+58: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(
+59: function meter(x,y,label,value,max,c){box(x-50,y-36,100,72,'#fbfdff');text(label,x,y-18,colors.muted,'center',12,'900');ctx.save();ctx.translate(x,y+10);ctx.str
+60: function drawCircuit(x,out){box(42,72,810,258,'#fff');text('光敏传感器自动控制装置：电路侧视 + 比较器 + 执行器',447,100,colors.ink,'center',16,'900');const lampX=142+(100-x.L)/100*11
+61: function drawGraph(x){box(42,356,810,210,'#fff');text('光照-输出数据图像与记录轨迹',447,382,colors.ink,'center',15,'900');const gx=90,gy=526,gw=690,gh=110;line(gx,gy,gx+gw,g
+62: function update(x,out){el.lightLabel.textContent=fmt(x.L,0)+'%';el.thLabel.textContent=fmt(x.T,0)+'%';el.hysLabel.textContent=fmt(x.H,0)+'%';el.readout.innerHTM
+64: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+66: canvas.addEventListener('pointermove',move);function move(e){if(state.drag!=='light')return;const p=pos(e);const L=100-(p.x-142)/110*100;el.light.value=Math.max
+70D: el.play.onclick=()=>{state.playing=!state.playing;el.play.textContent=state.playing?'暂停':'播放'};
+71: document.getElementById('disturb').onclick=()=>{el.light.value=Math.max(0,Math.min(100,+el.light.value+(Math.random()-.5)*38));draw()};
+74: function loop(){if(state.playing){state.t+=0.04;el.light.value=Math.round(50+38*Math.sin(state.t));}draw();requestAnimationFrame(loop)}
+
+===== anim/exp/ticker-tape-speed.html (526 lines, kept 59) =====
+86: <canvas id="c" width="790" height="560" aria-label="打点计时器测速实验台，含纸带、刻度尺、v-t 图像和数据记录"></canvas>
+89: <button id="playBtn" class="primary" type="button">播放</button>
+90: <button id="resetBtn" type="button">重置</button>
+91: <button id="recordBtn" type="button">记录</button>
+93: <label for="period">打点周期 T/s：<span id="periodVal"></span></label>
+97: <label for="acc">加速度 a/(m/s²)：<span id="accVal"></span></label>
+99: <label for="index">测量点 i：<span id="indexVal"></span></label>
+101: <div id="readout" class="readout"></div>
+101D: <div id="readout" class="readout"></div>
+104: <tbody id="records"></tbody>
+106: <div class="hint">观察任务：先播放看纸带怎样留下等时点，再拖动画面内蓝色速度把手、红色加速度把手和绿色测点，看公式里的 x、T、vi 如何跟着读数改变。</div>
+129: const state = {
+139: function motionX(v0, a, t) { return v0 * t + 0.5 * a * t * t; }
+143: for (let k = 0; k <= count; k++) arr.push({ k, t: k * T, x: motionX(v0, a, k * T), v: motionV(v0, a, k * T) });
+153: const vi = (next.x - prev.x) / (2 * T);
+154: const avg = (ds[10].x - ds[2].x) / (8 * T);
+160: if (i !== undefined) els.index.value = Math.round(clamp(i, 1, 10));
+177: const ang = Math.atan2(y2 - y1, x2 - x1);
+187: ctx.lineTo(x2 - 10 * Math.cos(ang - 0.45), y2 - 10 * Math.sin(ang - 0.45));
+188: ctx.lineTo(x2 - 10 * Math.cos(ang + 0.45), y2 - 10 * Math.sin(ang + 0.45));
+196: const xx = x + w * n / xSteps;
+200: const yy = y + h * n / ySteps;
+208: const vHandle = { name: 'v0', x: 160 + data.v0 * 76, y: 252, r: 13, label: '拖动 v0' };
+209: const aHandle = { name: 'a', x: 126 + data.a * 42, y: 304, r: 13, label: '拖动 a' };
+215: const maxX = Math.max(data.ds[12].x, 0.25);
+216: const scale = 455 / maxX;
+219: const progressCount = Math.min(12, Math.floor(state.time / data.T));
+220: const currentX = motionX(data.v0, data.a, Math.min(state.time, 12 * data.T));
+221: const carX = clamp(originX + currentX * scale, 248, 700);
+272: const x = 226 + n * 24;
+375: const maxT = 12 * data.T;
+376: const maxV = Math.max(motionV(data.v0, data.a, maxT), 1);
+381: const t = maxT * n / 60;
+382: const vx = gx + gw * t / maxT;
+383: const vy = gy + gh - gh * motionV(data.v0, data.a, t) / maxV;
+387: const ptX = gx + gw * data.mid.t / maxT;
+388: const ptY = gy + gh - gh * data.vi / maxV;
+403D: ctx.fillText(`公式绑定：vi≈(x${data.i + 1}-x${data.i - 1})/(2T)=${data.vi.toFixed(2)} m/s`, 40, 470);
+406: ctx.fillText(`读数：x${data.i - 1}=${data.prev.x.toFixed(3)} m，x${data.i + 1}=${data.next.x.toFixed(3)} m，平均速度 v=Δx/Δt=${data.avg.toFixed(2)} m/s`, 40, 494);
+408: const okText = data.T <= 0.04 && data.v0 >= 0.35 ? '能用：点迹清楚且点距适中' : '需重做：点太疏/太密或起步不稳';
+413D: els.periodVal.textContent = data.T.toFixed(2);
+414D: els.v0Val.textContent = data.v0.toFixed(2);
+415D: els.accVal.textContent = data.a.toFixed(2);
+416D: els.indexVal.textContent = data.i;
+417D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+419: `T=${data.T.toFixed(2)}s，v0=${data.v0.toFixed(2)}m/s，a=${data.a.toFixed(2)}m/s²`,
+428: const dt = Math.min(0.04, (now - state.last) / 1000);
+432: state.time += dt * 0.55;
+434: state.time = 12 * T;
+450: const scale = 455 / Math.max(data.ds[12].x, 0.25);
+452: return hs.find(h => Math.hypot(p.x - h.x, p.y - h.y) <= h.r + 7);
+456: const h = hitHandle(p);
+473: const scale = 455 / Math.max(data.ds[12].x, 0.25);
+474: for (let k = 1; k <= 10; k++) {
+475: const x = 254 + data.ds[k].x * scale;
+476: const d = Math.abs(p.x - x);
+481: state.time = Math.min(state.time, 12 * val('period'));
+511D: els.records.innerHTML = state.records.map((r, idx) =>
+517: state.time = Math.min(state.time, 12 * val('period'));
+
+===== anim/exp/transformer-turns-voltage-lab.html (79 lines, kept 26) =====
+27: <div class="stage"><canvas id="canvas" width="900" height="620" aria-label="变压器实验台：铁芯线圈侧视装置、电压表、电流表、U2-n2图像和数据记录"></canvas></div>
+29: <div class="card task"><b>观察任务：</b>保持原线圈匝数和输入交流电压不变，拖动副线圈匝数滑块或画面中的副线圈；看副线圈电压表读数是否随 n2 成正比变化。</div>
+31: <div class="title">实验条件</div>
+32: <label class="param"><span>原线圈匝数 n1 <b id="n1Label">800</b></span><input id="n1" type="range" min="200" max="1200" step="50" value="800"></label>
+33: <label class="param"><span>副线圈匝数 n2 <b id="n2Label">200</b></span><input id="n2" type="range" min="50" max="1000" step="50" value="200"></label>
+34: <label class="param"><span>原边电压 U1 <b id="u1Label">12.0 V</b></span><input id="u1" type="range" min="2" max="24" step="0.5" value="12"></label>
+35: <label class="param"><span>负载电阻 R <b id="rLabel">24 Ω</b></span><input id="load" type="range" min="6" max="80" step="2" value="24"></label>
+36: <div class="buttons"><button id="play">播放</button><button id="record">记录</button><button id="reset">重置</button></div>
+38: <div class="readout" id="readout"></div>
+38D: <div class="readout" id="readout"></div>
+39: <div class="card"><div class="title">数据记录</div><table><thead><tr><th>n2/n1</th><th>U1/V</th><th>U2/V</th><th>U2/U1</th></tr></thead><tbody id="rows"></tbody></t
+40: <div class="card formula"><div class="title">规律</div><div>理想变压器：U1/U2 = n1/n2，即 U2 = U1·n2/n1。</div><div>负载会改变电流和功率；空载或轻载时更适合验证电压比。</div></div>
+41: <div class="status" id="status"></div>
+50: const state={phase:0,playing:false,drag:null,records:[]};
+52: function val(){const n1=+el.n1.value,n2=+el.n2.value,u1=+el.u1.value,R=+el.load.value,u2=u1*n2/n1,i2=u2/R,p2=u2*i2,i1=p2/u1;return{n1,n2,u1,R,u2,i2,i1,p2,ratio:
+53: function fmt(n,d=2){return(Math.abs(n)<1e-9?0:n).toFixed(d)}
+57: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(
+58: function meter(x,y,label,display,numeric,c){box(x-58,y-42,116,84,'#fbfdff');text(label,x,y-22,colors.muted,'center',12,'900');ctx.save();ctx.translate(x,y+8);ct
+59: function drawCoils(v){box(42,70,810,262,'#fff');text('铁芯互感装置：原线圈通交流电，副线圈感应交流电压',447,98,colors.ink,'center',16,'900');ctx.save();ctx.strokeStyle='#334e68';ctx.li
+60: function drawWave(v){box(42,352,370,216,'#fff');text('交流输入与输出波形',227,378,colors.ink,'center',15,'900');const ox=74,oy=492,w=300,h=70;line(ox,oy,ox+w,oy,colors.i
+62: function drawGraph(v){box(438,352,414,216,'#fff');text('U2-n2 作图：斜率 = U1/n1',645,378,colors.ink,'center',15,'900');const gx=486,gy=528,gw=310,gh=120;line(gx,gy,
+63: function update(v){el.n1Label.textContent=v.n1;el.n2Label.textContent=v.n2;el.u1Label.textContent=fmt(v.u1,1)+' V';el.rLabel.textContent=v.R+' Ω';el.readout.inn
+65: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+67: canvas.addEventListener('pointermove',move);function move(e){if(state.drag!=='n2')return;const p=pos(e);let n=50+(p.x-595)/185*950;n=Math.max(50,Math.min(1000,M
+70D: el.play.onclick=()=>{state.playing=!state.playing;el.play.textContent=state.playing?'暂停':'播放'};
+72D: document.getElementById('reset').onclick=()=>{el.n1.value=800;el.n2.value=200;el.u1.value=12;el.load.value=24;state.phase=0;state.playing=false;state.records=[];el.play.textContent='播放';draw()};
+
+===== anim/exp/uniform-acceleration-lab.html (194 lines, kept 44) =====
+27: <canvas id="c" width="700" height="460" aria-label="匀变速实验纸带和 v-t 图"></canvas>
+29: <div class="row"><button id="playBtn" class="primary" type="button">播放</button><button id="resetBtn" type="button">重置</button><button id="recordBtn" type="butto
+32: <label for="acc">加速度 a/(m/s²)：<span id="accVal"></span></label>
+34: <label for="period">计数点间隔 Δt/s：<span id="periodVal"></span></label>
+36: <label for="noise">测量误差等级：<span id="noiseVal"></span></label>
+38: <div id="readout" class="readout"></div>
+38D: <div id="readout" class="readout"></div>
+39: <table style="width:100%;margin-top:10px;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;border-bottom:1px solid #d9e2ec">记录</th>
+40: <div class="hint">观察任务：看相邻位移差是否近似相等；再看 v-t 点是否接近直线，斜率是否等于加速度。</div>
+45: const c = document.getElementById('c');
+62: const state = { running:false, time:0, last:0, drag:null, records:[] };
+63: function pos(v0, a, t) { return v0 * t + 0.5 * a * t * t; }
+64: function pseudoNoise(k, level) { return Math.sin(k * 12.9898) * 0.0015 * level; }
+68: const dt = Number(els.period.value);
+70D: els.v0Val.textContent = v0.toFixed(1);
+71D: els.accVal.textContent = a.toFixed(1);
+72D: els.periodVal.textContent = dt.toFixed(2);
+73D: els.noiseVal.textContent = noise;
+75: for (let i = 0; i <= 8; i++) x.push(pos(v0, a, i * dt) + pseudoNoise(i, noise));
+86: const slope = (v[v.length - 1] - v[0]) / (t[t.length - 1] - t[0]);
+95: const scale = 440 / Math.max(x[8], 0.1);
+101: const shown = state.running ? Math.min(8, Math.floor(state.time / dt)) : 8;
+103: const px = 68 + x[i] * scale;
+118: const carT = state.running ? Math.min(8*dt,state.time) : 8*dt;
+119: const carX = Math.min(590,68+pos(v0,a,carT)*scale);
+121: ctx.fillStyle='#2c7be5';ctx.beginPath();ctx.arc(120+v0*70,138,11,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.font='700 10px system-ui';ctx.fillText('v0',12
+122: ctx.fillStyle='#e03131';ctx.beginPath();ctx.arc(120+a*45,206,11,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.fillText('a',120+a*45,210);
+123: ctx.fillStyle='#486581';ctx.font='12px system-ui';ctx.fillText('拖 v0',120+v0*70,158);ctx.fillText('拖 a',120+a*45,226);
+144: const maxT = Math.max(...t);
+145: const maxV = Math.max(...v, 0.5);
+150: const px = ox + t[i] / maxT * gw;
+151: const py = oy - vv / maxV * gh;
+156: const px = ox + t[i] / maxT * gw;
+157: const py = oy - vv / maxV * gh;
+169D: ctx.fillText('公式读数：v=v0+at；相等时间位移差 Δs≈aT²，v-t 斜率≈a。', 350, 434);
+170D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+173: `理论：v=v0+at，当前 a=${a.toFixed(1)}m/s²`,
+182: function posPointer(e){const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height};}
+183: c.addEventListener('pointerdown',e=>{const p=posPointer(e),v0=Number(els.v0.value),a=Number(els.acc.value);if(Math.hypot(p.x-(120+v0*70),p.y-138)<22){state.drag
+184: c.addEventListener('pointermove',e=>{const p=posPointer(e);if(!state.drag){c.style.cursor='grab';return;}if(state.drag==='v0'){els.v0.value=Math.max(0,Math.min(
+186: els.playBtn.addEventListener('click',()=>{state.running=!state.running;state.last=0;if(state.time>=8*Number(els.period.value))state.time=0;draw();});
+187D: els.resetBtn.addEventListener('click',()=>{state.running=false;state.time=0;state.records=[];els.v0.value=.4;els.acc.value=1.6;els.period.value=.08;els.noise.value=1;els.records.innerHTML='';draw();})
+188: els.recordBtn.addEventListener('click',()=>{const v0=Number(els.v0.value),a=Number(els.acc.value),dt=Number(els.period.value),noise=Number(els.noise.value),x=[]
+189: function loop(now){if(!state.last)state.last=now;const dtime=Math.min(.04,(now-state.last)/1000);state.last=now;if(state.running){state.time+=dtime;if(state.tim

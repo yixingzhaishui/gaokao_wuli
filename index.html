@@ -552,7 +552,8 @@
       if (!p.source || !p.stem || !p.answer || !p.solution || !p.method) return false;
       if (!(p.knowledge_ids || []).length && !(p.model_ids || []).length) return false;
       if (['单选', '多选'].includes(p.type) && (!Array.isArray(p.options) || p.options.length < 3)) return false;
-      if (p.type === '计算' && !/[0-9０-９]/.test(p.stem || '')) return false;
+      // 符号推导题可以不含数字；用显式字段保留严格的发布过滤，同时避免静默误杀。
+      if (p.type === '计算' && p.symbolic !== true && !/[0-9０-９]/.test(p.stem || '')) return false;
       if ((p.solution || '').replace(/\s/g, '').length < 35) return false;
       if ((p.method || '').replace(/\s/g, '').length < 8) return false;
       const needsFigure = /(如图|下图|图示|所示|图中|右图|左图)/.test(p.stem || '');

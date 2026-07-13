@@ -38,8 +38,8 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
   <canvas id="canvas" width="600" height="340" aria-label="库仑定律实验台：两电荷俯视装置、F-r图像和数据记录"></canvas>
   <div class="readouts">
     <span class="r">距离 r = <b id="r-val">3.0</b> m</span>
-    <span class="r">力 F = <b id="f-val">2.00</b> N</span>
-    <span class="r">k·q₁q₂ = <b id="kq-val">18.0</b> N·m²</span>
+    <span class="r">力 F = <b id="f-val">6.00×10⁻³</b> N</span>
+    <span class="r">k₀·|q₁q₂| = <b id="kq-val">5.39×10⁻²</b> N·m²</span>
     <span class="r" id="type-val">斥力（同号）</span>
     <span class="r">q₂ 速度 v = <b id="v-val">0.00</b> m/s</span>
     <span class="r">加速度 a = <b id="a-val">0.00</b> m/s²</span>
@@ -57,22 +57,23 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
   let q1=3,q2=2,r=3;
   let running=false,velocity=0,elapsed=0,drag=null,trail=[];
   let hot={q1:{x:0,y:0},q2:{x:0,y:0},cy:0};
-  const k=9; // 简化 k=9 N·m²/μC² (实际 9×10⁹ N·m²/C²，这里 q 用 μC 简化)
+  const k0=8.99e9; // N·m²/C²；界面输入为 μC，计算时统一换算为 C
   const scale=50; // px per meter
-  const simMass=8; // kg：为便于观察，将 q₂ 视为 8 kg 小球
+  const simMass=0.008; // kg：8 g 轻质带电小球，使真实毫牛级电力产生可观察运动
   const timeScale=1.25;
 
   function calcF(){
     const sign=q1*q2;
-    const f=k*Math.abs(q1*q2)/(r*r);
+    const q1C=q1*1e-6,q2C=q2*1e-6;
+    const f=k0*Math.abs(q1C*q2C)/(r*r);
     return {f:f,sign:sign,attractive:sign<0,direction:sign>0?1:(sign<0?-1:0)};
   }
 
   function updateReadouts(){
     const res=calcF();
     document.getElementById('r-val').textContent=r.toFixed(2);
-    document.getElementById('f-val').textContent=res.f.toFixed(2);
-    document.getElementById('kq-val').textContent=(k*Math.abs(q1*q2)).toFixed(1);
+    document.getElementById('f-val').textContent=formatScientific(res.f);
+    document.getElementById('kq-val').textContent=formatScientific(k0*Math.abs(q1*1e-6*q2*1e-6));
     document.getElementById('v-val').textContent=velocity.toFixed(2);
     document.getElementById('a-val').textContent=(res.direction*res.f/simMass).toFixed(2);
     document.getElementById('t-val').textContent=elapsed.toFixed(2);
@@ -80,6 +81,12 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
     if(q1*q2>0) tv.textContent='斥力（同号）';
     else if(q1*q2<0) tv.textContent='引力（异号）';
     else tv.textContent='无力（有电荷为零）';
+  }
+
+  function formatScientific(value){
+    if(value===0)return '0';
+    const parts=value.toExponential(2).split('e');
+    return parts[0]+'×10'+Number(parts[1]).toString().replace('-', '⁻').replace(/0/g,'⁰').replace(/1/g,'¹').replace(/2/g,'²').replace(/3/g,'³').replace(/4/g,'⁴').replace(/5/g,'⁵').replace(/6/g,'⁶').replace(/7/g,'⁷').replace(/8/g,'⁸').replace(/9/g,'⁹');
   }
 
   function drawCharge(x,y,q,label){
@@ -156,7 +163,8 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
     ctx.fillStyle='#7c3aed';ctx.font='11px sans-serif';ctx.textAlign='center';
     ctx.fillText(running?'已释放':'待释放',x2,cy-48);
     // force arrows
-    const fLen=Math.min(80,res.f*15+10);
+    const forceAtOneMeter=k0*Math.abs(q1*1e-6*q2*1e-6);
+    const fLen=Math.min(80,10+70*res.f/Math.max(forceAtOneMeter,1e-12));
     if(q1*q2>0){
       // repulsive: q1 pushed left, q2 pushed right
       drawArrow(x1-20,cy,x1-20-fLen,cy,'#e03131');
@@ -187,13 +195,13 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
     ctx.fillStyle='#243b53';
     ctx.font='13px sans-serif';
     ctx.textAlign='left';
-    ctx.fillText('F = k·|q₁q₂| / r² = '+k+'×|'+q1.toFixed(1)+'×'+q2.toFixed(1)+'|/'+r.toFixed(2)+'² = '+res.f.toFixed(2)+' N',15,226);
+    ctx.fillText('F = k₀|q₁q₂|/r² = 8.99×10⁹×|'+q1.toFixed(1)+'×10⁻⁶×'+q2.toFixed(1)+'×10⁻⁶|/'+r.toFixed(2)+'² = '+formatScientific(res.f)+' N',15,226);
     ctx.fillText('q₂: a=F/m = '+(res.direction*res.f/simMass).toFixed(2)+' m/s²；'+(res.attractive?'向 q₁ 加速':'远离 q₁ 加速'),15,246);
     // F-r curve binds the numerical formula to the changing position.
-    const gx=58,gy=324,gw=480,gh=54,maxF=Math.max(1,k*Math.abs(q1*q2));
+    const gx=58,gy=324,gw=480,gh=54,maxF=Math.max(1e-12,k0*Math.abs(q1*1e-6*q2*1e-6));
     ctx.strokeStyle='#9fb3c8';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(gx,gy);ctx.lineTo(gx+gw,gy);ctx.moveTo(gx,gy);ctx.lineTo(gx,gy-gh);ctx.stroke();
     ctx.strokeStyle='#2c7be5';ctx.lineWidth=2.5;ctx.beginPath();
-    for(let rr=1;rr<=8;rr+=.08){const px=gx+(rr-1)/7*gw,py=gy-(k*Math.abs(q1*q2)/(rr*rr))/maxF*gh;if(rr===1)ctx.moveTo(px,py);else ctx.lineTo(px,py);}ctx.stroke();
+    for(let rr=1;rr<=8;rr+=.08){const px=gx+(rr-1)/7*gw,py=gy-(k0*Math.abs(q1*1e-6*q2*1e-6)/(rr*rr))/maxF*gh;if(rr===1)ctx.moveTo(px,py);else ctx.lineTo(px,py);}ctx.stroke();
     const px=gx+(r-1)/7*gw,py=gy-res.f/maxF*gh;
     ctx.fillStyle='#f0a500';ctx.beginPath();ctx.arc(px,py,5,0,Math.PI*2);ctx.fill();
     ctx.fillStyle='#486581';ctx.font='11px sans-serif';ctx.textAlign='left';ctx.fillText('F-r 图：黄点随 q₂ 的位置移动',gx,gy-gh-8);ctx.fillText('r/m',gx+gw-24,gy+15);ctx.fillText('F',gx-14,gy-gh+10);

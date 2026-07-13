@@ -35,7 +35,7 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
   <div class="readouts">
     <span class="r">源电荷 Q = <b id="q-val">+5.0</b> μC</span>
     <span class="r">距离 r = <b id="r-val">3.0</b> m</span>
-    <span class="r">场强 E = <b id="e-val">5.00</b> N/C</span>
+    <span class="r">场强 E = <b id="e-val">4.99×10³</b> N/C</span>
     <span class="r" id="dir-val">方向：向外</span>
     <span class="r">场强状态：<b id="trend-val">—</b></span>
     <span class="r">+q 速度：<b id="v-val">0.00</b> m/s</span>
@@ -52,16 +52,16 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
   const W=canvas.width,H=canvas.height;
   let Q=5,r=3;
   let running=false,t=0,dragTest=false,lastE=0,velocity=0,trail=[];
-  const k=9;
+  const k0=8.99e9; // N·m²/C²；界面输入为 μC，计算时统一换算为 C
   const scale=40;
 
   function calcE(){
-    return k*Math.abs(Q)/(r*r);
+    return k0*Math.abs(Q*1e-6)/(r*r);
   }
 
   function updateReadouts(){
     const e=calcE();
-    document.getElementById('e-val').textContent=e.toFixed(2);
+    document.getElementById('e-val').textContent=formatScientific(e);
     document.getElementById('q-val').textContent=(Q>=0?'+':'')+Q.toFixed(1);
     document.getElementById('r-val').textContent=r.toFixed(1);
     document.getElementById('dir-val').textContent=Q>0?'方向：向外（正电荷）':(Q<0?'方向：向内（负电荷）':'Q=0，无场');
@@ -69,6 +69,12 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
     document.getElementById('v-val').textContent=velocity.toFixed(2);
     document.getElementById('t-val').textContent=t.toFixed(2);
     lastE=e;
+  }
+
+  function formatScientific(value){
+    if(value===0)return '0';
+    const parts=value.toExponential(2).split('e');
+    return parts[0]+'×10'+Number(parts[1]).toString().replace('-', '⁻').replace(/0/g,'⁰').replace(/1/g,'¹').replace(/2/g,'²').replace(/3/g,'³').replace(/4/g,'⁴').replace(/5/g,'⁵').replace(/6/g,'⁶').replace(/7/g,'⁷').replace(/8/g,'⁸').replace(/9/g,'⁹');
   }
 
   function drawArrow(x1,y1,x2,y2,color,lw){
@@ -176,7 +182,7 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
     }
     // formula
     ctx.fillStyle='#243b53';ctx.font='13px sans-serif';ctx.textAlign='left';
-    ctx.fillText('E = k|Q|/r² = '+k+'×'+Math.abs(Q).toFixed(1)+'/'+r.toFixed(1)+'² = '+e.toFixed(2)+' N/C；+q 的 a 与 E 同向',15,H-15);
+    ctx.fillText('E = k₀|Q|/r² = 8.99×10⁹×'+Math.abs(Q).toFixed(1)+'×10⁻⁶/'+r.toFixed(1)+'² = '+formatScientific(e)+' N/C；+q 的 a 与 E 同向',15,H-15);
   }
 
   function stopMotion(){running=false;velocity=0;t=0;trail=[];document.getElementById('play-btn').textContent='释放 +q';}
