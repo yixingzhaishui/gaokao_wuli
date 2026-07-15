@@ -307,7 +307,9 @@ console.log('隔离的页面例题数据:', pageExamples.length);
 console.log('隔离的自动补充题:', specExamples.length);
 console.log('学生端已核验真题数:', verifiedProblems.length);
 const verifiedKnowledgeIds = new Set(verifiedProblems.flatMap(p => p.knowledge_ids || []));
-console.log('学生端已核验知识点覆盖:', `${verifiedKnowledgeIds.size}/${allIds.length}`);
+const verifiedMappedIds = new Set(verifiedProblems.flatMap(p => (p.knowledge_ids || []).concat(p.model_ids || [])));
+console.log('学生端已核验非模型知识点覆盖:', `${verifiedKnowledgeIds.size}/${allIds.length - modelIds.size}`);
+console.log('学生端页面节点映射覆盖（含模型）:', `${verifiedMappedIds.size}/${allIds.length}`);
 console.log('隔离旧数据审计：原可展示', exampleAudit.ready, '道；待人工审核', exampleAudit.needs_review, '道');
 if (exampleAudit.needs_review) {
   const blocking = Object.entries(exampleAudit.by_flag)

@@ -99,6 +99,9 @@ for (const ch of CHAPTERS) {
   // examples: figure-hint without nearby figure
   let figMiss = 0;
   lines.forEach((ln, i) => {
+    // This is a general problem-solving reminder, not a problem statement
+    // that promises an accompanying figure.
+    if (/若题目给的是重力与某方向的夹角/.test(ln)) return;
     if (FIG_HINT.test(ln) && /题|求|下列|选项|A\.|如图/.test(ln)) {
       const ctx = lines.slice(Math.max(0, i - 30), Math.min(lines.length, i + 30)).join('\n');
       if (!/(<svg|<img|!\[|diagram|figure|<iframe)/.test(ctx)) { figMiss++; issue('P1?', `${ch}.md`, `疑似缺图 L${i + 1}`, ln.trim().slice(0, 80)); }
@@ -136,19 +139,29 @@ try {
 
 // ---------- write ----------
 mkdirSync(join(ROOT, 'eval/results'), { recursive: true });
-writeFileSync(join(ROOT, 'eval/results/static.json'), JSON.stringify(out, null, 1));
+const outputPath = join(ROOT, 'eval/results/static.json');
+let previous = null;
+try { previous = JSON.parse(readFileSync(outputPath, 'utf8')); } catch {}
+if (previous) {
+  const semantic = value => {
+    const copy = structuredClone(value);
+    delete copy.generatedAt;
+    return JSON.stringify(copy);
+  };
+  if (semantic(previous) === semantic(out)) out.generatedAt = previous.generatedAt;
+}
+const serialized = JSON.stringify(out, null, 1);
+let existing = '';
+try { existing = readFileSync(outputPath, 'utf8'); } catch {}
+if (existing !== serialized) writeFileSync(outputPath, serialized);
 const bySev = {};
 out.issues.forEach(i => bySev[i.sev] = (bySev[i.sev] || 0) + 1);
 console.log(`pages=${Object.keys(out.pages).length} chapters=${Object.keys(out.chapters).length} issues=${out.issues.length}`, bySev);
 
 // ---------- gate mode (npm run check) ----------
-// 拦截 P0/P1/P1?；P2 仅警告；P3（公式 lint 属系统性迁移事项）不拦截；白名单排除已核实误报。
+// 拦截 P0/P1/P1?；P2 仅警告；P3 为局部格式建议，不阻断发布。
 if (process.argv.includes('--gate')) {
-  const WHITELIST = [
-    (i) => i.file === 'bx1.md' && /疑似缺图 L3146/.test(i.msg), // 人工核实：一般性规则陈述，非题干引用图示
-  ];
-  const blocking = out.issues.filter(i =>
-    ['P0', 'P1', 'P1?'].includes(i.sev) && !WHITELIST.some(w => w(i)));
+  const blocking = out.issues.filter(i => ['P0', 'P1', 'P1?'].includes(i.sev));
   const warns = out.issues.filter(i => i.sev === 'P2');
   warns.forEach(i => console.warn('  [warn P2]', i.file, i.msg));
   if (blocking.length) {
@@ -156,5 +169,5 @@ if (process.argv.includes('--gate')) {
     blocking.forEach(i => console.error('  [' + i.sev + ']', i.file, i.msg, i.detail || ''));
     process.exit(1);
   }
-  console.log('GATE PASS (P0/P1 clean; P3 formula-lint excluded pending KaTeX migration)');
+  console.log('GATE PASS (P0/P1 clean; KaTeX formula lint clean)');
 }

@@ -1,4 +1,4 @@
-const { test } = require('@playwright/test');
+const { test, expect } = require('@playwright/test');
 const fs = require('fs');
 const path = require('path');
 const { pathToFileURL } = require('url');
@@ -597,6 +597,7 @@ for (const { moduleName, file } of pages) {
     } finally {
       results.push(record);
     }
+    expect(record.hard_failures, `${record.file} 存在交互审核硬失败`).toEqual([]);
   });
 }
 
