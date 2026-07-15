@@ -25,6 +25,21 @@
       overflow-x: hidden;
     }
     .app-nav { font-size: 14px; }
+    .review-banner {
+      position: fixed;
+      top: 0;
+      left: var(--sidebar-width);
+      right: 0;
+      z-index: 30;
+      padding: 9px 16px;
+      border-bottom: 1px solid #f0b429;
+      background: #fff3bf;
+      color: #7c4a03;
+      font-size: 14px;
+      line-height: 1.45;
+      text-align: center;
+    }
+    .content { padding-top: 42px; }
 
     /* 强制目录在左侧。Docsify 默认在窄屏会把目录折叠/挤到页面流里，
        本站是学习路径型网页，目录必须始终作为左侧导航存在。 */
@@ -300,8 +315,18 @@
       margin: 16px 0;
     }
     .verified-bank-link a { font-weight: 700; }
+    .status.review {
+      background: #fff3cd;
+      color: #7c4a03;
+    }
     @media (max-width: 760px) {
       :root { --sidebar-width: 270px; }
+      .review-banner {
+        left: 0;
+        padding: 7px 10px;
+        font-size: 12px;
+      }
+      .content { padding-top: 54px; }
       .sidebar {
         transform: translateX(-100%) !important;
         transition: transform .2s ease !important;
@@ -350,6 +375,9 @@
   </style>
 </head>
 <body>
+  <div class="review-banner" role="status">
+    非四川省教育考试院官方项目 · 当前为内容审校测试版 · 交互通过不代表物理内容、答案与来源均已审定
+  </div>
   <div id="app"></div>
   <script>
     window.$docsify = {
@@ -494,20 +522,35 @@
     async function hideUnverifiedExercises() {
       const section = document.querySelector('.markdown-section');
       if (!section) return;
+      const headers = Array.from(section.querySelectorAll('h3, h4, h5, h6'));
+      // 在任何网络请求之前先隐藏自由文本旧题，避免请求挂起时短暂暴露。
+      for (const heading of headers) {
+        const title = (heading.textContent || '').replace(/\s+/g, '');
+        if (!/(例题|训练题)/.test(title)) continue;
+        heading.hidden = true;
+        let node = heading.nextElementSibling;
+        while (node && !/^H[2-4]$/.test(node.tagName)) {
+          node.hidden = true;
+          node = node.nextElementSibling;
+        }
+      }
       let verified = [];
       let idMap = {};
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);
       try {
         const [rawProblems, rawDiagnostic, rawIdMap] = await Promise.all([
-          fetch('data/verified-problems.json').then(r => r.json()),
-          fetch('data/verified-diagnostic-2024cee.json').then(r => r.json()),
-          fetch('data/id-map.json').then(r => r.json())
+          fetch('data/verified-problems.json', { signal: controller.signal }).then(r => { if (!r.ok) throw new Error('题库请求失败'); return r.json(); }),
+          fetch('data/verified-diagnostic-2024cee.json', { signal: controller.signal }).then(r => { if (!r.ok) throw new Error('诊断题请求失败'); return r.json(); }),
+          fetch('data/id-map.json', { signal: controller.signal }).then(r => { if (!r.ok) throw new Error('目录请求失败'); return r.json(); })
         ]);
         idMap = rawIdMap || {};
         verified = problemList(rawProblems).concat(problemList(rawDiagnostic)).filter(isPublishableProblem);
       } catch (err) {
-        // 正文不因题库加载失败而中断；保留可访问的题库入口。
+        // 保持旧题隐藏；后续以明确的不可用提示替换。
+      } finally {
+        clearTimeout(timeout);
       }
-      const headers = Array.from(section.querySelectorAll('h3, h4, h5, h6'));
       for (const heading of headers) {
         if (heading.dataset.verifiedReplacement === '1') continue;
         const title = (heading.textContent || '').replace(/\s+/g, '');
@@ -528,9 +571,9 @@
         const replacement = document.createElement('aside');
         replacement.className = 'verified-bank-link';
         if (related.length) {
-          replacement.innerHTML = '<b>已核验例题</b>（与本知识点直接关联，原卷可追溯）' + related.map(p => renderProblemCard(p, idMap)).join('') + '<p>更多题目可到<a href="#/papers">已核验题库</a>按知识点筛选。</p>';
+          replacement.innerHTML = '<b>来源复核记录中的例题</b>（与本知识点直接关联；最终发布等级仍按政策 2.0 复核）' + related.map(p => renderProblemCard(p, idMap)).join('') + '<p>更多题目可到<a href="#/papers">来源复核中的题库</a>按知识点筛选。</p>';
         } else {
-          replacement.innerHTML = '<b>本知识点的旧例题已下架</b>：它们缺少可追溯原卷信息，不能作为学生练习。该知识点暂未补到可核验原卷题；请先到<a href="#/papers">已核验题库</a>练习，题库会持续补入带卷名、题号、来源链接和核验记录的题目。';
+          replacement.innerHTML = '<b>本知识点的旧例题已下架</b>：题库数据暂不可用，或题目尚未达到来源发布门槛。请到<a href="#/papers">来源复核中的题库</a>查看当前状态。';
         }
         heading.replaceWith(replacement);
         let node = replacement.nextElementSibling;
@@ -548,6 +591,10 @@
 
     function isPublishableProblem(p) {
       if (!['official_exam', 'regional_exam', 'published_simulation', 'diagnostic_exam'].includes(p.source_kind)) return false;
+      if (p.source_policy_version !== '2.0' || p.verification_status !== 'double_checked') return false;
+      const independentB = Array.isArray(p.independent_secondary_sources) && p.independent_secondary_sources.filter(s => s && s.tier === 'B').length >= 2;
+      if (!(p.primary_source_tier === 'A' || (independentB && p.no_primary_source_reason))) return false;
+      if (!p.scan_page || !p.file_sha256 || !p.stem_checked_by || !p.answer_checked_by || !p.solution_recalculated_by) return false;
       if (p.source_verified !== true || !p.source_detail || !p.exam || !p.question_no || !Array.isArray(p.source_urls) || !p.source_urls.length || !p.verified_at) return false;
       if (!p.source || !p.stem || !p.answer || !p.solution || !p.method) return false;
       if (!(p.knowledge_ids || []).length && !(p.model_ids || []).length) return false;
@@ -558,6 +605,7 @@
       if ((p.method || '').replace(/\s/g, '').length < 8) return false;
       const needsFigure = /(如图|下图|图示|所示|图中|右图|左图)/.test(p.stem || '');
       if ((needsFigure || p.diagram_required) && !(p.diagram || p.image || p.img || p.figure || p.svg)) return false;
+      if ((needsFigure || p.diagram_required) && !p.figure_fidelity_checked_by) return false;
       return true;
     }
 
@@ -771,8 +819,8 @@
           '  <aside class="graph-panel">',
           '    <h3>知识图谱</h3>',
           '    <p>点击节点跳到对应知识点；悬停查看模块、完成状态和前后关系。图谱排版完成后会自动静止，只有拖动节点时才会短暂重新排列。</p>',
-          '    <div class="graph-chip"><span class="graph-dot" style="background:#2c7be5"></span>done</div>',
-          '    <div class="graph-chip"><span class="graph-dot" style="background:#f0a500"></span>partial</div>',
+          '    <div class="graph-chip"><span class="graph-dot" style="background:#2c7be5"></span>interaction passed · content pending</div>',
+          '    <div class="graph-chip"><span class="graph-dot" style="background:#f0a500"></span>interaction partial · content pending</div>',
           '    <div class="graph-chip"><span class="graph-dot" style="background:#9fb3c8"></span>pending</div>',
           '    <div class="legend">',
           '      <div><b>prerequisite</b>：前置知识</div>',
@@ -845,7 +893,8 @@
           .attr('class', 'graph-node')
           .on('mouseenter', function(event, d) {
             const tip = document.getElementById('graph-tooltip');
-            tip.innerHTML = '<b>' + d.id + ' ' + d.title + '</b><br>' + d.module + ' · ' + d.level + '档 · ' + d.status;
+            const statusText = d.status === 'done' ? 'interaction passed · content pending' : d.status === 'partial' ? 'interaction partial · content pending' : d.status;
+            tip.innerHTML = '<b>' + d.id + ' ' + d.title + '</b><br>' + d.module + ' · ' + d.level + '档 · ' + statusText;
             tip.style.left = (event.clientX + 12) + 'px';
             tip.style.top = (event.clientY + 12) + 'px';
             tip.style.display = 'block';

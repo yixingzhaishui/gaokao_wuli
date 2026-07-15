@@ -62,6 +62,10 @@ const verifiedProblemsData = json('data/verified-problems.json');
 const diagnosticProblemsData = json('data/verified-diagnostic-2024cee.json');
 const pageExamplesData = json('data/page-examples.json');
 const specExamplesData = json('data/spec-supplement-examples.json');
+const officialExperiments = json('data/official-experiments.json');
+const curriculumMap = json('data/curriculum-map.json');
+const quarantinedMarkdown = json('data/quarantine/legacy-markdown-exercises.json');
+const publishablePageExamples = json('data/publishable-page-examples.json');
 const coreProblems = problemsData.problems || problemsData;
 const verifiedProblems = (verifiedProblemsData.problems || verifiedProblemsData).concat(diagnosticProblemsData.problems || diagnosticProblemsData);
 const pageExamples = pageExamplesData.examples || [];
@@ -73,6 +77,53 @@ const allIds = Object.keys(idMap);
 const validIds = new Set(allIds);
 const modelIds = new Set(allIds.filter(id => idMap[id].level === 'model' || id.startsWith('M-')));
 const allowedSourceKinds = new Set(['official_exam', 'regional_exam', 'published_simulation', 'diagnostic_exam']);
+
+// 0. Governance and release-safety documents must remain readable and portable.
+for (const rel of ['SOURCE_POLICY.md', 'SOURCE_VERIFICATION_REPORT.md']) {
+  const text = read(rel);
+  if (/No such file or directory|^sed:|\/Users\//m.test(text)) {
+    errors.push(`来源治理文档损坏或包含本地绝对路径: ${rel}`);
+  }
+}
+if (!/政策版本：2\.0/.test(read('SOURCE_POLICY.md'))) errors.push('SOURCE_POLICY.md 缺少政策版本 2.0');
+if (!/内容审校测试版/.test(read('index.html'))) errors.push('首页缺少内容审校测试版标识');
+if (!exists('MATH_SYMBOLS.md') || !/\\nu_0/.test(read('MATH_SYMBOLS.md'))) errors.push('缺少统一数学符号表或截止频率规范');
+
+// 0.1 The official experiment register is authoritative and must contain exactly 21 unique IDs.
+const officialExperimentIds = officialExperiments.official_required_ids || [];
+if (officialExperiments.official_required_count !== 21 || officialExperimentIds.length !== 21 || new Set(officialExperimentIds).size !== 21) {
+  errors.push('课标学生必做实验必须恰为 21 项且 ID 不重复');
+}
+if (officialExperimentIds.includes('E-02')) errors.push('E-02 不得计入独立课标学生必做实验');
+for (const id of officialExperimentIds) {
+  if (!idMap[id]) errors.push(`课标学生必做实验 ID 不存在: ${id}`);
+}
+if (idMap['E-04']?.title !== '探究两个互成角度的力的合成规律') errors.push('E-04 名称未使用课标探究表述');
+
+// 0.2 Every numbered node must have explicit curriculum scope; only primary nodes count as coverage.
+const curriculumNodes = curriculumMap.nodes || {};
+const primaryClauses = new Map();
+for (const id of allIds) {
+  const item = curriculumNodes[id];
+  if (!item) {
+    errors.push(`curriculum-map 缺少节点: ${id}`);
+    continue;
+  }
+  for (const field of ['official_module', 'requirement', 'scope', 'primary_node']) {
+    if (item[field] === undefined || item[field] === '') errors.push(`curriculum-map ${id} 缺少 ${field}`);
+  }
+  if (!['core', 'extension', 'review'].includes(item.scope)) errors.push(`curriculum-map ${id} scope 非法: ${item.scope}`);
+  if (item.primary_node) {
+    if (!item.standard_clause) errors.push(`primary curriculum node 缺少课标条款: ${id}`);
+    const key = `${item.official_module}:${item.standard_clause}`;
+    if (primaryClauses.has(key)) errors.push(`课标条款重复 primary_node: ${key} -> ${primaryClauses.get(key)}, ${id}`);
+    primaryClauses.set(key, id);
+  }
+}
+for (const id of Object.keys(curriculumNodes)) if (!idMap[id]) errors.push(`curriculum-map 多余节点: ${id}`);
+if (curriculumNodes['X1-24']?.primary_node !== false || curriculumNodes['X1-24']?.scope !== 'review') errors.push('X1-24 必须是跨模块复习入口且不计覆盖');
+if (curriculumNodes['X3-19']?.primary_node !== true || curriculumNodes['X3-19']?.standard_clause !== '3.4.1—3.4.2') errors.push('X3-19 必须是光电效应课标主节点');
+for (const id of ['B3-25', 'B3-26', 'B3-27']) if (curriculumNodes[id]?.primary_node !== true) errors.push(`${id} 必须是必修3基础链路主节点`);
 
 // 1. id-map files and slugs must point at real h4 anchors.
 for (const [id, meta] of Object.entries(idMap)) {
@@ -98,6 +149,19 @@ for (const id of allIds) {
 }
 for (const id of Object.keys(progress)) {
   if (!validIds.has(id)) errors.push(`progress.json 多余编号: ${id}`);
+}
+for (const [id, item] of Object.entries(progress)) {
+  const axes = item.review_axes;
+  const requiredAxes = ['curriculum_map', 'physics_content', 'examples_recalculated', 'source_review', 'pedagogy_review', 'interaction_qa', 'mobile_qa', 'editorial_structure', 'formula_first_use', 'publish'];
+  if (!axes) {
+    errors.push(`progress.json 缺少多轴审核状态: ${id}`);
+    continue;
+  }
+  for (const axis of requiredAxes) if (!axes[axis]?.status) errors.push(`progress.json ${id} 缺少审核轴 ${axis}`);
+  if (axes.editorial_structure?.status !== 'reviewed_by_codex') errors.push(`编辑模板尚未完成 Codex 全量审查: ${id}`);
+  if (axes.formula_first_use?.status !== 'reviewed_by_codex') errors.push(`公式首次使用尚未完成 Codex 全量审查: ${id}`);
+  if (axes.publish?.status !== 'blocked') errors.push(`未经全部审签的节点不得发布: ${id}`);
+  if ('score' in item) errors.push(`progress.json 不得保留无 rubric/审阅人的虚假精确分数: ${id}`);
 }
 
 // 3. sidebar links must point to real files/anchors and cover every id-map entry.
@@ -185,13 +249,14 @@ for (const p of problems) {
   }
 }
 
-// 6.2 Student-facing bank: verified original papers only.
+// 6.2 Source-review candidates: policy fields are explicit; only double-checked records may publish.
 for (const p of verifiedProblems) {
   const required = ['id', 'source', 'source_detail', 'exam', 'question_no', 'verified_at', 'stem', 'answer', 'solution', 'method'];
   for (const field of required) {
     if (!p[field] || (typeof p[field] === 'string' && !p[field].trim())) errors.push(`已核验真题缺少 ${field}: ${p.id || '未编号题目'}`);
   }
-  if (p.source_verified !== true) errors.push(`学生端真题未标记 source_verified=true: ${p.id}`);
+  if (p.source_policy_version !== '2.0') errors.push(`题目未迁移到来源政策 2.0: ${p.id}`);
+  if (!p.verification_status) errors.push(`题目缺少 verification_status: ${p.id}`);
   if (!allowedSourceKinds.has(p.source_kind)) errors.push(`学生端题目来源类型不允许: ${p.id} ${p.source_kind || '缺失'}`);
   if (!Array.isArray(p.source_urls) || !p.source_urls.length || p.source_urls.some(url => !/^https?:\/\//.test(url))) {
     errors.push(`已核验真题来源链接不完整: ${p.id}`);
@@ -199,6 +264,14 @@ for (const p of verifiedProblems) {
   if (!Array.isArray(p.knowledge_ids) || !p.knowledge_ids.length) errors.push(`已核验真题缺少知识标签: ${p.id}`);
   if (['单选', '多选'].includes(p.type) && (!Array.isArray(p.options) || p.options.length < 3)) errors.push(`已核验选择题缺少选项: ${p.id}`);
   if (figureRe.test(p.stem || '') && !hasProblemGraphic(p)) errors.push(`已核验图题缺图: ${p.id}`);
+  if (p.verification_status === 'double_checked') {
+    const independentB = Array.isArray(p.independent_secondary_sources) && p.independent_secondary_sources.filter(s => s?.tier === 'B').length >= 2;
+    if (!(p.primary_source_tier === 'A' || (independentB && p.no_primary_source_reason))) errors.push(`双签题来源等级不足: ${p.id}`);
+    for (const field of ['scan_page', 'file_sha256', 'stem_checked_by', 'answer_checked_by', 'solution_recalculated_by']) {
+      if (!p[field]) errors.push(`双签题缺少 ${field}: ${p.id}`);
+    }
+    if (p.source_verified !== true) errors.push(`双签题未设置 source_verified=true: ${p.id}`);
+  }
 }
 
 // 6.1 example-system quantitative gates.
@@ -245,7 +318,7 @@ for (const md of walk(root, (fp, name) => name.endsWith('.md'))) {
   // Avoid broad paragraph scanning here; it creates noise for phrases like “图中读数”.
 }
 
-// 8. A-level done knowledge points should keep the required learning sections.
+// 8. Only content-approved A-level nodes may be treated as having a complete learning loop.
 const aSectionRules = [
   { name: '现象引入', test: block => /先看现象|现象|实验情境/.test(block) },
   { name: '动画或交互实验', test: block => /<iframe\b|示意动画|交互动画|互动实验|动画/.test(block) },
@@ -256,7 +329,7 @@ const aSectionRules = [
 ];
 for (const [id, meta] of Object.entries(idMap)) {
   const p = progress[id];
-  if (!p || p.status !== 'done' || p.level !== 'A') continue;
+  if (!p || p.review_axes?.physics_content?.status !== 'approved' || p.level !== 'A') continue;
   if (!meta.file || ['experiments', 'models', 'gaokao-skills'].includes(meta.file)) continue;
   const text = read(`${meta.file}.md`);
   const start = text.search(new RegExp(`<h4[^>]*\\bid="${esc(meta.slug)}"`));
@@ -299,17 +372,40 @@ for (const fp of walk(root)) {
   }
 }
 
+// 11. Known student-visible content regressions identified in the 2026-07 review.
+const studentContentFiles = ['bx1.md', 'bx2.md', 'bx3.md', 'xb1.md', 'xb2.md', 'xb3.md', 'experiments.md', 'gaokao-skills.md', 'models.md'];
+const forbiddenContent = [
+  [/2\.94\s*W/, 'B3-16 错误功率 2.94 W'],
+  [/\\mathrm\{V\}1|ν\s+0|\\nu\s+0/, '损坏的下标或体积公式'],
+  [/取之不尽|几乎不排放污染物/, '绝对化能源表述'],
+  [/高考[^\n（）]{0,24}(?:改编|风格|演练)|四川适应性演练|[12][0-9]{3}[^\n（）]{0,16}改编/, '无元数据的考试来源标签'],
+  [/压轴/, '无具体试卷依据的压轴标签']
+];
+for (const rel of studentContentFiles) {
+  const text = read(rel);
+  for (const [re, label] of forbiddenContent) {
+    if (re.test(text)) errors.push(`${rel} 仍含${label}`);
+  }
+  const legacyExercisePattern = /^(?:\*\*(?:例题|训练题)|#{3,6}\s+(?!例题与训练（来源审核中）).*?(?:例题|训练题)|<h[5-6]\b[^>]*>.*(?:例题|训练题))/m;
+  if (legacyExercisePattern.test(text)) errors.push(`${rel} 仍物理包含历史自由文本例题/训练题`);
+}
+if (!quarantinedMarkdown.count || quarantinedMarkdown.count !== quarantinedMarkdown.records?.length) errors.push('Markdown 例题隔离记录为空或计数不一致');
+for (const record of quarantinedMarkdown.records || []) {
+  if (!record.file || !record.content || !/^[a-f0-9]{64}$/.test(record.sha256 || '')) errors.push('Markdown 例题隔离记录字段或哈希无效');
+}
+if (publishablePageExamples.fail_closed !== true || publishablePageExamples.source_policy_version !== '2.0') errors.push('构建期例题导出未启用政策 2.0 fail-closed');
+
 console.log('=== check.js strict 自动化检查 ===');
 console.log('知识点/实验/模型总数:', allIds.length);
 console.log('知识图谱节点数:', graphNodes.length);
 console.log('隔离的旧题库数据:', coreProblems.length);
 console.log('隔离的页面例题数据:', pageExamples.length);
 console.log('隔离的自动补充题:', specExamples.length);
-console.log('学生端已核验真题数:', verifiedProblems.length);
+console.log('来源政策 2.0 候选题数:', verifiedProblems.length);
 const verifiedKnowledgeIds = new Set(verifiedProblems.flatMap(p => p.knowledge_ids || []));
 const verifiedMappedIds = new Set(verifiedProblems.flatMap(p => (p.knowledge_ids || []).concat(p.model_ids || [])));
-console.log('学生端已核验非模型知识点覆盖:', `${verifiedKnowledgeIds.size}/${allIds.length - modelIds.size}`);
-console.log('学生端页面节点映射覆盖（含模型）:', `${verifiedMappedIds.size}/${allIds.length}`);
+console.log('候选题非模型知识点映射:', `${verifiedKnowledgeIds.size}/${allIds.length - modelIds.size}`);
+console.log('候选题页面节点映射（含模型）:', `${verifiedMappedIds.size}/${allIds.length}`);
 console.log('隔离旧数据审计：原可展示', exampleAudit.ready, '道；待人工审核', exampleAudit.needs_review, '道');
 if (exampleAudit.needs_review) {
   const blocking = Object.entries(exampleAudit.by_flag)
