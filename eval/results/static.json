@@ -1,9 +1,9 @@
 {
- "generatedAt": "2026-07-17T05:50:22.893Z",
+ "generatedAt": "2026-07-17T14:53:32.921Z",
  "pages": {
   "anim/bx1/acceleration.html": {
    "module": "bx1",
-   "bytes": 11885,
+   "bytes": 11891,
    "hasViewportMeta": true,
    "canvasCount": 1,
    "svgCount": 0,
@@ -167,18 +167,17 @@
   },
   "anim/bx1/elastic-force.html": {
    "module": "bx1",
-   "bytes": 9031,
+   "bytes": 7408,
    "hasViewportMeta": true,
    "canvasCount": 1,
    "svgCount": 0,
    "buttons": [
-    "mSupport",
-    "mRope",
-    "mSpring",
     "play",
-    "resetBtn"
+    "reset",
+    "zero",
+    "deformed"
    ],
-   "buttonsNoId": 0,
+   "buttonsNoId": 3,
    "ranges": [],
    "rangesNoId": 0,
    "selects": [],
@@ -220,19 +219,15 @@
   },
   "anim/bx1/force-composition.html": {
    "module": "bx1",
-   "bytes": 8267,
+   "bytes": 6177,
    "hasViewportMeta": true,
    "canvasCount": 1,
    "svgCount": 0,
    "buttons": [
-    "mSame",
-    "mRight",
-    "mOpp",
-    "mFree",
     "play",
-    "resetBtn"
+    "reset"
    ],
-   "buttonsNoId": 0,
+   "buttonsNoId": 4,
    "ranges": [],
    "rangesNoId": 0,
    "selects": [],
@@ -243,19 +238,21 @@
    "hasResize": false,
    "listensInput": false,
    "hasTask": true,
-   "hasFormulaPanel": true,
+   "hasFormulaPanel": false,
    "hasReadout": true,
    "hasResetBtn": true
   },
   "anim/bx1/force-decomposition.html": {
    "module": "bx1",
-   "bytes": 12752,
+   "bytes": 14100,
    "hasViewportMeta": true,
    "canvasCount": 1,
    "svgCount": 0,
    "buttons": [
     "playBtn",
-    "resetBtn"
+    "resetBtn",
+    "basisSlope",
+    "basisGround"
    ],
    "buttonsNoId": 4,
    "ranges": [],
@@ -355,7 +352,7 @@
   },
   "anim/bx1/gravity.html": {
    "module": "bx1",
-   "bytes": 8591,
+   "bytes": 8835,
    "hasViewportMeta": true,
    "canvasCount": 1,
    "svgCount": 0,
@@ -384,30 +381,27 @@
   },
   "anim/bx1/hooke-law.html": {
    "module": "bx1",
-   "bytes": 9631,
+   "bytes": 7742,
    "hasViewportMeta": true,
    "canvasCount": 1,
    "svgCount": 0,
    "buttons": [
-    "mStretch",
-    "mCompress",
-    "mHard",
-    "mOver",
-    "play",
-    "resetBtn"
+    "inside",
+    "outside",
+    "reset"
    ],
    "buttonsNoId": 0,
    "ranges": [],
-   "rangesNoId": 0,
+   "rangesNoId": 3,
    "selects": [],
    "checkboxes": 0,
    "hasRAF": true,
    "hasPointerEvents": true,
    "addsDynamicButtons": false,
    "hasResize": false,
-   "listensInput": false,
+   "listensInput": true,
    "hasTask": true,
-   "hasFormulaPanel": true,
+   "hasFormulaPanel": false,
    "hasReadout": true,
    "hasResetBtn": true
   },
@@ -513,7 +507,7 @@
   },
   "anim/bx1/particle.html": {
    "module": "bx1",
-   "bytes": 15260,
+   "bytes": 15296,
    "hasViewportMeta": true,
    "canvasCount": 1,
    "svgCount": 0,
@@ -536,13 +530,13 @@
    "hasResize": false,
    "listensInput": true,
    "hasTask": true,
-   "hasFormulaPanel": true,
+   "hasFormulaPanel": false,
    "hasReadout": true,
    "hasResetBtn": true
   },
   "anim/bx1/plank-block.html": {
    "module": "bx1",
-   "bytes": 19774,
+   "bytes": 20483,
    "hasViewportMeta": true,
    "canvasCount": 1,
    "svgCount": 0,
@@ -5342,8 +5336,8 @@
  },
  "chapters": {
   "bx1.md": {
-   "lines": 3635,
-   "bytes": 120670,
+   "lines": 3638,
+   "bytes": 121562,
    "iframes": [
     "anim/bx1/particle.html",
     "anim/bx1/reference-frame.html",

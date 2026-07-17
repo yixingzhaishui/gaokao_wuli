@@ -38,7 +38,7 @@
 <div class="root">
   <div class="stage"><canvas id="canvas" width="960" height="760" aria-label="板块模型交互实验台"></canvas></div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>先拖红色箭头或 v0 箭头，看摩擦方向；再拖时间游标，看相对滑痕 Δx 是否达到板长 L。</div>
+    <div class="card task"><b>观察任务·判断顺序：</b>假设共同运动 → 求所需静摩擦 → 比较 f需 与 fₛ,max → 超过上限后切换为 fₖ。只有相对滑动阶段才计算 Q=fₖ·s相对。</div>
     <div class="chips"><button id="playBtn">播放过程</button><button id="resetBtn">重置时间</button></div>
     <div class="card">
       <div class="title">实验模式</div>
@@ -66,10 +66,10 @@
       </div>
     </div>
     <div class="card formula">
-      <div><span>先假设共动</span><b>f需=Ma ≤ μmg</b></div>
-      <div><span>滑动后分列（地面光滑）</span><b>am=(F-μmg)/m, aM=μmg/M</b></div>
-      <div><span>滑痕/热量</span><b>Δx=xm-xM, Q=fΔx</b></div>
-      <div><span>初速度共速</span><b>v0-μgt=μmgt/M</b></div>
+      <div><span>先假设共动</span><b>f需=Ma ≤ μₛmg</b></div>
+      <div><span>滑动后分列（地面光滑）</span><b>am=(F-μₖmg)/m, aM=μₖmg/M</b></div>
+      <div><span>滑痕/热量</span><b>Δx=xm-xM, Q=fₖΔx（仅滑动）</b></div>
+      <div><span>初速度共速</span><b>v0-μₖgt=μₖmgt/M</b></div>
     </div>
     <div class="card small"><b>三视图绑定：</b>左侧是侧视实物过程，红色刻痕尺相当于俯视滑痕记录；右侧 x相-t 和 v-t 图用同一时间游标取读数。</div>
     <div class="status" id="status">相对静止：所需静摩擦没有超过最大静摩擦。</div>
@@ -80,7 +80,7 @@
   'use strict';
   const canvas=document.getElementById('canvas');
   const ctx=canvas.getContext('2d');
-  const state={mode:'pull',F:4,v0:4,mu:.4,m:1,M:3,L:2,g:10,t:0,drag:null,playing:false};
+  const state={mode:'pull',F:4,v0:4,mus:.4,muk:.3,m:1,M:3,L:2,g:10,t:0,drag:null,playing:false};
   const ids=['meter1','meter2','meter3','meter4','status','meter1Label'];
   const el=Object.fromEntries(ids.map(id=>[id,document.getElementById(id)]));
   const playBtn=document.getElementById('playBtn');
@@ -109,14 +109,15 @@
     line(x+35,y+h-30,x+w-16,y+h-30,'#94a3b8',1.5);line(x+35,y+h-30,x+35,y+34,'#94a3b8',1.5);
   }
   function calc(){
-    const fMax=state.mu*state.m*state.g;
+    const fMax=state.mus*state.m*state.g;
+    const fk=state.muk*state.m*state.g;
     const Fcrit=fMax*(state.m+state.M)/state.M;
     if(state.mode==='pull'){
       const fNeed=state.M*state.F/(state.m+state.M);
       const sliding=state.F>Fcrit+1e-7;
       const aCommon=state.F/(state.m+state.M);
-      const am=sliding?(state.F-fMax)/state.m:aCommon;
-      const aM=sliding?fMax/state.M:aCommon;
+      const am=sliding?(state.F-fk)/state.m:aCommon;
+      const aM=sliding?fk/state.M:aCommon;
       const relA=Math.max(0,am-aM);
       const fallT=relA>0?Math.sqrt(2*state.L/relA):Infinity;
       const endT=Math.min(2.8,Number.isFinite(fallT)?fallT:2.8);
@@ -124,11 +125,11 @@
       const relX=.5*relA*t*t;
       const xm=.5*am*t*t;
       const xM=.5*aM*t*t;
-      return{fMax,Fcrit,fNeed,sliding,am,aM,relA,fallT,endT,t,relX,xm,xM,Q:fMax*relX,phase:sliding?(relX>=state.L-.001?'滑下木板':'相对滑动'):'共同运动'};
+      return{fMax,fk,Fcrit,fNeed,sliding,am,aM,relA,fallT,endT,t,relX,xm,xM,Q:sliding?fk*relX:null,phase:sliding?(relX>=state.L-.001?'滑下木板':'相对滑动'):'共同运动'};
     }
-    const a1=-state.mu*state.g;
-    const a2=state.mu*state.m*state.g/state.M;
-    const A=state.mu*state.g*(1+state.m/state.M);
+    const a1=-state.muk*state.g;
+    const a2=state.muk*state.m*state.g/state.M;
+    const A=state.muk*state.g*(1+state.m/state.M);
     const tCommon=state.v0/A;
     const relMax=state.v0*state.v0/(2*A);
     const falls=relMax>state.L+1e-7;
@@ -144,7 +145,7 @@
     const xM=.5*a2*t*t;
     const vm=Math.max(0,state.v0+ a1*t);
     const vM=a2*t;
-    return{fMax,Fcrit:null,fNeed:null,sliding:t<endT-.001,am:a1,aM:a2,relA:-A,fallT,tCommon,endT,t,relX:Math.max(0,relX),xm,xM,Q:fMax*Math.max(0,relX),vm,vM,falls,phase:falls&&t>=endT-.001?'滑下木板':(!falls&&t>=endT-.001?'达到共速':'相对滑动')};
+    return{fMax,fk,Fcrit:null,fNeed:null,sliding:t<endT-.001,am:a1,aM:a2,relA:-A,fallT,tCommon,endT,t,relX:Math.max(0,relX),xm,xM,Q:fk*Math.max(0,relX),vm,vM,falls,phase:falls&&t>=endT-.001?'滑下木板':(!falls&&t>=endT-.001?'达到共速':'相对滑动')};
   }
   function geometry(){
     const pullX=202+state.F/30*180;
@@ -152,11 +153,12 @@
     return{
       top:{x:state.mode==='pull'?pullX:v0X,y:141},
       time:{x:78+(state.t/Math.max(.2,calc().endT))*330,y:704},
-      m:{x:70+(state.m-.5)/2.5*130,y:662},
-      M:{x:230+(state.M-1)/5*130,y:662},
-      mu:{x:390+(state.mu-.1)/.5*130,y:662},
-      L:{x:550+(state.L-.8)/2.7*130,y:662},
-      g:{x:710+(state.g-2)/8*130,y:662}
+      m:{x:48+(state.m-.5)/2.5*120,y:662},
+      M:{x:188+(state.M-1)/5*120,y:662},
+      mus:{x:328+(state.mus-.1)/.5*120,y:662},
+      muk:{x:468+(state.muk-.05)/.5*120,y:662},
+      L:{x:608+(state.L-.8)/2.7*120,y:662},
+      g:{x:748+(state.g-2)/8*120,y:662}
     };
   }
   function drawScene(v,g){
@@ -175,8 +177,9 @@
     if(state.mode==='pull'){
       arrow(blockX+blockW,topY,g.top.x,topY,colors.red,4);
       handle(g.top.x,g.top.y,`F=${fmt(state.F)}N`,state.drag==='F',colors.red);
-      if(v.sliding || state.F>0) arrow(blockX,topY,blockX-Math.min(88,v.fMax*13),topY,colors.orange,3);
-      if(v.sliding || state.F>0) arrow(plankX+36,baseY-8,plankX+36+Math.min(88,v.fMax*13),baseY-8,colors.orange,3);
+      const frictionNow=v.sliding?v.fk:v.fNeed;
+      if(v.sliding || state.F>0) arrow(blockX,topY,blockX-Math.min(88,frictionNow*13),topY,colors.orange,3);
+      if(v.sliding || state.F>0) arrow(plankX+36,baseY-8,plankX+36+Math.min(88,frictionNow*13),baseY-8,colors.orange,3);
     }else{
       arrow(blockX+12,topY-34,g.top.x,topY-34,colors.red,4);
       handle(g.top.x,g.top.y,`v0=${fmt(state.v0)}m/s`,state.drag==='v0',colors.red);
@@ -204,12 +207,12 @@
   function drawBars(v){
     box(580,56,330,154,8,'#f8fafc','#d7dee8');
     text('临界与摩擦读数',745,82,'#0f172a','center',15,'900');
-    const max=state.mode==='pull'?Math.max(v.fNeed,v.fMax,1):Math.max(v.fMax,state.mu*state.m*state.g,1);
-    const need=state.mode==='pull'?v.fNeed:v.fMax;
+    const max=state.mode==='pull'?Math.max(v.fNeed,v.fMax,v.fk,1):Math.max(v.fk,1);
+    const need=state.mode==='pull'?v.fNeed:v.fk;
     line(672,125,672+need/max*170,125,colors.blue,11);
     line(672,166,672+v.fMax/max*170,166,colors.orange,11);
-    text(state.mode==='pull'?`f需=${fmt(v.fNeed,2)}N`:'滑动摩擦',660,125,colors.blue,'right',12,'900');
-    text(`fmax=${fmt(v.fMax,2)}N`,660,166,colors.orange,'right',12,'900');
+    text(state.mode==='pull'?`f需=${fmt(v.fNeed,2)}N`:`fₖ=${fmt(v.fk,2)}N`,660,125,colors.blue,'right',12,'900');
+    text(`fₛ,max=${fmt(v.fMax,2)}N`,660,166,colors.orange,'right',12,'900');
     text(state.mode==='pull'?(v.sliding?'超过上限':'静摩擦够用'):'摩擦方向相反',882,145,state.mode==='pull'&&v.sliding?colors.red:colors.green,'right',13,'900');
   }
   function drawGraphs(v){
@@ -227,7 +230,7 @@
     plotArea(580,402,330,176,'v-t 图：共速时两线相交');
     const vy=548,vh=108,maxV=Math.max(state.v0,Math.abs(v.am*v.endT),Math.abs(v.aM*v.endT),1);
     ctx.beginPath();
-    for(let i=0;i<=80;i++){const tt=end*i/80,r=sampleAt(tt);const vm=state.mode==='kick'?Math.max(0,state.v0-state.mu*state.g*tt):r.am*tt;const x=gx+gw*i/80,y=vy-vm/maxV*vh;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}
+    for(let i=0;i<=80;i++){const tt=end*i/80,r=sampleAt(tt);const vm=state.mode==='kick'?Math.max(0,state.v0-state.muk*state.g*tt):r.am*tt;const x=gx+gw*i/80,y=vy-vm/maxV*vh;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}
     ctx.strokeStyle=colors.red;ctx.lineWidth=2.5;ctx.stroke();
     ctx.beginPath();
     for(let i=0;i<=80;i++){const tt=end*i/80,r=sampleAt(tt);const vM=Math.max(0,r.aM*tt);const x=gx+gw*i/80,y=vy-vM/maxV*vh;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}
@@ -239,11 +242,12 @@
     box(34,610,876,108,8,'#fff','#d7dee8');
     line(78,704,408,704,'#0f172a',2);for(let i=0;i<=10;i++)line(78+i*33,699,78+i*33,709,'#0f172a',1);
     text('拖时间游标，看侧视运动、俯视滑痕和图像记录同步变化',242,628,colors.purple,'center',12,'900');handle(g.time.x,g.time.y,`t=${fmt(v.t,2)}s`,state.drag==='time',colors.purple);
-    ruler(70,662,200,'m',colors.blue,g.m,`m=${fmt(state.m)}`,state.drag==='m');
-    ruler(230,662,360,'M',colors.red,g.M,`M=${fmt(state.M)}`,state.drag==='M');
-    ruler(390,662,520,'μ',colors.orange,g.mu,`μ=${fmt(state.mu,2)}`,state.drag==='mu');
-    ruler(550,662,680,'L',colors.green,g.L,`L=${fmt(state.L)}m`,state.drag==='L');
-    ruler(710,662,840,'g',colors.purple,g.g,`g=${fmt(state.g)}m/s²`,state.drag==='g');
+    ruler(48,662,168,'m',colors.blue,g.m,`m=${fmt(state.m)}`,state.drag==='m');
+    ruler(188,662,308,'M',colors.red,g.M,`M=${fmt(state.M)}`,state.drag==='M');
+    ruler(328,662,448,'μₛ',colors.orange,g.mus,`μₛ=${fmt(state.mus,2)}`,state.drag==='mus');
+    ruler(468,662,588,'μₖ','#d97706',g.muk,`μₖ=${fmt(state.muk,2)}`,state.drag==='muk');
+    ruler(608,662,728,'L',colors.green,g.L,`L=${fmt(state.L)}m`,state.drag==='L');
+    ruler(748,662,868,'g',colors.purple,g.g,`g=${fmt(state.g)}m/s²`,state.drag==='g');
   }
   function ruler(x1,y,x2,label,c,hx,txt,active){
     line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-18,c,'center',12,'900');handle(hx,y,txt,active,c);
@@ -251,12 +255,15 @@
   function update(v){
     el.meter1Label.textContent=state.mode==='pull'?'临界外力 Fcrit':'共速/滑下时刻';
     el.meter1.textContent=state.mode==='pull'?`${fmt(v.Fcrit,1)} N`:(v.falls?`${fmt(v.fallT,2)} s 滑下`:`${fmt(v.tCommon,2)} s 共速`);
-    el.meter2.textContent=state.mode==='pull'?`${fmt(v.fNeed||v.fMax,2)} / ${fmt(v.fMax,2)} N`:`${fmt(v.fMax,2)} N`;
+    el.meter2.textContent=state.mode==='pull'?`${fmt(v.fNeed||0,2)} / ${fmt(v.fMax,2)} N`:`fₖ=${fmt(v.fk,2)} N`;
     el.meter3.textContent=`${fmt(v.am,2)} / ${fmt(v.aM,2)} m/s²`;
     el.meter4.textContent=`${fmt(v.relX,2)} / ${fmt(state.L,1)} m`;
     const bad=v.relX>=state.L-.001, warn=state.mode==='pull'?Math.abs(state.F-v.Fcrit)<.2:v.phase.includes('滑动');
     el.status.className='status'+(bad?' bad':warn?' warn':'');
-    el.status.textContent=bad?'滑下木板：相对位移已经达到板长 L，要停止用“在板上”的方程。':(state.mode==='pull'?(v.sliding?'相对滑动：静摩擦不够，滑动后分别列两个加速度。':'相对静止：静摩擦按需要取值，两个物体共同加速。'):(v.phase.includes('共')?'达到共速：相对滑动停止，之后一起运动。':'相对滑动：滑块减速、木板加速，红色滑痕正在增长。'))+` 摩擦生热 Q=${fmt(v.Q,2)} J。`;
+    const heat=v.Q===null?' 相对静止阶段不使用 Q=fₖ·s相对。':` 相对滑动累计生热 Q=${fmt(v.Q,2)} J。`;
+    el.status.textContent=(bad?'滑下木板：相对位移已经达到板长 L，要停止用“在板上”的方程。':state.mode==='pull'?(v.sliding?'相对滑动：f需 已超过 fₛ,max，现切换为 fₖ 并分别列两个加速度。':'假设共动成立：先求 f需，再确认它没有超过 fₛ,max。'):v.phase.includes('共')?'达到共速：相对滑动停止，之后一起运动。':'相对滑动：滑块减速、木板加速，红色滑痕正在增长。')+heat;
+    canvas.dataset.frictionParameters='separate-mus-muk';
+    canvas.dataset.analysisStep=v.sliding?'kinetic-friction':'compare-required-static-to-maximum';
   }
   function draw(){
     const v=calc(),g=geometry();
@@ -275,7 +282,8 @@
     else if(near(p,g.time,24))state.drag='time';
     else if(near(p,g.m,24))state.drag='m';
     else if(near(p,g.M,24))state.drag='M';
-    else if(near(p,g.mu,24))state.drag='mu';
+    else if(near(p,g.mus,24))state.drag='mus';
+    else if(near(p,g.muk,24))state.drag='muk';
     else if(near(p,g.L,24))state.drag='L';
     else if(near(p,g.g,24))state.drag='g';
     if(state.drag){canvas.setPointerCapture(e.pointerId);move(e)}
@@ -286,11 +294,12 @@
     if(state.drag==='F')state.F=clamp((p.x-202)/180*30,0,30);
     if(state.drag==='v0')state.v0=clamp((p.x-202)/180*8,0,8);
     if(state.drag==='time')state.t=clamp((p.x-78)/330*Math.max(.2,v.endT),0,v.endT);
-    if(state.drag==='m')state.m=clamp(.5+(p.x-70)/130*2.5,.5,3);
-    if(state.drag==='M')state.M=clamp(1+(p.x-230)/130*5,1,6);
-    if(state.drag==='mu')state.mu=clamp(.1+(p.x-390)/130*.5,.1,.6);
-    if(state.drag==='L')state.L=clamp(.8+(p.x-550)/130*2.7,.8,3.5);
-    if(state.drag==='g')state.g=clamp(2+(p.x-710)/130*8,2,10);
+    if(state.drag==='m')state.m=clamp(.5+(p.x-48)/120*2.5,.5,3);
+    if(state.drag==='M')state.M=clamp(1+(p.x-188)/120*5,1,6);
+    if(state.drag==='mus')state.mus=clamp(.1+(p.x-328)/120*.5,.1,.6);
+    if(state.drag==='muk')state.muk=clamp(.05+(p.x-468)/120*.5,.05,.55);
+    if(state.drag==='L')state.L=clamp(.8+(p.x-608)/120*2.7,.8,3.5);
+    if(state.drag==='g')state.g=clamp(2+(p.x-748)/120*8,2,10);
     state.t=clamp(state.t,0,calc().endT);draw();
   }
   function up(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
@@ -299,10 +308,10 @@
   kickMode.addEventListener('click',()=>setMode('kick'));
   document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{
     const c=btn.dataset.case;state.playing=false;playBtn.textContent='播放过程';
-    if(c==='safe'){state.mode='pull';state.mu=.45;state.m=1;state.M=2.5;state.F=3;state.L=2;state.t=0}
-    if(c==='critical'){state.mode='pull';state.mu=.4;state.m=1;state.M=3;state.F=calc().Fcrit;state.L=2;state.t=0}
-    if(c==='fall'){state.mode='kick';state.mu=.25;state.m=1;state.M=3;state.v0=6;state.L=1.2;state.t=0}
-    if(c==='rough'){state.mu=.58;state.t=0}
+    if(c==='safe'){state.mode='pull';state.mus=.45;state.muk=.32;state.m=1;state.M=2.5;state.F=3;state.L=2;state.t=0}
+    if(c==='critical'){state.mode='pull';state.mus=.4;state.muk=.3;state.m=1;state.M=3;state.F=calc().Fcrit;state.L=2;state.t=0}
+    if(c==='fall'){state.mode='kick';state.mus=.4;state.muk=.25;state.m=1;state.M=3;state.v0=6;state.L=1.2;state.t=0}
+    if(c==='rough'){state.mus=.58;state.muk=.42;state.t=0}
     setMode(state.mode);
   }));
   playBtn.addEventListener('click',()=>{

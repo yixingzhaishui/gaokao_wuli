@@ -63,7 +63,8 @@
       <div class="title">判据绑定</div>
       <div>l：车身标尺和橙色长度手柄</div>
       <div>s：路尺终点和研究范围手柄</div>
-      <div>公式：l/s ≪ 1 且只研究整体位置，才可质点化</div>
+      <div>l/s：只提供尺度直觉，不是固定阈值判据</div>
+      <div>结论：看当前问题是否需要大小、形状、姿态或转动</div>
     </div>
     <div class="status" id="status"></div>
   </div>
@@ -87,8 +88,8 @@
   function q(){return{l:+els.len.value,s:+els.dist.value,mode,progress};}
   function verdict(d){
     const ratio=d.l/(d.s*1000);
-    const shape=d.mode!=='path';
-    return{ratio,shape,ok:!shape&&ratio<0.01};
+    const required={path:[],pass:['大小'],turn:['大小','转动'],posture:['形状','姿态']}[d.mode];
+    return{ratio,required,ok:required.length===0};
   }
   function setParam(name,value){
     const el=els[name];
@@ -164,20 +165,17 @@
     }
   }
   function modeMessage(d,v){
-    if(d.mode==='path') return v.ok?'只研究整体位置：蓝点和整车位置等效。':'行程很短或物体太长：尺寸不可忽略。';
+    if(d.mode==='path') return '只研究整体位置：此任务不需要车身细节。';
     if(d.mode==='pass') return '研究过线/过桥：前端和后端不是同一时刻通过，车长必须保留。';
     if(d.mode==='turn') return '研究车轮转动：点没有半径、轮辐和转角，不能替代车轮。';
     return '研究姿态：点没有车头方向和倾角，不能表示姿态变化。';
   }
   function drawGauge(x,y,v){
     box(x,y,222,72,'#f8fbff','#d9e2ec',7);
-    text('模型判据尺',x+111,y+15,'#334e68','center',13,'700');
+    text('辅助尺度比（不直接判真值）',x+111,y+15,'#334e68','center',13,'700');
     const gx=x+22, gy=y+42, gw=178;
     line(gx,gy,gx+gw,gy,'#d9e2ec',8);
-    line(gx,gy,gx+gw*Math.min(1,v.ratio/.03),gy,v.ok?'#38b2ac':'#f0a500',8);
-    const critical=gx+gw*(.01/.03);
-    line(critical,gy-13,critical,gy+13,'#e03131',2);
-    text('1% 临界',critical,gy+25,'#e03131','center',11,'700');
+    line(gx,gy,gx+gw*Math.min(1,v.ratio/.03),gy,'#2c7be5',8);
     const p=gx+gw*Math.min(1,v.ratio/.03);
     ctx.fillStyle=v.ok?'#087f5b':'#9a6700';
     ctx.beginPath();ctx.arc(p,gy,7,0,Math.PI*2);ctx.fill();
@@ -250,14 +248,16 @@
     text(modeMessage(d,v),759,399,v.ok?'#087f5b':'#9a6700','center',12,'700');
 
     box(118,438,704,48,v.ok?'#e6fffa':'#fff7e6',v.ok?'#38b2ac':'#f0a500');
-    text('判据：l/s = '+(v.ratio*100).toFixed(4)+'%，研究任务 = '+modes[d.mode],470,458,'#334e68','center',14,'700');
+    text('辅助比例 l/s = '+(v.ratio*100).toFixed(4)+'%，研究任务 = '+modes[d.mode],470,458,'#334e68','center',14,'700');
     text(d.mode==='path'?'把形状遮住，只保留整体位置，运动学计算不变。':'此任务正关心大小、形状、转动或姿态，遮住它们就会丢信息。',470,480,'#486581','center',13);
     update(d,v);
   }
   function update(d,v){
     document.getElementById('lenText').textContent=d.l+' m';
     document.getElementById('distText').textContent=d.s+' km';
-    document.getElementById('readout').innerHTML='任务=<b>'+modes[d.mode]+'</b><br>l/s=<b>'+(v.ratio*100).toFixed(4)+'%</b><br>位置 x=<b>'+(d.s*d.progress).toFixed(1)+' km</b><br>结论=<b>'+(v.ok?'可质点化':'不可质点化')+'</b>';
+    document.getElementById('readout').innerHTML='任务=<b>'+modes[d.mode]+'</b><br>辅助比例 l/s=<b>'+(v.ratio*100).toFixed(4)+'%</b><br>本题需要=<b>'+(v.required.length?v.required.join('、'):'仅整体位置')+'</b><br>结论=<b>'+(v.ok?'可质点化':'不可质点化')+'</b>';
+    canvas.dataset.verdictSource='research-question';
+    canvas.dataset.ratioIsThreshold='false';
     const st=document.getElementById('status');
     st.classList.toggle('bad',!v.ok);
     st.textContent=v.ok?'通过：本题只关心整体位置，大小和形状对结论影响可忽略。':'打回：当前任务需要车长、转角、姿态或各部分差异，不能用一个点替代。';
