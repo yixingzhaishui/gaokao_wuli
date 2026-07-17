@@ -1,290 +1,60 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>动态平衡实验台</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>B1-22 动态平衡：准静态边界</title>
 <link rel="icon" href="data:,">
 <style>
-  *{box-sizing:border-box}
-  body{margin:0;background:#eef3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
-  .root{display:grid;grid-template-columns:minmax(0,1fr) 306px;gap:10px;padding:10px;min-height:540px}
-  .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
-  canvas{display:block;width:100%;height:auto;touch-action:none}
-  .panel{display:flex;flex-direction:column;gap:8px}
-  .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
-  .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.45}
-  .title{font-weight:800;margin-bottom:5px;color:#0f172a}
-  .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:30px;cursor:pointer;color:#102a43}
-  button.active{background:#e0f2fe;border-color:#0284c7;color:#075985;font-weight:800}
-  .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:48px}
-  .meter span{display:block;font-size:11px;color:#b6c5d8}
-  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:16px;font-variant-numeric:tabular-nums}
-  .formula{display:grid;gap:5px;font-size:13px;color:#334155}
-  .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
-  .formula div:last-child{border-bottom:0;padding-bottom:0}
-  .formula b{white-space:nowrap;color:#0f172a}
-  .small{font-size:12px;line-height:1.5;color:#475569}
-  .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
-  .status.warn{border-color:#f59e0b;background:#fff7ed;color:#b45309}
-  @media(max-width:760px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
+*{box-sizing:border-box}body{margin:0;background:#eef3f8;color:#102a43;font-family:system-ui,-apple-system,"PingFang SC",sans-serif}.root{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px}.stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}canvas{display:block;width:100%;height:auto;aspect-ratio:920/520;touch-action:none}.panel{display:flex;flex-direction:column;gap:8px}.card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}.task{border-left:4px solid #f59e0b;background:#fff7ed;font-size:12px;line-height:1.5}.chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:36px;cursor:pointer;color:#102a43;font-weight:700}button.active{background:#e0f2fe;border-color:#0284c7;color:#075985}.readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}.meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px}.meter span{display:block;font-size:11px;color:#b6c5d8}.meter b{display:block;color:#fbbf24;font-size:15px}.formula{font-size:12px;line-height:1.55}.status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}.status.warn{border-color:#f59e0b;background:#fff7ed;color:#b45309}.status.bad{border-color:#ef4444;background:#fef2f2;color:#b91c1c}[hidden]{display:none!important}@media(max-width:760px){.root{grid-template-columns:minmax(0,1fr)}.panel{grid-row:2}}
 </style>
 </head>
 <body>
-<div class="root">
-  <div class="stage"><canvas id="canvas" width="920" height="520" aria-label="动态平衡交互实验台：绳结侧视装置、T-θ图像和数据记录"></canvas></div>
+<div class="root" id="app" data-mode="quasistatic" data-equilibrium="true" data-guided-complete="false">
+  <div class="stage"><canvas id="canvas" width="920" height="520" aria-label="对称双绳准静态与快速运动对比：实物场景、受力图、T-theta图像和数据记录"></canvas></div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>抓住任意蓝色绳端，对照绳结侧视装置、T-θ 图像和数据记录，把两根绳对称拉平；看 G 不变时 T 为什么会变大。</div>
-    <div class="chips"><button id="playBtn">▶ 播放：θ 自动放平</button><button id="resetBtn">重置</button></div>
-    <div class="card">
-      <div class="title">快速情境</div>
-      <div class="chips">
-        <button data-theta="20">接近水平</button>
-        <button data-theta="45" class="active">45° 常规</button>
-        <button data-theta="70">接近竖直</button>
-        <button data-heavy="1">重物加重</button>
-      </div>
-    </div>
-    <div class="card">
-      <div class="title">实时读数</div>
-      <div class="readout">
-        <div class="meter"><span>绳角 θ</span><b id="thetaText">45°</b></div>
-        <div class="meter"><span>重力 G</span><b id="gText">20.0 N</b></div>
-        <div class="meter"><span>每根绳 T</span><b id="tText">14.1 N</b></div>
-        <div class="meter"><span>每根竖直分量</span><b id="tyText">10.0 N</b></div>
-      </div>
-    </div>
-    <div class="card formula">
-      <div><span>竖直平衡</span><b>2Tsinθ=G</b></div>
-      <div><span>拉力大小</span><b>T=G/(2sinθ)</b></div>
-      <div><span>危险趋势</span><b>θ 越小，T 越大</b></div>
-    </div>
-    <div class="card small"><b>可直接操作：</b>抓任意蓝色绳端改变 θ，另一侧自动对称；抓红色重物上下拖动改变 G。曲线红点记录当前拉力。</div>
-    <div class="status" id="status">平衡仍成立：两根绳的竖直分量之和等于重力。</div>
+    <div class="card task"><b>观察任务：</b>先观察绳端按真实时间步长缓慢放平；接近水平前必须预测张力变化。完成准静态证据后，才开放快速反例、公式和自由拖动。</div>
+    <div class="chips"><button id="playBtn">▶ 开始准静态慢放</button><button id="resetBtn">重置</button></div>
+    <div class="card" id="predictCard" hidden><b>暂停预测：</b>绳继续接近水平，每根绳张力怎样变化？<div class="chips"><button data-predict="increase">增大</button><button data-predict="decrease">减小</button></div></div>
+    <div class="card" id="exploreCard" hidden><b>演示完成后探索</b><div class="chips"><button id="slowBtn" class="active">准静态慢速</button><button id="fastBtn">快速移动反例</button></div><div class="chips"><button data-theta="20">接近水平</button><button data-theta="55">常规角度</button></div></div>
+    <div class="card"><div class="readout"><div class="meter"><span>绳角 θ</span><b id="thetaText"></b></div><div class="meter"><span>每根绳 T</span><b id="tText"></b></div><div class="meter"><span>加速度 a</span><b id="aText"></b></div><div class="meter"><span>合力 ΣFy</span><b id="sumText"></b></div></div></div>
+    <div class="card formula" id="formulaCard" hidden><b>模型边界：</b>仅对称双绳、准静态平衡时，$2T\sin\theta=G$，$T=G/(2\sin\theta)$。快速运动出现明显加速度时改用 $\Sigma F_y=ma$。</div>
+    <div class="status" id="status">准备：默认模式为准静态慢速变化。</div>
   </div>
 </div>
 <script>
-(function(){
+(()=>{
   'use strict';
-  const canvas=document.getElementById('canvas');
-  const ctx=canvas.getContext('2d');
-  const state={theta:45,G:20,drag:null,playing:false,playDir:-1};
-  const els={
-    theta:document.getElementById('thetaText'),
-    g:document.getElementById('gText'),
-    t:document.getElementById('tText'),
-    ty:document.getElementById('tyText'),
-    status:document.getElementById('status')
-  };
-  const colors={blue:'#2563eb',red:'#dc2626',ink:'#102a43',muted:'#64748b',line:'#94a3b8',green:'#0f766e',orange:'#f59e0b'};
-  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
-  const fmt=(v,d=1)=>v.toFixed(d);
-  function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){
-    ctx.fillStyle=c;
-    ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;
-    ctx.textAlign=a;
-    ctx.textBaseline='middle';
-    ctx.fillText(s,x,y);
-  }
-  function line(x1,y1,x2,y2,c=colors.line,w=2,dash){
-    ctx.save();
-    ctx.strokeStyle=c;ctx.lineWidth=w;
-    if(dash)ctx.setLineDash(dash);
-    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
-    ctx.restore();
-  }
-  function arrow(x1,y1,x2,y2,c,w=3){
-    const a=Math.atan2(y2-y1,x2-x1);
-    line(x1,y1,x2,y2,c,w);
-    ctx.save();
-    ctx.fillStyle=c;
-    ctx.beginPath();
-    ctx.moveTo(x2,y2);
-    ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));
-    ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-  }
-  function roundRect(x,y,w,h,r,fill,stroke){
-    ctx.save();
-    ctx.beginPath();
-    ctx.roundRect(x,y,w,h,r);
-    ctx.fillStyle=fill;ctx.fill();
-    if(stroke){ctx.strokeStyle=stroke;ctx.stroke();}
-    ctx.restore();
-  }
-  function geom(){
-    const O={x:282,y:214};
-    const len=190;
-    const rad=state.theta*Math.PI/180;
-    const L={x:O.x-len*Math.cos(rad),y:O.y-len*Math.sin(rad)};
-    const R={x:O.x+len*Math.cos(rad),y:O.y-len*Math.sin(rad)};
-    const weightY=322+(state.G-5)/(80-5)*86;
-    return{O,len,rad,L,R,weight:{x:O.x,y:weightY}};
-  }
-  function values(){
-    const rad=state.theta*Math.PI/180;
-    const T=state.G/(2*Math.sin(rad));
-    const Ty=T*Math.sin(rad);
-    return{T,Ty,rad};
-  }
-  function drawHandle(x,y,label,active=false,c=colors.blue){
-    ctx.save();
-    ctx.fillStyle=active?'#fde68a':'#fff';
-    ctx.strokeStyle=active?'#d97706':c;
-    ctx.lineWidth=3;
-    ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();
-    text(label,x,y-22,active?'#92400e':c,'center',12,'900');
-    ctx.restore();
-  }
-  function drawScene(g,v){
-    roundRect(42,56,494,384,8,'#fff','#d7dee8');
-    line(72,58,506,58,'#cbd5e1',3);
-    line(g.L.x,g.L.y,g.O.x,g.O.y,'#334155',5);
-    line(g.O.x,g.O.y,g.R.x,g.R.y,'#334155',5);
-    line(g.O.x,g.O.y,g.weight.x,g.weight.y-30,'#64748b',3);
-    roundRect(g.weight.x-38,g.weight.y-28,76,56,8,'#fee2e2','#dc2626');
-    text(`${fmt(state.G)} N`,g.weight.x,g.weight.y-4,'#991b1b','center',15,'900');
-    text('拖 G',g.weight.x,g.weight.y+15,'#991b1b','center',12,'900');
-    ctx.fillStyle='#0f172a';ctx.beginPath();ctx.arc(g.O.x,g.O.y,7,0,Math.PI*2);ctx.fill();
-    drawHandle(g.L.x,g.L.y,'拖 θ',state.drag==='thetaL');
-    drawHandle(g.R.x,g.R.y,'拖 θ',state.drag==='thetaR');
-    drawHandle(g.weight.x,g.weight.y+36,'拖 G',state.drag==='G',colors.red);
-    const scale=Math.min(4.8,132/Math.max(v.T,state.G));
-    arrow(g.O.x,g.O.y,g.O.x-v.T*Math.cos(g.rad)*scale,g.O.y-v.T*Math.sin(g.rad)*scale,colors.blue,4);
-    arrow(g.O.x,g.O.y,g.O.x+v.T*Math.cos(g.rad)*scale,g.O.y-v.T*Math.sin(g.rad)*scale,colors.blue,4);
-    arrow(g.O.x,g.O.y,g.O.x,g.O.y+state.G*scale,colors.red,4);
-    line(g.O.x-225,g.O.y,g.O.x+225,g.O.y,'#cbd5e1',2,[6,5]);
-    text(`θ=${fmt(state.theta,0)}°`,g.O.x+92,g.O.y+22,'#475569','center',12,'900');
-    text(`T=${fmt(v.T)}N`,g.O.x-120,g.O.y-74,colors.blue,'center',13,'900');
-    text(`T=${fmt(v.T)}N`,g.O.x+120,g.O.y-74,colors.blue,'center',13,'900');
-  }
-  function graphPoint(theta,G){
-    return G/(2*Math.sin(theta*Math.PI/180));
-  }
-  function drawGraph(v){
-    roundRect(560,56,316,240,8,'#f8fafc','#d7dee8');
-    text('T-θ 曲线：越靠左越危险',718,82,'#0f172a','center',16,'900');
-    const ox=604,oy=250,w=232,h=145,xMin=10,xMax=80,yMax=130;
-    for(let x=10;x<=80;x+=10){
-      const px=ox+(x-xMin)/(xMax-xMin)*w;
-      line(px,oy-h,px,oy,'#e2e8f0',1);
-    }
-    for(let y=0;y<=120;y+=30){
-      const py=oy-y/yMax*h;
-      line(ox,py,ox+w,py,'#e2e8f0',1);
-    }
-    arrow(ox,oy,ox+w+18,oy,'#334155',2);
-    arrow(ox,oy,ox,oy-h-18,'#334155',2);
-    text('θ',ox+w+28,oy,'#475569','left',12,'800');
-    text('T',ox-8,oy-h-24,'#475569','right',12,'800');
-    ctx.save();
-    ctx.strokeStyle=colors.blue;ctx.lineWidth=3;
-    ctx.beginPath();
-    for(let i=10;i<=80;i++){
-      const T=graphPoint(i,state.G);
-      const x=ox+(i-xMin)/(xMax-xMin)*w;
-      const y=oy-clamp(T,0,yMax)/yMax*h;
-      if(i===10)ctx.moveTo(x,y);else ctx.lineTo(x,y);
-    }
-    ctx.stroke();
-    ctx.restore();
-    const px=ox+(state.theta-xMin)/(xMax-xMin)*w;
-    const py=oy-clamp(v.T,0,yMax)/yMax*h;
-    ctx.fillStyle=colors.red;ctx.beginPath();ctx.arc(px,py,6,0,Math.PI*2);ctx.fill();
-    text(`当前 T=${fmt(v.T)}N`,718,276,'#dc2626','center',13,'900');
-  }
-  function drawBalanceBars(v){
-    roundRect(560,314,316,112,8,'#fff','#d7dee8');
-    text('竖直分量校验',600,338,'#0f172a','left',14,'900');
-    const total=v.Ty*2;
-    const max=Math.max(state.G,total,10);
-    const leftW=v.Ty/max*105,rightW=v.Ty/max*105,gW=state.G/max*210;
-    line(626,365,626+leftW,365,colors.blue,9);
-    line(626+leftW,365,626+leftW+rightW,365,colors.blue,9);
-    line(626,395,626+gW,395,colors.red,9);
-    text(`Tsinθ=${fmt(v.Ty)}N`,602,365,colors.blue,'right',12,'900');
-    text(`G=${fmt(state.G)}N`,602,395,colors.red,'right',12,'900');
-    text(`2Tsinθ=${fmt(total)}N`,842,365,colors.blue,'right',12,'900');
-    text('相等，所以仍平衡',842,418,colors.green,'right',12,'900');
-  }
-  function update(v){
-    els.theta.textContent=`${fmt(state.theta,0)}°`;
-    els.g.textContent=`${fmt(state.G)} N`;
-    els.t.textContent=`${fmt(v.T)} N`;
-    els.ty.textContent=`${fmt(v.Ty)} N`;
-    document.querySelectorAll('[data-theta]').forEach(btn=>btn.classList.toggle('active',Math.abs(+btn.dataset.theta-state.theta)<.5));
-    const warn=state.theta<22;
-    els.status.className='status'+(warn?' warn':'');
-    els.status.textContent=(warn?'绳接近水平：为了让 2Tsinθ 仍等于 G，T 会急剧增大，绳更容易断。':'平衡仍成立：两根绳的竖直分量之和等于重力。')+(state.playing?'（播放中：θ 正在自动变化）':'');
-  }
-  function draw(){
-    const g=geom(),v=values();
-    ctx.clearRect(0,0,920,520);
-    var _bg=ctx.createLinearGradient(0,0,0,520);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,520);
-    text('动态平衡实验台：位置在变，每一瞬间仍满足 ΣF=0',460,30,'#0f172a','center',19,'900');
-    drawScene(g,v);
-    drawGraph(v);
-    drawBalanceBars(v);
-    update(v);
-  }
-  function pos(evt){
-    const r=canvas.getBoundingClientRect();
-    return{x:(evt.clientX-r.left)*canvas.width/r.width,y:(evt.clientY-r.top)*canvas.height/r.height};
-  }
-  function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
-  function pointerDown(evt){
-    if(state.playing){state.playing=false;document.getElementById('playBtn').textContent='▶ 播放：θ 自动放平'}
-    const p=pos(evt),g=geom();
-    if(near(p,g.L,28))state.drag='thetaL';
-    else if(near(p,g.R,28))state.drag='thetaR';
-    else if(near(p,{x:g.weight.x,y:g.weight.y+36},34))state.drag='G';
-    else state.drag=null;
-    if(state.drag){canvas.setPointerCapture(evt.pointerId);pointerMove(evt);}
-  }
-  function pointerMove(evt){
-    if(!state.drag)return;
-    const p=pos(evt),g=geom();
-    if(state.drag==='thetaL'){
-      state.theta=clamp(Math.atan2(g.O.y-p.y,g.O.x-p.x)*180/Math.PI,10,80);
-    }else if(state.drag==='thetaR'){
-      state.theta=clamp(Math.atan2(g.O.y-p.y,p.x-g.O.x)*180/Math.PI,10,80);
-    }else if(state.drag==='G'){
-      state.G=clamp(5+((p.y-36)-322)/86*(80-5),5,80);
-    }
-    draw();
-  }
-  function pointerUp(evt){
-    if(state.drag){
-      state.drag=null;
-      try{canvas.releasePointerCapture(evt.pointerId);}catch(e){}
-      draw();
-    }
-  }
-  canvas.addEventListener('pointerdown',pointerDown);
-  canvas.addEventListener('pointermove',pointerMove);
-  canvas.addEventListener('pointerup',pointerUp);
-  canvas.addEventListener('pointercancel',pointerUp);
-  document.querySelectorAll('[data-theta]').forEach(btn=>btn.addEventListener('click',()=>{state.theta=+btn.dataset.theta;draw();}));
-  document.querySelector('[data-heavy]').addEventListener('click',()=>{state.G=state.G<45?45:20;draw();});
-  const playBtn=document.getElementById('playBtn');
-  function animate(){
-    if(!state.playing)return;
-    state.theta+=state.playDir*0.4;
-    if(state.theta<=12){state.theta=12;state.playDir=1;}
-    if(state.theta>=78){state.theta=78;state.playDir=-1;}
-    draw();
-    requestAnimationFrame(animate);
-  }
-  playBtn.addEventListener('click',()=>{
-    state.playing=!state.playing;
-    playBtn.textContent=state.playing?'⏸ 暂停':'▶ 播放：θ 自动放平';
-    if(state.playing){state.playDir=-1;animate();}else draw();
-  });
-  document.getElementById('resetBtn').addEventListener('click',()=>{state.playing=false;state.theta=45;state.G=20;playBtn.textContent='▶ 播放：θ 自动放平';draw();});
+  const app=document.getElementById('app'),canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+  const playBtn=document.getElementById('playBtn'),predictCard=document.getElementById('predictCard'),exploreCard=document.getElementById('exploreCard'),formulaCard=document.getElementById('formulaCard'),status=document.getElementById('status');
+  const out={theta:document.getElementById('thetaText'),T:document.getElementById('tText'),a:document.getElementById('aText'),sum:document.getElementById('sumText')};
+  const state={theta:55,G:20,mode:'quasistatic',phase:'ready',playing:false,last:0,dt:0,ay:0,dragging:false,complete:false,prediction:''};
+  const C={blue:'#2563eb',red:'#dc2626',ink:'#102a43',muted:'#64748b',green:'#0f766e',orange:'#f59e0b'};
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  function text(s,x,y,c=C.ink,size=13,align='center',weight=700){ctx.fillStyle=c;ctx.font=`${weight} ${size}px system-ui`;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+  function line(x1,y1,x2,y2,c='#94a3b8',w=2,dash=[]){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
+  function arrow(x1,y1,x2,y2,c,w=3){line(x1,y1,x2,y2,c,w);const a=Math.atan2(y2-y1,x2-x1);ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-12*Math.cos(a-.43),y2-12*Math.sin(a-.43));ctx.lineTo(x2-12*Math.cos(a+.43),y2-12*Math.sin(a+.43));ctx.fill()}
+  function panel(x,y,w,h,fill='#fff'){ctx.fillStyle=fill;ctx.strokeStyle='#d7dee8';ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke()}
+  function values(){const rad=state.theta*Math.PI/180,m=state.G/10;const T=state.mode==='quasistatic'?state.G/(2*Math.sin(rad)):(state.G+m*state.ay)/(2*Math.sin(rad));return{rad,m,T,Ty:T*Math.sin(rad),net:m*state.ay}}
+  function geometry(){const O={x:270,y:235},len=185,rad=state.theta*Math.PI/180;return{O,L:{x:O.x-len*Math.cos(rad),y:O.y-len*Math.sin(rad)},R:{x:O.x+len*Math.cos(rad),y:O.y-len*Math.sin(rad)}}}
+  function drawScene(v,g){panel(35,62,490,390);line(g.L.x,g.L.y,g.O.x,g.O.y,'#334155',5);line(g.O.x,g.O.y,g.R.x,g.R.y,'#334155',5);line(g.O.x,g.O.y,g.O.x,350,'#64748b',3);ctx.fillStyle='#fee2e2';ctx.strokeStyle=C.red;ctx.beginPath();ctx.roundRect(g.O.x-38,350,76,58,7);ctx.fill();ctx.stroke();text('重物',g.O.x,379,'#991b1b');[g.L,g.R].forEach(p=>{ctx.fillStyle='#fff';ctx.strokeStyle=C.blue;ctx.lineWidth=3;ctx.beginPath();ctx.arc(p.x,p.y,10,0,Math.PI*2);ctx.fill();ctx.stroke()});const scale=Math.min(5,125/Math.max(v.T,state.G));arrow(g.O.x,g.O.y,g.O.x-v.T*Math.cos(v.rad)*scale,g.O.y-v.T*Math.sin(v.rad)*scale,C.blue,4);arrow(g.O.x,g.O.y,g.O.x+v.T*Math.cos(v.rad)*scale,g.O.y-v.T*Math.sin(v.rad)*scale,C.blue,4);arrow(g.O.x,g.O.y,g.O.x,g.O.y+state.G*scale,C.red,4);text(`θ=${state.theta.toFixed(1)}°`,g.O.x+95,g.O.y+20,C.muted);text(`T=${v.T.toFixed(1)} N`,g.O.x-118,g.O.y-75,C.blue);text(state.mode==='quasistatic'?'绳端缓慢移动：a≈0':'快速移动：出现明显 a',g.O.x,430,state.mode==='quasistatic'?C.green:C.red,14)}
+  function graphT(theta){return state.G/(2*Math.sin(theta*Math.PI/180))}
+  function drawGraph(v){panel(550,62,335,235,'#f8fafc');text('T-θ 图像（蓝线为准静态模型）',718,85,C.ink,15);const ox=600,oy=255,w=235,h=140;line(ox,oy,ox+w,oy,'#334155');line(ox,oy,ox,oy-h,'#334155');ctx.strokeStyle=C.blue;ctx.lineWidth=3;ctx.beginPath();for(let t=12;t<=80;t++){const x=ox+(t-12)/68*w,y=oy-clamp(graphT(t),0,100)/100*h;if(t===12)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke();const px=ox+(state.theta-12)/68*w,py=oy-clamp(v.T,0,100)/100*h;ctx.fillStyle=state.mode==='quasistatic'?C.orange:C.red;ctx.beginPath();ctx.arc(px,py,7,0,Math.PI*2);ctx.fill();text(state.mode==='quasistatic'?'当前准静态数据点':'快速数据点不在平衡模型上',718,278,state.mode==='quasistatic'?C.orange:C.red,12)}
+  function drawEvidence(v){panel(550,320,335,132);text('受力证据',580,344,C.ink,14,'left',900);const total=2*v.Ty,max=Math.max(total,state.G,25),w1=220*total/max,w2=220*state.G/max;line(620,378,620+w1,378,C.blue,9);line(620,411,620+w2,411,C.red,9);text(`2Tsinθ=${total.toFixed(1)} N`,610,378,C.blue,11,'right');text(`G=${state.G.toFixed(1)} N`,610,411,C.red,11,'right');text(state.mode==='quasistatic'?'ΣFy≈0，平衡近似成立':`ΣFy=${v.net.toFixed(1)} N=ma，不是 0`,855,440,state.mode==='quasistatic'?C.green:C.red,12,'right')}
+  function update(v){out.theta.textContent=`${state.theta.toFixed(1)}°`;out.T.textContent=`${v.T.toFixed(1)} N`;out.a.textContent=state.mode==='quasistatic'?'≈ 0':`${state.ay.toFixed(1)} m/s²`;out.sum.textContent=state.mode==='quasistatic'?'≈ 0':`${v.net.toFixed(1)} N`;app.dataset.mode=state.mode;app.dataset.equilibrium=String(state.mode==='quasistatic');app.dataset.guidedComplete=String(state.complete);app.dataset.dtSeconds=state.dt.toFixed(4);app.dataset.formulaAvailable=String(state.complete&&state.mode==='quasistatic');if(state.mode==='fast'){status.className='status bad';status.textContent='快速反例：物体有明显加速度，ΣF=ma≠0；不得继续强制显示平衡成立。'}else if(state.phase==='prediction'){status.className='status warn';status.textContent='已在绳接近水平前暂停：请先预测张力变化。'}else{status.className='status';status.textContent=state.complete?'准静态证据成立：a≈0、ΣF≈0；现已开放公式与自由探索。':'准静态慢速变化：a≈0、ΣF≈0。'}}
+  function draw(){const v=values(),g=geometry();ctx.clearRect(0,0,920,520);const bg=ctx.createLinearGradient(0,0,0,520);bg.addColorStop(0,'#fbfdff');bg.addColorStop(1,'#eaf0f7');ctx.fillStyle=bg;ctx.fillRect(0,0,920,520);text(state.mode==='quasistatic'?'准静态动态平衡：慢速变化不是任意运动':'快速移动反例：出现加速度后不满足平衡',460,30,state.mode==='quasistatic'?C.ink:C.red,19);drawScene(v,g);drawGraph(v);drawEvidence(v);update(v)}
+  function finishGuided(){state.playing=false;state.complete=true;state.phase='complete';state.theta=16;playBtn.textContent='▶ 重播准静态演示';exploreCard.hidden=false;formulaCard.hidden=false;draw()}
+  function loop(now){if(!state.playing)return;state.dt=Math.min(.05,Math.max(0,(now-state.last)/1000));state.last=now;if(state.mode==='quasistatic'){state.theta-=24*state.dt;if(state.phase==='moving'&&state.theta<=30){state.theta=30;state.playing=false;state.phase='prediction';predictCard.hidden=false;playBtn.textContent='等待预测';draw();return}if(state.phase==='after-prediction'&&state.theta<=16){finishGuided();return}}else{state.theta=45+9*Math.sin(now/180);state.ay=3.0*Math.cos(now/180)}draw();requestAnimationFrame(loop)}
+  function startGuided(){state.mode='quasistatic';state.theta=55;state.ay=0;state.phase='moving';state.playing=true;state.last=performance.now();state.prediction='';predictCard.hidden=true;playBtn.textContent='⏸ 暂停准静态演示';requestAnimationFrame(loop)}
+  playBtn.onclick=()=>{if(state.phase==='prediction')return;if(!state.playing)startGuided();else{state.playing=false;playBtn.textContent='▶ 继续准静态演示';draw()}};
+  document.querySelectorAll('[data-predict]').forEach(btn=>btn.onclick=()=>{state.prediction=btn.dataset.predict;predictCard.hidden=true;state.phase='after-prediction';state.playing=true;state.last=performance.now();playBtn.textContent='⏸ 继续观察';requestAnimationFrame(loop)});
+  document.getElementById('slowBtn').onclick=()=>{state.playing=false;state.mode='quasistatic';state.ay=0;draw()};
+  document.getElementById('fastBtn').onclick=()=>{state.mode='fast';state.phase='fast';state.playing=true;state.last=performance.now();playBtn.textContent='▶ 重播准静态演示';requestAnimationFrame(loop)};
+  document.querySelectorAll('[data-theta]').forEach(btn=>btn.onclick=()=>{if(!state.complete)return;state.playing=false;state.mode='quasistatic';state.ay=0;state.theta=+btn.dataset.theta;draw()});
+  function pointerPosition(event){const r=canvas.getBoundingClientRect();return{x:(event.clientX-r.left)*canvas.width/r.width,y:(event.clientY-r.top)*canvas.height/r.height}}
+  canvas.addEventListener('pointerdown',event=>{if(!state.complete)return;state.playing=false;state.dragging=true;canvas.setPointerCapture(event.pointerId)});
+  canvas.addEventListener('pointermove',event=>{if(!state.dragging)return;const p=pointerPosition(event),g=geometry();state.mode='quasistatic';state.ay=0;state.theta=clamp(Math.atan2(g.O.y-p.y,Math.abs(p.x-g.O.x))*180/Math.PI,12,80);draw()});
+  canvas.addEventListener('pointerup',()=>{state.dragging=false});
+  document.getElementById('resetBtn').onclick=()=>{state.playing=false;state.theta=55;state.mode='quasistatic';state.phase='ready';state.ay=0;state.complete=false;state.dt=0;predictCard.hidden=true;exploreCard.hidden=true;formulaCard.hidden=true;playBtn.textContent='▶ 开始准静态慢放';draw()};
   draw();
 })();
 </script>
