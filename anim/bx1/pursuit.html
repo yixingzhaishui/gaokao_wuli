@@ -138,7 +138,8 @@
     for(let v=0;v<=30;v+=10){const y=gvY(v);line(gv.ox-5,y,gv.ox+gv.w,y,'#d9e2ec');text(String(v),gv.ox-12,y,'#627d98',11,'right','500');}
   }
   function drawGraphs(){
-    ctx.beginPath();for(let i=0;i<=120;i++){const t=gd.tMax*i/120,sx=gdX(t),sy=gdY(dx(t));if(i===0)ctx.moveTo(sx,sy);else ctx.lineTo(sx,sy);}ctx.strokeStyle='#f08c00';ctx.lineWidth=3;ctx.stroke();
+    const graphEnd=state.revealed?gd.tMax:state.t,samples=Math.max(1,Math.ceil(120*graphEnd/gd.tMax));canvas.dataset.distanceGraph=state.revealed?'full':'observed';
+    ctx.beginPath();for(let i=0;i<=samples;i++){const t=graphEnd*i/samples,sx=gdX(t),sy=gdY(dx(t));if(i===0)ctx.moveTo(sx,sy);else ctx.lineTo(sx,sy);}ctx.strokeStyle='#f08c00';ctx.lineWidth=3;ctx.stroke();
     line(gd.ox,gdY(0),gd.ox+gd.w,gdY(0),'#7b8794',1.5,[5,5]);
     const te=tEq();
     if(state.revealed&&te!==null&&te>0&&te<gd.tMax){line(gdX(te),gd.oy,gdX(te),gdY(dx(te)),'#7b2cbf',2,[6,5]);handle(gdX(te),gdY(dx(te)),'v相等','#7b2cbf');}
@@ -189,44 +190,44 @@
   window.addEventListener('pointerup',()=>{drag=null;canvas.style.cursor='default';});
   draw();
 const playBtn=document.getElementById("play"),resetBtn=document.getElementById("resetBtn");
-let __run=false,__last=performance.now(),__phase='ready';
+let __run=false,__last=performance.now(),__phase='ready',__raf=0;
+function stopLoop(){__run=false;if(__raf)cancelAnimationFrame(__raf);__raf=0;app.dataset.running='false'}
+function startLoop(){if(__run)return;__run=true;__last=performance.now();app.dataset.running='true';__raf=requestAnimationFrame(__loop)}
 function guidedEnd(){const roots=meetTimes();return roots.length?Math.min(15,roots[0]):15;}
 function predictionTime(){const te=tEq();return te!==null&&te>0?Math.max(0,te-0.35):null;}
 playBtn.addEventListener("click",()=>{
   const cap=guidedEnd();
   if(__phase==='predict'){
-    if(!state.prediction)return;__phase='verify';app.dataset.phase='verify';state.revealed=true;predictionChoices.hidden=true;__run=true;playBtn.textContent='⏸ 验证中';
+    if(!state.prediction)return;__phase='verify';app.dataset.phase='verify';state.revealed=true;predictionChoices.hidden=true;playBtn.textContent='⏸ 验证中';
     status.textContent='预测已保存；现在显示速度与位置证据进行验证。';draw();
+    startLoop();
     return;
   }
   if(state.t>=cap||__phase==='done'){state.t=0;__phase='ready';}
-  __run=!__run;
-  playBtn.textContent=__run?'⏸ 暂停':'▶ 播放运动';
+  if(__run){stopLoop();playBtn.textContent='▶ 播放运动'}else{startLoop();playBtn.textContent='⏸ 暂停'}
 });
 document.querySelectorAll('[data-prediction]').forEach(b=>b.addEventListener('click',()=>{state.prediction=b.dataset.prediction;document.querySelectorAll('[data-prediction]').forEach(x=>x.classList.toggle('active',x===b));playBtn.disabled=false;playBtn.textContent='▶ 验证预测';status.textContent='预测已保存；答案仍隐藏，点击验证。'}));
-resetBtn.addEventListener("click",()=>{__run=false;__phase='ready';Object.assign(state,{prediction:null,revealed:false});app.dataset.phase='guided';predictionChoices.hidden=true;formulaBox.hidden=true;explore.hidden=true;hint.hidden=true;playBtn.disabled=false;playBtn.textContent="▶ 播放运动";document.querySelectorAll('[data-prediction]').forEach(x=>x.classList.remove('active'));setMode('start');});
-canvas.addEventListener("pointerdown",()=>{if(__run){__run=false;playBtn.textContent="▶ 播放运动";}});
+resetBtn.addEventListener("click",()=>{stopLoop();__phase='ready';Object.assign(state,{prediction:null,revealed:false});app.dataset.phase='guided';predictionChoices.hidden=true;formulaBox.hidden=true;explore.hidden=true;hint.hidden=true;playBtn.disabled=false;playBtn.textContent="▶ 播放运动";document.querySelectorAll('[data-prediction]').forEach(x=>x.classList.remove('active'));setMode('start');});
+canvas.addEventListener("pointerdown",()=>{if(__run){stopLoop();playBtn.textContent="▶ 播放运动";}});
 function __loop(now){
+  __raf=0;if(!__run)return;
   const dt=Math.min((now-__last)/1000,.05);__last=now;
   const cap=guidedEnd(),pauseAt=predictionTime();
-  if(__run){
-    state.t=Math.min(cap,state.t+dt);
-    if(__phase==='ready'&&pauseAt!==null&&state.t>=pauseAt){
-      state.t=pauseAt;__run=false;__phase='predict';
-      app.dataset.phase='prediction';predictionChoices.hidden=false;playBtn.disabled=true;playBtn.textContent='先选择预测';draw();
-      status.textContent='预测暂停：下一关键时刻表示相遇、距离最大还是距离最小？先选择再验证。';
-      requestAnimationFrame(__loop);return;
-    }
-    if(state.t>=cap){
-      __run=false;__phase='done';app.dataset.phase='final';state.revealed=true;formulaBox.hidden=false;explore.hidden=false;hint.hidden=false;playBtn.disabled=false;playBtn.textContent='▶ 重新播放';draw();
-      status.textContent=meetTimes().length&&meetTimes()[0]<=15?'演示完成：Δx=0，位置相同才是相遇；共速只标记此前的最大距离。':'当前 15 s 观察窗内尚未相遇；本理想模型继续运行后仍会追上。';
-      requestAnimationFrame(__loop);return;
-    }
-    draw();
+  state.t=Math.min(cap,state.t+dt);
+  if(__phase==='ready'&&pauseAt!==null&&state.t>=pauseAt){
+    state.t=pauseAt;stopLoop();__phase='predict';
+    app.dataset.phase='prediction';predictionChoices.hidden=false;playBtn.disabled=true;playBtn.textContent='先选择预测';draw();
+    status.textContent='预测暂停：下一关键时刻表示相遇、距离最大还是距离最小？先选择再验证。';
+    return;
   }
-  requestAnimationFrame(__loop);
+  if(state.t>=cap){
+    stopLoop();__phase='done';app.dataset.phase='final';state.revealed=true;formulaBox.hidden=false;explore.hidden=false;hint.hidden=false;playBtn.disabled=false;playBtn.textContent='▶ 重新播放';draw();
+    status.textContent=meetTimes().length&&meetTimes()[0]<=15?'演示完成：Δx=0，位置相同才是相遇；共速只标记此前的最大距离。':'当前 15 s 观察窗内尚未相遇；本理想模型继续运行后仍会追上。';
+    return;
+  }
+  draw();__raf=requestAnimationFrame(__loop);
 }
-requestAnimationFrame(__loop);
+app.dataset.running='false';
 })();
 </script>
 </body>

@@ -17,19 +17,24 @@ test('B1-12 默认演示在共速前预测并运行至相遇', async ({ page }) 
   await expect(page.locator('#formulaBox')).toBeHidden();
   await expect(page.locator('#explore')).toBeHidden();
   await expect(page.locator('#app')).toHaveAttribute('data-revealed','false');
+  await expect(page.locator('#app')).toHaveAttribute('data-running','false');
+  await expect(page.locator('#canvas')).toHaveAttribute('data-distance-graph','observed');
   await page.locator('#play').click();
   await expect(page.locator('#app')).toHaveAttribute('data-phase','prediction',{ timeout: 8_000 });
+  await expect(page.locator('#app')).toHaveAttribute('data-running','false');
   await expect(page.locator('#predictionChoices')).toBeVisible();
   await expect(page.locator('#play')).toBeDisabled();
   await expect(page.locator('#status')).toContainText('预测暂停');
   await page.locator('[data-prediction="max"]').click();
   await expect(page.locator('#app')).toHaveAttribute('data-revealed','false');
+  await expect(page.locator('#canvas')).toHaveAttribute('data-distance-graph','observed');
   await page.locator('#play').click();
   await expect(page.locator('#status')).toContainText('演示完成：Δx=0',{ timeout: 14_000 });
   await expect(page.locator('#readout')).toContainText('Δx=0.00');
   await expect(page.locator('#readout')).toContainText('t等=');
   await expect(page.locator('#formulaBox')).toBeVisible();
   await expect(page.locator('#explore')).toBeVisible();
+  await expect(page.locator('#canvas')).toHaveAttribute('data-distance-graph','full');
 });
 
 test('B1-18 预测先于结果且迁移情境不显示伪精确读数', async ({ page }) => {
@@ -42,6 +47,7 @@ test('B1-18 预测先于结果且迁移情境不显示伪精确读数', async ({
   await expect(page.locator('#motionBtn')).toContainText('分步');
   await page.locator('#playBtn').click();
   await expect(page.locator('#app')).toHaveAttribute('data-phase','static-evidence');
+  await expect(page.locator('#app')).toHaveAttribute('data-running','false');
   await expect(page.locator('#fText')).toHaveText('20.0 N');
   await page.locator('#playBtn').click();
   await expect(page.locator('#app')).toHaveAttribute('data-phase','critical-evidence');
@@ -61,6 +67,16 @@ test('B1-18 预测先于结果且迁移情境不显示伪精确读数', async ({
   await expect(page.locator('#status')).toContainText('自由探索现在才开放');
   await expect(page.locator('#quantitativeControls')).toBeHidden();
   await expect(page.locator('#qualitativeNote')).toBeVisible();
+  await expect(page.locator('[data-mode="belt"]')).toHaveClass(/active/);
+  await page.locator('[data-mode="push"]').click();
+  await page.locator('#forceRange').fill('47');
+  await page.locator('#musRange').fill('0.45');
+  await page.locator('#resetBtn').click();
+  await expect(page.locator('#forceRange')).toHaveValue('0');
+  await expect(page.locator('#forceOut')).toHaveText('0');
+  await expect(page.locator('#musRange')).toHaveValue('0.25');
+  await expect(page.locator('#musOut')).toHaveText('0.25');
+  await expect(page.locator('[data-mode="push"]')).toHaveClass(/active/);
 });
 
 test('B1-18 自动模式同样逐段停留在静止、临界和滑动证据', async ({ page }) => {
@@ -68,6 +84,7 @@ test('B1-18 自动模式同样逐段停留在静止、临界和滑动证据', as
   await page.locator('[data-p1="follow"]').click();
   await page.locator('#playBtn').click();
   await expect(page.locator('#app')).toHaveAttribute('data-phase','static-evidence',{ timeout: 12_000 });
+  await expect(page.locator('#app')).toHaveAttribute('data-running','false');
   await page.locator('#playBtn').click();
   await expect(page.locator('#app')).toHaveAttribute('data-phase','critical-evidence',{ timeout: 5_000 });
   await page.locator('#playBtn').click();
@@ -93,9 +110,13 @@ test('B1-24 逐点取证后揭示公式且静摩擦按需求取值', async ({ pa
   await page.locator('#playBtn').click();
   await expect(page.locator('#formula')).toBeVisible();
   await expect(page.locator('#canvas')).toHaveAttribute('data-secondary-axis','inverse-mass');
+  await expect(page.locator('#roughText')).toContainText('光滑面：无摩擦');
   await page.locator('[data-surface="static"]').click();
   await expect(page.locator('#roughText')).toContainText('fₛ=F外=6.0 N');
   await expect(page.locator('#roughText')).toContainText('F合=0.0 N');
+  await page.locator('#resetBtn').click();
+  await expect(page.locator('[data-surface="smooth"]')).toHaveClass(/active/);
+  await expect(page.locator('#roughText')).toContainText('光滑面：无摩擦');
 });
 
 test('B1-24 减少动态模式每次点击只增加一个数据点', async ({ page }) => {

@@ -32,7 +32,7 @@
     <div class="card extension" id="extension" hidden>
       <b>演示后拓展：粗糙面</b>
       <div class="buttons" style="margin-top:7px"><button data-surface="smooth" class="active">光滑面</button><button data-surface="static">静摩擦</button><button data-surface="slide">滑动摩擦</button></div>
-      <p id="roughText" style="margin:7px 0 0;font-size:12px"></p>
+      <p id="roughText" style="margin:7px 0 0;font-size:12px">光滑面：无摩擦；F合=6.0 N，a=2.00 m/s²。</p>
     </div>
     <div class="card status" id="status">先作出预测；未选择前不会显示理论线或最终公式。</div>
   </div>
@@ -103,7 +103,7 @@ playBtn.addEventListener('click',()=>{
   if(state.phase==='mass-predict-transform'){setPhase('final');document.getElementById('choices2').hidden=true;formula.hidden=false;extension.hidden=false;playBtn.disabled=true;playBtn.textContent='两轮实验完成';task.innerHTML=`<b>证据反馈：</b>你的选择是“${state.prediction2==='inv'?'a-1/m':state.prediction2==='m'?'a-m':'a-m²'}”。改画 a-1/m 后四点成过原点直线，说明 a∝1/m。`;status.textContent='两轮控制变量证据完成后，才揭示 F合=ma。粗糙面现作为独立拓展开放。';draw()}
 });
 document.querySelectorAll('[data-surface]').forEach(b=>b.addEventListener('click',()=>{state.surface=b.dataset.surface;state.F=state.surface==='static'?6:state.surface==='slide'?14:6;document.querySelectorAll('[data-surface]').forEach(x=>x.classList.toggle('active',x===b));const v=roughValues();document.getElementById('roughText').textContent=`${v.label}；F合=${v.net.toFixed(1)} N，a=${v.a.toFixed(2)} m/s²。`;status.textContent=state.surface==='static'?'静摩擦按维持静止所需取值，不会无条件等于 μmg。':state.surface==='slide'?'超过最大静摩擦后改用 μₖ，受力读数与加速度一致。':'光滑主实验只研究合力和质量。'}));
-document.getElementById('resetBtn').addEventListener('click',()=>{clearTimeout(state.timer);Object.assign(state,{phase:'predict-force',prediction1:null,prediction2:null,pointsF:[],pointsM:[],index:0,running:false,surface:'smooth',F:6,m:3});setPhase('predict-force');document.querySelectorAll('.choices button').forEach(b=>b.classList.remove('active'));document.getElementById('choices1').hidden=false;document.getElementById('choices2').hidden=true;formula.hidden=true;extension.hidden=true;playBtn.disabled=true;playBtn.textContent='▶ 开始第一轮取点';task.innerHTML='<b>预测 1：</b>保持质量不变，合力加倍，加速度会怎样？先选择，再开始取点。';fixedText.textContent='m=3.0 kg';renderTable();updateMeters(null);status.textContent='先作出预测；未选择前不会显示理论线或最终公式。';draw()});
+document.getElementById('resetBtn').addEventListener('click',()=>{clearTimeout(state.timer);Object.assign(state,{phase:'predict-force',prediction1:null,prediction2:null,pointsF:[],pointsM:[],index:0,running:false,timer:null,surface:'smooth',F:6,m:3});setPhase('predict-force');document.querySelectorAll('.choices button').forEach(b=>b.classList.remove('active'));document.querySelectorAll('[data-surface]').forEach(b=>b.classList.toggle('active',b.dataset.surface==='smooth'));document.getElementById('roughText').textContent='光滑面：无摩擦；F合=6.0 N，a=2.00 m/s²。';document.getElementById('choices1').hidden=false;document.getElementById('choices2').hidden=true;formula.hidden=true;extension.hidden=true;playBtn.disabled=true;playBtn.textContent='▶ 开始第一轮取点';task.innerHTML='<b>预测 1：</b>保持质量不变，合力加倍，加速度会怎样？先选择，再开始取点。';fixedText.textContent='m=3.0 kg';renderTable();updateMeters(null);status.textContent='先作出预测；未选择前不会显示理论线或最终公式。';draw()});
 renderTable();draw();
 })();
 </script>
