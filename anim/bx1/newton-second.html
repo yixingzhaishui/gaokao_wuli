@@ -10,10 +10,11 @@
 </style>
 </head>
 <body>
-<div class="root" id="app" data-phase="predict-force">
+<div class="root" id="app" data-phase="predict-force" data-ideal-simulation="true">
   <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="牛顿第二定律控制变量实验：小车、逐点数据表和关系图"></canvas></div>
   <div class="panel">
     <div class="card task" id="task"><b>预测 1：</b>保持质量不变，合力加倍，加速度会怎样？先选择，再开始取点。</div>
+    <div class="card" id="simulationNote"><b>理想仿真说明：</b>本页数据由牛顿第二定律的理想模型生成，不是独立实测数据；用途是看清控制变量、描点和图像关系。</div>
     <div class="choices" id="choices1">
       <button data-predict-force="half">变为一半</button><button data-predict-force="same">保持不变</button><button data-predict-force="double">变为两倍</button>
     </div>
@@ -63,24 +64,26 @@ function current(){
   const p=state.pointsF.at(-1);return p||null;
 }
 function axes(x,y,w,h,xLabel,yLabel,title){round(x,y,w,h,'#f8fafc');const ox=x+48,oy=y+h-38,gw=w-76,gh=h-80;for(let i=0;i<=4;i++){line(ox+i*gw/4,oy-gh,ox+i*gw/4,oy);line(ox,oy-i*gh/4,ox+gw,oy-i*gh/4)}arrow(ox,oy,ox+gw+14,oy,colors.ink,2);arrow(ox,oy,ox,oy-gh-14,colors.ink,2);text(title,x+w/2,y+22,colors.ink,14);text(xLabel,ox+gw+22,oy,colors.muted,11,'left');text(yLabel,ox-8,oy-gh-20,colors.muted,11,'right');return{ox,oy,gw,gh}}
-function plot(g,pts,xValue,xMax,yMax,color,showLine){
-  if(showLine&&pts.length>1){ctx.beginPath();pts.forEach((p,i)=>{const x=g.ox+xValue(p)/xMax*g.gw,y=g.oy-p.a/yMax*g.gh;i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.strokeStyle=color;ctx.lineWidth=3;ctx.stroke()}
+function plot(g,pts,xValue,xMax,yMax,color,showLine,originLabel){
+  if(showLine&&pts.length>1){const ordered=[...pts].sort((a,b)=>xValue(a)-xValue(b)),first=ordered[0],last=ordered.at(-1),x1=g.ox+xValue(first)/xMax*g.gw,y1=g.oy-first.a/yMax*g.gh,x2=g.ox+xValue(last)/xMax*g.gw,y2=g.oy-last.a/yMax*g.gh;line(g.ox,g.oy,x1,y1,color,2,[6,5]);line(x1,y1,x2,y2,color,3);ctx.beginPath();ctx.arc(g.ox,g.oy,6,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();ctx.strokeStyle=color;ctx.lineWidth=2;ctx.stroke();text(originLabel,g.ox+8,g.oy-13,color,10,'left','700')}
   pts.forEach(p=>{ctx.beginPath();ctx.arc(g.ox+xValue(p)/xMax*g.gw,g.oy-p.a/yMax*g.gh,6,0,Math.PI*2);ctx.fillStyle=color;ctx.fill()});
 }
 function draw(){
   ctx.clearRect(0,0,920,540);const bg=ctx.createLinearGradient(0,0,0,540);bg.addColorStop(0,'#fbfdff');bg.addColorStop(1,'#eaf0f7');ctx.fillStyle=bg;ctx.fillRect(0,0,920,540);
-  text('牛顿第二定律：先取证，后归纳',460,28,colors.ink,19);
+  text('牛顿第二定律理想仿真：看控制变量与图像',460,28,colors.ink,19);
   round(42,52,410,188);const p=current(),F=p?p.F:0,m=p?p.m:3,a=p?p.a:0,carX=120+Math.min(190,a*18);line(72,190,420,190,'#334155',5);round(carX,142,92,48,'#dbeafe','#2563eb');text(`m=${m.toFixed(1)} kg`,carX+46,166,colors.blue,13);if(F>0)arrow(carX+92,166,carX+92+Math.min(130,F*8),166,colors.red,4);if(a>0)arrow(carX+46,128,carX+46+Math.min(130,a*24),128,colors.purple,4);text(p?`测得：F合=${F.toFixed(1)} N，a=${a.toFixed(2)} m/s²`:'等待第一次测量',247,218,p?colors.green:colors.muted,13);
-  const g1=axes(478,52,400,210,'F合/N','a','实验一：固定 m，逐点形成 a-F合');plot(g1,state.pointsF,q=>q.F,12,6,colors.purple,state.phase==='force-revealed'||state.phase.includes('mass')||state.phase==='final');
+  const forceLineVisible=state.phase==='force-revealed'||state.phase.includes('mass')||state.phase==='final';canvas.dataset.forceOrigin=forceLineVisible?'physical-boundary-not-measured':'hidden';
+  const g1=axes(478,52,400,210,'F合/N','a','仿真一：固定 m，逐点形成 a-F合');plot(g1,state.pointsF,q=>q.F,12,6,colors.purple,forceLineVisible,'边界点（非测量）');
   const massRaw=state.phase==='mass-collect'||state.phase==='mass-predict-transform',transformed=state.phase==='final';canvas.dataset.secondaryAxis=transformed?'inverse-mass':'mass';
-  const g2=axes(42,278,836,224,transformed?'1/m (kg⁻¹)':'m/kg','a',transformed?'实验二验证：横轴变换后检验直线关系':massRaw?'实验二证据：质量与加速度呈怎样的关系？':'实验二：固定 F合，研究质量与加速度');
-  plot(g2,state.pointsM,transformed?q=>1/q.m:q=>q.m,transformed?.5:6,7,colors.blue,transformed);
+  canvas.dataset.massOrigin=transformed?'model-limit-extrapolated-not-measured':'hidden';
+  const g2=axes(42,278,836,224,transformed?'1/m (kg⁻¹)':'m/kg','a',transformed?'仿真二：拟合线向模型极限外推':massRaw?'仿真二数据：质量与加速度呈怎样的关系？':'仿真二：固定 F合，研究质量与加速度');
+  plot(g2,state.pointsM,transformed?q=>1/q.m:q=>q.m,transformed?.5:6,7,colors.blue,transformed,'模型极限外推（非测量）');
   if(state.phase==='predict-force')text('最终公式与拟合线尚未揭示',460,518,colors.muted,12);
 }
 function renderTable(){const pts=[...state.pointsF.map(p=>({...p,round:'一'})),...state.pointsM.map(p=>({...p,round:'二'}))];dataBody.innerHTML=pts.length?pts.map(p=>`<tr><td>${p.round}</td><td>${p.F.toFixed(1)}</td><td>${p.m.toFixed(1)}</td><td>${p.a.toFixed(2)}</td></tr>`).join(''):'<tr><td colspan="4">尚未取点</td></tr>'}
 function updateMeters(p){if(!p){measureText.textContent='等待预测';netText.textContent='—';aText.textContent='—';return}measureText.textContent=`第 ${state.index}/${state.phase.includes('force')?forceCases.length:massCases.length} 点`;netText.textContent=`${p.F.toFixed(1)} N`;aText.textContent=`${p.a.toFixed(2)} m/s²`}
 function schedule(fn){state.timer=setTimeout(fn,850)}
-function completeForce(){state.running=false;setPhase('force-revealed');playBtn.disabled=false;playBtn.textContent='继续：第二轮预测';task.innerHTML=`<b>证据反馈：</b>你的预测“${state.prediction1==='double'?'变为两倍':state.prediction1==='same'?'保持不变':'变为一半'}”。固定 m 时四点落在过原点直线上，a 与 F合成正比。`;status.textContent='第一轮完成：拟合线现在才揭示。点击继续，准备固定合力改变质量。';draw()}
+function completeForce(){state.running=false;setPhase('force-revealed');playBtn.disabled=false;playBtn.textContent='继续：第二轮预测';task.innerHTML=`<b>证据反馈：</b>你的预测“${state.prediction1==='double'?'变为两倍':state.prediction1==='same'?'保持不变':'变为一半'}”。固定 m 时四个理想数据点与过原点的模型线一致；虚线连接到未测量的物理边界 (0,0)。`;status.textContent='第一轮完成：模型线和原点外推现在才揭示。点击继续，准备固定合力改变质量。';draw()}
 function completeMass(){state.running=false;setPhase('mass-predict-transform');document.getElementById('choices2').hidden=false;playBtn.disabled=true;playBtn.textContent='等待第二次预测';task.innerHTML='<b>预测 2：</b>a-m 数据形成曲线。横轴改成什么量，数据才会成为直线？';status.textContent='先根据表格作答；坐标变换与最终公式仍然隐藏。';draw()}
 function collectForce(){
   if(state.index>=forceCases.length){completeForce();return}
@@ -100,7 +103,7 @@ playBtn.addEventListener('click',()=>{
   if(state.phase==='mass-collect'){state.running=true;playBtn.textContent='⏸ 暂停第二轮';collectMass();return}
   if(state.phase==='predict-force'){document.getElementById('choices1').hidden=true;state.running=true;state.index=0;setPhase('force-collect');playBtn.disabled=false;playBtn.textContent='⏸ 暂停第一轮';fixedText.textContent='m=3.0 kg';collectForce();return}
   if(state.phase==='force-revealed'){state.index=0;setPhase('mass-collect');state.running=true;playBtn.disabled=false;playBtn.textContent='⏸ 暂停第二轮';fixedText.textContent='F合=12.0 N';task.innerHTML='<b>观察：</b>保持 F合=12 N，逐步增加质量，先记录 a-m 数据。';collectMass();return}
-  if(state.phase==='mass-predict-transform'){setPhase('final');document.getElementById('choices2').hidden=true;formula.hidden=false;extension.hidden=false;playBtn.disabled=true;playBtn.textContent='两轮实验完成';task.innerHTML=`<b>证据反馈：</b>你的选择是“${state.prediction2==='inv'?'a-1/m':state.prediction2==='m'?'a-m':'a-m²'}”。改画 a-1/m 后四点成过原点直线，说明 a∝1/m。`;status.textContent='两轮控制变量证据完成后，才揭示 F合=ma。粗糙面现作为独立拓展开放。';draw()}
+  if(state.phase==='mass-predict-transform'){setPhase('final');document.getElementById('choices2').hidden=true;formula.hidden=false;extension.hidden=false;playBtn.disabled=true;playBtn.textContent='两轮仿真完成';task.innerHTML=`<b>证据反馈：</b>你的选择是“${state.prediction2==='inv'?'a-1/m':state.prediction2==='m'?'a-m':'a-m²'}”。改画 a-1/m 后四个理想点共线；虚线向原点外推，原点对应无限质量极限，不是测量点。`;status.textContent='两轮理想仿真用于理解控制变量和图像；真实定律证据来自小车与传感器实验。粗糙面现作为独立拓展开放。';draw()}
 });
 document.querySelectorAll('[data-surface]').forEach(b=>b.addEventListener('click',()=>{state.surface=b.dataset.surface;state.F=state.surface==='static'?6:state.surface==='slide'?14:6;document.querySelectorAll('[data-surface]').forEach(x=>x.classList.toggle('active',x===b));const v=roughValues();document.getElementById('roughText').textContent=`${v.label}；F合=${v.net.toFixed(1)} N，a=${v.a.toFixed(2)} m/s²。`;status.textContent=state.surface==='static'?'静摩擦按维持静止所需取值，不会无条件等于 μmg。':state.surface==='slide'?'超过最大静摩擦后改用 μₖ，受力读数与加速度一致。':'光滑主实验只研究合力和质量。'}));
 document.getElementById('resetBtn').addEventListener('click',()=>{clearTimeout(state.timer);Object.assign(state,{phase:'predict-force',prediction1:null,prediction2:null,pointsF:[],pointsM:[],index:0,running:false,timer:null,surface:'smooth',F:6,m:3});setPhase('predict-force');document.querySelectorAll('.choices button').forEach(b=>b.classList.remove('active'));document.querySelectorAll('[data-surface]').forEach(b=>b.classList.toggle('active',b.dataset.surface==='smooth'));document.getElementById('roughText').textContent='光滑面：无摩擦；F合=6.0 N，a=2.00 m/s²。';document.getElementById('choices1').hidden=false;document.getElementById('choices2').hidden=true;formula.hidden=true;extension.hidden=true;playBtn.disabled=true;playBtn.textContent='▶ 开始第一轮取点';task.innerHTML='<b>预测 1：</b>保持质量不变，合力加倍，加速度会怎样？先选择，再开始取点。';fixedText.textContent='m=3.0 kg';renderTable();updateMeters(null);status.textContent='先作出预测；未选择前不会显示理论线或最终公式。';draw()});

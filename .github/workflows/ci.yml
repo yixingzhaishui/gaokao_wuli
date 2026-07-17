@@ -26,8 +26,8 @@ jobs:
         run: node scripts/gen-data.js --check
       - name: Verify progress reports are current
         run: node scripts/update-progress-report.js --check
-      - name: Run strict repository checks
-        run: node scripts/check.js --strict
+      - name: Run full repository gate
+        run: npm run check
       - name: Audit animations
         run: node scripts/anim-audit.js
       - name: Install Playwright Chromium
