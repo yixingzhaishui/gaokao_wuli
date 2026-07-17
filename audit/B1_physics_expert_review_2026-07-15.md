@@ -1,5 +1,7 @@
 # 必修1（B1）物理专家与总主编审核意见
 
+> **SUPERSEDED BY `audit/chief_editor/B1_RE_REVIEW_2026-07-16.md`。本文件仅作为原始审核输入，不是当前发布审批依据。**
+
 > 审核对象：`yixingzhaishui/gaokao_wuli`  
 > 审核分支：`codex/repository-fixes`  
 > 审核日期：2026-07-15  

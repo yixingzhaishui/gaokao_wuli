@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { pathToFileURL } = require('url');
 const { execFileSync } = require('child_process');
+const crypto = require('crypto');
 
 const root = path.resolve(__dirname, '..');
 const requestedModule = process.env.AUDIT_MODULE || 'bx1';
@@ -369,6 +370,17 @@ for (const { moduleName, file } of pages) {
       let initial = await captureState(page);
       if (playIndex >= 0) {
         const playButton = buttons.nth(playIndex);
+        if (await playButton.isDisabled()) {
+          for (let i = 0; i < buttonCount && await playButton.isDisabled(); i++) {
+            if (i === playIndex || i === resetIndex) continue;
+            const prerequisite = buttons.nth(i);
+            if (await prerequisite.isVisible() && !(await prerequisite.isDisabled())) {
+              await prerequisite.click();
+              await page.waitForTimeout(80);
+            }
+          }
+          initial = await captureState(page);
+        }
         if (/暂停/.test(buttonTexts[playIndex])) {
           await playButton.click();
           await page.waitForTimeout(160);
@@ -451,6 +463,7 @@ for (const { moduleName, file } of pages) {
       const valueControlCount = await valueControls.count();
       for (let i = 0; i < valueControlCount; i++) {
         const control = valueControls.nth(i);
+        if (!(await control.isVisible()) || await control.isDisabled()) continue;
         const meta = await control.evaluate((node, index) => ({
           selector: node.id ? `#${node.id}` : `${node.tagName.toLowerCase()}[type="${node.type || ''}"]:${index}`,
           tag: node.tagName.toLowerCase(), type: node.type || '', value: node.value,
@@ -556,7 +569,7 @@ for (const { moduleName, file } of pages) {
         const canvas = document.querySelector('canvas');
         const controls = [...document.querySelectorAll('button, input, select')].filter(node => {
           const style = getComputedStyle(node);
-          return style.display !== 'none' && style.visibility !== 'hidden';
+          return style.display !== 'none' && style.visibility !== 'hidden' && node.getClientRects().length > 0;
         });
         const controlsVisible = controls.every(node => {
           const rect = node.getBoundingClientRect();
@@ -606,6 +619,19 @@ test.afterAll(() => {
   fs.mkdirSync(resultDir, { recursive: true });
   let commit = '';
   try { commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim(); } catch {}
+  let worktreeClean = false;
+  let gitDiffSha256 = '';
+  try {
+    const porcelain = execFileSync('git', ['status', '--porcelain'], { cwd: root, encoding: 'utf8' });
+    worktreeClean = porcelain.trim().length === 0;
+    const diff = execFileSync('git', ['diff', '--binary', 'HEAD'], { cwd: root });
+    gitDiffSha256 = crypto.createHash('sha256').update(diff).digest('hex');
+  } catch {}
+  const testedFilesSha256 = {};
+  for (const item of results) {
+    const filePath = path.join(root, item.file);
+    try { testedFilesSha256[item.file] = crypto.createHash('sha256').update(fs.readFileSync(filePath)).digest('hex'); } catch {}
+  }
   const summary = {
     total: results.length,
     score: Math.round(results.reduce((sum, item) => sum + (item.result === 'PASS' ? 100 : 0), 0) / Math.max(1, results.length)),
@@ -614,5 +640,6 @@ test.afterAll(() => {
     blocked: results.filter(item => item.result === 'BLOCKED').length
   };
   const reportName = process.env.AUDIT_REPORT || 'interaction-audit.json';
-  fs.writeFileSync(path.join(resultDir, reportName), JSON.stringify({ score_version: '3.0', generated_at: new Date().toISOString(), commit, module: requestedModule, modules: moduleNames, summary, results }, null, 2) + '\n');
+  const testCommand = process.env.AUDIT_COMMAND || `AUDIT_MODULE=${requestedModule} AUDIT_REPORT=${reportName} playwright test tests/interaction-audit.spec.js --workers=1`;
+  fs.writeFileSync(path.join(resultDir, reportName), JSON.stringify({ score_version: '3.1', generated_at: new Date().toISOString(), commit, worktree_clean: worktreeClean, git_diff_sha256: gitDiffSha256, tested_files_sha256: testedFilesSha256, test_command: testCommand, module: requestedModule, modules: moduleNames, summary, results }, null, 2) + '\n');
 });

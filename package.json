@@ -6,6 +6,7 @@
     "audit:static": "node scripts/check.js --audit-write && node scripts/anim-audit.js",
     "audit:interaction": "AUDIT_MODULE=all AUDIT_REPORT=interaction-audit.json playwright test tests/interaction-audit.spec.js --workers=1",
     "audit:interaction:module": "playwright test tests/interaction-audit.spec.js --workers=1",
+    "audit:pedagogy:b1": "playwright test tests/b1-priority-pedagogy.spec.js --workers=1",
     "eval:static": "node eval/static-eval.mjs",
     "eval:compile": "node eval/compile-results.mjs && node eval/score-pages.mjs"
   },

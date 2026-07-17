@@ -2,134 +2,105 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>牛顿第二定律实验台</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>B1-24 牛顿第二定律引导实验</title>
 <link rel="icon" href="data:,">
 <style>
-  *{box-sizing:border-box}
-  body{margin:0;background:#eef3f8;color:#102a43;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
-  .root{display:grid;grid-template-columns:minmax(0,1fr) 306px;gap:10px;padding:10px;min-height:540px}
-  .stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
-  canvas{display:block;width:100%;height:auto;touch-action:none}
-  .panel{display:flex;flex-direction:column;gap:8px}
-  .card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px}
-  .task{border-left:4px solid #f59e0b;background:#fff7ed;color:#475569;font-size:12px;line-height:1.45}
-  .title{font-weight:800;margin-bottom:5px;color:#0f172a}
-  .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-  button{border:1px solid #94a3b8;background:#fff;border-radius:7px;min-height:30px;cursor:pointer;color:#102a43}
-  .readout{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-  .meter{background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px;min-height:48px}
-  .meter span{display:block;font-size:11px;color:#b6c5d8}
-  .meter b{display:block;margin-top:2px;color:#fbbf24;font-size:16px;font-variant-numeric:tabular-nums}
-  .formula{display:grid;gap:5px;font-size:13px;color:#334155}
-  .formula div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #d7dee8;padding-bottom:4px}
-  .formula div:last-child{border-bottom:0;padding-bottom:0}
-  .formula b{white-space:nowrap;color:#0f172a}
-  .small{font-size:12px;line-height:1.5;color:#475569}
-  .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
-  .status.warn{border-color:#f59e0b;background:#fff7ed;color:#b45309}
-  @media(max-width:760px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
+*{box-sizing:border-box}body{margin:0;background:#eef3f8;color:#102a43;font-family:system-ui,-apple-system,"PingFang SC",sans-serif}.root{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:10px;padding:10px;max-width:100%}.stage{background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}.stage,.panel{min-width:0}canvas{display:block;width:100%;max-width:100%;height:auto;aspect-ratio:920/540}.panel{display:flex;flex-direction:column;gap:8px}.card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:9px;overflow-wrap:anywhere}.task{border-left:4px solid #f59e0b;background:#fff7ed;line-height:1.5;font-size:13px}.choices,.buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.buttons{grid-template-columns:repeat(2,minmax(0,1fr))}button{min-width:0;min-height:36px;border:1px solid #94a3b8;background:#fff;color:#102a43;border-radius:7px;font-weight:750;cursor:pointer;overflow-wrap:anywhere}button.active{background:#dbeafe;border-color:#2563eb;color:#1d4ed8}button:disabled{opacity:.45;cursor:not-allowed}.readout{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.meter{min-width:0;background:#0f172a;color:#dbeafe;border-radius:7px;padding:7px}.meter span{display:block;color:#94a3b8;font-size:11px}.meter b{display:block;color:#fbbf24;font-size:16px;margin-top:2px}.evidence{font-size:12px;width:100%;border-collapse:collapse}.evidence th,.evidence td{border-bottom:1px solid #e2e8f0;padding:4px;text-align:center}.formula{background:#ecfdf5;border-color:#10b981;color:#065f46;font-weight:800;line-height:1.55}.status{background:#eff6ff;border-color:#60a5fa;color:#1e40af;font-size:12px;line-height:1.5;font-weight:750}.extension[hidden],.formula[hidden],.choices[hidden]{display:none}.extension{background:#f8fafc}.extension .buttons{grid-template-columns:repeat(3,minmax(0,1fr))}@media(max-width:780px){.root{grid-template-columns:minmax(0,1fr)}.panel{grid-row:2}.choices{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(prefers-reduced-motion:reduce){button{scroll-behavior:auto}}
 </style>
 </head>
 <body>
-<div class="root">
-  <div class="stage"><canvas id="canvas" width="920" height="520" aria-label="牛顿第二定律交互实验台：小车侧视装置、a-F图像和数据记录"></canvas></div>
+<div class="root" id="app" data-phase="predict-force">
+  <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="牛顿第二定律控制变量实验：小车、逐点数据表和关系图"></canvas></div>
   <div class="panel">
-    <div class="card task" id="task"><b>观察任务／预测 1：</b>质量不变时，合力加倍，加速度会怎样？先预测，再播放两轮控制变量实验。</div>
-    <div class="chips"><button id="playBtn">▶ 引导演示：自动取点</button><button id="resetBtn">重置</button></div>
-    <div class="card">
-      <div class="title">快速情境</div>
-      <div class="chips">
-        <button data-case="light">轻车</button>
-        <button data-case="heavy">重车</button>
-        <button data-case="rough">粗糙面</button>
-        <button data-case="smooth">光滑面</button>
-      </div>
+    <div class="card task" id="task"><b>预测 1：</b>保持质量不变，合力加倍，加速度会怎样？先选择，再开始取点。</div>
+    <div class="choices" id="choices1">
+      <button data-predict-force="half">变为一半</button><button data-predict-force="same">保持不变</button><button data-predict-force="double">变为两倍</button>
     </div>
-    <div class="card">
-      <div class="title">实时读数</div>
-      <div class="readout">
-        <div class="meter"><span>外力 F</span><b id="fText">12.0 N</b></div>
-        <div class="meter"><span>质量 m</span><b id="mText">3.0 kg</b></div>
-        <div class="meter"><span>合力 F合</span><b id="netText">9.0 N</b></div>
-        <div class="meter"><span>加速度 a</span><b id="aText">3.00 m/s²</b></div>
-      </div>
+    <div class="choices" id="choices2" hidden>
+      <button data-predict-mass="m">直接画 a-m</button><button data-predict-mass="inv">改画 a-1/m</button><button data-predict-mass="square">改画 a-m²</button>
     </div>
-    <div class="card formula">
-      <div><span>实验一：m 不变</span><b>a∝F合</b></div>
-      <div><span>实验二：F合 不变</span><b>a∝1/m</b></div>
-      <div><span>归纳后</span><b>F合=ma</b></div>
+    <div class="buttons"><button id="playBtn" disabled>▶ 开始第一轮取点</button><button id="resetBtn">重置</button></div>
+    <div class="readout">
+      <div class="meter"><span>本轮固定量</span><b id="fixedText">m=3.0 kg</b></div>
+      <div class="meter"><span>当前测量</span><b id="measureText">等待预测</b></div>
+      <div class="meter"><span>合力 F合</span><b id="netText">—</b></div>
+      <div class="meter"><span>加速度 a</span><b id="aText">—</b></div>
     </div>
-    <div class="card small"><b>演示后可探索：</b>抓红色合力箭头端点改变 F合；抓砝码尺改变 m。粗糙度是拓展变量，用来比较外加拉力与合力。</div>
-    <div class="status" id="status">合力不为 0，小车加速；a 与 F合 同向。</div>
+    <div class="card"><table class="evidence"><thead><tr><th>轮次</th><th>F合/N</th><th>m/kg</th><th>a/(m/s²)</th></tr></thead><tbody id="dataBody"><tr><td colspan="4">尚未取点</td></tr></tbody></table></div>
+    <div class="card formula" id="formula" hidden>证据归纳：a∝F合，a∝1/m<br>同一物体同一时刻：F合=ma，且 a 与 F合同向。</div>
+    <div class="card extension" id="extension" hidden>
+      <b>演示后拓展：粗糙面</b>
+      <div class="buttons" style="margin-top:7px"><button data-surface="smooth" class="active">光滑面</button><button data-surface="static">静摩擦</button><button data-surface="slide">滑动摩擦</button></div>
+      <p id="roughText" style="margin:7px 0 0;font-size:12px"></p>
+    </div>
+    <div class="card status" id="status">先作出预测；未选择前不会显示理论线或最终公式。</div>
   </div>
 </div>
 <script>
-(function(){
-  'use strict';
-  const canvas=document.getElementById('canvas');
-  const ctx=canvas.getContext('2d');
-  const state={F:6,m:3,mu:0,drag:null,playing:false,playT:0,demoPhase:0};
-  const G=10;
-  const els={F:document.getElementById('fText'),m:document.getElementById('mText'),net:document.getElementById('netText'),a:document.getElementById('aText'),status:document.getElementById('status')};
-  const colors={red:'#dc2626',blue:'#2563eb',purple:'#7c3aed',ink:'#102a43',muted:'#64748b',green:'#0f766e',orange:'#f59e0b'};
-  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
-  const fmt=(v,d=1)=>v.toFixed(d);
-  function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){ctx.fillStyle=c;ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
-  function line(x1,y1,x2,y2,c='#94a3b8',w=2,dash){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
-  function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore()}
-  function roundRect(x,y,w,h,r,fill,stroke){ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}ctx.restore()}
-  function values(){const f=state.mu*state.m*G;const net=Math.max(0,state.F-f);return{f,net,a:net/state.m,invM:1/state.m}}
-  function geom(){return{forceEnd:{x:180+state.F/40*210,y:200},mass:{x:122+(state.m-1)/9*240,y:438},mu:{x:500+state.mu/.5*240,y:438}}}
-  function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();text(label,x,y-22,active?'#92400e':c,'center',12,'900');ctx.restore()}
-  function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-18,c,'center',12,'900')}
-  function drawScene(v,g0){
-    roundRect(42,58,492,286,8,'#fff','#d7dee8');
-    const off=state.playing?Math.min(70,0.5*v.a*state.playT*state.playT*18):0;
-    const groundY=284,boxX=142+off,boxW=74+state.m*5,boxH=42;
-    line(72,groundY,502,groundY,'#334155',5);
-    for(let i=0;i<12;i++){const x=80+i*34;line(x,groundY+9,x+20,groundY+9+state.mu*22,state.mu>.18?'#b45309':'#cbd5e1',state.mu>.18?3:2)}
-    roundRect(boxX,groundY-boxH,boxW,boxH,7,'#e2e8f0','#334155');
-    text(`m=${fmt(state.m)}kg`,boxX+boxW/2,groundY-boxH/2,'#0f172a','center',13,'900');
-    arrow(boxX+boxW,200,g0.forceEnd.x,200,colors.red,4);
-    handle(g0.forceEnd.x,g0.forceEnd.y,`F=${fmt(state.F)}N`,state.drag==='F',colors.red);
-    if(v.f>.05)arrow(boxX,groundY-20,boxX-Math.min(96,v.f*3),groundY-20,colors.orange,3);
-    arrow(boxX+boxW/2,groundY-boxH-22,boxX+boxW/2+Math.min(120,v.net*4),groundY-boxH-22,colors.red,4);
-    arrow(boxX+boxW/2,groundY+28,boxX+boxW/2+Math.min(120,v.a*24),groundY+28,colors.purple,4);
-    text(`f=μmg=${fmt(v.f)}N`,154,326,colors.orange,'left',12,'900');
-    text(`F合=${fmt(v.net)}N`,boxX+boxW/2+70,groundY-boxH-43,colors.red,'center',12,'900');
-    text(`a=${fmt(v.a,2)}m/s²`,boxX+boxW/2+68,groundY+50,colors.purple,'center',12,'900');
-  }
-  function graphBox(x,y,w,h,title,xLab,yLab){roundRect(x,y,w,h,8,'#f8fafc','#d7dee8');text(title,x+w/2,y+23,'#0f172a','center',14,'900');const ox=x+42,oy=y+h-30,gw=w-72,gh=h-70;for(let i=0;i<=4;i++){line(ox+i/4*gw,oy-gh,ox+i/4*gw,oy,'#e2e8f0',1);line(ox,oy-i/4*gh,ox+gw,oy-i/4*gh,'#e2e8f0',1)}arrow(ox,oy,ox+gw+14,oy,'#334155',2);arrow(ox,oy,ox,oy-gh-14,'#334155',2);text(xLab,ox+gw+22,oy,'#475569','left',11,'800');text(yLab,ox-8,oy-gh-20,'#475569','right',11,'800');return{ox,oy,gw,gh}}
-  function drawGraphs(v){
-    const g1=graphBox(560,58,300,166,'控制 m、μ，看 a-F','F','a');
-    const f0=state.mu*state.m*G;
-    ctx.save();ctx.strokeStyle=colors.purple;ctx.lineWidth=3;ctx.beginPath();
-    for(let F=0;F<=40;F++){const a=Math.max(0,F-f0)/state.m;const x=g1.ox+F/40*g1.gw,y=g1.oy-clamp(a,0,12)/12*g1.gh;if(F===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke();ctx.restore();
-    ctx.fillStyle=colors.red;ctx.beginPath();ctx.arc(g1.ox+state.F/40*g1.gw,g1.oy-clamp(v.a,0,12)/12*g1.gh,6,0,Math.PI*2);ctx.fill();
-    const g2=graphBox(560,236,300,158,'控制 F合，看 a-1/m','1/m','a');
-    ctx.save();ctx.strokeStyle=colors.blue;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(g2.ox,g2.oy);ctx.lineTo(g2.ox+g2.gw,g2.oy-clamp(v.net*1,0,12)/12*g2.gh);ctx.stroke();ctx.restore();
-    ctx.fillStyle=colors.red;ctx.beginPath();ctx.arc(g2.ox+v.invM/1*g2.gw,g2.oy-clamp(v.a,0,12)/12*g2.gh,6,0,Math.PI*2);ctx.fill();
-  }
-  function update(v){
-    els.F.textContent=`${fmt(state.F)} N`;els.m.textContent=`${fmt(state.m)} kg`;els.net.textContent=`${fmt(v.net)} N`;els.a.textContent=`${fmt(v.a,2)} m/s²`;
-    els.status.className='status'+(v.net===0?' warn':'');
-    const demo=state.playing?(state.demoPhase===1?'实验一：保持 m=3 kg，逐档增大 F合，记录 a。':'实验二：保持 F合=12 N，逐档增大 m，改画 a-1/m。'):'';
-    els.status.textContent=demo||(v.net===0?'合力为 0，小车加速度为 0。':'合力不为 0，小车加速；a 与 F合 同向。');
-  }
-  function draw(){const v=values(),g0=geom();ctx.clearRect(0,0,920,520);var _bg=ctx.createLinearGradient(0,0,0,520);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,520);text('牛顿第二定律实验台：加速度由合力和质量共同决定',460,30,'#0f172a','center',19,'900');drawScene(v,g0);drawGraphs(v);roundRect(42,404,816,76,8,'#fff','#d7dee8');ruler(122,438,362,'拖 m：轻车 → 重车',colors.blue);handle(g0.mass.x,g0.mass.y,`m=${fmt(state.m)}`,state.drag==='m',colors.blue);ruler(500,438,740,'拖 μ：光滑 → 粗糙',colors.orange);handle(g0.mu.x,g0.mu.y,`μ=${fmt(state.mu,2)}`,state.drag==='mu',colors.orange);update(v)}
-  function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
-  function near(a,b,rad=24){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
-  function down(e){if(state.playing){state.playing=false;document.getElementById('playBtn').textContent='▶ 引导演示：自动取点'}const p=pos(e),g0=geom();if(near(p,g0.forceEnd,30))state.drag='F';else if(near(p,g0.mass,28))state.drag='m';else if(near(p,g0.mu,28))state.drag='mu';else state.drag=null;if(state.drag){canvas.setPointerCapture(e.pointerId);move(e)}}
-  function move(e){if(!state.drag)return;const p=pos(e);if(state.drag==='F')state.F=clamp((p.x-180)/210*40,0,40);if(state.drag==='m')state.m=clamp(1+(p.x-122)/240*9,1,10);if(state.drag==='mu')state.mu=clamp((p.x-500)/240*.5,0,.5);draw()}
-  function up(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
-  canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
-  document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='light')state.m=1.5;if(c==='heavy')state.m=8;if(c==='rough')state.mu=.32;if(c==='smooth')state.mu=0;draw()}));
-  const playBtn=document.getElementById('playBtn');
-  function animate(){if(!state.playing)return;state.playT+=0.05;state.mu=0;if(state.playT<3){state.demoPhase=1;state.m=3;state.F=3+Math.floor(state.playT)*6}else if(state.playT<6){state.demoPhase=2;state.F=12;state.m=2+Math.floor(state.playT-3)*2}else{state.playing=false;state.demoPhase=0;playBtn.textContent='▶ 重播引导演示';document.getElementById('task').innerHTML='<b>归纳：</b>m 不变时 a 与 F合 成正比；F合 不变时 a 与 1/m 成正比。现在再揭示 F合=ma。';draw();return}draw();setTimeout(animate,50)}
-  playBtn.addEventListener('click',()=>{state.playing=!state.playing;playBtn.textContent=state.playing?'⏸ 暂停':'▶ 引导演示：自动取点';if(state.playing){state.playT=0;state.demoPhase=1;animate()}else draw()});
-  document.getElementById('resetBtn').addEventListener('click',()=>{state.F=6;state.m=3;state.mu=0;state.playing=false;state.playT=0;state.demoPhase=0;playBtn.textContent='▶ 引导演示：自动取点';document.getElementById('task').innerHTML='<b>观察任务／预测 1：</b>质量不变时，合力加倍，加速度会怎样？先预测，再播放两轮控制变量实验。';draw()});
-  draw();
+(()=>{
+'use strict';
+const app=document.getElementById('app'),canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+const task=document.getElementById('task'),playBtn=document.getElementById('playBtn'),dataBody=document.getElementById('dataBody'),formula=document.getElementById('formula'),extension=document.getElementById('extension'),status=document.getElementById('status');
+const fixedText=document.getElementById('fixedText'),measureText=document.getElementById('measureText'),netText=document.getElementById('netText'),aText=document.getElementById('aText');
+const forceCases=[3,6,9,12],massCases=[2,3,4,6];
+const state={phase:'predict-force',prediction1:null,prediction2:null,pointsF:[],pointsM:[],index:0,running:false,timer:null,surface:'smooth',F:6,m:3,mus:.32,muk:.24};
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const colors={ink:'#102a43',muted:'#64748b',blue:'#2563eb',red:'#dc2626',purple:'#7c3aed',green:'#059669',grid:'#e2e8f0'};
+function setPhase(p){state.phase=p;app.dataset.phase=p}
+function line(x1,y1,x2,y2,c=colors.grid,w=1,d=[]){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;ctx.setLineDash(d);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
+function text(s,x,y,c=colors.ink,size=13,align='center',weight='700'){ctx.fillStyle=c;ctx.font=`${weight} ${size}px system-ui`;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+function arrow(x1,y1,x2,y2,c,w=3){line(x1,y1,x2,y2,c,w);const q=Math.atan2(y2-y1,x2-x1),l=10;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-l*Math.cos(q-.5),y2-l*Math.sin(q-.5));ctx.lineTo(x2-l*Math.cos(q+.5),y2-l*Math.sin(q+.5));ctx.closePath();ctx.fillStyle=c;ctx.fill()}
+function round(x,y,w,h,fill='#fff',stroke='#cbd5e1'){ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=stroke;ctx.stroke()}
+function roughValues(){
+  if(state.surface==='smooth')return{f:0,net:state.F,a:state.F/state.m,label:'光滑面：无摩擦'};
+  const fsMax=state.mus*state.m*10;
+  if(state.surface==='static'||state.F<=fsMax)return{f:state.F,net:0,a:0,label:`静止：fₛ=F外=${state.F.toFixed(1)} N（≤fₛ,max=${fsMax.toFixed(1)} N）`};
+  const f=state.muk*state.m*10,net=Math.max(0,state.F-f);return{f,net,a:net/state.m,label:`滑动：fₖ=μₖmg=${f.toFixed(1)} N`};
+}
+function current(){
+  if(state.phase.includes('mass')||state.phase==='final'){const p=state.pointsM.at(-1);if(p)return p}
+  const p=state.pointsF.at(-1);return p||null;
+}
+function axes(x,y,w,h,xLabel,yLabel,title){round(x,y,w,h,'#f8fafc');const ox=x+48,oy=y+h-38,gw=w-76,gh=h-80;for(let i=0;i<=4;i++){line(ox+i*gw/4,oy-gh,ox+i*gw/4,oy);line(ox,oy-i*gh/4,ox+gw,oy-i*gh/4)}arrow(ox,oy,ox+gw+14,oy,colors.ink,2);arrow(ox,oy,ox,oy-gh-14,colors.ink,2);text(title,x+w/2,y+22,colors.ink,14);text(xLabel,ox+gw+22,oy,colors.muted,11,'left');text(yLabel,ox-8,oy-gh-20,colors.muted,11,'right');return{ox,oy,gw,gh}}
+function plot(g,pts,xValue,xMax,yMax,color,showLine){
+  if(showLine&&pts.length>1){ctx.beginPath();pts.forEach((p,i)=>{const x=g.ox+xValue(p)/xMax*g.gw,y=g.oy-p.a/yMax*g.gh;i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.strokeStyle=color;ctx.lineWidth=3;ctx.stroke()}
+  pts.forEach(p=>{ctx.beginPath();ctx.arc(g.ox+xValue(p)/xMax*g.gw,g.oy-p.a/yMax*g.gh,6,0,Math.PI*2);ctx.fillStyle=color;ctx.fill()});
+}
+function draw(){
+  ctx.clearRect(0,0,920,540);const bg=ctx.createLinearGradient(0,0,0,540);bg.addColorStop(0,'#fbfdff');bg.addColorStop(1,'#eaf0f7');ctx.fillStyle=bg;ctx.fillRect(0,0,920,540);
+  text('牛顿第二定律：先取证，后归纳',460,28,colors.ink,19);
+  round(42,52,410,188);const p=current(),F=p?p.F:0,m=p?p.m:3,a=p?p.a:0,carX=120+Math.min(190,a*18);line(72,190,420,190,'#334155',5);round(carX,142,92,48,'#dbeafe','#2563eb');text(`m=${m.toFixed(1)} kg`,carX+46,166,colors.blue,13);if(F>0)arrow(carX+92,166,carX+92+Math.min(130,F*8),166,colors.red,4);if(a>0)arrow(carX+46,128,carX+46+Math.min(130,a*24),128,colors.purple,4);text(p?`测得：F合=${F.toFixed(1)} N，a=${a.toFixed(2)} m/s²`:'等待第一次测量',247,218,p?colors.green:colors.muted,13);
+  const g1=axes(478,52,400,210,'F合/N','a','实验一：固定 m，逐点形成 a-F合');plot(g1,state.pointsF,q=>q.F,12,6,colors.purple,state.phase==='force-revealed'||state.phase.includes('mass')||state.phase==='final');
+  const massRaw=state.phase==='mass-collect'||state.phase==='mass-predict-transform';
+  const g2=axes(42,278,836,224,massRaw?'m/kg':'1/m (kg⁻¹)','a',massRaw?'实验二证据：a-m 是曲线，怎样变成直线？':'实验二：固定 F合，改画 a-1/m');
+  plot(g2,state.pointsM,massRaw?q=>q.m:q=>1/q.m,massRaw?6:.5,7,colors.blue,state.phase==='final');
+  if(state.phase==='predict-force')text('最终公式与拟合线尚未揭示',460,518,colors.muted,12);
+}
+function renderTable(){const pts=[...state.pointsF.map(p=>({...p,round:'一'})),...state.pointsM.map(p=>({...p,round:'二'}))];dataBody.innerHTML=pts.length?pts.map(p=>`<tr><td>${p.round}</td><td>${p.F.toFixed(1)}</td><td>${p.m.toFixed(1)}</td><td>${p.a.toFixed(2)}</td></tr>`).join(''):'<tr><td colspan="4">尚未取点</td></tr>'}
+function updateMeters(p){if(!p){measureText.textContent='等待预测';netText.textContent='—';aText.textContent='—';return}measureText.textContent=`第 ${state.index}/${state.phase.includes('force')?forceCases.length:massCases.length} 点`;netText.textContent=`${p.F.toFixed(1)} N`;aText.textContent=`${p.a.toFixed(2)} m/s²`}
+function schedule(fn){state.timer=setTimeout(fn,reduced?700:850)}
+function collectForce(){
+  if(state.index>=forceCases.length){state.running=false;setPhase('force-revealed');playBtn.disabled=false;playBtn.textContent='继续：第二轮预测';task.innerHTML=`<b>证据反馈：</b>你的预测“${state.prediction1==='double'?'变为两倍':state.prediction1==='same'?'保持不变':'变为一半'}”。固定 m 时四点落在过原点直线上，a 与 F合成正比。`;status.textContent='第一轮完成：拟合线现在才揭示。点击继续，准备固定合力改变质量。';draw();return}
+  const F=forceCases[state.index++],p={F,m:3,a:F/3};state.pointsF.push(p);renderTable();updateMeters(p);draw();schedule(collectForce)
+}
+function collectMass(){
+  if(state.index>=massCases.length){state.running=false;setPhase('mass-predict-transform');document.getElementById('choices2').hidden=false;playBtn.disabled=true;playBtn.textContent='等待第二次预测';task.innerHTML='<b>预测 2：</b>a-m 数据形成曲线。横轴改成什么量，数据才会成为直线？';status.textContent='先根据表格作答；最终公式仍然隐藏。';draw();return}
+  const m=massCases[state.index++],p={F:12,m,a:12/m};state.pointsM.push(p);renderTable();updateMeters(p);draw();schedule(collectMass)
+}
+document.querySelectorAll('[data-predict-force]').forEach(b=>b.addEventListener('click',()=>{state.prediction1=b.dataset.predictForce;document.querySelectorAll('[data-predict-force]').forEach(x=>x.classList.toggle('active',x===b));playBtn.disabled=false;status.textContent='预测已保存。现在可以开始第一轮逐点测量。'}));
+document.querySelectorAll('[data-predict-mass]').forEach(b=>b.addEventListener('click',()=>{state.prediction2=b.dataset.predictMass;document.querySelectorAll('[data-predict-mass]').forEach(x=>x.classList.toggle('active',x===b));playBtn.disabled=false;playBtn.textContent='揭示 a-1/m 与最终公式';status.textContent='第二次预测已保存，点击后再改画坐标并归纳。'}));
+playBtn.addEventListener('click',()=>{
+  if(state.running){state.running=false;clearTimeout(state.timer);playBtn.textContent=state.phase==='force-collect'?'▶ 继续第一轮':'▶ 继续第二轮';status.textContent='取点已暂停，当前数据和画面保持冻结。';return}
+  if(state.phase==='force-collect'){state.running=true;playBtn.textContent='⏸ 暂停第一轮';collectForce();return}
+  if(state.phase==='mass-collect'){state.running=true;playBtn.textContent='⏸ 暂停第二轮';collectMass();return}
+  if(state.phase==='predict-force'){document.getElementById('choices1').hidden=true;state.running=true;state.index=0;setPhase('force-collect');playBtn.disabled=false;playBtn.textContent='⏸ 暂停第一轮';fixedText.textContent='m=3.0 kg';collectForce();return}
+  if(state.phase==='force-revealed'){state.index=0;setPhase('mass-collect');state.running=true;playBtn.disabled=false;playBtn.textContent='⏸ 暂停第二轮';fixedText.textContent='F合=12.0 N';task.innerHTML='<b>观察：</b>保持 F合=12 N，逐步增加质量，先记录 a-m 数据。';collectMass();return}
+  if(state.phase==='mass-predict-transform'){setPhase('final');document.getElementById('choices2').hidden=true;formula.hidden=false;extension.hidden=false;playBtn.disabled=true;playBtn.textContent='两轮实验完成';task.innerHTML=`<b>证据反馈：</b>你的选择是“${state.prediction2==='inv'?'a-1/m':state.prediction2==='m'?'a-m':'a-m²'}”。改画 a-1/m 后四点成过原点直线，说明 a∝1/m。`;status.textContent='两轮控制变量证据完成后，才揭示 F合=ma。粗糙面现作为独立拓展开放。';draw()}
+});
+document.querySelectorAll('[data-surface]').forEach(b=>b.addEventListener('click',()=>{state.surface=b.dataset.surface;state.F=state.surface==='static'?6:state.surface==='slide'?14:6;document.querySelectorAll('[data-surface]').forEach(x=>x.classList.toggle('active',x===b));const v=roughValues();document.getElementById('roughText').textContent=`${v.label}；F合=${v.net.toFixed(1)} N，a=${v.a.toFixed(2)} m/s²。`;status.textContent=state.surface==='static'?'静摩擦按维持静止所需取值，不会无条件等于 μmg。':state.surface==='slide'?'超过最大静摩擦后改用 μₖ，受力读数与加速度一致。':'光滑主实验只研究合力和质量。'}));
+document.getElementById('resetBtn').addEventListener('click',()=>{clearTimeout(state.timer);Object.assign(state,{phase:'predict-force',prediction1:null,prediction2:null,pointsF:[],pointsM:[],index:0,running:false,surface:'smooth',F:6,m:3});setPhase('predict-force');document.querySelectorAll('.choices button').forEach(b=>b.classList.remove('active'));document.getElementById('choices1').hidden=false;document.getElementById('choices2').hidden=true;formula.hidden=true;extension.hidden=true;playBtn.disabled=true;playBtn.textContent='▶ 开始第一轮取点';task.innerHTML='<b>预测 1：</b>保持质量不变，合力加倍，加速度会怎样？先选择，再开始取点。';fixedText.textContent='m=3.0 kg';renderTable();updateMeters(null);status.textContent='先作出预测；未选择前不会显示理论线或最终公式。';draw()});
+renderTable();draw();
 })();
 </script>
 </body>

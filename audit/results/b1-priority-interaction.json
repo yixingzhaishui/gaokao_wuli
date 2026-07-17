@@ -1,15 +1,23 @@
 {
-  "score_version": "3.0",
-  "generated_at": "2026-07-16T00:29:36.053Z",
-  "commit": "a60116496a243bdf7dd52f019d4d6a6b49780bbb",
+  "score_version": "3.1",
+  "generated_at": "2026-07-17T04:03:45.599Z",
+  "commit": "1f86494efeb206425a8f0c93fb1b7f925bfd3605",
+  "worktree_clean": false,
+  "git_diff_sha256": "b60d36caf1cf028b0df1c9e256b96469d10ba35c6492c8998681e5247df7ef39",
+  "tested_files_sha256": {
+    "anim/bx1/friction.html": "56db6ae06d91f578a87267a6c92f3f1e57fbe46957a63081ede6a9f9ff889e2a",
+    "anim/bx1/newton-second.html": "6792235447a17a24d0dbd6cab5d103f5ebf6d14ec24d00a9095d03281a1dc995",
+    "anim/bx1/pursuit.html": "a3101b10f4562c62012d264c4e6e7ff2f29f54103e49e070db5d5fd6b2e65d48"
+  },
+  "test_command": "AUDIT_MODULE=bx1 AUDIT_REPORT=b1-priority-interaction.json playwright test tests/interaction-audit.spec.js --workers=1",
   "module": "bx1",
   "modules": [
     "bx1"
   ],
   "summary": {
-    "total": 2,
+    "total": 3,
     "score": 100,
-    "pass": 2,
+    "pass": 3,
     "needs_review": 0,
     "blocked": 0
   },
@@ -26,37 +34,25 @@
       "reset_worked": true,
       "controls": [
         {
-          "selector": "button:恰要滑动",
+          "selector": "button:始终为 0",
           "kind": "condition_button",
           "changed": true,
           "affected_result": true
         },
         {
-          "selector": "button:已经滑动",
+          "selector": "button:随需要增大",
           "kind": "condition_button",
           "changed": true,
-          "affected_result": true
+          "affected_result": false
         },
         {
-          "selector": "button:重箱子",
+          "selector": "button:始终取最大值",
           "kind": "condition_button",
           "changed": true,
-          "affected_result": true
+          "affected_result": false
         },
         {
-          "selector": "button:人走路",
-          "kind": "condition_button",
-          "changed": true,
-          "affected_result": true
-        },
-        {
-          "selector": "button:传送带",
-          "kind": "condition_button",
-          "changed": true,
-          "affected_result": true
-        },
-        {
-          "selector": "button:推箱未动",
+          "selector": "button:播放方式：自动",
           "kind": "condition_button",
           "changed": true,
           "affected_result": true
@@ -64,50 +60,528 @@
       ],
       "button_checks": [
         {
-          "selector": "#mStatic",
-          "text": "推箱未动",
+          "selector": "button:始终为 0",
+          "text": "始终为 0",
           "role": "condition",
           "checked": true,
           "worked": true
         },
         {
-          "selector": "#mCritical",
-          "text": "恰要滑动",
+          "selector": "button:随需要增大",
+          "text": "随需要增大",
           "role": "condition",
           "checked": true,
           "worked": true
         },
         {
-          "selector": "#mSlide",
-          "text": "已经滑动",
+          "selector": "button:始终取最大值",
+          "text": "始终取最大值",
           "role": "condition",
           "checked": true,
           "worked": true
         },
         {
-          "selector": "#mHeavy",
-          "text": "重箱子",
+          "selector": "button:向左",
+          "text": "向左",
           "role": "condition",
-          "checked": true,
-          "worked": true
+          "checked": null,
+          "worked": null
         },
         {
-          "selector": "#mWalk",
-          "text": "人走路",
+          "selector": "button:为 0",
+          "text": "为 0",
           "role": "condition",
-          "checked": true,
-          "worked": true
+          "checked": null,
+          "worked": null
         },
         {
-          "selector": "#mBelt",
-          "text": "传送带",
+          "selector": "button:向右",
+          "text": "向右",
           "role": "condition",
-          "checked": true,
-          "worked": true
+          "checked": null,
+          "worked": null
         },
         {
           "selector": "#playBtn",
-          "text": "▶ 引导演示",
+          "text": "▶ 开始第一幕",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#motionBtn",
+          "text": "播放方式：自动",
+          "role": "other",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#replayBtn",
+          "text": "重播完整演示",
+          "role": "other",
+          "checked": false,
+          "worked": "disabled_prerequisite"
+        },
+        {
+          "selector": "button:推箱",
+          "text": "推箱",
+          "role": "condition",
+          "checked": null,
+          "worked": null
+        },
+        {
+          "selector": "button:人走路",
+          "text": "人走路",
+          "role": "condition",
+          "checked": null,
+          "worked": null
+        },
+        {
+          "selector": "button:传送带",
+          "text": "传送带",
+          "role": "condition",
+          "checked": null,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "▶ 开始第一幕"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "28664e62",
+          "readout_hash": "3ba7309e",
+          "physical_readout_hash": "3ba7309e",
+          "readout": [
+            "水平推力 F0.0 N摩擦力 f0.0 N 最大静摩擦25.0 N当前状态等待预测",
+            "推力 F32",
+            "μₛ0.25",
+            "μₖ0.20",
+            "第一项预测已保存。现在开始只改变推力的证据演示。"
+          ],
+          "physical_readout": [
+            "水平推力 F0.0 N摩擦力 f0.0 N 最大静摩擦25.0 N当前状态等待预测",
+            "推力 F32",
+            "μₛ0.25",
+            "μₖ0.20",
+            "第一项预测已保存。现在开始只改变推力的证据演示。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "7b712a1",
+          "readout_hash": "52738c9e",
+          "physical_readout_hash": "52738c9e",
+          "readout": [
+            "水平推力 F0.7 N摩擦力 f0.7 N 最大静摩擦25.0 N当前状态仍静止",
+            "推力 F32",
+            "μₛ0.25",
+            "μₖ0.20",
+            "只改变水平推力；观察箱子未动时 fₛ 是否跟随 F。"
+          ],
+          "physical_readout": [
+            "水平推力 F0.7 N摩擦力 f0.7 N 最大静摩擦25.0 N当前状态仍静止",
+            "推力 F32",
+            "μₛ0.25",
+            "μₖ0.20",
+            "只改变水平推力；观察箱子未动时 fₛ 是否跟随 F。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "7b712a1",
+          "readout_hash": "7202be42",
+          "physical_readout_hash": "3d5b8d02",
+          "readout": [
+            "水平推力 F0.7 N摩擦力 f0.7 N 最大静摩擦25.0 N当前状态仍静止",
+            "推力 F32",
+            "μₛ0.25",
+            "μₖ0.20",
+            "演示已暂停，物理量保持冻结。"
+          ],
+          "physical_readout": [
+            "水平推力 F0.7 N摩擦力 f0.7 N 最大静摩擦25.0 N当前状态仍静止",
+            "推力 F32",
+            "μₛ0.25",
+            "μₖ0.20",
+            "演示，物理量保持冻结。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "7b712a1",
+          "readout_hash": "7202be42",
+          "physical_readout_hash": "3d5b8d02",
+          "readout": [
+            "水平推力 F0.7 N摩擦力 f0.7 N 最大静摩擦25.0 N当前状态仍静止",
+            "推力 F32",
+            "μₛ0.25",
+            "μₖ0.20",
+            "演示已暂停，物理量保持冻结。"
+          ],
+          "physical_readout": [
+            "水平推力 F0.7 N摩擦力 f0.7 N 最大静摩擦25.0 N当前状态仍静止",
+            "推力 F32",
+            "μₛ0.25",
+            "μₖ0.20",
+            "演示，物理量保持冻结。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "水平推力 F# N摩擦力 f# N 最大静摩擦# N当前状态等待预测|推力 F#|μₛ#|μₖ#|预测必须先发生；结果、公式和自由参数尚未揭示。",
+          "controls": [
+            {
+              "id": "forceRange",
+              "value": "32",
+              "checked": false
+            },
+            {
+              "id": "musRange",
+              "value": "0.25",
+              "checked": false
+            },
+            {
+              "id": "mukRange",
+              "value": "0.2",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "水平推力 F# N摩擦力 f# N 最大静摩擦# N当前状态等待预测|推力 F#|μₛ#|μₖ#|预测必须先发生；结果、公式和自由参数尚未揭示。",
+          "controls": [
+            {
+              "id": "forceRange",
+              "value": "32",
+              "checked": false
+            },
+            {
+              "id": "musRange",
+              "value": "0.25",
+              "checked": false
+            },
+            {
+              "id": "mukRange",
+              "value": "0.2",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx1/newton-second.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:变为一半",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:保持不变",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": false
+        },
+        {
+          "selector": "button:变为两倍",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": false
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "button:变为一半",
+          "text": "变为一半",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:保持不变",
+          "text": "保持不变",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:变为两倍",
+          "text": "变为两倍",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:直接画 a-m",
+          "text": "直接画 a-m",
+          "role": "condition",
+          "checked": null,
+          "worked": null
+        },
+        {
+          "selector": "button:改画 a-1/m",
+          "text": "改画 a-1/m",
+          "role": "condition",
+          "checked": null,
+          "worked": null
+        },
+        {
+          "selector": "button:改画 a-m²",
+          "text": "改画 a-m²",
+          "role": "condition",
+          "checked": null,
+          "worked": null
+        },
+        {
+          "selector": "#playBtn",
+          "text": "▶ 开始第一轮取点",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:光滑面",
+          "text": "光滑面",
+          "role": "condition",
+          "checked": null,
+          "worked": null
+        },
+        {
+          "selector": "button:静摩擦",
+          "text": "静摩擦",
+          "role": "condition",
+          "checked": null,
+          "worked": null
+        },
+        {
+          "selector": "button:滑动摩擦",
+          "text": "滑动摩擦",
+          "role": "condition",
+          "checked": null,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "▶ 开始第一轮取点"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "ea86a919",
+          "readout_hash": "7e815d56",
+          "physical_readout_hash": "7e815d56",
+          "readout": [
+            "本轮固定量m=3.0 kg 当前测量等待预测 合力 F合— 加速度 a—",
+            "尚未取点",
+            "预测已保存。现在可以开始第一轮逐点测量。"
+          ],
+          "physical_readout": [
+            "本轮固定量m=3.0 kg 当前测量等待预测 合力 F合— 加速度 a—",
+            "尚未取点",
+            "预测已保存。现在可以开始第一轮逐点测量。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "595b5137",
+          "readout_hash": "a0fa7963",
+          "physical_readout_hash": "a0fa7963",
+          "readout": [
+            "本轮固定量m=3.0 kg 当前测量第 1/4 点 合力 F合3.0 N 加速度 a1.00 m/s²",
+            "一3.03.01.00",
+            "预测已保存。现在可以开始第一轮逐点测量。"
+          ],
+          "physical_readout": [
+            "本轮固定量m=3.0 kg 当前测量第 1/4 点 合力 F合3.0 N 加速度 a1.00 m/s²",
+            "一3.03.01.00",
+            "预测已保存。现在可以开始第一轮逐点测量。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "595b5137",
+          "readout_hash": "30fedd65",
+          "physical_readout_hash": "8c88dd79",
+          "readout": [
+            "本轮固定量m=3.0 kg 当前测量第 1/4 点 合力 F合3.0 N 加速度 a1.00 m/s²",
+            "一3.03.01.00",
+            "取点已暂停，当前数据和画面保持冻结。"
+          ],
+          "physical_readout": [
+            "本轮固定量m=3.0 kg 当前测量第 1/4 点 合力 F合3.0 N 加速度 a1.00 m/s²",
+            "一3.03.01.00",
+            "取点，当前数据和画面保持冻结。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "595b5137",
+          "readout_hash": "30fedd65",
+          "physical_readout_hash": "8c88dd79",
+          "readout": [
+            "本轮固定量m=3.0 kg 当前测量第 1/4 点 合力 F合3.0 N 加速度 a1.00 m/s²",
+            "一3.03.01.00",
+            "取点已暂停，当前数据和画面保持冻结。"
+          ],
+          "physical_readout": [
+            "本轮固定量m=3.0 kg 当前测量第 1/4 点 合力 F合3.0 N 加速度 a1.00 m/s²",
+            "一3.03.01.00",
+            "取点，当前数据和画面保持冻结。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "本轮固定量m=# kg 当前测量等待预测 合力 F合— 加速度 a—|先作出预测；未选择前不会显示理论线或最终公式。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "本轮固定量m=# kg 当前测量等待预测 合力 F合— 加速度 a—|先作出预测；未选择前不会显示理论线或最终公式。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx1/pursuit.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:有初速追赶",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:加速度较小",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:临界共速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:静止追匀速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#mStart",
+          "text": "静止追匀速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mInitial",
+          "text": "有初速追赶",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mSlow",
+          "text": "加速度较小",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mEqual",
+          "text": "临界共速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "▶ 播放运动",
           "role": "play",
           "checked": true,
           "worked": null
@@ -126,7 +600,7 @@
         "affected_result": true,
         "point": {
           "px": 0.18,
-          "py": 0.68
+          "py": 0.32
         },
         "required": false
       },
@@ -135,10 +609,10 @@
       "hard_failures": [],
       "result": "PASS",
       "play_button": {
-        "id": "playBtn",
+        "id": "play",
         "auditPlay": false,
         "auditReset": false,
-        "text": "▶ 引导演示"
+        "text": "▶ 播放运动"
       },
       "reset_button": {
         "id": "resetBtn",
@@ -148,29 +622,29 @@
       },
       "play_debug": {
         "initial": {
-          "visual_hash": "ec1a5c47",
-          "readout_hash": "1fc48efd",
-          "physical_readout_hash": "1fc48efd",
+          "visual_hash": "9b6ebbd7",
+          "readout_hash": "752318a8",
+          "physical_readout_hash": "752318a8",
           "readout": [
-            "情境=推箱子F外=10.0 Nμₛ=0.25，μₖ=0.20N=100.0 Nfₛ,max=25.0 Nf=10.0 N状态=静止",
-            "仍静止：这一单推力情境中，静摩擦按需要与 F 等大。"
+            "v10=0.0 m/sa=2.00 m/s²v2=8.0 m/sd=40.0 mt=0.00 sΔx=40.00 mt等=4.00相遇=11.48 s",
+            "后车仍比前车慢，距离还在增大；到 v1=v2 时距离达到最远。"
           ],
           "physical_readout": [
-            "情境=推箱子F外=10.0 Nμₛ=0.25，μₖ=0.20N=100.0 Nfₛ,max=25.0 Nf=10.0 N状态=静止",
-            "仍静止：这一单推力情境中，静摩擦按需要与 F 等大。"
+            "v10=0.0 m/sa=2.00 m/s²v2=8.0 m/sd=40.0 mt=0.00 sΔx=40.00 mt等=4.00相遇=11.48 s",
+            "后车仍比前车慢，距离还在增大；到 v1=v2 时距离达到最远。"
           ]
         },
         "afterPlay": {
-          "visual_hash": "eab52d34",
-          "readout_hash": "5db24f8",
-          "physical_readout_hash": "5db24f8",
+          "visual_hash": "4851db9c",
+          "readout_hash": "dcbc9aa8",
+          "physical_readout_hash": "dcbc9aa8",
           "readout": [
-            "情境=推箱子F外=12.9 Nμₛ=0.25，μₖ=0.20N=100.0 Nfₛ,max=25.0 Nf=12.9 N状态=静止",
-            "仍静止：这一单推力情境中，静摩擦按需要与 F 等大。（引导演示中）"
+            "v10=0.0 m/sa=2.00 m/s²v2=8.0 m/sd=40.0 mt=0.35 sΔx=42.68 mt等=4.00相遇=11.48 s",
+            "后车仍比前车慢，距离还在增大；到 v1=v2 时距离达到最远。"
           ],
           "physical_readout": [
-            "情境=推箱子F外=12.9 Nμₛ=0.25，μₖ=0.20N=100.0 Nfₛ,max=25.0 Nf=12.9 N状态=静止",
-            "仍静止：这一单推力情境中，静摩擦按需要与 F 等大。（引导演示中）"
+            "v10=0.0 m/sa=2.00 m/s²v2=8.0 m/sd=40.0 mt=0.35 sΔx=42.68 mt等=4.00相遇=11.48 s",
+            "后车仍比前车慢，距离还在增大；到 v1=v2 时距离达到最远。"
           ]
         }
       },
@@ -181,218 +655,39 @@
       },
       "pause_debug": {
         "pauseA": {
-          "visual_hash": "49e655b1",
-          "readout_hash": "99afc077",
-          "physical_readout_hash": "99afc077",
+          "visual_hash": "7f329d78",
+          "readout_hash": "c3b43f2a",
+          "physical_readout_hash": "c3b43f2a",
           "readout": [
-            "情境=推箱子F外=13.8 Nμₛ=0.25，μₖ=0.20N=100.0 Nfₛ,max=25.0 Nf=13.8 N状态=静止",
-            "仍静止：这一单推力情境中，静摩擦按需要与 F 等大。"
+            "v10=0.0 m/sa=2.00 m/s²v2=8.0 m/sd=40.0 mt=0.37 sΔx=42.86 mt等=4.00相遇=11.48 s",
+            "后车仍比前车慢，距离还在增大；到 v1=v2 时距离达到最远。"
           ],
           "physical_readout": [
-            "情境=推箱子F外=13.8 Nμₛ=0.25，μₖ=0.20N=100.0 Nfₛ,max=25.0 Nf=13.8 N状态=静止",
-            "仍静止：这一单推力情境中，静摩擦按需要与 F 等大。"
+            "v10=0.0 m/sa=2.00 m/s²v2=8.0 m/sd=40.0 mt=0.37 sΔx=42.86 mt等=4.00相遇=11.48 s",
+            "后车仍比前车慢，距离还在增大；到 v1=v2 时距离达到最远。"
           ]
         },
         "pauseB": {
-          "visual_hash": "49e655b1",
-          "readout_hash": "99afc077",
-          "physical_readout_hash": "99afc077",
+          "visual_hash": "7f329d78",
+          "readout_hash": "c3b43f2a",
+          "physical_readout_hash": "c3b43f2a",
           "readout": [
-            "情境=推箱子F外=13.8 Nμₛ=0.25，μₖ=0.20N=100.0 Nfₛ,max=25.0 Nf=13.8 N状态=静止",
-            "仍静止：这一单推力情境中，静摩擦按需要与 F 等大。"
+            "v10=0.0 m/sa=2.00 m/s²v2=8.0 m/sd=40.0 mt=0.37 sΔx=42.86 mt等=4.00相遇=11.48 s",
+            "后车仍比前车慢，距离还在增大；到 v1=v2 时距离达到最远。"
           ],
           "physical_readout": [
-            "情境=推箱子F外=13.8 Nμₛ=0.25，μₖ=0.20N=100.0 Nfₛ,max=25.0 Nf=13.8 N状态=静止",
-            "仍静止：这一单推力情境中，静摩擦按需要与 F 等大。"
+            "v10=0.0 m/sa=2.00 m/s²v2=8.0 m/sd=40.0 mt=0.37 sΔx=42.86 mt等=4.00相遇=11.48 s",
+            "后车仍比前车慢，距离还在增大；到 v1=v2 时距离达到最远。"
           ]
         }
       },
       "reset_debug": {
         "resetSnapshot": {
-          "stableReadout": "情境=推箱子F外=# Nμₛ=#，μₖ=#N=# Nfₛ,max=# Nf=# N状态=静止|仍静止：这一单推力情境中，静摩擦按需要与 F 等大。",
+          "stableReadout": "v#=# m/sa=# m/s²v#=# m/sd=# mt=# sΔx=# mt等=#相遇=# s|后车仍比前车慢，距离还在增大；到 v#=v# 时距离达到最远。",
           "controls": []
         },
         "canonicalReset": {
-          "stableReadout": "情境=推箱子F外=# Nμₛ=#，μₖ=#N=# Nfₛ,max=# Nf=# N状态=静止|仍静止：这一单推力情境中，静摩擦按需要与 F 等大。",
-          "controls": []
-        }
-      },
-      "reset_visual_match": true
-    },
-    {
-      "file": "anim/bx1/newton-second.html",
-      "loaded": true,
-      "console_errors": [],
-      "page_errors": [],
-      "play_button_found": true,
-      "state_changed_after_play": true,
-      "pause_worked": true,
-      "reset_button_found": true,
-      "reset_worked": true,
-      "controls": [
-        {
-          "selector": "button:轻车",
-          "kind": "condition_button",
-          "changed": true,
-          "affected_result": true
-        },
-        {
-          "selector": "button:重车",
-          "kind": "condition_button",
-          "changed": true,
-          "affected_result": true
-        },
-        {
-          "selector": "button:粗糙面",
-          "kind": "condition_button",
-          "changed": true,
-          "affected_result": true
-        },
-        {
-          "selector": "button:光滑面",
-          "kind": "condition_button",
-          "changed": true,
-          "affected_result": true
-        }
-      ],
-      "button_checks": [
-        {
-          "selector": "#playBtn",
-          "text": "▶ 引导演示：自动取点",
-          "role": "play",
-          "checked": true,
-          "worked": null
-        },
-        {
-          "selector": "#resetBtn",
-          "text": "重置",
-          "role": "reset",
-          "checked": true,
-          "worked": null
-        },
-        {
-          "selector": "button:轻车",
-          "text": "轻车",
-          "role": "condition",
-          "checked": true,
-          "worked": true
-        },
-        {
-          "selector": "button:重车",
-          "text": "重车",
-          "role": "condition",
-          "checked": true,
-          "worked": true
-        },
-        {
-          "selector": "button:粗糙面",
-          "text": "粗糙面",
-          "role": "condition",
-          "checked": true,
-          "worked": true
-        },
-        {
-          "selector": "button:光滑面",
-          "text": "光滑面",
-          "role": "condition",
-          "checked": true,
-          "worked": true
-        }
-      ],
-      "semantic_checks": [],
-      "direct_canvas_drag": {
-        "tested": true,
-        "affected_result": true,
-        "point": {
-          "px": 0.32,
-          "py": 0.82
-        },
-        "required": false
-      },
-      "reentry_passed": true,
-      "mobile_passed": true,
-      "hard_failures": [],
-      "result": "PASS",
-      "play_button": {
-        "id": "playBtn",
-        "auditPlay": false,
-        "auditReset": false,
-        "text": "▶ 引导演示：自动取点"
-      },
-      "reset_button": {
-        "id": "resetBtn",
-        "auditPlay": false,
-        "auditReset": false,
-        "text": "重置"
-      },
-      "play_debug": {
-        "initial": {
-          "visual_hash": "89d843c2",
-          "readout_hash": "1dedc35c",
-          "physical_readout_hash": "1dedc35c",
-          "readout": [
-            "外力 F6.0 N 质量 m3.0 kg 合力 F合6.0 N 加速度 a2.00 m/s²",
-            "合力不为 0，小车加速；a 与 F合 同向。"
-          ],
-          "physical_readout": [
-            "外力 F6.0 N 质量 m3.0 kg 合力 F合6.0 N 加速度 a2.00 m/s²",
-            "合力不为 0，小车加速；a 与 F合 同向。"
-          ]
-        },
-        "afterPlay": {
-          "visual_hash": "9d0ffb70",
-          "readout_hash": "c48525ed",
-          "physical_readout_hash": "c48525ed",
-          "readout": [
-            "外力 F3.0 N 质量 m3.0 kg 合力 F合3.0 N 加速度 a1.00 m/s²",
-            "实验一：保持 m=3 kg，逐档增大 F合，记录 a。"
-          ],
-          "physical_readout": [
-            "外力 F3.0 N 质量 m3.0 kg 合力 F合3.0 N 加速度 a1.00 m/s²",
-            "实验一：保持 m=3 kg，逐档增大 F合，记录 a。"
-          ]
-        }
-      },
-      "motion_evidence": {
-        "canvas_or_svg_changed": true,
-        "physical_readout_changed": true,
-        "raw_readout_changed": true
-      },
-      "pause_debug": {
-        "pauseA": {
-          "visual_hash": "b599b862",
-          "readout_hash": "f399c0e7",
-          "physical_readout_hash": "f399c0e7",
-          "readout": [
-            "外力 F3.0 N 质量 m3.0 kg 合力 F合3.0 N 加速度 a1.00 m/s²",
-            "合力不为 0，小车加速；a 与 F合 同向。"
-          ],
-          "physical_readout": [
-            "外力 F3.0 N 质量 m3.0 kg 合力 F合3.0 N 加速度 a1.00 m/s²",
-            "合力不为 0，小车加速；a 与 F合 同向。"
-          ]
-        },
-        "pauseB": {
-          "visual_hash": "b599b862",
-          "readout_hash": "f399c0e7",
-          "physical_readout_hash": "f399c0e7",
-          "readout": [
-            "外力 F3.0 N 质量 m3.0 kg 合力 F合3.0 N 加速度 a1.00 m/s²",
-            "合力不为 0，小车加速；a 与 F合 同向。"
-          ],
-          "physical_readout": [
-            "外力 F3.0 N 质量 m3.0 kg 合力 F合3.0 N 加速度 a1.00 m/s²",
-            "合力不为 0，小车加速；a 与 F合 同向。"
-          ]
-        }
-      },
-      "reset_debug": {
-        "resetSnapshot": {
-          "stableReadout": "外力 F# N 质量 m# kg 合力 F合# N 加速度 a# m/s²|合力不为 #，小车加速；a 与 F合 同向。",
-          "controls": []
-        },
-        "canonicalReset": {
-          "stableReadout": "外力 F# N 质量 m# kg 合力 F合# N 加速度 a# m/s²|合力不为 #，小车加速；a 与 F合 同向。",
+          "stableReadout": "v#=# m/sa=# m/s²v#=# m/sd=# mt=# sΔx=# mt等=#相遇=# s|后车仍比前车慢，距离还在增大；到 v#=v# 时距离达到最远。",
           "controls": []
         }
       },

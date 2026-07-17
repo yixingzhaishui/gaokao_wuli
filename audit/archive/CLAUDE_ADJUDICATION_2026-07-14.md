@@ -1,3 +1,7 @@
+# HISTORICAL — NON-AUTHORITATIVE
+
+> 当前审核链不使用 Claude，本文件仅保留为历史记录，不得作为发布审批、内容通过或整改优先级依据。
+
 # Claude 复核裁决意见
 
 > 裁决人：Claude（按审核报告第 12 节要求逐项裁决）

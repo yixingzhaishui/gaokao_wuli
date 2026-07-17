@@ -2,7 +2,7 @@
 
 > 依据：`audit/B1_physics_expert_review_2026-07-15.md`  
 > 范围：B1-05、B1-06、B1-08、B1-18、B1-23、B1-24、B1-25、B1-26  
-> 状态说明：本记录只证明已按审核意见修改并完成工程复测，不替代物理教师终审。
+> 状态说明：本记录描述整改设计和实现进度，不替代 OpenAI Pro 物理专家复审；工程测试通过也不等于内容或教学路径通过。
 
 ```yaml
 - knowledge_id: B1-05
@@ -15,7 +15,7 @@
   formula_boundary: 挡光片变窄同时影响近似误差与计时相对误差
   gaokao_transfer: 同一情境辨析平均速度、平均速率、瞬时速度
   interaction_test: 待终审时复测默认演示的暂停点与手机端操作
-  content_review_status: revised_pending_expert_review
+  content_review_status: design_spec_added_implementation_pending
 
 - knowledge_id: B1-06
   student_question: 加速度为负为什么不一定减速？
@@ -27,7 +27,7 @@
   formula_boundary: 正负号表示选定方向，不直接表示快慢变化
   gaokao_transfer: 联合读取v-t图纵坐标和斜率
   interaction_test: 待终审时复测四幕自动路径与换向暂停
-  content_review_status: revised_pending_expert_review
+  content_review_status: design_spec_added_implementation_pending
 
 - knowledge_id: B1-08
   student_question: v-t图的面积为什么是位移而不是口诀？
@@ -39,7 +39,7 @@
   formula_boundary: 有符号面积是位移，绝对值面积之和才是路程
   gaokao_transfer: 越轴图像分别求位移和路程
   interaction_test: 待终审时复测三联动和正负面积读数
-  content_review_status: revised_pending_expert_review
+  content_review_status: design_spec_added_implementation_pending
 
 - knowledge_id: B1-18
   student_question: 摩擦为什么有时与物体对地运动同向？
@@ -50,8 +50,8 @@
   causal_explanation: 摩擦阻碍接触面间相对滑动，不是笼统阻碍物体对地运动
   formula_boundary: 静摩擦按需调节且只在临界取上限；滑动时才用mu-k-N
   gaokao_transfer: 用物块与传送带相对速度判断摩擦方向
-  interaction_test: 已改为mu-s与mu-k分离并增加人走路、传送带迁移；待教师视觉终审
-  content_review_status: rewritten_pending_expert_review
+  interaction_test: 已重构为两次结果前预测、基于dt的三幕路径、迁移情境去伪精确读数及减少动态效果分步模式；待重新生成当前提交证据
+  content_review_status: implementation_updated_pending_openai_pro_retest
 
 - knowledge_id: B1-23
   student_question: 汽车熄火后为什么会减速，运动是否需要力维持？
@@ -63,7 +63,7 @@
   formula_boundary: 无摩擦是理想模型，第一定律不降格为第二定律代数特例
   gaokao_transfer: 由频闪图证据外推理想情形
   interaction_test: 待终审时复测三表面自动连播
-  content_review_status: revised_pending_expert_review
+  content_review_status: design_spec_added_implementation_pending
 
 - knowledge_id: B1-24
   student_question: 怎样由实验而不是结论得到F合等于ma？
@@ -74,8 +74,8 @@
   causal_explanation: 合力改变速度，质量衡量运动状态改变的难易
   formula_boundary: 同一时刻同一物体的合外力与加速度，方向一致
   gaokao_transfer: 用a-F外图横截距诊断未补偿阻力
-  interaction_test: 已改为两轮自动取点引导演示；待教师视觉终审
-  content_review_status: rewritten_pending_expert_review
+  interaction_test: 已重构为预测输入、两轮逐点数据表、延迟拟合线与公式揭示，并修正粗糙面静/动摩擦模型；待重新生成当前提交证据
+  content_review_status: implementation_updated_pending_openai_pro_retest
 
 - knowledge_id: B1-25
   student_question: 等大反向的作用反作用力为什么不抵消？
@@ -87,7 +87,7 @@
   formula_boundary: 第三定律只约束力的关系，不保证运动效果相同
   gaokao_transfer: 用人走路分别画人和地面的受力图
   interaction_test: 待终审时复测双传感器同步与受力图分离
-  content_review_status: revised_pending_expert_review
+  content_review_status: design_spec_added_implementation_pending
 
 - knowledge_id: B1-26
   student_question: 电梯向上运动时为什么也可能失重？
@@ -99,12 +99,12 @@
   formula_boundary: 人与地板保持接触并具有相同加速度；完全失重是N等于0而非mg等于0
   gaokao_transfer: 由v-t图斜率判加速度后判断秤读数
   interaction_test: 待终审时复测四幕同屏信息和自由落体边界
-  content_review_status: revised_pending_expert_review
+  content_review_status: design_spec_added_implementation_pending
 ```
 
 ## 复审结论
 
 - 本批所有节点继续保持 `content review pending`，未擅自标记 `content approved`。
-- B1-18 与 B1-24 已按 `REWRITE` 要求重排核心模型和默认演示。
-- 其余六个第一优先节点已加入明确的预测—观察—解释—迁移闭环。
-- 下一轮仍需物理教师检查动画时序、术语一致性与 390 px 手机端实际操作。
+- B1-18 与 B1-24 已根据 OpenAI Pro 复审再次更新实现，当前状态是“实现完成、证据和专家复核待更新”，不得写成内容终审完成。
+- B1-05、B1-06、B1-08、B1-23、B1-25、B1-26 当前只确认教学设计已写入正文，对应动画默认路径仍待逐项实现和复审。
+- 下一轮由 OpenAI Pro 物理专家检查物理语义、预测时序、术语一致性与 390 px 手机端实际操作。
