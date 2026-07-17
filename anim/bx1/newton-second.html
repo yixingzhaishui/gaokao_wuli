@@ -72,21 +72,25 @@ function draw(){
   text('牛顿第二定律：先取证，后归纳',460,28,colors.ink,19);
   round(42,52,410,188);const p=current(),F=p?p.F:0,m=p?p.m:3,a=p?p.a:0,carX=120+Math.min(190,a*18);line(72,190,420,190,'#334155',5);round(carX,142,92,48,'#dbeafe','#2563eb');text(`m=${m.toFixed(1)} kg`,carX+46,166,colors.blue,13);if(F>0)arrow(carX+92,166,carX+92+Math.min(130,F*8),166,colors.red,4);if(a>0)arrow(carX+46,128,carX+46+Math.min(130,a*24),128,colors.purple,4);text(p?`测得：F合=${F.toFixed(1)} N，a=${a.toFixed(2)} m/s²`:'等待第一次测量',247,218,p?colors.green:colors.muted,13);
   const g1=axes(478,52,400,210,'F合/N','a','实验一：固定 m，逐点形成 a-F合');plot(g1,state.pointsF,q=>q.F,12,6,colors.purple,state.phase==='force-revealed'||state.phase.includes('mass')||state.phase==='final');
-  const massRaw=state.phase==='mass-collect'||state.phase==='mass-predict-transform';
-  const g2=axes(42,278,836,224,massRaw?'m/kg':'1/m (kg⁻¹)','a',massRaw?'实验二证据：a-m 是曲线，怎样变成直线？':'实验二：固定 F合，改画 a-1/m');
-  plot(g2,state.pointsM,massRaw?q=>q.m:q=>1/q.m,massRaw?6:.5,7,colors.blue,state.phase==='final');
+  const massRaw=state.phase==='mass-collect'||state.phase==='mass-predict-transform',transformed=state.phase==='final';canvas.dataset.secondaryAxis=transformed?'inverse-mass':'mass';
+  const g2=axes(42,278,836,224,transformed?'1/m (kg⁻¹)':'m/kg','a',transformed?'实验二验证：横轴变换后检验直线关系':massRaw?'实验二证据：质量与加速度呈怎样的关系？':'实验二：固定 F合，研究质量与加速度');
+  plot(g2,state.pointsM,transformed?q=>1/q.m:q=>q.m,transformed?.5:6,7,colors.blue,transformed);
   if(state.phase==='predict-force')text('最终公式与拟合线尚未揭示',460,518,colors.muted,12);
 }
 function renderTable(){const pts=[...state.pointsF.map(p=>({...p,round:'一'})),...state.pointsM.map(p=>({...p,round:'二'}))];dataBody.innerHTML=pts.length?pts.map(p=>`<tr><td>${p.round}</td><td>${p.F.toFixed(1)}</td><td>${p.m.toFixed(1)}</td><td>${p.a.toFixed(2)}</td></tr>`).join(''):'<tr><td colspan="4">尚未取点</td></tr>'}
 function updateMeters(p){if(!p){measureText.textContent='等待预测';netText.textContent='—';aText.textContent='—';return}measureText.textContent=`第 ${state.index}/${state.phase.includes('force')?forceCases.length:massCases.length} 点`;netText.textContent=`${p.F.toFixed(1)} N`;aText.textContent=`${p.a.toFixed(2)} m/s²`}
-function schedule(fn){state.timer=setTimeout(fn,reduced?700:850)}
+function schedule(fn){state.timer=setTimeout(fn,850)}
+function completeForce(){state.running=false;setPhase('force-revealed');playBtn.disabled=false;playBtn.textContent='继续：第二轮预测';task.innerHTML=`<b>证据反馈：</b>你的预测“${state.prediction1==='double'?'变为两倍':state.prediction1==='same'?'保持不变':'变为一半'}”。固定 m 时四点落在过原点直线上，a 与 F合成正比。`;status.textContent='第一轮完成：拟合线现在才揭示。点击继续，准备固定合力改变质量。';draw()}
+function completeMass(){state.running=false;setPhase('mass-predict-transform');document.getElementById('choices2').hidden=false;playBtn.disabled=true;playBtn.textContent='等待第二次预测';task.innerHTML='<b>预测 2：</b>a-m 数据形成曲线。横轴改成什么量，数据才会成为直线？';status.textContent='先根据表格作答；坐标变换与最终公式仍然隐藏。';draw()}
 function collectForce(){
-  if(state.index>=forceCases.length){state.running=false;setPhase('force-revealed');playBtn.disabled=false;playBtn.textContent='继续：第二轮预测';task.innerHTML=`<b>证据反馈：</b>你的预测“${state.prediction1==='double'?'变为两倍':state.prediction1==='same'?'保持不变':'变为一半'}”。固定 m 时四点落在过原点直线上，a 与 F合成正比。`;status.textContent='第一轮完成：拟合线现在才揭示。点击继续，准备固定合力改变质量。';draw();return}
+  if(state.index>=forceCases.length){completeForce();return}
   const F=forceCases[state.index++],p={F,m:3,a:F/3};state.pointsF.push(p);renderTable();updateMeters(p);draw();schedule(collectForce)
+  if(reduced){clearTimeout(state.timer);state.running=false;if(state.index>=forceCases.length){completeForce();return}playBtn.textContent='▶ 下一数据点';status.textContent='减少动态模式：每次点击只记录一个数据点。'}
 }
 function collectMass(){
-  if(state.index>=massCases.length){state.running=false;setPhase('mass-predict-transform');document.getElementById('choices2').hidden=false;playBtn.disabled=true;playBtn.textContent='等待第二次预测';task.innerHTML='<b>预测 2：</b>a-m 数据形成曲线。横轴改成什么量，数据才会成为直线？';status.textContent='先根据表格作答；最终公式仍然隐藏。';draw();return}
+  if(state.index>=massCases.length){completeMass();return}
   const m=massCases[state.index++],p={F:12,m,a:12/m};state.pointsM.push(p);renderTable();updateMeters(p);draw();schedule(collectMass)
+  if(reduced){clearTimeout(state.timer);state.running=false;if(state.index>=massCases.length){completeMass();return}playBtn.textContent='▶ 下一数据点';status.textContent='减少动态模式：每次点击只记录一个数据点。'}
 }
 document.querySelectorAll('[data-predict-force]').forEach(b=>b.addEventListener('click',()=>{state.prediction1=b.dataset.predictForce;document.querySelectorAll('[data-predict-force]').forEach(x=>x.classList.toggle('active',x===b));playBtn.disabled=false;status.textContent='预测已保存。现在可以开始第一轮逐点测量。'}));
 document.querySelectorAll('[data-predict-mass]').forEach(b=>b.addEventListener('click',()=>{state.prediction2=b.dataset.predictMass;document.querySelectorAll('[data-predict-mass]').forEach(x=>x.classList.toggle('active',x===b));playBtn.disabled=false;playBtn.textContent='揭示 a-1/m 与最终公式';status.textContent='第二次预测已保存，点击后再改画坐标并归纳。'}));

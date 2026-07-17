@@ -1,13 +1,13 @@
 {
   "score_version": "3.1",
-  "generated_at": "2026-07-17T04:15:02.147Z",
-  "commit": "492ab5e750840891f1b732d90302e52acc816598",
-  "worktree_clean": true,
-  "git_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "generated_at": "2026-07-17T04:57:49.629Z",
+  "commit": "441f6e575f62a9f0b8427f68ced147a852dfabef",
+  "worktree_clean": false,
+  "git_diff_sha256": "95c30e475001b88f854952a6b6fede03d5884dd8cf22f3bceac2495362eb1f7c",
   "tested_files_sha256": {
-    "anim/bx1/friction.html": "56db6ae06d91f578a87267a6c92f3f1e57fbe46957a63081ede6a9f9ff889e2a",
-    "anim/bx1/newton-second.html": "6792235447a17a24d0dbd6cab5d103f5ebf6d14ec24d00a9095d03281a1dc995",
-    "anim/bx1/pursuit.html": "a3101b10f4562c62012d264c4e6e7ff2f29f54103e49e070db5d5fd6b2e65d48"
+    "anim/bx1/friction.html": "44886133e6cad29cd796538c9e5459f057090ffb4475b119e931a98c1078e837",
+    "anim/bx1/newton-second.html": "87827c914bbd31d9fb8f5aaf1da548c36af0f0feaf387a7afde8fdbae34e17e5",
+    "anim/bx1/pursuit.html": "3cd64c3747ec2561862d037330bc50382d634141b51e2fd0a07700682f0af693"
   },
   "test_command": "AUDIT_MODULE=bx1 AUDIT_REPORT=b1-priority-interaction.json playwright test tests/interaction-audit.spec.js --workers=1",
   "module": "bx1",
@@ -175,7 +175,7 @@
       },
       "play_debug": {
         "initial": {
-          "visual_hash": "28664e62",
+          "visual_hash": "1c10ba0c",
           "readout_hash": "3ba7309e",
           "physical_readout_hash": "3ba7309e",
           "readout": [
@@ -194,22 +194,22 @@
           ]
         },
         "afterPlay": {
-          "visual_hash": "7b712a1",
-          "readout_hash": "52738c9e",
-          "physical_readout_hash": "52738c9e",
+          "visual_hash": "1139a235",
+          "readout_hash": "69484fde",
+          "physical_readout_hash": "69484fde",
           "readout": [
             "水平推力 F0.7 N摩擦力 f0.7 N 最大静摩擦25.0 N当前状态仍静止",
             "推力 F32",
             "μₛ0.25",
             "μₖ0.20",
-            "只改变水平推力；观察箱子未动时 fₛ 是否跟随 F。"
+            "自动模式按真实时间步长推进到下一个证据节点。"
           ],
           "physical_readout": [
             "水平推力 F0.7 N摩擦力 f0.7 N 最大静摩擦25.0 N当前状态仍静止",
             "推力 F32",
             "μₛ0.25",
             "μₖ0.20",
-            "只改变水平推力；观察箱子未动时 fₛ 是否跟随 F。"
+            "自动模式按真实时间步长推进到下一个证据节点。"
           ]
         }
       },
@@ -220,7 +220,7 @@
       },
       "pause_debug": {
         "pauseA": {
-          "visual_hash": "7b712a1",
+          "visual_hash": "9127b62f",
           "readout_hash": "7202be42",
           "physical_readout_hash": "3d5b8d02",
           "readout": [
@@ -239,7 +239,7 @@
           ]
         },
         "pauseB": {
-          "visual_hash": "7b712a1",
+          "visual_hash": "9127b62f",
           "readout_hash": "7202be42",
           "physical_readout_hash": "3d5b8d02",
           "readout": [
@@ -435,7 +435,7 @@
       },
       "play_debug": {
         "initial": {
-          "visual_hash": "ea86a919",
+          "visual_hash": "f00ccfff",
           "readout_hash": "7e815d56",
           "physical_readout_hash": "7e815d56",
           "readout": [
@@ -450,7 +450,7 @@
           ]
         },
         "afterPlay": {
-          "visual_hash": "595b5137",
+          "visual_hash": "696d9ed7",
           "readout_hash": "a0fa7963",
           "physical_readout_hash": "a0fa7963",
           "readout": [
@@ -472,7 +472,7 @@
       },
       "pause_debug": {
         "pauseA": {
-          "visual_hash": "595b5137",
+          "visual_hash": "696d9ed7",
           "readout_hash": "30fedd65",
           "physical_readout_hash": "8c88dd79",
           "readout": [
@@ -487,7 +487,7 @@
           ]
         },
         "pauseB": {
-          "visual_hash": "595b5137",
+          "visual_hash": "696d9ed7",
           "readout_hash": "30fedd65",
           "physical_readout_hash": "8c88dd79",
           "readout": [
@@ -524,60 +524,56 @@
       "pause_worked": true,
       "reset_button_found": true,
       "reset_worked": true,
-      "controls": [
-        {
-          "selector": "button:有初速追赶",
-          "kind": "condition_button",
-          "changed": true,
-          "affected_result": true
-        },
-        {
-          "selector": "button:加速度较小",
-          "kind": "condition_button",
-          "changed": true,
-          "affected_result": true
-        },
-        {
-          "selector": "button:临界共速",
-          "kind": "condition_button",
-          "changed": true,
-          "affected_result": true
-        },
-        {
-          "selector": "button:静止追匀速",
-          "kind": "condition_button",
-          "changed": true,
-          "affected_result": true
-        }
-      ],
+      "controls": [],
       "button_checks": [
+        {
+          "selector": "button:两车相遇",
+          "text": "两车相遇",
+          "role": "condition",
+          "checked": null,
+          "worked": null
+        },
+        {
+          "selector": "button:距离达到最大",
+          "text": "距离达到最大",
+          "role": "condition",
+          "checked": null,
+          "worked": null
+        },
+        {
+          "selector": "button:距离达到最小",
+          "text": "距离达到最小",
+          "role": "condition",
+          "checked": null,
+          "worked": null
+        },
         {
           "selector": "#mStart",
           "text": "静止追匀速",
           "role": "condition",
-          "checked": true,
-          "worked": true
+          "checked": null,
+          "worked": null
         },
         {
           "selector": "#mInitial",
           "text": "有初速追赶",
           "role": "condition",
-          "checked": true,
-          "worked": true
+          "checked": null,
+          "worked": null
         },
         {
           "selector": "#mSlow",
           "text": "加速度较小",
           "role": "condition",
-          "checked": true,
-          "worked": true
+          "checked": null,
+          "worked": null
         },
         {
           "selector": "#mEqual",
           "text": "临界共速",
           "role": "condition",
-          "checked": true,
-          "worked": true
+          "checked": null,
+          "worked": null
         },
         {
           "selector": "#play",
@@ -597,11 +593,7 @@
       "semantic_checks": [],
       "direct_canvas_drag": {
         "tested": true,
-        "affected_result": true,
-        "point": {
-          "px": 0.18,
-          "py": 0.32
-        },
+        "affected_result": false,
         "required": false
       },
       "reentry_passed": true,
@@ -622,29 +614,29 @@
       },
       "play_debug": {
         "initial": {
-          "visual_hash": "9b6ebbd7",
-          "readout_hash": "752318a8",
-          "physical_readout_hash": "752318a8",
+          "visual_hash": "b74f04f7",
+          "readout_hash": "848459e4",
+          "physical_readout_hash": "848459e4",
           "readout": [
-            "v10=0.0 m/sa=2.00 m/s²v2=8.0 m/sd=40.0 mt=0.00 sΔx=40.00 mt等=4.00相遇=11.48 s",
-            "后车仍比前车慢，距离还在增大；到 v1=v2 时距离达到最远。"
+            "t=0.00 s当前距离 Δx=40.00 m预测结果尚未揭示",
+            "当前事实：后车较慢，距离正在增大。"
           ],
           "physical_readout": [
-            "v10=0.0 m/sa=2.00 m/s²v2=8.0 m/sd=40.0 mt=0.00 sΔx=40.00 mt等=4.00相遇=11.48 s",
-            "后车仍比前车慢，距离还在增大；到 v1=v2 时距离达到最远。"
+            "t=0.00 s当前距离 Δx=40.00 m预测结果尚未揭示",
+            "当前事实：后车较慢，距离正在增大。"
           ]
         },
         "afterPlay": {
-          "visual_hash": "67e56d57",
-          "readout_hash": "dcbc9aa8",
-          "physical_readout_hash": "dcbc9aa8",
+          "visual_hash": "3017531",
+          "readout_hash": "207a8a45",
+          "physical_readout_hash": "207a8a45",
           "readout": [
-            "v10=0.0 m/sa=2.00 m/s²v2=8.0 m/sd=40.0 mt=0.35 sΔx=42.68 mt等=4.00相遇=11.48 s",
-            "后车仍比前车慢，距离还在增大；到 v1=v2 时距离达到最远。"
+            "t=0.35 s当前距离 Δx=42.67 m预测结果尚未揭示",
+            "当前事实：后车较慢，距离正在增大。"
           ],
           "physical_readout": [
-            "v10=0.0 m/sa=2.00 m/s²v2=8.0 m/sd=40.0 mt=0.35 sΔx=42.68 mt等=4.00相遇=11.48 s",
-            "后车仍比前车慢，距离还在增大；到 v1=v2 时距离达到最远。"
+            "t=0.35 s当前距离 Δx=42.67 m预测结果尚未揭示",
+            "当前事实：后车较慢，距离正在增大。"
           ]
         }
       },
@@ -655,39 +647,39 @@
       },
       "pause_debug": {
         "pauseA": {
-          "visual_hash": "2924fc23",
-          "readout_hash": "b6fd946d",
-          "physical_readout_hash": "b6fd946d",
+          "visual_hash": "9906466a",
+          "readout_hash": "a0e69912",
+          "physical_readout_hash": "a0e69912",
           "readout": [
-            "v10=0.0 m/sa=2.00 m/s²v2=8.0 m/sd=40.0 mt=0.38 sΔx=42.86 mt等=4.00相遇=11.48 s",
-            "后车仍比前车慢，距离还在增大；到 v1=v2 时距离达到最远。"
+            "t=0.37 s当前距离 Δx=42.86 m预测结果尚未揭示",
+            "当前事实：后车较慢，距离正在增大。"
           ],
           "physical_readout": [
-            "v10=0.0 m/sa=2.00 m/s²v2=8.0 m/sd=40.0 mt=0.38 sΔx=42.86 mt等=4.00相遇=11.48 s",
-            "后车仍比前车慢，距离还在增大；到 v1=v2 时距离达到最远。"
+            "t=0.37 s当前距离 Δx=42.86 m预测结果尚未揭示",
+            "当前事实：后车较慢，距离正在增大。"
           ]
         },
         "pauseB": {
-          "visual_hash": "2924fc23",
-          "readout_hash": "b6fd946d",
-          "physical_readout_hash": "b6fd946d",
+          "visual_hash": "9906466a",
+          "readout_hash": "a0e69912",
+          "physical_readout_hash": "a0e69912",
           "readout": [
-            "v10=0.0 m/sa=2.00 m/s²v2=8.0 m/sd=40.0 mt=0.38 sΔx=42.86 mt等=4.00相遇=11.48 s",
-            "后车仍比前车慢，距离还在增大；到 v1=v2 时距离达到最远。"
+            "t=0.37 s当前距离 Δx=42.86 m预测结果尚未揭示",
+            "当前事实：后车较慢，距离正在增大。"
           ],
           "physical_readout": [
-            "v10=0.0 m/sa=2.00 m/s²v2=8.0 m/sd=40.0 mt=0.38 sΔx=42.86 mt等=4.00相遇=11.48 s",
-            "后车仍比前车慢，距离还在增大；到 v1=v2 时距离达到最远。"
+            "t=0.37 s当前距离 Δx=42.86 m预测结果尚未揭示",
+            "当前事实：后车较慢，距离正在增大。"
           ]
         }
       },
       "reset_debug": {
         "resetSnapshot": {
-          "stableReadout": "v#=# m/sa=# m/s²v#=# m/sd=# mt=# sΔx=# mt等=#相遇=# s|后车仍比前车慢，距离还在增大；到 v#=v# 时距离达到最远。",
+          "stableReadout": "t=# s当前距离 Δx=# m预测结果尚未揭示|当前事实：后车较慢，距离正在增大。",
           "controls": []
         },
         "canonicalReset": {
-          "stableReadout": "v#=# m/sa=# m/s²v#=# m/sd=# mt=# sΔx=# mt等=#相遇=# s|后车仍比前车慢，距离还在增大；到 v#=v# 时距离达到最远。",
+          "stableReadout": "t=# s当前距离 Δx=# m预测结果尚未揭示|当前事实：后车较慢，距离正在增大。",
           "controls": []
         }
       },

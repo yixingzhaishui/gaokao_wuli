@@ -22,18 +22,22 @@
   .readout b{color:#ffd166}
   .formula{font-size:13px;line-height:1.55}
   .warn{border-color:#f0a202;color:#7c4d00;background:#fff8e6;font-size:13px;line-height:1.5;font-weight:700}
+  [hidden]{display:none!important}
   @media (max-width:850px){.wrap{grid-template-columns:1fr}.panel{grid-row:2}.hint{position:static;border-radius:0}}
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="wrap" id="app" data-phase="guided" data-revealed="false">
   <div class="stage">
     <canvas id="canvas" width="940" height="560" aria-label="追及相遇交互实验台"></canvas>
-    <div class="hint">可拖动前车起点 d、v-t 图中的后车 v0/终点、前车速度线和橙色时间游标</div>
+    <div class="hint" id="hint" hidden>演示完成后可拖动前车起点 d、速度图参数和橙色时间游标</div>
   </div>
   <div class="panel">
-    <div class="box task"><b>观察任务：</b>拖时间游标，看距离 Δx 先增后减；在 v1=v2 的竖线处，判断这是最远距离还是最近距离，不要把“速度相等”误当“相遇”。</div>
-    <div class="box">
+    <div class="box task" id="task"><b>观察任务：</b>后车逐渐变快。系统暂停时，请判断下一关键时刻表示相遇、距离最大还是距离最小。</div>
+    <div class="buttons" id="predictionChoices" hidden>
+      <button data-prediction="meet">两车相遇</button><button data-prediction="max">距离达到最大</button><button data-prediction="min">距离达到最小</button>
+    </div>
+    <div class="box" id="explore" hidden>
       <b>情境</b>
       <div class="buttons" style="margin-top:7px">
         <button id="mStart" class="active">静止追匀速</button><button id="mInitial">有初速追赶</button>
@@ -42,7 +46,7 @@
     </div>
     <div class="box"><div class="buttons"><button id="play">▶ 播放运动</button><button id="resetBtn">重置</button></div></div>
     <div class="readout" id="readout"></div>
-    <div class="box formula">
+    <div class="box formula" id="formulaBox" hidden>
       <b>公式绑定</b><br>
       x1=v10t+1/2at²。<br>
       x2=d+v2t。<br>
@@ -53,6 +57,7 @@
 </div>
 <script>
 (() => {
+  const app=document.getElementById('app');
   const canvas=document.getElementById('canvas');
   const ctx=canvas.getContext('2d');
   const readout=document.getElementById('readout');
@@ -63,7 +68,8 @@
     slow:document.getElementById('mSlow'),
     equal:document.getElementById('mEqual')
   };
-  const state={v10:0,a:2,v2:8,d:40,t:0,mode:'start'};
+  const task=document.getElementById('task'),predictionChoices=document.getElementById('predictionChoices'),formulaBox=document.getElementById('formulaBox'),explore=document.getElementById('explore'),hint=document.getElementById('hint');
+  const state={v10:0,a:2,v2:8,d:40,t:0,mode:'start',prediction:null,revealed:false};
   const track={x:82,y:110,w:720};
   const gd={ox:82,oy:405,w:340,h:210,tMax:15,dxMin:-30,dxMax:130};
   const gv={ox:510,oy:405,w:310,h:210,tMax:15,vMin:0,vMax:32};
@@ -118,7 +124,7 @@
     arrow(r,track.y-60,r+clamp(v1(state.t)*5,18,90),track.y-60,'#2f80ed',4);
     arrow(f,track.y-80,f+clamp(state.v2*5,18,90),track.y-80,'#e03131',4);
     if(dx(state.t)>0){line(r+25,track.y-90,f-25,track.y-90,'#f08c00',2,[5,5]);text(`Δx=${dx(state.t).toFixed(1)} m`,(r+f)/2,track.y-102,'#f08c00',13,'center','800');}
-    text('蓝=后车，红=前车；拖 d 改初始间距，拖 t 看距离先增后减',468,58,'#334e68',14,'center','800');
+    text(state.revealed?'蓝=后车，红=前车；演示后可拖动参数继续探索':'蓝=后车，红=前车；先观察当前距离怎样变化',468,58,'#334e68',14,'center','800');
     text(`t=${state.t.toFixed(1)} s，v1=${v1(state.t).toFixed(1)} m/s，v2=${state.v2.toFixed(1)} m/s`,468,86,'#0b7285',14,'center','800');
   }
   function drawAxes(){
@@ -135,17 +141,17 @@
     ctx.beginPath();for(let i=0;i<=120;i++){const t=gd.tMax*i/120,sx=gdX(t),sy=gdY(dx(t));if(i===0)ctx.moveTo(sx,sy);else ctx.lineTo(sx,sy);}ctx.strokeStyle='#f08c00';ctx.lineWidth=3;ctx.stroke();
     line(gd.ox,gdY(0),gd.ox+gd.w,gdY(0),'#7b8794',1.5,[5,5]);
     const te=tEq();
-    if(te!==null&&te>0&&te<gd.tMax){line(gdX(te),gd.oy,gdX(te),gdY(dx(te)),'#7b2cbf',2,[6,5]);handle(gdX(te),gdY(dx(te)),'v相等','#7b2cbf');}
-    for(const rt of meetTimes().filter(t=>t<=gd.tMax)){handle(gdX(rt),gdY(0),'相遇','#12b886');}
+    if(state.revealed&&te!==null&&te>0&&te<gd.tMax){line(gdX(te),gd.oy,gdX(te),gdY(dx(te)),'#7b2cbf',2,[6,5]);handle(gdX(te),gdY(dx(te)),'v相等','#7b2cbf');}
+    if(state.revealed)for(const rt of meetTimes().filter(t=>t<=gd.tMax)){handle(gdX(rt),gdY(0),'相遇','#12b886');}
     const curD={x:gdX(state.t),y:gdY(dx(state.t))};handle(curD.x,curD.y,'t','#f08c00');layout.time=curD;
-    ctx.beginPath();for(let i=0;i<=80;i++){const t=gv.tMax*i/80,sx=gvX(t),sy=gvY(v1(t));if(i===0)ctx.moveTo(sx,sy);else ctx.lineTo(sx,sy);}ctx.strokeStyle='#2f80ed';ctx.lineWidth=3;ctx.stroke();
-    line(gvX(0),gvY(state.v2),gvX(gv.tMax),gvY(state.v2),'#e03131',3);
-    const v0p={x:gvX(0),y:gvY(state.v10)}, vend={x:gvX(gv.tMax),y:gvY(v1(gv.tMax))}, v2p={x:gvX(12.5),y:gvY(state.v2)};
-    handle(v0p.x,v0p.y,'v10','#2f80ed');handle(vend.x,vend.y,'调a','#2f80ed');handle(v2p.x,v2p.y,'v2','#e03131');
-    layout.v10=v0p;layout.a=vend;layout.v2=v2p;
-    if(te!==null&&te>0&&te<gv.tMax){line(gvX(te),gv.oy,gvX(te),gvY(state.v2),'#7b2cbf',2,[6,5]);text('v1=v2',gvX(te)+8,gvY(state.v2)-13,'#7b2cbf',12);}
-    text('Δx-t：相遇看 Δx=0，极值看 v1=v2',250,214,'#334e68',13,'center','800');
-    text('v-t：蓝斜线=后车，红水平线=前车',665,214,'#334e68',13,'center','800');
+    if(state.revealed){
+      ctx.beginPath();for(let i=0;i<=80;i++){const t=gv.tMax*i/80,sx=gvX(t),sy=gvY(v1(t));if(i===0)ctx.moveTo(sx,sy);else ctx.lineTo(sx,sy);}ctx.strokeStyle='#2f80ed';ctx.lineWidth=3;ctx.stroke();
+      line(gvX(0),gvY(state.v2),gvX(gv.tMax),gvY(state.v2),'#e03131',3);
+      const v0p={x:gvX(0),y:gvY(state.v10)}, vend={x:gvX(gv.tMax),y:gvY(v1(gv.tMax))}, v2p={x:gvX(12.5),y:gvY(state.v2)};
+      handle(v0p.x,v0p.y,'v10','#2f80ed');handle(vend.x,vend.y,'调a','#2f80ed');handle(v2p.x,v2p.y,'v2','#e03131');layout.v10=v0p;layout.a=vend;layout.v2=v2p;
+      if(te!==null&&te>0&&te<gv.tMax){line(gvX(te),gv.oy,gvX(te),gvY(state.v2),'#7b2cbf',2,[6,5]);text('v1=v2',gvX(te)+8,gvY(state.v2)-13,'#7b2cbf',12);}
+      text('Δx-t：位置相同与距离极值是不同证据',250,214,'#334e68',13,'center','800');text('v-t：验证后开放完整速度证据',665,214,'#334e68',13,'center','800');
+    }else{text('距离随时间怎样变化？',250,214,'#334e68',13,'center','800');text('完成预测后显示速度证据',665,300,'#627d98',14,'center','700');}
   }
   function drawFormula(){
     const x=655,y=255,w=185,h=118,roots=meetTimes(),te=tEq();
@@ -157,16 +163,18 @@
   }
   function draw(){
     var _bg=ctx.createLinearGradient(0,0,0,560);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,940,560);layout={};
-    drawTrack();drawAxes();drawGraphs();drawFormula();
+    drawTrack();drawAxes();drawGraphs();if(state.revealed)drawFormula();
     const te=tEq(),roots=meetTimes();
-    readout.innerHTML=`v10=<b>${state.v10.toFixed(1)}</b> m/s<br>a=<b>${state.a.toFixed(2)}</b> m/s²<br>v2=<b>${state.v2.toFixed(1)}</b> m/s<br>d=<b>${state.d.toFixed(1)}</b> m<br>t=<b>${state.t.toFixed(2)}</b> s<br>Δx=<b>${dx(state.t).toFixed(2)}</b> m<br>t等=<b>${te!==null&&te>0?te.toFixed(2):'无'}</b><br>相遇=<b>${roots.length?roots[0].toFixed(2)+' s':'无'}</b>`;
+    readout.innerHTML=state.revealed?`v10=<b>${state.v10.toFixed(1)}</b> m/s<br>a=<b>${state.a.toFixed(2)}</b> m/s²<br>v2=<b>${state.v2.toFixed(1)}</b> m/s<br>d=<b>${state.d.toFixed(1)}</b> m<br>t=<b>${state.t.toFixed(2)}</b> s<br>Δx=<b>${dx(state.t).toFixed(2)}</b> m<br>t等=<b>${te!==null&&te>0?te.toFixed(2):'无'}</b><br>相遇=<b>${roots.length?roots[0].toFixed(2)+' s':'无'}</b>`:`t=<b>${state.t.toFixed(2)}</b> s<br>当前距离 Δx=<b>${dx(state.t).toFixed(2)}</b> m<br>预测结果尚未揭示`;
+    app.dataset.revealed=String(state.revealed);
+    if(!state.revealed){status.textContent=v1(state.t)<state.v2?'当前事实：后车较慢，距离正在增大。':'当前事实：后车较快，距离正在减小。';return}
     if(dx(state.t)<=0) status.textContent='已经相遇或超过：相遇条件是位置相同，也就是 Δx=0。';
-    else if(te!==null&&Math.abs(state.t-te)<0.08) status.textContent='当前是速度相等时刻。此模型中它通常是最远距离，不是相遇时刻。';
-    else if(te!==null&&state.t<te) status.textContent='后车仍比前车慢，距离还在增大；到 v1=v2 时距离达到最远。';
-    else status.textContent='后车已比前车快，距离开始缩小；是否相遇要看 Δx-t 曲线何时到 0。';
+    else if(te!==null&&Math.abs(state.t-te)<0.08) status.textContent='当前是速度相等时刻；距离变化率为零。';
+    else if(te!==null&&state.t<te) status.textContent='后车仍比前车慢，距离还在增大。';
+    else status.textContent='后车已比前车快，距离开始缩小。';
   }
   function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
-  canvas.addEventListener('pointerdown',e=>{const p=pointer(e);for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30){drag=k;canvas.setPointerCapture(e.pointerId);break;}}});
+  canvas.addEventListener('pointerdown',e=>{if(!state.revealed)return;const p=pointer(e);for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30){drag=k;canvas.setPointerCapture(e.pointerId);break;}}});
   canvas.addEventListener('pointermove',e=>{
     const p=pointer(e);
     if(drag==='d') state.d=Math.round(dFromPx(p.x));
@@ -187,15 +195,16 @@ function predictionTime(){const te=tEq();return te!==null&&te>0?Math.max(0,te-0.
 playBtn.addEventListener("click",()=>{
   const cap=guidedEnd();
   if(__phase==='predict'){
-    __phase='verify';__run=true;playBtn.textContent='⏸ 验证中';
-    status.textContent='继续观察：先到 v1=v2 的最大距离，再到 Δx=0 的真正相遇。';
+    if(!state.prediction)return;__phase='verify';app.dataset.phase='verify';state.revealed=true;predictionChoices.hidden=true;__run=true;playBtn.textContent='⏸ 验证中';
+    status.textContent='预测已保存；现在显示速度与位置证据进行验证。';draw();
     return;
   }
   if(state.t>=cap||__phase==='done'){state.t=0;__phase='ready';}
   __run=!__run;
   playBtn.textContent=__run?'⏸ 暂停':'▶ 播放运动';
 });
-resetBtn.addEventListener("click",()=>{__run=false;__phase='ready';playBtn.textContent="▶ 播放运动";setMode('start');});
+document.querySelectorAll('[data-prediction]').forEach(b=>b.addEventListener('click',()=>{state.prediction=b.dataset.prediction;document.querySelectorAll('[data-prediction]').forEach(x=>x.classList.toggle('active',x===b));playBtn.disabled=false;playBtn.textContent='▶ 验证预测';status.textContent='预测已保存；答案仍隐藏，点击验证。'}));
+resetBtn.addEventListener("click",()=>{__run=false;__phase='ready';Object.assign(state,{prediction:null,revealed:false});app.dataset.phase='guided';predictionChoices.hidden=true;formulaBox.hidden=true;explore.hidden=true;hint.hidden=true;playBtn.disabled=false;playBtn.textContent="▶ 播放运动";document.querySelectorAll('[data-prediction]').forEach(x=>x.classList.remove('active'));setMode('start');});
 canvas.addEventListener("pointerdown",()=>{if(__run){__run=false;playBtn.textContent="▶ 播放运动";}});
 function __loop(now){
   const dt=Math.min((now-__last)/1000,.05);__last=now;
@@ -204,12 +213,12 @@ function __loop(now){
     state.t=Math.min(cap,state.t+dt);
     if(__phase==='ready'&&pauseAt!==null&&state.t>=pauseAt){
       state.t=pauseAt;__run=false;__phase='predict';
-      playBtn.textContent='▶ 验证：共速还是相遇？';draw();
-      status.textContent='预测暂停：即将到达 v1=v2。此刻两车会相遇，还是距离达到极值？先作答再继续。';
+      app.dataset.phase='prediction';predictionChoices.hidden=false;playBtn.disabled=true;playBtn.textContent='先选择预测';draw();
+      status.textContent='预测暂停：下一关键时刻表示相遇、距离最大还是距离最小？先选择再验证。';
       requestAnimationFrame(__loop);return;
     }
     if(state.t>=cap){
-      __run=false;__phase='done';playBtn.textContent='▶ 重新播放';draw();
+      __run=false;__phase='done';app.dataset.phase='final';state.revealed=true;formulaBox.hidden=false;explore.hidden=false;hint.hidden=false;playBtn.disabled=false;playBtn.textContent='▶ 重新播放';draw();
       status.textContent=meetTimes().length&&meetTimes()[0]<=15?'演示完成：Δx=0，位置相同才是相遇；共速只标记此前的最大距离。':'当前 15 s 观察窗内尚未相遇；本理想模型继续运行后仍会追上。';
       requestAnimationFrame(__loop);return;
     }
