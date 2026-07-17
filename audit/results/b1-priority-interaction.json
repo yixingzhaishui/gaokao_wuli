@@ -1,0 +1,402 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-16T00:29:36.053Z",
+  "commit": "a60116496a243bdf7dd52f019d4d6a6b49780bbb",
+  "module": "bx1",
+  "modules": [
+    "bx1"
+  ],
+  "summary": {
+    "total": 2,
+    "score": 100,
+    "pass": 2,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/bx1/friction.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:恰要滑动",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:已经滑动",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:重箱子",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:人走路",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:传送带",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:推箱未动",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#mStatic",
+          "text": "推箱未动",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mCritical",
+          "text": "恰要滑动",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mSlide",
+          "text": "已经滑动",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mHeavy",
+          "text": "重箱子",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mWalk",
+          "text": "人走路",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mBelt",
+          "text": "传送带",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#playBtn",
+          "text": "▶ 引导演示",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.68
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "▶ 引导演示"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "ec1a5c47",
+          "readout_hash": "1fc48efd",
+          "physical_readout_hash": "1fc48efd",
+          "readout": [
+            "情境=推箱子F外=10.0 Nμₛ=0.25，μₖ=0.20N=100.0 Nfₛ,max=25.0 Nf=10.0 N状态=静止",
+            "仍静止：这一单推力情境中，静摩擦按需要与 F 等大。"
+          ],
+          "physical_readout": [
+            "情境=推箱子F外=10.0 Nμₛ=0.25，μₖ=0.20N=100.0 Nfₛ,max=25.0 Nf=10.0 N状态=静止",
+            "仍静止：这一单推力情境中，静摩擦按需要与 F 等大。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "eab52d34",
+          "readout_hash": "5db24f8",
+          "physical_readout_hash": "5db24f8",
+          "readout": [
+            "情境=推箱子F外=12.9 Nμₛ=0.25，μₖ=0.20N=100.0 Nfₛ,max=25.0 Nf=12.9 N状态=静止",
+            "仍静止：这一单推力情境中，静摩擦按需要与 F 等大。（引导演示中）"
+          ],
+          "physical_readout": [
+            "情境=推箱子F外=12.9 Nμₛ=0.25，μₖ=0.20N=100.0 Nfₛ,max=25.0 Nf=12.9 N状态=静止",
+            "仍静止：这一单推力情境中，静摩擦按需要与 F 等大。（引导演示中）"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "49e655b1",
+          "readout_hash": "99afc077",
+          "physical_readout_hash": "99afc077",
+          "readout": [
+            "情境=推箱子F外=13.8 Nμₛ=0.25，μₖ=0.20N=100.0 Nfₛ,max=25.0 Nf=13.8 N状态=静止",
+            "仍静止：这一单推力情境中，静摩擦按需要与 F 等大。"
+          ],
+          "physical_readout": [
+            "情境=推箱子F外=13.8 Nμₛ=0.25，μₖ=0.20N=100.0 Nfₛ,max=25.0 Nf=13.8 N状态=静止",
+            "仍静止：这一单推力情境中，静摩擦按需要与 F 等大。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "49e655b1",
+          "readout_hash": "99afc077",
+          "physical_readout_hash": "99afc077",
+          "readout": [
+            "情境=推箱子F外=13.8 Nμₛ=0.25，μₖ=0.20N=100.0 Nfₛ,max=25.0 Nf=13.8 N状态=静止",
+            "仍静止：这一单推力情境中，静摩擦按需要与 F 等大。"
+          ],
+          "physical_readout": [
+            "情境=推箱子F外=13.8 Nμₛ=0.25，μₖ=0.20N=100.0 Nfₛ,max=25.0 Nf=13.8 N状态=静止",
+            "仍静止：这一单推力情境中，静摩擦按需要与 F 等大。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "情境=推箱子F外=# Nμₛ=#，μₖ=#N=# Nfₛ,max=# Nf=# N状态=静止|仍静止：这一单推力情境中，静摩擦按需要与 F 等大。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "情境=推箱子F外=# Nμₛ=#，μₖ=#N=# Nfₛ,max=# Nf=# N状态=静止|仍静止：这一单推力情境中，静摩擦按需要与 F 等大。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx1/newton-second.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:轻车",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:重车",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:粗糙面",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:光滑面",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "▶ 引导演示：自动取点",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:轻车",
+          "text": "轻车",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重车",
+          "text": "重车",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:粗糙面",
+          "text": "粗糙面",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:光滑面",
+          "text": "光滑面",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.32,
+          "py": 0.82
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "▶ 引导演示：自动取点"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "89d843c2",
+          "readout_hash": "1dedc35c",
+          "physical_readout_hash": "1dedc35c",
+          "readout": [
+            "外力 F6.0 N 质量 m3.0 kg 合力 F合6.0 N 加速度 a2.00 m/s²",
+            "合力不为 0，小车加速；a 与 F合 同向。"
+          ],
+          "physical_readout": [
+            "外力 F6.0 N 质量 m3.0 kg 合力 F合6.0 N 加速度 a2.00 m/s²",
+            "合力不为 0，小车加速；a 与 F合 同向。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "9d0ffb70",
+          "readout_hash": "c48525ed",
+          "physical_readout_hash": "c48525ed",
+          "readout": [
+            "外力 F3.0 N 质量 m3.0 kg 合力 F合3.0 N 加速度 a1.00 m/s²",
+            "实验一：保持 m=3 kg，逐档增大 F合，记录 a。"
+          ],
+          "physical_readout": [
+            "外力 F3.0 N 质量 m3.0 kg 合力 F合3.0 N 加速度 a1.00 m/s²",
+            "实验一：保持 m=3 kg，逐档增大 F合，记录 a。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "b599b862",
+          "readout_hash": "f399c0e7",
+          "physical_readout_hash": "f399c0e7",
+          "readout": [
+            "外力 F3.0 N 质量 m3.0 kg 合力 F合3.0 N 加速度 a1.00 m/s²",
+            "合力不为 0，小车加速；a 与 F合 同向。"
+          ],
+          "physical_readout": [
+            "外力 F3.0 N 质量 m3.0 kg 合力 F合3.0 N 加速度 a1.00 m/s²",
+            "合力不为 0，小车加速；a 与 F合 同向。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "b599b862",
+          "readout_hash": "f399c0e7",
+          "physical_readout_hash": "f399c0e7",
+          "readout": [
+            "外力 F3.0 N 质量 m3.0 kg 合力 F合3.0 N 加速度 a1.00 m/s²",
+            "合力不为 0，小车加速；a 与 F合 同向。"
+          ],
+          "physical_readout": [
+            "外力 F3.0 N 质量 m3.0 kg 合力 F合3.0 N 加速度 a1.00 m/s²",
+            "合力不为 0，小车加速；a 与 F合 同向。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "外力 F# N 质量 m# kg 合力 F合# N 加速度 a# m/s²|合力不为 #，小车加速；a 与 F合 同向。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "外力 F# N 质量 m# kg 合力 F合# N 加速度 a# m/s²|合力不为 #，小车加速；a 与 F合 同向。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

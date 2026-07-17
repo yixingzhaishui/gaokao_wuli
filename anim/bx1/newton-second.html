@@ -35,8 +35,8 @@
 <div class="root">
   <div class="stage"><canvas id="canvas" width="920" height="520" aria-label="牛顿第二定律交互实验台：小车侧视装置、a-F图像和数据记录"></canvas></div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>直接拖推力箭头，对照小车侧视装置、a-F 图像和数据记录，看 a-F 图红点；拖质量砝码看 a-1/m 图红点。</div>
-    <div class="chips"><button id="playBtn">▶ 播放：按 a 匀加速滑动</button><button id="resetBtn">重置</button></div>
+    <div class="card task" id="task"><b>观察任务／预测 1：</b>质量不变时，合力加倍，加速度会怎样？先预测，再播放两轮控制变量实验。</div>
+    <div class="chips"><button id="playBtn">▶ 引导演示：自动取点</button><button id="resetBtn">重置</button></div>
     <div class="card">
       <div class="title">快速情境</div>
       <div class="chips">
@@ -56,11 +56,11 @@
       </div>
     </div>
     <div class="card formula">
-      <div><span>有摩擦</span><b>F合=F-μmg</b></div>
-      <div><span>第二定律</span><b>a=F合/m</b></div>
-      <div><span>控制变量</span><b>a∝F合, a∝1/m</b></div>
+      <div><span>实验一：m 不变</span><b>a∝F合</b></div>
+      <div><span>实验二：F合 不变</span><b>a∝1/m</b></div>
+      <div><span>归纳后</span><b>F合=ma</b></div>
     </div>
-    <div class="card small"><b>可直接操作：</b>抓红色推力箭头端点改变 F；抓砝码尺改变 m；抓粗糙度尺改变 μ。</div>
+    <div class="card small"><b>演示后可探索：</b>抓红色合力箭头端点改变 F合；抓砝码尺改变 m。粗糙度是拓展变量，用来比较外加拉力与合力。</div>
     <div class="status" id="status">合力不为 0，小车加速；a 与 F合 同向。</div>
   </div>
 </div>
@@ -69,7 +69,7 @@
   'use strict';
   const canvas=document.getElementById('canvas');
   const ctx=canvas.getContext('2d');
-  const state={F:12,m:3,mu:.1,drag:null,playing:false,playT:0};
+  const state={F:6,m:3,mu:0,drag:null,playing:false,playT:0,demoPhase:0};
   const G=10;
   const els={F:document.getElementById('fText'),m:document.getElementById('mText'),net:document.getElementById('netText'),a:document.getElementById('aText'),status:document.getElementById('status')};
   const colors={red:'#dc2626',blue:'#2563eb',purple:'#7c3aed',ink:'#102a43',muted:'#64748b',green:'#0f766e',orange:'#f59e0b'};
@@ -114,20 +114,21 @@
   function update(v){
     els.F.textContent=`${fmt(state.F)} N`;els.m.textContent=`${fmt(state.m)} kg`;els.net.textContent=`${fmt(v.net)} N`;els.a.textContent=`${fmt(v.a,2)} m/s²`;
     els.status.className='status'+(v.net===0?' warn':'');
-    els.status.textContent=(v.net===0?'外力还没超过最大静摩擦，合力为 0，小车暂不加速。':'合力不为 0，小车加速；a 与 F合 同向。')+(state.playing?'（播放中：按 a 匀加速运动）':'');
+    const demo=state.playing?(state.demoPhase===1?'实验一：保持 m=3 kg，逐档增大 F合，记录 a。':'实验二：保持 F合=12 N，逐档增大 m，改画 a-1/m。'):'';
+    els.status.textContent=demo||(v.net===0?'合力为 0，小车加速度为 0。':'合力不为 0，小车加速；a 与 F合 同向。');
   }
   function draw(){const v=values(),g0=geom();ctx.clearRect(0,0,920,520);var _bg=ctx.createLinearGradient(0,0,0,520);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,520);text('牛顿第二定律实验台：加速度由合力和质量共同决定',460,30,'#0f172a','center',19,'900');drawScene(v,g0);drawGraphs(v);roundRect(42,404,816,76,8,'#fff','#d7dee8');ruler(122,438,362,'拖 m：轻车 → 重车',colors.blue);handle(g0.mass.x,g0.mass.y,`m=${fmt(state.m)}`,state.drag==='m',colors.blue);ruler(500,438,740,'拖 μ：光滑 → 粗糙',colors.orange);handle(g0.mu.x,g0.mu.y,`μ=${fmt(state.mu,2)}`,state.drag==='mu',colors.orange);update(v)}
   function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
   function near(a,b,rad=24){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
-  function down(e){if(state.playing){state.playing=false;document.getElementById('playBtn').textContent='▶ 播放：按 a 匀加速滑动'}const p=pos(e),g0=geom();if(near(p,g0.forceEnd,30))state.drag='F';else if(near(p,g0.mass,28))state.drag='m';else if(near(p,g0.mu,28))state.drag='mu';else state.drag=null;if(state.drag){canvas.setPointerCapture(e.pointerId);move(e)}}
+  function down(e){if(state.playing){state.playing=false;document.getElementById('playBtn').textContent='▶ 引导演示：自动取点'}const p=pos(e),g0=geom();if(near(p,g0.forceEnd,30))state.drag='F';else if(near(p,g0.mass,28))state.drag='m';else if(near(p,g0.mu,28))state.drag='mu';else state.drag=null;if(state.drag){canvas.setPointerCapture(e.pointerId);move(e)}}
   function move(e){if(!state.drag)return;const p=pos(e);if(state.drag==='F')state.F=clamp((p.x-180)/210*40,0,40);if(state.drag==='m')state.m=clamp(1+(p.x-122)/240*9,1,10);if(state.drag==='mu')state.mu=clamp((p.x-500)/240*.5,0,.5);draw()}
   function up(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
   canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
   document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='light')state.m=1.5;if(c==='heavy')state.m=8;if(c==='rough')state.mu=.32;if(c==='smooth')state.mu=0;draw()}));
   const playBtn=document.getElementById('playBtn');
-  function animate(){if(!state.playing)return;state.playT+=0.03;draw();if(state.playT>2.5){state.playing=false;playBtn.textContent='▶ 播放：按 a 匀加速滑动';draw();return}requestAnimationFrame(animate)}
-  playBtn.addEventListener('click',()=>{state.playing=!state.playing;playBtn.textContent=state.playing?'⏸ 暂停':'▶ 播放：按 a 匀加速滑动';if(state.playing){state.playT=0;animate()}else draw()});
-  document.getElementById('resetBtn').addEventListener('click',()=>{state.F=12;state.m=3;state.mu=.1;state.playing=false;state.playT=0;playBtn.textContent='▶ 播放：按 a 匀加速滑动';draw()});
+  function animate(){if(!state.playing)return;state.playT+=0.05;state.mu=0;if(state.playT<3){state.demoPhase=1;state.m=3;state.F=3+Math.floor(state.playT)*6}else if(state.playT<6){state.demoPhase=2;state.F=12;state.m=2+Math.floor(state.playT-3)*2}else{state.playing=false;state.demoPhase=0;playBtn.textContent='▶ 重播引导演示';document.getElementById('task').innerHTML='<b>归纳：</b>m 不变时 a 与 F合 成正比；F合 不变时 a 与 1/m 成正比。现在再揭示 F合=ma。';draw();return}draw();setTimeout(animate,50)}
+  playBtn.addEventListener('click',()=>{state.playing=!state.playing;playBtn.textContent=state.playing?'⏸ 暂停':'▶ 引导演示：自动取点';if(state.playing){state.playT=0;state.demoPhase=1;animate()}else draw()});
+  document.getElementById('resetBtn').addEventListener('click',()=>{state.F=6;state.m=3;state.mu=0;state.playing=false;state.playT=0;state.demoPhase=0;playBtn.textContent='▶ 引导演示：自动取点';document.getElementById('task').innerHTML='<b>观察任务／预测 1：</b>质量不变时，合力加倍，加速度会怎样？先预测，再播放两轮控制变量实验。';draw()});
   draw();
 })();
 </script>
