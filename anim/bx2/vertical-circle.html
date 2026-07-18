@@ -30,6 +30,7 @@
   .small{font-size:12px;line-height:1.5;color:#475569}
   .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
   .status.warn{border-color:#f59e0b;background:#fff7ed;color:#b45309}
+  [hidden]{display:none!important}
   @media(max-width:820px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
 </style>
 </head>
@@ -37,8 +38,13 @@
 <div class="root">
   <div class="stage"><canvas id="canvas" width="960" height="760" aria-label="圆周临界模型交互实验台"></canvas></div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>拖 `position_angle` 到最高点，比较绳/杆；再拖 `v` 和 `g`，看约束力何时为 0。磁场迁移看 `r=mv/qB`。</div>
-    <div class="chips"><button id="playBtn">播放</button><button id="resetBtn">重置</button></div>
+    <div class="card task"><b>预测与观察任务：</b>绳模型最高点若 `v_top&lt;√gr`，绳还能拉住小球继续沿圆周运动吗？作答后再看受力证据。</div>
+    <div class="card" id="predictCard">
+      <div class="title">保存预测</div>
+      <div class="mode"><button data-predict="track">仍沿圆周</button><button data-predict="slack">绳会松弛</button></div>
+    </div>
+    <div class="card small" id="feedback" hidden></div>
+    <div class="chips"><button id="playBtn" disabled>播放</button><button id="resetBtn">重置</button></div>
     <div class="card">
       <div class="title">type_rope_or_rod</div>
       <div class="mode"><button id="ropeBtn" class="active">绳模型</button><button id="rodBtn">杆/圆管模型</button></div>
@@ -48,8 +54,8 @@
       <div class="chips">
         <button data-case="critical">最高点临界</button>
         <button data-case="fast">速度更大</button>
-        <button data-case="slow">杆低速过顶</button>
-        <button data-case="bridge">拱桥顶端</button>
+        <button data-case="slow">杆恰到最高点</button>
+        <button data-case="bridge">最低点读数</button>
       </div>
     </div>
     <div class="card">
@@ -61,13 +67,13 @@
         <div class="meter"><span>磁场半径</span><b id="magText">r=mv/qB</b></div>
       </div>
     </div>
-    <div class="card formula">
+    <div class="card formula" id="formulaCard" hidden>
       <div><span>径向方程</span><b>ΣF径=mv²/r</b></div>
       <div><span>绳最高点</span><b>v_min=√(gr)</b></div>
       <div><span>最低点</span><b>N-mg=mv²/r</b></div>
       <div><span>磁场迁移</span><b>r=mv/qB</b></div>
     </div>
-    <div class="card small"><b>三视图：</b>左侧是侧视圆周轨道；右侧是受力图和临界图像记录；底部可拖 `m,r,v,g,position_angle`。</div>
+    <div class="card small"><b>模型：</b>底部 `v_top` 是最高点速度。播放时由机械能计算当前位置速度，不把重力场中的整圈运动误画成恒速；绳在任意位置都必须满足 `T≥0`。</div>
     <div class="status" id="status">先找圆心方向，再沿径向列方程。</div>
   </div>
 </div>
@@ -75,20 +81,25 @@
 (function(){
   'use strict';
   const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
-  const state={m:.5,r:1,v:3.13,g:9.8,type:'rope',angle:0,running:false,drag:null};
+  const state={m:.5,r:1,v:2.2,g:9.8,type:'rope',angle:0,running:false,drag:null,lastTime:0,prediction:null,revealed:false,slackMode:false,slackTime:0};
   const els={radial:document.getElementById('radialText'),force:document.getElementById('forceText'),crit:document.getElementById('critText'),mag:document.getElementById('magText'),status:document.getElementById('status'),play:document.getElementById('playBtn'),rope:document.getElementById('ropeBtn'),rod:document.getElementById('rodBtn')};
   const colors={red:'#dc2626',blue:'#2563eb',purple:'#7c3aed',green:'#0f766e',orange:'#f59e0b',cyan:'#0891b2',ink:'#102a43',muted:'#64748b'};
   const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
   const fmt=(v,d=2)=>Number.isFinite(v)?(Math.abs(v)<1e-9?0:v).toFixed(d):'--';
   function values(){
-    const radNeed=state.m*state.v*state.v/state.r;
+    const localV2=Math.max(0,state.v*state.v+2*state.g*state.r*(1-Math.cos(state.angle)));
+    const localV=Math.sqrt(localV2);
+    const radNeed=state.m*localV2/state.r;
     const mgIn=state.m*state.g*Math.cos(state.angle);
     const constraint=radNeed-mgIn;
     const topCrit=Math.sqrt(state.g*state.r);
-    const bottomN=state.m*(state.g+state.v*state.v/state.r);
-    const canTrack=state.type==='rod'||constraint>=-1e-9||Math.abs(state.angle)>0.08;
+    const topRadNeed=state.m*state.v*state.v/state.r;
+    const topConstraint=topRadNeed-state.m*state.g;
+    const bottomV=Math.sqrt(Math.max(0,state.v*state.v+4*state.g*state.r));
+    const bottomN=state.m*(state.g+bottomV*bottomV/state.r);
+    const canTrack=state.type==='rod'||constraint>=-1e-9;
     const magR=state.m*state.v/1;
-    return{radNeed,mgIn,constraint,topCrit,bottomN,canTrack,magR};
+    return{localV,localV2,radNeed,mgIn,constraint,topCrit,topRadNeed,topConstraint,bottomV,bottomN,canTrack,magR};
   }
   function text(s,x,y,c=colors.ink,a='center',size=13,weight='700'){ctx.fillStyle=c;ctx.font=`${weight} ${size}px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif`;ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
   function line(x1,y1,x2,y2,c='#94a3b8',w=2,dash){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
@@ -98,29 +109,34 @@
   function massPoint(g){return{x:g.O.x+g.R*Math.sin(state.angle),y:g.O.y-g.R*Math.cos(state.angle)}}
   function drawTrack(vs){
     box(34,56,552,480,8,'#fff','#d7dee8');text('侧视圆周轨道：position_angle 可拖',310,84,'#0f172a','center',16,'900');
-    const g=circleGeom(),O=g.O,R=g.R,p=massPoint(g),inward={x:O.x-p.x,y:O.y-p.y},len=Math.hypot(inward.x,inward.y),ux=inward.x/len,uy=inward.y/len,tx=uy,ty=-ux;
+    const g=circleGeom(),O=g.O,R=g.R,pCircle=massPoint(g),p=state.slackMode?{x:O.x+state.v*state.slackTime*26,y:O.y-R+.5*state.g*state.slackTime*state.slackTime*26}:pCircle,inward={x:O.x-pCircle.x,y:O.y-pCircle.y},len=Math.hypot(inward.x,inward.y),ux=inward.x/len,uy=inward.y/len,tx=uy,ty=-ux;
     ctx.save();ctx.strokeStyle=state.type==='rope'?'#94a3b8':'#334155';ctx.lineWidth=state.type==='rope'?2:5;if(state.type==='rope')ctx.setLineDash([7,5]);ctx.beginPath();ctx.arc(O.x,O.y,R,0,Math.PI*2);ctx.stroke();ctx.restore();
-    line(O.x,O.y,p.x,p.y,'#d7dee8',2);
-    arrow(p.x,p.y,p.x+tx*70,p.y+ty*70,colors.green,3);text('v 切线',p.x+tx*90,p.y+ty*90,colors.green,'center',12,'900');
+    if(!state.slackMode)line(O.x,O.y,p.x,p.y,'#d7dee8',2);
+    if(state.slackMode){const vy=state.g*state.slackTime;arrow(p.x,p.y,p.x+state.v*12,p.y+vy*7,colors.green,3);text('绳松后按抛体运动',p.x+54,p.y-26,colors.orange,'center',12,'900')}
+    else if(vs.localV>.03){const speedLen=clamp(vs.localV*12,20,94);arrow(p.x,p.y,p.x+tx*speedLen,p.y+ty*speedLen,colors.green,3);text(`v=${fmt(vs.localV,1)}m/s`,p.x+tx*(speedLen+24),p.y+ty*(speedLen+24),colors.green,'center',12,'900')}
+    else{text('v=0',p.x+34,p.y-18,colors.green,'center',12,'900')}
     arrow(p.x,p.y,p.x,p.y+64,colors.red,3);text('mg',p.x+20,p.y+50,colors.red,'left',12,'900');
-    if(vs.constraint>=0){arrow(p.x,p.y,p.x+ux*clamp(vs.constraint*12,28,110),p.y+uy*clamp(vs.constraint*12,28,110),colors.purple,3);text(state.type==='rope'?'T/N 指向圆心':'N 指向圆心',p.x+ux*100,p.y+uy*100,colors.purple,'center',12,'900')}
-    else if(state.type==='rod'){arrow(p.x,p.y,p.x-ux*clamp(Math.abs(vs.constraint)*12,28,110),p.y-uy*clamp(Math.abs(vs.constraint)*12,28,110),colors.orange,3);text('杆向外托/推',p.x-ux*100,p.y-uy*100,colors.orange,'center',12,'900')}
-    else{text('绳松弛',p.x,p.y-28,colors.orange,'center',14,'900')}
-    ctx.fillStyle=vs.canTrack?colors.blue:colors.orange;ctx.beginPath();ctx.arc(p.x,p.y,12,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();
-    const top={x:O.x,y:O.y-R};arrow(top.x,top.y,top.x+54+state.v*14,top.y,colors.blue,4);text(`v=${fmt(state.v,1)}m/s`,top.x+72+state.v*14,top.y-12,colors.blue,'left',12,'900');
+    if(!state.slackMode&&state.revealed&&vs.constraint>.03){arrow(p.x,p.y,p.x+ux*clamp(vs.constraint*12,18,110),p.y+uy*clamp(vs.constraint*12,18,110),colors.purple,3);text(state.type==='rope'?'T 指向圆心':'杆力指向圆心',p.x+ux*100,p.y+uy*100,colors.purple,'center',12,'900')}
+    else if(!state.slackMode&&state.revealed&&Math.abs(vs.constraint)<=.03){text('约束力=0',p.x+34,p.y-28,colors.orange,'center',12,'900')}
+    else if(!state.slackMode&&state.revealed&&state.type==='rod'){arrow(p.x,p.y,p.x-ux*clamp(Math.abs(vs.constraint)*12,18,110),p.y-uy*clamp(Math.abs(vs.constraint)*12,18,110),colors.orange,3);text('杆向外托/推',p.x-ux*100,p.y-uy*100,colors.orange,'center',12,'900')}
+    else if(!state.slackMode&&state.revealed&&!vs.canTrack){text('绳松弛，圆周约束失效',p.x,p.y-28,colors.orange,'center',14,'900')}
+    ctx.fillStyle=!state.revealed||vs.canTrack&&!state.slackMode?colors.blue:colors.orange;ctx.beginPath();ctx.arc(p.x,p.y,12,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();
+    const top={x:O.x,y:O.y-R},topLen=clamp(state.v*14,20,100);if(state.v>.03)arrow(top.x,top.y,top.x+topLen,top.y,colors.blue,4);text(`v_top=${fmt(state.v,1)}m/s`,top.x+(state.v>.03?topLen+12:18),top.y-12,colors.blue,'left',12,'900');
     const right={x:O.x+R,y:O.y};line(O.x,O.y,right.x,right.y,colors.orange,3);handle(right.x,right.y,'r',state.drag==='radiusDirect',colors.orange);
     text(`θ=${fmt(state.angle*180/Math.PI,0)}°（从最高点计）`,310,512,colors.muted,'center',13,'900');
   }
   function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#b45309':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();text(label,x,y-22,active?'#92400e':c,'center',12,'900')}
   function drawForcePanel(vs){
-    box(612,70,298,198,8,'#fff','#d7dee8');text('瞬时受力图：只画真实力',761,94,'#0f172a','center',14,'900');
+    box(612,70,298,198,8,'#fff','#d7dee8');text('最高点受力证据：只画真实力',761,94,'#0f172a','center',14,'900');
+    if(!state.revealed){text('先保存预测',761,150,colors.orange,'center',17,'900');text('约束力与临界证据暂不揭示',761,186,colors.muted,'center',12,'700');return}
+    if(state.slackMode){text('绳已松弛：T=0',761,150,colors.orange,'center',17,'900');text('离开圆轨道后不再使用 ΣF径=mv²/r',761,188,colors.muted,'center',12,'700');return}
     const x=760,y=146;ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(x,y,12,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#102a43';ctx.stroke();
     arrow(x,y,x,y+58,colors.red,3);text('mg',x+22,y+44,colors.red,'left',12,'900');
-    arrow(x,y,x,y+clamp(vs.radNeed*16,36,96),colors.cyan,2);text('需要ΣF径',x+54,y+68,colors.cyan,'left',12,'900');
-    if(vs.constraint>=0)arrow(x-30,y,x-30,y+clamp(vs.constraint*16,28,90),colors.purple,3);
-    else arrow(x-30,y,x-30,y-clamp(Math.abs(vs.constraint)*16,28,90),colors.orange,3);
-    text(`约束=${fmt(vs.constraint,2)}N`,760,238,vs.constraint>=0?colors.purple:colors.orange,'center',13,'900');
-    box(612,294,298,152,8,'#f8fafc','#d7dee8');text('临界图像记录',761,318,'#0f172a','center',14,'900');
+    if(vs.topRadNeed>.03)arrow(x,y,x,y+clamp(vs.topRadNeed*16,18,96),colors.cyan,2);text(`需要ΣF径=${fmt(vs.topRadNeed,2)}N`,x+54,y+68,colors.cyan,'left',12,'900');
+    if(vs.topConstraint>.03)arrow(x-30,y,x-30,y+clamp(vs.topConstraint*16,18,90),colors.purple,3);
+    else if(vs.topConstraint<-.03)arrow(x-30,y,x-30,y-clamp(Math.abs(vs.topConstraint)*16,18,90),colors.orange,3);
+    text(`最高点约束=${fmt(vs.topConstraint,2)}N`,760,238,vs.topConstraint>=0?colors.purple:colors.orange,'center',13,'900');
+    box(612,294,298,152,8,'#f8fafc','#d7dee8');text('最高点临界证据',761,318,'#0f172a','center',14,'900');
     line(650,394,880,394,'#94a3b8',2);line(650,394,650,346,'#94a3b8',2);
     const critX=650+230*vs.topCrit/8,lineX=650+230*state.v/8;
     line(critX,346,critX,402,colors.orange,2,[5,4]);text('√gr',critX,416,colors.orange,'center',11,'900');
@@ -146,26 +162,36 @@
   }
   function drawControls(vs,g0){
     box(34,610,876,104,8,'#fff','#d7dee8');
-    text('拖动 m、r、v、g、position_angle；切换 type_rope_or_rod 看约束力能否取负',386,628,colors.orange,'center',12,'900');
+    text('拖动 m、r、v_top、g、position_angle；播放时由机械能计算当前位置速度',420,628,colors.orange,'center',12,'900');
     ruler(58,646,208,'m',colors.purple,g0.m,`m=${fmt(state.m,1)}kg`,state.drag==='m');
     ruler(238,646,388,'r',colors.orange,g0.r,`r=${fmt(state.r,1)}m`,state.drag==='r');
-    ruler(418,646,568,'v',colors.blue,g0.v,`v=${fmt(state.v,1)}m/s`,state.drag==='v');
+    ruler(418,646,568,'v_top',colors.blue,g0.v,`v_top=${fmt(state.v,1)}m/s`,state.drag==='v');
     ruler(598,646,748,'g',colors.green,g0.g,`g=${fmt(state.g,1)}`,state.drag==='g');
     ruler(778,646,928,'position_angle',colors.cyan,g0.angle,`${fmt(state.angle*180/Math.PI,0)}°`,state.drag==='angle');
   }
   function update(vs){
+    if(!state.revealed){
+      els.radial.textContent='待预测';els.force.textContent='待揭示';els.crit.textContent='待揭示';els.mag.textContent='待揭示';
+      els.status.className='status warn';els.status.textContent='先预测：v_top<√gr 时，绳还能否保持圆周约束？';els.play.textContent='播放';return;
+    }
     els.radial.textContent=`${fmt(vs.mgIn+vs.constraint,2)} / ${fmt(vs.radNeed,2)} N`;
     els.force.textContent=`${fmt(vs.constraint,2)} N`;
     els.crit.textContent=`${fmt(vs.topCrit,2)} / ${fmt(vs.bottomN,1)} N`;
     els.mag.textContent=`${fmt(vs.magR,2)} m`;
     els.rope.classList.toggle('active',state.type==='rope');els.rod.classList.toggle('active',state.type==='rod');
-    const warn=state.type==='rope'&&Math.abs(state.angle)<0.08&&vs.constraint<0;
+    const warn=state.type==='rope'&&vs.constraint<0;
     els.status.className='status'+(warn?' warn':'');
-    els.status.textContent=warn?'绳最高点速度不足：约束力需要为负，绳会松弛。':state.type==='rod'&&vs.constraint<0?'杆/圆管可提供向外约束，低速过顶不必套 √gr。':'径向合力满足 mv²/r，按当前位置的圆心方向列式。';
+    els.status.textContent=state.slackMode?'绳已松弛：T=0，小球离开圆轨道并按抛体运动；此后不能继续套圆周径向方程。':warn?'当前位置若维持圆周需要负张力，绳会松弛；圆周模型从这里失效。':state.type==='rod'&&Math.abs(state.v)<1e-6&&Math.abs(state.angle)<.03?'杆模型 v_top=0 只表示恰好到达最高点；连续通过需要 v_top>0。':state.type==='rod'&&vs.constraint<0?'杆/圆管可提供向外约束，最高点不必套绳模型的 √gr。':`机械能给出当前位置 v=${fmt(vs.localV,2)}m/s；径向合力满足 mv²/r。`;
     els.play.textContent=state.running?'暂停':'播放';
   }
   function draw(){
     const vs=values(),g0=geometry();
+    canvas.dataset.speedModel='energy-from-top';
+    canvas.dataset.ropeCheck='all-angles';
+    canvas.dataset.timestep='real-dt';
+    canvas.dataset.guidedComplete=String(state.revealed);
+    canvas.dataset.constraintValid=String(vs.canTrack);
+    canvas.dataset.localSpeed=fmt(vs.localV,3);
     ctx.clearRect(0,0,960,760);
     const bg=ctx.createLinearGradient(0,0,0,760);bg.addColorStop(0,'#fbfdff');bg.addColorStop(1,'#eaf0f7');ctx.fillStyle=bg;ctx.fillRect(0,0,960,760);
     text('圆周临界模型实验台：找圆心方向，约束力为 0 就是临界',480,28,'#0f172a','center',20,'900');
@@ -174,7 +200,8 @@
   function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
   function near(p,h,rad=25){return Math.hypot(p.x-h.x,p.y-h.y)<=rad}
   function down(e){
-    state.running=false;const p=pos(e),g0=geometry(),cg=circleGeom(),right={x:cg.O.x+cg.R,y:cg.O.y};state.drag=null;
+    if(!state.revealed)return;
+    state.running=false;state.slackMode=false;state.slackTime=0;const p=pos(e),g0=geometry(),cg=circleGeom(),right={x:cg.O.x+cg.R,y:cg.O.y};state.drag=null;
     if(near(p,right,28))state.drag='radiusDirect';
     else{for(const key of ['m','r','v','g','angle']){if(near(p,g0[key],24)){state.drag=key;break}}}
     if(state.drag){canvas.setPointerCapture(e.pointerId);move(e)}
@@ -191,11 +218,12 @@
   }
   function up(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
   canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
-  els.rope.addEventListener('click',()=>{state.type='rope';draw()});els.rod.addEventListener('click',()=>{state.type='rod';draw()});
-  els.play.addEventListener('click',()=>{state.running=!state.running;draw()});
-  document.getElementById('resetBtn').addEventListener('click',()=>{Object.assign(state,{m:.5,r:1,v:Math.sqrt(9.8),g:9.8,type:'rope',angle:0,running:false});draw()});
-  document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='critical'){state.r=1;state.g=9.8;state.v=Math.sqrt(state.g*state.r);state.type='rope';state.angle=0}if(c==='fast'){state.r=1;state.g=9.8;state.v=4.8;state.type='rope';state.angle=0}if(c==='slow'){state.r=1;state.g=9.8;state.v=1.2;state.type='rod';state.angle=0}if(c==='bridge'){state.r=1.5;state.g=9.8;state.v=2.6;state.type='rod';state.angle=0}draw()}));
-  function tick(){if(state.running){state.angle=(state.angle+Math.max(.35,state.v/state.r)*.014)%(Math.PI*2)}draw();requestAnimationFrame(tick)}
+  els.rope.addEventListener('click',()=>{if(!state.revealed)return;state.type='rope';state.running=false;state.slackMode=false;state.slackTime=0;draw()});els.rod.addEventListener('click',()=>{if(!state.revealed)return;state.type='rod';state.running=false;state.slackMode=false;state.slackTime=0;draw()});
+  els.play.addEventListener('click',()=>{if(!state.revealed)return;const vs=values();if(state.type==='rope'&&!vs.canTrack&&!state.slackMode){state.slackMode=true;state.slackTime=0;state.running=true;state.lastTime=performance.now();draw();return}state.running=!state.running;state.lastTime=performance.now();draw()});
+  document.getElementById('resetBtn').addEventListener('click',()=>{Object.assign(state,{m:.5,r:1,v:2.2,g:9.8,type:'rope',angle:0,running:false,drag:null,lastTime:0,prediction:null,revealed:false,slackMode:false,slackTime:0});document.getElementById('predictCard').hidden=false;document.getElementById('feedback').hidden=true;document.getElementById('formulaCard').hidden=true;els.play.disabled=true;draw()});
+  document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{if(!state.revealed)return;const c=btn.dataset.case;if(c==='critical'){state.r=1;state.g=9.8;state.v=Math.sqrt(state.g*state.r);state.type='rope';state.angle=0}if(c==='fast'){state.r=1;state.g=9.8;state.v=4.8;state.type='rope';state.angle=0}if(c==='slow'){state.r=1;state.g=9.8;state.v=0;state.type='rod';state.angle=0}if(c==='bridge'){state.r=1;state.g=9.8;state.v=3.3;state.type='rope';state.angle=Math.PI}state.running=false;state.slackMode=false;state.slackTime=0;draw()}));
+  document.querySelectorAll('[data-predict]').forEach(btn=>btn.addEventListener('click',()=>{state.prediction=btn.dataset.predict;state.revealed=true;const actual=values().canTrack?'仍能保持圆周约束':'绳会松弛';const labels={track:'仍沿圆周',slack:'绳会松弛'};const feedback=document.getElementById('feedback');feedback.hidden=false;feedback.textContent=`你的预测：${labels[state.prediction]}；实际证据：${actual}。因为最高点若维持圆周需要 T=m(v_top²/r-g)，绳不能提供负张力。`;document.getElementById('predictCard').hidden=true;document.getElementById('formulaCard').hidden=false;els.play.disabled=false;draw()}));
+  function tick(now){if(state.running){const dt=Math.min(.035,(now-state.lastTime)/1000||.016);state.lastTime=now;if(state.slackMode){state.slackTime+=dt;if(state.slackTime>1.15)state.running=false}else{const vs=values();state.angle=(state.angle+vs.localV/state.r*dt)%(Math.PI*2);const next=values();if(state.type==='rope'&&!next.canTrack){state.running=false;state.slackMode=true;state.slackTime=0}}}draw();requestAnimationFrame(tick)}
   draw();requestAnimationFrame(tick);
 })();
 </script>

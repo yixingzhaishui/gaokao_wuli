@@ -107,7 +107,7 @@
   </div>
   <div class="panel">
     <div class="card task">
-      <b>观察任务：</b>拖动小球时同时看三行账本：合力总功对动能，重力做功对势能，摩擦做功对机械能。
+      <b>观察任务：</b>拖动小球时同时看三行账本：合力总功对动能，重力做功对势能；第三行只验证“固定粗糙斜面、滑块为研究对象、动摩擦为唯一其他力”的特例。
     </div>
     <div class="card">
       <div class="title">实验控制</div>
@@ -133,8 +133,8 @@
       <div class="title">公式对照</div>
       <div>W合 = ΔEk：看合力总功和蓝色动能变化。</div>
       <div>WG = -ΔEp：看高度减少和紫色势能减少。</div>
-      <div>Wf = ΔE机：看摩擦负功和绿色机械能减少。</div>
-      <div>问哪个力，就找对应哪种能量变化。</div>
+      <div>本模型：Wf = ΔE机；不是摩擦力的普遍通式。</div>
+      <div>一般关系：W其他 = ΔE机；必须先选系统。</div>
     </div>
     <div class="status" id="status">光滑：Wf=0，机械能不变；但 W合 与 WG 仍分别对应自己的能量变化。</div>
   </div>
@@ -342,7 +342,7 @@
       ctx.strokeRect(26, 50, 532, 246);
       ctx.restore();
     }
-    text(q.mu === 0 ? '光滑：W合=WG，机械能不变。' : '粗糙：W合=WG+Wf，机械能减少。', 292, 34, q.mu === 0 ? '#087f5b' : '#c92a2a', 'center', 13, '700');
+    text(q.mu === 0 ? '光滑：W合=WG，机械能不变。' : '本固定斜面模型：W合=WG+Wf，Wf=ΔE机。', 292, 34, q.mu === 0 ? '#087f5b' : '#c92a2a', 'center', 13, '700');
   }
 
   function drawRelationMap(q, r) {
@@ -351,7 +351,7 @@
     const rows = [
       { y: 122, left: 'W合', right: 'ΔEk', value1: r.wt, value2: r.dek, color: '#2c7be5' },
       { y: 178, left: 'WG', right: '-ΔEp', value1: r.wg, value2: r.dep, color: '#7b2cbf' },
-      { y: 234, left: 'Wf', right: 'ΔE机', value1: r.wf, value2: r.dem, color: '#c92a2a' }
+      { y: 234, left: '本模型Wf', right: 'ΔE机', value1: r.wf, value2: r.dem, color: '#c92a2a' }
     ];
     rows.forEach(row => {
       box(622, row.y - 24, 246, 42, '#f7f9fc', '#d9e2ec');
@@ -396,7 +396,7 @@
     });
     box(640, 338, 222, 34, q.mu === 0 ? '#e6fffa' : '#fff7e6', q.mu === 0 ? '#38b2ac' : '#f0a500');
     text(state.note, 751, 355, q.mu === 0 ? '#087f5b' : '#9a6700', 'center', 12, '800');
-    text(q.mu === 0 ? '没有摩擦时，Wf=0，所以 ΔE机=0。' : '有摩擦时，Wf<0，所以 ΔE机<0，机械能减少。', 460, 310, q.mu === 0 ? '#087f5b' : '#c92a2a', 'center', 13, '700');
+    text(q.mu === 0 ? '没有摩擦时，Wf=0，所以 ΔE机=0。' : '仅在本固定斜面特例中：Wf=ΔE机<0。', 460, 310, q.mu === 0 ? '#087f5b' : '#c92a2a', 'center', 13, '700');
   }
 
   function updatePanel(q, r) {
@@ -416,7 +416,7 @@
       ui.status.style.color = '#087f5b';
       ui.status.style.borderColor = '#38b2ac';
     } else {
-      ui.status.textContent = '粗糙：摩擦负功让 ΔE机<0；求动能变化仍要看 W合。';
+      ui.status.textContent = '本模型限定：固定斜面、滑块为研究对象且动摩擦是唯一其他力，因此 Wf=ΔE机；求动能仍看 W合。';
       ui.status.style.background = '#fff0f0';
       ui.status.style.color = '#c92a2a';
       ui.status.style.borderColor = '#ff6b6b';
@@ -441,6 +441,8 @@
       }
     }
     const r = calc(q);
+    canvas.dataset.modelBoundary = 'fixed-rough-incline-block-dynamic-friction-only-other-force';
+    canvas.dataset.frictionWorkIsUniversalHeat = 'false';
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = '#f7f9fc';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
