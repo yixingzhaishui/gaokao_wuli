@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B3-26 磁场方向与安培力边界</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#eef2f7;color:#102a43}.wrap{padding:12px}.layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(280px,.85fr);gap:12px;align-items:start}canvas{display:block;width:100%;max-width:760px;background:#0b1728;border-radius:12px}.panel{background:#fff;border:1px solid #d9e2ec;border-radius:10px;padding:10px;display:grid;gap:9px}.task{background:#fff7e6;border-left:4px solid #f0a500;padding:9px;border-radius:6px;font-size:13px;line-height:1.55}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:7px}button{font:inherit;min-height:38px;border:1px solid #cbd5e1;background:#fff;border-radius:8px;padding:7px;cursor:pointer}button.active{background:#2563eb;color:#fff;border-color:#2563eb}.param{display:grid;gap:5px;font-size:13px}.param input{width:100%}.readout{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:9px;font-size:13px;line-height:1.6}.readout b{color:#0f766e}.formula{background:#eef6ff;border-left:4px solid #2563eb;padding:9px;border-radius:6px;font-size:13px;line-height:1.55}.status{font-size:13px;line-height:1.55;color:#334e68}@media(max-width:760px){.layout{grid-template-columns:1fr}.wrap{padding:8px}.buttons{grid-template-columns:1fr}canvas{max-height:380px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="layout">
+    <canvas id="canvas" width="760" height="470" aria-label="匀强磁场中的通电直导线，显示磁场方向、电流方向、夹角和安培力"></canvas>
+    <section class="panel">
+      <div class="task"><b>观察任务：</b>磁场方向由小磁针北极指向规定；导线受力还取决于电流与磁场夹角。</div>
+      <label class="param">导线与磁场夹角 θ：<b id="thetaLabel">90°</b><input id="theta" type="range" min="0" max="90" step="5" value="90"></label>
+      <div class="buttons">
+        <button id="playBtn" data-audit-play>▶ 自动比较夹角</button>
+        <button id="parallel">平行 θ=0°</button>
+        <button id="perpendicular" class="active">垂直 θ=90°</button>
+        <button id="reset" data-audit-reset>重置</button>
+      </div>
+      <div class="readout" id="readout">
+        磁感应强度 B：<b>0.40 T</b><br>
+        电流 I / 导线长度 L：<b>2.0 A / 0.30 m</b><br>
+        安培力 F：<b id="forceValue">0.240 N</b><br>
+        方向状态：<b id="directionValue">垂直纸面向外（示意）</b>
+      </div>
+      <div class="formula">当前模型：F=BIL sinθ。只有 θ=90° 时才可简写为 F=BIL；θ=0° 时 F=0。</div>
+      <div class="status" id="status">垂直条件：安培力最大。B 方向、I 方向和 F 方向是三个不同方向。</div>
+    </section>
+  </div>
+</div>
+<script>
+(function(){
+  const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+  const theta=document.getElementById('theta'),thetaLabel=document.getElementById('thetaLabel');
+  const forceValue=document.getElementById('forceValue'),directionValue=document.getElementById('directionValue'),status=document.getElementById('status');
+  const playBtn=document.getElementById('playBtn'),parallel=document.getElementById('parallel'),perpendicular=document.getElementById('perpendicular');
+  const B=.4,I=2,L=.3;let playing=false,phase=0,last=performance.now();
+
+  function arrow(x1,y1,x2,y2,color,label){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.45),y2-10*Math.sin(a-.45));ctx.lineTo(x2-10*Math.cos(a+.45),y2-10*Math.sin(a+.45));ctx.closePath();ctx.fill();ctx.font='bold 14px system-ui';ctx.fillText(label,x2+7,y2-7);}
+  function setAngle(value,source){theta.value=String(value);thetaLabel.textContent=`${Math.round(value)}°`;parallel.classList.toggle('active',value===0);perpendicular.classList.toggle('active',value===90);const rad=value*Math.PI/180,F=B*I*L*Math.sin(rad);forceValue.textContent=`${F.toFixed(3)} N`;directionValue.textContent=F<.0005?'无非零受力方向':'垂直纸面向外（示意）';status.textContent=F<.0005?'平行边界：θ=0°，F=0；不能把 F=BIL 当作任意夹角通式。':value===90?'垂直条件：安培力最大。B 方向、I 方向和 F 方向是三个不同方向。':`斜交条件：只有电流的垂直分量 I sinθ 贡献安培力（${source||'手动'}）。`;render();}
+  function render(){
+    const g=ctx.createLinearGradient(0,0,0,canvas.height);g.addColorStop(0,'#10233c');g.addColorStop(1,'#07111f');ctx.fillStyle=g;ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#dbeafe';ctx.font='bold 17px system-ui';ctx.textAlign='left';ctx.fillText('磁场、试探方向与安培力边界',24,32);
+    for(let y=90;y<=390;y+=60)for(let x=55;x<=680;x+=125)arrow(x,y,x+58,y,'#38bdf8','');ctx.fillStyle='#38bdf8';ctx.font='bold 15px system-ui';ctx.fillText('B 向右',610,65);
+    const angle=Number(theta.value)*Math.PI/180,cx=365,cy=245,len=150;const dx=Math.cos(angle)*len/2,dy=-Math.sin(angle)*len/2;ctx.strokeStyle='#fbbf24';ctx.lineWidth=10;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(cx-dx,cy-dy);ctx.lineTo(cx+dx,cy+dy);ctx.stroke();arrow(cx-dx,cy-dy,cx+dx,cy+dy,'#f97316','I');ctx.lineCap='butt';
+    const force=B*I*L*Math.sin(angle);if(force>.0005){ctx.fillStyle='#ef4444';ctx.beginPath();ctx.arc(cx,cy,24,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(cx,cy,7,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fca5a5';ctx.font='bold 15px system-ui';ctx.fillText('F 出纸面',cx+34,cy+5);}else{ctx.strokeStyle='#94a3b8';ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx,cy,23,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#cbd5e1';ctx.font='bold 15px system-ui';ctx.fillText('F=0',cx+32,cy+5);}
+    ctx.strokeStyle='#a78bfa';ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx,cy,72,0,-angle,true);ctx.stroke();ctx.fillStyle='#c4b5fd';ctx.font='14px system-ui';ctx.fillText(`θ=${theta.value}°`,cx+76,cy-18);
+    ctx.save();ctx.translate(110,400);ctx.fillStyle='#ef4444';ctx.beginPath();ctx.moveTo(0,-28);ctx.lineTo(-8,0);ctx.lineTo(8,0);ctx.closePath();ctx.fill();ctx.fillStyle='#3b82f6';ctx.beginPath();ctx.moveTo(0,28);ctx.lineTo(-8,0);ctx.lineTo(8,0);ctx.closePath();ctx.fill();ctx.restore();ctx.fillStyle='#e2e8f0';ctx.font='13px system-ui';ctx.fillText('小磁针 N 极给出当地 B 方向',145,405);
+  }
+  function stop(){playing=false;playBtn.textContent='▶ 自动比较夹角';}
+  theta.addEventListener('input',()=>{stop();setAngle(Number(theta.value),'滑块');});parallel.addEventListener('click',()=>{stop();setAngle(0,'平行按钮');});perpendicular.addEventListener('click',()=>{stop();setAngle(90,'垂直按钮');});
+  playBtn.addEventListener('click',()=>{playing=!playing;playBtn.textContent=playing?'⏸ 暂停比较':'▶ 自动比较夹角';last=performance.now();});
+  document.getElementById('reset').addEventListener('click',()=>{stop();phase=0;setAngle(90,'重置');});
+  function loop(now){if(playing){const dt=Math.min((now-last)/1000,.05);last=now;phase+=dt;setAngle(45+45*Math.cos(phase*2),'自动演示');}requestAnimationFrame(loop);}setAngle(90);requestAnimationFrame(loop);
+})();
+</script>
+<script src="guided-lesson.js"></script>
+</body>
+</html>

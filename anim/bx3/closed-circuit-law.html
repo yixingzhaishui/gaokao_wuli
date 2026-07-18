@@ -19,6 +19,7 @@ canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab;backgr
 .chip b{color:#ffd166}
 .hint{margin-top:10px;background:#fff7e6;border-left:3px solid var(--gold);border-radius:6px;padding:9px 11px;font-size:13px;color:#5a6b7b;line-height:1.55}
 .formula{margin-top:10px;border-top:1px solid var(--line);padding-top:10px;font-size:13px;color:#334e68;line-height:1.7}
+.cases{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.cases button{font:inherit;border:1px solid var(--line);background:#fff;border-radius:7px;padding:7px;cursor:pointer}.cases button.on{background:#e0f2fe;border-color:#2c7be5;color:#1554ad;font-weight:800}
 @media(max-width:820px){.lab{grid-template-columns:1fr}}
 </style>
 </head>
@@ -26,7 +27,7 @@ canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab;backgr
 <div class="wrap">
   <h2>闭合电路：拖 R、ε、r 和 U-I 工作点</h2>
   <div class="lab">
-    <div class="stage"><canvas id="cv" width="720" height="450" aria-label="闭合电路欧姆定律实验台：电路俯视装置、U-I图像和数据记录"></canvas><div style="padding:6px 10px;display:flex;gap:12px;align-items:center;font-size:13px;border-top:1px solid #eef2f7"><button id="play-btn" style="font:inherit;border:1px solid #cbd5e1;background:#fff;border-radius:6px;padding:5px 12px;cursor:pointer">⏸ 暂停</button><span>状态：<b id="run-st">运行中</b></span></div></div>
+    <div class="stage"><canvas id="cv" width="720" height="450" aria-label="闭合电路欧姆定律实验台：电路俯视装置、U-I图像和数据记录" data-limit-cases="explicit-short-and-open"></canvas><div style="padding:6px 10px;display:flex;gap:12px;align-items:center;font-size:13px;border-top:1px solid #eef2f7"><button id="play-btn" style="font:inherit;border:1px solid #cbd5e1;background:#fff;border-radius:6px;padding:5px 12px;cursor:pointer">⏸ 暂停</button><span>状态：<b id="run-st">运行中</b></span></div></div>
     <section class="panel">
       <div class="read">
         <div class="chip">电动势 ε = <b id="ev">6.0</b> V</div>
@@ -36,6 +37,7 @@ canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab;backgr
         <div class="chip">路端电压 U = <b id="uv">5.00</b> V</div>
         <div class="chip">内压降 Ir = <b id="irv">1.00</b> V</div>
       </div>
+      <div class="cases"><button data-case="short">短路 R=0</button><button data-case="open">断路 I=0</button></div>
       <div class="hint"><b>观察任务</b>：拖金色 R 手柄，对照电路俯视装置、U-I 图像和数据记录，看 R 增大时 I 变小、U 变大；拖 ε 改纵截距，拖 r 改斜率。</div>
       <div class="formula"><b>画面绑定</b><br>U-I 图直线满足 U=ε-Ir，纵截距是 ε，斜率是 -r。外电路还满足 U=IR，所以工作点由电源直线和外阻关系共同决定。</div>
     </section>
@@ -44,21 +46,21 @@ canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab;backgr
 <script>
 (function(){
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
-let E=6,r=1,R=5,drag=null,phase=0,last=performance.now();
+let E=6,r=1,R=5,circuitCase='normal',drag=null,phase=0,last=performance.now();
 const els={ev:id('ev'),rv:id('rv'),Rv:id('Rv'),iv:id('iv'),uv:id('uv'),irv:id('irv')};
 function id(s){return document.getElementById(s)}
 function clamp(x,a,b){return Math.max(a,Math.min(b,x))}
-function I(){return E/(R+r)}
-function U(){return I()*R}
+function I(){return circuitCase==='open'?0:circuitCase==='short'?E/r:E/(R+r)}
+function U(){return circuitCase==='open'?E:circuitCase==='short'?0:I()*R}
 function pos(e){const rc=cv.getBoundingClientRect(),s=cv.width/rc.width;return{x:(e.clientX-rc.left)*s,y:(e.clientY-rc.top)*s}}
 function drawKnob(x,y,label,color){ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,10,0,7);ctx.fill();ctx.fillStyle=color;ctx.font='700 12px system-ui';ctx.textAlign='center';ctx.fillText(label,x,y-16)}
 function drawCircuit(){
   ctx.strokeStyle='#5b7089';ctx.lineWidth=6;ctx.lineJoin='round';ctx.beginPath();ctx.rect(80,105,300,210);ctx.stroke();
-  const rx=230+(R-1)/19*120;ctx.strokeStyle='#f0a500';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(175,105);for(let i=0;i<9;i++)ctx.lineTo(175+i*(rx-175)/8,105+(i%2?8:-8));ctx.stroke();drawKnob(rx,105,'拖 R','#f0a500');
+  const rx=circuitCase==='short'?175:circuitCase==='open'?350:230+(R-1)/19*120;ctx.strokeStyle='#f0a500';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(175,105);for(let i=0;i<9;i++)ctx.lineTo(175+i*(rx-175)/8,105+(i%2?8:-8));ctx.stroke();drawKnob(rx,105,circuitCase==='short'?'R=0':circuitCase==='open'?'断路':'拖 R','#f0a500');
   const ey=280-(E-2)/10*115;ctx.strokeStyle='#e03131';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(60,280);ctx.lineTo(60,ey);ctx.stroke();drawKnob(60,ey,'拖 ε','#e03131');
   const ry=360-(r-.2)/4.8*120;ctx.strokeStyle='#7b2cbf';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(115,360);ctx.lineTo(250,360);ctx.stroke();drawKnob(115+(360-ry)/120*135,360,'拖 r','#7b2cbf');
   for(let k=0;k<14;k++){const x=80+((phase+k*42)%300);ctx.fillStyle='#ffd166';ctx.beginPath();ctx.arc(x,315,4,0,7);ctx.fill()}
-  ctx.fillStyle='#102a43';ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillText(`I=ε/(R+r)=${I().toFixed(2)}A，U=IR=${U().toFixed(2)}V`,95,345);
+  ctx.fillStyle='#102a43';ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillText(circuitCase==='open'?`断路：I=0，U=ε=${U().toFixed(2)}V`:circuitCase==='short'?`短路：R=0，I=ε/r=${I().toFixed(2)}A，U=0`:`I=ε/(R+r)=${I().toFixed(2)}A，U=IR=${U().toFixed(2)}V`,95,345);
 }
 function drawGraph(){
   const gx=430,gy=340,gw=245,gh=245,Imax=12,Umax=12,Is=E/r;
@@ -70,15 +72,17 @@ function drawGraph(){
   ctx.strokeStyle='rgba(21,154,107,.6)';ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(gx,py);ctx.lineTo(px,py);ctx.lineTo(px,gy);ctx.stroke();ctx.setLineDash([]);
   ctx.fillStyle='#102a43';ctx.font='12px system-ui';ctx.textAlign='left';ctx.fillText('拖工作点',px+12,py-10);ctx.fillText('截距 ε='+E.toFixed(1)+'V；斜率 −r=−'+r.toFixed(1)+'V/A',gx+12,gy-gh+20);
 }
-function update(){els.ev.textContent=E.toFixed(1);els.rv.textContent=r.toFixed(1);els.Rv.textContent=R.toFixed(1);els.iv.textContent=I().toFixed(2);els.uv.textContent=U().toFixed(2);els.irv.textContent=(I()*r).toFixed(2)}
-function draw(){ctx.clearRect(0,0,cv.width,cv.height);const bg=ctx.createLinearGradient(0,0,0,cv.height);bg.addColorStop(0,'#f8fbff');bg.addColorStop(1,'#edf3f8');ctx.fillStyle=bg;ctx.fillRect(0,0,cv.width,cv.height);ctx.strokeStyle='rgba(16,42,67,.06)';for(let x=0;x<cv.width;x+=36){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,cv.height);ctx.stroke()}for(let y=0;y<cv.height;y+=36){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(cv.width,y);ctx.stroke()}drawCircuit();drawGraph();ctx.fillStyle='#102a43';ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillText(`U=ε-Ir=${E.toFixed(1)}-${I().toFixed(2)}×${r.toFixed(1)}=${U().toFixed(2)}V；短路电流 ε/r=${(E/r).toFixed(2)}A`,24,34);update()}
-cv.addEventListener('pointerdown',e=>{const p=pos(e),rx=230+(R-1)/19*120,ey=280-(E-2)/10*115,rkx=115+(360-(360-(r-.2)/4.8*120))/120*135;const gx=430,gy=340,gw=245,gh=245,px=gx+I()/12*gw,py=gy-U()/12*gh;if(Math.hypot(p.x-rx,p.y-105)<24)drag='R';else if(Math.hypot(p.x-60,p.y-ey)<24)drag='E';else if(Math.hypot(p.x-rkx,p.y-360)<24)drag='r';else if(Math.hypot(p.x-px,p.y-py)<24)drag='point'});
-cv.addEventListener('pointermove',e=>{if(!drag)return;const p=pos(e);if(drag==='R')R=clamp(1+(p.x-230)/120*19,1,20);if(drag==='E')E=clamp(2+(280-p.y)/115*10,2,12);if(drag==='r')r=clamp(.2+(p.x-115)/135*4.8,.2,5);if(drag==='point'){const ii=clamp((p.x-430)/245*12,.02,Math.min(12,E/r*.98));R=clamp((E-r*ii)/ii,1,20)}draw()});
+function update(){els.ev.textContent=E.toFixed(1);els.rv.textContent=r.toFixed(1);els.Rv.textContent=circuitCase==='open'?'∞':circuitCase==='short'?'0':R.toFixed(1);els.iv.textContent=I().toFixed(2);els.uv.textContent=U().toFixed(2);els.irv.textContent=(I()*r).toFixed(2);cv.dataset.circuitCase=circuitCase;cv.dataset.current=I().toFixed(4);cv.dataset.terminalVoltage=U().toFixed(4)}
+function draw(){ctx.clearRect(0,0,cv.width,cv.height);const bg=ctx.createLinearGradient(0,0,0,cv.height);bg.addColorStop(0,'#f8fbff');bg.addColorStop(1,'#edf3f8');ctx.fillStyle=bg;ctx.fillRect(0,0,cv.width,cv.height);ctx.strokeStyle='rgba(16,42,67,.06)';for(let x=0;x<cv.width;x+=36){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,cv.height);ctx.stroke()}for(let y=0;y<cv.height;y+=36){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(cv.width,y);ctx.stroke()}drawCircuit();drawGraph();ctx.fillStyle='#102a43';ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillText(circuitCase==='open'?`断路边界：I=0，U=ε=${E.toFixed(1)}V`:circuitCase==='short'?`短路边界：R=0，U=0，I=ε/r=${(E/r).toFixed(2)}A`:`U=ε-Ir=${E.toFixed(1)}-${I().toFixed(2)}×${r.toFixed(1)}=${U().toFixed(2)}V`,24,34);update()}
+cv.addEventListener('pointerdown',e=>{const p=pos(e),rx=circuitCase==='short'?175:circuitCase==='open'?350:230+(R-1)/19*120,ey=280-(E-2)/10*115,rkx=115+(360-(360-(r-.2)/4.8*120))/120*135;const gx=430,gy=340,gw=245,gh=245,px=gx+I()/12*gw,py=gy-U()/12*gh;if(Math.hypot(p.x-rx,p.y-105)<24)drag='R';else if(Math.hypot(p.x-60,p.y-ey)<24)drag='E';else if(Math.hypot(p.x-rkx,p.y-360)<24)drag='r';else if(Math.hypot(p.x-px,p.y-py)<24)drag='point'});
+cv.addEventListener('pointermove',e=>{if(!drag)return;const p=pos(e);if(drag==='R'){circuitCase='normal';R=clamp(1+(p.x-230)/120*19,1,20)}if(drag==='E')E=clamp(2+(280-p.y)/115*10,2,12);if(drag==='r')r=clamp(.2+(p.x-115)/135*4.8,.2,5);if(drag==='point'){circuitCase='normal';const ii=clamp((p.x-430)/245*12,.02,Math.min(12,E/r*.98));R=clamp((E-r*ii)/ii,1,20)}document.querySelectorAll('[data-case]').forEach(b=>b.classList.remove('on'));draw()});
 window.addEventListener('pointerup',()=>drag=null);
 function loop(now){if(window.__paused){requestAnimationFrame(loop);return;}const dt=Math.min((now-last)/1000,.05);last=now;phase+=I()*55*dt;draw();requestAnimationFrame(loop)}
 draw();requestAnimationFrame(loop);
+document.querySelectorAll('[data-case]').forEach(b=>b.onclick=()=>{circuitCase=b.dataset.case;document.querySelectorAll('[data-case]').forEach(x=>x.classList.toggle('on',x===b));draw()});
 var _pb=document.getElementById("play-btn");if(_pb)_pb.onclick=function(){window.__paused=!window.__paused;this.textContent=window.__paused?"▶ 播放":"⏸ 暂停";var st=document.getElementById("run-st");if(st)st.textContent=window.__paused?"已暂停":"运行中";};
 })();
 </script>
-<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script></body>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script><script src="guided-lesson.js"></script>
+</body>
 </html>

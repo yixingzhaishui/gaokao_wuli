@@ -36,11 +36,11 @@
 <body>
 <div class="lab">
   <div class="stage">
-    <canvas id="canvas" aria-label="电荷与起电实验台：电子转移、金属球接触和静电感应"></canvas>
+    <canvas id="canvas" aria-label="电荷与起电实验台：电子转移、金属球接触和静电感应" data-induction-sequence="approach-ground-disconnect-ground-remove-charge"></canvas>
     <div class="hint">拖动黄色手柄；每个模式都把读数和画面同步显示</div>
   </div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>拖动手柄，先看电子从哪里到哪里，再看 qA、qB 和 q总如何变化。切换到感应模式后，按顺序操作“接地”“移开带电体”。</div>
+    <div class="card task"><b>观察任务：</b>拖动手柄，先看电子从哪里到哪里，再看 qA、qB 和 q总如何变化。切换到感应模式后，必须按顺序操作“接地”“断开接地”“移开带电体”。</div>
     <button id="playBtn" style="width:100%">▶ 播放过程</button>
     <div class="card">
       <div class="title">选择起电过程</div>
@@ -94,7 +94,13 @@
       const ext=k, amount=Math.abs(k), dir=ext===0?1:Math.sign(ext);
       const near=-dir*amount, far=dir*amount;
       const final=-dir*amount;
-      return { ext, amount, near, far, final, valid:true, note: state.inductionStage===0 ? '只靠近、不接触：自由电子重新分布，导体总电荷仍为 0。' : state.inductionStage===1 ? '接地后电子从地面流入或流出；带电体仍未接触导体。' : '移开带电体后，导体保留与外部带电体相反的电荷。' };
+      const notes=[
+        '只靠近、不接触：自由电子重新分布，导体总电荷仍为 0。',
+        '接地后电子可从大地流入或流出；外部带电体仍保持靠近。',
+        '先断开接地：净电荷已不能再经大地回流，外部带电体仍保持靠近。',
+        '最后移开带电体：导体保留与外部带电体相反的净电荷。'
+      ];
+      return { ext, amount, near, far, final, valid:true, note:notes[state.inductionStage] };
     }
     if(state.mode==='quantum'){
       return { a:state.invalid?1.5:k, b:0, sum:state.invalid?1.5:k, valid:!state.invalid, note:state.invalid?'1.5e 不是元电荷 e 的整数倍，孤立带电体不能带这种电荷。':'n 是整数，q=ne 检查通过。' };
@@ -109,14 +115,14 @@
   function drawElectrons(count,x1,x2,y){ const total=Math.min(12,Math.abs(Math.round(count))); for(let i=0;i<total;i++){ const t=total===1?.5:i/(total-1); const x=x1+(x2-x1)*t; ctx.fillStyle='#2c7be5'; ctx.beginPath(); ctx.arc(x,y+(i%2?10:-10),8,0,Math.PI*2); ctx.fill(); text('e−',x,y+(i%2?10:-10),'#fff','center',8,'700'); } }
   function responsive(){ const width=clamp(canvas.parentElement.getBoundingClientRect().width,320,920); state.W=width; state.H=width<600?620:540; state.dpr=Math.min(2,root.devicePixelRatio||1); canvas.width=Math.round(width*state.dpr); canvas.height=Math.round(state.H*state.dpr); canvas.style.height=state.H+'px'; ctx.setTransform(state.dpr,0,0,state.dpr,0,0); draw(); }
   function draw(){
-    const W=state.W,H=state.H,d=modeData(), mobile=W<600; ctx.clearRect(0,0,W,H); ctx.fillStyle='#f7f9fc'; ctx.fillRect(0,0,W,H); box(12,16,W-24,mobile?330:270,'#fff','#d9e2ec'); text(state.mode==='friction'?'电子从一个物体转移到另一个物体':state.mode==='contact'?'相同金属球接触，电荷平均分配':state.mode==='induction'?'靠近 → 接地 → 移开：静电感应全过程':'电荷量子化：q=ne',W/2,42,'#102a43','center',mobile?16:18,'700');
+    const W=state.W,H=state.H,d=modeData(), mobile=W<600; ctx.clearRect(0,0,W,H); ctx.fillStyle='#f7f9fc'; ctx.fillRect(0,0,W,H); box(12,16,W-24,mobile?330:270,'#fff','#d9e2ec'); text(state.mode==='friction'?'电子从一个物体转移到另一个物体':state.mode==='contact'?'相同金属球接触，电荷平均分配':state.mode==='induction'?'靠近 → 接地 → 断地 → 移开：感应起电全过程':'电荷量子化：q=ne',W/2,42,'#102a43','center',mobile?15:18,'700');
     const ax=W*.28,bx=W*.72,y=mobile?170:160;
     if(state.mode==='friction'){
       drawCharge(ax,y,d.a,'物体 A',fmt(d.a)); drawCharge(bx,y,d.b,'物体 B',fmt(d.b)); const dir=n()>=0?1:-1; arrow(dir>0?ax+48:bx-48,y,dir>0?bx-48:ax+48,y,'#2c7be5'); text(dir>0?'电子 A → B':'电子 B → A',W/2,y-36,'#2c7be5','center',13,'700'); drawElectrons(n(),ax+82,bx-82,y+40); if(state.playing){ const from=dir>0?ax+58:bx-58,to=dir>0?bx-58:ax+58,x=from+(to-from)*state.progress; ctx.fillStyle='#ffd166'; ctx.strokeStyle='#8a5a00'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(x,y,10,0,Math.PI*2); ctx.fill(); ctx.stroke(); text('e−',x,y,'#5a3d00','center',9,'700'); }
     } else if(state.mode==='contact'){
       drawCharge(ax,y,d.initialA,'A 接触前',fmt(d.initialA)); drawCharge(bx,y,d.initialB,'B 接触前',fmt(d.initialB)); arrow(ax+50,y,bx-50,y,'#087f5b'); text('金属球接触',W/2,y-36,'#087f5b','center',13,'700'); const p=state.playing?state.progress:1; const qa=d.initialA+(d.a-d.initialA)*p,qb=d.initialB+(d.b-d.initialB)*p; box(W*.16,mobile?250:238,W*.68,42,'#edf9f3','#74c69d'); text('接触后：qA=qB=('+fmt(d.total)+')/2='+fmt(d.a),W/2,mobile?271:259,'#087f5b','center',mobile?12:13,'700'); text('释放后',W/2,mobile?309:297,'#486581','center',12); drawCharge(W*.42,mobile?305:293,qa,'A',fmt(qa)); drawCharge(W*.58,mobile?305:293,qb,'B',fmt(qb));
     } else if(state.mode==='induction'){
-      const ext=d.ext, bodyX=W*.48, bodyY=y+4; if(state.inductionStage<2) drawCharge(W*.82,y,ext,'外部带电体',fmt(ext)); else text('外部带电体已移开',W*.72,y,'#486581','center',13,'700'); box(W*.31,y-48,W*.34,104,'#eef2ff','#9fb3c8'); text('金属导体',bodyX,y-28,'#102a43','center',13,'700'); if(state.inductionStage===0){ text(d.near+'e',bodyX-W*.115,y+14,'#2c7be5','center',16,'700'); text(d.far+'e',bodyX+W*.115,y+14,'#c92a2a','center',16,'700'); text('近侧',bodyX-W*.115,y+38,'#486581','center',11); text('远侧',bodyX+W*.115,y+38,'#486581','center',11); text('q导体总=0e',bodyX,y+82,'#087f5b','center',13,'700'); } else if(state.inductionStage===1){ text('电子 ↔ 地面',bodyX,y+10,'#2c7be5','center',15,'700'); arrow(bodyX,y+54,bodyX,y+82,'#2c7be5'); text('接地中',bodyX,y+94,'#2c7be5','center',12,'700'); } else { text(fmt(d.final),bodyX,y+10,chargeColor(d.final),'center',20,'700'); text('导体保留电荷',bodyX,y+40,'#087f5b','center',12,'700'); } if(state.inductionStage<2){ text('未接触导体：先观察电荷重新分布',W/2,mobile?266:254,'#486581','center',12); }
+      const ext=d.ext, bodyX=W*.48, bodyY=y+4; if(state.inductionStage<3) drawCharge(W*.82,y,ext,'外部带电体',fmt(ext)); else text('外部带电体已移开',W*.72,y,'#486581','center',13,'700'); box(W*.31,y-48,W*.34,104,'#eef2ff','#9fb3c8'); text('金属导体',bodyX,y-28,'#102a43','center',13,'700'); if(state.inductionStage===0){ text(d.near+'e',bodyX-W*.115,y+14,'#2c7be5','center',16,'700'); text(d.far+'e',bodyX+W*.115,y+14,'#c92a2a','center',16,'700'); text('近侧',bodyX-W*.115,y+38,'#486581','center',11); text('远侧',bodyX+W*.115,y+38,'#486581','center',11); text('q导体总=0e',bodyX,y+82,'#087f5b','center',13,'700'); } else if(state.inductionStage===1){ text('电子 ↔ 地面',bodyX,y+10,'#2c7be5','center',15,'700'); arrow(bodyX,y+54,bodyX,y+82,'#2c7be5'); text('接地中：不可先移开带电体',bodyX,y+94,'#2c7be5','center',11,'700'); } else if(state.inductionStage===2){ text(fmt(d.final),bodyX,y+8,chargeColor(d.final),'center',20,'700'); text('接地已断开',bodyX,y+36,'#087f5b','center',12,'700'); text('外部带电体仍靠近',bodyX,y+94,'#486581','center',11,'700'); } else { text(fmt(d.final),bodyX,y+10,chargeColor(d.final),'center',20,'700'); text('导体保留净电荷',bodyX,y+40,'#087f5b','center',12,'700'); } if(state.inductionStage<3){ text('外部带电体始终未接触导体',W/2,mobile?266:254,'#486581','center',12); }
     } else {
       drawCharge(W/2,y,d.a,'带电体',fmt(d.a)); text(d.valid?'q=ne，n 为整数':'q=+1.5e，n 不是整数',W/2,y-46,d.valid?'#087f5b':'#c92a2a','center',15,'700'); text(d.valid?'每拖一格就是一个元电荷':'这个电荷量不能单独存在',W/2,y+84,d.valid?'#486581':'#c92a2a','center',13,'700');
     }
@@ -125,7 +131,7 @@
   }
   function updatePanel(d){
     const k=n(); els.nText.textContent=(k>0?'+':'')+k+(state.mode==='friction'?' 个':' e'); els.nLabel.firstChild.textContent=state.mode==='contact'?'A 初始电荷 qA0/e ':state.mode==='induction'?'外部带电体 q/e ':state.mode==='quantum'?'整数 n ':'电子转移数 n ';
-    let html=''; if(state.mode==='induction'){ const stage=['靠近（未接触）','接地','移开后'][state.inductionStage]; html='<div>步骤：<b>'+stage+'</b></div><div>外部带电体 q=<b>'+fmt(d.ext)+'</b></div><div>导体 q总=<b>'+fmt(state.inductionStage===0?0:d.final)+'</b></div>'+(state.inductionStage<2?'<div>近侧/远侧：<b>'+fmt(d.near)+'</b> / <b>'+fmt(d.far)+'</b></div>':'<div>最终结果：<b>外部带电体已移开，导体保留 '+fmt(d.final)+'</b></div>')+'<div>物理检查：<b>不接触导体</b></div>'; els.inductionStep.style.display='block'; els.inductionStep.textContent=state.inductionStage===0?'接地':state.inductionStage===1?'移开带电体':'重置感应'; }
+    let html=''; if(state.mode==='induction'){ const stage=['靠近（未接触）','接地中','接地已断开、带电体仍靠近','带电体移开后'][state.inductionStage]; html='<div>步骤：<b>'+stage+'</b></div><div>外部带电体 q=<b>'+fmt(d.ext)+'</b></div><div>导体 q总=<b>'+fmt(state.inductionStage===0?0:d.final)+'</b></div>'+(state.inductionStage<3?'<div>近侧/远侧示意：<b>'+fmt(d.near)+'</b> / <b>'+fmt(d.far)+'</b></div>':'<div>最终结果：<b>导体保留 '+fmt(d.final)+'</b></div>')+'<div>物理检查：<b>'+(state.inductionStage===1?'接地未断，不得移开带电体':'外部带电体不接触导体')+'</b></div>'; els.inductionStep.style.display='block'; els.inductionStep.textContent=state.inductionStage===0?'接地':state.inductionStage===1?'断开接地':state.inductionStage===2?'移开带电体':'重置感应'; }
     else if(state.mode==='contact'){ html='<div>接触前：qA=<b>'+fmt(d.initialA)+'</b>，qB=<b>'+fmt(d.initialB)+'</b></div><div>接触前总电荷：<b>'+fmt(d.total)+'</b></div><div>接触后：qA=qB=<b>'+fmt(d.a)+'</b></div><div>q总（两球）：<b>'+fmt(d.total)+'</b></div><div>公式：<b>('+formulaFmt(d.initialA)+' '+formulaFmt(d.initialB)+')/2='+fmt(d.a)+'</b></div>'; els.inductionStep.style.display='none'; }
     else { html='<div>qA=<b>'+fmt(d.a)+'</b>　qB=<b>'+fmt(d.b)+'</b></div><div>q总=<b>'+fmt(d.sum)+'</b>　n=<b>'+k+'</b></div><div>量子化检查：<b style="color:'+(d.valid?'#ffd166':'#ff9b9b')+'">'+(d.valid?'通过':'不可能')+'</b></div>'; els.inductionStep.style.display='none'; }
     els.readout.innerHTML=html; els.status.textContent=d.note; els.status.style.background=d.valid?'#e6fffa':'#fff0f0'; els.status.style.color=d.valid?'#087f5b':'#c92a2a'; els.status.style.borderColor=d.valid?'#38b2ac':'#ff6b6b';
@@ -141,7 +147,7 @@
   els.play.addEventListener('click',()=>{ if(state.playing){ state.playing=false; els.play.textContent='▶ 继续播放'; if(state.raf)root.cancelAnimationFrame(state.raf); draw(); return; } state.playing=true; state.started=0; state.progress=0; els.play.textContent='⏸ 暂停动画'; state.raf=root.requestAnimationFrame(playFrame); });
   document.querySelectorAll('button[data-mode]').forEach(btn=>btn.addEventListener('click',()=>{ state.mode=btn.dataset.mode; state.invalid=false; state.inductionStage=0; document.querySelectorAll('button[data-mode]').forEach(b=>b.classList.toggle('on',b===btn)); draw(); }));
   document.querySelectorAll('button[data-case]').forEach(btn=>btn.addEventListener('click',()=>{ const id=btn.dataset.case; if(id==='glass'){state.mode='friction';setN(6);} if(id==='rubber'){state.mode='friction';setN(-6);} if(id==='share'){state.mode='contact';setN(6);} if(id==='invalid'){state.mode='quantum';setN(2);state.invalid=true;} document.querySelectorAll('button[data-mode]').forEach(b=>b.classList.toggle('on',b.dataset.mode===state.mode)); state.inductionStage=0; draw(); }));
-  els.inductionStep.addEventListener('click',()=>{ if(state.mode!=='induction')return; state.inductionStage=state.inductionStage===2?0:state.inductionStage+1; draw(); });
+  els.inductionStep.addEventListener('click',()=>{ if(state.mode!=='induction')return; state.inductionStage=state.inductionStage===3?0:state.inductionStage+1; draw(); });
   if(root.ResizeObserver){ new ResizeObserver(responsive).observe(canvas.parentElement); } else root.addEventListener('resize',responsive); responsive();
   root.__ANIM_TEST_STATE__={get:()=>({mode:state.mode,n:n(),inductionStage:state.inductionStage,invalid:state.invalid,readout:els.readout.textContent.trim()})};
 })();
@@ -166,5 +172,6 @@
   }
 })();
 </script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

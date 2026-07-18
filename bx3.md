@@ -5,7 +5,7 @@
 
 ## 3.1 静电场 <h3 id="electrostatic-field"></h3>
 
-<h4 id="charge">B3-01 电荷与起电 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="charge">B3-01 电荷与起电 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -39,10 +39,10 @@
 
 图中：丝绸摩擦玻璃棒 → 玻璃棒带正电（失去电子）；两个正电荷之间产生斥力。
 
-**交互探究。**
+#### 本页主问题与引导演示
 <iframe src="anim/bx3/charge-electrification.html" width="100%" height="760" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
-可直接拖动：黄色电子手柄。摩擦起电看电子 A↔B 转移；接触起电看相同金属球的守恒与平分；静电感应按“靠近→接地→移开”完成全过程；元电荷检查用非整数按钮制造一个明确的错误案例。所有读数都由画面当前状态实时计算。
+可直接拖动：黄色电子手柄。摩擦起电看电子 A↔B 转移；接触起电看相同金属球的守恒与平分；感应起电按“靠近→接地→先断开接地→再移开带电体”完成全过程；元电荷检查用非整数按钮制造一个明确的错误案例。所有读数都由画面当前状态实时计算。
 
 **证据任务。**
 
@@ -52,11 +52,11 @@
 
 - 摩擦模式把手柄向右：看电子从 A 到 B，A 失电子带正电、B 得电子带负电，$q_{\text{总}}$仍为 `0`。
 - 接触模式：先读接触前 $qA=+6e、qB=-2e$，再播放接触过程，核对 $qA=qB=(+6e-2e)/2=+2e$。
-- 静电感应：先只观察“靠近”时导体近侧与远侧的异号分布；再点“接地”，最后点“移开带电体”，看导体留下与外部带电体相反的电荷。全过程不让带电体接触导体。
+- 感应起电：先只观察“靠近”时导体近侧与远侧的异号分布；再点“接地”，随后必须先点“断开接地”，最后才点“移开带电体”。若接地尚未断开就移走带电体，电子仍可经大地回流，导体不会按本流程保留目标净电荷。全过程不让带电体接触导体。
 - 元电荷模式点“非整数尝试”：看 `1.5e` 被标为“不可能”，因为 $q=ne$ 中 `n` 必须是整数。
 
 #### 规律、证据与核心概念
-- **起电三种方式**：摩擦起电（电子转移）、接触起电（电荷共享）、感应起电（电荷重新分布）。
+- **起电三种方式**：摩擦起电（电子转移）、接触起电（电荷共享）、感应起电（先由静电感应发生电荷重新分布，再经接地、断地与移开带电体得到净电荷）。只靠近而不接地时只是静电感应，不等于导体已经带上净电荷。
 - **电荷守恒**：电荷不会凭空产生或消失，只能从一个物体转移到另一个物体，或从物体的一部分转移到另一部分。
 - **元电荷**：e = 1.6×10⁻¹⁹ C，任何带电体的电荷量都是 e 的整数倍。
 
@@ -70,7 +70,7 @@
 
 #### 边界检查与易错点
 - 认为摩擦创造了电荷（实际是电子转移，电荷守恒）。
-- 认为感应起电需要接触（实际只需靠近，利用电荷重新分布）。
+- 认为只要靠近就完成感应起电（只靠近时导体总电荷仍可为零；要得到净电荷，还必须按“接地→断地→移开带电体”的顺序操作）。
 
 #### 例题与训练（来源审核中）
 
@@ -82,7 +82,7 @@
 
 ---
 
-<h4 id="coulomb-law">B3-02 库仑定律 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="coulomb-law">B3-02 库仑定律 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -110,7 +110,7 @@
   <path d="M256 60 L280 60" stroke="#e03131" stroke-width="2" marker-end="url(#cl2)"/>
   <defs><marker id="cl2" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0 0 L5 3 L0 6" fill="#e03131"/></marker></defs>
   <text x="160" y="45" font-size="11" fill="#486581" text-anchor="middle">r</text>
-  <text x="160" y="72" font-size="11" fill="#e03131" text-anchor="middle">F = kq₁q₂/r²</text>
+  <text x="160" y="72" font-size="11" fill="#e03131" text-anchor="middle">F = k|q₁q₂|/r²</text>
 </svg>
 
 图中：两个同号正电荷之间产生斥力 F，力沿连线方向，大小由库仑定律决定。
@@ -118,7 +118,7 @@
 **动态表征。**
 自动演示：两个点电荷之间的力随距离和电荷量变化。
 
-**交互探究。**
+#### 本页主问题与引导演示
 <iframe src="anim/bx3/coulomb.html" width="100%" height="560" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 可直接拖动：画面里的任一点电荷来改变两电荷中心距离 `r`。下方滑块可辅助调整 `q₁、q₂、r`。实时变化：力的大小和方向（斥力/引力）、公式读数和距离读数。
@@ -134,7 +134,7 @@
 - 把 q₁ 拖到负值，看力从斥力（红色向外）变引力（蓝色向内）。
 
 #### 规律、证据与核心概念
-库仑通过扭秤实验（1785 年）精确测量了两个点电荷之间的作用力，发现：F = k·q₁q₂/r²。其中 k = 9×10⁹ N·m²/C² 为静电力常量。这是实验定律，不是理论推导。
+库仑通过扭秤实验（1785 年）精确测量了两个点电荷之间的作用力。力的大小为 $F=k|q_{1}q_{2}|/r^{2}$，其中 $k=9×10^{9}\ \mathrm{N·m^{2}/C^{2}}$ 为静电力常量；电荷正负只用于判断沿连线相斥还是相吸。这是实验定律，不是理论推导。
 
 **概念辨析。**
 - **点电荷**：当带电体的尺寸远小于它们之间的距离时，可视为点电荷（类似质点模型）。
@@ -142,7 +142,7 @@
 - **叠加**：多个电荷对某一电荷的作用力，等于各电荷单独存在时作用力的矢量和。
 
 #### 公式、变量、单位与条件
-- F = k·q₁q₂/r² → 图中力箭头长度
+- $F=k|q_{1}q_{2}|/r^{2}$ → 图中非负的力箭头长度；$q_{1}q_{2}$ 的符号另用于判断相斥或相吸
 - k = 9×10⁹ N·m²/C² → 比例系数
 - r → 可直接拖动的两电荷中心距离
 - q₁、q₂ → 图中两个电荷的值
@@ -160,7 +160,7 @@
 **解题路径。**
 1. 判断是否满足点电荷条件；
 2. 确定每个电荷的正负，判断力的方向（斥力或引力）；
-3. 用 F = kq₁q₂/r² 算大小；
+3. 用 $F=k|q_{1}q_{2}|/r^{2}$ 算大小，再由电荷正负判断方向；
 4. 多个力时用矢量合成（平行四边形或正交分解）。
 
 #### 边界检查与易错点
@@ -172,7 +172,7 @@
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B3-02）
 
-<h4 id="electric-field">B3-03 电场强度 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="electric-field">B3-03 电场强度 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -206,7 +206,7 @@
 **动态表征。**
 自动演示：电场线从正电荷向外辐射，试探点处显示 E 矢量。
 
-**交互探究。**
+#### 本页主问题与引导演示
 <iframe src="anim/bx3/charges-field.html" width="100%" height="580" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 
@@ -261,7 +261,7 @@
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B3-03）
 
-<h4 id="field-lines">B3-04 电场线 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="field-lines">B3-04 电场线 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 #### 课标定位与学习目标
@@ -291,7 +291,7 @@
 
 图中：电场线从正电荷出发，到负电荷终止。线越密处场强越大。
 
-**交互探究。**
+#### 本页主问题与引导演示
 <iframe src="anim/bx3/field-lines.html" width="100%" height="580" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 可直接拖动：红/蓝源电荷和黄色试探电荷。默认显示电场线，也可切回场矢量。拖动源电荷时，电场线实时重排；拖动试探电荷时，绿色 `E` 箭头显示该点电场线切线方向。
@@ -331,7 +331,7 @@
 
 ---
 
-<h4 id="equipotential">B3-05 等势面 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="equipotential">B3-05 等势面 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -364,12 +364,13 @@
 
 
 
+#### 本页主问题与引导演示
+<iframe src="anim/bx3/equipotential.html" width="100%" height="640" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
+
 > **公式首次使用卡**：适用边界——等势面上任意两点电势差为零；静电场中电场线与等势面正交；W=qU 的正负必须同时使用电荷符号和规定的始末点。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
 
 动画演示：黄色探针被外力先沿同一条等势线缓慢拖动，电势 φ 不变、$\Delta \varphi =0$、$W=q\Delta \varphi =0$；再跨到另一条等势线，电势读数改变，电场力做功不再为零。注意这不是电荷自由释放后的运动轨迹：自由正电荷会沿电场方向加速，而不是自动沿等势线运动。
-
-**交互探究。**
-<iframe src="anim/bx3/equipotential.html" width="100%" height="640" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 可直接拖动对象：黄色试探电荷、点电荷模型中的红色源电荷。可切换点电荷电场与匀强电场，可打开“锁定等势面拖动”。锁定模式表示“外力拖着探针沿等势线测量”，不表示真实自由运动。
 
@@ -413,7 +414,7 @@
 
 ---
 
-<h4 id="potential-difference">B3-06 电势差 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="potential-difference">B3-06 电势差 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -450,12 +451,13 @@
 
 
 
-> **公式首次使用卡**：适用边界——U = Ed 仅适用于匀强电场；W = qU 适用于任何电场；d 必须是沿电场方向的距离。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
+#### 本页主问题与引导演示
+<iframe src="anim/bx3/potential-difference.html" width="100%" height="580" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
+
+> **公式首次使用卡**：适用边界——$U=Ed$ 仅适用于匀强静电场；$W=qU$ 用于静电场中电场力做功；$d$ 必须是位移沿电场方向的有向分量。时变磁场产生的感生电场一般不是保守场，不能把本页路径无关结论直接推广过去。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
 
 自动演示：黄色电荷从 A 点移动到 B 点，画面同步显示沿电场方向的距离 `d`、电势差 $UAB=Ed$ 和电场力做功 $WAB=qUAB$。
-
-**交互探究。**
-<iframe src="anim/bx3/potential-difference.html" width="100%" height="580" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 可直接拖动：蓝色 B 点、紫色 E 箭头端点、底部 q 滑钮。实时变化：沿电场方向距离 `d`、电势差 $UAB=Ed$、电场力做功 $WAB=qUAB$。
 
@@ -470,7 +472,7 @@
 **概念辨析。**
 - **电势差**：UAB = φA - φB，标量，有正负。
 - **匀强电场**：U = Ed（d 沿电场方向的距离）。
-- **与路径无关**：电场力做功只与起止位置有关，电场力是保守力。
+- **与路径无关**：静电场中的电场力做功只与起止位置有关，静电力是保守力。
 - **电势降低方向**：沿电场线方向电势降低。
 
 #### 公式、变量、单位与条件
@@ -484,7 +486,7 @@
 
 **适用边界。**
 - U = Ed 仅适用于匀强电场。
-- W = qU 适用于任何电场。
+- $W=qU$ 用于静电场中电场力做功；感生电场一般不存在全局单值电势，不能直接套用本页路径无关结论。
 - d 必须是沿电场方向的距离。
 
 #### 边界检查与易错点
@@ -497,7 +499,7 @@
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B3-06）
 
-<h4 id="electric-pe">B3-07 电势能 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="electric-pe">B3-07 电势能 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -510,6 +512,10 @@
 
 #### 情境与现象
 
+
+
+#### 本页主问题与引导演示
+<iframe src="anim/bx3/electric-potential-energy.html" width="100%" height="610" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 
 > **公式首次使用卡**：适用边界——电势能等于电荷量与所在点电势的乘积，但数值依赖零电势面选择；真正与做功直接对应的是电势能变化；正负电荷移动时必须保留电荷符号。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
@@ -537,9 +543,6 @@
 
 **动态表征。**
 动画演示：黄色电荷从 A 点移到 B 点，右侧同步比较 $EpA=q\varphi A$、$EpB=q\varphi B$ 和 $WAB=EpA-EpB=-\Delta E_{p}$。当 q 变成负值时，电势高低与电势能大小的对应关系会反过来。
-
-**交互探究。**
-<iframe src="anim/bx3/electric-potential-energy.html" width="100%" height="610" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 可直接拖动：绿色 A 点、黄色 B 电荷、底部 q 滑钮。实时变化：两点电势、两点电势能、电场力做功和能量柱。
 
@@ -587,7 +590,7 @@
 
 ---
 
-<h4 id="electric-work">B3-08 电场力做功 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="electric-work">B3-08 电场力做功 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -601,6 +604,10 @@
 
 #### 情境与现象
 
+
+
+#### 本页主问题与引导演示
+<iframe src="anim/bx3/electric-work.html" width="100%" height="610" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 
 > **公式首次使用卡**：适用边界——W=qUAB 适用于静电力做功；静电力是保守力；匀强电场中也可写成 W=qEd，但 d 必须取沿电场方向的位移分量；若题目还涉及重力、外力或动能变化，要和动能定理、能量守恒联合使用。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
@@ -625,9 +632,6 @@
 **动态表征。**
 动画演示：黄色电荷沿橙色弯曲路径从 A 到 B，路径可以变长变弯，但直线、折线、弯曲路径的做功读数始终相同。
 
-**交互探究。**
-<iframe src="anim/bx3/electric-work.html" width="100%" height="610" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
-
 可直接拖动：A 点、B 点、橙色路径控制点、底部 q 滑钮。实时变化：`UAB`、三条路径做功、橙色路径长度。
 
 **证据任务。**
@@ -638,7 +642,7 @@
 
 #### 规律、证据与核心概念
 - **做功公式**：W = qUAB = q(φA - φB)。
-- **与路径无关**：电场力是保守力，做功只与起止位置有关。
+- **与路径无关**：静电力是保守力，做功只与起止位置有关。
 - **正负判断**：正电荷沿电场方向移动 → W > 0；逆电场方向 → W < 0。
 - **动能定理**：W = ΔEₖ（只有电场力做功时）。
 
@@ -657,7 +661,7 @@
 - 若题目还涉及重力、外力或动能变化，要和动能定理、能量守恒联合使用。
 
 #### 边界检查与易错点
-- 认为电场力做功与路径有关（电场力是保守力，与路径无关）。
+- 认为静电力做功与路径有关（静电力是保守力，与路径无关）；也不要反过来把这个结论推广到时变磁场产生的感生电场。
 - 忘记 W = qU 中 q 要带正负号。
 - 把路径长度当作 `d` 代入 $W=qEd$。
 - 只看电荷运动方向，不先判断 `UAB` 的正负。
@@ -674,7 +678,7 @@
 
 ---
 
-<h4 id="capacitor">B3-09 电容器 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="capacitor">B3-09 电容器 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -709,7 +713,7 @@
 **动态表征。**
 动画演示：电容器接上电源后两板带等量异号电荷；拖开极板时，接电源与断电源两种状态下 `U、Q、E、C` 的变化不同。
 
-**交互探究。**
+#### 本页主问题与引导演示
 <iframe src="anim/bx3/capacitor-lab.html" width="100%" height="610" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 可直接拖动：蓝色下极板改变板距 `d`、金色右边缘改变极板面积 `S`、底部滑钮改变电源电压或固定电量。可切换“接电源 U 不变 / 断电源 Q 不变”。
@@ -763,7 +767,7 @@
 
 ---
 
-<h4 id="capacitance">B3-10 电容 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="capacitance">B3-10 电容 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -774,8 +778,14 @@
 - 高考功能：选择题 / 计算题 / 实验题
 - 前置知识：B3-09 电容器
 
+#### 本页主问题与引导演示
+<iframe src="anim/bx3/capacitor.html" width="100%" height="580" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
+
+> **公式首次使用卡**：适用边界——$C=Q/U$ 是定义式，适用于任何电容器；$C=\varepsilon _{0}S/d$ 只用于真空（空气近似）的理想平行板电容器，填充均匀介质时用 $C=\varepsilon S/d$，并忽略边缘效应。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
+
 #### 情境与现象
-电容是电容器储存电荷本领的物理量。C = Q/U。对平行板电容器，C = ε₀S/d。
+电容是电容器储存电荷本领的物理量，定义式为 $C=Q/U$。对理想平行板电容器，真空（空气近似）中 $C=\varepsilon _{0}S/d$；填充均匀介质时写成 $C=\varepsilon S/d$。
 
 **静态表征。**
 <svg viewBox="0 0 320 140" width="100%" style="max-width:480px">
@@ -783,22 +793,14 @@
   <rect x="60" y="100" width="200" height="5" fill="#2c7be5"/>
   <text x="160" y="22" font-size="10" fill="#e03131" text-anchor="middle">极板面积 S</text>
   <text x="30" y="70" font-size="10" fill="#486581">d</text>
-  <text x="160" y="70" font-size="12" fill="#243b53" text-anchor="middle">C = ε₀S/d</text>
+  <text x="160" y="70" font-size="12" fill="#243b53" text-anchor="middle">C = εS/d</text>
   <text x="160" y="130" font-size="10" fill="#486581" text-anchor="middle">Q = CU</text>
 </svg>
 
 图中：平行板电容器电容 C 与极板面积 S 成正比，与板间距 d 成反比。
 
 **动态表征。**
-
-
-
-> **公式首次使用卡**：适用边界——C = Q/U 是定义式，适用于任何电容器；C = ε₀S/d 仅适用于平行板电容器。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
-
 自动演示：拖动板距 `d` 和极板面积 `S` 时，电容 $C=\varepsilon _{0}S/d$ 随结构改变；只拖电源电压或固定电量时，`Q、U` 改变，但同一结构下 `C` 不变。
-
-**交互探究。**
-<iframe src="anim/bx3/capacitor.html" width="100%" height="580" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 可直接拖动：蓝色下极板改变板距 `d`、金色右边缘改变面积 `S`、底部滑钮改变电源电压或固定电量。可切换“接电源 U 不变 / 断电源 Q 不变”。实时变化：电容 $C=\varepsilon _{0}S/d$、电量 $Q=CU$、场强 $E\approx U/d$。
 
@@ -809,11 +811,11 @@
 - 切到断电源模式后拖动 d，看 Q 不变时 U 如何变化，理解 $C=Q/U$ 是定义式，不表示 C 由 Q、U 决定。
 
 #### 规律、证据与核心概念
-电容 C = Q/U 是定义式。对平行板电容器，实验和理论推导得到 C = ε₀S/d（ε₀ 为真空介电常数）。电容由电容器自身结构决定，与是否带电无关。
+电容 $C=Q/U$ 是定义式。理想平行板电容器在真空（空气近似）中有 $C=\varepsilon _{0}S/d$；若极板间填充均匀介质，则用该介质的介电常数 $\varepsilon$，写成 $C=\varepsilon S/d$。电容由结构和介质决定，与是否带电无关。
 
 **概念辨析。**
 - **定义**：C = Q/U（Q 为一块板的电量，U 为两板电压）。
-- **平行板**：C = ε₀S/d。
+- **平行板**：真空（空气近似）中 $C=\varepsilon _{0}S/d$；均匀介质中 $C=\varepsilon S/d$。
 - **单位**：法拉 F，1 F = 10⁶ μF = 10¹² pF。
 - **由结构决定**：C 与 Q、U 无关，只由 S、d、介质决定。
 
@@ -828,7 +830,7 @@
 
 **适用边界。**
 - C = Q/U 是定义式，适用于任何电容器。
-- C = ε₀S/d 仅适用于平行板电容器。
+- $C=\varepsilon _{0}S/d$ 仅适用于真空（空气近似）的理想平行板电容器；均匀介质中应改用 $\varepsilon$。
 
 #### 边界检查与易错点
 - 认为 C 与 Q 或 U 有关（C 由结构决定，与 Q、U 无关）。
@@ -844,7 +846,7 @@
 
 ---
 
-<h4 id="current">B3-11 电流 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="current">B3-11 电流 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -859,9 +861,13 @@
 
 
 
-> **公式首次使用卡**：适用边界——I=Q/t 是电流定义式；稳恒电流中各截面电流相同；I=nqSv 是微观模型，适用于载流子密度、截面积、漂移速度可近似稳定的导体；金属中载流子是电子；电解液、半导体中载流子情况可能不同。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
+#### 本页主问题与引导演示
+<iframe src="anim/bx3/current.html" width="100%" height="610" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
-电荷的定向移动形成电流。真正定义电流时，不是看单个电荷跑多快，而是看单位时间内有多少电荷穿过某个截面：$I=Q/t$。金属中实际漂移的是电子，但电流方向规定为正电荷定向移动方向，所以与电子漂移方向相反。
+
+> **公式首次使用卡**：适用边界——$\bar I=\Delta Q/\Delta t$ 表示一段时间内的平均电流；稳恒电流中它等于任一时刻电流，常简写为 $I=Q/t$，且同一串联支路各截面电流相同。$I=nqSv$ 是稳态微观模型，适用于载流子密度、截面积、漂移速度可近似稳定的导体；金属中载流子是电子，电解液、半导体中的载流子可能不同。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
+
+电荷的定向移动形成电流。不是看单个电荷跑多快，而是看一段时间 $\Delta t$ 内有多少电荷 $\Delta Q$ 穿过某个截面：平均电流 $\bar I=\Delta Q/\Delta t$。本页研究稳恒电流，因此可简写为 $I=Q/t$。金属中实际漂移的是电子，但电流方向规定为正电荷定向移动方向，所以与电子漂移方向相反。
 
 **静态表征。**
 <svg viewBox="0 0 320 100" width="100%" style="max-width:400px">
@@ -880,9 +886,6 @@
 
 **动态表征。**
 动画演示：蓝色电子在导线中缓慢向左漂移，每秒穿过绿色截面的电荷量就是 `Q`；红色箭头表示规定电流方向，向右。
-
-**交互探究。**
-<iframe src="anim/bx3/current.html" width="100%" height="610" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 可直接拖动：蓝色速度手柄改变漂移速度 `v`、金色管壁改变截面积 `S`、底部滑钮改变载流子密度 `n`。实时变化：1 秒通过截面的电荷量 `Q` 和电流 `I`。
 
@@ -909,7 +912,7 @@
 | 电流方向 | 红色箭头 | 与金属中电子漂移方向相反 |
 
 **适用边界。**
-- $I=Q/t$ 是电流定义式；稳恒电流中各截面电流相同。
+- $\bar I=\Delta Q/\Delta t$ 是一段时间内的平均电流；只有稳恒电流中才可直接用 $I=Q/t$ 表示任一时刻电流，且同一串联支路各截面电流相同。
 - $I=nqSv$ 是微观模型，适用于载流子密度、截面积、漂移速度可近似稳定的导体。
 - 金属中载流子是电子；电解液、半导体中载流子情况可能不同。
 
@@ -929,7 +932,7 @@
 
 ---
 
-<h4 id="resistance">B3-12 电阻与电阻定律 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="resistance">B3-12 电阻与电阻定律 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -958,7 +961,7 @@
 **动态表征。**
 动画演示：同样接 3V 电压时，导线变长电阻变大、电流变小；导线变粗电阻变小、电流变大；换成电阻率更大的材料时，阻碍作用增强。
 
-**交互探究。**
+#### 本页主问题与引导演示
 <iframe src="anim/bx3/resistance-law.html" width="100%" height="610" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 
@@ -1010,7 +1013,7 @@
 
 ---
 
-<h4 id="ohm-law">B3-13 欧姆定律 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="ohm-law">B3-13 欧姆定律 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -1043,7 +1046,7 @@
 **动态表征。**
 动画演示：线性电阻两端电压 U 逐渐增大时，电流 I 按同一比例增大，I-U 图像上的工作点沿过原点直线滑动。
 
-**交互探究。**
+#### 本页主问题与引导演示
 <iframe src="anim/bx3/ohm-law.html" width="100%" height="610" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 可直接拖动：红色电压手柄、金色电阻手柄、I-U 图像上的蓝色工作点。可切换线性电阻与灯泡非线性模式。
@@ -1096,7 +1099,7 @@
 
 ---
 
-<h4 id="series-parallel">B3-14 串并联电路 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="series-parallel">B3-14 串并联电路 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -1137,7 +1140,7 @@
 **动态表征。**
 动画演示：串联时同一批电荷依次通过 R1、R2，电流处处相同，电压按电阻分配；并联时电流在节点分流，两支路电压相同，电阻小的支路电流更大。
 
-**交互探究。**
+#### 本页主问题与引导演示
 <iframe src="anim/bx3/series-parallel.html" width="100%" height="610" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 可直接拖动：电源 U 手柄、R1/R2 金色电阻手柄；可切换串联/并联。实时变化：等效电阻、总电流、串联分压或并联分流。
@@ -1192,7 +1195,7 @@
 
 ---
 
-<h4 id="joule-law">B3-15 焦耳定律 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="joule-law">B3-15 焦耳定律 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -1222,7 +1225,7 @@
 **动态表征。**
 动画演示：电流通过电阻丝时电阻丝变热；同样 R 和 t 下，电流加倍，热量变为 4 倍。切到电动机时，输入电能分成线圈发热和机械输出。
 
-**交互探究。**
+#### 本页主问题与引导演示
 <iframe src="anim/bx3/joule-law.html" width="100%" height="610" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 
@@ -1239,7 +1242,7 @@
 - 对比纯电阻模式：电能全部转化为热，$W=Q$。
 
 #### 规律、证据与核心概念
-- **焦耳定律**：Q = I²Rt（纯电阻电路）。
+- **焦耳定律**：电流和电阻近似恒定时，电阻元件产生的热量 $Q=I^{2}Rt$；电动机线圈等非纯电阻用电器的线圈热也按此计算。
 - **电功率**：P = UI = I²R = U²/R（纯电阻）。
 - **纯电阻**：电能全部转化为热能，W = Q = I²Rt = UIt。
 - **非纯电阻**：如电动机，W = UIt > Q = I²Rt（部分转化为机械能）。
@@ -1255,7 +1258,7 @@
 | `W-Q` | 绿色其他能量柱 | 电动机输出机械能等其他能量 |
 
 **适用边界。**
-- $Q=I^{2}Rt$ 是电流热效应公式，可用于电阻发热。
+- $Q=I^{2}Rt$ 是恒定电流、恒定电阻条件下的电流热效应公式，可用于电阻元件发热；只有纯电阻用电器才有输入电功全部转化为热，即 $W=Q$。
 - 纯电阻电路中 $W=Q$，可用 $UI、I^{2}R、U^{2}/R$ 任一功率式。
 - 非纯电阻中总电功用 $W=UIt$，发热只用 $Q=I^{2}Rt$，不能用 $U^{2}/R$ 算总功率。
 
@@ -1275,7 +1278,7 @@
 
 ---
 
-<h4 id="closed-circuit">B3-16 闭合电路欧姆定律 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="closed-circuit">B3-16 闭合电路欧姆定律 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -1284,8 +1287,14 @@
 - 模块：必修3
 - 主题：电路
 - 高考功能：选择题 / 计算题 / 实验题 / 综合题
-- 前置知识：B3-13 欧姆定律、B3-17 电源电动势
+- 前置知识：B3-13 欧姆定律（本页先给出所需的电动势定义，B3-17 再专门深化）
 - 后续应用：电学实验、电路动态分析
+
+#### 本页主问题与引导演示
+<iframe src="anim/bx3/closed-circuit-law.html" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
+
+> **公式首次使用卡**：先备概念——电动势 $\varepsilon$ 表示电源内非静电力对单位正电荷所做的功，单位为伏特，B3-17 将专门深化。本页使用电动势和内阻近似恒定的直流电源；外电路按纯电阻等效，电源有内阻 $r$，理想电源才取 $r=0$。短路和断路必须作为 $R=0$ 与 $I=0$ 的显式边界处理，不能用普通滑块端点冒充。其余符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
 
 #### 情境与现象
 闭合电路中，电流 I = ε/(R+r)，路端电压 U = ε - Ir。外阻 R 变大时，I 减小，U 增大（反向变化）。
@@ -1309,20 +1318,12 @@
 **动态表征。**
 自动演示：改变外阻 R，看电流 I 和路端电压 U 如何反向变化，U-I 图像上的工作点如何滑动。
 
-**交互探究。**
-<iframe src="anim/bx3/closed-circuit-law.html" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
-
 可直接拖动：外阻 R、电动势 ε、内阻 r、U-I 图像工作点。实时变化：电流 I、路端电压 U、内压降 Ir、U-I 图像截距与斜率。
 
 **证据任务。**
 - 拖动金色 R 手柄，看路端电压 U 和电流 I 如何反向变化（R↑ → I↓ → U↑）。
-- R 减到最小时 U ≈ 0（短路），I ≈ ε/r（最大电流）。
-- R 很大时 U ≈ ε（断路），I ≈ 0。
-
-
-
-> **公式首次使用卡**：适用边界——纯电阻外电路；电源有内阻 r（理想电源 r = 0）。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
-
+- 点“短路 $R=0$”时，动画应给出 $U=0、I=\varepsilon/r$；普通滑块的最小正电阻不能冒充短路。
+- 点“断路 $I=0$”时，动画应给出 $U=\varepsilon、I=0$；普通滑块的有限大电阻只能表示趋近断路。
 - 拖 U-I 图像上的蓝色工作点，看它沿 $U=\varepsilon -Ir$ 直线滑动，并等价于改变外阻 R。
 
 #### 规律、证据与核心概念
@@ -1367,7 +1368,7 @@
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B3-16）
 
-<h4 id="emf">B3-17 电源电动势 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="emf">B3-17 电源电动势 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -1376,7 +1377,8 @@
 - 模块：必修3
 - 主题：电路
 - 高考功能：选择题 / 实验题
-- 前置知识：B3-16 闭合电路欧姆定律
+- 前置知识：B3-11 电流、B3-13 欧姆定律
+- 关联应用：B3-16 闭合电路欧姆定律
 
 #### 情境与现象
 电源电动势是电源把非电能转化为电能的本领。在稳态断路、用理想电压表测量的近似条件下，其数值等于电源两端电压。
@@ -1395,15 +1397,16 @@
 
 
 
-> **公式首次使用卡**：适用边界——电动势由电源本身决定，和外电路是否接通无关；路端电压取决于外电路和内阻。电源放电、约定电流从正极流出时 U=\varepsilon-Ir \varepsilon；U=\varepsilon 对应稳态断路或测量电流可忽略的理想化条件；实际电压表仍会取微小电流。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
+#### 本页主问题与引导演示
+<iframe src="anim/bx3/emf.html" width="100%" height="610" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
+
+> **公式首次使用卡**：适用边界——电动势由电源本身决定，和外电路是否接通无关；路端电压取决于外电路和内阻。电源放电、约定电流从正极流出时 $U=\varepsilon-Ir<\varepsilon$；给电源充电、电流流入正极时 $U=\varepsilon+Ir>\varepsilon$；$U=\varepsilon$ 对应稳态断路或测量电流可忽略的理想化条件，实际电压表仍会取微小电流。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
 
 图中：电源符号；稳态断路且电压表可视为理想时，两端电压 $U=\varepsilon$。电动势是电源的本领，由电源本身决定。
 
 **动态表征。**
 动画演示：电源内部的非静电力把正电荷从负极搬到正极，每搬运 1C 电荷做功 ε 焦耳；接上外电路后，由于内阻分压，路端电压 U 小于 ε。
-
-**交互探究。**
-<iframe src="anim/bx3/emf.html" width="100%" height="610" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 可直接拖动：电动势 ε、电荷量 q、外阻 R。实时变化：非静电力做功 $W_{\text{非}}=q\varepsilon$、闭合电路电流、路端电压 $U=\varepsilon -Ir$。
 
@@ -1452,7 +1455,7 @@
 
 ---
 
-<h4 id="multimeter">B3-18 多用电表 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="multimeter">B3-18 多用电表 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -1480,7 +1483,7 @@
 **动态表征。**
 动画演示：切换 V/A/Ω 挡位时，表笔接法、表盘刻度和读数规则同时改变；欧姆挡若未调零或被测电路带电，会直接判为不合格。
 
-**交互探究。**
+#### 本页主问题与引导演示
 <iframe src="anim/exp/multimeter-practice-lab.html" width="100%" height="650" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 可调对象：测量模式、量程/倍率、被测量大小、欧姆调零、被测电路是否带电。实时变化：指针偏转、读数、接法提示和通过/不通过诊断。
@@ -1535,7 +1538,7 @@
 
 ---
 
-<h4 id="em-wave">B3-19 电磁场与电磁波 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="em-wave">B3-19 电磁场与电磁波 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: stse-extension; editorial-review: P1-EDITOR-002/003 -->
 
 #### 课标定位与学习目标
@@ -1556,7 +1559,7 @@
   <text x="160" y="25" font-size="10" fill="#e03131" text-anchor="middle">E（电场）</text>
   <path d="M300 70 L290 65 L290 75 Z" fill="#2c7be5"/>
   <text x="280" y="90" font-size="10" fill="#2c7be5" text-anchor="middle">k（传播方向）</text>
-  <text x="160" y="130" font-size="10" fill="#486581" text-anchor="middle">c = λf = 3×10⁸ m/s</text>
+  <text x="160" y="130" font-size="10" fill="#486581" text-anchor="middle">v = λf；真空中 v = c</text>
 </svg>
 
 图中：电磁波中 E 场（红色）垂直于传播方向 k（蓝色），B 场垂直于 E 和 k。
@@ -1564,7 +1567,7 @@
 **动态表征。**
 自动演示：E 场和 B 场同频同相振动，沿传播方向 k 传播。
 
-**交互探究。**
+#### 本页主问题与引导演示
 <iframe src="anim/bx3/em-wave.html" width="100%" height="560" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 可拖动参数：频率 f、振幅，也可直接拖动画面里的 λ 手柄。实时变化：E 场（红色竖直）、B 场（蓝色为垂直纸面方向的投影）、波长 λ = c/f。
@@ -1579,13 +1582,13 @@
 
 **概念辨析。**
 - **传播速度**：真空中 c = 3×10⁸ m/s（光速）。
-- **波长频率关系**：c = λf。
+- **波长频率关系**：同一介质中 $v=\lambda f$；真空中 $v=c=3×10^{8}\ \mathrm{m/s}$，空气中可近似取 c。
 - **电磁波谱**：无线电波 → 微波 → 红外线 → 可见光 → 紫外线 → X 射线 → γ 射线。
 - **不需要介质**：电磁波可在真空中传播。
 - **E ⊥ B ⊥ k**：三者互相垂直。
 
 #### 定量关系、变量、单位与边界
-- c = λf → 图中波长和频率
+- $v=\lambda f$ → 图中波长和频率；本动画的真空/空气模式取 $v=c$
 - c = 3×10⁸ m/s → 图中传播速度
 - E ⊥ B ⊥ k → 图中三个方向的关系
 
@@ -1603,7 +1606,7 @@
 
 ---
 
-<h4 id="energy">B3-20 能源与可持续发展 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="energy">B3-20 能源与可持续发展 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: stse-extension; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -1615,7 +1618,7 @@
 - 前置知识：能量守恒
 
 #### 技术与社会情境
-能源是人类社会发展的基础。化石能源（煤、石油、天然气）不可再生且污染环境，新能源（太阳能、风能、核能）可再生且清洁。
+能源是人类社会发展的基础。煤、石油、天然气和核燃料都属于不可再生资源；太阳能、风能、水能等属于可再生能源。核能在发电阶段具有低碳特点，但不能因此称为可再生能源；任何能源方案都要结合安全、资源补给、储能输电和全生命周期环境影响评价。
 
 **静态表征。**
 <svg viewBox="0 0 320 140" width="100%" style="max-width:480px">
@@ -1636,7 +1639,7 @@
 **动态表征。**
 动画演示：一次能源输入转化为有用电能和废热。总能量守恒，但废热属于低品质能量，难以继续完全利用；能源结构中化石占比越高，碳排越大。
 
-**交互探究。**
+#### 本页主问题与引导演示
 <iframe src="anim/bx3/energy-sustainability.html" width="100%" height="610" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 可直接拖动：用电量、化石能源占比、平均发电效率。实时变化：一次能源输入、有用电能、废热和碳排估算。
@@ -1687,7 +1690,7 @@
 
 ---
 
-<h4 id="electrostatic-induction-protection">B3-21 静电感应、静电利用与防护 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="electrostatic-induction-protection">B3-21 静电感应、静电利用与防护 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -1700,7 +1703,7 @@
 #### 情境与现象
 带正电的棒靠近中性导体，导体内自由电子被吸引到近端，远端相对显正电。导体总电荷仍可为零，但两端电荷分布已经改变。若接地，电子可以流入或流出，导体最终可能带电。
 
-**交互探究。**
+#### 本页主问题与引导演示
 <iframe src="anim/bx3/electrostatic-induction.html" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 **证据任务。**
@@ -1719,7 +1722,7 @@
 
 ```text
 导体内部电场 E = 0
-净电荷分布在导体外表面
+在导体内部没有带电体、且没有封闭空腔内置电荷的高中常用模型中，净电荷分布在导体外表面
 导体表面附近电场方向垂直表面
 ```
 
@@ -1729,7 +1732,7 @@
 | 场景 | 物理机制 | 判断要点 |
 |---|---|---|
 | 验电器张角 | 同种电荷排斥 | 看是否有净电荷或感应分布 |
-| 接地感应起电 | 大地提供电子库 | 先接地还是先移走带电体很关键 |
+| 接地感应起电 | 大地提供电子库 | 带电体靠近后接地，必须先断开接地，再移走带电体 |
 | 法拉第笼 | 导体壳外表面重排电荷 | 内部电场近似为零 |
 | 避雷针 | 尖端电场强，优先放电 | 引导电荷安全入地 |
 
@@ -1744,7 +1747,7 @@
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B3-21）
 
-<h4 id="household-circuit-safety">B3-22 家庭电路、安全用电与节约用电 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="household-circuit-safety">B3-22 家庭电路、安全用电与节约用电 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -1754,16 +1757,17 @@
 
 
 
+#### 本页主问题与引导演示
+<iframe src="anim/bx3/household-circuit.html" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
+
 > **公式首次使用卡**：适用边界——家庭电路按额定交流电压和正确火线、零线、保护接地连接分析；P=UI 用于相应稳态用电器，电能计算还需明确时间和计费单位；安全操作优先于计算。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
 
 - 会用 $I=P/U$ 估算家庭电路电流。
 - 会提出安全用电和节约用电方案。
 
 #### 情境与现象
-家庭电路电压约 `220 V`。正常情况下电流从火线经过开关、用电器回到零线；地线连接用电器金属外壳，一旦漏电可把危险电流引入大地并促使保护装置动作。
-
-**交互探究。**
-<iframe src="anim/bx3/household-circuit.html" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+我国居民家庭低压供电的额定交流电压有效值约为 `220 V`，不是任一时刻都恒定为 220 V。正常情况下电流从火线经过开关、用电器回到零线；保护地线连接用电器金属外壳，一旦漏电可提供低阻故障通路，并配合漏电保护器或过流保护切断电源。
 
 **证据任务。**
 - 切换“正常”：看开关为什么应接在火线上。
@@ -1803,13 +1807,17 @@ I = P / U
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B3-22）
 
-<h4 id="capacitor-charge-discharge-graph">B3-23 电容器充放电实验与图像 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="capacitor-charge-discharge-graph">B3-23 电容器充放电实验与图像 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
 #### 课标定位与学习目标
 - 能说清电容器充电、放电时电压和电流的变化方向。
 
+
+
+#### 本页主问题与引导演示
+<iframe src="anim/exp/capacitor-charge-discharge-lab.html" width="100%" height="730" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 
 > **公式首次使用卡**：适用边界——指数充放电和时间常量 τ=RC 只用于线性电阻、恒定电容和理想直流阶跃的 RC 电路；电流方向按预先约定；测量仪表内阻不可忽略时需修正模型。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
@@ -1819,10 +1827,7 @@ I = P / U
 - 会用电容充放电解释延时电路、闪光灯和传感器采样。
 
 #### 情境与现象
-电容器不是“马上充满”的元件。接上电源时，极板电荷逐渐积累，电容器电压 `Uc` 从 0 升高到接近电源电压，充电电流从最大逐渐减小；放电时，`Uc` 和电流都按指数规律衰减，电流方向与充电相反。
-
-**交互探究。**
-<iframe src="anim/exp/capacitor-charge-discharge-lab.html" width="100%" height="730" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+在线性电阻、恒定电容和理想直流阶跃模型中，若电容器初始未充电，接上电源后极板电荷逐渐积累，电容器电压 `Uc` 从 0 升高到接近电源电压，充电电流从最大逐渐减小；放电时，`Uc` 和电流都按指数规律衰减，电流方向与充电相反。若初始已经带电，起始电压不再是 0。
 
 **证据任务。**
 - 拖动三挡开关到“充电”：看 `Uc` 如何上升，`I` 如何衰减。
@@ -1861,12 +1866,16 @@ I-t 图像面积表示通过电路的电荷量
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B3-23）
 
-<h4 id="em-wave-applications-communication">B3-24 电磁波应用与现代通信 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="em-wave-applications-communication">B3-24 电磁波应用与现代通信 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: stse-extension; editorial-review: P1-EDITOR-002/003 -->
 
 
 #### 课标定位与学习目标
 
+
+
+#### 本页主问题与引导演示
+<iframe src="anim/bx3/em-wave-applications.html" width="100%" height="730" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 
 > **公式首次使用卡**：适用边界——真空中电磁波速率取 c，满足 c=λf；进入介质时频率由波源决定而保持不变，传播速度和波长随介质改变；通信结论还受带宽、衰减和噪声限制。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
@@ -1879,26 +1888,23 @@ I-t 图像面积表示通过电路的电荷量
 #### 技术与社会情境
 现代通信的共同底层是“把信息加载到电磁波上，再让接收端还原信息”。频率决定波长，带宽影响可传信息量，距离带来传播延迟和信号衰减。雷达多看回波时间，卫星通信多看远距离延迟，光纤通信多利用高频光波和大带宽。
 
-**交互探究。**
-<iframe src="anim/bx3/em-wave-applications.html" width="100%" height="730" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
-
 **证据任务。**
 - 切换“广播”：看调制波形如何携带声音信息。
 - 切换“卫星”：看距离变大时传播延迟如何明显增大。
 - 切换“雷达”：看发射波和回波为什么对应往返时间。
-- 切换“光纤”：看高频、大带宽为什么适合高速通信。
+- 切换“光纤”：看红外光进入介质后传播速度和波长如何改变，并区分“载波频率高”与“系统可用带宽大”这两个不同概念。
 
 #### 核心物理机制与证据
 
 ```text
-电磁波速：c = λf
-空气中近似：c ≈ 3.0×10^8 m/s
-传播延迟：t = d / c
+一般波速关系：v = λf
+真空中：c = 3.0×10^8 m/s；空气中近似取 c，光纤中 v<c
+传播延迟：t = d / v（空气中近似取 v=c）
 雷达测距：s = ct / 2
 光子能量：E = hf
 ```
 
-频率升高时，波长变短；传播速度在同一介质中主要由介质决定，不是“频率越高传播越快”。通信质量还受发射功率、接收天线、噪声、带宽和距离影响。
+同一介质中频率升高时波长变短；传播速度主要由介质决定，不是“频率越高传播越快”。载波频率和可用带宽不是同一个量，通信容量还取决于可用带宽、信噪比、调制编码、发射功率、接收条件和距离。
 
 #### 应用归纳
 | 应用 | 看见的物理过程 | 高考常考判断 |
@@ -1906,12 +1912,13 @@ I-t 图像面积表示通过电路的电荷量
 | 广播通信 | 声音信号调制到电磁波 | 载波传信息，接收端解调 |
 | 雷达测距 | 发射脉冲，接收回波 | 距离用 $s=ct/2$，不能漏掉往返 |
 | 卫星通信 | 地面站、卫星、接收端之间传播 | 远距离带来延迟 |
-| 光纤通信 | 光脉冲在光纤中传播 | 频率高、带宽大、抗电磁干扰 |
+| 光纤通信 | 红外光脉冲在介质中以小于 c 的速度传播 | 光纤系统可提供很大的可用带宽，且抗外界电磁干扰 |
 
 #### 证据限制与常见误区
 | 易错说法 | 为什么错 | 改法 |
 |---|---|---|
-| “频率越高，传播越快” | 同一介质中波速近似由介质决定 | 用 $c=\lambda f$ 判断波长改变 |
+| “频率越高，传播越快” | 同一介质中波速近似由介质决定 | 用 $v=\lambda f$ 判断波长改变；真空/空气近似时才令 $v=c$ |
+| “载波频率高就必然传得更多” | 载波频率和可用带宽不是同一个量 | 结合带宽、信噪比和调制编码判断通信容量 |
 | “雷达时间就是单程时间” | 信号经历发射到目标再返回 | 距离公式用 `ct/2` |
 | “光纤通信不是电磁波” | 光也是电磁波 | 把光纤看作高频电磁波通信 |
 
@@ -1923,7 +1930,7 @@ I-t 图像面积表示通过电路的电荷量
 
 > 课标依据：必修3“电磁场与电磁波初步”3.3.1—3.3.3。本节建立必修层级的定性基础；安培力、洛伦兹力、法拉第电磁感应定律、自感和交变电流等定量深化内容仍在选择性必修2。
 
-<h4 id="magnetic-phenomena-foundation">B3-25 磁现象及其应用 <span class="status review">content review pending</span></h4>
+<h4 id="magnetic-phenomena-foundation">B3-25 磁现象及其应用 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 #### 课标定位与学习目标
@@ -1931,23 +1938,52 @@ I-t 图像面积表示通过电路的电荷量
 - 官方模块：必修3
 - 课标条款：3.3.1
 - 内容要求：能列举磁现象在生产生活中的应用，了解我国古代磁学成果，关注现代磁技术发展。
+- 本页主问题：一根没有接触指南针的导线，为什么一通电就能使指南针偏转？
+- 学习结果：能用可观察证据说明“电流周围存在磁场”，并解释一种磁技术中磁场承担的作用。
+
+#### 本页主问题与引导演示
+
+<iframe src="anim/bx3/magnetic-phenomena.html" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
+先预测通电后指南针是否偏转，再由动画真实接通电流。完成主线后反向电流，检查指南针偏转方向是否随之反向；最后截断条形磁体，观察每一段是否仍同时具有南、北两极。
+
+> **概念判据卡**：磁效应的证据不是“设备名称里有一个磁字”，而是磁体、电流或运动电荷在周围建立磁场，并通过指南针方向、受力或其他可测效应表现出来。磁极不能像正负电荷那样被单独分离。
+
+#### 观察证据
+
+1. 未通电时，指南针只在地磁场作用下指向南北。
+2. 接通正向电流后，指南针从 `0°` 偏转到约 `+55°`，导线周围出现环形磁场表征。
+3. 反向电流后，环形磁场和指南针偏转方向同时反向。
+4. 截断条形磁体后，每一段仍同时标有 N、S 两极，没有出现孤立磁极。
 
 #### 规律、证据与核心概念
 
-磁体有南、北两极；同名磁极相斥、异名磁极相吸。指南针、扬声器、电动机、磁悬浮和磁存储都涉及磁现象，但具体工作过程还要分析磁场与电流或运动电荷的相互作用。
+磁体有南、北两极；同名磁极相斥、异名磁极相吸。指南针的偏转说明：除了地磁场外，通电导线在周围产生了新的磁场。电流方向反向时，磁场方向随之反向，这是“电流产生磁场”的可检验证据，而不是只靠定义得出的口号。
 
-#### 观察与解释
+奥斯特实验把电与磁联系起来。指南针、扬声器、电动机、磁悬浮和磁存储都涉及磁现象，但解释应用时必须写出磁场的具体作用：是电流产生磁场，还是电流在磁场中受力，或是材料的磁化状态被读写。
 
-- 指南针静止时指向南北，说明地球周围存在磁场。
-- 通电导线附近的指南针发生偏转，说明电流能产生磁场。
-- 磁现象的应用不能只写设备名称，还要指出磁场在其中承担的作用。
+#### 因果解释与应用迁移
+
+- **指南针**：地球周围存在磁场，小磁针北极沿当地地磁场方向静止。
+- **电流磁效应**：导线中的定向电荷运动在周围产生磁场；该磁场与地磁场矢量叠加，改变指南针静止方向。
+- **扬声器和电动机**：电流不是“自己转动”，而是载流导体在外磁场中受力并产生机械运动。
+- **磁存储**：利用材料局部磁化状态记录信息；读取和写入机制还要结合具体器件分析。
+- **我国古代磁学**：指南针应用体现了对磁体指向性的长期观察，但现代物理解释要落到地磁场与磁针受力。
 
 #### 边界检查与易错点
 
 - 磁极不能像正、负电荷那样被单独分离；把磁体截断后，每一段仍有南、北两极。
 - “有磁性材料”不等于任何状态下都表现为强磁体，材料磁化状态和外界条件会影响表现。
+- 指南针偏转只能证明当地合磁场方向改变，不能直接给出通电导线受力方向。
+- 列举“电动机、扬声器”不算解释；必须指出磁场与电流怎样产生可见效果。
 
-<h4 id="magnetic-field-induction-foundation">B3-26 磁场、磁感线与磁感应强度 <span class="status review">content review pending</span></h4>
+#### 学习收束
+
+- 我看见了什么：通电使指南针偏转，反向电流使偏转反向。
+- 我为什么能解释：电流在周围产生磁场，与地磁场叠加后改变小磁针方向。
+- 条件改变后我能预测什么：断电后指南针回到地磁方向；电流反向时偏转反向。
+
+<h4 id="magnetic-field-induction-foundation">B3-26 磁场、磁感线与磁感应强度 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -1956,17 +1992,37 @@ I-t 图像面积表示通过电路的电荷量
 - 官方模块：必修3
 - 课标条款：3.3.2
 - 内容要求：通过实验认识磁场，了解磁感应强度，会用磁感线描述磁场。
+- 本页主问题：磁场方向、通电导线方向和导线受力方向是同一个方向吗？
+- 学习结果：能用小磁针规定磁场方向，并用夹角反例说明 `F=BIL` 不是任意方向下的通式。
+
+#### 本页主问题与引导演示
+
+<iframe src="anim/bx3/magnetic-field.html" width="100%" height="700" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
+先预测导线与磁场平行时是否仍有安培力。验证后把夹角从 `0°` 调到 `90°`，比较导线方向、磁场箭头、受力符号和数值，检查它们是否同步。
+
+> **公式首次使用卡**：适用边界——磁感应强度方向按小磁针北极静止时的指向规定。用 $B=F/(IL)$ 定量描述时，只取通电直导线与磁场垂直的特例，且试探电流不显著改变原磁场；若导线与磁场夹角为 $\theta$，安培力大小为 $F=BIL\sin\theta$，平行时力为零。磁场方向不是通电导线受力方向。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
+
+#### 观察证据
+
+1. 画面中蓝色箭头向右表示匀强磁场方向；小磁针北极沿当地磁场方向。
+2. 导线与磁场平行时，读数为 $\theta=0^\circ$、$F=0.000\ \mathrm{N}$，没有非零受力方向。
+3. 导线与磁场垂直时，读数为 $\theta=90^\circ$、$F=0.240\ \mathrm{N}$，安培力达到本组参数下最大值。
+4. 斜交时，读数按 $\sin\theta$ 连续变化；不是把 `F=BIL` 无条件套到任意夹角。
 
 #### 规律、证据与核心概念
-
-
-
-
-> **公式首次使用卡**：适用边界——磁感应强度方向按小磁针北极受力方向规定；用 B=F/(IL) 定量定义时要求直导线有效长度 L 与磁场垂直，且试探电流不显著改变原磁场。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
 
 磁场是存在于磁体、电流和运动电荷周围的一种物质。可用小磁针的受力方向或通电导线的受力效应探测磁场。磁感应强度 $\boldsymbol B$ 描述磁场的强弱和方向；某点的方向规定为小磁针北极静止时的指向。
 
 磁感线是描述磁场的模型：曲线上每一点的切线方向表示该点磁场方向，疏密定性表示磁场强弱。磁感线不是真实存在的细线，不相交，也不在空间中突然中断。
+
+通电直导线的受力提供一种比较磁场强弱的办法，但必须控制电流、有效长度和方向。导线与磁场垂直时，$B=F/(IL)$；一般夹角下，只有垂直于磁场的电流分量产生该受力效应，因此 $F=BIL\sin\theta$。
+
+#### 因果解释
+
+- 小磁针给出的是磁场方向，不是任意带电粒子的运动方向。
+- 受力方向必须同时依据 $\boldsymbol B$ 和电流方向判断；它通常与二者都垂直。
+- 平行时安培力为零，并不表示该处没有磁场。此时磁场仍能使小磁针定向，只是所选通电导线没有产生可测安培力。
 
 #### 课标边界与迁移
 
@@ -1976,8 +2032,16 @@ I-t 图像面积表示通过电路的电荷量
 
 - 磁感线切线方向是 $\boldsymbol B$ 的方向，不是带电粒子必然运动的方向。
 - 磁感线越密只表示磁场越强，不表示那里“磁感线条数更多”这一实体事实。
+- $F=0$ 不能单独推出 $B=0$；还可能是导线与磁场平行，或没有电流。
+- 磁场方向不是通电导线受力方向，二者不能共用同一箭头。
 
-<h4 id="magnetic-flux-induction-foundation">B3-27 磁通量与电磁感应现象初步 <span class="status review">content review pending</span></h4>
+#### 学习收束
+
+- 我看见了什么：夹角从垂直变为平行时，安培力从最大连续降到零。
+- 我为什么能解释：只有电流的垂直于磁场的分量参与该受力效应。
+- 条件改变后我能预测什么：已知 B、I、L 与夹角，可以先判断零力/最大力边界，再估计中间值。
+
+<h4 id="magnetic-flux-induction-foundation">B3-27 磁通量与电磁感应现象初步 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -1986,13 +2050,28 @@ I-t 图像面积表示通过电路的电荷量
 - 官方模块：必修3
 - 课标条款：3.3.3
 - 内容要求：知道磁通量；通过实验了解电磁感应现象和产生感应电流的条件；知道其应用及社会影响。
+- 本页主问题：磁通量很大就一定有感应电流吗？
+- 学习结果：能分两步判断“磁通量是否变化”和“回路是否闭合”，并用正反证据说明两个条件的作用。
 
-#### 规律、证据与核心概念
+#### 本页主问题与引导演示
 
+<iframe src="anim/bx3/magnetic-flux-induction.html" width="100%" height="760" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
-
+先建立 `Φ=0.080 Wb` 的较大磁通量并保持不变，观察是否有持续电流；随后分别点击“改变磁通量”和“开路并改变 Φ”，比较感应电动势与感应电流是否同时存在。
 
 > **公式首次使用卡**：适用边界——Φ=BS cosθ 只用于匀强磁场和平面线圈，θ 是磁场与面积法线夹角；产生感应电流还要求闭合回路且磁通量发生变化。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
+
+#### 观察证据
+
+| 实验状态 | 磁通量变化 | 回路 | 观察结果 |
+|---|---|---|---|
+| $\Phi=0.080\ \mathrm{Wb}$ 且保持不变 | $\Delta\Phi=0$ | 闭合 | $\varepsilon=0$、$I=0$，磁通量大并不够 |
+| 改变 B 或夹角 | `ΔΦ≠0` | 闭合 | 出现感应电动势和感应电流；变化结束后电流回到零 |
+| 开路并改变 Φ | $\Delta\Phi\ne 0$ | 开路 | 可有感应电动势，但 $I=0$ |
+
+三组状态分别提供“变化条件”的反例与正例，以及“闭合条件”的反例。不能只看一次指针偏转就省略条件。
+
+#### 规律、证据与核心概念
 
 磁通量 $\Phi$ 描述穿过某一面积的磁场。在匀强磁场中，若平面面积为 $S$，其法线与磁场夹角为 $\theta$，则：
 
@@ -2006,6 +2085,8 @@ $$
 
 闭合回路中的磁通量发生变化时，回路中产生感应电流。造成变化的方式可以是改变 $B$、改变回路面积、改变回路与磁场的夹角，或让回路进出磁场区域。磁通量很大但保持不变，并不产生持续感应电流。
 
+因果链是：外界操作改变穿过回路的磁通量 → 回路中出现感应电动势；若回路闭合，感应电动势驱动感应电流。变化停止后，磁通量重新恒定，感应电动势与电流回到零。这里的电能来自外界改变磁场或回路状态时所做的功，不是凭空产生。
+
 #### 课标边界与迁移
 
 本节只要求定性判断磁通量是否变化以及是否发生电磁感应。感应电流方向、楞次定律和法拉第电磁感应定律的定量计算属于选择性必修2，可继续学习 [X2-08 电磁感应现象](xb2?id=electromagnetic-induction) 与 [X2-09 楞次定律](xb2?id=lenz-law)。
@@ -2013,6 +2094,19 @@ $$
 #### 应用与迁移
 
 发电机、无线充电、感应式传感器等都利用电磁感应。分析应用时应写清能量从何种形式转化为何种形式，不能把“产生电流”理解为凭空产生能量。
+
+#### 边界检查与易错点
+
+- `Φ` 大不等于 `ΔΦ` 大；只有磁通量发生变化才产生感应电动势。
+- 有感应电动势不等于一定有感应电流；开路时没有持续电流通路。
+- θ 是磁场与面积法线的夹角，不是磁场与线圈平面的夹角。
+- 本节只作定性条件判断；方向和定量法拉第定律在选择性必修2深化。
+
+#### 学习收束
+
+- 我看见了什么：恒定大磁通时无电流；变化且闭合时有电流；变化但开路时仍无电流。
+- 我为什么能解释：磁通量变化先产生感应电动势，闭合条件再决定能否形成电流。
+- 条件改变后我能预测什么：改变 B、S、夹角或进出磁场时，能逐项判断 `ΔΦ` 与回路状态。
 
 ---
 

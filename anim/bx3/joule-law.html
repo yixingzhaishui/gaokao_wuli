@@ -30,7 +30,7 @@ button.on{background:#2c7be5;color:#fff}
 <div class="wrap">
   <h2>焦耳定律：拖 I、R、t，看 Q=I²Rt 和非纯电阻分流</h2>
   <div class="lab">
-    <div class="stage"><canvas id="cv" width="720" height="450" aria-label="焦耳定律实验台：电阻丝侧视装置、热量图像和数据记录"></canvas></div>
+    <div class="stage"><canvas id="cv" width="720" height="450" aria-label="焦耳定律实验台：电阻丝侧视装置、热量图像和数据记录" data-joule-heat-scope="resistive-heating-constant-I-R" data-input-equals-heat-only-for-pure-resistor="true"></canvas></div>
     <section class="panel">
       <button id="playBtn" style="font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;width:100%;margin-bottom:10px">▶ 播放：随时间累积发热</button>
       <div class="seg" id="mode"><button class="on" data-mode="pure">纯电阻</button><button data-mode="motor">电动机</button></div>
@@ -93,5 +93,6 @@ id('playBtn').onclick=()=>{
 draw();
 })();
 </script>
-<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script></body>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script><script src="guided-lesson.js"></script>
+</body>
 </html>
