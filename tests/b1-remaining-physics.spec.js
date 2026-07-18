@@ -12,7 +12,15 @@ test.setTimeout(45_000);
 test('B1-01 固定 0.01 阈值不再决定质点结论', async ({ page }) => {
   await page.goto(pageUrl('particle.html'));
   await expect(page.locator('#canvas')).toHaveAttribute('data-ratio-is-threshold', 'false');
-  await expect(page.locator('#readout')).toContainText('可质点化');
+  await expect(page.locator('#readout')).toContainText('尚未揭示');
+  await expect(page.locator('#exploreCard')).toBeHidden();
+  await page.locator('#guideBtn').click();
+  await expect(page.locator('#predictCard')).toBeVisible();
+  await page.locator('[data-predict="no"]').click();
+  await expect(page.locator('#app')).toHaveAttribute('data-guided-complete', 'true');
+  await expect(page.locator('#feedbackCard')).toContainText('你的预测');
+  await expect(page.locator('#feedbackCard')).toContainText('不是由固定 l/s 阈值决定');
+  await page.locator('#modePath').click();
   await page.locator('#len').fill('20');
   await page.locator('#dist').fill('5');
   await expect(page.locator('#readout')).toContainText('可质点化');
@@ -26,10 +34,16 @@ test('B1-06 用上抛最高点建立 v=0 但 a=-g 的反例', async ({ page }) =
   await page.locator('#zeroBtn').click();
   await expect(page.locator('#status')).toContainText('竖直上抛最高点');
   await expect(page.locator('#status')).toContainText('a=-g');
+  await expect(page.locator('#readout')).toContainText('a=Δv/Δt=-9.80 m/s²');
 });
 
 test('B1-15 斜面释放显式限定为光滑且无其他沿面力', async ({ page }) => {
   await page.goto(pageUrl('gravity.html'));
+  await expect(page.locator('#canvas')).toHaveAttribute('data-extension', 'false');
+  await expect(page.locator('#readout')).not.toContainText('G∥');
+  await expect(page.locator('body')).not.toContainText('绝不是垂直地面');
+  await page.locator('#extensionBtn').click();
+  await expect(page.locator('#canvas')).toHaveAttribute('data-extension', 'true');
   await page.locator('#play').click();
   await expect(page.locator('#canvas')).toHaveAttribute('data-release-model', 'smooth-incline-no-other-along-force');
   await expect(page.locator('#status')).toContainText('光滑斜面');
@@ -41,7 +55,13 @@ test('B1-16 桌面和绳不再显示通用 kx，松弛绳有可见余绳语义',
   await expect(page.locator('#app')).toHaveAttribute('data-universal-kx', 'false');
   await expect(page.locator('#readout')).not.toContainText('k=');
   await expect(page.locator('#readout')).not.toContainText('F=kx');
-  await page.locator('[data-mode="rope"]').click();
+  await page.locator('#zero').click();
+  await expect(page.locator('#canvas')).toHaveAttribute('data-support-state', 'externally-suspended-just-touching');
+  await expect(page.locator('#status')).toContainText('外部悬挂力平衡重力');
+  await page.locator('button[data-mode="support"]').click();
+  await page.locator('#deformed').click();
+  await expect(page.locator('#canvas')).toHaveAttribute('data-support-state', 'resting-with-normal');
+  await page.locator('button[data-mode="rope"]').click();
   await page.locator('#zero').click();
   await expect(page.locator('#canvas')).toHaveAttribute('data-rope-state', 'slack-visible-sag');
   await expect(page.locator('#status')).toContainText('弹力不存在');
@@ -50,23 +70,31 @@ test('B1-16 桌面和绳不再显示通用 kx，松弛绳有可见余绳语义',
 test('B1-17 弹性限度外不输出 kx 精确值且理论线终止于限度', async ({ page }) => {
   await page.goto(pageUrl('hooke-law.html'));
   await page.locator('#outside').click();
+  await expect(page.locator('#predictCard')).toBeVisible();
+  await expect(page.locator('#app')).toHaveAttribute('data-model-valid', 'true');
+  await page.locator('[data-predict="no"]').click();
   await expect(page.locator('#app')).toHaveAttribute('data-model-valid', 'false');
   await expect(page.locator('#app')).toHaveAttribute('data-force-value', 'unknown');
   await expect(page.locator('#readout')).toContainText('关系未知');
   await expect(page.locator('#status')).toContainText('当前模型失效');
   await expect(page.locator('#canvas')).toHaveAttribute('data-theory-line', '-7:7');
   await expect(page.locator('#canvas')).toHaveAttribute('data-point-kind', 'invalid-no-force-value');
+  await expect(page.locator('#feedbackCard')).toContainText('你的预测');
+  await expect(page.locator('#app')).toHaveAttribute('data-guided-complete', 'true');
 });
 
 test('B1-19 单调结论包含固定 F1、F2 条件且自动扫描锁定大小', async ({ page }) => {
   await page.goto(pageUrl('force-composition.html'));
   const before = await page.locator('#app').evaluate(el => [el.dataset.f1, el.dataset.f2]);
   await page.locator('#play').click();
+  await expect(page.locator('#predictCard')).toBeVisible();
+  await page.locator('[data-predict="decrease"]').click();
   await page.waitForTimeout(500);
   const after = await page.locator('#app').evaluate(el => [el.dataset.f1, el.dataset.f2]);
   expect(after).toEqual(before);
   await expect(page.locator('#status')).toContainText('F1、F2 大小保持不变');
   await expect(page.locator('#app')).toHaveAttribute('data-resultant-is-third-force', 'false');
+  await expect(page.locator('#readout')).toContainText('F1=7.0 N（锁定）');
   await page.locator('[data-case="free"]').click();
   await expect(page.locator('#status')).toContainText('不能声称');
 });
@@ -75,6 +103,9 @@ test('B1-20 mg sinθ 只表示下滑趋势并可切换另一组分解方向', as
   await page.goto(pageUrl('force-decomposition.html'));
   await expect(page.locator('#status')).toContainText('产生下滑趋势');
   await expect(page.locator('#status')).toContainText('沿面合力');
+  await page.locator('[data-theta="60"]').click();
+  await expect(page.locator('#status')).toContainText('实际静摩擦仍须结合沿面合力按需要求值');
+  await expect(page.locator('#status')).not.toContainText('摩擦相关量也会变小');
   await page.locator('#basisGround').click();
   await expect(page.locator('#canvas')).toHaveAttribute('data-basis', 'ground');
   await expect(page.locator('#parallelLabel')).toHaveText('水平分量 Gx');
@@ -97,10 +128,20 @@ test('B1-25 Markdown 表格行与 KaTeX 语法完整', async () => {
 test('B1-28 静动摩擦参数分离且 Q 只在相对滑动阶段使用', async ({ page }) => {
   await page.goto(pageUrl('plank-block.html'));
   await expect(page.locator('#canvas')).toHaveAttribute('data-friction-parameters', 'separate-mus-muk');
+  await expect(page.locator('#canvas')).toHaveAttribute('data-friction-constraint', 'muk-lte-mus');
+  await expect(page.locator('#canvas')).toHaveAttribute('data-control-stage', 'critical');
+  await expect(page.locator('#canvas')).toHaveAttribute('data-mu-order-valid', 'true');
+  await expect(page.locator('#stageHint')).toContainText('先只改变外力 F');
   await expect(page.locator('#canvas')).toHaveAttribute('data-analysis-step', 'compare-required-static-to-maximum');
   await expect(page.locator('#status')).toContainText('不使用 Q=fₖ·s相对');
   await expect(page.locator('body')).toContainText('μₛ');
   await expect(page.locator('body')).toContainText('μₖ');
+  await page.locator('[data-stage="friction"]').click();
+  await expect(page.locator('#canvas')).toHaveAttribute('data-control-stage', 'friction');
+  await expect(page.locator('#stageHint')).toContainText('μₖ≤μₛ');
+  await page.locator('[data-stage="explore"]').click();
+  await expect(page.locator('#canvas')).toHaveAttribute('data-control-stage', 'explore');
+  await expect(page.locator('#stageHint')).toContainText('全部参数已开放');
   await page.locator('[data-case="fall"]').click();
   await expect(page.locator('#canvas')).toHaveAttribute('data-analysis-step', 'kinetic-friction');
   await expect(page.locator('#status')).toContainText('相对滑动累计生热');

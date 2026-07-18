@@ -4,18 +4,20 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>B1-17 胡克定律</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:#243b53;font-family:system-ui,-apple-system,"PingFang SC",sans-serif}.wrap{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px}.stage{background:#fff;border:1px solid #d9e2ec;border-radius:8px;overflow:hidden}canvas{display:block;width:100%;height:auto;aspect-ratio:940/560}.panel{display:flex;flex-direction:column;gap:8px}.box{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:9px}.task{background:#fff8e6;border-color:#f0a202;font-size:13px;line-height:1.5}.control label{display:flex;justify-content:space-between;font-size:12px;font-weight:700}.control input{width:100%}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:6px}button{min-height:38px;border:1px solid #bcccdc;background:#fff;border-radius:6px;font-weight:700;cursor:pointer}.readout{background:#102a43;color:#fff;border-radius:7px;padding:10px;font-size:13px;line-height:1.65}.readout b{color:#ffd166}.status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}.status.bad{border-color:#ef4444;background:#fef2f2;color:#b91c1c}@media(max-width:760px){.wrap{grid-template-columns:minmax(0,1fr)}.panel{grid-row:2}}
+*{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:#243b53;font-family:system-ui,-apple-system,"PingFang SC",sans-serif}.wrap{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:10px;padding:10px}.stage{background:#fff;border:1px solid #d9e2ec;border-radius:8px;overflow:hidden}canvas{display:block;width:100%;height:auto;aspect-ratio:940/560}.panel{display:flex;flex-direction:column;gap:8px}.box{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:9px}.task{background:#fff8e6;border-color:#f0a202;font-size:13px;line-height:1.5}.control label{display:flex;justify-content:space-between;font-size:12px;font-weight:700}.control input{width:100%}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:6px}button{min-height:38px;border:1px solid #bcccdc;background:#fff;border-radius:6px;font-weight:700;cursor:pointer}.readout{background:#102a43;color:#fff;border-radius:7px;padding:10px;font-size:13px;line-height:1.65}.readout b{color:#ffd166}.status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}.status.bad{border-color:#ef4444;background:#fef2f2;color:#b91c1c}[hidden]{display:none!important}@media(max-width:760px){.wrap{grid-template-columns:minmax(0,1fr)}.panel{grid-row:2}}
 </style>
 </head>
 <body>
-<div class="wrap" id="app" data-model-valid="true">
+<div class="wrap" id="app" data-model-valid="true" data-guided-complete="false">
   <div class="stage"><canvas id="canvas" width="940" height="560" aria-label="胡克定律：弹簧形变量、弹性限度内数据与模型失效区"></canvas></div>
   <div class="panel">
-    <div class="box task"><b>观察任务：</b>拖动画布中的弹簧实物端点，先在弹性限度内改变 x，再越过限度；同步比较 F-x 图像、数据记录和模型失效区。</div>
+    <div class="box task"><b>观察任务：</b>先看弹性限度内的理想模型点；越界前必须预测页面是否还能继续给出 $F=k|x|$ 的精确值。</div>
     <div class="box control"><label>形变量 x（相对原长）<output id="xOut"></output></label><input id="x" type="range" min="-12" max="12" step="0.5" value="4"></div>
     <div class="box control"><label>劲度系数 k<output id="kOut"></output></label><input id="k" type="range" min="1" max="10" step="0.5" value="5"></div>
     <div class="box control"><label>弹性限度 |x|max<output id="limitOut"></output></label><input id="limit" type="range" min="4" max="10" step="0.5" value="8"></div>
-    <div class="box buttons"><button id="inside">限度内示例</button><button id="outside">▶ 演示越过限度</button><button id="reset">重置</button></div>
+    <div class="box buttons"><button id="inside">限度内模型点</button><button id="outside" data-audit-play>越界前先预测</button><button id="reset">重置</button></div>
+    <div class="box" id="predictCard" hidden><b>暂停预测：</b>超过弹性限度后，页面还能继续按 $F=k|x|$ 给精确值吗？<div class="buttons"><button data-predict="yes">能</button><button data-predict="no">不能</button></div></div>
+    <div class="box" id="feedbackCard" hidden></div>
     <div class="readout" id="readout"></div>
     <div class="box"><b>模型边界</b><br>只有弹性限度内可用 $F=k|x|$。超过限度后关系未知，本页不延长理论线、不输出精确数值。</div>
     <div class="status" id="status"></div>
@@ -25,24 +27,34 @@
 (()=>{
   const app=document.getElementById('app'),canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
   const input={x:document.getElementById('x'),k:document.getElementById('k'),limit:document.getElementById('limit')};
-  const readout=document.getElementById('readout'),status=document.getElementById('status');
+  const readout=document.getElementById('readout'),status=document.getElementById('status'),predictCard=document.getElementById('predictCard'),feedbackCard=document.getElementById('feedbackCard');
   const state=()=>({x:+input.x.value,k:+input.k.value,limit:+input.limit.value});
   const text=(s,x,y,c='#243b53',size=14,align='center',weight=700)=>{ctx.fillStyle=c;ctx.font=`${weight} ${size}px system-ui`;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(s,x,y)};
   const line=(x1,y1,x2,y2,c='#334e68',w=2,dash=[])=>{ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()};
   function spring(x1,y,x2){ctx.strokeStyle='#334e68';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(x1,y);const n=22,step=(x2-x1)/n;for(let i=1;i<n;i++)ctx.lineTo(x1+i*step,y+(i%2?14:-14));ctx.lineTo(x2,y);ctx.stroke()}
   function draw(){const s=state(),valid=Math.abs(s.x)<=s.limit,F=valid?s.k*Math.abs(s.x):null;ctx.clearRect(0,0,940,560);const bg=ctx.createLinearGradient(0,0,0,560);bg.addColorStop(0,'#fbfdff');bg.addColorStop(1,'#eaf0f7');ctx.fillStyle=bg;ctx.fillRect(0,0,940,560);text('胡克定律：理论直线只存在于弹性限度内',470,30,'#102a43',20);
     ctx.fillStyle='#fff';ctx.strokeStyle='#d9e2ec';ctx.beginPath();ctx.roundRect(40,55,390,445,9);ctx.fill();ctx.stroke();text('x 是相对原长的形变量',235,82,'#334e68',15);const origin=235,end=origin+s.x*13;line(80,235,115,235,'#334e68',6);line(115,150,115,320,'#334e68',6);spring(115,235,end);ctx.fillStyle='#d9e2ec';ctx.strokeStyle='#334e68';ctx.beginPath();ctx.roundRect(end,200,85,70,7);ctx.fill();ctx.stroke();line(origin,130,origin,350,'#64748b',2,[6,5]);text('原长端点',origin,370,'#64748b',12);text(`x=${s.x.toFixed(1)} cm`,235,410,'#0f766e',15);text(valid?`F=${F.toFixed(1)} N`:'关系未知',235,445,valid?'#0f766e':'#b91c1c',17);if(!valid)text('超过弹性限度：当前模型失效',235,475,'#b91c1c',13);
-    const g={x:490,y:460,w:370,h:340},sx=x=>g.x+(x+12)/24*g.w,sy=f=>g.y-(f+110)/220*g.h;ctx.fillStyle='#fff';ctx.strokeStyle='#d9e2ec';ctx.beginPath();ctx.roundRect(455,55,440,445,9);ctx.fill();ctx.stroke();line(g.x,sy(0),g.x+g.w,sy(0),'#334e68');line(sx(0),g.y,sx(0),g.y-g.h,'#334e68');text('x/cm',g.x+g.w+8,sy(0)+18,'#64748b',12);text('F/N',sx(0)-12,g.y-g.h-14,'#64748b',12);ctx.fillStyle='rgba(239,68,68,.12)';ctx.fillRect(g.x,g.y-g.h,sx(-s.limit)-g.x,g.h);ctx.fillRect(sx(s.limit),g.y-g.h,g.x+g.w-sx(s.limit),g.h);text('模型失效区',(g.x+sx(-s.limit))/2,95,'#b91c1c',12);text('模型失效区',(sx(s.limit)+g.x+g.w)/2,95,'#b91c1c',12);line(sx(-s.limit),sy(s.k*s.limit),sx(s.limit),sy(-s.k*s.limit),'#2563eb',4);line(sx(-s.limit),g.y-g.h,sx(-s.limit),g.y,'#0f766e',2,[5,4]);line(sx(s.limit),g.y-g.h,sx(s.limit),g.y,'#0f766e',2,[5,4]);if(valid){ctx.fillStyle='#f59e0b';ctx.beginPath();ctx.arc(sx(s.x),sy(-s.k*s.x),7,0,Math.PI*2);ctx.fill();canvas.dataset.pointKind='measured-model-point'}else{ctx.strokeStyle='#b91c1c';ctx.lineWidth=3;ctx.beginPath();ctx.arc(sx(s.x),sy(0),8,0,Math.PI*2);ctx.stroke();text('未知',sx(s.x),sy(0)-20,'#b91c1c',12);canvas.dataset.pointKind='invalid-no-force-value'}text('蓝色：限度内模型线；橙点：当前有效数据',675,485,'#334e68',12);
+    const g={x:490,y:460,w:370,h:340},sx=x=>g.x+(x+12)/24*g.w,sy=f=>g.y-(f+110)/220*g.h;ctx.fillStyle='#fff';ctx.strokeStyle='#d9e2ec';ctx.beginPath();ctx.roundRect(455,55,440,445,9);ctx.fill();ctx.stroke();line(g.x,sy(0),g.x+g.w,sy(0),'#334e68');line(sx(0),g.y,sx(0),g.y-g.h,'#334e68');text('x/cm',g.x+g.w+8,sy(0)+18,'#64748b',12);text('F/N',sx(0)-12,g.y-g.h-14,'#64748b',12);ctx.fillStyle='rgba(239,68,68,.12)';ctx.fillRect(g.x,g.y-g.h,sx(-s.limit)-g.x,g.h);ctx.fillRect(sx(s.limit),g.y-g.h,g.x+g.w-sx(s.limit),g.h);text('模型失效区',(g.x+sx(-s.limit))/2,95,'#b91c1c',12);text('模型失效区',(sx(s.limit)+g.x+g.w)/2,95,'#b91c1c',12);line(sx(-s.limit),sy(s.k*s.limit),sx(s.limit),sy(-s.k*s.limit),'#2563eb',4);line(sx(-s.limit),g.y-g.h,sx(-s.limit),g.y,'#0f766e',2,[5,4]);line(sx(s.limit),g.y-g.h,sx(s.limit),g.y,'#0f766e',2,[5,4]);if(valid){ctx.fillStyle='#f59e0b';ctx.beginPath();ctx.arc(sx(s.x),sy(-s.k*s.x),7,0,Math.PI*2);ctx.fill();canvas.dataset.pointKind='ideal-model-point'}else{ctx.strokeStyle='#b91c1c';ctx.lineWidth=3;ctx.beginPath();ctx.arc(sx(s.x),sy(0),8,0,Math.PI*2);ctx.stroke();text('未知',sx(s.x),sy(0)-20,'#b91c1c',12);canvas.dataset.pointKind='invalid-no-force-value'}text('蓝色：限度内模型线；橙点：当前理想模型点',675,485,'#334e68',12);
     document.getElementById('xOut').textContent=`${s.x.toFixed(1)} cm`;document.getElementById('kOut').textContent=`${s.k.toFixed(1)} N/cm`;document.getElementById('limitOut').textContent=`${s.limit.toFixed(1)} cm`;readout.innerHTML=`x=<b>${s.x.toFixed(1)} cm（相对原长）</b><br>k=<b>${s.k.toFixed(1)} N/cm</b><br>弹性限度=<b>${s.limit.toFixed(1)} cm</b><br>弹力=<b>${valid?`${F.toFixed(1)} N`:'关系未知'}</b>`;status.className='status'+(valid?'':' bad');status.textContent=valid?'在弹性限度内：可以使用 F=k|x|。':'超过弹性限度：关系未知 / 当前模型失效，不输出 kx 精确值。';app.dataset.modelValid=String(valid);app.dataset.forceValue=valid?F.toFixed(1):'unknown';canvas.dataset.theoryLine=`${-s.limit}:${s.limit}`}
-  let animation=0;
-  function stopAnimation(){if(animation)cancelAnimationFrame(animation);animation=0}
-  function reset(){stopAnimation();input.x.value='4';input.k.value='5';input.limit.value='8';draw()}
-  function demonstrateBoundary(){stopAnimation();input.limit.value='7';const started=performance.now();function step(now){const p=Math.min(1,(now-started)/650);input.x.value=String(4+6*p);draw();if(p<1)animation=requestAnimationFrame(step);else animation=0}animation=requestAnimationFrame(step)}
+  const outsideBtn=document.getElementById('outside');
+  let animation=0,boundaryProgress=0,boundaryPrediction='';
+  function stopAnimation(){if(animation)cancelAnimationFrame(animation);animation=0;outsideBtn.textContent='越界前先预测'}
+  function reset(){stopAnimation();boundaryProgress=0;boundaryPrediction='';input.x.value='4';input.k.value='5';input.limit.value='8';predictCard.hidden=true;feedbackCard.hidden=true;app.dataset.guidedComplete='false';draw()}
+  function demonstrateBoundary(prediction){
+    if(animation)cancelAnimationFrame(animation);
+    animation=0;boundaryPrediction=prediction;input.limit.value='7';outsideBtn.textContent='⏸ 暂停越界演示';
+    const started=performance.now()-boundaryProgress*650;
+    function step(now){
+      boundaryProgress=Math.min(1,(now-started)/650);input.x.value=String(4+6*boundaryProgress);draw();
+      if(boundaryProgress<1)animation=requestAnimationFrame(step);else{animation=0;outsideBtn.textContent='▶ 重播越界演示';feedbackCard.hidden=false;feedbackCard.innerHTML=`<b>你的预测：</b>${prediction==='yes'?'还能给精确值':'不能继续给精确值'}<br><b>实际结果：</b>限度外只显示“关系未知”。<br><b>证据：</b>理论线在限度处终止，当前点进入模型失效区。<br><b>原因：</b>胡克定律只在弹性限度内成立。`;app.dataset.guidedComplete='true';draw()}
+    }
+    animation=requestAnimationFrame(step);
+  }
   let dragging=false;
   canvas.addEventListener('pointerdown',event=>{dragging=true;canvas.setPointerCapture(event.pointerId)});
   canvas.addEventListener('pointermove',event=>{if(!dragging)return;stopAnimation();const rect=canvas.getBoundingClientRect(),px=(event.clientX-rect.left)*canvas.width/rect.width;input.x.value=String(Math.max(-12,Math.min(12,(px-235)/13)));draw()});
   canvas.addEventListener('pointerup',()=>{dragging=false});
-  Object.values(input).forEach(el=>el.addEventListener('input',()=>{stopAnimation();draw()}));document.getElementById('inside').onclick=()=>{stopAnimation();input.x.value='4';draw()};document.getElementById('outside').onclick=demonstrateBoundary;document.getElementById('reset').onclick=reset;draw();
+  Object.values(input).forEach(el=>el.addEventListener('input',()=>{stopAnimation();boundaryProgress=0;draw()}));document.getElementById('inside').onclick=()=>{stopAnimation();boundaryProgress=0;input.x.value='4';draw()};outsideBtn.onclick=()=>{if(animation){cancelAnimationFrame(animation);animation=0;outsideBtn.textContent='▶ 继续越界演示';return}if(boundaryProgress>0&&boundaryProgress<1&&boundaryPrediction){demonstrateBoundary(boundaryPrediction);return}boundaryProgress=0;boundaryPrediction='';stopAnimation();input.limit.value='7';input.x.value='6.5';feedbackCard.hidden=true;predictCard.hidden=false;draw()};document.querySelectorAll('[data-predict]').forEach(btn=>btn.onclick=()=>{predictCard.hidden=true;boundaryProgress=0;demonstrateBoundary(btn.dataset.predict)});document.getElementById('reset').onclick=reset;draw();
 })();
 </script>
 </body>

@@ -31,6 +31,8 @@
   .status{border:1px solid #14b8a6;background:#ecfdf5;color:#0f766e;border-radius:8px;padding:8px;font-size:12px;font-weight:800;line-height:1.45}
   .status.warn{border-color:#f59e0b;background:#fff7ed;color:#b45309}
   .status.bad{border-color:#f87171;background:#fef2f2;color:#b91c1c}
+  #stageCard .chips{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #stageCard button{font-size:12px;padding:4px}
   @media(max-width:820px){.root{grid-template-columns:1fr}.readout{grid-template-columns:1fr 1fr}}
 </style>
 </head>
@@ -46,6 +48,15 @@
         <button id="pullMode" class="active">拉物块判临界</button>
         <button id="kickMode">初速度看滑痕</button>
       </div>
+    </div>
+    <div class="card" id="stageCard">
+      <div class="title">分阶段开放变量</div>
+      <div class="chips">
+        <button data-stage="critical" class="active">1 判临界</button>
+        <button data-stage="friction">2 分静动</button>
+        <button data-stage="explore">3 综合</button>
+      </div>
+      <div class="small" id="stageHint">先只改变外力 F；质量、摩擦参数和板长保持不变。</div>
     </div>
     <div class="card">
       <div class="title">快速情境</div>
@@ -80,12 +91,13 @@
   'use strict';
   const canvas=document.getElementById('canvas');
   const ctx=canvas.getContext('2d');
-  const state={mode:'pull',F:4,v0:4,mus:.4,muk:.3,m:1,M:3,L:2,g:10,t:0,drag:null,playing:false};
+  const state={mode:'pull',stage:'critical',F:4,v0:4,mus:.4,muk:.3,m:1,M:3,L:2,g:10,t:0,drag:null,playing:false};
   const ids=['meter1','meter2','meter3','meter4','status','meter1Label'];
   const el=Object.fromEntries(ids.map(id=>[id,document.getElementById(id)]));
   const playBtn=document.getElementById('playBtn');
   const pullMode=document.getElementById('pullMode');
   const kickMode=document.getElementById('kickMode');
+  const stageHint=document.getElementById('stageHint');
   const colors={ink:'#102a43',blue:'#2563eb',red:'#dc2626',orange:'#f59e0b',green:'#0f766e',purple:'#7c3aed',muted:'#64748b'};
   const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
   const fmt=(v,d=1)=>Number.isFinite(v)?v.toFixed(d):'--';
@@ -242,12 +254,20 @@
     box(34,610,876,108,8,'#fff','#d7dee8');
     line(78,704,408,704,'#0f172a',2);for(let i=0;i<=10;i++)line(78+i*33,699,78+i*33,709,'#0f172a',1);
     text('拖时间游标，看侧视运动、俯视滑痕和图像记录同步变化',242,628,colors.purple,'center',12,'900');handle(g.time.x,g.time.y,`t=${fmt(v.t,2)}s`,state.drag==='time',colors.purple);
-    ruler(48,662,168,'m',colors.blue,g.m,`m=${fmt(state.m)}`,state.drag==='m');
-    ruler(188,662,308,'M',colors.red,g.M,`M=${fmt(state.M)}`,state.drag==='M');
-    ruler(328,662,448,'μₛ',colors.orange,g.mus,`μₛ=${fmt(state.mus,2)}`,state.drag==='mus');
-    ruler(468,662,588,'μₖ','#d97706',g.muk,`μₖ=${fmt(state.muk,2)}`,state.drag==='muk');
-    ruler(608,662,728,'L',colors.green,g.L,`L=${fmt(state.L)}m`,state.drag==='L');
-    ruler(748,662,868,'g',colors.purple,g.g,`g=${fmt(state.g)}m/s²`,state.drag==='g');
+    if(state.stage==='critical'){
+      text('阶段1：只改变 F（或 v₀），先判断是否超过最大静摩擦',618,665,'#475569','center',13,'900');
+    }else if(state.stage==='friction'){
+      ruler(328,662,448,'μₛ',colors.orange,g.mus,`μₛ=${fmt(state.mus,2)}`,state.drag==='mus');
+      ruler(468,662,588,'μₖ','#d97706',g.muk,`μₖ=${fmt(state.muk,2)}`,state.drag==='muk');
+      text('阶段2：质量与板长锁定，只比较 μₛ 与 μₖ 的不同职责',738,665,'#475569','center',12,'900');
+    }else{
+      ruler(48,662,168,'m',colors.blue,g.m,`m=${fmt(state.m)}`,state.drag==='m');
+      ruler(188,662,308,'M',colors.red,g.M,`M=${fmt(state.M)}`,state.drag==='M');
+      ruler(328,662,448,'μₛ',colors.orange,g.mus,`μₛ=${fmt(state.mus,2)}`,state.drag==='mus');
+      ruler(468,662,588,'μₖ','#d97706',g.muk,`μₖ=${fmt(state.muk,2)}`,state.drag==='muk');
+      ruler(608,662,728,'L',colors.green,g.L,`L=${fmt(state.L)}m`,state.drag==='L');
+      ruler(748,662,868,'g',colors.purple,g.g,`g=${fmt(state.g)}m/s²`,state.drag==='g');
+    }
   }
   function ruler(x1,y,x2,label,c,hx,txt,active){
     line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-18,c,'center',12,'900');handle(hx,y,txt,active,c);
@@ -263,6 +283,9 @@
     const heat=v.Q===null?' 相对静止阶段不使用 Q=fₖ·s相对。':` 相对滑动累计生热 Q=${fmt(v.Q,2)} J。`;
     el.status.textContent=(bad?'滑下木板：相对位移已经达到板长 L，要停止用“在板上”的方程。':state.mode==='pull'?(v.sliding?'相对滑动：f需 已超过 fₛ,max，现切换为 fₖ 并分别列两个加速度。':'假设共动成立：先求 f需，再确认它没有超过 fₛ,max。'):v.phase.includes('共')?'达到共速：相对滑动停止，之后一起运动。':'相对滑动：滑块减速、木板加速，红色滑痕正在增长。')+heat;
     canvas.dataset.frictionParameters='separate-mus-muk';
+    canvas.dataset.frictionConstraint='muk-lte-mus';
+    canvas.dataset.muOrderValid=String(state.muk<=state.mus+1e-9);
+    canvas.dataset.controlStage=state.stage;
     canvas.dataset.analysisStep=v.sliding?'kinetic-friction':'compare-required-static-to-maximum';
   }
   function draw(){
@@ -275,17 +298,23 @@
   function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
   function near(p,h,rad=26){return Math.hypot(p.x-h.x,p.y-h.y)<=rad}
   function setMode(mode){state.mode=mode;state.t=0;state.playing=false;playBtn.textContent='播放过程';pullMode.classList.toggle('active',mode==='pull');kickMode.classList.toggle('active',mode==='kick');draw()}
+  function setStage(stage){
+    state.stage=stage;state.drag=null;state.playing=false;playBtn.textContent='播放过程';
+    document.querySelectorAll('[data-stage]').forEach(btn=>btn.classList.toggle('active',btn.dataset.stage===stage));
+    stageHint.textContent=stage==='critical'?'先只改变外力 F；质量、摩擦参数和板长保持不变。':stage==='friction'?'保持质量和板长不变，分别改变 μₛ 与 μₖ；程序始终约束 μₖ≤μₛ。':'全部参数已开放，用于完成临界判断后的综合迁移。';
+    draw();
+  }
   function down(e){
     state.playing=false;playBtn.textContent='播放过程';
     const p=pos(e),g=geometry();state.drag=null;
     if(near(p,g.top,34))state.drag=state.mode==='pull'?'F':'v0';
     else if(near(p,g.time,24))state.drag='time';
-    else if(near(p,g.m,24))state.drag='m';
-    else if(near(p,g.M,24))state.drag='M';
-    else if(near(p,g.mus,24))state.drag='mus';
-    else if(near(p,g.muk,24))state.drag='muk';
-    else if(near(p,g.L,24))state.drag='L';
-    else if(near(p,g.g,24))state.drag='g';
+    else if(state.stage==='explore'&&near(p,g.m,24))state.drag='m';
+    else if(state.stage==='explore'&&near(p,g.M,24))state.drag='M';
+    else if(state.stage!=='critical'&&near(p,g.mus,24))state.drag='mus';
+    else if(state.stage!=='critical'&&near(p,g.muk,24))state.drag='muk';
+    else if(state.stage==='explore'&&near(p,g.L,24))state.drag='L';
+    else if(state.stage==='explore'&&near(p,g.g,24))state.drag='g';
     if(state.drag){canvas.setPointerCapture(e.pointerId);move(e)}
   }
   function move(e){
@@ -296,8 +325,11 @@
     if(state.drag==='time')state.t=clamp((p.x-78)/330*Math.max(.2,v.endT),0,v.endT);
     if(state.drag==='m')state.m=clamp(.5+(p.x-48)/120*2.5,.5,3);
     if(state.drag==='M')state.M=clamp(1+(p.x-188)/120*5,1,6);
-    if(state.drag==='mus')state.mus=clamp(.1+(p.x-328)/120*.5,.1,.6);
-    if(state.drag==='muk')state.muk=clamp(.05+(p.x-468)/120*.5,.05,.55);
+    if(state.drag==='mus'){
+      state.mus=clamp(.1+(p.x-328)/120*.5,.1,.6);
+      state.muk=Math.min(state.muk,state.mus);
+    }
+    if(state.drag==='muk')state.muk=clamp(.05+(p.x-468)/120*.5,.05,Math.min(.55,state.mus));
     if(state.drag==='L')state.L=clamp(.8+(p.x-608)/120*2.7,.8,3.5);
     if(state.drag==='g')state.g=clamp(2+(p.x-748)/120*8,2,10);
     state.t=clamp(state.t,0,calc().endT);draw();
@@ -306,6 +338,7 @@
   canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
   pullMode.addEventListener('click',()=>setMode('pull'));
   kickMode.addEventListener('click',()=>setMode('kick'));
+  document.querySelectorAll('[data-stage]').forEach(btn=>btn.addEventListener('click',()=>setStage(btn.dataset.stage)));
   document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{
     const c=btn.dataset.case;state.playing=false;playBtn.textContent='播放过程';
     if(c==='safe'){state.mode='pull';state.mus=.45;state.muk=.32;state.m=1;state.M=2.5;state.F=3;state.L=2;state.t=0}

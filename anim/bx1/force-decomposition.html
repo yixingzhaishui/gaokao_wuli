@@ -216,12 +216,14 @@
     els.perpLabel.textContent=state.basis==='slope'?'垂直斜面 G⊥':'竖直分量 Gy';
     const buttons=document.querySelectorAll('[data-theta]');
     buttons.forEach(btn=>btn.classList.toggle('active',Math.abs(+btn.dataset.theta-state.theta)<.5));
-    if(state.theta<1){
+    if(state.basis==='ground'){
+      els.status.textContent='同一个重力改沿水平/竖直分解，得到 Gx=0、Gy=G；分力不同但合成仍是原重力。';
+    }else if(state.theta<1){
       els.status.textContent='θ=0° 时，G∥=0：重力只把物体压向水平面，没有沿面下滑分力。';
     }else if(state.theta>55){
-      els.status.textContent='斜面越陡，G∥ 越接近 G，G⊥ 变小；支持力和摩擦相关量也会变小。';
+      els.status.textContent='斜面越陡，G∥ 越接近 G，G⊥ 变小；本页只分解重力，实际静摩擦仍须结合沿面合力按需要求值。';
     }else{
-      els.status.textContent=state.basis==='slope'?'mg sinθ 只是沿斜面向下的分量，产生下滑趋势；是否下滑取决于沿面合力。':'同一个重力改沿水平/竖直分解，得到 Gx=0、Gy=G；分力不同但合成仍是原重力。';
+      els.status.textContent='mg sinθ 只是沿斜面向下的分量，产生下滑趋势；是否下滑取决于沿面合力。';
     }
     if(state.playing)els.status.textContent+='（播放中：θ 自动变化）';
   }

@@ -370,6 +370,20 @@ for (const { moduleName, file } of pages) {
       let initial = await captureState(page);
       if (playIndex >= 0) {
         const playButton = buttons.nth(playIndex);
+        if (!(await playButton.isVisible())) {
+          // Some lessons intentionally hide a secondary demonstration until
+          // the student opens an explicit extension card. Exercise visible
+          // prerequisite buttons until the designated transport is exposed.
+          for (let i = 0; i < buttonCount && !(await playButton.isVisible()); i++) {
+            if (i === playIndex || i === resetIndex) continue;
+            const prerequisite = buttons.nth(i);
+            if (await prerequisite.isVisible() && !(await prerequisite.isDisabled())) {
+              await prerequisite.click();
+              await page.waitForTimeout(80);
+            }
+          }
+          initial = await captureState(page);
+        }
         if (await playButton.isDisabled()) {
           for (let i = 0; i < buttonCount && await playButton.isDisabled(); i++) {
             if (i === playIndex || i === resetIndex) continue;
@@ -388,7 +402,22 @@ for (const { moduleName, file } of pages) {
         }
         await playButton.click();
         await page.waitForTimeout(350);
-        const afterPlay = await captureState(page);
+        let afterPlay = await captureState(page);
+        // Guided lessons may intentionally pause for a prediction before any
+        // physical state moves. Complete one visible prediction choice, then
+        // require the ensuing evidence animation to change a physical trace.
+        if (!meaningfulMotionChanged(initial, afterPlay)) {
+          const predictionChoices = page.locator('button[data-predict], button[data-prediction], button[data-p1], button[data-p2], button[data-predict-force], button[data-predict-mass]');
+          for (let i = 0; i < await predictionChoices.count(); i++) {
+            const choice = predictionChoices.nth(i);
+            if (await choice.isVisible() && !(await choice.isDisabled())) {
+              await choice.click();
+              await page.waitForTimeout(350);
+              afterPlay = await captureState(page);
+              break;
+            }
+          }
+        }
         record.play_debug = { initial, afterPlay };
         record.motion_evidence = {
           canvas_or_svg_changed: initial.visual_hash !== afterPlay.visual_hash,
@@ -413,7 +442,21 @@ for (const { moduleName, file } of pages) {
       }
 
       if (resetIndex >= 0) {
-        await buttons.nth(resetIndex).click();
+        const resetButton = buttons.nth(resetIndex);
+        if (!(await resetButton.isVisible())) {
+          // Reset may live inside the exploration card that is revealed only
+          // after a required prediction. Finish one visible prerequisite so
+          // the canonical reset can be tested rather than timing out hidden.
+          for (let i = 0; i < buttonCount && !(await resetButton.isVisible()); i++) {
+            if (i === playIndex || i === resetIndex) continue;
+            const prerequisite = buttons.nth(i);
+            if (await prerequisite.isVisible() && !(await prerequisite.isDisabled())) {
+              await prerequisite.click();
+              await page.waitForTimeout(80);
+            }
+          }
+        }
+        await resetButton.click();
         await page.waitForTimeout(140);
         let afterReset = await captureState(page);
         // Time-based demos may start running immediately after a page reload.
@@ -442,6 +485,17 @@ for (const { moduleName, file } of pages) {
           }
         }
         const canonicalResetButton = page.locator('button').nth(resetIndex);
+        if (!(await canonicalResetButton.isVisible())) {
+          const canonicalButtons = page.locator('button');
+          for (let i = 0; i < await canonicalButtons.count() && !(await canonicalResetButton.isVisible()); i++) {
+            if (i === resetIndex) continue;
+            const prerequisite = canonicalButtons.nth(i);
+            if (await prerequisite.isVisible() && !(await prerequisite.isDisabled())) {
+              await prerequisite.click();
+              await page.waitForTimeout(80);
+            }
+          }
+        }
         await canonicalResetButton.click();
         await page.waitForTimeout(140);
         let canonicalReset = await captureResetState(page);
