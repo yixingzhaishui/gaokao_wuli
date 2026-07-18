@@ -1,6 +1,7 @@
 # B1 当前 HEAD 整改验收矩阵
 
 > 基线：`af2032c12acb145b36c9be8405e2af35a04f32cd`
+> 受测实现：`2b141c56bc1b3a4f69ce64ce1f277976343585c4`
 > 来源：`OPENAI_PRO_B1_CURRENT_HEAD_REVIEW_af2032c.md`
 > 状态：VERIFIED — CURRENT FINDINGS CLOSED
 > 原则：物理阻断优先；工程 PASS 不替代内容批准；开发继续。
@@ -37,6 +38,7 @@
 - `npm run audit:pedagogy:b1`：7/7 PASS
 - `npm run audit:physics:b1`：13/13 PASS
 - B1 全部动画真实交互回归：32/32 PASS，100 分，`blocked=0`，无 hard failure
+- 交互证据：`audit/results/b1-current-head-remediation-2b141c5.json`；记录 `worktree_clean=true` 并绑定受测实现提交
 - 真实浏览器抽查：质点预测、重力拓展、板块分阶段解锁均按可见控件完成
 - 390×844：无横向溢出；浏览器控制台无 error/warning
 
