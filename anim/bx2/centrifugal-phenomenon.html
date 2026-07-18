@@ -24,5 +24,8 @@ function draw(){const x=vals();ctx.clearRect(0,0,900,600);const bg=ctx.createLin
 id('reset').onclick=()=>{el.speed.value=12;el.radius.value=40;el.mu.value=.4;state.playing=false;state.t=0;el.play.textContent='播放';draw()};
 })();
 </script>
+<script>
+window.B2_GUIDE={id:'B2-25',question:'弯道半径和摩擦条件不变，车速显著增大后为什么会沿切线偏离？',observe:'在惯性系中只分析真实力。把速度从12 m/s提高到32 m/s，比较所需向心作用和最大静摩擦。',options:[{value:'insufficient',label:'所需向心力超过最大静摩擦，约束不足'},{value:'outward',label:'出现了一个真实的向外离心力'},{value:'gravity',label:'重力突然消失'}],correct:'insufficient',actions:[{selector:'#speed',value:'32'}],result:'所需向心力超过最大静摩擦，车辆不能继续沿原圆弧转弯。',evidence:'mv²/r对应的需求超过μmg上限，状态切换为沿原速度切线偏离。',explanation:'惯性系中没有额外真实离心力；物体保持原运动趋势，是向内约束不足。',transfer:'水平弯道临界题比较mv²/r与最大静摩擦，并说明离心力只可作为旋转参考系中的惯性力。'};
+</script><script src="guided-lesson.js"></script>
 </body>
 </html>

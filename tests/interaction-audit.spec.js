@@ -249,7 +249,7 @@ async function auditChargeElectrificationSemantics(page, record) {
   await page.waitForTimeout(80);
   const step = page.locator('#inductionStep');
   const phases = [];
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 3; i++) {
     if (!(await step.isVisible())) break;
     const label = ((await step.textContent()) || '').trim();
     const before = await captureState(page);
@@ -258,10 +258,11 @@ async function auditChargeElectrificationSemantics(page, record) {
     const after = await captureState(page);
     phases.push({ label, changed: changed(before, after) });
   }
-  const pass = phases.length === 2 && phases.every(phase => phase.changed);
+  const expectedLabels = ['接地', '断开接地', '移开带电体'];
+  const pass = phases.length === 3 && phases.every((phase, index) => phase.changed && phase.label === expectedLabels[index]);
   record.semantic_checks.push({
     kind: '静电感应分步流程',
-    expected: '进入静电感应后依次完成“接地 → 移开带电体”，每步改变画面或物理读数',
+    expected: '进入静电感应后依次完成“接地 → 断开接地 → 移开带电体”，每步改变画面或物理读数',
     actual: phases,
     pass
   });
@@ -270,7 +271,7 @@ async function auditChargeElectrificationSemantics(page, record) {
     stepCheck.checked = true;
     stepCheck.worked = pass;
   }
-  if (!pass) record.hard_failures.push({ code: 'H5', description: '静电感应的“接地 → 移开带电体”分步流程未产生真实状态变化。' });
+  if (!pass) record.hard_failures.push({ code: 'H5', description: '感应起电的“接地 → 断开接地 → 移开带电体”分步流程或步骤顺序错误。' });
 }
 
 async function auditReferenceFrameSemantics(page, record) {
@@ -403,6 +404,13 @@ for (const { moduleName, file } of pages) {
         await playButton.click();
         await page.waitForTimeout(350);
         let afterPlay = await captureState(page);
+        // Some canvas lessons start their time-step loop on the next stable
+        // animation frame after a guided panel is unlocked. Give that real
+        // transport one bounded retry before treating it as a dead play button.
+        if (!meaningfulMotionChanged(initial, afterPlay)) {
+          await page.waitForTimeout(450);
+          afterPlay = await captureState(page);
+        }
         // Guided lessons may intentionally pause for a prediction before any
         // physical state moves. Complete one visible prediction choice, then
         // require the ensuing evidence animation to change a physical trace.
@@ -463,7 +471,7 @@ for (const { moduleName, file } of pages) {
         // Freeze them before comparing the restored physical baseline.
         if (playIndex >= 0) {
           const resetPlayButton = buttons.nth(playIndex);
-          if (/暂停/.test((await resetPlayButton.textContent()) || '')) {
+          if (await resetPlayButton.isVisible() && /暂停/.test((await resetPlayButton.textContent()) || '')) {
             await resetPlayButton.click();
             await page.waitForTimeout(80);
             afterReset = await captureState(page);
@@ -479,7 +487,7 @@ for (const { moduleName, file } of pages) {
         await page.waitForTimeout(140);
         if (playIndex >= 0) {
           const canonicalPlayButton = page.locator('button').nth(playIndex);
-          if (/暂停/.test((await canonicalPlayButton.textContent()) || '')) {
+          if (await canonicalPlayButton.isVisible() && /暂停/.test((await canonicalPlayButton.textContent()) || '')) {
             await canonicalPlayButton.click();
             await page.waitForTimeout(80);
           }
@@ -501,7 +509,7 @@ for (const { moduleName, file } of pages) {
         let canonicalReset = await captureResetState(page);
         if (playIndex >= 0) {
           const canonicalPlayAfterReset = page.locator('button').nth(playIndex);
-          if (/暂停/.test((await canonicalPlayAfterReset.textContent()) || '')) {
+          if (await canonicalPlayAfterReset.isVisible() && /暂停/.test((await canonicalPlayAfterReset.textContent()) || '')) {
             await canonicalPlayAfterReset.click();
             await page.waitForTimeout(80);
             canonicalReset = await captureResetState(page);

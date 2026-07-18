@@ -168,7 +168,7 @@
     status: document.getElementById('status'),
     play: document.getElementById('play')
   };
-  const state = { running: false, drag: null, hot: {}, lastTime: 0 };
+  const state = { running: false, drag: null, hot: {}, lastTime: 0, progress: Number(els.u.value) };
 
   function clamp(v, min, max) {
     return Math.max(min, Math.min(max, v));
@@ -494,6 +494,7 @@
 
   Object.values(els).forEach(el => {
     el.addEventListener('input', () => {
+      state.progress = Number(els.u.value);
       stopRun();
       draw();
     });
@@ -503,6 +504,7 @@
     state.running = !state.running;
     ui.play.textContent = state.running ? '暂停' : '播放';
     state.lastTime = performance.now();
+    state.progress = Number(els.u.value);
   });
 
   document.getElementById('reset').addEventListener('click', () => {
@@ -535,8 +537,9 @@
     if (state.running) {
       const dt = Math.min(0.035, (now - state.lastTime) / 1000 || 0.016);
       state.lastTime = now;
-      let next = Number(els.u.value) + dt * 0.35;
+      let next = state.progress + dt * 0.35;
       if (next > 1) next = 0;
+      state.progress = next;
       els.u.value = String(next);
     }
     draw();
@@ -547,5 +550,8 @@
   requestAnimationFrame(tick);
 })();
 </script>
+<script>
+window.B2_GUIDE={id:'B2-21',question:'轨道由光滑变粗糙后，机械能和系统总能量怎样变化？',observe:'系统选“物块+固定轨道+地球”，只改变是否存在滑动摩擦。',options:[{value:'internal',label:'机械能减少，内能增加，总能量不变'},{value:'lost',label:'机械能和总能量都消失'},{value:'same',label:'机械能仍保持不变'}],correct:'internal',actions:[{selector:'[data-case="rough"]'}],result:'机械能减少并转化为内能，所选近似封闭系统总能量不变。',evidence:'同一位置的机械能柱下降，内能柱等量增加，总能量柱保持不变。',explanation:'摩擦使机械能不守恒，但能量没有消失；是否守恒必须先明确系统边界和能量形式。',transfer:'机械能守恒题先选系统，再检查是否只有重力或弹力做功，不能只看“有没有摩擦”三个字。'};
+</script><script src="guided-lesson.js"></script>
 </body>
 </html>
