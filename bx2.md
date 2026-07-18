@@ -5,7 +5,7 @@
 
 ## 2.1 曲线运动 <h3 id="curved-motion"></h3>
 
-<h4 id="curved-condition">B2-01 曲线运动条件 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="curved-condition">B2-01 曲线运动条件 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -136,7 +136,7 @@ F合 与 v 不共线，或 F⊥ ≠ 0
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B2-01）
 
-<h4 id="motion-composition">B2-02 运动合成与分解 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="motion-composition">B2-02 运动合成与分解 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -272,7 +272,7 @@ vy = v船 sinθ
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B2-02）
 
-<h4 id="projectile-motion">B2-03 平抛运动 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="projectile-motion">B2-03 平抛运动 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -369,7 +369,7 @@ vy = v船 sinθ
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B2-03）
 
-<h4 id="oblique-throw">B2-04 斜抛运动/类平抛 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="oblique-throw">B2-04 斜抛运动/类平抛 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -506,7 +506,7 @@ vy = v0y - gt
 
 ## 2.2 圆周运动 <h3 id="circular-motion"></h3>
 
-<h4 id="circular-basics">B2-05 圆周运动基本量 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="circular-basics">B2-05 圆周运动基本量 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -650,7 +650,7 @@ v = rω
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B2-05）
 
-<h4 id="centripetal">B2-06 向心加速度与向心力 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="centripetal">B2-06 向心加速度与向心力 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -739,7 +739,7 @@ v = rω
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B2-06）
 
-<h4 id="conical-pendulum">B2-07 水平圆周与圆锥摆 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="conical-pendulum">B2-07 水平圆周与圆锥摆 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -903,7 +903,7 @@ tanθ = v²/(rg)
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B2-07）
 
-<h4 id="vertical-circle">B2-08 竖直圆周临界 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="vertical-circle">B2-08 竖直圆周临界 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -1050,7 +1050,7 @@ v_bottom,min = √(5gr)
 
 ## 2.3 万有引力与天体 <h3 id="gravitation-section"></h3>
 
-<h4 id="gravitation">B2-09 万有引力定律 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="gravitation">B2-09 万有引力定律 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -1154,7 +1154,7 @@ G = 6.67×10^-11 N·m²/kg²
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B2-09）
 
-<h4 id="kepler-law">B2-10 开普勒定律 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="kepler-law">B2-10 开普勒定律 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -1277,7 +1277,7 @@ T²/a³ = 4π²/(GM)
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B2-10）
 
-<h4 id="satellite-orbit">B2-11 卫星圆轨道 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="satellite-orbit">B2-11 卫星圆轨道 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -1373,7 +1373,7 @@ T²/a³ = 4π²/(GM)
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B2-11）
 
-<h4 id="geostationary">B2-12 同步卫星 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="geostationary">B2-12 同步卫星 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -1494,7 +1494,7 @@ h = r - R
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B2-12）
 
-<h4 id="orbit-transfer">B2-13 卫星变轨 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="orbit-transfer">B2-13 卫星变轨 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -1614,7 +1614,7 @@ a = (r1 + r2)/2
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B2-13）
 
-<h4 id="binary-star">B2-14 双星模型 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="binary-star">B2-14 双星模型 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -1734,7 +1734,7 @@ T = 2π√[L³ / G(m1 + m2)]
 
 ---
 
-<h4 id="work">B2-15 功 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="work">B2-15 功 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -1870,7 +1870,7 @@ $\cos \alpha$ 负责决定符号：$\alpha <90^{\circ}$ 时 $\cos \alpha >0$，`
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B2-15）
 
-<h4 id="power">B2-16 功率 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="power">B2-16 功率 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -2008,7 +2008,7 @@ P = ΔW/Δt = Fv cosα = F∥v
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B2-16）
 
-<h4 id="vehicle-start">B2-17 机车启动 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="vehicle-start">B2-17 机车启动 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -2172,7 +2172,7 @@ v1 = P额/F0
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B2-17）
 
-<h4 id="kinetic-energy-theorem">B2-18 动能定理 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="kinetic-energy-theorem">B2-18 动能定理 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -2357,7 +2357,7 @@ W合 = ΔEₖ = Ek2 - Ek1
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B2-18）
 
-<h4 id="gravitational-pe">B2-19 重力势能 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="gravitational-pe">B2-19 重力势能 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -2502,7 +2502,7 @@ WG = mg(h1-h2) = -ΔEp
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B2-19）
 
-<h4 id="elastic-pe">B2-20 弹性势能 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="elastic-pe">B2-20 弹性势能 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -2638,7 +2638,7 @@ Ep = 1/2 × kx × x = 1/2 kx²
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B2-20）
 
-<h4 id="mechanical-energy">B2-21 机械能守恒 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="mechanical-energy">B2-21 机械能守恒 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -2764,7 +2764,7 @@ Ek1 + Ep1 = Ek2 + Ep2
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B2-21）
 
-<h4 id="work-energy-relation">B2-22 功能关系 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="work-energy-relation">B2-22 功能关系 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -2884,7 +2884,7 @@ W其他 = ΔE机（先选系统）
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B2-22）
 
-<h4 id="energy-conservation">B2-23 能量守恒 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="energy-conservation">B2-23 能量守恒 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -3003,7 +3003,7 @@ W其他 = ΔE机（先选系统）
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B2-23）
 
-<h4 id="relativity">B2-24 相对论初步 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="relativity">B2-24 相对论初步 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: stse-extension; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -3135,7 +3135,7 @@ W其他 = ΔE机（先选系统）
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B2-24）
 
-<h4 id="centrifugal-phenomenon">B2-25 离心现象与生活应用 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="centrifugal-phenomenon">B2-25 离心现象与生活应用 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -3190,7 +3190,7 @@ W其他 = ΔE机（先选系统）
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B2-25）
 
-<h4 id="cosmic-velocity">B2-26 宇宙速度专题 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="cosmic-velocity">B2-26 宇宙速度专题 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: stse-extension; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -3246,7 +3246,7 @@ v2 = √(2GM/R) ≈ 11.2 km/s
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：B2-26）
 
-<h4 id="newtonian-limit-relativity-universe">B2-27 牛顿力学局限、相对论边界与宇宙观 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="newtonian-limit-relativity-universe">B2-27 牛顿力学局限、相对论边界与宇宙观 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: stse-extension; editorial-review: P1-EDITOR-002/003 -->
 
 
