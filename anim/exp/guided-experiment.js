@@ -30,18 +30,57 @@
     'isothermal-gas-law-lab.html':['E-26','等温压缩后 P 与 V 的乘积怎样？',['近似不变','持续增大'],'快速压缩时气体未热平衡，必须等待水浴恢复恒温后读数。','改变水浴温度后，P-1/V 斜率怎样变化？']
   };
 
+  // These two experiment benches are also the guided demonstrations for B3.
+  // Keep one control lock (the E8 guide) and expose a small compatibility view
+  // instead of loading a second guide that would compete for the same controls.
+  const b3CompatConfigs = {
+    'multimeter-practice-lab.html': {
+      id: 'B3-18',
+      question: '使用欧姆挡测电阻时，被测电路仍接通电源，能否继续读数？',
+      options: [['reject', '不能，必须先断开被测电路电源'], ['allow', '能，读数照常有效']],
+      result: '操作不通过：测电阻必须先断开被测电路电源。',
+      evidence: '电源状态切为“是”，状态栏显示“不通过”，并明确要求断电。',
+      explanation: '欧姆挡内部自带电源，外部带电会破坏测量条件并可能损坏仪表。',
+      boundary: '换倍率后仍要重新欧姆调零；测电压并联、测电流串联。',
+      transfer: '实验操作题先检查安全与接法，再判断量程和读数。',
+      act() { setControlValue('#power', '1'); }
+    },
+    'capacitor-charge-discharge-lab.html': {
+      id: 'B3-23',
+      question: '保持 C 不变，把 R 从 20 kΩ 加倍到 40 kΩ，充电快慢怎样变？',
+      options: [['slower', '时间常数加倍，充电更慢'], ['faster', '电阻更大，充电更快']],
+      result: 'τ=RC 由 2.00 s 增至 4.00 s，达到同一比例所需时间加倍。',
+      evidence: 'R 标签显示 40 kΩ，读数显示 τ=4.00 s，Uc 和 I 曲线同步变慢。',
+      explanation: 'R 越大，同一电压差下电荷转移速率越小，因此 RC 过程更慢。',
+      boundary: '“Uc 从 0 开始”要求初始未充电；一般初态要使用相应初值。',
+      transfer: '比较 RC 曲线先比较 τ，再找 0.632 或 0.368 特征点。',
+      act() { setControlValue('#r', '40'); document.querySelector('#play')?.click(); }
+    }
+  };
+
+  function setControlValue(selector, value) {
+    const control = document.querySelector(selector);
+    if (!control) return;
+    control.value = value;
+    control.dispatchEvent(new Event('input', { bubbles: true }));
+    control.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+
   const file = location.pathname.split('/').pop();
   const config = configs[file];
   if (!config) return;
+  const b3Compat = b3CompatConfigs[file] || null;
   const [node, question, choices, boundary, transfer] = config;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   document.documentElement.dataset.expGuided = 'true';
   document.documentElement.dataset.reducedMotion = String(reduced);
+  if (b3Compat) document.documentElement.dataset.b3Motion = reduced ? 'reduce' : 'full';
 
   const style = document.createElement('style');
   style.textContent = `
     .exp-guide{margin:10px 12px 0;padding:12px;border:1px solid #b8c9dd;border-left:5px solid #2c7be5;border-radius:9px;background:#f7fbff;color:#102a43;font:13px/1.55 -apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
-    .exp-guide__title{font-weight:900;font-size:15px}.exp-guide__step{color:#486581;margin:4px 0 8px}.exp-guide__actions{display:flex;flex-wrap:wrap;gap:7px}.exp-guide button{width:auto!important;min-height:34px!important;padding:6px 10px;border:1px solid #9fb3c8;border-radius:7px;background:#fff;color:#102a43;font:inherit;font-weight:800;cursor:pointer}.exp-guide button[data-selected=true]{background:#2c7be5;color:#fff;border-color:#2c7be5}.exp-guide__note{margin-top:8px;color:#486581}.exp-guide__result{margin-top:8px;padding:8px;border-radius:7px;background:#e6fffa;color:#087f5b;font-weight:700}.exp-guide [hidden]{display:none!important}.exp-guide-locked{opacity:.55;filter:grayscale(.25)}
+    .exp-guide__title{font-weight:900;font-size:15px}.exp-guide__step{color:#486581;margin:4px 0 8px}.exp-guide__actions{display:flex;flex-wrap:wrap;gap:7px}.exp-guide button,.exp-guide .b3-guide-replay{box-sizing:border-box;width:auto!important;max-width:100%;min-height:34px!important;padding:6px 10px;border:1px solid #9fb3c8;border-radius:7px;background:#fff;color:#102a43;font:inherit;font-weight:800;cursor:pointer;text-decoration:none}.exp-guide button[data-selected=true],.exp-guide button[aria-pressed=true]{background:#2c7be5;color:#fff;border-color:#2c7be5}.exp-guide__note{margin-top:8px;color:#486581}.exp-guide__result{margin-top:8px;padding:8px;border-radius:7px;background:#e6fffa;color:#087f5b;font-weight:700}.exp-guide [hidden]{display:none!important}.exp-guide-locked{opacity:.55;filter:grayscale(.25)}
+    .exp-b3-compat{border-left-color:#7c3aed;background:#fbfaff}.b3-guide-veil{margin:6px 0;padding:7px 9px;border-radius:7px;background:#f3e8ff;color:#6b21a8;font-weight:800}.b3-guide-question{margin:5px 0 8px;font-weight:800}.b3-guide-feedback{margin-top:8px;padding:8px;border-radius:7px;background:#f0fdf4;color:#166534}.b3-guide-motion{margin-top:7px;color:#486581;font-size:12px}
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
   `;
   document.head.appendChild(style);
@@ -51,7 +90,15 @@
   const controlState = new Map();
   originalControls.forEach(el => {
     if ('disabled' in el) controlState.set(el, el.disabled);
-    if (el.tagName === 'CANVAS') { el.dataset.guidePointerEvents = el.style.pointerEvents; el.style.pointerEvents='none'; }
+    if (el.tagName === 'CANVAS') {
+      el.dataset.guidePointerEvents = el.style.pointerEvents;
+      el.style.pointerEvents='none';
+      if (b3Compat) {
+        el.dataset.guideOpacity = el.style.opacity;
+        el.style.opacity = '.35';
+        el.dataset.guideStage = 'predict';
+      }
+    }
     else if ('disabled' in el) {
       const resetLike=el.matches('[data-audit-reset]')||/^reset/i.test(el.id)||/重置|复位/.test(el.textContent||'');
       if(!resetLike)el.disabled=true;
@@ -67,11 +114,25 @@
   const step=guide.querySelector('[data-guide-step]'),predict=guide.querySelector('[data-guide-predict]'),verify=guide.querySelector('[data-exp-guide="verify"]'),analyze=guide.querySelector('[data-exp-guide="analyze"]'),replay=guide.querySelector('[data-exp-guide="replay"]'),result=guide.querySelector('[data-guide-result]');
   let selected='',unlocked=false,measured=false;
 
+  function unlockControls() {
+    originalControls.forEach(el=>{
+      el.classList.remove('exp-guide-locked');
+      if(el.tagName==='CANVAS') {
+        el.style.pointerEvents=el.dataset.guidePointerEvents||'';
+        if (b3Compat) {
+          el.style.opacity=el.dataset.guideOpacity||'';
+          el.dataset.guideStage='explore';
+        }
+      } else if('disabled' in el) el.disabled=controlState.get(el)||false;
+    });
+    document.querySelector('.b3-guide-veil')?.remove();
+  }
+
   guide.querySelector('[data-exp-guide="setup"]').addEventListener('click',e=>{e.currentTarget.hidden=true;predict.hidden=false;step.textContent='2/5 预测：'+question;});
   guide.querySelectorAll('[data-exp-guide="choice"]').forEach(btn=>btn.addEventListener('click',()=>{selected=btn.dataset.predict;guide.querySelectorAll('[data-exp-guide="choice"]').forEach(b=>b.dataset.selected=String(b===btn));verify.hidden=false;}));
   verify.addEventListener('click',()=>{
     unlocked=true;predict.hidden=true;verify.hidden=true;
-    originalControls.forEach(el=>{el.classList.remove('exp-guide-locked');if(el.tagName==='CANVAS')el.style.pointerEvents=el.dataset.guidePointerEvents||'';else if('disabled' in el)el.disabled=controlState.get(el)||false;});
+    unlockControls();
     step.textContent='3/5 测量：真实拖动/调节装置并记录至少一组有效数据。预测已锁定：'+(selected==='a'?choices[0]:choices[1]);
   });
   function markMeasured(){if(!unlocked||measured)return;measured=true;analyze.hidden=false;step.textContent='4/5 作图/拟合：检查原始记录、坐标轴、拟合关系与异常数据，再进入分析。';}
@@ -83,6 +144,36 @@
   }
   analyze.addEventListener('click',()=>{revealNodes.forEach(el=>el.style.display=el.dataset.guideDisplay||'');analyze.hidden=true;replay.hidden=false;result.hidden=false;result.textContent='5/5 解释与迁移：'+boundary+' 迁移：'+transfer;step.textContent='完成：用观测证据解释预测，并明确适用边界。';document.dispatchEvent(new CustomEvent('exp-guide-complete',{detail:{node,selected}}));});
   replay.addEventListener('click',()=>location.reload());
+
+  if (b3Compat) {
+    const b3Guide = document.createElement('section');
+    b3Guide.className = 'exp-guide exp-b3-compat';
+    b3Guide.dataset.b3Guide = b3Compat.id;
+    b3Guide.setAttribute('aria-label', b3Compat.id + ' 预测—证据引导');
+    b3Guide.innerHTML = `<div class="exp-guide__title">${b3Compat.id} 跨章预测—证据引导</div><div class="b3-guide-veil">先完成预测，实验画面随后开放。</div><div class="b3-guide-question">${b3Compat.question}</div><div class="exp-guide__actions">${b3Compat.options.map(([value,label])=>`<button type="button" data-guide-choice="${value}">${label}</button>`).join('')}<button class="b3-guide-verify" type="button" hidden>验证预测并观察</button><a class="b3-guide-replay" href="#" role="button" hidden>重新预测并重置</a></div><div class="b3-guide-motion">${reduced?'已启用减少动态：保留关键状态变化，压缩连续动画。':'支持系统“减少动态”设置。'}</div><div class="b3-guide-feedback" hidden></div>`;
+    guide.insertAdjacentElement('afterend', b3Guide);
+    const b3Verify = b3Guide.querySelector('.b3-guide-verify');
+    const b3Replay = b3Guide.querySelector('.b3-guide-replay');
+    const b3Feedback = b3Guide.querySelector('.b3-guide-feedback');
+    let b3Selected = '';
+    b3Guide.querySelectorAll('[data-guide-choice]').forEach(button=>button.addEventListener('click',()=>{
+      b3Selected = button.dataset.guideChoice;
+      b3Guide.querySelectorAll('[data-guide-choice]').forEach(item=>item.setAttribute('aria-pressed', String(item===button)));
+      b3Verify.hidden = false;
+    }));
+    b3Verify.addEventListener('click',()=>{
+      unlocked = true;
+      unlockControls();
+      revealNodes.forEach(el=>el.style.display=el.dataset.guideDisplay||'');
+      b3Compat.act();
+      b3Verify.hidden = true;
+      b3Replay.hidden = false;
+      b3Feedback.hidden = false;
+      const choiceLabel = b3Compat.options.find(([value])=>value===b3Selected)?.[1] || '未选择';
+      b3Feedback.innerHTML = `<b>你的预测：</b>${choiceLabel}<br><b>实际结果：</b>${b3Compat.result}<br><b>画面证据：</b>${b3Compat.evidence}<br><b>为什么：</b>${b3Compat.explanation}<br><b>模型边界：</b>${b3Compat.boundary}<br><b>高考迁移：</b>${b3Compat.transfer}`;
+    });
+    b3Replay.addEventListener('click',event=>{event.preventDefault();location.reload();});
+  }
 
   if(reduced){document.querySelectorAll('button').forEach(btn=>{if(btn.closest('.exp-guide'))return;if(/暂停/.test(btn.textContent)&&!btn.disabled)btn.click();});}
   window.__EXP_GUIDE__={node,get stage(){return !unlocked?'prediction':!measured?'measurement':result.hidden?'analysis':'complete'},get selected(){return selected},get measured(){return measured},reduced};
