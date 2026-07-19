@@ -13,34 +13,43 @@
   <canvas id="c" width="940" height="640" aria-label="结合能实验台：核子模型、结合能曲线、质量亏损和数据记录"></canvas>
   <section class="panel">
     <div class="row"><button id="playBtn" class="play-btn">播放</button><button id="resetBtn" class="secondary">重置</button><button id="recordBtn" class="secondary">记录</button></div>
-    <label for="a">核子数 A：<span id="aVal"></span></label><input id="a" type="range" min="2" max="240" value="56" step="1">
-    <label for="eb">总结合能 Eb/MeV：<span id="ebVal"></span></label><input id="eb" type="range" min="5" max="2000" value="492" step="1">
-    <label for="compare">对比核平均结合能：<span id="compareVal"></span></label><input id="compare" type="range" min="1" max="9" value="7" step="0.1">
+    <label for="a">当前真实核素：<span id="aVal"></span></label><input id="a" type="range" min="0" max="6" value="4" step="1">
+    <label>由核素数据得到总结合能 Eb：<span id="ebVal"></span></label>
+    <label for="compare">对比真实核素：<span id="compareVal"></span></label><input id="compare" type="range" min="0" max="6" value="6" step="1">
     <div id="readout" class="readout"></div><div id="status" class="status"></div>
-    <div class="hint">观察任务：拖动画面中结合能曲线上的蓝色探针。比较稳定性时看 Eb/A，不要只看总结合能。</div>
-    <table><thead><tr><th>记录</th><th>A</th><th>Eb/A</th><th>更稳定</th></tr></thead><tbody id="recordBody"><tr><td colspan="4">点击“记录”保存一次比较</td></tr></tbody></table>
+    <div class="hint">观察任务：拖动画面中结合能曲线上的蓝色探针。页面只使用常见真实核素的近似教学数据；比较结合紧密程度时看 Eb/A，不要任意拼接 A 和 Eb。</div>
+    <table><thead><tr><th>记录</th><th>A</th><th>Eb/A</th><th>结合更紧</th></tr></thead><tbody id="recordBody"><tr><td colspan="4">点击“记录”保存一次比较</td></tr></tbody></table>
   </section>
 </div></div>
 <script>
-const canvas=document.getElementById('c'),ctx=canvas.getContext('2d'),els={a:by('a'),eb:by('eb'),compare:by('compare'),aVal:by('aVal'),ebVal:by('ebVal'),compareVal:by('compareVal'),readout:by('readout'),status:by('status'),playBtn:by('playBtn'),resetBtn:by('resetBtn'),recordBtn:by('recordBtn'),recordBody:by('recordBody')};function by(id){return document.getElementById(id)}
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d'),els={a:by('a'),compare:by('compare'),aVal:by('aVal'),ebVal:by('ebVal'),compareVal:by('compareVal'),readout:by('readout'),status:by('status'),playBtn:by('playBtn'),resetBtn:by('resetBtn'),recordBtn:by('recordBtn'),recordBody:by('recordBody')};function by(id){return document.getElementById(id)}
 let playing=false,t=0,last=0,dragging=false,records=[];const graph={x:584,y:438,w:300,h:250};
-function params(){const A=+els.a.value,Eb=+els.eb.value,avg=Eb/A,dm=Eb/931.5,cmp=+els.compare.value;return{A,Eb,avg,dm,cmp,stable:avg>cmp}}
+const NUCLIDES=[
+ {label:'氘 ²H',A:2,Z:1,avg:1.112},
+ {label:'氦-4 ⁴He',A:4,Z:2,avg:7.074},
+ {label:'碳-12 ¹²C',A:12,Z:6,avg:7.680},
+ {label:'氧-16 ¹⁶O',A:16,Z:8,avg:7.976},
+ {label:'铁-56 ⁵⁶Fe',A:56,Z:26,avg:8.790},
+ {label:'镍-62 ⁶²Ni',A:62,Z:28,avg:8.795},
+ {label:'铀-235 ²³⁵U',A:235,Z:92,avg:7.591}
+];
+function params(){const index=+els.a.value,compareIndex=+els.compare.value,nuc=NUCLIDES[index],cmpNuc=NUCLIDES[compareIndex],A=nuc.A,avg=nuc.avg,Eb=A*avg,dm=Eb/931.5,cmp=cmpNuc.avg;return{index,compareIndex,nuc,cmpNuc,A,Eb,avg,dm,cmp,stable:avg>cmp,tie:Math.abs(avg-cmp)<.0005}}
 function curve(A){return 8.8*(1-Math.exp(-A/18))*Math.exp(-Math.max(0,A-62)/520)}
 function label(s,x,y,c='#102a43',size=13,align='center',w='700'){ctx.fillStyle=c;ctx.font=`${w} ${size}px system-ui`;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
 function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.48),y2-10*Math.sin(a-.48));ctx.lineTo(x2-10*Math.cos(a+.48),y2-10*Math.sin(a+.48));ctx.closePath();ctx.fill()}
-function drawScene(p){ctx.fillStyle='#fff';ctx.fillRect(0,0,940,640);label('结合能实验台：用 Eb/A 判断原子核稳定性',470,28,'#102a43',19);label('三视图联动：核子模型、结合能曲线、质量亏损仪表和数据记录',470,52,'#486581',13,'center','600');
+function drawScene(p){ctx.fillStyle='#fff';ctx.fillRect(0,0,940,640);label('结合能实验台：用 Eb/A 比较核子结合紧密程度',470,28,'#102a43',19);label('三视图联动：核子模型、结合能曲线、质量亏损仪表和数据记录',470,52,'#486581',13,'center','600');
  ctx.fillStyle='#f2f7ff';ctx.strokeStyle='#2c7be5';ctx.lineWidth=2;ctx.fillRect(54,82,486,284);ctx.strokeRect(54,82,486,284);label('核子装置：核子被强相互作用束缚',297,106,'#2c7be5',14);ctx.save();ctx.translate(188,224);ctx.rotate(playing?t*.25:0);ctx.fillStyle='#fff7e6';ctx.strokeStyle='#f0a500';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,82,0,Math.PI*2);ctx.fill();ctx.stroke();for(let i=0;i<Math.min(72,p.A);i++){const a=i*2.399+t*.4,r=10+Math.sqrt(i)*8.2;ctx.fillStyle=i%2?'#2c7be5':'#e03131';ctx.beginPath();ctx.arc(Math.cos(a)*r,Math.sin(a)*r,5,0,Math.PI*2);ctx.fill()}ctx.restore();label(`A=${p.A}`,188,326,'#102a43',17);meter(330,156,152,22,Math.min(1,p.Eb/2000),'#2c7be5','总结合能 Eb');meter(330,224,152,22,Math.min(1,p.avg/9),'#e03131','平均结合能 Eb/A');meter(330,292,152,22,Math.min(1,p.dm/2.2),'#f0a500','质量亏损 Δm');
  ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1;ctx.fillRect(578,82,318,398);ctx.strokeRect(578,82,318,398);label('图像：平均结合能曲线与可拖动探针',737,106,'#102a43',14);drawGraph(p);
- ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(70,420,470,156);ctx.strokeRect(70,420,470,156);label('公式绑定与稳定性判定',305,444,'#102a43',14);label('Eb = Δmc²；平均结合能 = Eb/A',305,482,'#2c7be5',17);label(`当前 Eb/A=${p.avg.toFixed(2)} MeV/核子，对比=${p.cmp.toFixed(1)} MeV/核子`,305,522,'#102a43',15);label(p.stable?'当前核平均结合能更大，通常更稳定':'对比核平均结合能更大，通常更稳定',305,552,p.stable?'#087f5b':'#c92a2a',15);
+ ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(70,420,470,156);ctx.strokeRect(70,420,470,156);label('真实核素近似数据与结合紧密程度',305,444,'#102a43',14);label('Eb = Δmc²；平均结合能 = Eb/A',305,482,'#2c7be5',17);label(`${p.nuc.label}: ${p.avg.toFixed(3)}；${p.cmpNuc.label}: ${p.cmp.toFixed(3)} MeV/核子`,305,522,'#102a43',14);label(p.tie?'两核素平均结合能近似相同':p.stable?'当前核素平均结合能更大、核子结合更紧':'对比核素平均结合能更大、核子结合更紧',305,552,p.tie?'#486581':p.stable?'#087f5b':'#c92a2a',14);
 }
 function meter(x,y,w,h,val,c,txt){label(txt,x,y-14,'#486581',12,'left');ctx.fillStyle='#e9eef5';ctx.fillRect(x,y,w,h);ctx.fillStyle=c;ctx.fillRect(x,y,w*val,h)}
 function drawGraph(p){const x=graph.x+36,y=graph.y,w=graph.w-58,h=graph.h-92;arrow(x,y,x+w,y,'#52606d',2);arrow(x,y,x,y-h,'#52606d',2);label('A',x+w+10,y+16,'#52606d',11);label('Eb/A',x-20,y-h+8,'#52606d',11);ctx.strokeStyle='#38b2ac';ctx.lineWidth=3;ctx.beginPath();for(let i=2;i<=240;i+=2){const px=x+(i-2)/238*w,py=y-curve(i)/9*h;if(i===2)ctx.moveTo(px,py);else ctx.lineTo(px,py)}ctx.stroke();const px=x+(p.A-2)/238*w,py=y-Math.min(9,p.avg)/9*h;ctx.setLineDash([4,4]);ctx.strokeStyle='#2c7be5';ctx.beginPath();ctx.moveTo(px,y);ctx.lineTo(px,py);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=dragging?'#e03131':'#2c7be5';ctx.beginPath();ctx.arc(px,py,9,0,Math.PI*2);ctx.fill();label('拖动探针',px,py-18,'#2c7be5',11);ctx.strokeStyle='#f0a500';ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(x,y-p.cmp/9*h);ctx.lineTo(x+w,y-p.cmp/9*h);ctx.stroke();ctx.setLineDash([]);label('对比线',x+w-30,y-p.cmp/9*h-12,'#f0a500',11)}
-function update(p){els.aVal.textContent=p.A;els.ebVal.textContent=p.Eb.toFixed(0);els.compareVal.textContent=p.cmp.toFixed(1)+' MeV/核子';els.readout.innerHTML=[`A=${p.A}，Eb=${p.Eb.toFixed(0)} MeV`,`平均结合能 Eb/A=${p.avg.toFixed(2)} MeV/核子`,`质量亏损 Δm=Eb/931.5=${p.dm.toFixed(3)} u`,`比较：${p.stable?'当前核更稳定':'对比核更稳定'}`].join('<br>');els.status.className=p.stable?'status':'status bad';els.status.textContent=p.stable?'判定：当前核平均结合能更大。':'判定：对比核平均结合能更大。'}
+function update(p){els.aVal.textContent=`${p.nuc.label}（A=${p.A}）`;els.ebVal.textContent=p.Eb.toFixed(1)+' MeV';els.compareVal.textContent=p.cmpNuc.label;els.readout.innerHTML=[`当前=${p.nuc.label}，A=${p.A}，Eb≈${p.Eb.toFixed(1)} MeV`,`平均结合能 Eb/A≈${p.avg.toFixed(3)} MeV/核子`,`质量亏损 Δm=Eb/931.5≈${p.dm.toFixed(4)} u`,`比较对象=${p.cmpNuc.label}，Eb/A≈${p.cmp.toFixed(3)} MeV/核子`].join('<br>');els.status.className='status';els.status.textContent='教学近似值用于比较核子结合紧密程度；放射性稳定性还要检查具体衰变通道，精确计算以题设或质量表为准。';canvas.dataset.bindingDataModel='bounded-real-nuclide-reference-values';canvas.dataset.nuclide=p.nuc.label;canvas.dataset.massNumber=String(p.A);canvas.dataset.bindingPerNucleonMev=p.avg.toFixed(6);canvas.dataset.totalBindingMev=p.Eb.toFixed(6)}
 function render(){const p=params();drawScene(p);update(p)}
 function animate(now){if(!last)last=now;const dt=Math.min(.04,(now-last)/1000);last=now;if(playing)t+=dt;render();requestAnimationFrame(animate)}
-function dragProbe(clientX,clientY){const r=canvas.getBoundingClientRect(),x=(clientX-r.left)*canvas.width/r.width,y=(clientY-r.top)*canvas.height/r.height;const gx=graph.x+36,gy=graph.y,gw=graph.w-58,gh=graph.h-92;const A=Math.max(2,Math.min(240,Math.round(2+(x-gx)/gw*238)));const avg=Math.max(1,Math.min(9,(gy-y)/gh*9));els.a.value=String(A);els.eb.value=String(Math.max(5,Math.min(2000,Math.round(avg*A))));render()}
+function dragProbe(clientX){const r=canvas.getBoundingClientRect(),x=(clientX-r.left)*canvas.width/r.width,gx=graph.x+36,gw=graph.w-58;const A=Math.max(2,Math.min(240,2+(x-gx)/gw*238));let best=0;for(let i=1;i<NUCLIDES.length;i++)if(Math.abs(NUCLIDES[i].A-A)<Math.abs(NUCLIDES[best].A-A))best=i;els.a.value=String(best);render()}
 canvas.addEventListener('pointerdown',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.height;if(x>graph.x&&x<graph.x+graph.w&&y>130&&y<graph.y+20){dragging=true;canvas.setPointerCapture(e.pointerId);dragProbe(e.clientX,e.clientY)}});canvas.addEventListener('pointermove',e=>{if(dragging)dragProbe(e.clientX,e.clientY)});canvas.addEventListener('pointerup',e=>{dragging=false;try{canvas.releasePointerCapture(e.pointerId)}catch{}});canvas.addEventListener('pointercancel',()=>dragging=false);
-els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textContent=playing?'暂停':'播放'});els.resetBtn.addEventListener('click',()=>{playing=false;t=0;els.playBtn.textContent='播放';render()});els.recordBtn.addEventListener('click',()=>{const p=params();records.unshift({A:p.A,avg:p.avg,stable:p.stable});records=records.slice(0,5);els.recordBody.innerHTML=records.map((r,i)=>`<tr><td>${i+1}</td><td>${r.A}</td><td>${r.avg.toFixed(2)}</td><td>${r.stable?'当前':'对比'}</td></tr>`).join('')});[els.a,els.eb,els.compare].forEach(el=>el.addEventListener('input',render));render();requestAnimationFrame(animate);
+els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textContent=playing?'暂停':'播放'});els.resetBtn.addEventListener('click',()=>{playing=false;t=0;els.a.value=4;els.compare.value=6;els.playBtn.textContent='播放';render()});els.recordBtn.addEventListener('click',()=>{const p=params();records.unshift({A:p.A,avg:p.avg,stable:p.stable,tie:p.tie});records=records.slice(0,5);els.recordBody.innerHTML=records.map((r,i)=>`<tr><td>${i+1}</td><td>${r.A}</td><td>${r.avg.toFixed(3)}</td><td>${r.tie?'近似相同':r.stable?'当前':'对比'}</td></tr>`).join('')});[els.a,els.compare].forEach(el=>el.addEventListener('input',render));window.__ANIM_TEST_STATE__={get:()=>params()};render();requestAnimationFrame(animate);
 </script>
 
 <script>/* GKWL: unified full reset (2026-07-12 review remediation) */
@@ -62,5 +71,6 @@ els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textConte
   }
 })();
 </script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

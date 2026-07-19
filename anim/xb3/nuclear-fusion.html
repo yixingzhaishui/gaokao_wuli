@@ -47,7 +47,7 @@
       <div id="status" class="status"></div>
       <div class="hint">观察任务：拖动画面里的氘核或氚核改变接近距离；点“播放”看高温热运动是否能越过电斥能垒，形成 ⁴He+n 并释放 17.6 MeV。</div>
       <table aria-label="聚变条件数据记录">
-        <thead><tr><th>组</th><th>T</th><th>约束</th><th>概率</th></tr></thead>
+        <thead><tr><th>组</th><th>T</th><th>约束</th><th>条件判断</th></tr></thead>
         <tbody id="recordRows"></tbody>
       </table>
     </section>
@@ -88,10 +88,11 @@ function values() {
   const confine = conf / 10;
   const barrier = 0.58;
   const closeness = 1 - state.approach;
-  const prob = clamp((thermal * 0.62 + confine * 0.28 + closeness * 0.36 - barrier) * 170, 0, 100);
-  const ready = prob >= 50;
+  const conditionIndex = clamp(thermal * 0.55 + confine * 0.25 + closeness * 0.20, 0, 1);
+  const conditionLabel = conditionIndex >= 0.72 ? '较有利' : conditionIndex >= 0.48 ? '改善中' : '不足';
+  const ready = conditionIndex >= 0.72;
   const total = 17.6 * count;
-  return { temp, conf, count, thermal, confine, barrier, closeness, prob, ready, total };
+  return { temp, conf, count, thermal, confine, barrier, closeness, conditionIndex, conditionLabel, ready, total };
 }
 function drawArrow(x1, y1, x2, y2, color) {
   const a = Math.atan2(y2 - y1, x2 - x1);
@@ -181,19 +182,19 @@ function drawGauge(v) {
   ctx.fillStyle = '#486581';
   ctx.font = '13px system-ui';
   ctx.textAlign = 'center';
-  ctx.fillText('约束侧视/概率表盘', x + 88, y + 24);
+  ctx.fillText('约束侧视/条件趋势表盘', x + 88, y + 24);
   ctx.strokeStyle = '#f0a500';
   ctx.setLineDash([7, 5]);
   ctx.beginPath();
   ctx.arc(x + 88, y + 96, 70 - v.conf * 4, 0, Math.PI * 2);
   ctx.stroke();
   ctx.setLineDash([]);
-  const barH = clamp(v.prob / 100, 0, 1) * 90;
+  const barH = v.conditionIndex * 90;
   ctx.fillStyle = v.ready ? '#087f5b' : '#e03131';
   ctx.fillRect(x + 128, y + 146 - barH, 18, barH);
   ctx.fillStyle = '#102a43';
   ctx.font = '700 15px system-ui';
-  ctx.fillText('概率 ' + v.prob.toFixed(0) + '%', x + 88, y + 154);
+  ctx.fillText('条件：' + v.conditionLabel, x + 88, y + 154);
 }
 function drawBarrier(v) {
   const x0 = 474, y0 = 456, w = 210, h = 134;
@@ -247,18 +248,20 @@ function draw() {
   drawBarrier(v);
   els.readout.innerHTML = [
     `<div id="r1">温度等级=${v.temp}，约束强度=${v.conf}</div>`,
-    `<div id="r2">聚变概率指标≈${v.prob.toFixed(0)}%，${v.ready ? '条件较充分' : '条件不足'}</div>`,
+    `<div id="r2">聚变条件趋势：${v.conditionLabel}（不是反应概率）</div>`,
     `<div id="r3">D-T 单次聚变释放 17.6 MeV</div>`,
     `<div id="r4">${v.count} 次总能量≈${v.total.toFixed(1)} MeV，E=Δmc²</div>`
   ].join('');
   els.status.className = v.ready ? 'status' : 'status bad';
   els.status.textContent = v.ready
-    ? '条件较充分：高温动能和约束时间让轻核有机会靠近到核力范围。'
-    : '条件不足：轻核带正电，电斥力使它们难以靠近。';
+    ? '条件较有利：高温、约束和足够接近共同增加发生聚变的机会；本示意不输出截面或概率。'
+    : '条件仍不足：轻核带正电，电斥力使它们难以靠近；本示意不输出截面或概率。';
+  c.dataset.fusionModel = 'qualitative-condition-trend-not-probability';
+  c.dataset.condition = v.conditionLabel;
 }
 function renderRecords() {
   els.recordRows.innerHTML = state.records.slice(-5).map((p, i) =>
-    `<tr><td>${i + 1}</td><td>${p.temp}</td><td>${p.conf}</td><td>${p.prob.toFixed(0)}%</td></tr>`
+    `<tr><td>${i + 1}</td><td>${p.temp}</td><td>${p.conf}</td><td>${p.conditionLabel}</td></tr>`
   ).join('');
 }
 function setApproachFromPointer(ev) {
@@ -294,7 +297,7 @@ els.playBtn.addEventListener('click', () => {
 });
 els.recordBtn.addEventListener('click', () => {
   const v = values();
-  state.records.push({ temp: v.temp, conf: v.conf, prob: v.prob });
+  state.records.push({ temp: v.temp, conf: v.conf, conditionLabel: v.conditionLabel });
   renderRecords();
 });
 els.resetBtn.addEventListener('click', () => {
@@ -323,7 +326,9 @@ c.addEventListener('pointermove', ev => {
 c.addEventListener('pointerup', () => { state.drag = null; });
 c.addEventListener('pointerleave', () => { state.drag = null; });
 renderRecords();
+window.__ANIM_TEST_STATE__ = { get: () => values() };
 requestAnimationFrame(loop);
 </script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

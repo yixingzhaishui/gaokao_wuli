@@ -78,5 +78,6 @@ for(const id of ['v1','v2','p1'])els[id].addEventListener('input',draw);
 document.querySelectorAll('[data-mode]').forEach(btn=>btn.addEventListener('click',()=>{state.mode=btn.dataset.mode;document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',b===btn));state.time=0;draw();}));
 renderRecords();requestAnimationFrame(loop);
 </script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>
