@@ -1,0 +1,269 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T17:17:39.904Z",
+  "commit": "d96e3a5392db06e30a38e2285ff44f23116e201c",
+  "module": "bx3",
+  "modules": [
+    "bx3"
+  ],
+  "summary": {
+    "total": 1,
+    "score": 100,
+    "pass": 1,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/bx3/series-parallel.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#r1",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#r2",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#u",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:并联",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:串联",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play-btn",
+          "text": "⏸ 暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:串联",
+          "text": "串联",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:并联",
+          "text": "并联",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.5
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "⏸ 暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "4b14072d",
+          "readout_hash": "5ef5864f",
+          "physical_readout_hash": "5ef5864f",
+          "readout": [
+            "R1（拖动后看蓝色支路/元件读数）3.0 Ω",
+            "R2（拖动后看紫色支路/元件读数）6.0 Ω",
+            "电源 U（拖动后看所有表的变化）12.0 V",
+            "电源 U = 12.0 V",
+            "R1 = 3.0 Ω，R2 = 6.0 Ω",
+            "等效电阻 R = 9.00 Ω",
+            "总电流 I = 1.33 A",
+            "支路/元件：U1=4.0V, U2=8.0V"
+          ],
+          "physical_readout": [
+            "R1（拖动后看蓝色支路/元件读数）3.0 Ω",
+            "R2（拖动后看紫色支路/元件读数）6.0 Ω",
+            "电源 U（拖动后看所有表的变化）12.0 V",
+            "电源 U = 12.0 V",
+            "R1 = 3.0 Ω，R2 = 6.0 Ω",
+            "等效电阻 R = 9.00 Ω",
+            "总电流 I = 1.33 A",
+            "支路/元件：U1=4.0V, U2=8.0V"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "7d8cf177",
+          "readout_hash": "5ef5864f",
+          "physical_readout_hash": "5ef5864f",
+          "readout": [
+            "R1（拖动后看蓝色支路/元件读数）3.0 Ω",
+            "R2（拖动后看紫色支路/元件读数）6.0 Ω",
+            "电源 U（拖动后看所有表的变化）12.0 V",
+            "电源 U = 12.0 V",
+            "R1 = 3.0 Ω，R2 = 6.0 Ω",
+            "等效电阻 R = 9.00 Ω",
+            "总电流 I = 1.33 A",
+            "支路/元件：U1=4.0V, U2=8.0V"
+          ],
+          "physical_readout": [
+            "R1（拖动后看蓝色支路/元件读数）3.0 Ω",
+            "R2（拖动后看紫色支路/元件读数）6.0 Ω",
+            "电源 U（拖动后看所有表的变化）12.0 V",
+            "电源 U = 12.0 V",
+            "R1 = 3.0 Ω，R2 = 6.0 Ω",
+            "等效电阻 R = 9.00 Ω",
+            "总电流 I = 1.33 A",
+            "支路/元件：U1=4.0V, U2=8.0V"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "7f9e538",
+          "readout_hash": "5ef5864f",
+          "physical_readout_hash": "5ef5864f",
+          "readout": [
+            "R1（拖动后看蓝色支路/元件读数）3.0 Ω",
+            "R2（拖动后看紫色支路/元件读数）6.0 Ω",
+            "电源 U（拖动后看所有表的变化）12.0 V",
+            "电源 U = 12.0 V",
+            "R1 = 3.0 Ω，R2 = 6.0 Ω",
+            "等效电阻 R = 9.00 Ω",
+            "总电流 I = 1.33 A",
+            "支路/元件：U1=4.0V, U2=8.0V"
+          ],
+          "physical_readout": [
+            "R1（拖动后看蓝色支路/元件读数）3.0 Ω",
+            "R2（拖动后看紫色支路/元件读数）6.0 Ω",
+            "电源 U（拖动后看所有表的变化）12.0 V",
+            "电源 U = 12.0 V",
+            "R1 = 3.0 Ω，R2 = 6.0 Ω",
+            "等效电阻 R = 9.00 Ω",
+            "总电流 I = 1.33 A",
+            "支路/元件：U1=4.0V, U2=8.0V"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "7f9e538",
+          "readout_hash": "5ef5864f",
+          "physical_readout_hash": "5ef5864f",
+          "readout": [
+            "R1（拖动后看蓝色支路/元件读数）3.0 Ω",
+            "R2（拖动后看紫色支路/元件读数）6.0 Ω",
+            "电源 U（拖动后看所有表的变化）12.0 V",
+            "电源 U = 12.0 V",
+            "R1 = 3.0 Ω，R2 = 6.0 Ω",
+            "等效电阻 R = 9.00 Ω",
+            "总电流 I = 1.33 A",
+            "支路/元件：U1=4.0V, U2=8.0V"
+          ],
+          "physical_readout": [
+            "R1（拖动后看蓝色支路/元件读数）3.0 Ω",
+            "R2（拖动后看紫色支路/元件读数）6.0 Ω",
+            "电源 U（拖动后看所有表的变化）12.0 V",
+            "电源 U = 12.0 V",
+            "R1 = 3.0 Ω，R2 = 6.0 Ω",
+            "等效电阻 R = 9.00 Ω",
+            "总电流 I = 1.33 A",
+            "支路/元件：U1=4.0V, U2=8.0V"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "R#（拖动后看蓝色支路/元件读数）# Ω|R#（拖动后看紫色支路/元件读数）# Ω|电源 U（拖动后看所有表的变化）# V|电源 U = # V|R# = # Ω，R# = # Ω|等效电阻 R = # Ω|总电流 I = # A|支路/元件：U#=#V, U#=#V",
+          "controls": [
+            {
+              "id": "r1",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "r2",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "u",
+              "value": "12",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "R#（拖动后看蓝色支路/元件读数）# Ω|R#（拖动后看紫色支路/元件读数）# Ω|电源 U（拖动后看所有表的变化）# V|电源 U = # V|R# = # Ω，R# = # Ω|等效电阻 R = # Ω|总电流 I = # A|支路/元件：U#=#V, U#=#V",
+          "controls": [
+            {
+              "id": "r1",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "r2",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "u",
+              "value": "12",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

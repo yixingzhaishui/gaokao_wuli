@@ -1,0 +1,316 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T02:33:42.090Z",
+  "commit": "e355ceafd3f3da33a27b9a455352ea43aa630e5c",
+  "module": "skill",
+  "modules": [
+    "skill"
+  ],
+  "summary": {
+    "total": 1,
+    "score": 100,
+    "pass": 1,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/skill/circuit-experiment-design.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#rx",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#pos",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#emf",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:内接法",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:外接法",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:限流式",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录方案",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:分压式",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#inner",
+          "text": "内接法",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#outer",
+          "text": "外接法",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#divider",
+          "text": "分压式",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#limiter",
+          "text": "限流式",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录方案",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.32,
+          "py": 0.32
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "68689293",
+          "readout_hash": "db897cd5",
+          "physical_readout_hash": "db897cd5",
+          "readout": [
+            "待测电阻 Rx 20.0 Ω",
+            "20.0 Ω",
+            "滑片位置 0.54",
+            "0.54",
+            "电源电压 6.0 V",
+            "6.0 V",
+            "电压表读数：3.24 V电流表读数：0.164 A测得电阻：19.80 Ω误差方向：偏小",
+            "外接分压19.80",
+            "提示：小电阻常优先考虑电流表外接，减小电流表分压影响。"
+          ],
+          "physical_readout": [
+            "待测电阻 Rx 20.0 Ω",
+            "20.0 Ω",
+            "滑片位置 0.54",
+            "0.54",
+            "电源电压 6.0 V",
+            "6.0 V",
+            "电压表读数：3.24 V电流表读数：0.164 A测得电阻：19.80 Ω误差方向：偏小",
+            "外接分压19.80",
+            "提示：小电阻常优先考虑电流表外接，减小电流表分压影响。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "c421c83c",
+          "readout_hash": "894d1c0c",
+          "physical_readout_hash": "894d1c0c",
+          "readout": [
+            "待测电阻 Rx 20.0 Ω",
+            "20.0 Ω",
+            "滑片位置 0.63",
+            "0.63",
+            "电源电压 6.0 V",
+            "6.0 V",
+            "电压表读数：3.78 V电流表读数：0.191 A测得电阻：19.80 Ω误差方向：偏小",
+            "外接分压19.80",
+            "提示：小电阻常优先考虑电流表外接，减小电流表分压影响。"
+          ],
+          "physical_readout": [
+            "待测电阻 Rx 20.0 Ω",
+            "20.0 Ω",
+            "滑片位置 0.63",
+            "0.63",
+            "电源电压 6.0 V",
+            "6.0 V",
+            "电压表读数：3.78 V电流表读数：0.191 A测得电阻：19.80 Ω误差方向：偏小",
+            "外接分压19.80",
+            "提示：小电阻常优先考虑电流表外接，减小电流表分压影响。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "4dbbb7fe",
+          "readout_hash": "5e46fe38",
+          "physical_readout_hash": "5e46fe38",
+          "readout": [
+            "待测电阻 Rx 20.0 Ω",
+            "20.0 Ω",
+            "滑片位置 0.64",
+            "0.64",
+            "电源电压 6.0 V",
+            "6.0 V",
+            "电压表读数：3.84 V电流表读数：0.194 A测得电阻：19.80 Ω误差方向：偏小",
+            "外接分压19.80",
+            "提示：小电阻常优先考虑电流表外接，减小电流表分压影响。"
+          ],
+          "physical_readout": [
+            "待测电阻 Rx 20.0 Ω",
+            "20.0 Ω",
+            "滑片位置 0.64",
+            "0.64",
+            "电源电压 6.0 V",
+            "6.0 V",
+            "电压表读数：3.84 V电流表读数：0.194 A测得电阻：19.80 Ω误差方向：偏小",
+            "外接分压19.80",
+            "提示：小电阻常优先考虑电流表外接，减小电流表分压影响。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "4dbbb7fe",
+          "readout_hash": "5e46fe38",
+          "physical_readout_hash": "5e46fe38",
+          "readout": [
+            "待测电阻 Rx 20.0 Ω",
+            "20.0 Ω",
+            "滑片位置 0.64",
+            "0.64",
+            "电源电压 6.0 V",
+            "6.0 V",
+            "电压表读数：3.84 V电流表读数：0.194 A测得电阻：19.80 Ω误差方向：偏小",
+            "外接分压19.80",
+            "提示：小电阻常优先考虑电流表外接，减小电流表分压影响。"
+          ],
+          "physical_readout": [
+            "待测电阻 Rx 20.0 Ω",
+            "20.0 Ω",
+            "滑片位置 0.64",
+            "0.64",
+            "电源电压 6.0 V",
+            "6.0 V",
+            "电压表读数：3.84 V电流表读数：0.194 A测得电阻：19.80 Ω误差方向：偏小",
+            "外接分压19.80",
+            "提示：小电阻常优先考虑电流表外接，减小电流表分压影响。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "待测电阻 Rx # Ω|# Ω|滑片位置 #|#|电源电压 # V|# V|电压表读数：# V电流表读数：# A测得电阻：# Ω误差方向：偏小|提示：小电阻常优先考虑电流表外接，减小电流表分压影响。",
+          "controls": [
+            {
+              "id": "rx",
+              "value": "20",
+              "checked": false
+            },
+            {
+              "id": "pos",
+              "value": "0.54",
+              "checked": false
+            },
+            {
+              "id": "emf",
+              "value": "6",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "待测电阻 Rx # Ω|# Ω|滑片位置 #|#|电源电压 # V|# V|电压表读数：# V电流表读数：# A测得电阻：# Ω误差方向：偏小|提示：小电阻常优先考虑电流表外接，减小电流表分压影响。",
+          "controls": [
+            {
+              "id": "rx",
+              "value": "20",
+              "checked": false
+            },
+            {
+              "id": "pos",
+              "value": "0.54",
+              "checked": false
+            },
+            {
+              "id": "emf",
+              "value": "6",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

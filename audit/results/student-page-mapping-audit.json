@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-07-12T19:50:10.503Z",
+  "scope": "student-page-verified-problem-mapping",
+  "mechanism_checked": "index.html fetches data/verified-problems.json and data/verified-diagnostic-2024cee.json, filters publishable source_verified problems, then maps each page/node by knowledge_ids and model_ids.",
+  "summary": {
+    "total_nodes": 226,
+    "publishable_verified_problems": 231,
+    "nodes_with_at_least_one_problem": 226,
+    "mapping_gaps": 0,
+    "minimum_problem_count_per_node": 1,
+    "maximum_problem_count_per_node": 19,
+    "nodes_with_exactly_one_problem": 100
+  },
+  "status": "pass",
+  "notes": [
+    "This confirms every id-map node can receive at least one student-facing verified problem through the same knowledge_ids/model_ids mapping used by index.html.",
+    "This audit is independent of the older scripts/check.js example-system coverage number, which intentionally reports 211/226 using the legacy page/core example pool.",
+    "X3-39 remains covered by MS-UNIT-INTERACTION-01; its formal-source upgrade is recorded separately in audit/results/source-missing-gaps.json."
+  ]
+}

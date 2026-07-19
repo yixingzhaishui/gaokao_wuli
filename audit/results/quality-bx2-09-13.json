@@ -1,0 +1,939 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-11T15:42:28.490Z",
+  "commit": "736d0fbd53f7d75528ac2c3c2b3cf9746e1dbc79",
+  "module": "bx2",
+  "modules": [
+    "bx2"
+  ],
+  "summary": {
+    "total": 5,
+    "score": 100,
+    "pass": 5,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/bx2/geostationary.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:静止卫星",
+          "kind": "initial_condition_retry",
+          "changed": false,
+          "affected_result": false
+        },
+        {
+          "selector": "button:低轨快跑",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:倾斜同步",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:反向同步",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:静止卫星",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:静止卫星",
+          "text": "静止卫星",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:低轨快跑",
+          "text": "低轨快跑",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:倾斜同步",
+          "text": "倾斜同步",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:反向同步",
+          "text": "反向同步",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "356b8957",
+          "readout_hash": "4a343adc",
+          "physical_readout_hash": "4a343adc",
+          "readout": [
+            "周期 T24.0 h 离地高度 h35793 km 线速度 v3.07 km/s 经度漂移0°/日",
+            "同步、赤道、同向同时满足：卫星固定在同一经度上空。"
+          ],
+          "physical_readout": [
+            "周期 T24.0 h 离地高度 h35793 km 线速度 v3.07 km/s 经度漂移0°/日",
+            "同步、赤道、同向同时满足：卫星固定在同一经度上空。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "2ea6ddf8",
+          "readout_hash": "4a343adc",
+          "physical_readout_hash": "4a343adc",
+          "readout": [
+            "周期 T24.0 h 离地高度 h35793 km 线速度 v3.07 km/s 经度漂移0°/日",
+            "同步、赤道、同向同时满足：卫星固定在同一经度上空。"
+          ],
+          "physical_readout": [
+            "周期 T24.0 h 离地高度 h35793 km 线速度 v3.07 km/s 经度漂移0°/日",
+            "同步、赤道、同向同时满足：卫星固定在同一经度上空。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "a9b35dec",
+          "readout_hash": "4a343adc",
+          "physical_readout_hash": "4a343adc",
+          "readout": [
+            "周期 T24.0 h 离地高度 h35793 km 线速度 v3.07 km/s 经度漂移0°/日",
+            "同步、赤道、同向同时满足：卫星固定在同一经度上空。"
+          ],
+          "physical_readout": [
+            "周期 T24.0 h 离地高度 h35793 km 线速度 v3.07 km/s 经度漂移0°/日",
+            "同步、赤道、同向同时满足：卫星固定在同一经度上空。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "a9b35dec",
+          "readout_hash": "4a343adc",
+          "physical_readout_hash": "4a343adc",
+          "readout": [
+            "周期 T24.0 h 离地高度 h35793 km 线速度 v3.07 km/s 经度漂移0°/日",
+            "同步、赤道、同向同时满足：卫星固定在同一经度上空。"
+          ],
+          "physical_readout": [
+            "周期 T24.0 h 离地高度 h35793 km 线速度 v3.07 km/s 经度漂移0°/日",
+            "同步、赤道、同向同时满足：卫星固定在同一经度上空。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "周期 T# h 离地高度 h# km 线速度 v# km/s 经度漂移#°/日|同步、赤道、同向同时满足：卫星固定在同一经度上空。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "周期 T# h 离地高度 h# km 线速度 v# km/s 经度漂移#°/日|同步、赤道、同向同时满足：卫星固定在同一经度上空。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx2/gravitation.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:地月量级",
+          "kind": "initial_condition_retry",
+          "changed": false,
+          "affected_result": false
+        },
+        {
+          "selector": "button:距离翻倍",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:质量翻倍",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:距离更近",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:地月量级",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "button:地月量级",
+          "text": "地月量级",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:距离翻倍",
+          "text": "距离翻倍",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:质量翻倍",
+          "text": "质量翻倍",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:距离更近",
+          "text": "距离更近",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#playBtn",
+          "text": "暂停演示",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.5,
+          "py": 0.5
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停演示"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "5a89c34d",
+          "readout_hash": "be05209f",
+          "physical_readout_hash": "be05209f",
+          "readout": [
+            "当前引力 F7.13e21 N 2r 时引力1.78e21 N 质心距离 r6.40e7 m 比例判断1/4",
+            "两物体受到的引力大小相等、方向相反，沿质心连线。"
+          ],
+          "physical_readout": [
+            "当前引力 F7.13e21 N 2r 时引力1.78e21 N 质心距离 r6.40e7 m 比例判断1/4",
+            "两物体受到的引力大小相等、方向相反，沿质心连线。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "ba5e7545",
+          "readout_hash": "be05209f",
+          "physical_readout_hash": "be05209f",
+          "readout": [
+            "当前引力 F7.13e21 N 2r 时引力1.78e21 N 质心距离 r6.40e7 m 比例判断1/4",
+            "两物体受到的引力大小相等、方向相反，沿质心连线。"
+          ],
+          "physical_readout": [
+            "当前引力 F7.13e21 N 2r 时引力1.78e21 N 质心距离 r6.40e7 m 比例判断1/4",
+            "两物体受到的引力大小相等、方向相反，沿质心连线。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "3ed1a0bc",
+          "readout_hash": "be05209f",
+          "physical_readout_hash": "be05209f",
+          "readout": [
+            "当前引力 F7.13e21 N 2r 时引力1.78e21 N 质心距离 r6.40e7 m 比例判断1/4",
+            "两物体受到的引力大小相等、方向相反，沿质心连线。"
+          ],
+          "physical_readout": [
+            "当前引力 F7.13e21 N 2r 时引力1.78e21 N 质心距离 r6.40e7 m 比例判断1/4",
+            "两物体受到的引力大小相等、方向相反，沿质心连线。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "3ed1a0bc",
+          "readout_hash": "be05209f",
+          "physical_readout_hash": "be05209f",
+          "readout": [
+            "当前引力 F7.13e21 N 2r 时引力1.78e21 N 质心距离 r6.40e7 m 比例判断1/4",
+            "两物体受到的引力大小相等、方向相反，沿质心连线。"
+          ],
+          "physical_readout": [
+            "当前引力 F7.13e21 N 2r 时引力1.78e21 N 质心距离 r6.40e7 m 比例判断1/4",
+            "两物体受到的引力大小相等、方向相反，沿质心连线。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "当前引力 F#e# N #r 时引力#e# N 质心距离 r#e# m 比例判断#/#|两物体受到的引力大小相等、方向相反，沿质心连线。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "当前引力 F#e# N #r 时引力#e# N 质心距离 r#e# m 比例判断#/#|两物体受到的引力大小相等、方向相反，沿质心连线。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx2/kepler-law.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:近圆轨道",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:偏心较大",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:大半长轴",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:大中心质量",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:近圆轨道",
+          "text": "近圆轨道",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:偏心较大",
+          "text": "偏心较大",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:大半长轴",
+          "text": "大半长轴",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:大中心质量",
+          "text": "大中心质量",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.32,
+          "py": 0.5
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "d900f011",
+          "readout_hash": "ea096055",
+          "physical_readout_hash": "ea096055",
+          "readout": [
+            "近日距0.70 AU 远日距1.30 AU 周期 T1.00 年 T²/a³1.00",
+            "偏心率越大，近日点越近、速度越快；太阳在焦点，不在椭圆中心。"
+          ],
+          "physical_readout": [
+            "近日距0.70 AU 远日距1.30 AU 周期 T1.00 年 T²/a³1.00",
+            "偏心率越大，近日点越近、速度越快；太阳在焦点，不在椭圆中心。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "14f8849c",
+          "readout_hash": "ea096055",
+          "physical_readout_hash": "ea096055",
+          "readout": [
+            "近日距0.70 AU 远日距1.30 AU 周期 T1.00 年 T²/a³1.00",
+            "偏心率越大，近日点越近、速度越快；太阳在焦点，不在椭圆中心。"
+          ],
+          "physical_readout": [
+            "近日距0.70 AU 远日距1.30 AU 周期 T1.00 年 T²/a³1.00",
+            "偏心率越大，近日点越近、速度越快；太阳在焦点，不在椭圆中心。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "b23c2e8c",
+          "readout_hash": "ea096055",
+          "physical_readout_hash": "ea096055",
+          "readout": [
+            "近日距0.70 AU 远日距1.30 AU 周期 T1.00 年 T²/a³1.00",
+            "偏心率越大，近日点越近、速度越快；太阳在焦点，不在椭圆中心。"
+          ],
+          "physical_readout": [
+            "近日距0.70 AU 远日距1.30 AU 周期 T1.00 年 T²/a³1.00",
+            "偏心率越大，近日点越近、速度越快；太阳在焦点，不在椭圆中心。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "b23c2e8c",
+          "readout_hash": "ea096055",
+          "physical_readout_hash": "ea096055",
+          "readout": [
+            "近日距0.70 AU 远日距1.30 AU 周期 T1.00 年 T²/a³1.00",
+            "偏心率越大，近日点越近、速度越快；太阳在焦点，不在椭圆中心。"
+          ],
+          "physical_readout": [
+            "近日距0.70 AU 远日距1.30 AU 周期 T1.00 年 T²/a³1.00",
+            "偏心率越大，近日点越近、速度越快；太阳在焦点，不在椭圆中心。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "近日距# AU 远日距# AU 周期 T# 年 T²/a³#|偏心率越大，近日点越近、速度越快；太阳在焦点，不在椭圆中心。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "近日距# AU 远日距# AU 周期 T# 年 T²/a³#|偏心率越大，近日点越近、速度越快；太阳在焦点，不在椭圆中心。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx2/orbit-transfer.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:低圆",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:转移",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:高圆",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:小升轨",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:到同步轨",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:大升轨",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:低圆",
+          "text": "低圆",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:转移",
+          "text": "转移",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:高圆",
+          "text": "高圆",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:小升轨",
+          "text": "小升轨",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:到同步轨",
+          "text": "到同步轨",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:大升轨",
+          "text": "大升轨",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "5956e3f",
+          "readout_hash": "1cf16dff",
+          "physical_readout_hash": "1cf16dff",
+          "readout": [
+            "低圆 v16.81 km/s 近地点 vt18.77 km/s 远地点 vt21.79 km/s 高圆 v23.07 km/s 第一次 Δv11.97 km/s 第二次 Δv21.28 km/s",
+            "转移椭圆：不能套圆轨速度公式，近地点快、远地点慢。"
+          ],
+          "physical_readout": [
+            "低圆 v16.81 km/s 近地点 vt18.77 km/s 远地点 vt21.79 km/s 高圆 v23.07 km/s 第一次 Δv11.97 km/s 第二次 Δv21.28 km/s",
+            "转移椭圆：不能套圆轨速度公式，近地点快、远地点慢。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "ea37a66e",
+          "readout_hash": "1cf16dff",
+          "physical_readout_hash": "1cf16dff",
+          "readout": [
+            "低圆 v16.81 km/s 近地点 vt18.77 km/s 远地点 vt21.79 km/s 高圆 v23.07 km/s 第一次 Δv11.97 km/s 第二次 Δv21.28 km/s",
+            "转移椭圆：不能套圆轨速度公式，近地点快、远地点慢。"
+          ],
+          "physical_readout": [
+            "低圆 v16.81 km/s 近地点 vt18.77 km/s 远地点 vt21.79 km/s 高圆 v23.07 km/s 第一次 Δv11.97 km/s 第二次 Δv21.28 km/s",
+            "转移椭圆：不能套圆轨速度公式，近地点快、远地点慢。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "f5243d0e",
+          "readout_hash": "1cf16dff",
+          "physical_readout_hash": "1cf16dff",
+          "readout": [
+            "低圆 v16.81 km/s 近地点 vt18.77 km/s 远地点 vt21.79 km/s 高圆 v23.07 km/s 第一次 Δv11.97 km/s 第二次 Δv21.28 km/s",
+            "转移椭圆：不能套圆轨速度公式，近地点快、远地点慢。"
+          ],
+          "physical_readout": [
+            "低圆 v16.81 km/s 近地点 vt18.77 km/s 远地点 vt21.79 km/s 高圆 v23.07 km/s 第一次 Δv11.97 km/s 第二次 Δv21.28 km/s",
+            "转移椭圆：不能套圆轨速度公式，近地点快、远地点慢。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "f5243d0e",
+          "readout_hash": "1cf16dff",
+          "physical_readout_hash": "1cf16dff",
+          "readout": [
+            "低圆 v16.81 km/s 近地点 vt18.77 km/s 远地点 vt21.79 km/s 高圆 v23.07 km/s 第一次 Δv11.97 km/s 第二次 Δv21.28 km/s",
+            "转移椭圆：不能套圆轨速度公式，近地点快、远地点慢。"
+          ],
+          "physical_readout": [
+            "低圆 v16.81 km/s 近地点 vt18.77 km/s 远地点 vt21.79 km/s 高圆 v23.07 km/s 第一次 Δv11.97 km/s 第二次 Δv21.28 km/s",
+            "转移椭圆：不能套圆轨速度公式，近地点快、远地点慢。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "低圆 v# km/s 近地点 vt# km/s 远地点 vt# km/s 高圆 v# km/s 第一次 Δv# km/s 第二次 Δv# km/s|转移椭圆：不能套圆轨速度公式，近地点快、远地点慢。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "低圆 v# km/s 近地点 vt# km/s 远地点 vt# km/s 高圆 v# km/s 第一次 Δv# km/s 第二次 Δv# km/s|转移椭圆：不能套圆轨速度公式，近地点快、远地点慢。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx2/satellite.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:同步卫星",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:高轨比较",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:椭圆变轨",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:近地卫星",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:近地卫星",
+          "text": "近地卫星",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:同步卫星",
+          "text": "同步卫星",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:高轨比较",
+          "text": "高轨比较",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:椭圆变轨",
+          "text": "椭圆变轨",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "972e9063",
+          "readout_hash": "4399cc5b",
+          "physical_readout_hash": "4399cc5b",
+          "readout": [
+            "r / h6.9 / 0.5 ×10⁶m v7.62 km/s T94.9 min g'8.41 m/s²",
+            "高轨低速长周期；卫星质量 m 在圆轨方程中约掉。"
+          ],
+          "physical_readout": [
+            "r / h6.9 / 0.5 ×10⁶m v7.62 km/s T94.9 min g'8.41 m/s²",
+            "高轨低速长周期；卫星质量 m 在圆轨方程中约掉。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "15486747",
+          "readout_hash": "4399cc5b",
+          "physical_readout_hash": "4399cc5b",
+          "readout": [
+            "r / h6.9 / 0.5 ×10⁶m v7.62 km/s T94.9 min g'8.41 m/s²",
+            "高轨低速长周期；卫星质量 m 在圆轨方程中约掉。"
+          ],
+          "physical_readout": [
+            "r / h6.9 / 0.5 ×10⁶m v7.62 km/s T94.9 min g'8.41 m/s²",
+            "高轨低速长周期；卫星质量 m 在圆轨方程中约掉。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "19000548",
+          "readout_hash": "4399cc5b",
+          "physical_readout_hash": "4399cc5b",
+          "readout": [
+            "r / h6.9 / 0.5 ×10⁶m v7.62 km/s T94.9 min g'8.41 m/s²",
+            "高轨低速长周期；卫星质量 m 在圆轨方程中约掉。"
+          ],
+          "physical_readout": [
+            "r / h6.9 / 0.5 ×10⁶m v7.62 km/s T94.9 min g'8.41 m/s²",
+            "高轨低速长周期；卫星质量 m 在圆轨方程中约掉。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "19000548",
+          "readout_hash": "4399cc5b",
+          "physical_readout_hash": "4399cc5b",
+          "readout": [
+            "r / h6.9 / 0.5 ×10⁶m v7.62 km/s T94.9 min g'8.41 m/s²",
+            "高轨低速长周期；卫星质量 m 在圆轨方程中约掉。"
+          ],
+          "physical_readout": [
+            "r / h6.9 / 0.5 ×10⁶m v7.62 km/s T94.9 min g'8.41 m/s²",
+            "高轨低速长周期；卫星质量 m 在圆轨方程中约掉。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "r / h# / # ×#⁶m v# km/s T# min g'# m/s²|高轨低速长周期；卫星质量 m 在圆轨方程中约掉。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "r / h# / # ×#⁶m v# km/s T# min g'# m/s²|高轨低速长周期；卫星质量 m 在圆轨方程中约掉。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

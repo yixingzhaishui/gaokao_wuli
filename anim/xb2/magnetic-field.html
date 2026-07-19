@@ -294,11 +294,12 @@ document.getElementById('magnet-btn').onclick=()=>{mode='magnet';trail=[];docume
 document.getElementById('wire-btn').onclick=()=>{mode='wire';trail=[];document.getElementById('wire-btn').classList.add('on');document.getElementById('magnet-btn').classList.remove('on');draw()};
 document.getElementById('dir-btn').onclick=()=>{normal=!normal;trail=[];draw()};
 document.getElementById('play-btn').onclick=()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';draw()};
-document.getElementById('reset-btn').onclick=()=>{mode='magnet';strength=6;normal=true;probe={x:260,y:245};trail=[];document.getElementById('strength').value=6;document.getElementById('magnet-btn').classList.add('on');document.getElementById('wire-btn').classList.remove('on');draw()};
+document.getElementById('reset-btn').onclick=()=>{mode='magnet';strength=6;normal=true;probe={x:260,y:245};trail=[];t=0;running=true;document.getElementById('strength').value=6;document.getElementById('magnet-btn').classList.add('on');document.getElementById('wire-btn').classList.remove('on');document.getElementById('play-btn').textContent='暂停';draw()};
 let last=performance.now();
 function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;if(running)t+=dt;draw();requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
 })();
 </script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

@@ -52,8 +52,28 @@
   function draw(){const v=vals(),ok=eq(v.left,v.right);ctx.clearRect(0,0,900,600);const bg=ctx.createLinearGradient(0,0,0,600);bg.addColorStop(0,'#fbfdff');bg.addColorStop(1,'#edf3f8');ctx.fillStyle=bg;ctx.fillRect(0,0,900,600);text('B1-31 国际单位制与量纲检查：公式天平侧视 + 单位积木 + 维度图像',450,34,colors.ink,'center',18,'900');box(56,80,788,250,'#fff');text(v.name,450,112,colors.ink,'center',22,'900');line(230,236,670,236,ok?colors.green:colors.red,8);line(450,236,450,300,colors.ink,5);drawBlocks(v.left,240,160,'左边量纲');drawBlocks(v.right,660,160,'右边量纲');text(ok?'量纲平衡：公式可能成立':'量纲不平衡：公式必错',450,284,ok?colors.green:colors.red,'center',17,'900');arrow(365,370,535,370,colors.gold,4);text('检查流程：写基本量纲 → 合并指数 → 比较左右',450,348,colors.gold,'center',14,'900');box(56,400,788,136,'#fff');['M','L','T'].forEach((k,i)=>{const lx=150+i*230,lv=v.left[k],rv=v.right[k];text(k+' 指数',lx,430,colors.ink,'center',14,'900');line(lx-60,490,lx+60,490,colors.muted,2);ctx.fillStyle=colors.blue;ctx.fillRect(lx-38,490-lv*18,28,lv*18);ctx.fillStyle=colors.red;ctx.fillRect(lx+10,490-rv*18,28,rv*18);text('左 '+lv,lx-25,514,colors.blue,'center',12,'900');text('右 '+rv,lx+25,514,colors.red,'center',12,'900')});el.lLab.textContent=el.l.value;el.tLab.textContent=el.t.value;el.mLab.textContent=el.m.value;el.readout.innerHTML='左：<b>'+dim(v.left)+'</b><br>右：<b>'+dim(v.right)+'</b><br>结论：<b>'+(ok?'一致':'不一致')+'</b><br>说明：<b>'+v.note+'</b>';el.status.textContent=ok?'左右单位一致，下一步再看物理条件。':'量纲不一致，公式无需代数计算即可判错。'}
   document.querySelectorAll('[data-case]').forEach(b=>b.onclick=()=>{state.key=b.dataset.case;document.querySelectorAll('[data-case]').forEach(x=>x.classList.toggle('active',x===b));const r=cases[state.key].right;el.m.value=r.M;el.l.value=r.L;el.t.value=r.T;draw()});[el.l,el.t,el.m].forEach(x=>x.addEventListener('input',draw));
   canvas.addEventListener('pointerdown',e=>{state.drag='right';canvas.setPointerCapture(e.pointerId);move(e)});canvas.addEventListener('pointermove',move);function move(e){if(!state.drag)return;const r=canvas.getBoundingClientRect();const y=(e.clientY-r.top)*canvas.height/r.height;el.t.value=Math.max(-4,Math.min(2,Math.round((420-y)/28)));draw();e.preventDefault()}canvas.addEventListener('pointerup',e=>{state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}});canvas.addEventListener('pointercancel',()=>state.drag=null);
-  el.play.onclick=()=>{state.playing=!state.playing;el.play.textContent=state.playing?'暂停':'播放'};id('reset').onclick=()=>{const r=cases[state.key].right;el.m.value=r.M;el.l.value=r.L;el.t.value=r.T;draw()};
+  el.play.onclick=()=>{state.playing=!state.playing;el.play.textContent=state.playing?'暂停':'播放'};id('reset').onclick=()=>{const r=cases[state.key].right;state.playing=false;el.m.value=r.M;el.l.value=r.L;el.t.value=r.T;el.play.textContent='播放';draw()};
   function loop(){if(state.playing){state.phase+=0.04;el.t.value=Math.round(-1+2*Math.sin(state.phase));}draw();requestAnimationFrame(loop)}draw();requestAnimationFrame(loop);
+})();
+</script>
+
+<script>/* GKWL: unified full reset (2026-07-12 review remediation) */
+(function(){
+  var btns=[].slice.call(document.querySelectorAll('button'));
+  var resets=btns.filter(function(b){return /重置|复位/.test(b.textContent)});
+  if(!resets.length)return;
+  var scoped=/播放|时间|回放/;
+  var primary=resets[0];
+  if(scoped.test(primary.textContent)){
+    var nb=document.createElement('button');
+    nb.textContent='全部重置';
+    nb.className=primary.className;
+    nb.setAttribute('data-gkwl-full-reset','1');
+    nb.addEventListener('click',function(){location.reload()});
+    primary.parentNode.insertBefore(nb,primary.nextSibling);
+  }else{
+    resets.forEach(function(b){b.addEventListener('click',function(){setTimeout(function(){location.reload()},60)})});
+  }
 })();
 </script>
 </body>

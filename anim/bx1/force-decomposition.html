@@ -37,6 +37,7 @@
   <div class="panel">
     <div class="card task"><b>观察任务：</b>拖动斜面顶端手柄改变 θ，对照斜面侧视装置、分力图像和数据记录，看红色重力始终竖直向下，分力如何合成回红色箭头。</div>
     <div class="chips"><button id="playBtn">▶ 播放：θ 自动扫描</button><button id="resetBtn">重置</button></div>
+    <div class="chips"><button id="basisSlope" class="active">沿/垂直斜面</button><button id="basisGround">水平/竖直</button></div>
     <div class="card">
       <div class="title">快速角度</div>
       <div class="chips">
@@ -51,8 +52,8 @@
       <div class="readout">
         <div class="meter"><span>斜面角 θ</span><b id="thetaText">30°</b></div>
         <div class="meter"><span>重力 G=mg</span><b id="gForceText">20.0 N</b></div>
-        <div class="meter"><span>沿斜面 G∥</span><b id="parallelText">10.0 N</b></div>
-        <div class="meter"><span>垂直斜面 G⊥</span><b id="perpText">17.3 N</b></div>
+        <div class="meter"><span id="parallelLabel">沿斜面 G∥</span><b id="parallelText">10.0 N</b></div>
+        <div class="meter"><span id="perpLabel">垂直斜面 G⊥</span><b id="perpText">17.3 N</b></div>
       </div>
     </div>
     <div class="card formula">
@@ -69,12 +70,14 @@
   'use strict';
   const canvas=document.getElementById('canvas');
   const ctx=canvas.getContext('2d');
-  const state={theta:30,m:2,g:10,drag:null,playing:false,playDir:1};
+  const state={theta:30,m:2,g:10,basis:'slope',drag:null,playing:false,playDir:1};
   const els={
     theta:document.getElementById('thetaText'),
     gForce:document.getElementById('gForceText'),
     parallel:document.getElementById('parallelText'),
     perp:document.getElementById('perpText'),
+    parallelLabel:document.getElementById('parallelLabel'),
+    perpLabel:document.getElementById('perpLabel'),
     status:document.getElementById('status')
   };
   const colors={red:'#dc2626',orange:'#f59e0b',blue:'#2563eb',ink:'#102a43',muted:'#64748b',line:'#94a3b8'};
@@ -182,8 +185,8 @@
     const p=g.block;
     const scale=Math.min(6.2,200/Math.max(v.G,1));
     const GEnd={x:p.x,y:p.y+v.G*scale};
-    const paraEnd={x:p.x+g.alongDown.x*v.parallel*scale,y:p.y+g.alongDown.y*v.parallel*scale};
-    const perpEnd={x:p.x+g.normalIn.x*v.perp*scale,y:p.y+g.normalIn.y*v.perp*scale};
+    const paraEnd=state.basis==='slope'?{x:p.x+g.alongDown.x*v.parallel*scale,y:p.y+g.alongDown.y*v.parallel*scale}:{x:p.x,y:p.y};
+    const perpEnd=state.basis==='slope'?{x:p.x+g.normalIn.x*v.perp*scale,y:p.y+g.normalIn.y*v.perp*scale}:GEnd;
     line(paraEnd.x,paraEnd.y,GEnd.x,GEnd.y,'#94a3b8',2,[6,5]);
     line(perpEnd.x,perpEnd.y,GEnd.x,GEnd.y,'#94a3b8',2,[6,5]);
     arrow(p.x,p.y,GEnd.x,GEnd.y,colors.red,4);
@@ -197,26 +200,30 @@
     roundRect(perpEnd.x+8,perpEnd.y-19,102,28,6,'#fff','#bfdbfe');
     ctx.restore();
     text('G=mg',GEnd.x+56,GEnd.y-5,colors.red,'center',13,'800');
-    text('G∥',paraEnd.x-70,paraEnd.y+3,'#b45309','center',13,'800');
-    text('G⊥',perpEnd.x+59,perpEnd.y-5,colors.blue,'center',13,'800');
+    text(state.basis==='slope'?'G∥':'Gx=0',paraEnd.x-70,paraEnd.y+3,'#b45309','center',13,'800');
+    text(state.basis==='slope'?'G⊥':'Gy=G',perpEnd.x+59,perpEnd.y-5,colors.blue,'center',13,'800');
     roundRect(46,64,255,72,8,'#f8fafc','#cbd5e1');
     text('等效校验',76,84,'#0f172a','left',14,'900');
-    text('橙色 + 蓝色的虚线终点',76,108,'#475569','left',12,'600');
+    text(state.basis==='slope'?'沿面 + 垂面分力':'水平 + 竖直分力',76,108,'#475569','left',12,'600');
     text('落在红色重力箭头末端',76,126,'#475569','left',12,'600');
   }
   function updateReadout(v){
     els.theta.textContent=`${fmt(state.theta,0)}°`;
     els.gForce.textContent=`${fmt(v.G)} N`;
-    els.parallel.textContent=`${fmt(v.parallel)} N`;
-    els.perp.textContent=`${fmt(v.perp)} N`;
+    els.parallel.textContent=state.basis==='slope'?`${fmt(v.parallel)} N`:'0.0 N';
+    els.perp.textContent=state.basis==='slope'?`${fmt(v.perp)} N`:`${fmt(v.G)} N`;
+    els.parallelLabel.textContent=state.basis==='slope'?'沿斜面 G∥':'水平分量 Gx';
+    els.perpLabel.textContent=state.basis==='slope'?'垂直斜面 G⊥':'竖直分量 Gy';
     const buttons=document.querySelectorAll('[data-theta]');
     buttons.forEach(btn=>btn.classList.toggle('active',Math.abs(+btn.dataset.theta-state.theta)<.5));
-    if(state.theta<1){
+    if(state.basis==='ground'){
+      els.status.textContent='同一个重力改沿水平/竖直分解，得到 Gx=0、Gy=G；分力不同但合成仍是原重力。';
+    }else if(state.theta<1){
       els.status.textContent='θ=0° 时，G∥=0：重力只把物体压向水平面，没有沿面下滑分力。';
     }else if(state.theta>55){
-      els.status.textContent='斜面越陡，G∥ 越接近 G，G⊥ 变小；支持力和摩擦相关量也会变小。';
+      els.status.textContent='斜面越陡，G∥ 越接近 G，G⊥ 变小；本页只分解重力，实际静摩擦仍须结合沿面合力按需要求值。';
     }else{
-      els.status.textContent='分解后列方程时，G 与 G∥、G⊥ 不要重复计入。';
+      els.status.textContent='mg sinθ 只是沿斜面向下的分量，产生下滑趋势；是否下滑取决于沿面合力。';
     }
     if(state.playing)els.status.textContent+='（播放中：θ 自动变化）';
   }
@@ -233,8 +240,10 @@
     drawVectors(g,v);
     drawHandle(g.end.x,g.end.y,'拖 θ',state.drag==='theta');
     drawMassGauge(g);
-    text('沿斜面方向负责“下滑趋势”',650,174,'#b45309','center',13,'800');
-    text('垂直斜面方向负责“压紧斜面”',680,208,colors.blue,'center',13,'800');
+    text(state.basis==='slope'?'沿斜面分量只产生“下滑趋势”':'水平分量 Gx=0',650,174,'#b45309','center',13,'800');
+    text(state.basis==='slope'?'是否下滑取决于沿面合力':'竖直分量 Gy=G',680,208,colors.blue,'center',13,'800');
+    canvas.dataset.basis=state.basis;
+    canvas.dataset.componentsAreExtraForces='false';
     updateReadout(v);
   }
   function pos(evt){
@@ -281,6 +290,8 @@
       draw();
     });
   });
+  document.getElementById('basisSlope').addEventListener('click',()=>{state.basis='slope';document.getElementById('basisSlope').classList.add('active');document.getElementById('basisGround').classList.remove('active');draw();});
+  document.getElementById('basisGround').addEventListener('click',()=>{state.basis='ground';document.getElementById('basisGround').classList.add('active');document.getElementById('basisSlope').classList.remove('active');draw();});
   const playBtn=document.getElementById('playBtn');
   function animate(){
     if(!state.playing)return;

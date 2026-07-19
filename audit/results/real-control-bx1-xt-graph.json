@@ -1,0 +1,193 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T18:03:54.455Z",
+  "commit": "77b88de2496355353cfe9b77cb1d5e989ac848d7",
+  "module": "bx1",
+  "modules": [
+    "bx1"
+  ],
+  "summary": {
+    "total": 1,
+    "score": 100,
+    "pass": 1,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/bx1/xt-graph.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:加速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:减速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:静止",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:匀速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#mUniform",
+          "text": "匀速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mAccel",
+          "text": "加速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mDecel",
+          "text": "减速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mStill",
+          "text": "静止",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#playBtn",
+          "text": "▶ 播放：小车随时间运动",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置播放",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "▶ 播放：小车随时间运动"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置播放"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "48b5b8ec",
+          "readout_hash": "90c22976",
+          "physical_readout_hash": "b0c792e6",
+          "readout": [
+            "运动类型=匀速直线t=3.00 sx=12.00 m割线斜率=4.00 m/s切线斜率 v=4.00 m/s播放状态：暂停",
+            "x-t 图的斜率表示速度；交点才表示同一时刻同一位置，图线形状不是空间路线。"
+          ],
+          "physical_readout": [
+            "运动类型=匀速直线t=3.00 sx=12.00 m割线斜率=4.00 m/s切线斜率 v=4.00 m/s",
+            "x-t 图的斜率表示速度；交点才表示同一时刻同一位置，图线形状不是空间路线。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "60964951",
+          "readout_hash": "63671ccc",
+          "physical_readout_hash": "908e5f2a",
+          "readout": [
+            "运动类型=匀速直线t=3.92 sx=15.68 m割线斜率=4.00 m/s切线斜率 v=4.00 m/s播放状态：播放中",
+            "x-t 图的斜率表示速度；交点才表示同一时刻同一位置，图线形状不是空间路线。"
+          ],
+          "physical_readout": [
+            "运动类型=匀速直线t=3.92 sx=15.68 m割线斜率=4.00 m/s切线斜率 v=4.00 m/s",
+            "x-t 图的斜率表示速度；交点才表示同一时刻同一位置，图线形状不是空间路线。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "563c711",
+          "readout_hash": "3cc2801",
+          "physical_readout_hash": "45ee1f4b",
+          "readout": [
+            "运动类型=匀速直线t=3.98 sx=15.92 m割线斜率=4.00 m/s切线斜率 v=4.00 m/s播放状态：暂停",
+            "x-t 图的斜率表示速度；交点才表示同一时刻同一位置，图线形状不是空间路线。"
+          ],
+          "physical_readout": [
+            "运动类型=匀速直线t=3.98 sx=15.92 m割线斜率=4.00 m/s切线斜率 v=4.00 m/s",
+            "x-t 图的斜率表示速度；交点才表示同一时刻同一位置，图线形状不是空间路线。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "563c711",
+          "readout_hash": "3cc2801",
+          "physical_readout_hash": "45ee1f4b",
+          "readout": [
+            "运动类型=匀速直线t=3.98 sx=15.92 m割线斜率=4.00 m/s切线斜率 v=4.00 m/s播放状态：暂停",
+            "x-t 图的斜率表示速度；交点才表示同一时刻同一位置，图线形状不是空间路线。"
+          ],
+          "physical_readout": [
+            "运动类型=匀速直线t=3.98 sx=15.92 m割线斜率=4.00 m/s切线斜率 v=4.00 m/s",
+            "x-t 图的斜率表示速度；交点才表示同一时刻同一位置，图线形状不是空间路线。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "运动类型=匀速直线t=# sx=# m割线斜率=# m/s切线斜率 v=# m/s播放状态：暂停|x-t 图的斜率表示速度；交点才表示同一时刻同一位置，图线形状不是空间路线。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "运动类型=匀速直线t=# sx=# m割线斜率=# m/s切线斜率 v=# m/s播放状态：暂停|x-t 图的斜率表示速度；交点才表示同一时刻同一位置，图线形状不是空间路线。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

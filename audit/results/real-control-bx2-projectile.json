@@ -1,0 +1,219 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T17:50:34.389Z",
+  "commit": "a368c0ccbb4d86accb71180cea0b16fcf879b764",
+  "module": "bx2",
+  "modules": [
+    "bx2"
+  ],
+  "summary": {
+    "total": 1,
+    "score": 100,
+    "pass": 1,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/bx2/projectile.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:电场类平抛",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:标准平抛",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:大初速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:正电偏转",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:负电偏转",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:重力平抛",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#gravityMode",
+          "text": "重力平抛",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#electricMode",
+          "text": "电场类平抛",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:标准平抛",
+          "text": "标准平抛",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:大初速",
+          "text": "大初速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:正电偏转",
+          "text": "正电偏转",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:负电偏转",
+          "text": "负电偏转",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "d7cbc00d",
+          "readout_hash": "b3508473",
+          "physical_readout_hash": "b3508473",
+          "readout": [
+            "x / y5.00 / 1.25 m vx / vy10.0 / 5.00 偏角 tanθ0.50 (26.6°) 加速度 a10.00 m/s²",
+            "平抛：水平方向无力，x=v0t；竖直方向受重力，y=1/2gt²。"
+          ],
+          "physical_readout": [
+            "x / y5.00 / 1.25 m vx / vy10.0 / 5.00 偏角 tanθ0.50 (26.6°) 加速度 a10.00 m/s²",
+            "平抛：水平方向无力，x=v0t；竖直方向受重力，y=1/2gt²。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "691f53df",
+          "readout_hash": "20f70bd",
+          "physical_readout_hash": "20f70bd",
+          "readout": [
+            "x / y11.30 / 6.38 m vx / vy10.0 / 11.30 偏角 tanθ1.13 (48.5°) 加速度 a10.00 m/s²",
+            "平抛：水平方向无力，x=v0t；竖直方向受重力，y=1/2gt²。"
+          ],
+          "physical_readout": [
+            "x / y11.30 / 6.38 m vx / vy10.0 / 11.30 偏角 tanθ1.13 (48.5°) 加速度 a10.00 m/s²",
+            "平抛：水平方向无力，x=v0t；竖直方向受重力，y=1/2gt²。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "c9497c93",
+          "readout_hash": "3030ed78",
+          "physical_readout_hash": "3030ed78",
+          "readout": [
+            "x / y11.72 / 6.87 m vx / vy10.0 / 11.72 偏角 tanθ1.17 (49.5°) 加速度 a10.00 m/s²",
+            "平抛：水平方向无力，x=v0t；竖直方向受重力，y=1/2gt²。"
+          ],
+          "physical_readout": [
+            "x / y11.72 / 6.87 m vx / vy10.0 / 11.72 偏角 tanθ1.17 (49.5°) 加速度 a10.00 m/s²",
+            "平抛：水平方向无力，x=v0t；竖直方向受重力，y=1/2gt²。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "c9497c93",
+          "readout_hash": "3030ed78",
+          "physical_readout_hash": "3030ed78",
+          "readout": [
+            "x / y11.72 / 6.87 m vx / vy10.0 / 11.72 偏角 tanθ1.17 (49.5°) 加速度 a10.00 m/s²",
+            "平抛：水平方向无力，x=v0t；竖直方向受重力，y=1/2gt²。"
+          ],
+          "physical_readout": [
+            "x / y11.72 / 6.87 m vx / vy10.0 / 11.72 偏角 tanθ1.17 (49.5°) 加速度 a10.00 m/s²",
+            "平抛：水平方向无力，x=v0t；竖直方向受重力，y=1/2gt²。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "x / y# / # m vx / vy# / # 偏角 tanθ# (#°) 加速度 a# m/s²|平抛：水平方向无力，x=v#t；竖直方向受重力，y=#/#gt²。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "x / y# / # m vx / vy# / # 偏角 tanθ# (#°) 加速度 a# m/s²|平抛：水平方向无力，x=v#t；竖直方向受重力，y=#/#gt²。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

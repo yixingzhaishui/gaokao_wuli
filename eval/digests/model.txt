@@ -1,0 +1,235 @@
+
+===== anim/model/compound-field-particle.html (265 lines, kept 84) =====
+32: <canvas id="c" width="940" height="640" aria-label="复合场带电粒子速度选择器实验台：俯视、侧视、图像和数据记录"></canvas>
+35: <button id="playBtn" class="play-btn">播放</button>
+36: <button id="resetBtn" class="secondary">重置</button>
+37: <button id="recordBtn" class="secondary">记录</button>
+39: <label for="charge">电荷性质：<span id="chargeVal"></span></label>
+40: <select id="charge"><option value="1">正电荷</option><option value="-1">负电荷</option></select>
+41: <label for="electric">电场强度 E/(10^3 V/m)：<span id="electricVal"></span></label>
+43: <label for="magnetic">磁感应强度 B/T：<span id="magneticVal"></span></label>
+45: <label for="speed">入射速度 v/(10^3 m/s)：<span id="speedVal"></span></label>
+49: <div id="readout" class="readout"></div>
+49D: <div id="readout" class="readout"></div>
+50: <div id="status" class="status"></div>
+51: <div class="hint">观察任务：拖动画面里的蓝色入射速度手柄，或点“播放”，看轨迹、力表盘、偏差图像和数据记录怎样同步变化。直线通过时应满足 qE=qvB，即 v=E/B。</div>
+54: <tbody id="recordBody"><tr><td colspan="4">点击“记录”保存一次测量</td></tr></tbody>
+77: const E=Number(els.electric.value)*1000;
+78: const B=Number(els.magnetic.value);
+79: const v=Number(els.speed.value)*1000;
+80: const m=Number(els.mass.value)*1e-15;
+81: const q=sign*1e-12;
+82: const Fe=Math.abs(q)*E;
+83: const Fm=Math.abs(q)*v*B;
+84: const v0=E/B;
+85: const netSigned=sign*(E-v*B);
+86: const a=netSigned*Math.abs(q)/m;
+87: const radius=m*v/(Math.abs(q)*B);
+88: const rel=(v-v0)/v0;
+92D: els.chargeVal.textContent=p.sign>0?'正电荷':'负电荷';
+93: els.electricVal.textContent=(p.E/1000).toFixed(1);
+93D: els.electricVal.textContent=(p.E/1000).toFixed(1);
+94D: els.magneticVal.textContent=p.B.toFixed(1);
+95: els.speedVal.textContent=(p.v/1000).toFixed(1);
+95D: els.speedVal.textContent=(p.v/1000).toFixed(1);
+96: els.massVal.textContent=(p.m/1e-15).toFixed(1);
+96D: els.massVal.textContent=(p.m/1e-15).toFixed(1);
+99: const a=Math.atan2(y2-y1,x2-x1);
+102: ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-11*Math.cos(a-.48),y2-11*Math.sin(a-.48));ctx.lineTo(x2-11*Math.cos(a+.48),y2-11*Math.sin(a+.48));ctx.closePath(
+109: const x=lab.x+44+(lab.w-86)*Math.min(time,passTime)/passTime;
+110: const y=lab.entryY+0.5*p.a*time*time*0.000014;
+115: for(let i=0;i<=95;i++){pts.push(particleAt(p,i/95*0.09));}
+139: pts.forEach((pt,i)=>{if(i%15===0){ctx.fillStyle='#74a9ff';ctx.beginPath();ctx.arc(pt.x,pt.y,3,0,Math.PI*2);ctx.fill();}});
+141: const progress=playing?Math.min(t/0.09,1):0.48;
+142: const pt=particleAt(p,Math.min(0.09,playing?t:0.043));
+143: ctx.fillStyle=p.sign>0?'#e03131':'#7b2cbf';ctx.beginPath();ctx.arc(pt.x,pt.y,12,0,Math.PI*2);ctx.fill();
+147: const feLen=Math.min(86,34+p.Fe*1.15e10), fmLen=Math.min(86,34+p.Fm*1.15e10);
+151: const handleX=lab.x+62+Math.min(1,(p.v/10000))*270;
+154: ctx.fillStyle='#2c7be5';ctx.beginPath();ctx.arc(handleX,handleY,13,0,Math.PI*2);ctx.fill();
+166: const feW=190*p.Fe/maxF, fmW=190*p.Fm/maxF;
+169: const rScale=Math.min(180,p.radius*8);
+171: for(let i=0;i<=6;i++){const xx=x+326+i*30;ctx.strokeStyle='#486581';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(xx,y+101);ctx.lineTo(xx,y+115);ctx.stroke();label
+181: const vMax=10000, fMax=Math.max(p.Fe,1e-8);
+182: const yE=y+h-34-p.Fe/fMax*88;
+184: ctx.strokeStyle='#7b2cbf';ctx.beginPath();ctx.moveTo(x+42,y+h-34);ctx.lineTo(x+w-25,y+h-34-(p.Fm/(Math.abs(p.q)*vMax*p.B))*88);ctx.stroke();label('qvB',x+w-52,y
+185: const vx=x+42+p.v/vMax*(w-70);const vy=y+h-34-p.Fm/fMax*88;
+186: ctx.fillStyle='#2c7be5';ctx.beginPath();ctx.arc(vx,vy,6,0,Math.PI*2);ctx.fill();
+187: const v0x=x+42+Math.min(1,p.v0/vMax)*(w-70);
+189: label('v0=E/B',v0x,y+34,'#087f5b',11);
+195: ctx.strokeStyle='#38b2ac';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x+120,y+95,Math.min(58,20+p.radius*2.2),-Math.PI*.88,-Math.PI*.2);ctx.stroke();
+196: const a=-Math.PI*.88+progress*Math.PI*.68;
+197: const rr=Math.min(58,20+p.radius*2.2);
+198: const px=x+120+rr*Math.cos(a),py=y+95+rr*Math.sin(a);
+199: ctx.fillStyle=p.sign>0?'#e03131':'#7b2cbf';ctx.beginPath();ctx.arc(px,py,8,0,Math.PI*2);ctx.fill();
+200: arrow(px,py,px+28*Math.cos(a+Math.PI/2),py+28*Math.sin(a+Math.PI/2),'#2c7be5',3);
+201: label('R=mv/(|q|B)',x+w/2,y+138,'#38b2ac',13);
+205: const absRel=Math.abs(p.rel)*100;
+208: `<div>公式绑定：qE=${p.Fe.toExponential(2)} N，qvB=${p.Fm.toExponential(2)} N</div>`,
+208D: `<div>公式绑定：qE=${p.Fe.toExponential(2)} N，qvB=${p.Fm.toExponential(2)} N</div>`,
+209: `<div>选择速度 v0=E/B=${(p.v0/1000).toFixed(2)} x 10^3 m/s</div>`,
+210: `<div>当前 v=${(p.v/1000).toFixed(2)} x 10^3 m/s，偏差=${absRel.toFixed(1)}%</div>`,
+211: `<div>纯磁场半径 R=mv/(|q|B)=${p.radius.toFixed(2)} m</div>`,
+216D: els.status.textContent=ok?'判定：接近临界直线通过，qE 与 qvB 等大反向。':`判定：未通过，${direction}，粒子会向合力方向偏转。`;
+225: const dt=Math.min(0.035,(now-last)/1000);
+227: if(playing){t+=dt*0.32;if(t>0.12)t=0;}
+231: function reset(){t=0;playing=false;last=0;records=[];els.charge.value='1';els.electric.value='4';els.magnetic.value='0.8';els.speed.value='5';els.mass.value='2'
+234: const x=(clientX-rect.left)*canvas.width/rect.width;
+235: const raw=(x-(lab.x+62))/270;
+236: const v=Math.max(1,Math.min(10,raw*10));
+237: els.speed.value=(Math.round(v*5)/5).toFixed(1);
+242: const x=(ev.clientX-rect.left)*canvas.width/rect.width;
+243: const y=(ev.clientY-rect.top)*canvas.height/rect.height;
+245: const hx=lab.x+62+Math.min(1,(p.v/10000))*270,hy=lab.y+lab.h-38;
+246: if(Math.hypot(x-hx,y-hy)<30){dragging=true;canvas.setPointerCapture(ev.pointerId);syncSpeedFromHandle(ev.clientX);}
+251D: els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textContent=playing?'暂停':'播放';});
+257: els.recordBody.innerHTML=records.map((r,i)=>`<tr><td>${i+1} ${r.ok?'通过':'偏转'}</td><td>${r.v.toFixed(2)}</td><td>${r.v0.toFixed(2)}</td><td>${r.rel.toFixed(1)}%<
+257D: els.recordBody.innerHTML=records.map((r,i)=>`<tr><td>${i+1} ${r.ok?'通过':'偏转'}</td><td>${r.v.toFixed(2)}</td><td>${r.v0.toFixed(2)}</td><td>${r.rel.toFixed(1)}%</td></tr>`).join('');
+
+===== anim/model/model-selector.html (223 lines, kept 84) =====
+73: <p class="hint">不是背模型名，而是从题眼出发：信号是什么、第一步列什么、哪个临界最容易错。</p>
+74: <input id="search" class="search" placeholder="输入题眼：轻绳 / 传送带 / 导轨 / p-V / 半衰期">
+76: <div class="chips" id="signalChips"></div>
+78: <div class="list" id="modelList"></div>
+84: <div class="title" id="title"></div>
+85: <div class="subtitle" id="subtitle"></div>
+88: <div class="score"><span>题眼信号</span><b id="signalBox"></b></div>
+89: <div class="score"><span>第一反应</span><b id="reactionBox"></b></div>
+90: <div class="score"><span>判据读数</span><b id="criterionBox"></b></div>
+91: <div class="score"><span>当前状态</span><b id="stateBox"></b></div>
+94: <canvas id="canvas" width="920" height="430" aria-label="高频模型诊断台：实物场景、判据图像、仪器读数和数据记录"></canvas>
+96: <button id="playBtn" data-audit-play type="button">播放演示</button>
+97: <label><span id="la"></span><input id="a" type="range"><span class="val" id="va"></span></label>
+98: <label><span id="lb"></span><input id="b" type="range"><span class="val" id="vb"></span></label>
+99: <label><span id="lc"></span><input id="c" type="range"><span class="val" id="vc"></span></label>
+106: <div class="k">推荐模型</div>
+107: <div class="strong" id="recommend"></div>
+110: <div class="k">为什么不是别的模型</div>
+111: <div id="whyNot" class="k"></div>
+114: <div class="steps" id="steps"></div>
+115: <div class="formula" id="formula"></div>
+117: <div class="k">最容易错</div>
+118: <div class="strong" id="trap"></div>
+120: <a id="openLink" class="link" target="_top" href="../../#/models">进入对应模型复习</a>
+122: <div class="compare" id="candidates"></div>
+129: {id:'M-02',name:'板块模型',anchor:'model-plank-block',family:'friction',signals:['木板','物块','相对滑动','滑痕','静摩擦临界'],desc:'物块与木板可能一起走，也可能相对滑动。',reaction:'先假设共同运动，比较 f需 与
+130: {id:'M-03',name:'传送带模型',anchor:'model-conveyor-belt',family:'friction',signals:['传送带','共速','划痕','相对位移','摩擦生热'],desc:'核心是物块相对传送带的运动，不是单纯对地运动。',reaction:'先比较 v物 与
+131: {id:'M-04',name:'弹簧瞬时问题',anchor:'model-spring-instant',family:'force',signals:['剪断','撤去支撑','瞬时加速度','弹簧','绳力突变'],desc:'t=0+ 重新受力，弹簧力不突变，绳力可突变。',reaction:'保留弹簧力，删
+132: {id:'M-05',name:'平抛与类平抛',anchor:'model-projectile-like',family:'motion',signals:['水平初速度','竖直加速度','偏转','类平抛','分运动'],desc:'一个方向匀速，另一个方向匀加速。',reaction:'拆成 x 匀速、y 匀
+133: {id:'M-06',name:'圆周临界模型',anchor:'model-circular-critical',family:'circle',signals:['最高点','恰好过顶','绳松','杆支持','圆周临界'],desc:'最高点或最低点列向心方向方程。',reaction:'先找圆心方向，再列 v²
+134: {id:'M-07',name:'天体运动模型',anchor:'model-orbital-motion',family:'gravity',signals:['卫星','轨道半径','周期','双星','变轨'],desc:'万有引力提供向心力，半径越大速度越小周期越大。',reaction:'先写 GMm/r² 
+135: {id:'M-08',name:'机车启动模型',anchor:'model-vehicle-start',family:'energy',signals:['恒定功率','额定功率','牵引力','最大速度','启动'],desc:'P=Fv，恒功率时速度越大牵引力越小。',reaction:'先判断恒力启动还是恒功
+137: {id:'M-10',name:'碰撞模型',anchor:'model-collision',family:'momentum',signals:['碰撞','爆炸','反冲','短时间','动量守恒'],desc:'短时间内内力远大于外力，优先写动量守恒。',reaction:'先判断外力冲量能否忽略',crite
+138: {id:'M-11',name:'导轨模型',anchor:'model-rail-rod',family:'em',signals:['导轨','金属棒','切割磁感线','灯泡','安培阻力'],desc:'棒是运动电源，电流后又受安培阻力。',reaction:'先定 B、L、v，再写 E=BLv',criter
+139: {id:'M-12',name:'交流电综合',anchor:'model-ac-transformer',family:'em',signals:['有效值','峰值','变压器','输电','匝数比'],desc:'交流电先区分瞬时值、峰值、有效值，再看理想变压器关系。',reaction:'先把题目给的是峰值还是
+140: {id:'M-13',name:'复合场粒子模型',anchor:'model-compound-field-particle',family:'em',signals:['速度选择器','复合场','偏转','带电粒子','圆周'],desc:'先看电场力和洛伦兹力方向，再判断直线、偏转或圆周。',reaction:
+141: {id:'M-14',name:'气体状态变化模型',anchor:'model-gas-state-change',family:'thermal',signals:['p-V图','等温','等压','等容','做功'],desc:'先识别过程类型，再用状态方程和 p-V 面积。',reaction:'先在 p-V
+150: function matchScore(m){const q=(query+' '+signal).trim();if(!q)return active===models.indexOf(m)?100:60;let s=0;for(const w of m.signals){if(q.includes(w))s+=35
+153: document.getElementById('signalChips').innerHTML=signalBank.map(s=>`<button class="chip" data-s="${s}">${s}</button>`).join('');
+153D: document.getElementById('signalChips').innerHTML=signalBank.map(s=>`<button class="chip" data-s="${s}">${s}</button>`).join('');
+163: document.getElementById('modelList').innerHTML=ranked().map(r=>`<button class="model-btn ${r._i===active?'on':''}" data-i="${r._i}"><b>${r.id} ${r.name}</b><spa
+165D: document.getElementById('title').textContent=`${m.id} ${m.name}`;
+166D: document.getElementById('subtitle').textContent=m.desc;
+167: document.getElementById('signalBox').textContent=m.signals.slice(0,3).join(' / ');
+167D: document.getElementById('signalBox').textContent=m.signals.slice(0,3).join(' / ');
+168D: document.getElementById('reactionBox').textContent=m.reaction;
+169D: document.getElementById('recommend').textContent=`${m.id} ${m.name}`;
+170D: document.getElementById('whyNot').textContent=whyNot(m);
+171: document.getElementById('steps').innerHTML=m.steps.map((s,i)=>`<div class="step"><span class="num">${i+1}</span><span>${s}</span></div>`).join('');
+171D: document.getElementById('steps').innerHTML=m.steps.map((s,i)=>`<div class="step"><span class="num">${i+1}</span><span>${s}</span></div>`).join('');
+172D: document.getElementById('formula').textContent=m.formula.join('\n');
+173D: document.getElementById('trap').textContent=m.trap;
+174: document.getElementById('openLink').href='../../#/models?id='+m.anchor;
+175: document.getElementById('candidates').innerHTML=ranked().slice(0,4).map(r=>`<button class="candidate ${r._i===active?'on':''}" data-i="${r._i}"><b>${r.id}</b> $
+175D: document.getElementById('candidates').innerHTML=ranked().slice(0,4).map(r=>`<button class="candidate ${r._i===active?'on':''}" data-i="${r._i}"><b>${r.id}</b> ${r.name}<br>${r.reaction}</button>`).joi
+177: m.sliders.forEach((s,i)=>{const c=ctrls[i];if(c.dataset.model!==m.id){c.min=s[1];c.max=s[2];c.step=(s[2]-s[1])>30?1:.01;c.value=s[3];c.dataset.model=m.id}docume
+184D: function setStatus(criterion,state){document.getElementById('criterionBox').textContent=criterion;document.getElementById('stateBox').textContent=state}
+185: function loop(ts){if(running){t=ts/1000;const m=models[active],s=m.sliders[0],mid=(s[1]+s[2])/2,amp=(s[2]-s[1])*.25;ctrls[0].value=Math.max(s[1],Math.min(s[2],m
+186D: document.getElementById('playBtn').addEventListener('click',e=>{running=!running;e.currentTarget.textContent=running?'暂停演示':'播放演示';if(running)draw()});
+187: function clear(){ctx.clearRect(0,0,920,430);ctx.strokeStyle='#eef2f7';ctx.lineWidth=1;for(let x=40;x<920;x+=40)line(x,0,x,430);for(let y=40;y<430;y+=40)line(0,y
+188D: function draw(){clear();const m=models[active];drawers[m.draw](vals());const stateBox=document.getElementById('stateBox');stateBox.textContent+=` · 演示 t=${t.toFixed(2)} s`}
+191: function arrow(x1,y1,x2,y2,c,label){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,4);ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-12*Mat
+192: function box(x,y,w,h,fill,label){ctx.fillStyle=fill;round(x,y,w,h,8);ctx.fill();text(label,x+w/2,y+h/2,'#fff',16,'center',true)}
+194: function gauge(vals,labels){const x=690,y=245,w=190,h=132;ctx.fillStyle='rgba(255,255,255,.94)';ctx.strokeStyle='#d9e2ec';round(x,y,w,h,8);ctx.fill();ctx.stroke
+197: connecting([F,m1,m2]){const a=F/(m1+m2),T=m1*a;setStatus(`a=${fmt(a)} m/s²`,`T=${fmt(T)} N`);box(240,220,94,58,'#2c7be5','m1');box(430,220,120,58,'#38b2ac','m2'
+198: plank([F,mu,M]){const m=1.5,g=10,a=F/(m+M),need=M*a,max=mu*m*g,slip=need>max;setStatus(`f需 ${fmt(need)} / fmax ${fmt(max)}`,slip?'相对滑动':'共同运动');box(310+(slip?Ma
+199: belt([vb,v0,mu]){const dv=vb-v0,dir=Math.abs(dv)<.08?0:Math.sign(dv),tc=Math.abs(dv)/(mu*10);setStatus(`v物-v带=${fmt(v0-vb)}`,dir?`摩擦向${dir>0?'右':'左'}`:'已共速');li
+200: spring([m,T0,k]){const F=m*10+T0,a=T0/m,x=F/k;setStatus(`F弹=${fmt(F)} N`,`a=${fmt(a)} m/s²`);line(250,70,390,70,'#334e68',5);line(560,70,700,70,'#334e68',5);spr
+201: projectile([v0,a,tt]){const sx=180,sy=105,scale=42,x=v0*tt*scale/5,y=.5*a*tt*tt*scale/5;setStatus(`x=${fmt(v0*tt)}, y=${fmt(.5*a*tt*tt)}`,'类平抛');line(sx,sy,sx,3
+202: circle([r,v,m]){const g=10,T=m*v*v/r-m*g;setStatus(`T=${fmt(T)} N`,T>=0?'绳可绷紧':'绳会松');const cx=360,cy=235,R=r*82;ctx.strokeStyle='#829ab1';ctx.lineWidth=3;ctx.b
+203: orbit([r,M,rate]){const v=Math.sqrt(M/r),T=Math.sqrt(r*r*r/M);setStatus(`v∝√(M/r)`,`T∝√(r³/M)`);const cx=360,cy=230,R=r*38;ctx.fillStyle='#2c7be5';ctx.beginPath
+204: vehicle([P,f,v]){const F=P/v,a=F-f,vm=P/f;setStatus(`F=P/v=${fmt(F)} kN`,v<vm?'加速':'接近终速');box(260+Math.sin(t*2)*8,230,150,60,'#2c7be5','车');arrow(410,260,410+F
+205: energy([h,f,s]){const mg=10*h,Q=f*s;setStatus(`Q=f·s=${fmt(Q)} J`,`W非保=ΔE机`);line(190,300,680,160,'#829ab1',5);box(300+Math.sin(t)*60,220-Math.sin(t)*20,80,54,'
+206: collision([m1,m2,e]){const v1=5,v2=0,v1p=(m1*v1-m2*e*(v1-v2))/(m1+m2),v2p=v1p+e*(v1-v2);setStatus('总动量守恒',`e=${fmt(e)}`);const gap=Math.max(0,120-((t*90)%170));
+207: rail([B,L,v]){const E=B*L*v,I=E/2,F=B*I*L;setStatus(`E=${fmt(E)} V`,`F安=${fmt(F)} N`);line(210,170,710,170,'#334e68',5);line(210,310,710,310,'#334e68',5);const 
+208: ac([n1,n2,U1]){const U2=U1*n2/n1;setStatus(`U2=${fmt(U2)} V`,n2>n1?'升压':'降压');box(230,150,90,170,'#2c7be5','n1');box(560,150,90,170,'#38b2ac','n2');for(let i=0;
+209: compound([E,B,v]){const v0=E/B,dev=v-v0;setStatus(`v0=E/B=${fmt(v0)}`,Math.abs(dev)<.25?'直线通过':dev>0?'磁场力较大':'电场力较大');box(210,120,420,210,'#eef4ff','');for(let 
+210: gas([p,vr,tr]){const p2=p*tr/vr,W=p*(vr-1);setStatus(`p2=${fmt(p2)}p0`,`W≈pΔV=${fmt(W)}`);const gx=210,gy=320;line(gx,gy,gx+360,gy,'#334e68',2);line(gx,gy,gx,gy
+211: nuclear([dm,N,eb]){const Q=dm*931.5,J=Q*1.602e-13*N*1e20;setStatus(`Q=${fmt(Q)} MeV`,dm>=0?'放能':'吸能');box(230,210,90,58,'#2c7be5','反应前');arrow(340,240,470,240,'
+213: function spring(x1,y1,x2,y2){ctx.strokeStyle='#334e68';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(x1,y1);for(let i=1;i<=8;i++){const y=y1+(y2-y1)*i/8,x=x1+(i%2?
+215: function move(e){if(!drag)return;const p=pos(e),m=models[active],s=m.sliders[drag.i],val=Math.max(s[1],Math.min(s[2],drag.fn(p)));ctrls[drag.i].value=val;render
+217: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*920/r.width,y:(e.clientY-r.top)*430/r.height}}
+218: function findHandle(p){const m=models[active],v=vals();let hs=[];if(m.draw==='connecting')hs=[{x:550+v[0]*8,y:249,i:0,fn:p=>(p.x-550)/8}];if(m.draw==='plank')hs
+221: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/model/nuclear-mass-energy.html (258 lines, kept 61) =====
+32: <canvas id="c" width="940" height="640" aria-label="核反应与质能方程模型实验台：俯视反应室、质量天平、图像、数据记录和多视角读数"></canvas>
+35: <button id="playBtn" class="play-btn">播放</button>
+36: <button id="resetBtn" class="secondary">重置</button>
+37: <button id="recordBtn" class="secondary">记录</button>
+39: <label for="template">反应模板：<span id="templateVal"></span></label>
+41: <option value="fission">中子诱发裂变</option>
+42: <option value="fusion">氘氚聚变</option>
+43: <option value="alpha">α 衰变配平</option>
+45: <label for="dm">质量亏损 Δm/u：<span id="dmVal"></span></label>
+47: <label for="count">反应次数 N/(10^20 次)：<span id="countVal"></span></label>
+49: <label for="binding">产物平均结合能 Eb/A/MeV：<span id="bindingVal"></span></label>
+51: <label for="probeA">结合能曲线探针 A：<span id="probeVal"></span></label>
+53: <div id="readout" class="readout"></div>
+53D: <div id="readout" class="readout"></div>
+54: <div id="status" class="status"></div>
+55: <div class="hint">观察任务：拖动画面里的 Δm 砝码或曲线探针，看质量天平、E=Δmc²、E/MeV≈Δm/u×931.5、ΣA/ΣZ 守恒和数据记录如何同步变化。</div>
+58: <tbody id="recordBody"><tr><td colspan="4">点击“记录”保存一次读数</td></tr></tbody>
+84: const q=dm*931.5;
+85: const joule=q*1.602e-13*count*1e20;
+90D: els.templateVal.textContent=p.tpl.name;
+91D: els.dmVal.textContent=p.dm.toFixed(3);
+92D: els.countVal.textContent=p.count.toFixed(0);
+93D: els.bindingVal.textContent=p.binding.toFixed(2);
+94D: els.probeVal.textContent=p.probeA.toFixed(0);
+100: const a=Math.atan2(y2-y1,x2-x1);
+103: ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.48),y2-10*Math.sin(a-.48));ctx.lineTo(x2-10*Math.cos(a+.48),y2-10*Math.sin(a+.48));ctx.closePath(
+106: ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+118: const flash=playing?0.5+0.5*Math.sin(t*5):.75;
+119: ctx.fillStyle=`rgba(240,165,0,${flash})`;ctx.beginPath();ctx.arc(x+274,y+136,34+10*flash,0,Math.PI*2);ctx.fill();
+134: ctx.strokeStyle='#52606d';ctx.lineWidth=3;ctx.beginPath();ctx.arc(x+214,y+158,46,Math.PI,0);ctx.stroke();
+135: const tilt=Math.max(-24,Math.min(24,p.dm*120-7));
+139: const blockX=x+372,blockY=y+72+Math.max(-26,Math.min(46,(.21-p.dm)*115));
+144: const e=Math.max(-120,Math.min(120,p.q/2.2));
+145: ctx.strokeStyle='#d9e2ec';ctx.lineWidth=10;ctx.beginPath();ctx.arc(x+430,y+142,52,Math.PI*.78,Math.PI*2.22);ctx.stroke();
+146: ctx.strokeStyle=p.q>=0?'#f0a500':'#c92a2a';ctx.lineWidth=10;ctx.beginPath();ctx.arc(x+430,y+142,52,Math.PI*.78,Math.PI*.78+(Math.PI*1.44)*(e+120)/240);ctx.strok
+157: const px=x+46+(p.dm+0.04)/0.36*(w-72),py=y+h-34-(p.q+37.26)/(335.34+37.26)*(h-82);
+158: ctx.fillStyle=p.q>=0?'#f0a500':'#c92a2a';ctx.beginPath();ctx.arc(px,py,7,0,Math.PI*2);ctx.fill();
+163: return 1.2+7.7*(1-Math.exp(-A/18))-0.00045*Math.max(0,A-56)**1.55;
+173: const A=2+i*238/120,eb=bindingAt(A);
+174: const px=x+42+(A-2)/238*(w-72),py=y+h-34-(eb/9.2)*(h-78);
+178: const px=x+42+(p.probeA-2)/238*(w-72),py=y+h-34-(bindingAt(p.probeA)/9.2)*(h-78);
+179: ctx.fillStyle='#7b2cbf';ctx.beginPath();ctx.arc(px,py,8,0,Math.PI*2);ctx.fill();
+182: const targetY=y+h-34-(p.binding/9.2)*(h-78);
+197: `<div>质能换算：Q=Δm×931.5=${p.q.toFixed(2)} MeV</div>`,
+198: `<div>总能量：N=${p.count.toFixed(0)}×10^20 次，E=${p.joule.toExponential(2)} J</div>`,
+199: `<div>结合能读数：Eb/A=${p.binding.toFixed(2)} MeV，探针 A=${p.probeA.toFixed(0)}</div>`,
+200: `<div>公式绑定：E=Δmc²，E/MeV≈Δm/u×931.5；Δm>0 放能，Δm<0 吸能</div>`
+200D: `<div>公式绑定：E=Δmc²，E/MeV≈Δm/u×931.5；Δm>0 放能，Δm<0 吸能</div>`
+203D: els.status.textContent=p.q>=0&&ok?'判定：A、Z 守恒且 Δm>0，反应释放能量。':'判定：守恒仍需检查；若 Δm<0，则该反应需要外界输入能量。';
+207: if(playing)t+=(ts-last)/1000;
+218: els.recordBody.innerHTML=records.map((r,i)=>`<tr><td>${i+1}. ${r.name}</td><td>${r.dm.toFixed(3)}</td><td>${r.q.toFixed(1)}</td><td>${r.state}</td></tr>`).join(
+218D: els.recordBody.innerHTML=records.map((r,i)=>`<tr><td>${i+1}. ${r.name}</td><td>${r.dm.toFixed(3)}</td><td>${r.q.toFixed(1)}</td><td>${r.state}</td></tr>`).join('');
+222: els.dm.value=tpl.baseDm;els.count.value=12;els.binding.value=els.template.value==='fusion'?7.1:8.45;els.probeA.value=els.template.value==='fission'?56:4;t=0;pla
+230: const val=.21-(pos.y-(box.scaleY+72))/115;
+231: els.dm.value=String(Math.max(-.04,Math.min(.32,val)).toFixed(3));
+234: const val=2+(pos.x-(box.curveX+42))/(box.curveW-72)*238;
+235: els.probeA.value=String(Math.max(2,Math.min(240,val)).toFixed(0));
+240: const blockX=box.scaleX+372,blockY=box.scaleY+72+Math.max(-26,Math.min(46,(.21-p.dm)*115));
+241: const probeX=box.curveX+42+(p.probeA-2)/238*(box.curveW-72);
+242: if(Math.hypot(pos.x-blockX,pos.y-blockY)<44)dragging='mass';
+248D: els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textContent=playing?'暂停':'播放';});

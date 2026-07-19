@@ -28,7 +28,7 @@
 <div class="wrap">
   <div class="stage">
     <canvas id="canvas" width="940" height="560" aria-label="刹车问题交互实验台"></canvas>
-    <div class="hint">可拖动 v0 点、停车点 t停 和橙色观察时间；红色虚线是错误的继续代入</div>
+    <div class="hint">可拖动 v0 点、停车点 t停 和橙色观察时间；带“错误外推”标签的红色虚线表示停车后仍继续代入公式的错误结果</div>
   </div>
   <div class="panel">
     <div class="box task"><b>观察任务：</b>拖橙色时间游标越过 t停，看蓝车是否继续动；比较蓝色真实位置和红色错误外推位置，体会为什么不能再代 t。</div>
@@ -127,7 +127,7 @@
     }else{
       text('v=0，车已停住',realPx,track.y-62,'#0b7285',13,'center','800');
     }
-    text('真实刹车：到 v=0 后位置锁定；红色虚线是把公式错误延长',468,58,'#334e68',14,'center','800');
+    text('真实刹车：到 v=0 后位置锁定；红色虚线（错误外推）是把公式错误延长',468,58,'#334e68',14,'center','800');
     text(`t=${state.t.toFixed(1)} s，真实 x=${xReal(state.t).toFixed(1)} m，错误外推 x=${xWrong(state.t).toFixed(1)} m`,468,86,'#0b7285',14,'center','800');
   }
   function drawAxes(){

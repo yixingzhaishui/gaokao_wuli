@@ -30,6 +30,7 @@
   .formula{font-size:12px;line-height:1.35;color:#334e68}
   .status{font-size:12px;font-weight:700;border-radius:6px;padding:7px;border:1px solid #38b2ac;background:#e6fffa;color:#087f5b;line-height:1.35}
   .status.bad{border-color:#f08c00;background:#fff7e6;color:#9a6700}
+  [hidden]{display:none!important}
   @media(max-width:760px){
     .root{grid-template-columns:1fr;min-height:auto}
     canvas{height:auto;min-height:430px}
@@ -39,14 +40,17 @@
 </style>
 </head>
 <body>
-<div class="root">
+<div class="root" id="app" data-guided-complete="false">
   <div class="stage">
     <canvas id="canvas" width="940" height="560" aria-label="质点模型交互实验台：道路俯视装置、比例图像和数据记录"></canvas>
     <div class="hint">可直接拖动橙色手柄：车身长度 l、研究范围 s</div>
   </div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>拖动车身右端和终点手柄，对照道路俯视装置、比例图像和数据记录，比较整车与蓝点。</div>
-    <div class="card">
+    <div class="card task"><b>主问题：</b>同一列车，研究长途位置时可以画成点；研究完全过线时还能这样做吗？先看第一种任务，再预测第二种。</div>
+    <div class="card"><button id="guideBtn" style="width:100%">开始对比演示</button></div>
+    <div class="card" id="predictCard" hidden><b>暂停预测：</b>改为研究“列车完全通过停止线”，还能只用一个点吗？<div class="mode"><button data-predict="yes">能</button><button data-predict="no">不能</button></div></div>
+    <div class="card" id="feedbackCard" hidden></div>
+    <div class="card" id="exploreCard" hidden>
       <div class="title">实验条件</div>
       <label class="param"><span>车身长度 l <b id="lenText">4 m</b></span><input id="len" type="range" min="1" max="20" step="1" value="4"></label>
       <div class="stepper"><button data-step="len" data-dir="-1">缩短 l</button><button data-step="len" data-dir="1">加长 l</button></div>
@@ -59,11 +63,12 @@
       <div class="transport"><button id="playBtn">播放</button><button id="resetBtn">重置</button></div>
     </div>
     <div class="readout" id="readout"></div>
-    <div class="card formula">
+    <div class="card formula" id="formulaCard" hidden>
       <div class="title">判据绑定</div>
       <div>l：车身标尺和橙色长度手柄</div>
       <div>s：路尺终点和研究范围手柄</div>
-      <div>公式：l/s ≪ 1 且只研究整体位置，才可质点化</div>
+      <div>l/s：只提供尺度直觉，不是固定阈值判据</div>
+      <div>结论：看当前问题是否需要大小、形状、姿态或转动</div>
     </div>
     <div class="status" id="status"></div>
   </div>
@@ -74,7 +79,13 @@
   const canvas=document.getElementById('canvas');
   const ctx=canvas.getContext('2d');
   const els={len:document.getElementById('len'),dist:document.getElementById('dist')};
+  const app=document.getElementById('app');
   const playBtn=document.getElementById('playBtn');
+  const guideBtn=document.getElementById('guideBtn');
+  const predictCard=document.getElementById('predictCard');
+  const feedbackCard=document.getElementById('feedbackCard');
+  const exploreCard=document.getElementById('exploreCard');
+  const formulaCard=document.getElementById('formulaCard');
   const modes={path:'行程',pass:'过线',turn:'转动',posture:'姿态'};
   let mode='path';
   let running=false;
@@ -82,13 +93,15 @@
   let last=performance.now();
   let drag=null;
   let layout=null;
+  let revealed=false;
+  let guidedComplete=false;
 
   function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
   function q(){return{l:+els.len.value,s:+els.dist.value,mode,progress};}
   function verdict(d){
     const ratio=d.l/(d.s*1000);
-    const shape=d.mode!=='path';
-    return{ratio,shape,ok:!shape&&ratio<0.01};
+    const required={path:[],pass:['大小'],turn:['大小','转动'],posture:['形状','姿态']}[d.mode];
+    return{ratio,required,ok:required.length===0};
   }
   function setParam(name,value){
     const el=els[name];
@@ -164,20 +177,17 @@
     }
   }
   function modeMessage(d,v){
-    if(d.mode==='path') return v.ok?'只研究整体位置：蓝点和整车位置等效。':'行程很短或物体太长：尺寸不可忽略。';
+    if(d.mode==='path') return '只研究整体位置：此任务不需要车身细节。';
     if(d.mode==='pass') return '研究过线/过桥：前端和后端不是同一时刻通过，车长必须保留。';
     if(d.mode==='turn') return '研究车轮转动：点没有半径、轮辐和转角，不能替代车轮。';
     return '研究姿态：点没有车头方向和倾角，不能表示姿态变化。';
   }
   function drawGauge(x,y,v){
     box(x,y,222,72,'#f8fbff','#d9e2ec',7);
-    text('模型判据尺',x+111,y+15,'#334e68','center',13,'700');
+    text('辅助尺度比（不直接判真值）',x+111,y+15,'#334e68','center',13,'700');
     const gx=x+22, gy=y+42, gw=178;
     line(gx,gy,gx+gw,gy,'#d9e2ec',8);
-    line(gx,gy,gx+gw*Math.min(1,v.ratio/.03),gy,v.ok?'#38b2ac':'#f0a500',8);
-    const critical=gx+gw*(.01/.03);
-    line(critical,gy-13,critical,gy+13,'#e03131',2);
-    text('1% 临界',critical,gy+25,'#e03131','center',11,'700');
+    line(gx,gy,gx+gw*Math.min(1,v.ratio/.03),gy,'#2c7be5',8);
     const p=gx+gw*Math.min(1,v.ratio/.03);
     ctx.fillStyle=v.ok?'#087f5b':'#9a6700';
     ctx.beginPath();ctx.arc(p,gy,7,0,Math.PI*2);ctx.fill();
@@ -222,10 +232,10 @@
     box(38,262,584,154,'#fff','#d9e2ec');
     text('质点近似视图：蓝点只保留“整体位置”，不保留车身细节',330,285,'#334e68','center',14,'700');
     scaleLine(left,358,roadW,d);
-    ctx.fillStyle=v.ok?'#2c7be5':'#f08c00';
+    ctx.fillStyle=!revealed?'#829ab1':v.ok?'#2c7be5':'#f08c00';
     ctx.beginPath();ctx.arc(pointX,323,9,0,Math.PI*2);ctx.fill();
-    arrow(left,323,pointX,323,v.ok?'#2c7be5':'#f08c00',3);
-    text('蓝点：质点位置',pointX,300,v.ok?'#2c7be5':'#f08c00','center',13,'700');
+    arrow(left,323,pointX,323,!revealed?'#829ab1':v.ok?'#2c7be5':'#f08c00',3);
+    text('蓝点：质点位置',pointX,300,!revealed?'#829ab1':v.ok?'#2c7be5':'#f08c00','center',13,'700');
 
     if(d.mode==='pass'){
       const rear=carX;
@@ -245,22 +255,26 @@
     }
 
     drawGauge(648,274,v);
-    box(648,358,222,58,v.ok?'#e6fffa':'#fff7e6',v.ok?'#38b2ac':'#f0a500');
-    text(v.ok?'可看作质点':'不能看作质点',759,378,v.ok?'#087f5b':'#9a6700','center',16,'700');
-    text(modeMessage(d,v),759,399,v.ok?'#087f5b':'#9a6700','center',12,'700');
+    box(648,358,222,58,!revealed?'#f8fbff':v.ok?'#e6fffa':'#fff7e6',!revealed?'#829ab1':v.ok?'#38b2ac':'#f0a500');
+    text(!revealed?'等待观察任务':v.ok?'可看作质点':'不能看作质点',759,378,!revealed?'#486581':v.ok?'#087f5b':'#9a6700','center',16,'700');
+    text(!revealed?'先看问题需要保留什么':modeMessage(d,v),759,399,!revealed?'#486581':v.ok?'#087f5b':'#9a6700','center',12,'700');
 
     box(118,438,704,48,v.ok?'#e6fffa':'#fff7e6',v.ok?'#38b2ac':'#f0a500');
-    text('判据：l/s = '+(v.ratio*100).toFixed(4)+'%，研究任务 = '+modes[d.mode],470,458,'#334e68','center',14,'700');
+    text('辅助比例 l/s = '+(v.ratio*100).toFixed(4)+'%，研究任务 = '+modes[d.mode],470,458,'#334e68','center',14,'700');
     text(d.mode==='path'?'把形状遮住，只保留整体位置，运动学计算不变。':'此任务正关心大小、形状、转动或姿态，遮住它们就会丢信息。',470,480,'#486581','center',13);
     update(d,v);
   }
   function update(d,v){
     document.getElementById('lenText').textContent=d.l+' m';
     document.getElementById('distText').textContent=d.s+' km';
-    document.getElementById('readout').innerHTML='任务=<b>'+modes[d.mode]+'</b><br>l/s=<b>'+(v.ratio*100).toFixed(4)+'%</b><br>位置 x=<b>'+(d.s*d.progress).toFixed(1)+' km</b><br>结论=<b>'+(v.ok?'可质点化':'不可质点化')+'</b>';
+    document.getElementById('readout').innerHTML='任务=<b>'+modes[d.mode]+'</b><br>辅助比例 l/s=<b>'+(v.ratio*100).toFixed(4)+'%</b><br>本题需要=<b>'+(revealed?(v.required.length?v.required.join('、'):'仅整体位置'):'等待演示')+'</b><br>结论=<b>'+(revealed?(v.ok?'可质点化':'不可质点化'):'尚未揭示')+'</b>';
+    canvas.dataset.verdictSource='research-question';
+    canvas.dataset.ratioIsThreshold='false';
     const st=document.getElementById('status');
-    st.classList.toggle('bad',!v.ok);
-    st.textContent=v.ok?'通过：本题只关心整体位置，大小和形状对结论影响可忽略。':'打回：当前任务需要车长、转角、姿态或各部分差异，不能用一个点替代。';
+    st.classList.toggle('bad',revealed&&!v.ok);
+    st.textContent=!revealed?'先判断研究问题需要保留哪些信息；尺度比只作辅助。':v.ok?'通过：本题只关心整体位置，大小和形状对结论影响可忽略。':'打回：当前任务需要车长、转角、姿态或各部分差异，不能用一个点替代。';
+    app.dataset.guidedComplete=String(guidedComplete);
+    app.dataset.conclusionRevealed=String(revealed);
   }
   function setMode(m){
     mode=m;
@@ -317,11 +331,13 @@
     el.dispatchEvent(new Event('input',{bubbles:true}));
   }));
   playBtn.onclick=()=>{running=!running;playBtn.textContent=running?'暂停':'播放';last=performance.now();draw();};
-  document.getElementById('resetBtn').onclick=()=>{progress=0;running=false;playBtn.textContent='播放';draw();};
+  document.getElementById('resetBtn').onclick=()=>{progress=0;running=false;els.len.value=4;els.dist.value=400;setMode('path');playBtn.textContent='播放';draw();};
   document.getElementById('modePath').onclick=()=>setMode('path');
   document.getElementById('modePass').onclick=()=>setMode('pass');
   document.getElementById('modeTurn').onclick=()=>setMode('turn');
   document.getElementById('modePosture').onclick=()=>setMode('posture');
+  guideBtn.onclick=()=>{running=false;progress=.45;revealed=true;guidedComplete=false;exploreCard.hidden=true;formulaCard.hidden=true;feedbackCard.hidden=true;setMode('path');predictCard.hidden=false;guideBtn.textContent='正在比较：长途位置 → 完全过线';draw();};
+  document.querySelectorAll('[data-predict]').forEach(btn=>btn.onclick=()=>{const prediction=btn.dataset.predict;predictCard.hidden=true;setMode('pass');revealed=true;guidedComplete=true;exploreCard.hidden=false;formulaCard.hidden=false;feedbackCard.hidden=false;feedbackCard.innerHTML=`<b>你的预测：</b>${prediction==='yes'?'还能用一个点':'不能只用一个点'}<br><b>实际结果：</b>研究完全过线必须保留车长。<br><b>证据：</b>车头和车尾通过停止线的时刻不同。<br><b>原因：</b>当前问题需要物体大小信息；不是由固定 l/s 阈值决定。`;guideBtn.textContent='重播对比演示';draw();});
   draw();
   requestAnimationFrame(tick);
 })();

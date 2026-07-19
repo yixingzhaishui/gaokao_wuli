@@ -28,15 +28,17 @@
     <canvas id="c" width="700" height="470" aria-label="验证机械能守恒实验台：侧视纸带、能量柱、ΔEk-ΔEp图像和数据记录"></canvas>
     <section class="panel">
       <button id="playBtn">▶ 自动扫描测量点</button>
+      <button id="recordBtn" style="margin-top:8px">记录当前测点</button>
       <label for="height">释放高度 h/m：<span id="heightVal"></span></label>
       <input id="height" type="range" min="0.5" max="1.8" value="1.2" step="0.1">
       <label for="mass">重物质量 m/kg：<span id="massVal"></span></label>
       <input id="mass" type="range" min="0.05" max="0.30" value="0.10" step="0.01">
       <label for="point">测量点 n：<span id="pointVal"></span></label>
       <input id="point" type="range" min="5" max="13" value="8" step="1">
-      <label for="loss">阻力损失：<span id="lossVal"></span></label>
+      <label for="loss">阻力（占重力百分比）：<span id="lossVal"></span></label>
       <input id="loss" type="range" min="0" max="12" value="2" step="1">
       <div id="readout" class="readout"></div>
+      <table style="width:100%;margin-top:10px;border-collapse:collapse;font-size:12px"><thead><tr><th>n</th><th>ΔEp/J</th><th>ΔEk/J</th><th>|W阻|/J</th></tr></thead><tbody id="records"></tbody></table>
       <div id="status" class="status"></div>
       <div class="hint">观察任务：调大阻力损失，看 ΔEk 是否小于 ΔEp；移动测量点，看速度是由前后两点间距算出的。</div>
     </section>
@@ -56,7 +58,9 @@ const els = {
   lossVal: document.getElementById('lossVal'),
   readout: document.getElementById('readout'),
   status: document.getElementById('status'),
-  play: document.getElementById('playBtn')
+  play: document.getElementById('playBtn'),
+  record: document.getElementById('recordBtn'),
+  records: document.getElementById('records')
 };
 const g = 9.8;
 const T = 0.04;
@@ -64,6 +68,7 @@ let autoScan = false;
 let autoDir = 1;
 let lastScan = 0;
 let drag = null;
+const records = [];
 function yAt(n, loss) {
   return 0.5 * g * Math.pow(n * T, 2) * (1 - loss);
 }
@@ -127,6 +132,9 @@ function draw() {
   const v = (yNext - yPrev) / (2 * T);
   const dep = m * g * y;
   const dek = 0.5 * m * v * v;
+  const fDrag = loss * m * g;
+  const wDrag = fDrag * y;
+  const residual = dep > 0 ? Math.abs(dep - dek - wDrag) / dep * 100 : 0;
   const rel = dep > 0 ? Math.abs(dep - dek) / dep * 100 : 0;
   const valid = yNext < h;
   els.heightVal.textContent = h.toFixed(1);
@@ -197,7 +205,7 @@ function draw() {
   ctx.fillStyle = '#2c7be5';
   ctx.fillText('下落高度 y=' + y.toFixed(3) + 'm', 332, 130 + y * scale / 2);
 
-  const maxE = Math.max(dep, dek, 0.2);
+  const maxE = Math.max(dep, dek, wDrag, 0.2);
   drawBar(394, 105, 78, 190, dep, maxE, '#7b2cbf', 'ΔEp=mgy');
   drawBar(500, 105, 78, 190, dek, maxE, '#2c7be5', 'ΔEk=1/2mv²');
   drawGraph(410, 420, 210, 90, m, loss);
@@ -214,14 +222,17 @@ function draw() {
     `<div id="r2">v_n≈(y_{n+1}-y_{n-1})/(2T)=${v.toFixed(2)}m/s</div>`,
     `<div id="r3">ΔEp=mgy=${dep.toFixed(3)}J</div>`,
     `<div id="r4">ΔEk=1/2mv²=${dek.toFixed(3)}J</div>`,
-    `<div id="r5">相对误差≈${rel.toFixed(1)}%</div>`
+    `<div id="r5">|W阻|=F阻y=${wDrag.toFixed(3)}J；ΔEp-(ΔEk+|W阻|) 相对残差≈${residual.toFixed(1)}%</div>`
   ].join('');
-  els.status.className = valid && rel < 5 ? 'status' : 'status bad';
+  els.status.className = valid && residual < 5 ? 'status' : 'status bad';
   els.status.textContent = !valid
     ? '测点太低：前后点超过释放高度，应选更高释放点或更靠前的纸带点。'
-    : rel < 5
-      ? '通过：ΔEk 与 ΔEp 接近，说明阻力较小时机械能近似守恒。'
-      : '不通过：ΔEk 明显小于 ΔEp，阻力或纸带摩擦造成机械能损失。';
+    : loss < 0.01 && rel < 5
+      ? '通过：阻力可忽略时，ΔEk 与 ΔEp 接近，机械能近似守恒。'
+      : residual < 5
+        ? '含阻力：机械能不守恒，但能量关系 ΔEp≈ΔEk+|W阻| 闭合。'
+        : '数据不闭合：请检查测点是否越过释放高度或测量参数。';
+  window.__EXP_TEST_STATE__={n,dep,dek,fDrag,wDrag,residual,loss,valid,records:records.length};
 }
 function stopAuto() {
   autoScan = false;
@@ -271,6 +282,7 @@ els.play.addEventListener('click', () => {
     requestAnimationFrame(scan);
   }
 });
+els.record.addEventListener('click',()=>{const q=window.__EXP_TEST_STATE__;if(!q.valid)return;records.unshift({n:q.n,dep:q.dep,dek:q.dek,wDrag:q.wDrag});records.splice(5);els.records.innerHTML=records.map(r=>`<tr><td>${r.n}</td><td>${r.dep.toFixed(3)}</td><td>${r.dek.toFixed(3)}</td><td>${r.wDrag.toFixed(3)}</td></tr>`).join('');draw();});
 c.addEventListener('pointerdown', ev => {
   drag = 'measurement-handle';
   stopAuto();
@@ -286,5 +298,5 @@ c.addEventListener('pointerup', () => { drag = null; });
 c.addEventListener('pointerleave', () => { drag = null; });
 draw();
 </script>
-</body>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script><script src="guided-experiment.js"></script></body>
 </html>

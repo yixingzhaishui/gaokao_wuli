@@ -13,6 +13,7 @@
 <div class="root">
   <div class="stage"><canvas id="canvas" width="900" height="600" aria-label="涡流实验台装置：铜管侧视装置、金属盘俯视图、磁场空间方向、涡流环形图像、速度热量数据记录"></canvas></div>
   <div class="panel">
+    <div class="card"><button id="playBtn" type="button">暂停演示</button></div>
     <div class="card task"><b>观察任务：</b>拖动磁体穿过铜管或拖动金属盘进入磁场，对照侧视装置、俯视图和速度图像，看磁通量变化怎样产生涡流，涡流安培力怎样阻碍相对运动并转化为热。</div>
     <div class="card"><div class="title">模式</div><div class="buttons"><button data-mode="tube" class="active">铜管阻尼</button><button data-mode="disc">金属盘</button><button data-mode="drive">电磁驱动</button></div></div>
     <div class="card">
@@ -34,19 +35,51 @@
 'use strict';
 const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
 const els={b:document.getElementById('b'),v:document.getElementById('v'),rho:document.getElementById('rho'),slot:document.getElementById('slot'),bLabel:document.getElementById('bLabel'),vLabel:document.getElementById('vLabel'),rhoLabel:document.getElementById('rhoLabel'),slotLabel:document.getElementById('slotLabel'),readout:document.getElementById('readout'),rows:document.getElementById('rows'),status:document.getElementById('status'),record:document.getElementById('record')};
-const buttons=Array.from(document.querySelectorAll('button[data-mode]'));const state={mode:'tube',t:0,drag:false,records:[]};
+const buttons=Array.from(document.querySelectorAll('button[data-mode]'));const state={mode:'tube',t:0,drag:false,records:[],running:true};
 const C={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',green:'#087f5b',gold:'#f0a500',purple:'#7c3aed'};
 function p(){const B=+els.b.value,v=+els.v.value,rho=+els.rho.value,slot=+els.slot.value/100;const eddy=Math.max(0,B*v*(1-slot)/(rho/3));return{B,v,rho,slot,eddy,damp:Math.min(1,eddy/3.5),heat:Math.min(1,eddy*eddy*.16*rho)}}
 function fmt(n,d=2){return n.toFixed(d)}function line(x1,y1,x2,y2,c='#9fb3c8',w=2,d){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(d)ctx.setLineDash(d);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}function box(x,y,w,h,f='#fff',s='#d9e2ec'){ctx.save();ctx.fillStyle=f;ctx.strokeStyle=s;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.restore()}function text(s,x,y,c=C.ink,a='center',z=13,w='700'){ctx.fillStyle=c;ctx.font=w+' '+z+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.45),y2-10*Math.sin(a-.45));ctx.lineTo(x2-10*Math.cos(a+.45),y2-10*Math.sin(a+.45));ctx.closePath();ctx.fill()}
 function draw(){const q=p();ctx.clearRect(0,0,900,600);box(34,34,832,520,'#fff');text('涡流：闭合导体内部的环形感应电流',450,60,C.ink,'center',16,'800');state.mode==='tube'?drawTube(q):drawDisc(q);drawGraph(q);update()}
 function drawTube(q){box(68,92,430,330,'#fbfdff');text('铜管侧视装置：磁体下落受阻',283,116,C.ink,'center',14,'800');ctx.fillStyle='#e2e8f0';ctx.fillRect(260,150,90,230);ctx.clearRect(284,150,42,230);line(260,150,260,380,'#94a3b8',4);line(350,150,350,380,'#94a3b8',4);const y=170+((state.t*q.v*26)%175);drawMagnet(305,y);arrow(360,y,360,y+54,C.blue,3);text('v',374,y+30,C.blue,'left',12,'900');arrow(250,y+42,250,y-16,C.red,3);text('F阻',232,y+12,C.red,'right',12,'900');for(let k=0;k<5;k++){const cy=y-28+k*16;ctx.strokeStyle=k%2?C.purple:C.gold;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(305,cy,48,10,0,0,Math.PI*2);ctx.stroke()}text('环形涡流阻碍磁体相对铜管运动',283,398,C.purple,'center',12,'900')}
 function drawMagnet(x,y){box(x-28,y-34,56,68,'#fff','#d9e2ec');ctx.fillStyle=C.red;ctx.fillRect(x-28,y-34,56,34);ctx.fillStyle=C.blue;ctx.fillRect(x-28,y,56,34);text('N',x,y-17,'#fff','center',14,'900');text('S',x,y+17,'#fff','center',14,'900')}
-function drawDisc(q){box(68,92,430,330,'#fbfdff');text(state.mode==='drive'?'金属盘俯视图：旋转磁场驱动':'金属盘俯视图：进入磁场产生阻尼',283,116,C.ink,'center',14,'800');ctx.fillStyle='rgba(44,123,229,.14)';ctx.fillRect(300,150,130,210);text('B 区域 ⊗',365,136,C.blue,'center',12,'900');const cx=state.mode==='drive'?260+Math.sin(state.t)*34:220+((state.t*q.v*38)%180),cy=255;ctx.fillStyle='#e5e7eb';ctx.beginPath();ctx.arc(cx,cy,74,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#94a3b8';ctx.stroke();for(let i=0;i<q.slot*8;i++){const a=i*Math.PI/4;line(cx,cy,cx+70*Math.cos(a),cy+70*Math.sin(a),'#fff',4)}for(let r=28;r<=58;r+=15){ctx.strokeStyle=C.purple;ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx,cy,r,state.t,state.t+Math.PI*1.55);ctx.stroke()}arrow(cx-35,cy+80,cx+35,cy+80,C.blue,3);text('v/旋转',cx,cy+104,C.blue,'center',12,'900');arrow(cx+78,cy,cx+38,cy,state.mode==='drive'?C.green:C.red,3);text(state.mode==='drive'?'驱动力':'阻力',cx+96,cy,state.mode==='drive'?C.green:C.red,'left',12,'900')}
+function driveK(q){return Math.min(.82,.24+.42*q.B*(1-q.slot)/(q.rho/3))}
+function drawDisc(q){
+  box(68,92,430,330,'#fbfdff');text(state.mode==='drive'?'金属盘俯视图：旋转磁场以转差产生驱动转矩':'金属盘俯视图：进入磁场产生阻尼',283,116,C.ink,'center',14,'800');
+  const drive=state.mode==='drive',cx=drive?260:220+((state.t*q.v*38)%180),cy=255,fieldAngle=state.t,diskAngle=state.t*driveK(q);
+  if(drive){ctx.strokeStyle='rgba(44,123,229,.18)';ctx.lineWidth=18;ctx.beginPath();ctx.arc(cx,cy,108,0,Math.PI*2);ctx.stroke();const fx=cx+112*Math.cos(fieldAngle),fy=cy+112*Math.sin(fieldAngle);arrow(cx,cy,fx,fy,C.blue,5);text('旋转磁场 B',fx,fy-18,C.blue,'center',12,'900')}else{ctx.fillStyle='rgba(44,123,229,.14)';ctx.fillRect(300,150,130,210);text('B 区域 ⊗',365,136,C.blue,'center',12,'900')}
+  ctx.fillStyle='#e5e7eb';ctx.beginPath();ctx.arc(cx,cy,74,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#94a3b8';ctx.stroke();
+  for(let i=0;i<8;i++){const a=i*Math.PI/4+(drive?diskAngle:0);line(cx,cy,cx+70*Math.cos(a),cy+70*Math.sin(a),i<q.slot*8?'#fff':'#cbd5e1',i<q.slot*8?4:2)}
+  for(let r=28;r<=58;r+=15){ctx.strokeStyle=C.purple;ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx,cy,r,diskAngle,diskAngle+Math.PI*1.55);ctx.stroke()}
+  if(drive){const px=cx+70*Math.cos(diskAngle),py=cy+70*Math.sin(diskAngle);arrow(px,py,px-44*Math.sin(diskAngle),py+44*Math.cos(diskAngle),C.green,3);text('感应转矩',cx,cy+104,C.green,'center',12,'900');text('旋转磁场领先金属盘',cx,cy-102,C.purple,'center',12,'900')}else{arrow(cx-35,cy+80,cx+35,cy+80,C.blue,3);text('v',cx,cy+104,C.blue,'center',12,'900');arrow(cx+78,cy,cx+38,cy,C.red,3);text('阻力',cx+96,cy,C.red,'left',12,'900')}
+  canvas.dataset.driveModel=drive?'rotating-field-slip-torque':'not-drive-mode';canvas.dataset.fieldAngle=fieldAngle.toFixed(4);canvas.dataset.diskAngle=diskAngle.toFixed(4);canvas.dataset.slipRate=drive?(1-driveK(q)).toFixed(4):'0';
+}
 function drawGraph(q){box(540,92,286,330,'#fff');text('速度-热量图像与读数',683,116,C.ink,'center',14,'800');const gx=585,gy=338,gw=205,gh=150;line(gx,gy,gx+gw,gy,C.ink,2);line(gx,gy,gx,gy-gh,C.ink,2);let p1,p2;for(let i=0;i<32;i++){const x=gx+i*gw/31,speed=q.v*Math.exp(-q.damp*i/18),heat=Math.min(1,q.heat*i/18),y1=gy-(speed/4)*gh,y2=gy-heat*gh;if(i>0){line(gx+(i-1)*gw/31,p1,x,y1,C.blue,2);line(gx+(i-1)*gw/31,p2,x,y2,C.red,2)}p1=y1;p2=y2}text('蓝：速度衰减',642,374,C.blue,'center',12,'900');text('红：热量增加',730,374,C.red,'center',12,'900');box(585,172,198,34,'#eef2ff','#9fb3c8');ctx.fillStyle=C.purple;ctx.fillRect(585,172,198*Math.min(1,q.eddy/4),34);text('涡流强度',684,189,C.ink,'center',12,'900');box(585,224,198,34,'#fff7e6','#f0a500');ctx.fillStyle=C.red;ctx.fillRect(585,224,198*q.heat,34);text('热效应',684,241,C.ink,'center',12,'900')}
-function update(){const q=p();els.bLabel.textContent=fmt(q.B,2)+' T';els.vLabel.textContent=fmt(q.v,1)+' m/s';els.rhoLabel.textContent=q.rho<4?'低':q.rho<7?'中':'高';els.slotLabel.textContent=Math.round(q.slot*100)+'%';els.readout.innerHTML='涡流强度：<b>'+fmt(q.eddy,2)+'</b><br>阻尼系数：<b>'+Math.round(q.damp*100)+'%</b><br>热效应：<b>'+Math.round(q.heat*100)+'%</b><br>方向判断：<b>阻碍磁通量变化</b>';els.status.textContent=q.slot>.55?'开槽切断环形电流路径，涡流显著减弱，阻尼和发热都变小。':'闭合金属内部形成环形涡流，安培力按楞次定律阻碍相对运动。';els.rows.innerHTML=state.records.slice(-6).map(r=>'<tr><td>'+r.m+'</td><td>'+r.e+'</td><td>'+r.d+'</td><td>'+r.h+'</td></tr>').join('')||'<tr><td colspan="4">暂无记录</td></tr>'}
-function record(){const q=p();state.records.push({m:modeName(),e:fmt(q.eddy,1),d:Math.round(q.damp*100)+'%',h:Math.round(q.heat*100)+'%'});if(state.records.length>8)state.records.shift();update()}function modeName(){return state.mode==='tube'?'铜管':state.mode==='disc'?'阻尼盘':'驱动'}
-buttons.forEach(b=>b.addEventListener('click',()=>{state.mode=b.dataset.mode;buttons.forEach(x=>x.classList.toggle('active',x===b));record();draw()}));[els.b,els.v,els.rho,els.slot].forEach(el=>el.addEventListener('input',()=>{draw();update()}));els.record.addEventListener('click',record);canvas.addEventListener('pointerdown',e=>{state.drag=true;canvas.setPointerCapture(e.pointerId)});canvas.addEventListener('pointermove',e=>{if(!state.drag)return;const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width;els.v.value=Math.max(.2,Math.min(4,(x-100)/160));draw()});canvas.addEventListener('pointerup',e=>{state.drag=false;record();try{canvas.releasePointerCapture(e.pointerId)}catch(_){}});function loop(){state.t+=.035;draw();requestAnimationFrame(loop)}record();loop();
+function level(x){return x<.22?'弱':x<.62?'中':'强'}
+function update(){const q=p();els.bLabel.textContent=fmt(q.B,2)+' T';els.vLabel.textContent=fmt(q.v,1)+' m/s';els.rhoLabel.textContent=q.rho<4?'低':q.rho<7?'中':'高';els.slotLabel.textContent=Math.round(q.slot*100)+'%';els.readout.innerHTML='涡流相对强度：<b>'+level(Math.min(1,q.eddy/4))+'</b><br>阻尼相对强弱：<b>'+level(q.damp)+'</b><br>发热相对强弱：<b>'+level(q.heat)+'</b><br>方向判断：<b>阻碍相对运动</b>';els.status.textContent=state.mode==='drive'?'旋转磁场相对金属盘保持转差，变化磁通量产生涡流，涡流安培力形成同向驱动转矩；盘速不能等于同步场速。':q.slot>.55?'开槽切断环形电流路径，涡流显著减弱，阻尼和发热都变小。':'闭合金属内部形成环形涡流，安培力按楞次定律阻碍相对运动。';els.rows.innerHTML=state.records.slice(-6).map(r=>'<tr><td>'+r.m+'</td><td>'+r.e+'</td><td>'+r.d+'</td><td>'+r.h+'</td></tr>').join('')||'<tr><td colspan="4">暂无记录</td></tr>';window.__ANIM_TEST_STATE__={mode:state.mode,...q,driveModel:canvas.dataset.driveModel,fieldAngle:+canvas.dataset.fieldAngle,diskAngle:+canvas.dataset.diskAngle,slipRate:+canvas.dataset.slipRate}}
+function record(){const q=p();state.records.push({m:modeName(),e:level(Math.min(1,q.eddy/4)),d:level(q.damp),h:level(q.heat)});if(state.records.length>8)state.records.shift();update()}function modeName(){return state.mode==='tube'?'铜管':state.mode==='disc'?'阻尼盘':'驱动'}
+const playBtn=document.getElementById('playBtn');playBtn.addEventListener('click',()=>{state.running=!state.running;playBtn.textContent=state.running?'暂停演示':'播放演示';if(state.running)draw()});buttons.forEach(b=>b.addEventListener('click',()=>{state.mode=b.dataset.mode;buttons.forEach(x=>x.classList.toggle('active',x===b));record();draw()}));[els.b,els.v,els.rho,els.slot].forEach(el=>el.addEventListener('input',()=>{draw();update()}));els.record.addEventListener('click',record);canvas.addEventListener('pointerdown',e=>{state.drag=true;canvas.setPointerCapture(e.pointerId)});canvas.addEventListener('pointermove',e=>{if(!state.drag)return;const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width;els.v.value=Math.max(.2,Math.min(4,(x-100)/160));draw()});canvas.addEventListener('pointerup',e=>{state.drag=false;record();try{canvas.releasePointerCapture(e.pointerId)}catch(_){}});function loop(){if(state.running){state.t+=.035;draw()}requestAnimationFrame(loop)}record();loop();
 })();
 </script>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script>
+<script>/* GKWL: unified full reset (2026-07-12 review remediation) */
+(function(){
+  var btns=[].slice.call(document.querySelectorAll('button'));
+  var resets=btns.filter(function(b){return /重置|复位/.test(b.textContent)});
+  if(!resets.length)return;
+  var scoped=/播放|时间|回放/;
+  var primary=resets[0];
+  if(scoped.test(primary.textContent)){
+    var nb=document.createElement('button');
+    nb.textContent='全部重置';
+    nb.className=primary.className;
+    nb.setAttribute('data-gkwl-full-reset','1');
+    nb.addEventListener('click',function(){location.reload()});
+    primary.parentNode.insertBefore(nb,primary.nextSibling);
+  }else{
+    resets.forEach(function(b){b.addEventListener('click',function(){setTimeout(function(){location.reload()},60)})});
+  }
+})();
+</script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

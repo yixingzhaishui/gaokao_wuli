@@ -1,0 +1,303 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T18:20:31.338Z",
+  "commit": "cf04ce5c4f55de12b680712b1e039f893ad26ea4",
+  "module": "exp",
+  "modules": [
+    "exp"
+  ],
+  "summary": {
+    "total": 1,
+    "score": 100,
+    "pass": 1,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/exp/sensor-auto-control-lab.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#light",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#threshold",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#hys",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:亮时开风扇",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:扰动",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:暗时开灯",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "button:暗时开灯",
+          "text": "暗时开灯",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:亮时开风扇",
+          "text": "亮时开风扇",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#disturb",
+          "text": "扰动",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#reset",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "77f8d21d",
+          "readout_hash": "625ce22c",
+          "physical_readout_hash": "625ce22c",
+          "readout": [
+            "环境光照 45%",
+            "45%",
+            "阈值设定 50%",
+            "50%",
+            "滞回宽度 6%",
+            "6%",
+            "模式：dark传感器电压 Us：2.75 V参考电压 Uref：2.50 V比较结果：低于阈值输出状态：灯泡工作",
+            "暂无记录",
+            "闭环：传感器把光照变成电压，比较器把电压与阈值比较，继电器再控制灯泡。"
+          ],
+          "physical_readout": [
+            "环境光照 45%",
+            "45%",
+            "阈值设定 50%",
+            "50%",
+            "滞回宽度 6%",
+            "6%",
+            "模式：dark传感器电压 Us：2.75 V参考电压 Uref：2.50 V比较结果：低于阈值输出状态：灯泡工作",
+            "暂无记录",
+            "闭环：传感器把光照变成电压，比较器把电压与阈值比较，继电器再控制灯泡。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "4393b214",
+          "readout_hash": "4508804a",
+          "physical_readout_hash": "4508804a",
+          "readout": [
+            "环境光照 87%",
+            "87%",
+            "阈值设定 50%",
+            "50%",
+            "滞回宽度 6%",
+            "6%",
+            "模式：dark传感器电压 Us：0.65 V参考电压 Uref：2.50 V比较结果：高于阈值输出状态：灯泡停止",
+            "暂无记录",
+            "闭环：传感器把光照变成电压，比较器把电压与阈值比较，继电器再控制灯泡。"
+          ],
+          "physical_readout": [
+            "环境光照 87%",
+            "87%",
+            "阈值设定 50%",
+            "50%",
+            "滞回宽度 6%",
+            "6%",
+            "模式：dark传感器电压 Us：0.65 V参考电压 Uref：2.50 V比较结果：高于阈值输出状态：灯泡停止",
+            "暂无记录",
+            "闭环：传感器把光照变成电压，比较器把电压与阈值比较，继电器再控制灯泡。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "cae90b9d",
+          "readout_hash": "2fee209c",
+          "physical_readout_hash": "2fee209c",
+          "readout": [
+            "环境光照 86%",
+            "86%",
+            "阈值设定 50%",
+            "50%",
+            "滞回宽度 6%",
+            "6%",
+            "模式：dark传感器电压 Us：0.70 V参考电压 Uref：2.50 V比较结果：高于阈值输出状态：灯泡停止",
+            "暂无记录",
+            "闭环：传感器把光照变成电压，比较器把电压与阈值比较，继电器再控制灯泡。"
+          ],
+          "physical_readout": [
+            "环境光照 86%",
+            "86%",
+            "阈值设定 50%",
+            "50%",
+            "滞回宽度 6%",
+            "6%",
+            "模式：dark传感器电压 Us：0.70 V参考电压 Uref：2.50 V比较结果：高于阈值输出状态：灯泡停止",
+            "暂无记录",
+            "闭环：传感器把光照变成电压，比较器把电压与阈值比较，继电器再控制灯泡。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "87cc90aa",
+          "readout_hash": "2fee209c",
+          "physical_readout_hash": "2fee209c",
+          "readout": [
+            "环境光照 86%",
+            "86%",
+            "阈值设定 50%",
+            "50%",
+            "滞回宽度 6%",
+            "6%",
+            "模式：dark传感器电压 Us：0.70 V参考电压 Uref：2.50 V比较结果：高于阈值输出状态：灯泡停止",
+            "暂无记录",
+            "闭环：传感器把光照变成电压，比较器把电压与阈值比较，继电器再控制灯泡。"
+          ],
+          "physical_readout": [
+            "环境光照 86%",
+            "86%",
+            "阈值设定 50%",
+            "50%",
+            "滞回宽度 6%",
+            "6%",
+            "模式：dark传感器电压 Us：0.70 V参考电压 Uref：2.50 V比较结果：高于阈值输出状态：灯泡停止",
+            "暂无记录",
+            "闭环：传感器把光照变成电压，比较器把电压与阈值比较，继电器再控制灯泡。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "环境光照 #%|#%|阈值设定 #%|#%|滞回宽度 #%|#%|模式：dark传感器电压 Us：# V参考电压 Uref：# V比较结果：低于阈值输出状态：灯泡工作|闭环：传感器把光照变成电压，比较器把电压与阈值比较，继电器再控制灯泡。",
+          "controls": [
+            {
+              "id": "light",
+              "value": "45",
+              "checked": false
+            },
+            {
+              "id": "threshold",
+              "value": "50",
+              "checked": false
+            },
+            {
+              "id": "hys",
+              "value": "6",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "环境光照 #%|#%|阈值设定 #%|#%|滞回宽度 #%|#%|模式：dark传感器电压 Us：# V参考电压 Uref：# V比较结果：低于阈值输出状态：灯泡工作|闭环：传感器把光照变成电压，比较器把电压与阈值比较，继电器再控制灯泡。",
+          "controls": [
+            {
+              "id": "light",
+              "value": "45",
+              "checked": false
+            },
+            {
+              "id": "threshold",
+              "value": "50",
+              "checked": false
+            },
+            {
+              "id": "hys",
+              "value": "6",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

@@ -41,7 +41,7 @@
       <div class="title">快速情境</div>
       <div class="chips">
         <button data-case="base">45°</button>
-        <button data-case="flat">类平抛</button>
+        <button data-case="flat">水平抛出</button>
         <button data-case="steep">大角度</button>
         <button data-case="height">有高度</button>
       </div>
@@ -100,7 +100,7 @@
     text(`R=${fmt(v.R)}m`,L.originX+v.R*L.scale/2,L.baseY+22,colors.orange,'center',13,'900');
   }
   function drawExplain(v){roundRect(640,84,220,110,8,'#f8fafc','#d7dee8');text('速度分解',750,112,'#0f172a','center',15,'900');text(`v0x=${fmt(v.vx)}m/s`,750,146,colors.green,'center',13,'900');text(`v0y=${fmt(v.vy0)}m/s`,750,172,colors.purple,'center',13,'900');roundRect(640,248,220,116,8,'#fff','#d7dee8');text('当前',750,276,'#0f172a','center',15,'900');text(`vy=${fmt(v.vy)}m/s`,750,312,colors.purple,'center',18,'900');text(`Hmax=${fmt(v.H)}m`,750,342,'#475569','center',12,'700')}
-  function update(v){els.vx.textContent=`${fmt(v.vx)} m/s`;els.vy0.textContent=`${fmt(v.vy0)} m/s`;els.time.textContent=`${fmt(v.T,2)} s`;els.range.textContent=`${fmt(v.R)} m`;els.status.textContent=state.theta===0?'θ=0°：退化为类平抛，初始竖直速度为 0。':'最高点只表示 vy=0，水平速度 vx 仍然存在。';els.play.textContent=state.running?'暂停':'播放'}
+  function update(v){els.vx.textContent=`${fmt(v.vx)} m/s`;els.vy0.textContent=`${fmt(v.vy0)} m/s`;els.time.textContent=`${fmt(v.T,2)} s`;els.range.textContent=`${fmt(v.R)} m`;els.status.textContent=state.theta===0?'θ=0°：这是重力场斜抛模型中的水平抛出（平抛）；“类平抛”还包括电场等其他恒加速度情境。':'最高点只表示 vy=0，水平速度 vx 仍然存在。';els.play.textContent=state.running?'暂停':'播放'}
   function draw(){const v=values(),L=layout(v),g0=geom(v);ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);text('斜抛运动实验台：初速度分解 + 竖直匀变速',460,30,'#0f172a','center',19,'900');drawScene(v,L);drawExplain(v);roundRect(48,458,820,62,8,'#fff','#d7dee8');ruler(86,494,206,'v0',colors.red);handle(g0.v0.x,g0.v0.y,`v0=${fmt(state.v0)}`,state.drag==='v0',colors.red);ruler(250,494,380,'θ',colors.purple);handle(g0.theta.x,g0.theta.y,`θ=${fmt(state.theta,0)}°`,state.drag==='theta',colors.purple);ruler(430,494,550,'h',colors.orange);handle(g0.h.x,g0.h.y,`h=${fmt(state.h)}`,state.drag==='h',colors.orange);ruler(600,494,720,'g',colors.blue);handle(g0.g.x,g0.g.y,`g=${fmt(state.g)}`,state.drag==='g',colors.blue);ruler(768,494,860,'t',colors.green);handle(g0.t.x,g0.t.y,`t=${fmt(v.tc,2)}s`,state.drag==='t',colors.green);update(v)}
   function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
   function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
@@ -113,6 +113,26 @@
   document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='base'){state.v0=20;state.theta=45;state.h=0;state.g=10;state.t=0}if(c==='flat'){state.v0=20;state.theta=0;state.h=8;state.g=10;state.t=.5}if(c==='steep'){state.v0=20;state.theta=70;state.h=0;state.g=10;state.t=.5}if(c==='height'){state.v0=18;state.theta=35;state.h=8;state.g=10;state.t=.5}draw()}));
   function tick(){if(state.running){const v=values();state.t+=.012;if(state.t>v.T)state.t=0}draw();requestAnimationFrame(tick)}
   draw();requestAnimationFrame(tick);
+})();
+</script>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script>
+<script>/* GKWL: unified full reset (2026-07-12 review remediation) */
+(function(){
+  var btns=[].slice.call(document.querySelectorAll('button'));
+  var resets=btns.filter(function(b){return /重置|复位/.test(b.textContent)});
+  if(!resets.length)return;
+  var scoped=/播放|时间|回放/;
+  var primary=resets[0];
+  if(scoped.test(primary.textContent)){
+    var nb=document.createElement('button');
+    nb.textContent='全部重置';
+    nb.className=primary.className;
+    nb.setAttribute('data-gkwl-full-reset','1');
+    nb.addEventListener('click',function(){location.reload()});
+    primary.parentNode.insertBefore(nb,primary.nextSibling);
+  }else{
+    resets.forEach(function(b){b.addEventListener('click',function(){setTimeout(function(){location.reload()},60)})});
+  }
 })();
 </script>
 </body>

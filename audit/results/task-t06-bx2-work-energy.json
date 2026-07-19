@@ -1,0 +1,1099 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T06:38:19.269Z",
+  "commit": "94300b5867f1eb4af5bc79f710a2f8b04cc2b857",
+  "module": "bx2",
+  "modules": [
+    "bx2"
+  ],
+  "summary": {
+    "total": 5,
+    "score": 100,
+    "pass": 5,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/bx2/energy-conservation.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#m",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#h",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#mu",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#u",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:无摩擦",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:有摩擦",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:多生热",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:增高",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:无摩擦",
+          "text": "无摩擦",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:有摩擦",
+          "text": "有摩擦",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:多生热",
+          "text": "多生热",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:增高",
+          "text": "增高",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "46152f26",
+          "readout_hash": "b908e699",
+          "physical_readout_hash": "b908e699",
+          "readout": [
+            "质量 m 2.0 kg",
+            "初始高度 h 5.0 m",
+            "摩擦因数 μ 0.20",
+            "过程位置 65%",
+            "Ep=35.0 J Ek=44.2 J E内=20.8 J E机=79.2 J E总=100.0 J E0=100.0 J",
+            "有摩擦：机械能减少，但减少量进入内能，总能量守恒。"
+          ],
+          "physical_readout": [
+            "质量 m 2.0 kg",
+            "初始高度 h 5.0 m",
+            "摩擦因数 μ 0.20",
+            "过程位置 65%",
+            "Ep=35.0 J Ek=44.2 J E内=20.8 J E机=79.2 J E总=100.0 J E0=100.0 J",
+            "有摩擦：机械能减少，但减少量进入内能，总能量守恒。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "94986a56",
+          "readout_hash": "43deac26",
+          "physical_readout_hash": "43deac26",
+          "readout": [
+            "质量 m 2.0 kg",
+            "初始高度 h 5.0 m",
+            "摩擦因数 μ 0.20",
+            "过程位置 66%",
+            "Ep=34.0 J Ek=44.9 J E内=21.1 J E机=78.9 J E总=100.0 J E0=100.0 J",
+            "有摩擦：机械能减少，但减少量进入内能，总能量守恒。"
+          ],
+          "physical_readout": [
+            "质量 m 2.0 kg",
+            "初始高度 h 5.0 m",
+            "摩擦因数 μ 0.20",
+            "过程位置 66%",
+            "Ep=34.0 J Ek=44.9 J E内=21.1 J E机=78.9 J E总=100.0 J E0=100.0 J",
+            "有摩擦：机械能减少，但减少量进入内能，总能量守恒。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "94986a56",
+          "readout_hash": "43deac26",
+          "physical_readout_hash": "43deac26",
+          "readout": [
+            "质量 m 2.0 kg",
+            "初始高度 h 5.0 m",
+            "摩擦因数 μ 0.20",
+            "过程位置 66%",
+            "Ep=34.0 J Ek=44.9 J E内=21.1 J E机=78.9 J E总=100.0 J E0=100.0 J",
+            "有摩擦：机械能减少，但减少量进入内能，总能量守恒。"
+          ],
+          "physical_readout": [
+            "质量 m 2.0 kg",
+            "初始高度 h 5.0 m",
+            "摩擦因数 μ 0.20",
+            "过程位置 66%",
+            "Ep=34.0 J Ek=44.9 J E内=21.1 J E机=78.9 J E总=100.0 J E0=100.0 J",
+            "有摩擦：机械能减少，但减少量进入内能，总能量守恒。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "94986a56",
+          "readout_hash": "43deac26",
+          "physical_readout_hash": "43deac26",
+          "readout": [
+            "质量 m 2.0 kg",
+            "初始高度 h 5.0 m",
+            "摩擦因数 μ 0.20",
+            "过程位置 66%",
+            "Ep=34.0 J Ek=44.9 J E内=21.1 J E机=78.9 J E总=100.0 J E0=100.0 J",
+            "有摩擦：机械能减少，但减少量进入内能，总能量守恒。"
+          ],
+          "physical_readout": [
+            "质量 m 2.0 kg",
+            "初始高度 h 5.0 m",
+            "摩擦因数 μ 0.20",
+            "过程位置 66%",
+            "Ep=34.0 J Ek=44.9 J E内=21.1 J E机=78.9 J E总=100.0 J E0=100.0 J",
+            "有摩擦：机械能减少，但减少量进入内能，总能量守恒。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "质量 m # kg|初始高度 h # m|摩擦因数 μ #|过程位置 #%|Ep=# J Ek=# J E内=# J E机=# J E总=# J E#=# J|有摩擦：机械能减少，但减少量进入内能，总能量守恒。",
+          "controls": [
+            {
+              "id": "m",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "h",
+              "value": "5",
+              "checked": false
+            },
+            {
+              "id": "mu",
+              "value": "0.2",
+              "checked": false
+            },
+            {
+              "id": "u",
+              "value": "0.65",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "质量 m # kg|初始高度 h # m|摩擦因数 μ #|过程位置 #%|Ep=# J Ek=# J E内=# J E机=# J E总=# J E#=# J|有摩擦：机械能减少，但减少量进入内能，总能量守恒。",
+          "controls": [
+            {
+              "id": "m",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "h",
+              "value": "5",
+              "checked": false
+            },
+            {
+              "id": "mu",
+              "value": "0.2",
+              "checked": false
+            },
+            {
+              "id": "u",
+              "value": "0.65",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx2/kinetic-energy.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:无摩擦",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:粗糙面",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:更陡",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:到不了底",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:无摩擦",
+          "text": "无摩擦",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:粗糙面",
+          "text": "粗糙面",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:更陡",
+          "text": "更陡",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:到不了底",
+          "text": "到不了底",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "d8d3544a",
+          "readout_hash": "4f7e6dc7",
+          "physical_readout_hash": "4f7e6dc7",
+          "readout": [
+            "重力功 WG100.0 J 摩擦功 Wf-34.6 J 合力总功65.4 J 动能变化65.4 J 末速度 v28.1 m/s 斜面路程 s10.0 m",
+            "通过：W合 = ΔEk，做功账本和动能变化对上了。"
+          ],
+          "physical_readout": [
+            "重力功 WG100.0 J 摩擦功 Wf-34.6 J 合力总功65.4 J 动能变化65.4 J 末速度 v28.1 m/s 斜面路程 s10.0 m",
+            "通过：W合 = ΔEk，做功账本和动能变化对上了。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "28609889",
+          "readout_hash": "4f7e6dc7",
+          "physical_readout_hash": "4f7e6dc7",
+          "readout": [
+            "重力功 WG100.0 J 摩擦功 Wf-34.6 J 合力总功65.4 J 动能变化65.4 J 末速度 v28.1 m/s 斜面路程 s10.0 m",
+            "通过：W合 = ΔEk，做功账本和动能变化对上了。"
+          ],
+          "physical_readout": [
+            "重力功 WG100.0 J 摩擦功 Wf-34.6 J 合力总功65.4 J 动能变化65.4 J 末速度 v28.1 m/s 斜面路程 s10.0 m",
+            "通过：W合 = ΔEk，做功账本和动能变化对上了。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "2661ec6b",
+          "readout_hash": "4f7e6dc7",
+          "physical_readout_hash": "4f7e6dc7",
+          "readout": [
+            "重力功 WG100.0 J 摩擦功 Wf-34.6 J 合力总功65.4 J 动能变化65.4 J 末速度 v28.1 m/s 斜面路程 s10.0 m",
+            "通过：W合 = ΔEk，做功账本和动能变化对上了。"
+          ],
+          "physical_readout": [
+            "重力功 WG100.0 J 摩擦功 Wf-34.6 J 合力总功65.4 J 动能变化65.4 J 末速度 v28.1 m/s 斜面路程 s10.0 m",
+            "通过：W合 = ΔEk，做功账本和动能变化对上了。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "2661ec6b",
+          "readout_hash": "4f7e6dc7",
+          "physical_readout_hash": "4f7e6dc7",
+          "readout": [
+            "重力功 WG100.0 J 摩擦功 Wf-34.6 J 合力总功65.4 J 动能变化65.4 J 末速度 v28.1 m/s 斜面路程 s10.0 m",
+            "通过：W合 = ΔEk，做功账本和动能变化对上了。"
+          ],
+          "physical_readout": [
+            "重力功 WG100.0 J 摩擦功 Wf-34.6 J 合力总功65.4 J 动能变化65.4 J 末速度 v28.1 m/s 斜面路程 s10.0 m",
+            "通过：W合 = ΔEk，做功账本和动能变化对上了。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "重力功 WG# J 摩擦功 Wf# J 合力总功# J 动能变化# J 末速度 v# m/s 斜面路程 s# m|通过：W合 = ΔEk，做功账本和动能变化对上了。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "重力功 WG# J 摩擦功 Wf# J 合力总功# J 动能变化# J 末速度 v# m/s 斜面路程 s# m|通过：W合 = ΔEk，做功账本和动能变化对上了。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx2/power.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:同功快做",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:同功慢做",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:垂直零功率",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:阻力负功率",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:同功快做",
+          "text": "同功快做",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:同功慢做",
+          "text": "同功慢做",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:垂直零功率",
+          "text": "垂直零功率",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:阻力负功率",
+          "text": "阻力负功率",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "c90ea4d1",
+          "readout_hash": "a0c5a016",
+          "physical_readout_hash": "a0c5a016",
+          "readout": [
+            "做功 W120 J 用时 t4.0 s 平均功率30.0 W 投影 F∥30.0 N 速度 v3.0 m/s 瞬时功率90.0 W",
+            "正功率：力的投影与速度同向，正在给物体输入能量。"
+          ],
+          "physical_readout": [
+            "做功 W120 J 用时 t4.0 s 平均功率30.0 W 投影 F∥30.0 N 速度 v3.0 m/s 瞬时功率90.0 W",
+            "正功率：力的投影与速度同向，正在给物体输入能量。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "2fade00a",
+          "readout_hash": "a0c5a016",
+          "physical_readout_hash": "a0c5a016",
+          "readout": [
+            "做功 W120 J 用时 t4.0 s 平均功率30.0 W 投影 F∥30.0 N 速度 v3.0 m/s 瞬时功率90.0 W",
+            "正功率：力的投影与速度同向，正在给物体输入能量。"
+          ],
+          "physical_readout": [
+            "做功 W120 J 用时 t4.0 s 平均功率30.0 W 投影 F∥30.0 N 速度 v3.0 m/s 瞬时功率90.0 W",
+            "正功率：力的投影与速度同向，正在给物体输入能量。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "c90ea4d1",
+          "readout_hash": "a0c5a016",
+          "physical_readout_hash": "a0c5a016",
+          "readout": [
+            "做功 W120 J 用时 t4.0 s 平均功率30.0 W 投影 F∥30.0 N 速度 v3.0 m/s 瞬时功率90.0 W",
+            "正功率：力的投影与速度同向，正在给物体输入能量。"
+          ],
+          "physical_readout": [
+            "做功 W120 J 用时 t4.0 s 平均功率30.0 W 投影 F∥30.0 N 速度 v3.0 m/s 瞬时功率90.0 W",
+            "正功率：力的投影与速度同向，正在给物体输入能量。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "c90ea4d1",
+          "readout_hash": "a0c5a016",
+          "physical_readout_hash": "a0c5a016",
+          "readout": [
+            "做功 W120 J 用时 t4.0 s 平均功率30.0 W 投影 F∥30.0 N 速度 v3.0 m/s 瞬时功率90.0 W",
+            "正功率：力的投影与速度同向，正在给物体输入能量。"
+          ],
+          "physical_readout": [
+            "做功 W120 J 用时 t4.0 s 平均功率30.0 W 投影 F∥30.0 N 速度 v3.0 m/s 瞬时功率90.0 W",
+            "正功率：力的投影与速度同向，正在给物体输入能量。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "做功 W# J 用时 t# s 平均功率# W 投影 F∥# N 速度 v# m/s 瞬时功率# W|正功率：力的投影与速度同向，正在给物体输入能量。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "做功 W# J 用时 t# s 平均功率# W 投影 F∥# N 速度 v# m/s 瞬时功率# W|正功率：力的投影与速度同向，正在给物体输入能量。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx2/work-energy-relation.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#m",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#h",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#mu",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#u",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:光滑下滑",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:增大摩擦",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:增高",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:大质量",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:光滑下滑",
+          "text": "光滑下滑",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:增大摩擦",
+          "text": "增大摩擦",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:增高",
+          "text": "增高",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:大质量",
+          "text": "大质量",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "71b7f1bf",
+          "readout_hash": "818fb359",
+          "physical_readout_hash": "818fb359",
+          "readout": [
+            "质量 m 2.0 kg",
+            "高度 h 5.0 m",
+            "摩擦因数 μ 0.00",
+            "过程位置 0%",
+            "W合=0.0 J ΔEk=0.0 J WG=0.0 J -ΔEp=0.0 J Wf=0.0 J ΔE机=0.0 J",
+            "光滑：Wf=0，机械能不变；但 W合 与 WG 仍分别对应自己的能量变化。"
+          ],
+          "physical_readout": [
+            "质量 m 2.0 kg",
+            "高度 h 5.0 m",
+            "摩擦因数 μ 0.00",
+            "过程位置 0%",
+            "W合=0.0 J ΔEk=0.0 J WG=0.0 J -ΔEp=0.0 J Wf=0.0 J ΔE机=0.0 J",
+            "光滑：Wf=0，机械能不变；但 W合 与 WG 仍分别对应自己的能量变化。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "657092ec",
+          "readout_hash": "8ea8707f",
+          "physical_readout_hash": "8ea8707f",
+          "readout": [
+            "质量 m 2.0 kg",
+            "高度 h 5.0 m",
+            "摩擦因数 μ 0.00",
+            "过程位置 2%",
+            "W合=2.0 J ΔEk=2.0 J WG=2.0 J -ΔEp=2.0 J Wf=0.0 J ΔE机=0.0 J",
+            "光滑：Wf=0，机械能不变；但 W合 与 WG 仍分别对应自己的能量变化。"
+          ],
+          "physical_readout": [
+            "质量 m 2.0 kg",
+            "高度 h 5.0 m",
+            "摩擦因数 μ 0.00",
+            "过程位置 2%",
+            "W合=2.0 J ΔEk=2.0 J WG=2.0 J -ΔEp=2.0 J Wf=0.0 J ΔE机=0.0 J",
+            "光滑：Wf=0，机械能不变；但 W合 与 WG 仍分别对应自己的能量变化。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "657092ec",
+          "readout_hash": "8ea8707f",
+          "physical_readout_hash": "8ea8707f",
+          "readout": [
+            "质量 m 2.0 kg",
+            "高度 h 5.0 m",
+            "摩擦因数 μ 0.00",
+            "过程位置 2%",
+            "W合=2.0 J ΔEk=2.0 J WG=2.0 J -ΔEp=2.0 J Wf=0.0 J ΔE机=0.0 J",
+            "光滑：Wf=0，机械能不变；但 W合 与 WG 仍分别对应自己的能量变化。"
+          ],
+          "physical_readout": [
+            "质量 m 2.0 kg",
+            "高度 h 5.0 m",
+            "摩擦因数 μ 0.00",
+            "过程位置 2%",
+            "W合=2.0 J ΔEk=2.0 J WG=2.0 J -ΔEp=2.0 J Wf=0.0 J ΔE机=0.0 J",
+            "光滑：Wf=0，机械能不变；但 W合 与 WG 仍分别对应自己的能量变化。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "657092ec",
+          "readout_hash": "8ea8707f",
+          "physical_readout_hash": "8ea8707f",
+          "readout": [
+            "质量 m 2.0 kg",
+            "高度 h 5.0 m",
+            "摩擦因数 μ 0.00",
+            "过程位置 2%",
+            "W合=2.0 J ΔEk=2.0 J WG=2.0 J -ΔEp=2.0 J Wf=0.0 J ΔE机=0.0 J",
+            "光滑：Wf=0，机械能不变；但 W合 与 WG 仍分别对应自己的能量变化。"
+          ],
+          "physical_readout": [
+            "质量 m 2.0 kg",
+            "高度 h 5.0 m",
+            "摩擦因数 μ 0.00",
+            "过程位置 2%",
+            "W合=2.0 J ΔEk=2.0 J WG=2.0 J -ΔEp=2.0 J Wf=0.0 J ΔE机=0.0 J",
+            "光滑：Wf=0，机械能不变；但 W合 与 WG 仍分别对应自己的能量变化。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "质量 m # kg|高度 h # m|摩擦因数 μ #|过程位置 #%|W合=# J ΔEk=# J WG=# J -ΔEp=# J Wf=# J ΔE机=# J|光滑：Wf=#，机械能不变；但 W合 与 WG 仍分别对应自己的能量变化。",
+          "controls": [
+            {
+              "id": "m",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "h",
+              "value": "5",
+              "checked": false
+            },
+            {
+              "id": "mu",
+              "value": "0",
+              "checked": false
+            },
+            {
+              "id": "u",
+              "value": "0",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "质量 m # kg|高度 h # m|摩擦因数 μ #|过程位置 #%|W合=# J ΔEk=# J WG=# J -ΔEp=# J Wf=# J ΔE机=# J|光滑：Wf=#，机械能不变；但 W合 与 WG 仍分别对应自己的能量变化。",
+          "controls": [
+            {
+              "id": "m",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "h",
+              "value": "5",
+              "checked": false
+            },
+            {
+              "id": "mu",
+              "value": "0",
+              "checked": false
+            },
+            {
+              "id": "u",
+              "value": "0",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx2/work.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:正功",
+          "kind": "initial_condition_retry",
+          "changed": false,
+          "affected_result": false
+        },
+        {
+          "selector": "button:零功",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:负功",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:无位移",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:正功",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:正功",
+          "text": "正功",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:零功",
+          "text": "零功",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:负功",
+          "text": "负功",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:无位移",
+          "text": "无位移",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "c62fb909",
+          "readout_hash": "9b952ce",
+          "physical_readout_hash": "9b952ce",
+          "readout": [
+            "力 F20 N 位移 s5.0 m 夹角 α37° cosα0.80 投影 F∥16.0 N 功 W79.9 J",
+            "正功：F∥ 与位移同向，力在推动物体沿位移方向运动。"
+          ],
+          "physical_readout": [
+            "力 F20 N 位移 s5.0 m 夹角 α37° cosα0.80 投影 F∥16.0 N 功 W79.9 J",
+            "正功：F∥ 与位移同向，力在推动物体沿位移方向运动。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "41411d1d",
+          "readout_hash": "9b952ce",
+          "physical_readout_hash": "9b952ce",
+          "readout": [
+            "力 F20 N 位移 s5.0 m 夹角 α37° cosα0.80 投影 F∥16.0 N 功 W79.9 J",
+            "正功：F∥ 与位移同向，力在推动物体沿位移方向运动。"
+          ],
+          "physical_readout": [
+            "力 F20 N 位移 s5.0 m 夹角 α37° cosα0.80 投影 F∥16.0 N 功 W79.9 J",
+            "正功：F∥ 与位移同向，力在推动物体沿位移方向运动。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "c62fb909",
+          "readout_hash": "9b952ce",
+          "physical_readout_hash": "9b952ce",
+          "readout": [
+            "力 F20 N 位移 s5.0 m 夹角 α37° cosα0.80 投影 F∥16.0 N 功 W79.9 J",
+            "正功：F∥ 与位移同向，力在推动物体沿位移方向运动。"
+          ],
+          "physical_readout": [
+            "力 F20 N 位移 s5.0 m 夹角 α37° cosα0.80 投影 F∥16.0 N 功 W79.9 J",
+            "正功：F∥ 与位移同向，力在推动物体沿位移方向运动。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "c62fb909",
+          "readout_hash": "9b952ce",
+          "physical_readout_hash": "9b952ce",
+          "readout": [
+            "力 F20 N 位移 s5.0 m 夹角 α37° cosα0.80 投影 F∥16.0 N 功 W79.9 J",
+            "正功：F∥ 与位移同向，力在推动物体沿位移方向运动。"
+          ],
+          "physical_readout": [
+            "力 F20 N 位移 s5.0 m 夹角 α37° cosα0.80 投影 F∥16.0 N 功 W79.9 J",
+            "正功：F∥ 与位移同向，力在推动物体沿位移方向运动。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "力 F# N 位移 s# m 夹角 α#° cosα# 投影 F∥# N 功 W# J|正功：F∥ 与位移同向，力在推动物体沿位移方向运动。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "力 F# N 位移 s# m 夹角 α#° cosα# 投影 F∥# N 功 W# J|正功：F∥ 与位移同向，力在推动物体沿位移方向运动。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

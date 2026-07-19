@@ -1,0 +1,704 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T06:32:30.493Z",
+  "commit": "b40ed78efd4194e984f507b15d8ba31a47997dfd",
+  "module": "bx1",
+  "modules": [
+    "bx1"
+  ],
+  "summary": {
+    "total": 4,
+    "score": 100,
+    "pass": 4,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/bx1/braking.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:恰好停下",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:高速刹车",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:减速较小",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:超时错误区",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#mOver",
+          "text": "超时错误区",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mExact",
+          "text": "恰好停下",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mFast",
+          "text": "高速刹车",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mSoft",
+          "text": "减速较小",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "▶ 播放运动",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "▶ 播放运动"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "5b56e99a",
+          "readout_hash": "5afce2eb",
+          "physical_readout_hash": "5afce2eb",
+          "readout": [
+            "v0=20.0 m/s|a|=5.00 m/s²t=6.00 st停=4.00 sv=0.00 m/s真实 x=40.00 m错误代入 x=30.00 mx停=40.00 m",
+            "t 已超过 t停：真实车停在 x停，红色错误外推会让位移变小甚至倒退。"
+          ],
+          "physical_readout": [
+            "v0=20.0 m/s|a|=5.00 m/s²t=6.00 st停=4.00 sv=0.00 m/s真实 x=40.00 m错误代入 x=30.00 mx停=40.00 m",
+            "t 已超过 t停：真实车停在 x停，红色错误外推会让位移变小甚至倒退。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "3d060725",
+          "readout_hash": "f9a1d115",
+          "physical_readout_hash": "f9a1d115",
+          "readout": [
+            "v0=20.0 m/s|a|=5.00 m/s²t=0.38 st停=4.00 sv=18.08 m/s真实 x=7.30 m错误代入 x=7.30 mx停=40.00 m",
+            "还没停：可以用 v=v0-|a|t 和 x=v0t-1/2|a|t²；但仍要先算 t停。"
+          ],
+          "physical_readout": [
+            "v0=20.0 m/s|a|=5.00 m/s²t=0.38 st停=4.00 sv=18.08 m/s真实 x=7.30 m错误代入 x=7.30 mx停=40.00 m",
+            "还没停：可以用 v=v0-|a|t 和 x=v0t-1/2|a|t²；但仍要先算 t停。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "d4a22f88",
+          "readout_hash": "ba089f",
+          "physical_readout_hash": "ba089f",
+          "readout": [
+            "v0=20.0 m/s|a|=5.00 m/s²t=0.41 st停=4.00 sv=17.96 m/s真实 x=7.75 m错误代入 x=7.75 mx停=40.00 m",
+            "还没停：可以用 v=v0-|a|t 和 x=v0t-1/2|a|t²；但仍要先算 t停。"
+          ],
+          "physical_readout": [
+            "v0=20.0 m/s|a|=5.00 m/s²t=0.41 st停=4.00 sv=17.96 m/s真实 x=7.75 m错误代入 x=7.75 mx停=40.00 m",
+            "还没停：可以用 v=v0-|a|t 和 x=v0t-1/2|a|t²；但仍要先算 t停。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "d4a22f88",
+          "readout_hash": "ba089f",
+          "physical_readout_hash": "ba089f",
+          "readout": [
+            "v0=20.0 m/s|a|=5.00 m/s²t=0.41 st停=4.00 sv=17.96 m/s真实 x=7.75 m错误代入 x=7.75 mx停=40.00 m",
+            "还没停：可以用 v=v0-|a|t 和 x=v0t-1/2|a|t²；但仍要先算 t停。"
+          ],
+          "physical_readout": [
+            "v0=20.0 m/s|a|=5.00 m/s²t=0.41 st停=4.00 sv=17.96 m/s真实 x=7.75 m错误代入 x=7.75 mx停=40.00 m",
+            "还没停：可以用 v=v0-|a|t 和 x=v0t-1/2|a|t²；但仍要先算 t停。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "v#=# m/s|a|=# m/s²t=# st停=# sv=# m/s真实 x=# m错误代入 x=# mx停=# m|t 已超过 t停：真实车停在 x停，红色错误外推会让位移变小甚至倒退。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "v#=# m/s|a|=# m/s²t=# st停=# sv=# m/s真实 x=# m错误代入 x=# mx停=# m|t 已超过 t停：真实车停在 x停，红色错误外推会让位移变小甚至倒退。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx1/displacement.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:拉直路线",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:回到起点",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#straightBtn",
+          "text": "拉直路线",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#loopBtn",
+          "text": "回到起点",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.68
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "baae82c1",
+          "readout_hash": "d51828ee",
+          "physical_readout_hash": "d51828ee",
+          "readout": [
+            "已走路程=0.0 m全程路程 s=275.9 mΔx=245.5 m，Δy=81.8 m|Δr|=258.7 m方向=18.4°",
+            "拖绕路点只改变蓝色轨迹长度；拖 B 终点才会改变红色位移箭头和 Δx、Δy。"
+          ],
+          "physical_readout": [
+            "已走路程=0.0 m全程路程 s=275.9 mΔx=245.5 m，Δy=81.8 m|Δr|=258.7 m方向=18.4°",
+            "拖绕路点只改变蓝色轨迹长度；拖 B 终点才会改变红色位移箭头和 Δx、Δy。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "850dcadd",
+          "readout_hash": "bde07f3c",
+          "physical_readout_hash": "bde07f3c",
+          "readout": [
+            "已走路程=32.9 m全程路程 s=275.9 mΔx=245.5 m，Δy=81.8 m|Δr|=258.7 m方向=18.4°",
+            "拖绕路点只改变蓝色轨迹长度；拖 B 终点才会改变红色位移箭头和 Δx、Δy。"
+          ],
+          "physical_readout": [
+            "已走路程=32.9 m全程路程 s=275.9 mΔx=245.5 m，Δy=81.8 m|Δr|=258.7 m方向=18.4°",
+            "拖绕路点只改变蓝色轨迹长度；拖 B 终点才会改变红色位移箭头和 Δx、Δy。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "900cfdda",
+          "readout_hash": "857eeb0c",
+          "physical_readout_hash": "857eeb0c",
+          "readout": [
+            "已走路程=35.2 m全程路程 s=275.9 mΔx=245.5 m，Δy=81.8 m|Δr|=258.7 m方向=18.4°",
+            "拖绕路点只改变蓝色轨迹长度；拖 B 终点才会改变红色位移箭头和 Δx、Δy。"
+          ],
+          "physical_readout": [
+            "已走路程=35.2 m全程路程 s=275.9 mΔx=245.5 m，Δy=81.8 m|Δr|=258.7 m方向=18.4°",
+            "拖绕路点只改变蓝色轨迹长度；拖 B 终点才会改变红色位移箭头和 Δx、Δy。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "900cfdda",
+          "readout_hash": "857eeb0c",
+          "physical_readout_hash": "857eeb0c",
+          "readout": [
+            "已走路程=35.2 m全程路程 s=275.9 mΔx=245.5 m，Δy=81.8 m|Δr|=258.7 m方向=18.4°",
+            "拖绕路点只改变蓝色轨迹长度；拖 B 终点才会改变红色位移箭头和 Δx、Δy。"
+          ],
+          "physical_readout": [
+            "已走路程=35.2 m全程路程 s=275.9 mΔx=245.5 m，Δy=81.8 m|Δr|=258.7 m方向=18.4°",
+            "拖绕路点只改变蓝色轨迹长度；拖 B 终点才会改变红色位移箭头和 Δx、Δy。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "已走路程=# m全程路程 s=# mΔx=# m，Δy=# m|Δr|=# m方向=#°|拖绕路点只改变蓝色轨迹长度；拖 B 终点才会改变红色位移箭头和 Δx、Δy。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "已走路程=# m全程路程 s=# mΔx=# m，Δy=# m|Δr|=# m方向=#°|拖绕路点只改变蓝色轨迹长度；拖 B 终点才会改变红色位移箭头和 Δx、Δy。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx1/uniform-motion.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:负向匀速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:静止",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:对比匀加速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:正向匀速",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#mForward",
+          "text": "正向匀速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mBackward",
+          "text": "负向匀速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mStill",
+          "text": "静止",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mCompare",
+          "text": "对比匀加速",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "▶ 播放运动",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.32,
+          "py": 0.32
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "▶ 播放运动"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "ddf922f",
+          "readout_hash": "8443a604",
+          "physical_readout_hash": "8443a604",
+          "readout": [
+            "模式=forwardx0=-8.0 mt=4.00 sx=8.00 mv=4.00 m/sa=0.00 m/s²每 0.5 s 间距=2.00 m",
+            "判断匀速看“相同时间内位移相同”：频闪等间距、x-t 直线、v-t 水平线三者一致。"
+          ],
+          "physical_readout": [
+            "模式=forwardx0=-8.0 mt=4.00 sx=8.00 mv=4.00 m/sa=0.00 m/s²每 0.5 s 间距=2.00 m",
+            "判断匀速看“相同时间内位移相同”：频闪等间距、x-t 直线、v-t 水平线三者一致。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "9735d4aa",
+          "readout_hash": "22f482a3",
+          "physical_readout_hash": "22f482a3",
+          "readout": [
+            "模式=forwardx0=-8.0 mt=4.35 sx=9.40 mv=4.00 m/sa=0.00 m/s²每 0.5 s 间距=2.00 m",
+            "判断匀速看“相同时间内位移相同”：频闪等间距、x-t 直线、v-t 水平线三者一致。"
+          ],
+          "physical_readout": [
+            "模式=forwardx0=-8.0 mt=4.35 sx=9.40 mv=4.00 m/sa=0.00 m/s²每 0.5 s 间距=2.00 m",
+            "判断匀速看“相同时间内位移相同”：频闪等间距、x-t 直线、v-t 水平线三者一致。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "5aa158d6",
+          "readout_hash": "ac570772",
+          "physical_readout_hash": "ac570772",
+          "readout": [
+            "模式=forwardx0=-8.0 mt=4.37 sx=9.50 mv=4.00 m/sa=0.00 m/s²每 0.5 s 间距=2.00 m",
+            "判断匀速看“相同时间内位移相同”：频闪等间距、x-t 直线、v-t 水平线三者一致。"
+          ],
+          "physical_readout": [
+            "模式=forwardx0=-8.0 mt=4.37 sx=9.50 mv=4.00 m/sa=0.00 m/s²每 0.5 s 间距=2.00 m",
+            "判断匀速看“相同时间内位移相同”：频闪等间距、x-t 直线、v-t 水平线三者一致。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "5aa158d6",
+          "readout_hash": "ac570772",
+          "physical_readout_hash": "ac570772",
+          "readout": [
+            "模式=forwardx0=-8.0 mt=4.37 sx=9.50 mv=4.00 m/sa=0.00 m/s²每 0.5 s 间距=2.00 m",
+            "判断匀速看“相同时间内位移相同”：频闪等间距、x-t 直线、v-t 水平线三者一致。"
+          ],
+          "physical_readout": [
+            "模式=forwardx0=-8.0 mt=4.37 sx=9.50 mv=4.00 m/sa=0.00 m/s²每 0.5 s 间距=2.00 m",
+            "判断匀速看“相同时间内位移相同”：频闪等间距、x-t 直线、v-t 水平线三者一致。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "模式=forwardx#=# mt=# sx=# mv=# m/sa=# m/s²每 # s 间距=# m|判断匀速看“相同时间内位移相同”：频闪等间距、x-t 直线、v-t 水平线三者一致。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "模式=forwardx#=# mt=# sx=# mv=# m/sa=# m/s²每 # s 间距=# m|判断匀速看“相同时间内位移相同”：频闪等间距、x-t 直线、v-t 水平线三者一致。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx1/vertical-throw.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:月球",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:大 g",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:高速上抛",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:地球",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#mEarth",
+          "text": "地球",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mMoon",
+          "text": "月球",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mHigh",
+          "text": "大 g",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mFast",
+          "text": "高速上抛",
+          "role": "other",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "▶ 播放上抛",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.5,
+          "py": 0.68
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "▶ 播放上抛"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "fd39e5cb",
+          "readout_hash": "45722d8",
+          "physical_readout_hash": "45722d8",
+          "readout": [
+            "v0=20.0 m/sg=9.80 m/s²t=2.00 sv=0.40 m/sh=20.40 mt上=2.04 sHmax=20.41 mt总=4.08 s",
+            "最高点：v=0，但紫色 a=g 箭头仍向下，不为零。"
+          ],
+          "physical_readout": [
+            "v0=20.0 m/sg=9.80 m/s²t=2.00 sv=0.40 m/sh=20.40 mt上=2.04 sHmax=20.41 mt总=4.08 s",
+            "最高点：v=0，但紫色 a=g 箭头仍向下，不为零。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "e7ccd3f",
+          "readout_hash": "81f37cbd",
+          "physical_readout_hash": "81f37cbd",
+          "readout": [
+            "v0=20.0 m/sg=9.80 m/s²t=2.35 sv=-3.03 m/sh=19.94 mt上=2.04 sHmax=20.41 mt总=4.08 s",
+            "下落阶段：速度向下，g 仍向下；落回抛点速度为 -v0。"
+          ],
+          "physical_readout": [
+            "v0=20.0 m/sg=9.80 m/s²t=2.35 sv=-3.03 m/sh=19.94 mt上=2.04 sHmax=20.41 mt总=4.08 s",
+            "下落阶段：速度向下，g 仍向下；落回抛点速度为 -v0。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "77ea51f",
+          "readout_hash": "820af5fa",
+          "physical_readout_hash": "820af5fa",
+          "readout": [
+            "v0=20.0 m/sg=9.80 m/s²t=2.38 sv=-3.28 m/sh=19.86 mt上=2.04 sHmax=20.41 mt总=4.08 s",
+            "下落阶段：速度向下，g 仍向下；落回抛点速度为 -v0。"
+          ],
+          "physical_readout": [
+            "v0=20.0 m/sg=9.80 m/s²t=2.38 sv=-3.28 m/sh=19.86 mt上=2.04 sHmax=20.41 mt总=4.08 s",
+            "下落阶段：速度向下，g 仍向下；落回抛点速度为 -v0。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "77ea51f",
+          "readout_hash": "820af5fa",
+          "physical_readout_hash": "820af5fa",
+          "readout": [
+            "v0=20.0 m/sg=9.80 m/s²t=2.38 sv=-3.28 m/sh=19.86 mt上=2.04 sHmax=20.41 mt总=4.08 s",
+            "下落阶段：速度向下，g 仍向下；落回抛点速度为 -v0。"
+          ],
+          "physical_readout": [
+            "v0=20.0 m/sg=9.80 m/s²t=2.38 sv=-3.28 m/sh=19.86 mt上=2.04 sHmax=20.41 mt总=4.08 s",
+            "下落阶段：速度向下，g 仍向下；落回抛点速度为 -v0。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "v#=# m/sg=# m/s²t=# sv=# m/sh=# mt上=# sHmax=# mt总=# s|最高点：v=#，但紫色 a=g 箭头仍向下，不为零。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "v#=# m/sg=# m/s²t=# sv=# m/sh=# mt上=# sHmax=# mt总=# s|最高点：v=#，但紫色 a=g 箭头仍向下，不为零。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

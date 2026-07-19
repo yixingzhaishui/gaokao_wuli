@@ -206,9 +206,16 @@
   document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
   function animate(){if(!state.playing)return;state.t+=.035;draw();if(state.t>2.4){state.playing=false;document.getElementById('playBtn').textContent='播放过程';draw();return}requestAnimationFrame(animate)}
   document.getElementById('playBtn').addEventListener('click',()=>{state.playing=!state.playing;document.getElementById('playBtn').textContent=state.playing?'暂停':'播放过程';if(state.playing){state.t=0;animate()}else draw()});
-  document.getElementById('resetBtn').addEventListener('click',()=>{state.playing=false;state.t=0;document.getElementById('playBtn').textContent='播放过程';draw()});
+  document.getElementById('resetBtn').addEventListener('click',()=>{
+    // This control is labelled “reset”, so restore the complete experiment
+    // rather than merely rewinding the animation clock.
+    Object.assign(state,{mode:'horizontal',m1:2,m2:1,F:8,mu:0,theta:30,g:10,t:0,drag:null,playing:false});
+    document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode==='horizontal'));
+    document.getElementById('playBtn').textContent='播放过程';draw();
+  });
   draw();
 })();
 </script>
+<script src="../model/guided-lesson.js"></script>
 </body>
 </html>

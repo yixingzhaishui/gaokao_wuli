@@ -1,0 +1,290 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T17:37:34.681Z",
+  "commit": "a81fcb9279f155eb30d3a7612782c0d6b9d0d399",
+  "module": "xb2",
+  "modules": [
+    "xb2"
+  ],
+  "summary": {
+    "total": 1,
+    "score": 100,
+    "pass": 1,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/xb2/sensor.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#inputr",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#thr",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:热敏",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:力敏",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:光敏",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "button:光敏",
+          "text": "光敏",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:热敏",
+          "text": "热敏",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:力敏",
+          "text": "力敏",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play-btn",
+          "text": "播放扫描",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset-btn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放扫描"
+      },
+      "reset_button": {
+        "id": "reset-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "211559e",
+          "readout_hash": "29734dbf",
+          "physical_readout_hash": "fcd0b38c",
+          "readout": [
+            "光照 = 0%",
+            "光照",
+            "触发阈值 = 2.50 V",
+            "类型 = 光敏电阻",
+            "光照 = 0%",
+            "敏感电阻 Rₛ = 20000 Ω",
+            "输出电压 Uout = 4.00 V",
+            "阈值 = 2.50 V",
+            "执行器 = 触发",
+            "状态：暂停：已超过阈值",
+            "暂停：已超过阈值"
+          ],
+          "physical_readout": [
+            "光照 = 0%",
+            "光照",
+            "触发阈值 = 2.50 V",
+            "类型 = 光敏电阻",
+            "光照 = 0%",
+            "敏感电阻 Rₛ = 20000 Ω",
+            "输出电压 Uout = 4.00 V",
+            "阈值 = 2.50 V",
+            "执行器 = 触发",
+            "：已超过阈值",
+            "：已超过阈值"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "2be1ca4e",
+          "readout_hash": "6d4eca31",
+          "physical_readout_hash": "6d4eca31",
+          "readout": [
+            "光照 = 66%",
+            "光照",
+            "触发阈值 = 2.50 V",
+            "类型 = 光敏电阻",
+            "光照 = 66%",
+            "敏感电阻 Rₛ = 1412 Ω",
+            "输出电压 Uout = 1.10 V",
+            "阈值 = 2.50 V",
+            "执行器 = 未触发",
+            "状态：自动扫描输入量",
+            "自动扫描输入量"
+          ],
+          "physical_readout": [
+            "光照 = 66%",
+            "光照",
+            "触发阈值 = 2.50 V",
+            "类型 = 光敏电阻",
+            "光照 = 66%",
+            "敏感电阻 Rₛ = 1412 Ω",
+            "输出电压 Uout = 1.10 V",
+            "阈值 = 2.50 V",
+            "执行器 = 未触发",
+            "状态：自动扫描输入量",
+            "自动扫描输入量"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "57cafaf",
+          "readout_hash": "f918165d",
+          "physical_readout_hash": "6b579c26",
+          "readout": [
+            "光照 = 67%",
+            "光照",
+            "触发阈值 = 2.50 V",
+            "类型 = 光敏电阻",
+            "光照 = 67%",
+            "敏感电阻 Rₛ = 1397 Ω",
+            "输出电压 Uout = 1.09 V",
+            "阈值 = 2.50 V",
+            "执行器 = 未触发",
+            "状态：暂停：未达阈值",
+            "暂停：未达阈值"
+          ],
+          "physical_readout": [
+            "光照 = 67%",
+            "光照",
+            "触发阈值 = 2.50 V",
+            "类型 = 光敏电阻",
+            "光照 = 67%",
+            "敏感电阻 Rₛ = 1397 Ω",
+            "输出电压 Uout = 1.09 V",
+            "阈值 = 2.50 V",
+            "执行器 = 未触发",
+            "：未达阈值",
+            "：未达阈值"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "eca4aaa9",
+          "readout_hash": "f918165d",
+          "physical_readout_hash": "6b579c26",
+          "readout": [
+            "光照 = 67%",
+            "光照",
+            "触发阈值 = 2.50 V",
+            "类型 = 光敏电阻",
+            "光照 = 67%",
+            "敏感电阻 Rₛ = 1397 Ω",
+            "输出电压 Uout = 1.09 V",
+            "阈值 = 2.50 V",
+            "执行器 = 未触发",
+            "状态：暂停：未达阈值",
+            "暂停：未达阈值"
+          ],
+          "physical_readout": [
+            "光照 = 67%",
+            "光照",
+            "触发阈值 = 2.50 V",
+            "类型 = 光敏电阻",
+            "光照 = 67%",
+            "敏感电阻 Rₛ = 1397 Ω",
+            "输出电压 Uout = 1.09 V",
+            "阈值 = 2.50 V",
+            "执行器 = 未触发",
+            "：未达阈值",
+            "：未达阈值"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "光照 = #%|光照|触发阈值 = # V|类型 = 光敏电阻|光照 = #%|敏感电阻 Rₛ = # Ω|输出电压 Uout = # V|阈值 = # V|执行器 = 触发|状态：暂停：已超过阈值|暂停：已超过阈值",
+          "controls": [
+            {
+              "id": "inputr",
+              "value": "0",
+              "checked": false
+            },
+            {
+              "id": "thr",
+              "value": "2.5",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "光照 = #%|光照|触发阈值 = # V|类型 = 光敏电阻|光照 = #%|敏感电阻 Rₛ = # Ω|输出电压 Uout = # V|阈值 = # V|执行器 = 触发|状态：暂停：已超过阈值|暂停：已超过阈值",
+          "controls": [
+            {
+              "id": "inputr",
+              "value": "0",
+              "checked": false
+            },
+            {
+              "id": "thr",
+              "value": "2.5",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

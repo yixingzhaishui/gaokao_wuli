@@ -1,0 +1,32 @@
+{
+  "problems": [
+    {
+      "id": "GT-2025-SH-19",
+      "source": "2025年上海市普通高中学业水平等级性考试物理试卷",
+      "source_kind": "official_exam",
+      "source_verified": true,
+      "source_detail": "物理第19题；锦宏教育试卷PDF含原题、斜坡图、数据和同PDF答案页；答案由匀变速直线运动和沿斜面方向牛顿第二定律独立核验。",
+      "source_urls": ["https://www.jhgk.cn/upload/file/20250612/1749695610079025886.pdf"],
+      "verification": "原题第19题与同PDF答案页核对：答案为x=62.5 m，F=5230 N。独立核验：v0=72 km/h=20 m/s，vt=18 km/h=5 m/s，t=5 s，x=(v0+vt)t/2=62.5 m；沿坡向下取正，a=(5-20)/5=-3 m/s²，ma=mg sin4.8°-f-F，代入m=1500 kg、f=500 N、g≈9.8 m/s²得F≈5.23×10^3 N。",
+      "verified_at": "2026-07-11",
+      "year": 2025,
+      "exam": "上海等级考·物理",
+      "question_no": "19",
+      "type": "计算",
+      "difficulty": "中档",
+      "knowledge_ids": ["B1-10", "B1-18", "B1-24"],
+      "model_ids": [],
+      "stem": "在倾斜角为4.8°的斜坡上，有一辆向下滑动的小车，存在动能回收系统；小车的质量m=1500 kg。在t=5 s时间内，速度从v0=72 km/h减速到vt=18 km/h，运动过程中所有其他阻力的合力f=500 N。求这一过程中：（1）小车的位移大小x；（2）回收作用力大小F。",
+      "diagram_required": true,
+      "diagram": {
+        "type": "inline-svg",
+        "title": "原卷第19题汽车沿4.8°斜坡下滑减速示意",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 680 300\" role=\"img\" aria-label=\"汽车沿倾角4.8度斜坡向下运动并受到回收制动力\"><path d=\"M90 210L590 250\" stroke=\"#334155\" stroke-width=\"6\"/><path d=\"M120 210h120\" stroke=\"#94a3b8\" stroke-width=\"3\"/><path d=\"M150 215c30 0 55 5 83 8\" stroke=\"#64748b\" stroke-width=\"3\" fill=\"none\"/><text x=\"104\" y=\"196\" font-size=\"26\" fill=\"#334155\">4.8°</text><rect x=\"345\" y=\"190\" width=\"90\" height=\"42\" rx=\"8\" transform=\"rotate(4.6 345 190)\" fill=\"#bfdbfe\" stroke=\"#1d4ed8\" stroke-width=\"3\"/><circle cx=\"365\" cy=\"238\" r=\"12\" fill=\"#111827\"/><circle cx=\"425\" cy=\"242\" r=\"12\" fill=\"#111827\"/><path d=\"M430 215h95\" stroke=\"#16a34a\" stroke-width=\"5\" marker-end=\"url(#arrow)\"/><text x=\"480\" y=\"205\" font-size=\"18\" fill=\"#16a34a\">运动方向</text><path d=\"M350 185h-90\" stroke=\"#dc2626\" stroke-width=\"5\" marker-end=\"url(#arrowRed)\"/><text x=\"253\" y=\"176\" font-size=\"18\" fill=\"#dc2626\">F、f</text><defs><marker id=\"arrow\" markerWidth=\"10\" markerHeight=\"10\" refX=\"8\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L0,6 L9,3 z\" fill=\"#16a34a\"/></marker><marker id=\"arrowRed\" markerWidth=\"10\" markerHeight=\"10\" refX=\"8\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L0,6 L9,3 z\" fill=\"#dc2626\"/></marker></defs></svg>"
+      },
+      "answer": "（1）x=62.5 m；（2）F=5230 N",
+      "solution": "速度换算：72 km/h=20 m/s，18 km/h=5 m/s。该过程可按匀变速直线运动处理，位移x=(v0+vt)t/2=(20+5)×5/2=62.5 m。加速度a=(vt-v0)/t=(5-20)/5=-3 m/s²。沿斜面向下取正，受力为重力沿斜面分力mg sin4.8°向下，其他阻力f和回收作用力F向上：ma=mg sin4.8°-f-F。代入得F=mg sin4.8°-f-ma≈1500×9.8×sin4.8°-500-1500×(-3)≈5230 N。",
+      "method": "先用速度单位换算和匀变速公式求运动学量，再沿斜面列牛顿第二定律；减速时加速度方向与运动方向相反。",
+      "traps": ["忘记把km/h换成m/s", "把减速过程的加速度符号写反", "沿斜面列力时漏掉重力分力mg sinθ"]
+    }
+  ]
+}

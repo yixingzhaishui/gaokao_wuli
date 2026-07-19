@@ -1,0 +1,36 @@
+{
+  "score_version": "1.0",
+  "generated_at": "2026-07-19T05:20:55Z",
+  "chapter": "E8",
+  "scope": "E-01..E-26",
+  "commit": "3b4983bf850d7ffb977cb6318818bcd90942a671",
+  "worktree_clean_before_tests": true,
+  "test_command": "npx playwright test tests/e8-remediation.spec.js --workers=1",
+  "summary": {
+    "total": 9,
+    "pass": 9,
+    "fail": 0,
+    "experiment_pages_staged_flow": 26,
+    "reduced_motion_pages": 26,
+    "findings_closed": 17
+  },
+  "closed_findings": [
+    "E-03", "E-10", "E-15", "E-18", "E-23", "E-25",
+    "E-06", "E-08", "E-20", "E-21", "E-22", "E-24", "E-26",
+    "E-SYS-01", "E-SYS-02", "E-SYS-03", "E-SYS-04"
+  ],
+  "browser_inputs": [
+    "keyboard range control",
+    "button click",
+    "canvas pointer drag",
+    "reduced-motion media emulation"
+  ],
+  "file_sha256": {
+    "experiments.md": "631ebf88e707307375bef6314845ff8cb50bfbbf71dd7c19b4fac387dab07cc0",
+    "anim/exp/guided-experiment.js": "7ab818332098381df478f86d7c5bda0cb59c8651e766249ebb755423b85644d8",
+    "tests/e8-remediation.spec.js": "813cf4e89c69ddead2dd507be8cfcdf2b44e3f6a0e7d3d2ec1ee84d6121b0534"
+  },
+  "generic_interaction_report": "audit/results/exp-remediated-3b4983b.json",
+  "source_gate": "all static examples remain quarantined pending source review",
+  "teacher_signoff": "pending"
+}

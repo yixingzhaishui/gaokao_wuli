@@ -239,5 +239,28 @@
   draw();requestAnimationFrame(tick);
 })();
 </script>
+
+<script>/* GKWL: unified full reset (2026-07-12 review remediation) */
+(function(){
+  var btns=[].slice.call(document.querySelectorAll('button'));
+  var resets=btns.filter(function(b){return /重置|复位/.test(b.textContent)});
+  if(!resets.length)return;
+  var scoped=/播放|时间|回放/;
+  var primary=resets[0];
+  if(scoped.test(primary.textContent)){
+    var nb=document.createElement('button');
+    nb.textContent='全部重置';
+    nb.className=primary.className;
+    nb.setAttribute('data-gkwl-full-reset','1');
+    nb.addEventListener('click',function(){location.reload()});
+    primary.parentNode.insertBefore(nb,primary.nextSibling);
+  }else{
+    resets.forEach(function(b){b.addEventListener('click',function(){setTimeout(function(){location.reload()},60)})});
+  }
+})();
+</script>
+<script>
+window.B2_GUIDE={id:'B2-03',question:'同一高度平抛，把水平初速度增大后，落地时间会怎样？',observe:'保持高度、当地重力加速度和竖直初速度不变，只增大水平初速度。',options:[{value:'same',label:'落地时间不变，水平射程增大'},{value:'shorter',label:'落地时间变短'},{value:'longer',label:'落地时间变长'}],correct:'same',actions:[{selector:'[data-case="fast"]'}],result:'落地时间不变，水平射程增大。',evidence:'竖直频闪点和落地时刻不变，水平点距和水平射程变大。',explanation:'忽略空气阻力时，竖直运动只由高度、竖直初速度和g决定；水平初速度只影响水平位移。',transfer:'比较平抛落地时间前，必须先确认同一地点、同一高度、竖直初速度为零且忽略阻力。'};
+</script><script src="guided-lesson.js"></script><script src="../model/guided-lesson.js"></script>
 </body>
 </html>

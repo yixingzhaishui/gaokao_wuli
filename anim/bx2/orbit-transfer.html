@@ -255,5 +255,8 @@
   draw();requestAnimationFrame(tick);
 })();
 </script>
+<script>
+window.B2_GUIDE={id:'B2-13',question:'卫星在低圆轨道某点瞬时加速后，立刻进入什么轨道？',observe:'点火时间很短，位置来不及改变；比较点火前后的速度和轨道形状。',options:[{value:'ellipse',label:'进入以该点为近地点的转移椭圆'},{value:'high-circle',label:'立刻进入高圆轨道'},{value:'fall',label:'立刻落向地球'}],correct:'ellipse',actions:[{selector:'[data-stage="1"]'}],result:'进入转移椭圆，第一次点火点成为近地点。',evidence:'同一点速度由v1增至vt1，轨道从低圆切换为椭圆；尚未到高圆轨道。',explanation:'瞬时变速先改变机械能和轨道，位置连续不跳变；到远地点还需第二次点火圆化。',transfer:'变轨题必须区分同一点的瞬时速度、转移轨速度和该半径处的圆轨速度。'};
+</script><script src="guided-lesson.js"></script>
 </body>
 </html>

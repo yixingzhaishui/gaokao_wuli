@@ -51,13 +51,17 @@ let P=100,U=10,r=10,drag=false,t=0,running=true,last=performance.now();
 function I(){return P/U}
 function loss(){return I()*I()*r/1000}
 function dU(){return I()*r/1000}
-function userP(){return Math.max(0,P-loss())}
-function eff(){return Math.max(0,userP()/P*100)}
+function minValidU(){return Math.sqrt(P*r/1000)}
+function valid(){return U>minValidU()}
+function userP(){return P-loss()}
+function eff(){return userP()/P*100}
 function sync(){
-  pv.textContent=P.toFixed(0);uv.textContent=U.toFixed(1);iv.textContent=I().toFixed(1);lossv.textContent=loss().toFixed(1);
-  duv.textContent=dU().toFixed(2);userv.textContent=userP().toFixed(1);effv.textContent=eff().toFixed(1);
+  const ok=valid(),shown=ok?null:'—';pv.textContent=P.toFixed(0);uv.textContent=U.toFixed(1);iv.textContent=ok?I().toFixed(1):shown;lossv.textContent=ok?loss().toFixed(1):shown;
+  duv.textContent=ok?dU().toFixed(2):shown;userv.textContent=ok?userP().toFixed(1):shown;effv.textContent=ok?eff().toFixed(1):shown;
   pl.textContent=P.toFixed(0);ul.textContent=U.toFixed(1);rl.textContent=r.toFixed(0);
-  statev.textContent=drag?'手动拖电压点':(running?'自动演示高压降损':(loss()>P*.2?'低压高损耗':'暂停观察读数'));
+  statev.textContent=ok?(drag?'手动拖电压点':(running?'自动演示高压降损':(loss()>P*.2?'低压高损耗':'暂停观察读数'))):`无效：U 必须 > ${minValidU().toFixed(2)} kV`;
+  statev.style.color=ok?'':'#ff8a80';cv.dataset.transmissionValidity=ok?'valid':'invalid';cv.dataset.requiredMinVoltageKv=minValidU().toFixed(4);cv.dataset.impossibleReadouts=ok?'none':'suppressed';
+  window.__ANIM_TEST_STATE__={P,U,r,valid:ok,minValidU:minValidU(),I:ok?I():null,loss:ok?loss():null,dU:ok?dU():null,userP:ok?userP():null,eff:ok?eff():null};
 }
 function rect(x,y,w,h,fill,stroke,label){
   ctx.fillStyle=fill;ctx.strokeStyle=stroke;ctx.lineWidth=1.5;ctx.fillRect(x,y,w,h);ctx.strokeRect(x,y,w,h);
@@ -70,6 +74,7 @@ function plot(){
   const gx=458,gy=90,gw=250,gh=210;
   ctx.strokeStyle='#b0bcc9';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(gx,gy+gh);ctx.lineTo(gx+gw,gy+gh);ctx.moveTo(gx,gy);ctx.lineTo(gx,gy+gh);ctx.stroke();
   ctx.fillStyle='#486581';ctx.font='11px system-ui';ctx.textAlign='left';ctx.fillText('P损=(P/U)²r',gx+6,gy+14);ctx.fillText('U 越大，损耗按平方下降',gx+6,gy+30);
+  const invalidWidth=Math.max(0,Math.min(gw,(minValidU()-1)/49*gw));ctx.fillStyle='rgba(224,49,49,.12)';ctx.fillRect(gx,gy,invalidWidth,gh);if(invalidWidth>24){ctx.fillStyle='#c92a2a';ctx.fillText('无效区',gx+6,gy+48)}
   const maxLoss=Math.max(20,(P/1)*(P/1)*r/1000);
   ctx.strokeStyle='#e8590c';ctx.lineWidth=2.5;ctx.beginPath();
   for(let k=0;k<=180;k++){
@@ -79,13 +84,13 @@ function plot(){
   }
   ctx.stroke();
   const px=gx+(U-1)/49*gw,py=gy+gh-Math.min(1,loss()/maxLoss)*gh;
-  ctx.fillStyle='#1c7ed6';ctx.beginPath();ctx.arc(px,py,8,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=valid()?'#1c7ed6':'#c92a2a';ctx.beginPath();ctx.arc(px,py,8,0,Math.PI*2);ctx.fill();
   ctx.fillStyle='#1c7ed6';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText(U.toFixed(1)+' kV',px,py-13);
 }
 function draw(){
   sync();
   ctx.clearRect(0,0,W,H);
-  const heat=Math.min(1,loss()/P),flow=Math.min(1,I()/100);
+  const ok=valid(),heat=ok?Math.min(1,loss()/P):0,flow=ok?Math.min(1,I()/100):0;
   const sky=ctx.createLinearGradient(0,70,0,320);sky.addColorStop(0,'rgba(208,235,255,.32)');sky.addColorStop(1,'rgba(255,255,255,0)');
   ctx.fillStyle=sky;ctx.fillRect(18,78,535,250);
   rect(30,130,64,46,'#e6edf5','#334e68','发电机');
@@ -102,11 +107,11 @@ function draw(){
   }
   ctx.fillStyle=`rgba(232,89,12,${0.08+0.35*heat})`;ctx.fillRect(205,222,168,42);
   ctx.fillStyle='#c92a2a';ctx.font='13px system-ui';ctx.textAlign='center';
-  ctx.fillText('线路发热损耗 P损 = I²r = '+loss().toFixed(1)+' kW',290,248);
+  ctx.fillText(ok?'线路发热损耗 P损 = I²r = '+loss().toFixed(1)+' kW':'参数无效：P损≥P 或 ΔU≥U，不显示伪物理读数',290,248);
   ctx.fillStyle='#243b53';ctx.font='13px system-ui';
-  ctx.fillText('I=P/U='+P.toFixed(0)+' kW ÷ '+U.toFixed(1)+' kV = '+I().toFixed(1)+' A',34,366);
-  ctx.fillText('ΔU=Ir='+I().toFixed(1)+'×'+r+' Ω = '+dU().toFixed(2)+' kV；用户得到约 '+userP().toFixed(1)+' kW',34,388);
-  const bx=600,base=382,bw=44,lh=Math.min(120,loss()/Math.max(P,1)*140),uh=Math.min(120,userP()/Math.max(P,1)*120);
+  ctx.fillText(ok?'I=P/U='+P.toFixed(0)+' kW ÷ '+U.toFixed(1)+' kV = '+I().toFixed(1)+' A':'有效模型要求 U > √(Pr/1000) = '+minValidU().toFixed(2)+' kV',34,366);
+  ctx.fillText(ok?'ΔU=Ir='+I().toFixed(1)+'×'+r+' Ω = '+dU().toFixed(2)+' kV；用户得到约 '+userP().toFixed(1)+' kW':'请提高输送电压或降低 P、r 后再读取 I、损耗、压降和效率',34,388);
+  const bx=600,base=382,bw=44,lh=ok?Math.min(120,loss()/Math.max(P,1)*140):0,uh=ok?Math.min(120,userP()/Math.max(P,1)*120):0;
   ctx.fillStyle='#e6edf5';ctx.fillRect(bx,base-120,bw,120);ctx.fillRect(bx+60,base-120,bw,120);
   ctx.fillStyle='#e8590c';ctx.fillRect(bx,base-lh,bw,lh);
   ctx.fillStyle='#2b8a3e';ctx.fillRect(bx+60,base-uh,bw,uh);
@@ -122,10 +127,11 @@ pr.oninput=e=>{P=parseFloat(e.target.value);draw()};
 ur.oninput=e=>{U=parseFloat(e.target.value);draw()};
 rr.oninput=e=>{r=parseFloat(e.target.value);draw()};
 document.getElementById('play-btn').onclick=()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停演示':'播放演示';draw()};
-document.getElementById('reset-btn').onclick=()=>{P=100;U=10;r=10;t=0;running=true;pr.value=P;ur.value=U;rr.value=r;document.getElementById('play-btn').textContent='暂停演示';draw()};
-function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;if(running&&!drag){t+=dt;U=1+24*(0.5+0.5*Math.sin(t*.65));ur.value=U.toFixed(1)}draw();requestAnimationFrame(loop)}
+document.getElementById('reset-btn').onclick=()=>{P=100;U=10;r=10;t=0;running=false;pr.value=P;ur.value=U;rr.value=r;document.getElementById('play-btn').textContent='播放演示';draw()};
+function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;if(running&&!drag){t+=dt;const low=Math.min(49,Math.max(1.1,minValidU()*1.1)),high=50;U=low+(high-low)*(0.5+0.5*Math.sin(t*.65));ur.value=U.toFixed(1)}draw();requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
 })();
 </script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

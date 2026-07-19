@@ -1,0 +1,1297 @@
+
+===== anim/xb3/atomic-spectrum.html (314 lines, kept 35) =====
+32: <canvas id="c" width="740" height="540" aria-label="原子光谱实验台：放电管光路侧视、谱线屏幕、能级图像和数据记录"></canvas>
+35: <button id="playBtn" class="primary" type="button">播放</button>
+36: <button id="recordBtn" type="button">记录</button>
+37: <button id="resetBtn" type="button">重置</button>
+39: <label for="element">元素：<span id="elementVal"></span></label>
+41: <label for="excite">激发强度：<span id="exciteVal"></span></label>
+43: <label for="mode">光谱模式：<span id="modeVal"></span></label>
+45: <div id="readout" class="readout"></div>
+45D: <div id="readout" class="readout"></div>
+46: <div id="status" class="status"></div>
+47: <div class="hint">观察任务：拖动屏幕上的谱线探针读出波长 λ；切换元素看谱线位置变成不同“指纹”，切到吸收模式看亮线变暗线。</div>
+50: <tbody id="recordRows"></tbody>
+56: const c = document.getElementById('c');
+77: const state = { running: false, last: 0, time: 0, probeLambda: 486, drag: null, records: [] };
+86: const g = ctx.createLinearGradient(x, 0, x + w, 0);
+125: const y = 162 + Math.sin((x + state.time * 80) / 7) * 22;
+145: const t = (state.time * (0.25 + Number(els.excite.value) * 0.06) + i * 0.18) % 1;
+146: const px = 150 + (endX - 150) * t;
+147: const py = 162 + (endY - 162) * t;
+159: const bright = 0.28 + excite * 0.14;
+202: ctx.fillText('能级图像：ΔE=hν=hc/λ', x + w / 2, y - h + 18);
+223D: els.elementVal.textContent = it.name;
+224D: els.exciteVal.textContent = excite;
+225D: els.modeVal.textContent = absorb ? '吸收光谱' : '发射光谱';
+237: const freq = 3e8 / (lambda * 1e-9);
+238: const ev = 4.136e-15 * freq;
+240: `<div id="r1">元素=${it.name}，模式=${absorb ? '吸收' : '发射'}</div>`,
+241: `<div id="r2">探针读数 λ≈${lambda} nm，ν≈${freq.toExponential(2)} Hz</div>`,
+242: `<div id="r3">光子能量 hν=hc/λ≈${ev.toFixed(2)} eV</div>`,
+243: `<div id="r4">谱线组：${it.lines.join('、')} nm，强度等级=${excite}</div>`
+245D: els.status.textContent = absorb
+250D: els.recordRows.innerHTML = state.records.slice(-5).map((p, i) =>
+256: const x = (ev.clientX - rect.left) * c.width / rect.width;
+262: const dt = Math.min(0.05, (ts - state.last) / 1000);
+278D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+
+===== anim/xb3/atomic-structure.html (297 lines, kept 36) =====
+32: <canvas id="c" width="740" height="540" aria-label="原子结构实验台：α粒子散射俯视、原子截面、偏转角图像和数据记录"></canvas>
+35: <button id="playBtn" class="primary" type="button">播放</button>
+36: <button id="recordBtn" type="button">记录</button>
+37: <button id="resetBtn" type="button">重置</button>
+39: <label for="b">碰撞参数 b：<span id="bVal"></span></label>
+45: <div id="readout" class="readout"></div>
+45D: <div id="readout" class="readout"></div>
+46: <div id="status" class="status"></div>
+47: <div class="hint">观察任务：拖动画面里的入射 α 粒子改变 b；点“播放”看多数直穿、少数偏转、极少反弹为什么支持“小而重的正电原子核”。</div>
+50: <tbody id="recordRows"></tbody>
+56: const c = document.getElementById('c');
+72: const state = { running: false, last: 0, time: 0, progress: 0, drag: null, records: [] };
+78: const forceIndex = z * 900 / (b * b);
+79: const angle = Math.min(140, forceIndex * 35);
+90: const x = 36 + 330 * t - 235 * Math.max(0, t - 0.62) * 2.3;
+91: const y = y0 + 24 * Math.sin(t * Math.PI) + 150 * Math.max(0, t - 0.58) * 1.4;
+94: const x = 36 + 630 * t;
+95: const y = y0 - v.angle * 1.25 * Math.max(0, t - 0.42) + 20 * Math.sin(t * Math.PI) * (v.angle / 80);
+103: const p = pathPoint(i / 80, v);
+144: const a = i * Math.PI * 2 / 14;
+146: ctx.arc(nx + Math.cos(a) * v.cloud * 0.82, ny + Math.sin(a) * v.cloud * 0.54, 5, 0, Math.PI * 2);
+186: const yy = y + 62 + i * 58;
+200: const px = x + 26 + clamp(v.angle / 140, 0, 1) * 124;
+212D: els.bVal.textContent = v.b.toFixed(0);
+213D: els.zVal.textContent = v.z.toFixed(0);
+214D: els.cloudVal.textContent = v.cloud.toFixed(0);
+225: `<div id="r1">碰撞参数 b=${v.b.toFixed(0)}，核电荷 Z=${v.z}</div>`,
+226: `<div id="r2">F∝Z/b²≈${v.forceIndex.toFixed(2)}</div>`,
+227: `<div id="r3">偏转角≈${v.angle.toFixed(0)}°，判断：${v.label}</div>`,
+228: `<div id="r4">多数直穿说明原子内部空旷；大角散射说明正电荷集中在小原子核</div>`
+230D: els.status.textContent = v.label + '：这是卢瑟福 α 粒子散射实验支持核式结构的关键证据。';
+233D: els.recordRows.innerHTML = state.records.slice(-5).map((p, i) =>
+239: const y = (ev.clientY - rect.top) * c.height / rect.height;
+247: const dt = Math.min(0.05, (ts - state.last) / 1000);
+251: state.progress += dt * 0.34;
+262D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+
+===== anim/xb3/avogadro.html (425 lines, kept 54) =====
+76: <canvas id="c" width="790" height="560" aria-label="阿伏伽德罗常数实验台：俯视装置、换算剖面、粒子计数器、图像和数据记录"></canvas>
+79: <button id="playBtn" class="primary" type="button">播放</button>
+80: <button id="resetBtn" type="button">重置</button>
+81: <button id="recordBtn" type="button">记录</button>
+87: <label for="scale">显示比例：每点代表 mol：<span id="scaleVal"></span></label>
+89: <div id="readout" class="readout"></div>
+89D: <div id="readout" class="readout"></div>
+92: <tbody id="records"></tbody>
+94: <div class="hint">观察任务：拖动画面里的蓝色砝码改变 m，拖橙色摩尔卡改变 M；看天平读数、mol 表盘和粒子计数器怎样按 N=nNA 同步变化。</div>
+115: const state = { running: false, time: 0, last: 0, drag: null, records: [] };
+121: const e = Math.floor(Math.log10(Math.max(x, 1)));
+122: const a = x / Math.pow(10, e);
+129: const n = m / M;
+130: const N = n * NA;
+131: const dots = Math.max(1, Math.min(150, Math.round(n / scale)));
+135: if (next.m !== undefined) els.mass.value = Math.round(clamp(next.m, 1, 120));
+136: if (next.M !== undefined) els.molar.value = Math.round(clamp(next.M, 2, 120));
+168: const a = Math.atan2(y2 - y1, x2 - x1);
+178: ctx.lineTo(x2 - 11 * Math.cos(a - 0.45), y2 - 11 * Math.sin(a - 0.45));
+179: ctx.lineTo(x2 - 11 * Math.cos(a + 0.45), y2 - 11 * Math.sin(a + 0.45));
+187: const xx = x + w * i / nx;
+191: const yy = y + h * i / ny;
+218: const massH = 24 + q.m * 0.55 * progress;
+239: const angle = Math.PI + Math.PI * Math.min(q.n / 4, 1) * progress;
+240: arrow(cx, cy, cx + Math.cos(angle) * 45, cy + Math.sin(angle) * 45, '#9a6700', 3);
+241: text(`n = m/M = ${q.n.toFixed(3)} mol`, cx, 238, '#9a6700', 16, '700');
+242: text(`M = ${q.M.toFixed(0)} g/mol`, cx, 136, '#486581', 13, '700');
+247: const visible = Math.round(q.dots * progress);
+250: const x = 582 + (i % cols) * 13;
+251: const y = 138 + Math.floor(i / cols) * 13;
+269: const maxN = (120 / q.M) * NA;
+273: for (let k = 0; k <= 60; k++) {
+274: const m = maxM * k / 60;
+275: const px = x + w * m / maxM;
+276: const py = y + h - h * ((m / q.M) * NA) / maxN;
+280: const px = x + w * q.m / maxM;
+281: const py = y + h - h * q.N / maxN;
+297: text(`M = ${q.M.toFixed(0)} g/mol`, 710, 374, '#9a6700', 13, '700', 'right');
+298: text('3. 物质的量 n=m/M', 442, 406, '#486581', 13, '700', 'left');
+306: const q = data();
+307: const progress = state.running ? Math.min(1, state.time / 2.4) : 1;
+335D: els.massVal.textContent = q.m.toFixed(0);
+336D: els.molarVal.textContent = q.M.toFixed(0);
+337D: els.scaleVal.textContent = q.scale.toFixed(2);
+338D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+340: `m=${q.m.toFixed(0)}g，M=${q.M.toFixed(0)}g/mol`,
+341: `n=m/M=<b>${q.n.toFixed(3)}mol</b>`,
+342: `N=nNA=<b>${sci(q.N)}个</b>`,
+343: `NA=<b>6.02×10^23 mol^-1</b>`
+348: const dt = Math.min(0.04, (now - state.last) / 1000);
+368: return handles(data()).find(h => Math.hypot(p.x - h.x, p.y - h.y) <= h.r + 8);
+371: const h = hit(pos(evt));
+407: const q = data();
+413D: els.records.innerHTML = state.records.map((r, idx) =>
+
+===== anim/xb3/binding-energy.html (47 lines, kept 22) =====
+13: <canvas id="c" width="940" height="640" aria-label="结合能实验台：核子模型、结合能曲线、质量亏损和数据记录"></canvas>
+15: <div class="row"><button id="playBtn" class="play-btn">播放</button><button id="resetBtn" class="secondary">重置</button><button id="recordBtn" class="secondary">记录
+16: <label for="a">核子数 A：<span id="aVal"></span></label><input id="a" type="range" min="2" max="240" value="56" step="1">
+17: <label for="eb">总结合能 Eb/MeV：<span id="ebVal"></span></label><input id="eb" type="range" min="5" max="2000" value="492" step="1">
+18: <label for="compare">对比核平均结合能：<span id="compareVal"></span></label><input id="compare" type="range" min="1" max="9" value="7" step="0.1">
+19: <div id="readout" class="readout"></div><div id="status" class="status"></div>
+19D: <div id="readout" class="readout"></div><div id="status" class="status"></div>
+20: <div class="hint">观察任务：拖动画面中结合能曲线上的蓝色探针。比较稳定性时看 Eb/A，不要只看总结合能。</div>
+21: <table><thead><tr><th>记录</th><th>A</th><th>Eb/A</th><th>更稳定</th></tr></thead><tbody id="recordBody"><tr><td colspan="4">点击“记录”保存一次比较</td></tr></tbody></table>
+27: function params(){const A=+els.a.value,Eb=+els.eb.value,avg=Eb/A,dm=Eb/931.5,cmp=+els.compare.value;return{A,Eb,avg,dm,cmp,stable:avg>cmp}}
+28: function curve(A){return 8.8*(1-Math.exp(-A/18))*Math.exp(-Math.max(0,A-62)/520)}
+30: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo
+31: function drawScene(p){ctx.fillStyle='#fff';ctx.fillRect(0,0,940,640);label('结合能实验台：用 Eb/A 判断原子核稳定性',470,28,'#102a43',19);label('三视图联动：核子模型、结合能曲线、质量亏损仪表和数据记录',47
+32: ctx.fillStyle='#f2f7ff';ctx.strokeStyle='#2c7be5';ctx.lineWidth=2;ctx.fillRect(54,82,486,284);ctx.strokeRect(54,82,486,284);label('核子装置：核子被强相互作用束缚',297,106,'#2c
+34: ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(70,420,470,156);ctx.strokeRect(70,420,470,156);label('公式绑定与稳定性判定',305,444,'#102a43',14);label('Eb
+36: function meter(x,y,w,h,val,c,txt){label(txt,x,y-14,'#486581',12,'left');ctx.fillStyle='#e9eef5';ctx.fillRect(x,y,w,h);ctx.fillStyle=c;ctx.fillRect(x,y,w*val,h)}
+37: function drawGraph(p){const x=graph.x+36,y=graph.y,w=graph.w-58,h=graph.h-92;arrow(x,y,x+w,y,'#52606d',2);arrow(x,y,x,y-h,'#52606d',2);label('A',x+w+10,y+16,'#5
+38: function update(p){els.aVal.textContent=p.A;els.ebVal.textContent=p.Eb.toFixed(0);els.compareVal.textContent=p.cmp.toFixed(1)+' MeV/核子';els.readout.innerHTML=[`
+40: function animate(now){if(!last)last=now;const dt=Math.min(.04,(now-last)/1000);last=now;if(playing)t+=dt;render();requestAnimationFrame(animate)}
+41: function dragProbe(clientX,clientY){const r=canvas.getBoundingClientRect(),x=(clientX-r.left)*canvas.width/r.width,y=(clientY-r.top)*canvas.height/r.height;cons
+42: canvas.addEventListener('pointerdown',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.h
+43: els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textContent=playing?'暂停':'播放'});els.resetBtn.addEventListener('click',()=>{playing=false;
+
+===== anim/xb3/bohr-energy-level.html (291 lines, kept 42) =====
+32: <canvas id="c" width="740" height="540" aria-label="玻尔能级实验台：轨道俯视、能级图像、光子波形和数据记录"></canvas>
+35: <button id="playBtn" class="primary" type="button">播放</button>
+36: <button id="recordBtn" type="button">记录</button>
+37: <button id="resetBtn" type="button">重置</button>
+39: <label for="ni">初态能级 ni：<span id="niVal"></span></label>
+41: <label for="nf">末态能级 nf：<span id="nfVal"></span></label>
+43: <div id="readout" class="readout"></div>
+43D: <div id="readout" class="readout"></div>
+44: <div id="status" class="status"></div>
+45: <div class="hint">观察任务：拖动能级图上的蓝色初态或红色末态手柄；向低能级跃迁看发射光子，向高能级跃迁看吸收光子，并比较 hν=|ΔE|。</div>
+48: <tbody id="recordRows"></tbody>
+54: const c = document.getElementById('c');
+68: const state = { running: false, last: 0, time: 0, progress: 0, drag: null, records: [] };
+77: const photon = Math.abs(dE);
+78: const freq = photon / 4.136e-15;
+83: const a = Math.atan2(y2 - y1, x2 - x1);
+93: ctx.lineTo(x2 - 11 * Math.cos(a - 0.45), y2 - 11 * Math.sin(a - 0.45));
+94: ctx.lineTo(x2 - 11 * Math.cos(a + 0.45), y2 - 11 * Math.sin(a + 0.45));
+117: const r = 22 + n * 18;
+124: const ri = 22 + v.ni * 18;
+125: const rf = 22 + v.nf * 18;
+126: const rNow = ri + (rf - ri) * state.progress;
+127: const a = state.time * 2.1;
+130: ctx.arc(cx + rNow * Math.cos(a), cy + rNow * Math.sin(a), 6, 0, Math.PI * 2);
+143: ctx.fillText('能级图像：En=-13.6/n² eV，光子能量 hν=|ΔE|', 545, 104);
+160: const waveY = v.dE > 0 ? Math.min(yi, yf) - 28 : Math.max(yi, yf) + 30;
+165: const y = waveY + Math.sin((x - 536) / 7 + state.time * 7) * 8;
+170: const photonX = 536 + 132 * state.progress;
+191D: els.niVal.textContent = v.ni;
+192D: els.nfVal.textContent = v.nf;
+203: `<div id="r1">Ei=E${v.ni}=${v.ei.toFixed(2)} eV，Ef=E${v.nf}=${v.ef.toFixed(2)} eV</div>`,
+204: `<div id="r2">ΔE=Ef-Ei=${v.dE.toFixed(2)} eV，判断：${v.action}</div>`,
+205: `<div id="r3">hν=|ΔE|=${v.photon.toFixed(2)} eV，ν≈${v.freq.toExponential(2)} Hz</div>`,
+206: `<div id="r4">规则：向高能级吸收，向低能级发射</div>`
+208D: els.status.textContent = v.ni === v.nf
+213D: els.recordRows.innerHTML = state.records.slice(-5).map((p, i) =>
+220: const d = Math.abs(y - yFor(n));
+227: const y = (ev.clientY - rect.top) * c.height / rect.height;
+236: const dt = Math.min(0.05, (ts - state.last) / 1000);
+240: state.progress += dt * 0.55;
+254D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+274: const x = (ev.clientX - rect.left) * c.width / rect.width;
+
+===== anim/xb3/boyle-law.html (278 lines, kept 52) =====
+32: <canvas id="c" width="740" height="540" aria-label="玻意耳定律实验台：等温气缸侧视、压力表、p-V图像和数据记录"></canvas>
+35: <button id="playBtn" class="primary" type="button">播放</button>
+36: <button id="recordBtn" type="button">记录</button>
+37: <button id="resetBtn" type="button">重置</button>
+39: <label for="vol">体积 V/L：<span id="volVal"></span></label>
+41: <label for="temp">等温温度 T/K：<span id="tempVal"></span></label>
+43: <div id="readout" class="readout"></div>
+43D: <div id="readout" class="readout"></div>
+44: <div id="status" class="status"></div>
+45: <div class="hint">观察任务：直接拖动活塞把 V 减小到一半，看压力表 p 是否约加倍，并记录 pV 是否保持同一个 nRT 常量。</div>
+48: <tbody id="recordRows"></tbody>
+54: const c = document.getElementById('c');
+69: const state = { running: false, last: 0, time: 0, drag: null, records: [] };
+73: const T = Number(els.temp.value);
+74: const C = T;
+75: const p = C / V;
+76: return { V, T, C, p, speed: Math.sqrt(T / 300) };
+84: m.x += Math.cos(m.a) * dt * 0.38 * q.speed;
+85: m.y += Math.sin(m.a) * dt * 0.38 * q.speed;
+86: if (m.x < 0.04 || m.x > 0.96) { m.a = Math.PI - m.a; m.x = clamp(m.x, 0.04, 0.96); }
+91: const a = Math.atan2(y2 - y1, x2 - x1);
+101: ctx.lineTo(x2 - 9 * Math.cos(a - 0.45), y2 - 9 * Math.sin(a - 0.45));
+102: ctx.lineTo(x2 - 9 * Math.cos(a + 0.45), y2 - 9 * Math.sin(a + 0.45));
+107: const x0 = 54, y0 = 98, h = 282, w = 140 + q.V / 2 * 330;
+116: mol.forEach(m => { ctx.beginPath(); ctx.arc(x0 + m.x * w, y0 + m.y * h, 3, 0, Math.PI * 2); ctx.fill(); });
+123: const arrows = clamp(Math.round(q.p / 45), 2, 10);
+125: const yy = y0 + 36 + i * (h - 72) / Math.max(1, arrows - 1);
+144: const a = Math.PI - clamp(q.p / 1250, 0, 1) * Math.PI;
+149: ctx.lineTo(cx + 46 * Math.cos(a), cy + 14 - 46 * Math.sin(a));
+172: const V = 0.4 + i / 80 * 1.6;
+173: const p = q.C / V;
+174: const x = x0 + (V - 0.4) / 1.6 * w;
+175: const y = y0 - clamp(p / 1250, 0, 1) * h;
+180: const px = x0 + (q.V - 0.4) / 1.6 * w;
+181: const py = y0 - clamp(q.p / 1250, 0, 1) * h;
+189: ctx.fillText('p-V 图像/数据记录：同一条等温线上 pV=常量', x0 + w / 2, y0 + 28);
+192: const q = values();
+193D: els.volVal.textContent = q.V.toFixed(2);
+194D: els.tempVal.textContent = q.T.toFixed(0);
+207: `<div id="r1">p=C/V≈${q.p.toFixed(1)}</div>`,
+208: `<div id="r2">pV≈${(q.p * q.V).toFixed(1)}，C=nRT≈${q.C.toFixed(1)}</div>`,
+209: `<div id="r3">当前 V=${q.V.toFixed(2)} L，T=${q.T.toFixed(0)} K</div>`,
+210: `<div id="r4">玻意耳定律：一定量、等温时 p1V1=p2V2</div>`
+212D: els.status.textContent = '同一条等温线上 pV 保持常量；改变 T 会换到另一条等温线。';
+215D: els.recordRows.innerHTML = state.records.slice(-5).map((p, i) =>
+221: const x = (ev.clientX - rect.left) * c.width / rect.width;
+222: const V = clamp((x - 54 - 140) / 330 * 2, 0.4, 2);
+228: const dt = Math.min(0.05, (ts - state.last) / 1000);
+230: const q = values();
+234: els.vol.value = clamp(1.2 + 0.55 * Math.sin(state.time * 1.15), 0.4, 2).toFixed(2);
+244D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+247: const q = values();
+
+===== anim/xb3/capillary.html (51 lines, kept 25) =====
+14: <div class="stage"><canvas id="canvas" width="920" height="610" aria-label="毛细现象实验台装置：水槽和细玻璃管侧视图、接触角剖面、液柱高度刻度尺、h-r图像和数据记录"></canvas></div>
+16: <div class="card task"><b>观察任务：</b>直接拖动细管宽度手柄和接触角手柄，看浸润液体在细管中上升、不浸润液体下降；管径越小，毛细升降越明显。</div>
+18: <div class="title">调毛细管</div>
+19: <label class="param"><span>管半径 r <b id="rLabel">0.50 mm</b></span><input id="radius" type="range" min="0.15" max="1.5" step="0.05" value="0.5"></label>
+20: <label class="param"><span>接触角 θ <b id="thLabel">35°</b></span><input id="theta" type="range" min="10" max="150" step="5" value="35"></label>
+21: <label class="param"><span>表面张力 σ <b id="sLabel">0.072 N/m</b></span><input id="sigma" type="range" min="0.03" max="0.09" step="0.002" value="0.072"></label>
+22: <div class="buttons"><button id="play">暂停</button><button id="record">记录数据</button></div>
+24: <div class="readout" id="readout"></div>
+24D: <div class="readout" id="readout"></div>
+25: <div class="card"><div class="title">数据记录</div><table><thead><tr><th>r/mm</th><th>θ</th><th>h/cm</th><th>类型</th></tr></thead><tbody id="rows"></tbody></table></
+26: <div class="card formula"><div class="title">公式与图像</div><div>近似关系：h=2σcosθ/(ρgr)。</div><div>θ&lt;90° 为浸润，上升；θ&gt;90° 为不浸润，下降。</div><div>r 越小，|h| 越大。</div></div>
+26D: <div class="card formula"><div class="title">公式与图像</div><div>近似关系：h=2σcosθ/(ρgr)。</div><div>θ&lt;90° 为浸润，上升；θ&gt;90° 为不浸润，下降。</div><div>r 越小，|h| 越大。</div></div>
+27: <div class="status" id="status"></div>
+35: const C={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',green:'#087f5b',gold:'#f0a500',purple:'#7c3aed'};
+37: function p(){const r=+els.radius.value,theta=+els.theta.value,sigma=+els.sigma.value,cos=Math.cos(theta*Math.PI/180),h=2*sigma*cos/(1000*9.8*r*1e-3);return{r,th
+38: function box(x,y,w,h,f='#fff',s='#d9e2ec'){ctx.save();ctx.fillStyle=f;ctx.strokeStyle=s;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.res
+39: function draw(){const q=p();ctx.clearRect(0,0,920,610);box(34,34,852,528,'#fff');text('毛细现象：表面张力、接触角与管径共同决定液柱升降',460,60,C.ink,'center',17,'900');drawTube(q);dra
+40: function drawTube(q){box(70,96,470,330,'#fbfdff');text('水槽与细玻璃管侧视实验台 + 刻度尺读数',305,120,C.muted,'center',12,'800');const baseY=332,cx=285,tubeW=26+q.r*42,hpx=Math
+41: function drawAngle(q){box(585,96,262,160,'#fff');text('接触角剖面：θ 决定浸润/不浸润',716,120,C.ink,'center',13,'900');const cx=716,cy=190;line(cx-80,cy,cx+80,cy,'#9fb3c8',3
+42: function drawGraph(q){box(585,282,262,174,'#fff');text('h-r 图像记录：r 越小 |h| 越大',716,306,C.ink,'center',13,'900');const x0=622,y0=420,w=190,h=86;line(x0,y0,x0+w,y0
+43: function drawHandles(q){box(112,458,420,76,'#fff');text('画面内可拖动：管径手柄 / 接触角手柄',322,478,C.ink,'center',13,'900');line(154,506,308,506,'#d9e2ec',9);line(350,506,49
+44: function update(q){els.rLabel.textContent=q.r.toFixed(2)+' mm';els.thLabel.textContent=q.theta+'°';els.sLabel.textContent=q.sigma.toFixed(3)+' N/m';els.readout.
+45: function record(){const q=p();S.records.push({r:q.r.toFixed(2),t:q.theta,h:q.cm.toFixed(1),k:q.theta<90?'上升':'下降'});if(S.records.length>8)S.records.shift();upda
+46: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}function res
+49: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/xb3/charles-law.html (265 lines, kept 46) =====
+32: <canvas id="c" width="740" height="540" aria-label="查理定律实验台：等容硬质容器侧视、温度计、压力表、p-T图像和数据记录"></canvas>
+35: <button id="playBtn" class="primary" type="button">播放</button>
+36: <button id="recordBtn" type="button">记录</button>
+37: <button id="resetBtn" type="button">重置</button>
+39: <label for="temp">热力学温度 T/K：<span id="tempVal"></span></label>
+41: <label for="amount">物质的量 n/mol：<span id="amountVal"></span></label>
+43: <div id="readout" class="readout"></div>
+43D: <div id="readout" class="readout"></div>
+44: <div id="status" class="status"></div>
+45: <div class="hint">观察任务：拖动画面里的温度计改变 T；固定 n 时，把 T 从 300K 到 600K，看压力表 p 是否约加倍，并注意不能用 ℃ 直接成比例。</div>
+48: <tbody id="recordRows"></tbody>
+54: const c = document.getElementById('c');
+69: const state = { running: false, last: 0, time: 0, drag: null, records: [] };
+72: const T = Number(els.temp.value);
+74: const p = n * T;
+75: return { T, n, p, k: p / T, celsius: T - 273.15, speed: Math.sqrt(T / 300), count: Math.round(24 + n * 24) };
+84: m.x += Math.cos(m.a) * q.speed * 96 * dt;
+85: m.y += Math.sin(m.a) * q.speed * 96 * dt;
+86: if (m.x < 72 || m.x > 414) { m.a = Math.PI - m.a; m.x = clamp(m.x, 72, 414); }
+91: const a = Math.atan2(y2 - y1, x2 - x1);
+101: ctx.lineTo(x2 - 9 * Math.cos(a - 0.45), y2 - 9 * Math.sin(a - 0.45));
+102: ctx.lineTo(x2 - 9 * Math.cos(a + 0.45), y2 - 9 * Math.sin(a + 0.45));
+115: mol.forEach(m => { ctx.beginPath(); ctx.arc(m.x, m.y, 3, 0, Math.PI * 2); ctx.fill(); });
+116: const arrows = clamp(Math.round(q.p / 140), 2, 10);
+118: const yy = 118 + i * 230 / Math.max(1, arrows - 1);
+143: const fill = clamp((q.T - 200) / 500, 0, 1) * 70;
+169: const px = x0 + (q.T - 200) / 500 * w;
+170: const py = y0 - clamp(q.p / (2.5 * 700), 0, 1) * h;
+178: ctx.fillText('p-T(K) 图像/数据记录：等容一定量时 p/T=常量', x0 + w / 2, y0 + 28);
+181: const q = values();
+182D: els.tempVal.textContent = q.T.toFixed(0);
+183D: els.amountVal.textContent = q.n.toFixed(2);
+195: `<div id="r1">p=nRT/V≈${q.p.toFixed(1)}</div>`,
+196: `<div id="r2">p/T≈${q.k.toFixed(2)}，nR/V≈${q.n.toFixed(2)}</div>`,
+197: `<div id="r3">T=${q.T.toFixed(0)} K，摄氏温度 t≈${q.celsius.toFixed(1)} ℃</div>`,
+198: `<div id="r4">查理定律：一定量、等容时 p1/T1=p2/T2</div>`
+200D: els.status.textContent = '正比例关系是 p 与热力学温度 T(K)，不是 p 与摄氏温度 t(℃)。';
+203D: els.recordRows.innerHTML = state.records.slice(-5).map((p, i) =>
+209: const y = (ev.clientY - rect.top) * c.height / rect.height;
+210: const T = clamp(700 - (y - 80) / 126 * 500, 200, 700);
+211: els.temp.value = String(Math.round(T / 10) * 10);
+216: const dt = Math.min(0.05, (ts - state.last) / 1000);
+218: const q = values();
+222: els.temp.value = String(Math.round((450 + 180 * Math.sin(state.time * 1.1)) / 10) * 10);
+232D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+235: const q = values();
+
+===== anim/xb3/crystal-amorphous.html (287 lines, kept 42) =====
+33: <canvas id="c" width="740" height="540" aria-label="晶体与非晶体实验台：微观结构俯视、加热曲线图像、温度计和数据记录"></canvas>
+36: <button id="playBtn" class="primary" type="button">播放</button>
+37: <button id="recordBtn" type="button">记录</button>
+38: <button id="resetBtn" type="button">重置</button>
+41: <button id="crystalBtn" class="active" type="button">晶体</button>
+42: <button id="amorphousBtn" type="button">非晶体</button>
+44: <label for="heat">加热进度：<span id="heatVal"></span></label>
+48: <div id="readout" class="readout"></div>
+48D: <div id="readout" class="readout"></div>
+49: <div id="status" class="status"></div>
+50: <div class="hint">观察任务：拖动加热曲线上的红点，比较晶体是否出现熔化平台；切换非晶体，看它是否没有固定熔点而是逐渐软化。</div>
+53: <tbody id="recordRows"></tbody>
+59: const c = document.getElementById('c');
+75: const state = { type: 'crystal', running: false, last: 0, time: 0, drag: null, records: [] };
+96: const T = tempAt(heat, state.type);
+112: const disorder = state.type === 'crystal' ? (100 - v.grain) / 100 : 0.75;
+115: const jitterX = Math.sin(i * 2.1 + j * 1.7) * 22 * disorder;
+116: const jitterY = Math.cos(i * 1.6 - j * 2.4) * 20 * disorder;
+117: const x = 92 + i * 45 + jitterX;
+118: const y = 150 + j * 42 + jitterY;
+126: ctx.arc(x, y, 13 + Math.sin(state.time * 6 + i + j) * 2, 0, Math.PI * 2);
+136: const T = tempAt(heat, type);
+137: const x = x0 + heat / 100 * w;
+138: const y = y0 - clamp((T + 30) / 160, 0, 1) * h;
+163: for (let q = 0; q <= 100; q += 2) {
+187: const fill = clamp((v.T + 30) / 160, 0, 1) * (w - 40);
+194: ctx.fillText('T=' + v.T.toFixed(0) + '℃，' + v.phase, x + w / 2, y + 70);
+198D: els.heatVal.textContent = v.heat.toFixed(0) + '%';
+199D: els.grainVal.textContent = v.grain.toFixed(0) + '%';
+213: `<div id="r1">材料：${state.type === 'crystal' ? '晶体' : '非晶体'}</div>`,
+214: `<div id="r2">吸热进度=${v.heat.toFixed(0)}%，温度 T≈${v.T.toFixed(0)}℃</div>`,
+215: `<div id="r3">状态：${v.phase}</div>`,
+216: `<div id="r4">判断：晶体有固定熔点平台；非晶体无固定熔点</div>`
+218D: els.status.textContent = state.type === 'crystal'
+223D: els.recordRows.innerHTML = state.records.slice(-5).map((p, i) =>
+229: const x = (ev.clientX - rect.left) * c.width / rect.width;
+230: const heat = clamp((x - 436) / 250 * 100, 0, 100);
+231: els.heat.value = String(Math.round(heat));
+235: const dt = Math.min(0.05, (ts - state.last) / 1000);
+239: const next = (Number(els.heat.value) + dt * 18) % 101;
+240: els.heat.value = String(Math.round(next));
+250D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+
+===== anim/xb3/diffusion-brownian.html (53 lines, kept 26) =====
+14: <div class="stage"><canvas id="canvas" width="920" height="610" aria-label="扩散与布朗运动实验台装置：液体显微镜俯视图、染料扩散剖面、花粉颗粒轨迹、温度计和均方位移图像记录"></canvas></div>
+16: <div class="card task"><b>观察任务：</b>直接拖动花粉颗粒或温度手柄，看液体分子无规则碰撞如何造成布朗运动；升温后染料扩散更快、花粉轨迹更乱。</div>
+18: <div class="title">调微观运动</div>
+19: <label class="param"><span>温度 T <b id="tLabel">300 K</b></span><input id="temp" type="range" min="260" max="420" step="5" value="300"></label>
+20: <label class="param"><span>花粉半径 r <b id="rLabel">3.0 μm</b></span><input id="radius" type="range" min="1" max="8" step="0.5" value="3"></label>
+21: <label class="param"><span>染料浓度差 <b id="cLabel">80%</b></span><input id="conc" type="range" min="10" max="100" step="5" value="80"></label>
+22: <div class="buttons"><button id="play">暂停</button><button id="record">记录状态</button></div>
+24: <div class="readout" id="readout"></div>
+24D: <div class="readout" id="readout"></div>
+25: <div class="card"><div class="title">记录本</div><table><thead><tr><th>T</th><th>r</th><th>扩散</th><th>抖动</th></tr></thead><tbody id="rows"></tbody></table></div>
+26: <div class="card formula"><div class="title">公式与图像</div><div>温度是分子平均动能的标志。</div><div>布朗运动来自液体分子对悬浮颗粒的不平衡碰撞。</div><div>扩散是大量粒子无规则运动导致的宏观混合。</div></div>
+27: <div class="status" id="status"></div>
+35: const C={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',green:'#087f5b',gold:'#f0a500',purple:'#7c3aed'};
+37: function p(){const T=+els.temp.value,r=+els.radius.value,c=+els.conc.value/100;return{T,r,c,thermal:(T-260)/160,diff:(T/300)*c/r,brown:(T/300)/Math.sqrt(r)}}
+38: function init(){if(S.dye.length)return;for(let i=0;i<160;i++)S.dye.push({x:105+Math.random()*80,y:140+Math.random()*210,vx:0,vy:0});for(let i=0;i<80;i++)S.mol.p
+39: function box(x,y,w,h,f='#fff',s='#d9e2ec'){ctx.save();ctx.fillStyle=f;ctx.strokeStyle=s;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.res
+40: function step(q){if(!S.run||S.drag)return;S.dye.forEach((d,i)=>{const k=q.diff*(.5+((i*37)%100)/100);d.x+=(-.5+Math.random())*k*2.2+q.diff*.34;d.y+=(-.5+Math.ra
+41: function draw(){const q=p();init();step(q);ctx.clearRect(0,0,920,610);box(34,34,852,528,'#fff');text('扩散、布朗运动与温度：大量分子的无规则运动',460,60,C.ink,'center',17,'900');dra
+42: function drawMicro(q){box(68,96,420,280,'#fbfdff');text('显微镜俯视实验台：液体分子碰撞花粉颗粒',278,120,C.muted,'center',12,'800');ctx.fillStyle='rgba(44,123,229,.07)';ctx.fillRe
+43: function drawDiff(q){box(530,96,318,178,'#fff');text('染料扩散剖面：浓度梯度逐渐变平',689,120,C.ink,'center',13,'900');const x0=566,y0=232,w=240,h=80;line(x0,y0,x0+w,y0,'#9fb3
+44: function drawGraph(q){box(530,300,318,176,'#fff');text('布朗轨迹与均方位移记录',689,324,C.ink,'center',13,'900');const x0=566,y0=438,w=240,h=82;line(x0,y0,x0+w,y0,'#9fb3c8
+45: function drawTemp(q){box(110,410,382,84,'#fff');text('画面内可拖动温度手柄',300,430,C.ink,'center',13,'900');line(160,466,430,466,'#d9e2ec',9);const hx=160+(q.T-260)/160*
+46: function update(q){els.tLabel.textContent=q.T+' K';els.rLabel.textContent=q.r.toFixed(1)+' μm';els.cLabel.textContent=Math.round(q.c*100)+'%';els.readout.innerH
+47: function record(){const q=p();S.records.push({T:q.T,r:q.r.toFixed(1),d:q.diff.toFixed(2),b:q.brown.toFixed(2)});if(S.records.length>8)S.records.shift();update(q
+48: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}function set
+51: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/xb3/energy-conservation-thermal.html (61 lines, kept 22) =====
+21: <canvas id="c" width="940" height="640" aria-label="能量守恒实验台：能量流、分流阀、仪表、账本图像和数据记录"></canvas>
+23: <div class="row"><button id="playBtn" class="play-btn">播放</button><button id="resetBtn" class="secondary">重置</button><button id="recordBtn" class="secondary">记录
+24: <label for="input">输入能量 Ein/J：<span id="inputVal"></span></label><input id="input" type="range" min="200" max="2000" step="50" value="1000">
+25: <label for="useful">有用输出比例：<span id="usefulVal"></span></label><input id="useful" type="range" min="0" max="120" step="1" value="32">
+26: <label for="internal">内能增加比例：<span id="internalVal"></span></label><input id="internal" type="range" min="0" max="120" step="1" value="18">
+27: <div id="readout" class="readout"></div><div id="status" class="status"></div>
+27D: <div id="readout" class="readout"></div><div id="status" class="status"></div>
+28: <div class="hint">观察任务：拖动画面里的输入能量包或分流阀，看有用输出、内能增加、散失能量怎样闭合成同一个账本。</div>
+29: <table><thead><tr><th>记录</th><th>Ein</th><th>输出+储存</th><th>散失</th></tr></thead><tbody id="recordBody"><tr><td colspan="4">点击“记录”保存一次能量账本</td></tr></tbody></tabl
+38: function params(){const Ein=+els.input.value,use=+els.useful.value/100,u=+els.internal.value/100,Euse=Ein*use,DU=Ein*u,Eloss=Ein-Euse-DU,ok=Eloss>=-1e-9;return{
+40: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo
+44: function drawFlow(p){const sx=128,sy=250;ctx.fillStyle='#fff7e6';ctx.strokeStyle=dragMode==='input'?'#e03131':'#f0a500';ctx.lineWidth=3;ctx.fillRect(sx-54,sy-40
+46: function energyDots(p,x1,y1,x2){if(!playing)return;for(let i=0;i<10;i++){const u=(t*0.65+i/10)%1;ctx.fillStyle=['#f0a500','#38b2ac','#2c7be5','#e03131'][i%4];ct
+47: function drawGraph(p){const x=graph.x,y=graph.y,w=graph.w,h=graph.h;ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1;ctx.fillRect(x,y,w,h);ctx.
+48: function bar(x,y,w,h,val,max,c,txt){ctx.fillStyle='#e9eef5';ctx.fillRect(x,y,w,h);ctx.fillStyle=c;ctx.fillRect(x,y+h-Math.max(0,val)/max*h,w,Math.max(0,val)/max
+49: function drawLedger(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(610,354,260,176);ctx.strokeRect(610,354,260,176);label('账本检查/公式绑定',740,378
+51: function handle(x,y,w,val,min,max,c,name){ctx.strokeStyle='#d9e2ec';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+w,y);ctx.stroke();const hx=x+(v
+52: function update(p){els.inputVal.textContent=p.Ein+' J';els.usefulVal.textContent=Math.round(p.use*100)+'%';els.internalVal.textContent=Math.round(p.u*100)+'%';e
+54: function animate(now){if(!last)last=now;const dt=Math.min(.04,(now-last)/1000);last=now;if(playing)t+=dt;render();requestAnimationFrame(animate)}
+55: function setFromPointer(e){const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width;if(dragMode==='input'){const val=200+(Math.max(118,M
+56: canvas.addEventListener('pointerdown',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.h
+57: els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textContent=playing?'暂停':'播放'});els.resetBtn.addEventListener('click',()=>{playing=false;
+
+===== anim/xb3/first-law.html (72 lines, kept 22) =====
+30: <canvas id="c" width="940" height="640" aria-label="热力学第一定律实验台：气缸装置、p-V图像、能量账本和数据记录"></canvas>
+32: <div class="row"><button id="playBtn" class="play-btn">播放</button><button id="resetBtn" class="secondary">重置</button><button id="recordBtn" class="secondary">记录
+33: <label for="heat">热量 Q/J：<span id="heatVal"></span></label><input id="heat" type="range" min="-800" max="1000" step="50" value="500">
+34: <label for="work">外界对系统做功 W/J：<span id="workVal"></span></label><input id="work" type="range" min="-800" max="1000" step="50" value="200">
+35: <label for="volume">活塞位置 V/L：<span id="volumeVal"></span></label><input id="volume" type="range" min="1.0" max="4.0" step="0.1" value="2.4">
+36: <div id="readout" class="readout"></div><div id="status" class="status"></div>
+36D: <div id="readout" class="readout"></div><div id="status" class="status"></div>
+37: <div class="hint">观察任务：拖动画面里的活塞或红蓝能量手柄，看气缸、p-V 面积、内能槽和 ΔU=Q+W 读数如何同步变化。</div>
+38: <table><thead><tr><th>记录</th><th>Q</th><th>W</th><th>ΔU</th></tr></thead><tbody id="recordBody"><tr><td colspan="4">点击“记录”保存一次能量账本</td></tr></tbody></table>
+47: function params(){const Q=+els.heat.value,W=+els.work.value,V=+els.volume.value,dU=Q+W;const P=Math.max(.45,3.2/V+(W>0?0.28:-0.08));return{Q,W,V,dU,P,temp:300+d
+49: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo
+53: const pistonX=cyl.x+82+(p.V-1)/3*210;ctx.fillStyle='#eef4ff';ctx.strokeStyle='#334e68';ctx.lineWidth=3;ctx.fillRect(cyl.x,cyl.y,cyl.w,cyl.h);ctx.strokeRect(cyl.
+56: ctx.fillStyle='#102a43';label(`压力表 p≈${p.P.toFixed(2)} atm`,222,142,'#102a43',13);label(`体积 V=${p.V.toFixed(1)} L`,222,164,'#102a43',13);label(`温度读数 T≈${Math.ma
+57: function drawMolecules(p){const pistonX=cyl.x+82+(p.V-1)/3*210;const count=22;for(let i=0;i<count;i++){const a=i*2.399+t*(playing?1.8:.2),rx=(pistonX-cyl.x-40)*
+58: function drawGraph(p){const x=graph.x,y=graph.y,w=graph.w,h=graph.h;ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1;ctx.fillRect(x,y,w,h);ctx.
+59: function drawLedger(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(610,338,260,190);ctx.strokeRect(610,338,260,190);label('能量账本/仪器读数',740,362
+60: function meter(x,y,w,h,val,c,txt){label(txt,x,y-12,c,12,'left');ctx.fillStyle='#e9eef5';ctx.fillRect(x,y,w,h);ctx.fillStyle=c;ctx.fillRect(x,y,w*val,h)}
+62: function handle(x,y,w,val,min,max,c,name){ctx.strokeStyle='#d9e2ec';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+w,y);ctx.stroke();const hx=x+(v
+65: function animate(now){if(!last)last=now;const dt=Math.min(.04,(now-last)/1000);last=now;if(playing)t+=dt;render();requestAnimationFrame(animate)}
+66: function setFromPointer(e){const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.height;if(dragMo
+67: canvas.addEventListener('pointerdown',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.h
+68: els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textContent=playing?'暂停':'播放'});els.resetBtn.addEventListener('click',()=>{playing=false;
+
+===== anim/xb3/fundamental-interactions.html (52 lines, kept 24) =====
+14: <div class="stage"><canvas id="canvas" width="920" height="610" aria-label="四种基本相互作用实验台装置：多视角俯视场景、侧视尺度滑条、宇宙到原子核尺度、引力电磁强弱相互作用卡片、粒子场景图、强度尺度图像和数据记录"></canvas></div
+16: <div class="card task"><b>观察任务：</b>直接拖动尺度探针，从星系、日常物体、原子到原子核，观察主导相互作用如何变化，并比较作用对象、范围和相对强度。</div>
+18: <div class="title">调观察尺度</div>
+19: <label class="param"><span>尺度 log10(m) <b id="scaleLabel">-15</b></span><input id="scale" type="range" min="-18" max="22" step="1" value="-15"></label>
+20: <label class="param"><span>电荷/质量情境 <b id="chargeLabel">60%</b></span><input id="charge" type="range" min="0" max="100" step="1" value="60"></label>
+21: <div class="buttons"><button id="play">暂停</button><button id="record">记录判断</button></div>
+23: <div class="readout" id="readout"></div>
+23D: <div class="readout" id="readout"></div>
+24: <div class="card"><div class="title">判断记录</div><table><thead><tr><th>尺度</th><th>主导</th><th>对象</th><th>范围</th></tr></thead><tbody id="rows"></tbody></table></div
+25: <div class="card formula"><div class="title">框架</div><div>引力：所有有质量物体，长程，宏观天体明显。</div><div>电磁：带电粒子，长程，原子分子和电路重要。</div><div>强相互作用：束缚夸克和核子，短程，原子核内强。</div><div>弱相互作
+26: <div class="card formula"><div class="title">公式绑定</div><div>长程对比：F=Gm1m2/r²，F=kq1q2/r²。</div><div>短程判断：强/弱相互作用只在核尺度附近显著。</div></div>
+26D: <div class="card formula"><div class="title">公式绑定</div><div>长程对比：F=Gm1m2/r²，F=kq1q2/r²。</div><div>短程判断：强/弱相互作用只在核尺度附近显著。</div></div>
+27: <div class="status" id="status"></div>
+35: const C={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',green:'#087f5b',gold:'#f0a500',purple:'#7c3aed'};
+37: function p(){const s=+els.scale.value,c=+els.charge.value/100;let dom='电磁相互作用',obj='带电粒子/原子分子',range='长程';if(s>8){dom='引力相互作用';obj='天体/有质量物体';range='长程'}else if
+38: function box(x,y,w,h,f='#fff',st='#d9e2ec'){ctx.save();ctx.fillStyle=f;ctx.strokeStyle=st;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.r
+39: function draw(){const q=p();ctx.clearRect(0,0,920,610);box(34,34,852,528,'#fff');text('四种基本相互作用：对象、强度、作用范围与尺度',460,60,C.ink,'center',17,'900');drawScale(q);draw
+40: function drawScale(q){box(80,420,520,110,'#fff');text('画面内可拖动尺度探针：从原子核到宇宙',340,444,C.ink,'center',13,'900');line(126,486,552,486,'#d9e2ec',9);const x=126+(q.s+1
+41: function drawScene(q){box(70,96,500,288,'#fbfdff');text('多视角俯视/侧视尺度场景图：当前主导 '+q.dom,320,120,C.muted,'center',12,'800');const cx=320,cy=242;if(q.dom.includes('引力
+43: function drawGraph(q){box(610,366,250,164,'#fff');text('尺度-主导作用图像',735,390,C.ink,'center',13,'900');const x0=642,y0=488,w=182,h=74;line(x0,y0,x0+w,y0,'#9fb3c8',
+44: function update(q){els.scaleLabel.textContent=q.s;els.chargeLabel.textContent=Math.round(q.c*100)+'%';els.readout.innerHTML='当前主导：<b>'+q.dom+'</b><br>作用对象：<b>'+
+45: function record(){const q=p();S.records.push({s:'10^'+q.s,d:q.dom.replace('相互作用',''),o:q.obj,r:q.range});if(S.records.length>8)S.records.shift();update(q)}
+46: [els.scale,els.charge].forEach(el=>el.addEventListener('input',draw));els.play.onclick=()=>{S.run=!S.run;els.play.textContent=S.run?'暂停':'播放'};els.record.onclic
+50: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/xb3/gas-law.html (129 lines, kept 40) =====
+7: <link rel="stylesheet" href="../common/controls.css">
+27: <canvas id="canvas" width="660" height="330" aria-label="理想气体实验台：气缸剖面、活塞拖动、温度表、p-V图像和数据记录"></canvas>
+29: <span class="r">体积 V = <b id="v-v">1.0</b></span>
+30: <span class="r">温度 T = <b id="t-v">300</b> K</span>
+31: <span class="r">压强 p = nRT/V = <b id="p-v">—</b></span>
+32: <span class="r">pV/T = <b id="k-v">—</b>（守恒）</span>
+35: <label>体积 V = <span id="v-d">1.0</span>
+36: <input type="range" id="v" min="0.4" max="2.0" step="0.05" value="1"></label>
+37: <label>温度 T = <span id="t-d">300</span> K
+38: <input type="range" id="t" min="150" max="600" step="10" value="300"></label>
+39: <button id="play-btn">暂停</button>
+40: <button id="reset-btn">重置</button>
+43: <p><b>观察任务</b>：气缸里封闭一定量理想气体。拖<b>体积 V</b> 变小（压缩活塞）→分子撞壁更频繁→压强 p 变大（等温时 pV=常量，玻意耳定律）；拖<b>温度 T</b> 升高→分子跑得更快撞得更猛→p 变大（等容时 p/T=常量，查理定律）。无论怎么拖，右上角 <b>pV/T 始终不变</b>（理
+52: const nR=1; // p = nRT/V (normalized)
+55: function init(){mol=[];for(let i=0;i<N;i++){const a=Math.random()*Math.PI*2;mol.push({x:Math.random(),y:Math.random(),ang:a});}}
+59: const sp=Math.sqrt(T/300)*1.1;
+60: for(const m of mol){m.x+=Math.cos(m.ang)*sp*dt; m.y+=Math.sin(m.ang)*sp*dt;
+61: if(m.x<0.02){m.ang=Math.PI-m.ang;m.x=0.02;} if(m.x>0.98){m.ang=Math.PI-m.ang;m.x=0.98;}
+75: for(const m of mol){const mx=cylX+m.x*(pistX-cylX);const my=cylTop+m.y*(cylBot-cylTop);ctx.beginPath();ctx.arc(mx,my,3,0,Math.PI*2);ctx.fill();}
+80: ctx.fillStyle='#2c7be5';ctx.beginPath();ctx.arc(pistX+7,cylBot+22,10,0,Math.PI*2);ctx.fill();
+85: const na=Math.round(2+p()*2.2);
+86: for(let i=0;i<na;i++){const yy=cylTop+20+i*(cylBot-cylTop-40)/Math.max(1,na-1);
+93: const px=gx0 + (V/2.0)*gW; const py=gBot - (p()/ (nR*600/0.4))*(gBot-gTop);
+94: ctx.fillStyle='#e8590c';ctx.beginPath();ctx.arc(px,Math.max(gTop,py),5,0,Math.PI*2);ctx.fill();
+96: ctx.fillText('公式读数：p=nRT/V，pV/T = '+ (p()*V/T).toFixed(4)+'（常量）',gx0-6,gBot+30);
+96D: ctx.fillText('公式读数：p=nRT/V，pV/T = '+ (p()*V/T).toFixed(4)+'（常量）',gx0-6,gBot+30);
+98: const tx=382,ty=64,th=170,fillH=(T-150)/(600-150)*th;
+103: ctx.fillStyle='#e03131';ctx.beginPath();ctx.arc(tx+12,ty+th-fillH,10,0,Math.PI*2);ctx.fill();
+106D: document.getElementById('v-v').textContent=V.toFixed(2);
+107D: document.getElementById('t-v').textContent=T;
+108D: document.getElementById('p-v').textContent=p().toFixed(2);
+109: document.getElementById('k-v').textContent=(p()*V/T).toFixed(4);
+109D: document.getElementById('k-v').textContent=(p()*V/T).toFixed(4);
+112D: bind('v',x=>{V=x;document.getElementById('v-d').textContent=x.toFixed(2);});
+113D: bind('t',x=>{T=x;document.getElementById('t-d').textContent=x;});
+114: function pointerPos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
+115: canvas.addEventListener('pointerdown',e=>{const m=pointerPos(e),px=pistonX();const tx=382,ty=64,th=170,fillH=(T-150)/(600-150)*th;if(Math.hypot(m.x-(px+7),m.y-(
+116: canvas.addEventListener('pointermove',e=>{const m=pointerPos(e);if(!drag){canvas.style.cursor='grab';return;}if(drag==='V'){V=Math.max(.4,Math.min(2,(m.x-cylX)/
+119D: document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
+123: function loop(now){const dt=Math.min((now-last)/1000,0.03);last=now;if(running)step(dt);draw();requestAnimationFrame(loop);}
+
+===== anim/xb3/gas-state-parameters.html (290 lines, kept 53) =====
+32: <canvas id="c" width="740" height="540" aria-label="气体状态参量实验台：气缸侧视、压力表、状态表图像和数据记录"></canvas>
+35: <button id="playBtn" class="primary" type="button">播放</button>
+36: <button id="recordBtn" type="button">记录</button>
+37: <button id="resetBtn" type="button">重置</button>
+39: <label for="vol">体积 V/m³：<span id="volVal"></span></label>
+41: <label for="temp">温度 T/K：<span id="tempVal"></span></label>
+43: <label for="amount">物质的量 n/mol：<span id="amountVal"></span></label>
+45: <div id="readout" class="readout"></div>
+45D: <div id="readout" class="readout"></div>
+46: <div id="status" class="status"></div>
+47: <div class="hint">观察任务：直接拖动气缸活塞改变 V；保持 n 不变时看 pV/T 是否保持 nR，改变 n 时看状态表怎样一起变化。</div>
+50: <tbody id="recordRows"></tbody>
+56: const c = document.getElementById('c');
+72: const R = 8.31;
+74: const state = { running: false, last: 0, time: 0, drag: null, records: [] };
+78: const T = Number(els.temp.value);
+80: const p = n * R * T / V;
+81: return { V, T, n, p, invV: 1 / V, k: p * V / T, count: Math.round(20 + n * 26), speed: Math.sqrt(T / 300) };
+90: m.x += Math.cos(m.a) * dt * 0.34 * q.speed;
+91: m.y += Math.sin(m.a) * dt * 0.34 * q.speed;
+92: if (m.x < 0.04 || m.x > 0.96) { m.a = Math.PI - m.a; m.x = clamp(m.x, 0.04, 0.96); }
+97: const a = Math.atan2(y2 - y1, x2 - x1);
+107: ctx.lineTo(x2 - 9 * Math.cos(a - 0.45), y2 - 9 * Math.sin(a - 0.45));
+108: ctx.lineTo(x2 - 9 * Math.cos(a + 0.45), y2 - 9 * Math.sin(a + 0.45));
+113: const x0 = 54, y0 = 96, h = 286, w = 150 + q.V / 2 * 330;
+133: const arrows = clamp(Math.round(q.p / 850), 2, 10);
+135: const yy = y0 + 36 + i * (h - 72) / Math.max(1, arrows - 1);
+154: const a = Math.PI - clamp(q.p / 8000, 0, 1) * Math.PI;
+159: ctx.lineTo(cx + 48 * Math.cos(a), cy + 16 - 48 * Math.sin(a));
+182: const V = 0.4 + i / 70 * 1.6;
+183: const p = q.n * R * q.T / V;
+184: const x = x0 + (V - 0.4) / 1.6 * w;
+185: const y = y0 - clamp(p / 8000, 0, 1) * h;
+190: const px = x0 + (q.V - 0.4) / 1.6 * w;
+191: const py = y0 - clamp(q.p / 8000, 0, 1) * h;
+202: const q = values();
+203D: els.volVal.textContent = q.V.toFixed(2);
+204D: els.tempVal.textContent = q.T.toFixed(0);
+205D: els.amountVal.textContent = q.n.toFixed(2);
+217: `<div id="r1">p=nRT/V≈${q.p.toFixed(0)} Pa</div>`,
+218: `<div id="r2">pV/T≈${q.k.toFixed(2)} Pa·m³/K，nR≈${(q.n * R).toFixed(2)}</div>`,
+219: `<div id="r3">状态表：V=${q.V.toFixed(2)} m³，T=${q.T.toFixed(0)} K，n=${q.n.toFixed(2)} mol</div>`,
+220: `<div id="r4">分子点数=${q.count}；温度升高时平均速率比例∝√T</div>`
+222: els.status.textContent = '封闭定量气体 n 不变时，pV/T 保持 nR；若充气或漏气，n 改变，pV/T 也随之改变。';
+222D: els.status.textContent = '封闭定量气体 n 不变时，pV/T 保持 nR；若充气或漏气，n 改变，pV/T 也随之改变。';
+225D: els.recordRows.innerHTML = state.records.slice(-5).map((p, i) =>
+231: const x = (ev.clientX - rect.left) * c.width / rect.width;
+232: const V = clamp((x - 54 - 150) / 330 * 2, 0.4, 2);
+238: const dt = Math.min(0.05, (ts - state.last) / 1000);
+240: const q = values();
+244: const V = 1.2 + 0.45 * Math.sin(state.time * 1.2);
+255D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+258: const q = values();
+
+===== anim/xb3/half-life.html (55 lines, kept 21) =====
+21: <canvas id="c" width="940" height="640" aria-label="半衰期实验台：随机核衰变、计数器、指数曲线、数据记录"></canvas>
+23: <div class="row"><button id="playBtn" class="play-btn">播放</button><button id="resetBtn" class="secondary">重置</button><button id="recordBtn" class="secondary">记录
+24: <label for="n0">初始核数 N0：<span id="n0Val"></span></label><input id="n0" type="range" min="20" max="120" value="80" step="10">
+25: <label for="half">半衰期 T：<span id="halfVal"></span></label><input id="half" type="range" min="1" max="10" value="4" step="1">
+26: <label for="time">经过时间 t：<span id="timeVal"></span></label><input id="time" type="range" min="0" max="30" value="8" step="1">
+27: <div id="readout" class="readout"></div><div id="status" class="status"></div>
+27D: <div id="readout" class="readout"></div><div id="status" class="status"></div>
+28: <div class="hint">观察任务：拖动画面中的时间游标到 T、2T、3T，看剩余比例约为 1/2、1/4、1/8；注意单个核衰变是随机的。</div>
+29: <table><thead><tr><th>记录</th><th>t/T</th><th>剩余</th><th>比例</th></tr></thead><tbody id="recordBody"><tr><td colspan="4">点击“记录”保存一次读数</td></tr></tbody></table>
+37: function ensureSeeds(n){while(seeds.length<n)seeds.push((Math.sin(seeds.length*99.17)*10000)%1);seeds=seeds.slice(0,n)}
+38: function params(){const n0=+els.n0.value,T=+els.half.value,t=+els.time.value;ensureSeeds(n0);const factor=Math.pow(.5,t/T),remain=Math.round(n0*factor);return{n
+40: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo
+42: function drawGrid(p){ctx.fillStyle='#f2f7ff';ctx.strokeStyle='#2c7be5';ctx.lineWidth=2;ctx.fillRect(54,82,500,302);ctx.strokeRect(54,82,500,302);label('样品计数窗：蓝色
+43: function drawGraph(p){const x=610,y=94,w=260,h=230;ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(x,y,w,h);ctx.strokeRect(x,y,w,h);label('图像：N=N
+44: function drawCounters(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(610,356,260,140);ctx.strokeRect(610,356,260,140);label('仪器读数/公式绑定',740,3
+45: function drawHandle(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(70,440,500,132);ctx.strokeRect(70,440,500,132);label('画面内可拖动时间尺',320,464,'
+46: function update(p){els.n0Val.textContent=p.n0;els.halfVal.textContent=p.T;els.timeVal.textContent=p.t;els.readout.innerHTML=[`N0=${p.n0}，T=${p.T}，t=${p.t}`,`t/T
+48: function animate(now){if(!last)last=now;const dt=Math.min(.04,(now-last)/1000);last=now;if(playing){els.time.value=String(Math.min(30,+els.time.value+dt*2.5));i
+49: function dragTime(e){const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width;const t=Math.max(0,Math.min(30,(x-118)/402*30));els.time.v
+50: canvas.addEventListener('pointerdown',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.h
+51: els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textContent=playing?'暂停':'播放'});els.resetBtn.addEventListener('click',()=>{playing=false;
+
+===== anim/xb3/internal-energy.html (252 lines, kept 44) =====
+33: <canvas id="c" width="740" height="540" aria-label="内能实验台：微观分子俯视、分子间距侧视、能量柱图像和数据记录"></canvas>
+36: <button id="playBtn" class="primary" type="button">暂停</button>
+37: <button id="recordBtn" type="button">记录</button>
+38: <button id="resetBtn" type="button">重置</button>
+40: <label for="temp">温度 T/K：<span id="tempVal"></span></label>
+42: <label for="amount">物质的量 n/mol：<span id="amountVal"></span></label>
+44: <label for="dist">分子间距 r/r0：<span id="distVal"></span></label>
+46: <div id="readout" class="readout"></div>
+46D: <div id="readout" class="readout"></div>
+47: <div id="status" class="status"></div>
+48: <div class="hint">观察任务：拖动下方两分子改变 r/r0，看势能柱如何离开 r0 后升高；调高 T 看总动能柱升高，调大 n 看三根能量柱整体增大。</div>
+51: <tbody id="recordRows"></tbody>
+57: const c = document.getElementById('c');
+74: const state = { running: true, last: 0, time: 0, drag: null, records: [] };
+77: const T = Number(els.temp.value);
+80: const kin = n * T / 300;
+81: const pot = n * (Math.pow(r - 1, 2) * 2.2 + Math.max(0, 1 - r) * 1.4);
+83: return { T, n, r, kin, pot, U, speed: Math.sqrt(T / 300), count: Math.round(22 + n * 18) };
+92: m.x += Math.cos(m.a) * q.speed * 82 * dt;
+93: m.y += Math.sin(m.a) * q.speed * 82 * dt;
+94: if (m.x < 60 || m.x > 410) { m.a = Math.PI - m.a; m.x = clamp(m.x, 60, 410); }
+96: if (Math.random() < 0.02) m.a += (Math.random() - 0.5) * 0.8;
+100: const bh = clamp(val / max, 0, 1) * h;
+126: mol.forEach(m => { ctx.beginPath(); ctx.arc(m.x, m.y, 3, 0, Math.PI * 2); ctx.fill(); });
+127: const cx = 238, y = 346, sep = 44 + q.r * 44;
+157: const max = Math.max(3.2, q.U, q.kin, q.pot);
+167: const q = values();
+168D: els.tempVal.textContent = q.T.toFixed(0);
+169D: els.amountVal.textContent = q.n.toFixed(1);
+170D: els.distVal.textContent = q.r.toFixed(2);
+181: `<div id="r1">总动能示意 ∝nT：${q.kin.toFixed(2)}</div>`,
+182: `<div id="r2">分子势能示意：${q.pot.toFixed(2)}</div>`,
+183: `<div id="r3">内能 U=动能+势能≈${q.U.toFixed(2)}</div>`,
+184: `<div id="r4">分子数显示=${q.count} 个点，速率比例≈${q.speed.toFixed(2)}</div>`
+186: els.status.className = Math.abs(q.r - 1) < 0.03 ? 'status' : 'status bad';
+187: els.status.textContent = Math.abs(q.r - 1) < 0.03
+187D: els.status.textContent = Math.abs(q.r - 1) < 0.03
+192D: els.recordRows.innerHTML = state.records.slice(-5).map((p, i) =>
+198: const x = (ev.clientX - rect.left) * c.width / rect.width;
+199: const r = clamp((Math.abs(x - 238) * 2 - 44) / 44, 0.75, 2.2);
+205: const dt = Math.min(0.03, (ts - state.last) / 1000);
+207: const q = values();
+217D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+220: const q = values();
+
+===== anim/xb3/materials-microstructure.html (53 lines, kept 26) =====
+14: <div class="stage"><canvas id="canvas" width="920" height="610" aria-label="材料微观结构实验台装置：液晶分子取向俯视图、半导体能带和载流子图像、纳米尺度剖面、宏观性质数据记录"></canvas></div>
+16: <div class="card task"><b>观察任务：</b>切换液晶、半导体、纳米材料，直接拖动画面里的电场/掺杂/尺度手柄，看微观结构怎样改变透光率、导电性或比表面积。</div>
+18: <div class="title">选择材料情境</div>
+19: <div class="tabs"><button id="lc" class="active">液晶</button><button id="semi">半导体</button><button id="nano">纳米</button></div>
+20: <label class="param"><span>外场/电压 <b id="fieldLabel">45%</b></span><input id="field" type="range" min="0" max="100" step="1" value="45"></label>
+21: <label class="param"><span>温度 <b id="tempLabel">300 K</b></span><input id="temp" type="range" min="260" max="420" step="5" value="300"></label>
+22: <label class="param"><span>掺杂/尺寸 <b id="sizeLabel">30 nm</b></span><input id="size" type="range" min="5" max="100" step="1" value="30"></label>
+23: <div class="buttons"><button id="play">暂停</button><button id="record">记录状态</button></div>
+25: <div class="readout" id="readout"></div>
+25D: <div class="readout" id="readout"></div>
+26: <div class="card"><div class="title">状态记录</div><table><thead><tr><th>材料</th><th>参数</th><th>性质</th><th>判断</th></tr></thead><tbody id="rows"></tbody></table></div
+27: <div class="card formula"><div class="title">公式与图像</div><div>材料性质常由微观结构决定。</div><div>半导体导电性介于导体和绝缘体之间，受掺杂、温度、光照影响。</div><div>纳米材料常因尺度小、比表面积大而表现特殊性质。</div></div>
+28: <div class="status" id="status"></div>
+36: const C={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',green:'#087f5b',gold:'#f0a500',purple:'#7c3aed'};
+38: function p(){const f=+els.field.value/100,T=+els.temp.value,nm=+els.size.value;return{f,T,nm,align:f,trans:.15+.75*f,carrier:(.2+f*1.1)*(T/300),surface:600/nm}}
+39: function box(x,y,w,h,f='#fff',s='#d9e2ec'){ctx.save();ctx.fillStyle=f;ctx.strokeStyle=s;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.res
+40: function draw(){const q=p();ctx.clearRect(0,0,920,610);box(34,34,852,528,'#fff');text('液晶、半导体与纳米材料：微观结构决定宏观性质',460,60,C.ink,'center',17,'900');if(S.mode==='lc')
+41: function drawLC(q){box(70,96,500,320,'#fbfdff');text('液晶显示单元俯视/侧视：电场改变分子取向与透光率',320,120,C.muted,'center',12,'800');const alpha=.12+.5*q.trans;ctx.fillStyle='rgb
+42: function drawSemi(q){box(70,96,500,320,'#fbfdff');text('半导体能带/载流子图像：掺杂或升温增加载流子',320,120,C.muted,'center',12,'800');const x0=126,y0=300,w=360;line(x0,y0,x0+w,y0,
+43: function drawNano(q){box(70,96,500,320,'#fbfdff');text('纳米尺度剖面：尺寸小，比表面积大，表面效应明显',320,120,C.muted,'center',12,'800');const cx=306,cy=246,R=Math.max(22,110-q.nm*.
+44: function drawHandle(q){box(104,444,430,76,'#fff');text('画面内可拖动控制手柄',318,464,C.ink,'center',13,'900');line(150,492,488,492,'#d9e2ec',9);const hx=150+q.f*338;ctx.
+45: function drawPanel(q){box(610,100,230,420,'#fbfdff');text('实物装置 + 图像记录',725,126,C.ink,'center',14,'900');const y=178;ctx.fillStyle='#eef3f8';ctx.strokeStyle='#c
+46: function update(q){els.lc.classList.toggle('active',S.mode==='lc');els.semi.classList.toggle('active',S.mode==='semi');els.nano.classList.toggle('active',S.mode
+47: function record(){const q=p();S.records.push({m:S.mode==='lc'?'液晶':S.mode==='semi'?'半导体':'纳米',p:S.mode==='nano'?q.nm+'nm':Math.round(q.f*100)+'%',v:S.mode==='lc
+48: function mode(m){S.mode=m;record();draw()}els.lc.onclick=()=>mode('lc');els.semi.onclick=()=>mode('semi');els.nano.onclick=()=>mode('nano');[els.field,els.temp,
+51: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/xb3/molecular-force.html (306 lines, kept 40) =====
+33: <canvas id="c" width="740" height="540" aria-label="分子力实验台：两分子俯视、F-r图像、Ep-r图像和数据记录"></canvas>
+36: <button id="playBtn" class="primary" type="button">播放</button>
+37: <button id="recordBtn" type="button">记录</button>
+38: <button id="resetBtn" type="button">重置</button>
+40: <label for="dist">分子间距 r/r0：<span id="distVal"></span></label>
+42: <label for="temp">热扰动强度：<span id="tempVal"></span></label>
+44: <div id="readout" class="readout"></div>
+44D: <div id="readout" class="readout"></div>
+45: <div id="status" class="status"></div>
+46: <div class="hint">观察任务：直接拖动右侧分子改变 r；看 r&lt;r0 时斥力箭头推开、r&gt;r0 时引力箭头拉回，且 Ep 在 r0 附近最小。</div>
+49: <tbody id="recordRows"></tbody>
+55: const c = document.getElementById('c');
+69: const state = { running: false, last: 0, time: 0, velocity: 0, drag: null, records: [] };
+71: function Fof(x) { return 1 / Math.pow(x, 10) - 1 / Math.pow(x, 5); }
+72: function Epof(x) { return (1 / Math.pow(x, 9) / 9 - 1 / Math.pow(x, 4) / 4) * 4; }
+85: const a = Math.atan2(y2 - y1, x2 - x1);
+95: ctx.lineTo(x2 - 10 * Math.cos(a - 0.45), y2 - 10 * Math.sin(a - 0.45));
+96: ctx.lineTo(x2 - 10 * Math.cos(a + 0.45), y2 - 10 * Math.sin(a + 0.45));
+118: const left = x0, right = x0 + v.r * scale;
+139: ctx.fillText('r=' + v.r.toFixed(2) + 'r0', (left + right) / 2, y + 62);
+140: const len = clamp(Math.abs(v.F) * 145, 12, 66);
+173: const xToPix = x => x0 + (x - 0.75) / (2.5 - 0.75) * w;
+190: const py = y0 - h / 2 - clamp(Fof(x) * 75, -105, 105);
+199: const py = y0 - h / 2 - clamp(Epof(x) * 58, -100, 100);
+220D: els.distVal.textContent = v.r.toFixed(2);
+221D: els.tempVal.textContent = v.temp.toFixed(0);
+232: `<div id="r1">r=${v.r.toFixed(2)}r0，合力 F≈${v.F.toFixed(3)}</div>`,
+233: `<div id="r2">状态：${forceLabel(v.F, v.r)}</div>`,
+234: `<div id="r3">分子势能 Ep≈${v.Ep.toFixed(3)}，r=r0 附近最小</div>`,
+235: `<div id="r4">判断口诀：近斥、平衡零、稍远引、很远近似无力</div>`
+237: els.status.className = Math.abs(v.r - 1) < 0.04 ? 'status' : 'status bad';
+238: els.status.textContent = Math.abs(v.r - 1) < 0.04
+238D: els.status.textContent = Math.abs(v.r - 1) < 0.04
+243D: els.recordRows.innerHTML = state.records.slice(-5).map((p, i) =>
+249: const x = (ev.clientX - rect.left) * c.width / rect.width;
+250: const r = clamp((x - 78) / 112, 0.75, 2.5);
+256: const dt = Math.min(0.05, (ts - state.last) / 1000);
+260: const temp = Number(els.temp.value) / 100;
+261: const target = 1 + Math.sin(state.time * (1.4 + temp * 2.2)) * (0.12 + temp * 0.32);
+272D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+
+===== anim/xb3/molecular-motion.html (280 lines, kept 48) =====
+32: <canvas id="c" width="740" height="540" aria-label="分子热运动实验台：显微镜俯视、温度计侧视、速率图像和数据记录"></canvas>
+35: <button id="playBtn" class="primary" type="button">暂停</button>
+36: <button id="recordBtn" type="button">记录</button>
+37: <button id="resetBtn" type="button">重置</button>
+39: <label for="temp">温度 T/K：<span id="tempVal"></span></label>
+41: <label for="size">颗粒大小：<span id="sizeVal"></span></label>
+43: <div id="readout" class="readout"></div>
+43D: <div id="readout" class="readout"></div>
+44: <div id="status" class="status"></div>
+45: <div class="hint">观察任务：拖动红色大颗粒看布朗运动轨迹；拖动温度计改变 T，观察分子平均速率 ∝√T、平均动能 ∝T 和轨迹抖动强弱。</div>
+48: <tbody id="recordRows"></tbody>
+54: const c = document.getElementById('c');
+68: const state = { running: true, last: 0, drag: null, records: [] };
+73: const T = Number(els.temp.value);
+75: return { T, size, speed: Math.sqrt(T / 300), ek: T / 300, brown: Math.sqrt(T / 300) * (12 / size) };
+79: for (let i = 0; i < 72; i++) mol.push({ x: 70 + Math.random() * 315, y: 86 + Math.random() * 298, a: Math.random() * Math.PI * 2 });
+83: const sp = 92 * q.speed;
+85: m.x += Math.cos(m.a) * sp * dt;
+86: m.y += Math.sin(m.a) * sp * dt;
+87: if (m.x < 58 || m.x > 402) { m.a = Math.PI - m.a; m.x = clamp(m.x, 58, 402); }
+89: if (Math.random() < 0.02) m.a += (Math.random() - 0.5) * 0.8;
+91: big.vx += (Math.random() - 0.5) * sp * dt * 5.8 / q.size;
+92: big.vy += (Math.random() - 0.5) * sp * dt * 5.8 / q.size;
+118: mol.forEach(m => { ctx.beginPath(); ctx.arc(m.x, m.y, 3, 0, Math.PI * 2); ctx.fill(); });
+146: const fill = clamp((q.T - 100) / 500, 0, 1) * 68;
+170: const T = 100 + i / 80 * 500;
+171: const x = x0 + (T - 100) / 500 * w;
+172: const y = y0 - clamp(Math.sqrt(T / 300) / 1.45, 0, 1) * h;
+176: const px = x0 + (q.T - 100) / 500 * w;
+177: const py = y0 - clamp(q.speed / 1.45, 0, 1) * h;
+188: const q = values();
+189D: els.tempVal.textContent = q.T.toFixed(0);
+190D: els.sizeVal.textContent = q.size.toFixed(0);
+202: `<div id="r1">温度 T=${q.T.toFixed(0)} K，平均速率比例≈${q.speed.toFixed(2)}</div>`,
+203: `<div id="r2">平均动能比例∝T≈${q.ek.toFixed(2)}</div>`,
+204: `<div id="r3">布朗运动强度≈${q.brown.toFixed(2)}；颗粒越小越明显</div>`,
+205: `<div id="r4">注意：布朗运动是颗粒运动，间接反映分子热运动</div>`
+207D: els.status.textContent = q.T < 220 ? '低温：分子仍不停运动，只是平均动能较小。' : (q.T < 420 ? '中温：颗粒轨迹呈明显无规则折线。' : '高温：分子撞击更频繁猛烈，布朗运动更剧烈。');
+210D: els.recordRows.innerHTML = state.records.slice(-5).map((p, i) =>
+216: const x = (ev.clientX - rect.left) * c.width / rect.width;
+217: const y = (ev.clientY - rect.top) * c.height / rect.height;
+224: const T = clamp(600 - (y - 90) / 126 * 500, 100, 600);
+225: els.temp.value = String(Math.round(T / 10) * 10);
+231: const dt = Math.min(0.03, (ts - state.last) / 1000);
+233: const q = values();
+243D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+246: const q = values();
+262: const x = (ev.clientX - rect.left) * c.width / rect.width;
+
+===== anim/xb3/molecular-speed-distribution.html (72 lines, kept 33) =====
+15: <div class="stage"><canvas id="canvas" aria-label="分子运动速率分布实验台：可见分子运动、速率直方图和麦克斯韦分布曲线"></canvas></div>
+17: <div class="card task"><b>观察任务：</b>固定分子质量，拖动温度探针或温度滑块。先看容器中箭头长短，再核对直方图和曲线：升温后峰位右移、峰值降低、分布变宽，但归一化面积仍接近 1。</div>
+19: <div class="title">改变一个物理量</div>
+20: <label class="param"><span>温度 T <b id="tLabel">300 K</b></span><input id="temp" type="range" min="180" max="720" step="10" value="300"></label>
+21: <label class="param"><span>分子质量 m <b id="mLabel">28 u</b></span><input id="mass" type="range" min="12" max="60" step="2" value="28"></label>
+22: <label class="param"><span>样本数 N <b id="nLabel">160</b></span><input id="count" type="range" min="80" max="240" step="20" value="160"></label>
+23: <div class="buttons"><button id="play">暂停分子运动</button><button id="record">记录当前曲线</button></div>
+25: <div class="readout" id="readout"></div>
+25D: <div class="readout" id="readout"></div>
+26: <div class="card"><div class="title">实验记录</div><table><thead><tr><th>T/K</th><th>峰位</th><th>平均速率</th><th>面积</th></tr></thead><tbody id="rows"></tbody></table></
+27: <div class="card formula"><div class="title">公式与图像</div><div><b>麦克斯韦速率分布：</b><code>f(v)∝v²e<sup>−v²/(2a²)</sup></code>，其中 <code>a∝√(T/m)</code>。</div><div>曲线下面积
+28: <div class="status" id="status"></div>
+36: const C={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',green:'#087f5b',gold:'#f0a500',purple:'#7c3aed',line:'#9fb3c8'};
+40: function params(){const T=+els.temp.value,m=+els.mass.value,N=+els.count.value,a=Math.sqrt(T/m)*46;const lowA=Math.sqrt(180/m)*46,highA=Math.sqrt(720/m)*46;retu
+41: function hash(i){let x=(i*1664525+1013904223)>>>0;x^=x>>>16;x=Math.imul(x,2246822519)>>>0;x^=x>>>13;return(x>>>0)/4294967296}
+42: function normal(i,j){const u=Math.max(.00001,hash(i*7+j*31+13)),v=hash(i*11+j*17+29);return Math.sqrt(-2*Math.log(u))*Math.cos(2*PI*v)}
+43: function rebuild(q){S.particles=[];for(let i=0;i<q.N;i++){S.particles.push({x:hash(i+1),y:hash(i+101),dir:hash(i+201)*PI*2,unit:Math.sqrt(normal(i,1)**2+normal(
+45: function density(v,a){return Math.sqrt(2/PI)*v*v*Math.exp(-v*v/(2*a*a))/(a*a*a)}
+46: function integral(a,vmax){let sum=0,steps=360,dx=vmax/steps;for(let i=0;i<=steps;i++){const w=i===0||i===steps?.5:1;sum+=w*density(i*dx,a)}return sum*dx}
+50: function arrow(x1,y1,x2,y2,c,w=2){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-9*Math.c
+51: function responsive(){const width=clamp(canvas.parentElement.getBoundingClientRect().width,320,920);S.W=width;S.H=width<600?720:620;S.dpr=Math.min(2,window.devi
+52: function draw(){const q=params();ensure(q);const W=S.W,H=S.H,mobile=W<600;ctx.clearRect(0,0,W,H);ctx.fillStyle='#f5f7fb';ctx.fillRect(0,0,W,H);box(12,12,W-24,H-
+53: function drawContainer(q,x,y,w,h){box(x,y,w,h,'#fbfdff');text('① 容器：箭头越长，表示速率越大',x+w/2,y+21,C.ink,'center',13,'800');const ix=x+18,iy=y+44,iw=w-36,ih=h-72;ctx.s
+54: function drawHistogram(q,x,y,w,h){box(x,y,w,h,'#fff');text('② 直方图：每根柱子是一个速率区间',x+w/2,y+21,C.ink,'center',13,'800');const px=x+34,py=y+h-32,pw=w-56,ph=h-72,bins=
+55: function drawCurve(q,x,y,w,h){box(x,y,w,h,'#fff');text('③ 分布曲线：峰值、峰位、宽度',x+w/2,y+20,C.ink,'center',13,'800');const px=x+38,py=y+h-28,pw=w-58,ph=h-64,allA=[q.low
+57: function drawTrack(q,x,y,w){text('直接拖动温度探针',x+w/2,y+8,C.ink,'center',13,'800');const left=x+24,right=x+w-24,track=y+34;line(left,track,right,track,C.line,4);con
+58: function update(q){els.tLabel.textContent=q.T+' K';els.mLabel.textContent=q.m+' u';els.nLabel.textContent=q.N;const area=integral(q.a,q.vmax),fastRatio=S.partic
+59: function record(){const q=params();S.records.push({T:q.T,p:q.most.toFixed(0),a:q.avg.toFixed(0),area:integral(q.a,q.vmax).toFixed(3)});if(S.records.length>8)S.r
+60: function pointerPos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*S.W/r.width,y:(e.clientY-r.top)*S.H/r.height}}
+61: function setTempByX(x){if(!S.track)return;els.temp.value=String(Math.round(clamp(180+(x-S.track.left)/(S.track.right-S.track.left)*540,180,720)/10)*10);draw()}
+63: canvas.addEventListener('pointerdown',e=>{const p=pointerPos(e);if(S.track&&Math.abs(p.y-S.track.y)<28&&p.x>=S.track.left-20&&p.x<=S.track.right+20){S.drag=true
+65: let last=Date.now();function loop(now){const dt=Math.min((now-last)/1000,.04);last=now;if(S.running)S.time+=dt;draw();schedule(loop)}
+70: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/xb3/molecular-theory.html (317 lines, kept 51) =====
+32: <canvas id="c" width="740" height="540" aria-label="分子动理论实验台：布朗运动俯视、分子力侧视、速率统计图像和数据记录"></canvas>
+35: <button id="playBtn" class="primary" type="button">暂停</button>
+36: <button id="recordBtn" type="button">记录</button>
+37: <button id="resetBtn" type="button">重置</button>
+39: <label for="temp">温度 T/K：<span id="tempVal"></span></label>
+41: <label for="count">分子数 N：<span id="countVal"></span></label>
+43: <label for="dist">分子间距 r/r0：<span id="distVal"></span></label>
+45: <div id="readout" class="readout"></div>
+45D: <div id="readout" class="readout"></div>
+46: <div id="status" class="status"></div>
+47: <div class="hint">观察任务：拖动红色悬浮颗粒看布朗轨迹；拖动右侧分子改变 r/r0，看近斥、平衡、远引；调高 T 看平均速率和平均动能读数。</div>
+50: <tbody id="recordRows"></tbody>
+56: const c = document.getElementById('c');
+74: const state = { running: true, last: 0, drag: null, records: [] };
+83: const T = Number(els.temp.value);
+86: return { T, N, r, speed: Math.sqrt(T / 300), ek: T / 300, fs: forceState(r) };
+94: const sp = 88 * q.speed;
+96: m.x += Math.cos(m.a) * sp * dt;
+97: m.y += Math.sin(m.a) * sp * dt;
+98: if (m.x < 48 || m.x > 410) { m.a = Math.PI - m.a; m.x = clamp(m.x, 48, 410); }
+100: if (Math.random() < 0.016 * q.speed) m.a += (Math.random() - 0.5) * 1.1;
+102: brown.vx += (Math.random() - 0.5) * sp * dt * 6.5;
+103: brown.vy += (Math.random() - 0.5) * sp * dt * 6.5;
+106: brown.x += brown.vx * dt;
+107: brown.y += brown.vy * dt;
+114: const a = Math.atan2(y2 - y1, x2 - x1);
+124: ctx.lineTo(x2 - 9 * Math.cos(a - 0.45), y2 - 9 * Math.sin(a - 0.45));
+125: ctx.lineTo(x2 - 9 * Math.cos(a + 0.45), y2 - 9 * Math.sin(a + 0.45));
+140: mol.forEach(m => { ctx.beginPath(); ctx.arc(m.x, m.y, 3, 0, Math.PI * 2); ctx.fill(); });
+155: const left = 536, right = 536 + q.r * 66, y = 190;
+206: const T = 100 + i / 70 * 600;
+207: const x = x0 + (T - 100) / 600 * w;
+208: const y = y0 - clamp(Math.sqrt(T / 300) / 1.55, 0, 1) * h;
+213: const px = x0 + (q.T - 100) / 600 * w;
+214: const py = y0 - clamp(q.speed / 1.55, 0, 1) * h;
+225: const q = values();
+226D: els.tempVal.textContent = q.T.toFixed(0);
+227D: els.countVal.textContent = q.N.toFixed(0);
+228D: els.distVal.textContent = q.r.toFixed(2);
+240: `<div id="r1">平均速率比例 ∝√T：${q.speed.toFixed(2)}</div>`,
+241: `<div id="r2">平均动能比例 ∝T：${q.ek.toFixed(2)}</div>`,
+242: `<div id="r3">分子数 N=${q.N}，分子力状态：${q.fs.kind}</div>`,
+243: `<div id="r4">三条图像：大量分子、无规则热运动、分子间作用力</div>`
+248D: els.recordRows.innerHTML = state.records.slice(-5).map((p, i) =>
+254: const x = (ev.clientX - rect.left) * c.width / rect.width;
+255: const y = (ev.clientY - rect.top) * c.height / rect.height;
+261: const r = clamp((x - 536) / 66, 0.75, 2.6);
+268: const dt = Math.min(0.03, (ts - state.last) / 1000);
+270: const q = values();
+280D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+299: const x = (ev.clientX - rect.left) * c.width / rect.width;
+
+===== anim/xb3/nuclear-energy.html (51 lines, kept 21) =====
+13: <canvas id="c" width="940" height="640" aria-label="核能质能方程实验台：天平、能量计、图像和数据记录"></canvas>
+15: <div class="row"><button id="playBtn" class="play-btn">播放</button><button id="resetBtn" class="secondary">重置</button><button id="recordBtn" class="secondary">记录
+16: <label for="dm">质量亏损 Δm/u：<span id="dmVal"></span></label><input id="dm" type="range" min="-0.06" max="0.30" value="0.20" step="0.01">
+17: <label for="count">反应次数：<span id="countVal"></span></label><input id="count" type="range" min="1" max="100" value="20" step="1">
+18: <label for="type">反应类型：<span id="typeVal"></span></label><input id="type" type="range" min="0" max="1" value="0" step="1">
+19: <div id="readout" class="readout"></div><div id="status" class="status"></div>
+19D: <div id="readout" class="readout"></div><div id="status" class="status"></div>
+20: <div class="hint">观察任务：拖动画面中的金色 Δm 砝码，看质量天平、能量计和 E-Δm 图像如何同步变化。Δm 为负时表示吸收能量。</div>
+21: <table><thead><tr><th>记录</th><th>Δm/u</th><th>E1/MeV</th><th>状态</th></tr></thead><tbody id="recordBody"><tr><td colspan="4">点击“记录”保存一次测量</td></tr></tbody></tabl
+27: function params(){const dm=+els.dm.value,count=+els.count.value,type=+els.type.value,e1=dm*931.5,total=e1*count;return{dm,count,type,typeName:type===0?'裂变':'聚变'
+29: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo
+33: for(let i=0;i<8;i++){const x=318+Math.cos(t*3+i)*36,y=188+Math.sin(t*2+i*1.7)*28;ctx.fillStyle=i%2?'#e03131':'#2c7be5';ctx.globalAlpha=playing?.9:.55;ctx.beginP
+35: ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1;ctx.fillRect(610,82,270,180);ctx.strokeRect(610,82,270,180);label('质量天平/仪器读数',745,106,'#102a43
+36: ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(610,298,270,180);ctx.strokeRect(610,298,270,180);label('图像：E 与 Δm 成正比',745,322,'#102a43',13);axis
+37: ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(70,408,490,170);ctx.strokeRect(70,408,490,170);label('能量计与公式绑定',315,432,'#102a43',14);meter(116,4
+39: function box(x,y,w,h,fill,stroke,a,b){ctx.fillStyle=fill;ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.fillRect(x,y,w,h);ctx.strokeRect(x,y,w,h);label(a,x+w/2,y+28
+40: function meter(x,y,w,h,val,c){ctx.fillStyle='#e9eef5';ctx.fillRect(x,y,w,h);ctx.fillStyle=c;ctx.fillRect(x,y,w*val,h);for(let i=0;i<=5;i++){ctx.strokeStyle='#52
+44: function animate(now){if(!last)last=now;const dt=Math.min(.04,(now-last)/1000);last=now;if(playing)t+=dt;render();requestAnimationFrame(animate)}
+45: function dragChip(clientX){const r=canvas.getBoundingClientRect(),x=(clientX-r.left)*canvas.width/r.width;chip.x=Math.max(120,Math.min(500,x));const dm=-.06+(ch
+46: canvas.addEventListener('pointerdown',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.h
+47: els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textContent=playing?'暂停':'播放'});els.resetBtn.addEventListener('click',()=>{playing=false;
+
+===== anim/xb3/nuclear-fission.html (309 lines, kept 50) =====
+33: <canvas id="c" width="740" height="540" aria-label="核裂变链式反应实验台：反应堆俯视、控制棒侧视、代数图像和数据记录"></canvas>
+36: <button id="playBtn" class="primary" type="button">播放</button>
+37: <button id="recordBtn" type="button">记录</button>
+38: <button id="resetBtn" type="button">重置</button>
+42: <label for="absorb">控制棒吸收比例：<span id="absorbVal"></span></label>
+46: <div id="readout" class="readout"></div>
+46D: <div id="readout" class="readout"></div>
+47: <div id="status" class="status"></div>
+48: <div class="hint">观察任务：拖动画面里的红色控制棒，调节中子吸收比例，让有效增殖系数 k 接近 1；播放时看链式反应是增长、稳定还是衰减。</div>
+51: <tbody id="recordRows"></tbody>
+57: const c = document.getElementById('c');
+73: const state = {
+85: const absorb = Number(els.absorb.value) / 100;
+87: const k = n * (1 - absorb);
+89: for (let g = 0; g <= gen; g++) counts.push(Math.min(36, Math.max(1, Math.round(Math.pow(k, g)))));
+98: const a = Math.atan2(y2 - y1, x2 - x1);
+108: ctx.lineTo(x2 - 9 * Math.cos(a - 0.45), y2 - 9 * Math.sin(a - 0.45));
+109: ctx.lineTo(x2 - 9 * Math.cos(a + 0.45), y2 - 9 * Math.sin(a + 0.45));
+126: const rods = Math.round(5 + v.absorb * 9);
+128: const x = 96 + i * 20;
+132: const active = Math.min(v.counts[state.generation] || 1, 24);
+134: const a = i * Math.PI * 2 / 28;
+135: const r = 42 + (i % 4) * 28;
+136: const x = cx + r * Math.cos(a + 0.22 * (i % 3));
+137: const y = cy + r * Math.sin(a + 0.22 * (i % 3));
+145: const tx = x + 30 * Math.cos(a + state.phase);
+146: const ty = y + 30 * Math.sin(a + state.phase);
+169: const maxC = Math.max(2, ...v.counts);
+171: const x = x0 + i / v.gen * w;
+172: const bh = clamp(v.counts[i] / maxC, 0, 1) * h;
+201: const knobY = y + 150 - v.absorb * 102;
+216D: els.neutronsVal.textContent = v.n;
+217: els.absorbVal.textContent = Math.round(v.absorb * 100) + '%';
+217D: els.absorbVal.textContent = Math.round(v.absorb * 100) + '%';
+218D: els.genVal.textContent = v.gen;
+231: `<div id="r1">有效增殖系数 k=${v.n}(1-${Math.round(v.absorb * 100)}%)≈${v.k.toFixed(2)}</div>`,
+232: `<div id="r2">当前第 ${state.generation} 代，裂变数≈${last}</div>`,
+233: `<div id="r3">状态判定：${stateLabel(v.k)}</div>`,
+234: `<div id="r4">核反应：²³⁵U+n→碎片+${v.n}n+能量，质量亏损 Δm 对应 E=Δmc²</div>`
+236: els.status.className = Math.abs(v.k - 1) < 0.08 ? 'status' : 'status bad';
+237: els.status.textContent = Math.abs(v.k - 1) < 0.08
+237D: els.status.textContent = Math.abs(v.k - 1) < 0.08
+242D: els.recordRows.innerHTML = state.records.slice(-5).map((p, i) =>
+248: const y = (ev.clientY - rect.top) * c.height / rect.height;
+249: const absorb = clamp((234 - y) / 128, 0, 0.8);
+250: els.absorb.value = String(Math.round(absorb * 100 / 5) * 5);
+254: const dt = Math.min(0.05, (ts - state.last) / 1000);
+258: state.phase += dt * 2.8;
+260: const next = Math.min(v.gen, Math.floor(state.time / 0.8));
+272D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+
+===== anim/xb3/nuclear-fusion.html (330 lines, kept 49) =====
+33: <canvas id="c" width="740" height="540" aria-label="核聚变实验台：粒子轨迹俯视、约束侧视、能垒图像和数据记录"></canvas>
+36: <button id="playBtn" class="primary" type="button">播放</button>
+37: <button id="recordBtn" type="button">记录</button>
+38: <button id="resetBtn" type="button">重置</button>
+40: <label for="temp">温度等级：<span id="tempVal"></span></label>
+42: <label for="confine">约束强度：<span id="confineVal"></span></label>
+44: <label for="count">反应次数：<span id="countVal"></span></label>
+46: <div id="readout" class="readout"></div>
+46D: <div id="readout" class="readout"></div>
+47: <div id="status" class="status"></div>
+48: <div class="hint">观察任务：拖动画面里的氘核或氚核改变接近距离；点“播放”看高温热运动是否能越过电斥能垒，形成 ⁴He+n 并释放 17.6 MeV。</div>
+51: <tbody id="recordRows"></tbody>
+57: const c = document.getElementById('c');
+73: const state = {
+87: const thermal = temp / 10;
+88: const confine = conf / 10;
+91: const prob = clamp((thermal * 0.62 + confine * 0.28 + closeness * 0.36 - barrier) * 170, 0, 100);
+93: const total = 17.6 * count;
+97: const a = Math.atan2(y2 - y1, x2 - x1);
+107: ctx.lineTo(x2 - 9 * Math.cos(a - 0.45), y2 - 9 * Math.sin(a - 0.45));
+108: ctx.lineTo(x2 - 9 * Math.cos(a + 0.45), y2 - 9 * Math.sin(a + 0.45));
+142: const a = i * 1.9 + state.time;
+143: const r = 28 + (i % 6) * 22;
+146: ctx.arc(cx + r * Math.cos(a), cy + 0.74 * r * Math.sin(a), 3, 0, Math.PI * 2);
+149: const close = 168 * state.approach;
+150: const leftX = cx - close / 2;
+151: const rightX = cx + close / 2;
+157: ctx.fillStyle = 'rgba(240,165,0,' + (0.25 + 0.55 * state.flash) + ')';
+191: const barH = clamp(v.prob / 100, 0, 1) * 90;
+212: const t = i / 80;
+213: const x = x0 + t * w;
+214: const y = y0 - (0.18 + 0.78 * Math.exp(-Math.pow((t - 0.42) / 0.18, 2))) * h;
+219: const energyY = y0 - v.thermal * h;
+235D: els.tempVal.textContent = v.temp;
+236D: els.confineVal.textContent = v.conf;
+237D: els.countVal.textContent = v.count;
+249: `<div id="r1">温度等级=${v.temp}，约束强度=${v.conf}</div>`,
+250: `<div id="r2">聚变概率指标≈${v.prob.toFixed(0)}%，${v.ready ? '条件较充分' : '条件不足'}</div>`,
+251: `<div id="r3">D-T 单次聚变释放 17.6 MeV</div>`,
+252: `<div id="r4">${v.count} 次总能量≈${v.total.toFixed(1)} MeV，E=Δmc²</div>`
+255D: els.status.textContent = v.ready
+260D: els.recordRows.innerHTML = state.records.slice(-5).map((p, i) =>
+266: const x = (ev.clientX - rect.left) * c.width / rect.width;
+267: state.approach = clamp(Math.abs(x - 230) / 150, 0.08, 0.95);
+272: const dt = Math.min(0.05, (ts - state.last) / 1000);
+277: const speed = 0.12 + v.thermal * 0.48;
+278: state.approach -= speed * dt;
+283: state.flash = Math.max(0, state.flash - dt * 1.6);
+293D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+
+===== anim/xb3/nuclear-reaction.html (75 lines, kept 21) =====
+21: <canvas id="c" width="940" height="640" aria-label="核反应方程配平实验台：装置、守恒账本、图像和数据记录"></canvas>
+23: <div class="row"><button id="playBtn" class="play-btn">播放</button><button id="resetBtn" class="secondary">重置</button><button id="recordBtn" class="secondary">记录
+24: <label for="template">反应模板：<span id="templateVal"></span></label><input id="template" type="range" min="0" max="2" value="0" step="1">
+25: <label for="unknown">未知项位置：<span id="unknownVal"></span></label><input id="unknown" type="range" min="0" max="1" value="1" step="1">
+26: <label for="guessA">学生猜测 A：<span id="guessAVal"></span></label><input id="guessA" type="range" min="0" max="6" value="1" step="1">
+27: <label for="guessZ">学生猜测 Z：<span id="guessZVal"></span></label><input id="guessZ" type="range" min="-1" max="3" value="1" step="1">
+28: <div id="readout" class="readout"></div><div id="status" class="status"></div>
+28D: <div id="readout" class="readout"></div><div id="status" class="status"></div>
+29: <div class="hint">观察任务：拖动画面里的“未知粒子卡片”或调 A、Z，先看质量数账本，再看电荷数账本。两张账都为 0 才配平。</div>
+30: <table><thead><tr><th>记录</th><th>A差</th><th>Z差</th><th>判定</th></tr></thead><tbody id="recordBody"><tr><td colspan="4">点击“记录”保存一次配平</td></tr></tbody></table>
+47: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo
+49: function drawNucleus(x,y,r,c,text){ctx.fillStyle=c;ctx.globalAlpha=.18;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;ctx.strokeStyle=c
+51: ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);label('核反应配平实验台：装置、守恒账本、图像与数据记录',470,28,'#102a43',19);label('三视图联动：反应装置看过程，账本看 ΣA/ΣZ，图像看差值是否归零
+55: const prog=playing?(Math.sin(t*5)+1)/2:.52;drawNucleus(150+110*prog,238,32,'#e03131','入射');arrow(92,238,270,238,'#e03131',4);drawNucleus(318,238,54,'#2c7be5','靶
+56: ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(610,82,270,180);ctx.strokeRect(610,82,270,180);label('守恒账本/仪器读数',745,106,'#102a43',14);bar(642,14
+61: function bar(x,y,w,h,val,max,c,txt){ctx.fillStyle='#e9eef5';ctx.fillRect(x,y,w,h);ctx.fillStyle=c;ctx.fillRect(x,y,Math.min(w,w*val/max),h);label(txt,x+w/2,y-12
+63: function plotDiff(p){const x0=642,y0=446;ctx.strokeStyle='#e03131';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x0+20,y0-12);ctx.lineTo(x0+95,y0-Math.abs(p.dA)*14
+66: function animate(now){if(!last)last=now;const dt=Math.min(.04,(now-last)/1000);last=now;if(playing)t+=dt;render();requestAnimationFrame(animate)}
+67: function setGuessFromCard(clientX,clientY){const r=canvas.getBoundingClientRect(),x=(clientX-r.left)*canvas.width/r.width,y=(clientY-r.top)*canvas.height/r.heig
+68: canvas.addEventListener('pointerdown',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.h
+70: els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textContent=playing?'暂停':'播放'});els.resetBtn.addEventListener('click',()=>{playing=false;
+
+===== anim/xb3/nuclear-structure.html (57 lines, kept 19) =====
+21: <canvas id="c" width="940" height="640" aria-label="原子核结构实验台：核子、核素符号、电子轨道、同位素记录"></canvas>
+23: <div class="row"><button id="playBtn" class="play-btn">播放</button><button id="resetBtn" class="secondary">重置</button><button id="recordBtn" class="secondary">记录
+24: <label for="z">质子数 Z：<span id="zVal"></span></label><input id="z" type="range" min="1" max="10" value="6" step="1">
+25: <label for="n">中子数 N：<span id="nVal"></span></label><input id="n" type="range" min="0" max="12" value="8" step="1">
+26: <label for="ion">电离状态：<span id="ionVal"></span></label><input id="ion" type="range" min="-2" max="3" value="0" step="1">
+27: <div id="readout" class="readout"></div><div id="status" class="status"></div>
+27D: <div id="readout" class="readout"></div><div id="status" class="status"></div>
+28: <div class="hint">观察任务：拖动画面里的质子/中子卡片进核，固定 Z 改 N 看同位素；改变电离状态只改电子数，不改原子核。</div>
+29: <table><thead><tr><th>记录</th><th>核素</th><th>Z</th><th>N</th></tr></thead><tbody id="recordBody"><tr><td colspan="4">点击“记录”保存一个核素</td></tr></tbody></table>
+38: function params(){const Z=+els.z.value,N=+els.n.value,ion=+els.ion.value,A=Z+N,e=Math.max(0,Z-ion);const ionText=ion===0?'中性':ion>0?ion+'+':Math.abs(ion)+'-';re
+40: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo
+42: function drawNucleus(p){ctx.fillStyle='#f2f7ff';ctx.strokeStyle='#2c7be5';ctx.lineWidth=2;ctx.fillRect(54,82,510,326);ctx.strokeRect(54,82,510,326);label('核子装置：
+43: function drawParticle(x,y,s,c){ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,13,0,Math.PI*2);ctx.fill();label(s,x,y,'#fff',12)}
+45: function drawMeters(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(610,348,270,168);ctx.strokeRect(610,348,270,168);label('公式绑定/读数',745,372,'
+48: function update(p){els.zVal.textContent=p.Z;els.nVal.textContent=p.N;els.ionVal.textContent=p.ionText;els.readout.innerHTML=[`Z=${p.Z}：质子数，决定元素=${p.name}`,`N=${
+50: function animate(now){if(!last)last=now;const dt=Math.min(.04,(now-last)/1000);last=now;if(playing)t+=dt;render();requestAnimationFrame(animate)}
+51: function setFromPointer(e){const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.height;if(x>165&
+52: canvas.addEventListener('pointerdown',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.h
+53: els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textContent=playing?'暂停':'播放'});els.resetBtn.addEventListener('click',()=>{playing=false;
+
+===== anim/xb3/particle-physics.html (68 lines, kept 20) =====
+21: <canvas id="c" width="940" height="640" aria-label="粒子物理初步实验台：探测器、分类、夸克组成、守恒图像和数据记录"></canvas>
+23: <div class="row"><button id="playBtn" class="play-btn">播放</button><button id="resetBtn" class="secondary">重置</button><button id="recordBtn" class="secondary">记录
+24: <label for="particle">粒子卡片：<span id="particleVal"></span></label><input id="particle" type="range" min="0" max="5" value="2" step="1">
+25: <label for="anti">反粒子开关：<span id="antiVal"></span></label><input id="anti" type="range" min="0" max="1" value="0" step="1">
+26: <label for="reaction">反应室目标电荷/e：<span id="reactionVal"></span></label><input id="reaction" type="range" min="-1" max="1" value="1" step="1">
+27: <div id="readout" class="readout"></div><div id="status" class="status"></div>
+27D: <div id="readout" class="readout"></div><div id="status" class="status"></div>
+28: <div class="hint">观察任务：拖动画面里的粒子卡进入反应室，观察分类、夸克组成、电荷表和守恒差值。打开反粒子时重点看 q反=-q。</div>
+29: <table><thead><tr><th>记录</th><th>粒子</th><th>q/e</th><th>差值</th></tr></thead><tbody id="recordBody"><tr><td colspan="4">点击“记录”保存一次检查</td></tr></tbody></table>
+45: function params(){const base=particles[+els.particle.value],anti=+els.anti.value===1,target=+els.reaction.value;const q=anti?-base.charge:base.charge;return{bas
+48: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo
+52: function drawDetector(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1;ctx.fillRect(86,230,442,132);ctx.strokeRect(86,230,442,132);label('反应
+55: function drawQuarks(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1;ctx.fillRect(610,82,270,186);ctx.strokeRect(610,82,270,186);label('组成仪表
+56: function drawMeters(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(70,438,490,138);ctx.strokeRect(70,438,490,138);label('公式绑定与守恒检查',315,462,'
+57: function meter(x,y,w,h,val,c,txt){label(txt,x,y-12,c,12,'left');ctx.fillStyle='#e9eef5';ctx.fillRect(x,y,w,h);ctx.fillStyle=c;ctx.fillRect(x,y,Math.min(w,w*val)
+58: function drawGraph(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(610,304,270,182);ctx.strokeRect(610,304,270,182);label('图像：电荷守恒差值',745,328,
+61: function animate(now){if(!last)last=now;const dt=Math.min(.04,(now-last)/1000);last=now;if(playing)t+=dt;render();requestAnimationFrame(animate)}
+62: function dragCard(clientX,clientY){const r=canvas.getBoundingClientRect(),x=(clientX-r.left)*canvas.width/r.width,y=(clientY-r.top)*canvas.height/r.height;card.
+63: canvas.addEventListener('pointerdown',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.h
+64: els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textContent=playing?'暂停':'播放'});els.resetBtn.addEventListener('click',()=>{playing=false;
+
+===== anim/xb3/pv-graph.html (83 lines, kept 28) =====
+30: <canvas id="c" width="790" height="560" aria-label="p-V 图像实验台：气缸剖面、p-V坐标图像、面积做功和数据记录"></canvas>
+32: <div class="row"><button id="playBtn" class="primary" type="button">播放</button><button id="resetBtn" type="button">重置</button><button id="recordBtn" type="butto
+33: <div class="seg"><button data-mode="isoT" class="active">等温</button><button data-mode="isoP">等压</button><button data-mode="isoV">等容</button></div>
+34: <label for="v1">初态体积 V1：<span id="v1Val"></span></label><input id="v1" type="range" min="0.5" max="2.5" step="0.1" value="1">
+35: <label for="v2">末态体积 V2：<span id="v2Val"></span></label><input id="v2" type="range" min="0.5" max="2.5" step="0.1" value="2">
+36: <label for="p1">初态压强 p1：<span id="p1Val"></span></label><input id="p1" type="range" min="0.8" max="4" step="0.1" value="2">
+37: <div id="readout" class="readout"></div>
+37D: <div id="readout" class="readout"></div>
+38: <table><thead><tr><th>记录</th><th>过程</th><th>W</th><th>方向</th></tr></thead><tbody id="records"></tbody></table>
+39: <div class="hint">观察任务：拖 p-V 图上的 1、2 状态点，播放过程箭头；看曲线下方面积 W=∫p dV 如何随膨胀/压缩改变正负。</div>
+46: const state={mode:'isoT',running:false,time:0,last:0,drag:null,records:[]};
+50: function model(){const V1=val('v1'),rawV2=val('v2'),p1=val('p1');let V2=rawV2,p2=p1,work=0,label='等温：pV=常量';if(state.mode==='isoT'){p2=p1*V1/V2;work=p1*V1*Math.
+54: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo
+57: function pathPoint(q,t){if(state.mode==='isoT'){const V=q.V1+(q.V2-q.V1)*t;return{V,p:q.p1*q.V1/V};}if(state.mode==='isoP'){return{V:q.V1+(q.V2-q.V1)*t,p:q.p1};
+58: function drawGraph(q){box(36,82,510,360,'#fff');text('p-V 图像：图线形状读过程，曲线下面积读做功',291,106,'#102a43',14,'700');for(let i=0;i<=5;i++){ctx.strokeStyle='#e6edf5';ctx.l
+59: if(state.mode!=='isoV'){ctx.fillStyle='rgba(240,165,0,.20)';ctx.beginPath();ctx.moveTo(mapX(q.V1),gy+gh);for(let i=0;i<=80;i++){const pp=pathPoint(q,i/80);ctx.l
+60: ctx.strokeStyle=state.mode==='isoT'?'#e8590c':state.mode==='isoP'?'#2c7be5':'#7b2cbf';ctx.lineWidth=4;ctx.beginPath();for(let i=0;i<=80;i++){const pp=pathPoint(
+61: const now=pathPoint(q,state.running?Math.min(1,state.time/2.4):1),mid=pathPoint(q,.55);arrow(mapX(pathPoint(q,.45).V),mapY(pathPoint(q,.45).p),mapX(mid.V),mapY(
+62: ctx.fillStyle='#102a43';ctx.beginPath();ctx.arc(mapX(q.V1),mapY(q.p1),7,0,Math.PI*2);ctx.fill();ctx.fillStyle='#c92a2a';ctx.beginPath();ctx.arc(mapX(q.V2),mapY(
+63: function drawCylinder(q){box(576,82,170,190,'#f7f9fc');text('气缸剖面读数',661,106,'#102a43',14,'700');const pp=pathPoint(q,state.running?Math.min(1,state.time/2.4):1
+66: function draw(){const q=model();ctx.clearRect(0,0,canvas.width,canvas.height);const bg=ctx.createLinearGradient(0,0,canvas.width,canvas.height);bg.addColorStop(
+67: function loop(now){if(!state.last)state.last=now;const dt=Math.min(.04,(now-state.last)/1000);state.last=now;if(state.running){state.time+=dt;if(state.time>2.4)
+68: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
+69: function hit(p){return handles(model()).find(h=>Math.hypot(p.x-h.x,p.y-h.y)<=h.r+8);}
+70: canvas.addEventListener('pointerdown',e=>{const h=hit(pos(e));if(h){state.drag=h.name;canvas.setPointerCapture(e.pointerId);}});
+75: els.recordBtn.addEventListener('click',()=>{const q=model();state.records.unshift({mode:state.mode,W:q.work,dir:q.V2>q.V1?'膨胀':q.V2<q.V1?'压缩':'等容'});state.recor
+76: function renderRecords(){els.records.innerHTML=state.records.map((r,i)=>`<tr><td>${i+1}</td><td>${r.mode}</td><td>${r.W.toFixed(2)}</td><td>${r.dir}</td></tr>`)
+76D: function renderRecords(){els.records.innerHTML=state.records.map((r,i)=>`<tr><td>${i+1}</td><td>${r.mode}</td><td>${r.W.toFixed(2)}</td><td>${r.dir}</td></tr>`).join('');}
+
+===== anim/xb3/radiation-protection.html (52 lines, kept 25) =====
+14: <div class="stage"><canvas id="canvas" width="920" height="610" aria-label="射线防护实验台装置：αβγ射线源、屏蔽材料、探测器表盘、距离尺、剂量-距离-厚度图像和数据记录"></canvas></div>
+16: <div class="card task"><b>观察任务：</b>切换 α、β、γ，直接拖动探测器距离和屏蔽厚度手柄，看剂量如何随时间、距离、屏蔽变化。</div>
+18: <div class="title">选择射线</div>
+19: <div class="tabs"><button id="alpha" class="active">α</button><button id="beta">β</button><button id="gamma">γ</button></div>
+20: <label class="param"><span>距离 d <b id="dLabel">2.0 m</b></span><input id="dist" type="range" min="0.5" max="6" step="0.1" value="2"></label>
+21: <label class="param"><span>屏蔽厚度 x <b id="xLabel">2.0 mm</b></span><input id="thick" type="range" min="0" max="10" step="0.2" value="2"></label>
+22: <label class="param"><span>暴露时间 t <b id="timeLabel">10 min</b></span><input id="time" type="range" min="1" max="60" step="1" value="10"></label>
+23: <div class="buttons"><button id="play">暂停</button><button id="record">记录方案</button></div>
+25: <div class="readout" id="readout"></div>
+25D: <div class="readout" id="readout"></div>
+26: <div class="card"><div class="title">防护记录</div><table><thead><tr><th>射线</th><th>d</th><th>x</th><th>剂量</th></tr></thead><tbody id="rows"></tbody></table></div>
+27: <div class="card formula"><div class="title">公式与图像</div><div>防护三原则：缩短时间、增大距离、增加屏蔽。</div><div>粗略模型：剂量 ∝ t/d² × e^(-μx)。</div><div>α 电离强、穿透弱；γ 穿透强、防护更难。</div></di
+28: <div class="status" id="status"></div>
+36: const C={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',green:'#087f5b',gold:'#f0a500',purple:'#7c3aed'};
+38: const R={alpha:{name:'α',pen:.18,ion:1,mu:2.4,color:'#e03131',shield:'纸/皮肤即可显著阻挡'},beta:{name:'β',pen:.48,ion:.55,mu:.75,color:'#2c7be5',shield:'薄铝板可明显削弱'},gamm
+39: function box(x,y,w,h,f='#fff',s='#d9e2ec'){ctx.save();ctx.fillStyle=f;ctx.strokeStyle=s;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.res
+40: function draw(){const q=p();ctx.clearRect(0,0,920,610);box(34,34,852,528,'#fff');text('射线危害与防护：时间、距离、屏蔽三原则',460,60,C.ink,'center',17,'900');drawScene(q);drawMet
+41: function drawScene(q){box(70,96,510,312,'#fbfdff');text('射线源-屏蔽-探测器侧视装置 + 距离尺',325,120,C.muted,'center',12,'800');const source={x:135,y:250},shieldX=310+q.x*10,
+42: function drawMeters(q){box(620,96,226,170,'#fff');text('穿透能力 / 电离能力表盘',733,120,C.ink,'center',13,'900');meter(654,158,150,18,q.pen,q.color,'穿透');meter(654,214,1
+43: function drawGraph(q){box(620,292,226,170,'#fff');text('剂量随距离/屏蔽变化',733,316,C.ink,'center',13,'900');const x0=650,y0=426,w=156,h=88;line(x0,y0,x0+w,y0,'#9fb3c8'
+44: function drawHandles(q){box(108,444,430,80,'#fff');text('画面内可拖动：距离手柄 / 屏蔽厚度手柄',323,464,C.ink,'center',13,'900');line(150,494,318,494,'#d9e2ec',9);line(360,494,5
+45: function update(q){els.alpha.classList.toggle('active',S.ray==='alpha');els.beta.classList.toggle('active',S.ray==='beta');els.gamma.classList.toggle('active',S
+46: function record(){const q=p();S.records.push({r:q.name,d:q.d.toFixed(1),x:q.x.toFixed(1),dose:q.dose.toFixed(3)});if(S.records.length>8)S.records.shift();update
+47: function ray(r){S.ray=r;record();draw()}els.alpha.onclick=()=>ray('alpha');els.beta.onclick=()=>ray('beta');els.gamma.onclick=()=>ray('gamma');[els.dist,els.thi
+50: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/xb3/radioactive-decay.html (58 lines, kept 21) =====
+21: <canvas id="c" width="940" height="640" aria-label="放射性衰变实验台：母核、子核、射线、守恒账本、探测器"></canvas>
+23: <div class="row"><button id="playBtn" class="play-btn">播放</button><button id="resetBtn" class="secondary">重置</button><button id="recordBtn" class="secondary">记录
+24: <label for="type">衰变类型：<span id="typeVal"></span></label><input id="type" type="range" min="0" max="2" value="0" step="1">
+25: <label for="z">母核质子数 Z：<span id="zVal"></span></label><input id="z" type="range" min="20" max="92" value="92" step="1">
+26: <label for="n">母核中子数 N：<span id="nVal"></span></label><input id="n" type="range" min="20" max="150" value="146" step="1">
+27: <div id="readout" class="readout"></div><div id="status" class="status"></div>
+27D: <div id="readout" class="readout"></div><div id="status" class="status"></div>
+28: <div class="hint">观察任务：播放衰变过程，拖动探测器看 α、β、γ 的穿透和偏转差异；盯住 A、Z 两张守恒账。</div>
+29: <table><thead><tr><th>记录</th><th>类型</th><th>A'</th><th>Z'</th></tr></thead><tbody id="recordBody"><tr><td colspan="4">点击“记录”保存一次衰变</td></tr></tbody></table>
+41: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo
+42: function drawScene(p){ctx.fillStyle='#fff';ctx.fillRect(0,0,940,640);label('放射性衰变实验台：核素变化与射线探测',470,28,'#102a43',19);label('三视图联动：衰变过程、A/Z 守恒账本、射线探测器和数据记录',470,
+43: function drawNucleus(x,y,title,A,Z,fill){ctx.fillStyle=fill;ctx.strokeStyle='#334e68';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,56,0,Math.PI*2);ctx.fill();ctx
+44: function drawReaction(p){ctx.fillStyle='#f2f7ff';ctx.strokeStyle='#2c7be5';ctx.lineWidth=2;ctx.fillRect(54,82,520,302);ctx.strokeRect(54,82,520,302);label('自发衰变
+45: function drawDetector(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(610,82,270,214);ctx.strokeRect(610,82,270,214);label('射线探测器/仪器读数',745,10
+46: function meter(x,y,w,h,val,c,txt){label(txt,x,y-12,c,12,'left');ctx.fillStyle='#e9eef5';ctx.fillRect(x,y,w,h);ctx.fillStyle=c;ctx.fillRect(x,y,w*val,h)}
+47: function drawLedger(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(610,332,270,176);ctx.strokeRect(610,332,270,176);label('守恒账本/公式绑定',745,356
+48: function drawHandles(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(70,432,500,136);ctx.strokeRect(70,432,500,136);label('画面内探测路径',320,456,'#
+51: function animate(now){if(!last)last=now;const dt=Math.min(.04,(now-last)/1000);last=now;if(playing)t+=dt;render();requestAnimationFrame(animate)}
+52: function dragDetector(e){const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.height;detector.x=
+53: canvas.addEventListener('pointerdown',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.h
+54: els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textContent=playing?'暂停':'播放'});els.resetBtn.addEventListener('click',()=>{playing=false;
+
+===== anim/xb3/radioisotope-applications.html (53 lines, kept 26) =====
+14: <div class="stage"><canvas id="canvas" width="920" height="610" aria-label="放射性同位素应用实验台装置：医学示踪、工业探伤、考古测年场景，射线探测器、半衰期曲线和数据记录"></canvas></div>
+16: <div class="card task"><b>观察任务：</b>切换医学示踪、工业探伤、考古测年，拖动探测器或时间手柄，看射线类型、穿透能力、半衰期如何服务不同应用。</div>
+18: <div class="title">选择应用场景</div>
+19: <div class="tabs"><button id="med" class="active">医学</button><button id="ind">探伤</button><button id="arch">测年</button></div>
+20: <label class="param"><span>半衰期 T <b id="halfLabel">6 h</b></span><input id="half" type="range" min="1" max="100" step="1" value="6"></label>
+21: <label class="param"><span>时间 t <b id="timeLabel">6 h</b></span><input id="time" type="range" min="0" max="300" step="1" value="6"></label>
+22: <label class="param"><span>屏蔽/厚度 <b id="shieldLabel">30%</b></span><input id="shield" type="range" min="0" max="100" step="1" value="30"></label>
+23: <div class="buttons"><button id="play">暂停</button><button id="record">记录选择</button></div>
+25: <div class="readout" id="readout"></div>
+25D: <div class="readout" id="readout"></div>
+26: <div class="card"><div class="title">记录本</div><table><thead><tr><th>场景</th><th>T</th><th>剩余</th><th>射线</th></tr></thead><tbody id="rows"></tbody></table></div>
+27: <div class="card formula"><div class="title">公式与图像</div><div>剩余比例：N/N0=(1/2)^(t/T)。</div><div>医学示踪重视半衰期适中、剂量可控。</div><div>工业探伤重视穿透能力；考古测年重视半衰期足够长。</div></div>
+27D: <div class="card formula"><div class="title">公式与图像</div><div>剩余比例：N/N0=(1/2)^(t/T)。</div><div>医学示踪重视半衰期适中、剂量可控。</div><div>工业探伤重视穿透能力；考古测年重视半衰期足够长。</div></div>
+28: <div class="status" id="status"></div>
+36: const C={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',green:'#087f5b',gold:'#f0a500',purple:'#7c3aed'};
+38: function p(){const T=+els.half.value,t=+els.time.value,shield=+els.shield.value/100,left=Math.pow(.5,t/Math.max(1,T));return{T,t,shield,left,ray:S.mode==='ind'?
+39: function box(x,y,w,h,f='#fff',s='#d9e2ec'){ctx.save();ctx.fillStyle=f;ctx.strokeStyle=s;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.res
+40: function draw(){const q=p();ctx.clearRect(0,0,920,610);box(34,34,852,528,'#fff');text('放射性同位素应用：射线类型、半衰期与场景匹配',460,60,C.ink,'center',17,'900');drawScene(q);draw
+41: function drawScene(q){box(70,96,500,300,'#fbfdff');text('应用装置侧视/俯视：同位素源、对象、探测器',320,120,C.muted,'center',12,'800');const source={x:150,y:245},obj={x:330,y:245};
+42: function drawDetector(q){ctx.fillStyle=S.drag==='detector-handle'?C.red:'#829ab1';ctx.fillRect(S.det.x-20,S.det.y-62,40,124);ctx.fillStyle='#fff';ctx.fillRect(S
+43: function drawDecay(q){box(610,330,238,168,'#fff');text('半衰期曲线 N/N0',729,354,C.ink,'center',13,'900');const x0=642,y0=462,w=170,h=84;line(x0,y0,x0+w,y0,'#9fb3c8'
+44: function drawHandle(q){box(100,430,420,86,'#fff');text('画面内可拖动时间手柄',310,452,C.ink,'center',13,'900');line(148,486,480,486,'#d9e2ec',9);const hx=148+q.t/300*332;
+45: function update(q){els.med.classList.toggle('active',S.mode==='med');els.ind.classList.toggle('active',S.mode==='ind');els.arch.classList.toggle('active',S.mode
+46: function record(){const q=p();S.records.push({m:S.mode==='med'?'医学':S.mode==='ind'?'探伤':'测年',T:q.T,left:Math.round(q.left*100)+'%',ray:q.ray});if(S.records.leng
+47: function mode(m){S.mode=m;if(m==='arch'){els.half.value=80;els.time.value=160}else if(m==='ind'){els.half.value=30;els.time.value=20}else{els.half.value=6;els.t
+51: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/xb3/second-law.html (418 lines, kept 52) =====
+77: <canvas id="c" width="790" height="560" aria-label="热机效率实验台：俯视热流装置、能流剖面、效率图像和数据记录"></canvas>
+80: <button id="playBtn" class="primary" type="button">播放</button>
+81: <button id="resetBtn" type="button">重置</button>
+82: <button id="recordBtn" type="button">记录</button>
+84: <label for="hot">高温热库 TH/K：<span id="hotVal"></span></label>
+88: <label for="eta">设定效率 η/%：<span id="etaVal"></span></label>
+90: <div id="readout" class="readout"></div>
+90D: <div id="readout" class="readout"></div>
+93: <tbody id="records"></tbody>
+95: <div class="hint">观察任务：先播放看 QH 怎样分成 W 和 QC；再拖红色热库、蓝色热库和黑色效率阀，看 ηmax=1-TC/TH 怎样限制热机。</div>
+116: const state = { running: false, time: 0, last: 0, drag: null, records: [] };
+121: if (next.TH !== undefined) els.hot.value = Math.round(clamp(next.TH, 350, 900) / 10) * 10;
+122: if (next.TC !== undefined) els.cold.value = Math.round(clamp(next.TC, 250, 500) / 10) * 10;
+123: if (next.eta !== undefined) els.eta.value = Math.round(clamp(next.eta, 0, 100));
+124: if (val('cold') >= val('hot')) els.cold.value = Math.max(250, val('hot') - 10);
+133: const eta = val('eta') / 100;
+134: const max = 1 - TC / TH;
+135: const W = eta * QH;
+169: const a = Math.atan2(y2 - y1, x2 - x1);
+179: ctx.lineTo(x2 - 12 * Math.cos(a - 0.45), y2 - 12 * Math.sin(a - 0.45));
+180: ctx.lineTo(x2 - 12 * Math.cos(a + 0.45), y2 - 12 * Math.sin(a + 0.45));
+185: const fillH = h * (value - lo) / (hi - lo);
+203: const xx = x + w * i / nx;
+207: const yy = y + h * i / ny;
+219: const pulse = 0.65 + 0.35 * Math.sin((phase + delay) * Math.PI * 2);
+228: const phase = (state.time % 2.2) / 2.2;
+252: const t = (phase + i * 0.18) % 1;
+256: const t = (phase + i * 0.22) % 1;
+260: const t = (phase + i * 0.22) % 1;
+276: text('图像：ηmax=1-TC/TH', 204, 398, '#102a43', 14, '700');
+287: const TH = 350 + (900 - 350) * i / 80;
+288: const e = 1 - q.TC / TH;
+289: const px = x + w * i / 80;
+290: const py = y + h - h * e / maxEta;
+294: const px = x + w * (q.TH - 350) / 550;
+295: const py = y + h - h * q.max / maxEta;
+298: const etaY = y + h - h * q.eta / maxEta;
+314: text('ηmax = 1 - TC/TH', 436, 494, '#486581', 13, '700', 'left');
+319: const q = model();
+332D: els.hotVal.textContent = q.TH.toFixed(0);
+333D: els.coldVal.textContent = q.TC.toFixed(0);
+334: els.etaVal.textContent = (q.eta * 100).toFixed(0);
+334D: els.etaVal.textContent = (q.eta * 100).toFixed(0);
+335D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+337: `QH=<b>${QH}J</b>，W=<b>${q.W.toFixed(0)}J</b>，QC=<b>${q.QC.toFixed(0)}J</b>`,
+338: `η=W/QH=<b>${(q.eta * 100).toFixed(0)}%</b>`,
+339: `ηmax=1-TC/TH=<b>${(q.max * 100).toFixed(1)}%</b>`,
+345: const dt = Math.min(0.04, (now - state.last) / 1000);
+359: return handles(model()).find(h => Math.hypot(p.x - h.x, p.y - h.y) <= h.r + 8);
+362: const h = hit(pos(evt));
+397: const q = model();
+403D: els.records.innerHTML = state.records.map((r, idx) =>
+
+===== anim/xb3/surface-tension.html (60 lines, kept 24) =====
+21: <canvas id="c" width="940" height="640" aria-label="液体表面张力实验台：液面、针、张力计、侧视和数据记录"></canvas>
+23: <div class="row"><button id="playBtn" class="play-btn">播放</button><button id="resetBtn" class="secondary">重置</button><button id="recordBtn" class="secondary">记录
+24: <label for="sigma">表面张力系数 σ/(N/m)：<span id="sigmaVal"></span></label><input id="sigma" type="range" min="0.02" max="0.10" step="0.005" value="0.07">
+25: <label for="length">有效边界长度 L/m：<span id="lengthVal"></span></label><input id="length" type="range" min="0.05" max="0.50" step="0.01" value="0.20">
+26: <label for="weight">物体重力 G/N：<span id="weightVal"></span></label><input id="weight" type="range" min="0.002" max="0.040" step="0.001" value="0.010">
+27: <div id="readout" class="readout"></div><div id="status" class="status"></div>
+27D: <div id="readout" class="readout"></div><div id="status" class="status"></div>
+28: <div class="hint">观察任务：拖动画面里的细针或边界尺，看液面形变、切向张力、张力计和 F=σL 读数如何同步变化。</div>
+29: <table><thead><tr><th>记录</th><th>F</th><th>G</th><th>状态</th></tr></thead><tbody id="recordBody"><tr><td colspan="4">点击“记录”保存一次测量</td></tr></tbody></table>
+37: function params(){const s=+els.sigma.value,L=+els.length.value,G=+els.weight.value,F=s*L;return{s,L,G,F,ok:F>=G,ratio:G/Math.max(F,.0001)}}
+39: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo
+41: function drawTank(p){ctx.fillStyle='#f2f7ff';ctx.strokeStyle='#2c7be5';ctx.lineWidth=2;ctx.fillRect(tank.x,tank.y,tank.w,tank.h);ctx.strokeRect(tank.x,tank.y,ta
+42: const sag=Math.min(78,20+p.ratio*35+(playing?Math.sin(t*4)*6:0));ctx.fillStyle='#d8f3ff';ctx.fillRect(tank.x+34,tank.y+150,tank.w-68,112);ctx.strokeStyle='#2c7b
+43: for(let i=0;i<10;i++){ctx.fillStyle='#2c7be5';ctx.beginPath();ctx.arc(tank.x+66+i*42,tank.y+150+Math.sin(i+t)*7,5,0,Math.PI*2);ctx.fill()}
+44: const needleY=tank.y+132+sag*.55;ctx.fillStyle=dragMode==='needle'?'#e03131':'#444';ctx.beginPath();ctx.roundRect(tank.x+210,needleY,tank.w?110:110,14,7);ctx.fi
+45: const len=50+p.F/.05*145;arrow(tank.x+250,tank.y+132,tank.x+250-len/2,tank.y+132,'#e03131',4);arrow(tank.x+280,tank.y+132,tank.x+280+len/2,tank.y+132,'#e03131',
+46: ctx.strokeStyle=dragMode==='length'?'#e03131':'#38b2ac';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(tank.x+128,tank.y+318);ctx.lineTo(tank.x+128+p.L/.5*320,tank.
+47: function drawMeters(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(610,92,270,236);ctx.strokeRect(610,92,270,236);label('张力计/临界读数',745,116,'#
+48: function meter(x,y,w,h,val,c,txt){label(txt,x,y-12,c,12,'left');ctx.fillStyle='#e9eef5';ctx.fillRect(x,y,w,h);ctx.fillStyle=c;ctx.fillRect(x,y,Math.min(w,w*val)
+50: function handle(x,y,w,val,min,max,c,name){ctx.strokeStyle='#d9e2ec';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+w,y);ctx.stroke();const hx=x+(v
+53: function animate(now){if(!last)last=now;const dt=Math.min(.04,(now-last)/1000);last=now;if(playing)t+=dt;render();requestAnimationFrame(animate)}
+54: function setFromPointer(e){const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.height;if(dragMo
+55: canvas.addEventListener('pointerdown',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.h
+56: els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textContent=playing?'暂停':'播放'});els.resetBtn.addEventListener('click',()=>{playing=false;
+
+===== anim/xb3/temperature-scale.html (240 lines, kept 43) =====
+33: <canvas id="c" width="740" height="540" aria-label="温度与温标实验台：双温度计侧视、分子热运动俯视、温标换算图像和数据记录"></canvas>
+36: <button id="playBtn" class="primary" type="button">播放</button>
+37: <button id="recordBtn" type="button">记录</button>
+38: <button id="resetBtn" type="button">重置</button>
+40: <label for="tempA">物体 A 温度 tA/℃：<span id="tempAVal"></span></label>
+42: <label for="tempB">物体 B 温度 tB/℃：<span id="tempBVal"></span></label>
+44: <div id="readout" class="readout"></div>
+44D: <div id="readout" class="readout"></div>
+45: <div id="status" class="status"></div>
+46: <div class="hint">观察任务：直接拖动温度计液柱改变摄氏读数；看 K 读数必须用 T=t+273.15，温差满足 ΔT=Δt，但温度倍数必须用 K。</div>
+49: <tbody id="recordRows"></tbody>
+55: const c = document.getElementById('c');
+70: const state = { running: false, last: 0, drag: null, records: [] };
+71: for (let i = 0; i < 52; i++) dots.push({ x: 440 + Math.random() * 250, y: 170 + Math.random() * 180, a: Math.random() * Math.PI * 2 });
+77: return { a, b, KA: K(a), KB: K(b), speed: Math.sqrt(Math.max(1, K(a)) / 300), ratio: K(a) / 273.15 };
+81: d.x += Math.cos(d.a) * q.speed * 88 * dt;
+82: d.y += Math.sin(d.a) * q.speed * 88 * dt;
+83: if (d.x < 434 || d.x > 704) { d.a = Math.PI - d.a; d.x = clamp(d.x, 434, 704); }
+105: const frac = clamp((t + 100) / 400, 0, 1);
+106: const h = 24 + frac * 126;
+132: dots.forEach(d => { ctx.beginPath(); ctx.arc(d.x, d.y, 3, 0, Math.PI * 2); ctx.fill(); });
+140: const cmp = Math.abs(q.KA - q.KB) < 0.5 ? '=' : (q.KA > q.KB ? '>' : '<');
+150: const q = values();
+151D: els.tempAVal.textContent = q.a.toFixed(0);
+152D: els.tempBVal.textContent = q.b.toFixed(0);
+165: `<div id="r1">A：T=t+273.15=${q.KA.toFixed(1)} K</div>`,
+166: `<div id="r2">B：T=${q.KB.toFixed(1)} K</div>`,
+167: `<div id="r3">A 平均动能比例(相对0℃)≈${q.ratio.toFixed(2)}</div>`,
+168: `<div id="r4">温差：ΔT=Δt=${(q.a - q.b).toFixed(0)} K</div>`
+170: const equal = Math.abs(q.a - q.b) < 1;
+172D: els.status.textContent = equal ? 'A 与 B 温度相同，达到热平衡，没有净热传递。' : (q.a > q.b ? 'A 温度更高，接触后热量将自发从 A 传向 B。' : 'B 温度更高，接触后热量将自发从 B 传向 A。');
+175D: els.recordRows.innerHTML = state.records.slice(-5).map((p, i) =>
+181: const y = (ev.clientY - rect.top) * c.height / rect.height;
+182: const t = clamp((282 - y) / 150 * 400 - 100, -100, 300);
+183: if (state.drag === 'A-thermometer-handle') els.tempA.value = String(Math.round(t));
+184: if (state.drag === 'B-thermometer-handle') els.tempB.value = String(Math.round(t));
+189: const dt = Math.min(0.05, (ts - state.last) / 1000);
+191: const q = values();
+194: const avg = (q.a + q.b) / 2;
+195: els.tempA.value = (q.a + (avg - q.a) * 0.018).toFixed(0);
+196: els.tempB.value = (q.b + (avg - q.b) * 0.018).toFixed(0);
+206D: els.playBtn.textContent = state.running ? '暂停' : '播放';
+223: const x = (ev.clientX - rect.left) * c.width / rect.width;
+
+===== anim/xb3/wave-particle.html (59 lines, kept 22) =====
+21: <canvas id="c" width="940" height="640" aria-label="波粒二象性实验台：光子能量、光强、德布罗意波、双缝记录"></canvas>
+23: <div class="row"><button id="playBtn" class="play-btn">播放</button><button id="resetBtn" class="secondary">重置</button><button id="recordBtn" class="secondary">记录
+24: <label for="nu">光频率 ν/(10^14 Hz)：<span id="nuVal"></span></label><input id="nu" type="range" min="3" max="12" step="0.1" value="6">
+25: <label for="intensity">光强/光子数：<span id="intensityVal"></span></label><input id="intensity" type="range" min="1" max="5" step="1" value="3">
+26: <label for="mom">粒子动量 p/(h/单位)：<span id="momVal"></span></label><input id="mom" type="range" min="0.8" max="5" step="0.1" value="2">
+27: <div id="readout" class="readout"></div><div id="status" class="status"></div>
+27D: <div id="readout" class="readout"></div><div id="status" class="status"></div>
+28: <div class="hint">观察任务：拖动画面里的频率探针或动量探针，看光子能量、光子数量和德布罗意波长分别由什么决定。</div>
+29: <table><thead><tr><th>记录</th><th>E/eV</th><th>光子数</th><th>λ</th></tr></thead><tbody id="recordBody"><tr><td colspan="4">点击“记录”保存一次读数</td></tr></tbody></table>
+38: function params(){const nu=+els.nu.value,intensity=+els.intensity.value,mom=+els.mom.value,E=hEV*nu*1e14,lambda=1/mom;return{nu,intensity,mom,E,lambda}}
+40: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo
+41: function wave(x0,y0,w,amp,cycles,c,phase=0){ctx.strokeStyle=c;ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=w;i++){const y=y0+Math.sin(i/w*cycles*Math.PI*2+pha
+43: function drawPhotonBench(p){ctx.fillStyle='#f2f7ff';ctx.strokeStyle='#2c7be5';ctx.lineWidth=2;ctx.fillRect(54,82,510,238);ctx.strokeRect(54,82,510,238);label('光
+44: function drawMatterBench(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1;ctx.fillRect(54,342,510,142);ctx.strokeRect(54,342,510,142);label(
+45: function drawMeters(p){ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.fillRect(610,82,270,260);ctx.strokeRect(610,82,270,260);label('仪表读数/公式绑定',745,106,'
+46: function meter(x,y,w,h,val,c,txt){label(txt,x,y-12,c,12,'left');ctx.fillStyle='#e9eef5';ctx.fillRect(x,y,w,h);ctx.fillStyle=c;ctx.fillRect(x,y,Math.min(w,w*val)
+48: function handle(x,y,w,val,min,max,c,name){ctx.strokeStyle='#d9e2ec';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+w,y);ctx.stroke();const hx=x+(v
+49: function update(p){els.nuVal.textContent=p.nu.toFixed(1);els.intensityVal.textContent=['','很弱','弱','中','强','很强'][p.intensity];els.momVal.textContent=p.mom.toFix
+51: function animate(now){if(!last)last=now;const dt=Math.min(.04,(now-last)/1000);last=now;if(playing)t+=dt;render();requestAnimationFrame(animate)}
+52: function setFromPointer(e){const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width;if(dragMode==='nu'){const val=3+(Math.max(652,Math.m
+53: canvas.addEventListener('pointerdown',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.h
+54: function renderRecords(){els.recordBody.innerHTML=records.length?records.map((r,i)=>`<tr><td>${i+1}</td><td>${r.E.toFixed(2)}</td><td>${r.int}</td><td>${r.lam.t

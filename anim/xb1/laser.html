@@ -34,13 +34,13 @@
 <body>
 <div class="root">
   <div class="stage">
-    <canvas id="canvas" width="900" height="600" aria-label="激光实验台装置：光源侧视装置、光束俯视图、屏幕光斑图像、干涉条纹图像和数据记录"></canvas>
+    <canvas id="canvas" width="900" height="600" data-divergence-angle="half-angle-radians-in-r-equals-L-theta" aria-label="激光实验台装置：光源侧视装置、半发散角、屏幕光斑图像、干涉条纹图像和数据记录"></canvas>
   </div>
   <div class="panel">
     <div class="card task"><b>观察任务：</b>对照普通光源与激光的侧视装置、光束俯视图和屏幕图像，拖动红色光束手柄改变发散角；调相干性看条纹是否清晰，调波长看单色光颜色和光子能量如何变化。</div>
     <div class="card">
       <div class="title">调激光器</div>
-      <label class="param"><span>发散角 θ <b id="divLabel">2.0 mrad</b></span><input id="divergence" type="range" min="0.2" max="12" step="0.1" value="2"></label>
+      <label class="param"><span>半发散角 θ <b id="divLabel">2.0 mrad</b></span><input id="divergence" type="range" min="0.2" max="12" step="0.1" value="2"></label>
       <label class="param"><span>相干性 <b id="cohLabel">85%</b></span><input id="coherence" type="range" min="0" max="100" step="1" value="85"></label>
       <label class="param"><span>功率 P <b id="powerLabel">5.0 mW</b></span><input id="power" type="range" min="1" max="20" step="0.5" value="5"></label>
       <label class="param"><span>波长 λ <b id="lambdaLabel">650 nm</b></span><input id="lambda" type="range" min="405" max="780" step="5" value="650"></label>
@@ -56,7 +56,7 @@
     </div>
     <div class="card formula">
       <div class="title">公式与图像</div>
-      <div>方向性：远处光斑半径 r≈Lθ。</div>
+      <div>方向性：θ 为弧度制半发散角，远处光斑半径 r≈Lθ；若给全角 Θ，则 r≈LΘ/2。</div>
       <div>单色性：λ 集中，颜色单一，E=hc/λ。</div>
       <div>高亮度：同样功率集中到小面积，照度更高。</div>
     </div>
@@ -122,7 +122,7 @@
     const hx = 460, hy = 258 + half;
     ctx.fillStyle=colors.purple; ctx.beginPath(); ctx.arc(hx,hy,9,0,Math.PI*2); ctx.fill();
     text('拖发散角',hx,hy+20,colors.purple,'center',11,'800');
-    text('激光：发散角小，能量集中',324,282,colors.red,'center',12,'900');
+    text('激光：半发散角小，能量集中',324,282,colors.red,'center',12,'900');
   }
   function drawScreen(q, beam){
     box(596,92,232,210,'#fbfdff');
@@ -170,7 +170,7 @@
     els.cohLabel.textContent = Math.round(q.coh*100)+'%';
     els.powerLabel.textContent = fmt(q.power,1)+' mW';
     els.lambdaLabel.textContent = fmt(q.lambda,0)+' nm';
-    els.readout.innerHTML = '远处 L=<b>'+q.L+' m</b><br>激光光斑半径 r≈Lθ：<b>'+fmt(q.rLaser,2)+' m</b><br>光子能量 E=hc/λ：<b>'+fmt(q.eEv,2)+' eV</b><br>相干性：<b>'+Math.round(q.coh*100)+'%</b>';
+    els.readout.innerHTML = '远处 L=<b>'+q.L+' m</b><br>半发散角 θ=<b>'+fmt(q.theta,1)+' mrad</b><br>光斑半径 r≈Lθ：<b>'+fmt(q.rLaser,2)+' m</b><br>光子能量 E=hc/λ：<b>'+fmt(q.eEv,2)+' eV</b><br>相干性：<b>'+Math.round(q.coh*100)+'%</b>';
     els.status.textContent = q.theta < 3 ? '发散角小：方向性强，远处光斑仍小，适合测距和准直。' : '发散角变大：光束扩散，远处光斑变大，能量不再集中。';
     els.rows.innerHTML = state.records.slice(-6).map(r=>'<tr><td>'+r.app+'</td><td>'+r.radius+' m</td><td>'+r.energy+'</td></tr>').join('') || '<tr><td colspan="3">暂无记录</td></tr>';
   }
@@ -196,5 +196,26 @@
   record(); loop();
 })();
 </script>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script>
+<script>/* GKWL: unified full reset (2026-07-12 review remediation) */
+(function(){
+  var btns=[].slice.call(document.querySelectorAll('button'));
+  var resets=btns.filter(function(b){return /重置|复位/.test(b.textContent)});
+  if(!resets.length)return;
+  var scoped=/播放|时间|回放/;
+  var primary=resets[0];
+  if(scoped.test(primary.textContent)){
+    var nb=document.createElement('button');
+    nb.textContent='全部重置';
+    nb.className=primary.className;
+    nb.setAttribute('data-gkwl-full-reset','1');
+    nb.addEventListener('click',function(){location.reload()});
+    primary.parentNode.insertBefore(nb,primary.nextSibling);
+  }else{
+    resets.forEach(function(b){b.addEventListener('click',function(){setTimeout(function(){location.reload()},60)})});
+  }
+})();
+</script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

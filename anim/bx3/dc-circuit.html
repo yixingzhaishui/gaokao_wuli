@@ -36,7 +36,7 @@ canvas{display:block;width:100%;max-width:720px;background:#0e1a2b;border-radius
     <span class="chip">内阻分压 U内 = Ir = <b id="cUr">0</b> V</span>
     <span class="chip">电路状态：<b id="cState">闭合</b></span>
   </div>
-  <div class="hint"><b>怎么玩</b>：黄色小球是电路里定向移动的电荷。对照电路俯视装置、电表图像和数据记录，拖<b>R</b> 变大看电流变小、灯变暗；拖<b>E</b> 变大看电流变大、灯变亮。</div>
+  <div class="hint"><b>观察任务</b>：先保持电源不变并拖大 <b>R</b>，对照电表读数、灯泡亮度和电荷流速，验证电流变小；再保持 R 不变并拖大 <b>E</b>，观察三者如何同步增大。</div>
 </div>
 <script>
 (function(){
@@ -54,7 +54,13 @@ function ptAt(d){ // distance along loop -> point (clockwise)
   for(let i=0;i<4;i++){const s=seg(i);if(d<=s.len){const f=d/s.len;return{x:s.a.x+(s.b.x-s.a.x)*f,y:s.a.y+(s.b.y-s.a.y)*f};}d-=s.len;}
   return pts[0];
 }
-function wire(){ctx.strokeStyle='#5b7089';ctx.lineWidth=6;ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);for(let i=1;i<4;i++)ctx.lineTo(pts[i].x,pts[i].y);ctx.closePath();ctx.stroke();}
+function wire(){
+  // Leave a real gap at the switch. The lever is the only conductor that can
+  // close it, so the picture and I=0 state never contradict each other.
+  ctx.strokeStyle='#5b7089';ctx.lineWidth=6;ctx.lineJoin='round';
+  ctx.beginPath();ctx.moveTo(L,B);ctx.lineTo(L,T);ctx.lineTo(Rt,T);ctx.lineTo(Rt,B);ctx.lineTo(swX,B);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(swX-30,B);ctx.lineTo(L,B);ctx.stroke();
+}
 function battery(){const cx=L,cy=(T+B)/2;
   // gap in wire
   ctx.strokeStyle='#0e1a2b';ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(cx,cy-26);ctx.lineTo(cx,cy+26);ctx.stroke();
@@ -131,5 +137,6 @@ function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;if(playing&&
 draw();requestAnimationFrame(loop);
 })();
 </script>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script><script src="guided-lesson.js"></script>
 </body>
 </html>

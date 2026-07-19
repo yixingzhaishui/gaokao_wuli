@@ -43,7 +43,7 @@
       <label class="param"><span>介质1波速 v₁ <b id="v1Label">2.0 m/s</b></span><input id="v1" type="range" min="1" max="4" step="0.1" value="2"></label>
       <label class="param"><span>介质2波速 v₂ <b id="v2Label">1.2 m/s</b></span><input id="v2" type="range" min="0.6" max="4" step="0.1" value="1.2"></label>
       <label class="param"><span>频率 f <b id="fLabel">5.0 Hz</b></span><input id="freq" type="range" min="2" max="10" step="0.5" value="5"></label>
-      <button id="record">记录一组读数</button>
+      <button id="record">记录一组读数</button><button id="playBtn" type="button">暂停演示</button>
     </div>
     <div class="readout" id="readout"></div>
     <div class="card">
@@ -72,7 +72,7 @@
     angleLabel: document.getElementById('angleLabel'), v1Label: document.getElementById('v1Label'), v2Label: document.getElementById('v2Label'), fLabel: document.getElementById('fLabel'),
     readout: document.getElementById('readout'), status: document.getElementById('status'), rows: document.getElementById('rows'), record: document.getElementById('record')
   };
-  const state = { t: 0, drag: false, records: [] };
+  const state = { t: 0, drag: false, records: [], running: true };
   const colors = { ink:'#102a43', muted:'#486581', blue:'#2c7be5', red:'#e03131', green:'#087f5b', gold:'#f0a500', purple:'#7c3aed' };
   function p() {
     const a = +els.angle.value * Math.PI / 180, v1 = +els.v1.value, v2 = +els.v2.value, f = +els.freq.value;
@@ -182,9 +182,32 @@
     draw(); update();
   });
   canvas.addEventListener('pointerup',e=>{ state.drag=false; record(); try{canvas.releasePointerCapture(e.pointerId);}catch(_){} });
-  function loop(){ state.t+=0.04; draw(); update(); requestAnimationFrame(loop); }
+  const playBtn=document.getElementById('playBtn');
+  playBtn.addEventListener('click',()=>{state.running=!state.running;playBtn.textContent=state.running?'暂停演示':'播放演示';if(state.running){draw();update()}});
+  function loop(){if(state.running){state.t+=0.04;draw();update()}requestAnimationFrame(loop);}
   record(); loop();
 })();
 </script>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script>
+<script>/* GKWL: unified full reset (2026-07-12 review remediation) */
+(function(){
+  var btns=[].slice.call(document.querySelectorAll('button'));
+  var resets=btns.filter(function(b){return /重置|复位/.test(b.textContent)});
+  if(!resets.length)return;
+  var scoped=/播放|时间|回放/;
+  var primary=resets[0];
+  if(scoped.test(primary.textContent)){
+    var nb=document.createElement('button');
+    nb.textContent='全部重置';
+    nb.className=primary.className;
+    nb.setAttribute('data-gkwl-full-reset','1');
+    nb.addEventListener('click',function(){location.reload()});
+    primary.parentNode.insertBefore(nb,primary.nextSibling);
+  }else{
+    resets.forEach(function(b){b.addEventListener('click',function(){setTimeout(function(){location.reload()},60)})});
+  }
+})();
+</script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

@@ -171,10 +171,11 @@ c.addEventListener('pointerdown',e=>{const p=pos(e),F=Number(els.force.value),m=
 c.addEventListener('pointermove',e=>{const p=pos(e);if(!state.drag){c.style.cursor='grab';return;}if(state.drag==='F')setVal('force',Math.max(.2,Math.min(4,4-(p.y-232)/10)).toFixed(1));if(state.drag==='m')setVal('mass',Math.max(.4,Math.min(3,(p.y-64)/35)).toFixed(1));});
 c.addEventListener('pointerup',e=>{state.drag=null;try{c.releasePointerCapture(e.pointerId)}catch(err){}});c.addEventListener('pointercancel',()=>{state.drag=null;});
 els.playBtn.addEventListener('click',()=>{state.running=!state.running;state.last=0;if(state.time>2.8)state.time=0;draw();});
-els.resetBtn.addEventListener('click',()=>{state.running=false;state.time=0;els.mode.value=0;els.force.value=2;els.mass.value=1;els.friction.value=90;draw();});
+els.resetBtn.addEventListener('click',()=>{state.running=false;state.time=0;state.records=[];els.mode.value=0;els.force.value=2;els.mass.value=1;els.friction.value=90;els.records.innerHTML='';draw();});
 els.recordBtn.addEventListener('click',()=>{const F=Number(els.force.value),m=Number(els.mass.value),comp=Number(els.friction.value)/100,Fnet=Math.max(0,F-(1-comp)*0.8),a=Fnet/m;state.records.unshift({Fnet,m,a});state.records=state.records.slice(0,4);els.records.innerHTML=state.records.map((r,i)=>`<tr><td style="text-align:left;border-bottom:1px solid #d9e2ec">${i+1}</td><td style="border-bottom:1px solid #d9e2ec">${r.Fnet.toFixed(2)}</td><td style="border-bottom:1px solid #d9e2ec">${r.m.toFixed(1)}</td><td style="border-bottom:1px solid #d9e2ec">${r.a.toFixed(2)}</td></tr>`).join('');});
 function loop(now){if(!state.last)state.last=now;const dt=Math.min(.04,(now-state.last)/1000);state.last=now;if(state.running){state.time+=dt;if(state.time>2.8){state.time=2.8;state.running=false;}}draw();requestAnimationFrame(loop);}
 requestAnimationFrame(loop);
 </script>
+<script src="guided-experiment.js"></script>
 </body>
 </html>

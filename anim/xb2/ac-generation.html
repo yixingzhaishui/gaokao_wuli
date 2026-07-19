@@ -119,11 +119,12 @@ canvas{display:block;width:100%;max-width:760px;background:#fff;border:1px solid
   window.addEventListener('pointerup',()=>dragCoil=false);
   document.getElementById('w').addEventListener('input',e=>{w=parseFloat(e.target.value);document.getElementById('w-d').textContent=w.toFixed(1);draw();});
   document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
-  document.getElementById('reset-btn').addEventListener('click',()=>{t=0;draw();});
+  document.getElementById('reset-btn').addEventListener('click',()=>{t=0;w=2;running=true;document.getElementById('w').value=w;document.getElementById('w-d').textContent=w.toFixed(1);document.getElementById('play-btn').textContent='暂停';draw();});
   let last=performance.now();
   function loop(now){const dt=Math.min((now-last)/1000,0.03);last=now;if(running)t+=dt;draw();requestAnimationFrame(loop);}
   draw();requestAnimationFrame(loop);
 })();
 </script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

@@ -28,19 +28,21 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
       <input type="range" id="q" min="-10" max="10" step="0.5" value="5"></label>
     <label>试探距离 r = <span id="r-display">3.0</span> m
       <input type="range" id="r" min="1" max="6" step="0.1" value="3"></label>
-    <button id="play-btn">播放</button>
+    <button id="play-btn">释放 +q</button>
     <button id="reset-btn">重置</button>
   </div>
   <canvas id="canvas" width="600" height="380" aria-label="电场强度实验台：点电荷俯视装置、场强图像和数据记录"></canvas>
   <div class="readouts">
     <span class="r">源电荷 Q = <b id="q-val">+5.0</b> μC</span>
     <span class="r">距离 r = <b id="r-val">3.0</b> m</span>
-    <span class="r">场强 E = <b id="e-val">5.00</b> N/C</span>
+    <span class="r">场强 E = <b id="e-val">4.99×10³</b> N/C</span>
     <span class="r" id="dir-val">方向：向外</span>
     <span class="r">场强状态：<b id="trend-val">—</b></span>
+    <span class="r">+q 速度：<b id="v-val">0.00</b> m/s</span>
+    <span class="r">演示时间：<b id="t-val">0.00</b> s</span>
   </div>
   <div class="hint">
-    <p><b>观察任务</b>：直接<b>拖动画面里橙色的试探点</b>改变 r，对照点电荷俯视装置、场强图像和数据记录，看场强如何按 1/r² 减小。</p>
+    <p><b>观察任务</b>：直接<b>拖动画面里橙色探针</b>沿刻度尺改变 r，再释放 <b>+q</b>。看场线箭头、绿色 E 箭头、速度轨迹和读数：r 变小，E 按 1/r² 增大；正源电荷使 +q 向外，负源电荷使 +q 向内。</p>
   </div>
 </div>
 <script>
@@ -49,22 +51,30 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
   const ctx=canvas.getContext('2d');
   const W=canvas.width,H=canvas.height;
   let Q=5,r=3;
-  let running=false,t=0,dragTest=false,lastE=0;
-  const k=9;
+  let running=false,t=0,dragTest=false,lastE=0,velocity=0,trail=[];
+  const k0=8.99e9; // N·m²/C²；界面输入为 μC，计算时统一换算为 C
   const scale=40;
 
   function calcE(){
-    return k*Math.abs(Q)/(r*r);
+    return k0*Math.abs(Q*1e-6)/(r*r);
   }
 
   function updateReadouts(){
     const e=calcE();
-    document.getElementById('e-val').textContent=e.toFixed(2);
+    document.getElementById('e-val').textContent=formatScientific(e);
     document.getElementById('q-val').textContent=(Q>=0?'+':'')+Q.toFixed(1);
     document.getElementById('r-val').textContent=r.toFixed(1);
     document.getElementById('dir-val').textContent=Q>0?'方向：向外（正电荷）':(Q<0?'方向：向内（负电荷）':'Q=0，无场');
     document.getElementById('trend-val').textContent=e>lastE+0.01?'增强中':(e<lastE-0.01?'减弱中':'稳定');
+    document.getElementById('v-val').textContent=velocity.toFixed(2);
+    document.getElementById('t-val').textContent=t.toFixed(2);
     lastE=e;
+  }
+
+  function formatScientific(value){
+    if(value===0)return '0';
+    const parts=value.toExponential(2).split('e');
+    return parts[0]+'×10'+Number(parts[1]).toString().replace('-', '⁻').replace(/0/g,'⁰').replace(/1/g,'¹').replace(/2/g,'²').replace(/3/g,'³').replace(/4/g,'⁴').replace(/5/g,'⁵').replace(/6/g,'⁶').replace(/7/g,'⁷').replace(/8/g,'⁸').replace(/9/g,'⁹');
   }
 
   function drawArrow(x1,y1,x2,y2,color,lw){
@@ -81,7 +91,7 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
     ctx.clearRect(0,0,W,H);
     const cx=W/2,cy=H/2;
     // field lines
-    const nLines=12;
+    const nLines=Math.max(4,Math.round(Math.abs(Q)*2));
     const lineLen=160;
     for(let i=0;i<nLines;i++){
       const ang=(i/nLines)*Math.PI*2;
@@ -135,6 +145,12 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
     ctx.setLineDash([]);
     ctx.fillStyle='#486581';ctx.font='12px sans-serif';ctx.textAlign='center';
     ctx.fillText('r='+r.toFixed(1)+' m',(cx+testX)/2,cy-8);
+    // A ruler turns the numerical distance into a directly readable length.
+    ctx.strokeStyle='#64748b';ctx.lineWidth=1;
+    for(let m=1;m<=6;m++){
+      const x=cx+m*scale;ctx.beginPath();ctx.moveTo(x,cy+34);ctx.lineTo(x,cy+42);ctx.stroke();
+      ctx.fillStyle='#486581';ctx.font='10px sans-serif';ctx.textAlign='center';ctx.fillText(m+' m',x,cy+55);
+    }
     // test point
     ctx.save();ctx.shadowColor='rgba(240,165,0,.7)';ctx.shadowBlur=10;
     ctx.fillStyle='#f0a500';
@@ -143,6 +159,10 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
     ctx.strokeStyle='#334e68';ctx.lineWidth=1.5;ctx.stroke();
     ctx.fillStyle='#334e68';ctx.font='11px sans-serif';
     ctx.fillText('试探点',testX,testY+22);
+    if(trail.length>1){
+      ctx.strokeStyle='rgba(240,165,0,.75)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(cx+trail[0]*scale,cy);
+      trail.forEach(point=>ctx.lineTo(cx+point*scale,cy));ctx.stroke();
+    }
     // E vector at test point
     const e=calcE();
     const eLen=Math.min(100,e*10+10);
@@ -155,34 +175,52 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
       ctx.fillStyle='#2c7be5';ctx.font='12px sans-serif';
       ctx.fillText('E',testX-eLen-12,testY+4);
     }
+    if(Math.abs(velocity)>.01){
+      const vLen=Math.min(70,18+Math.abs(velocity)*20),vx=testX+(velocity>0?vLen:-vLen);
+      drawArrow(testX,cy+78,vx,cy+78,'#7c3aed',2.5);
+      ctx.fillStyle='#7c3aed';ctx.font='11px sans-serif';ctx.textAlign='center';ctx.fillText('v='+velocity.toFixed(2)+' m/s',(testX+vx)/2,cy+96);
+    }
     // formula
     ctx.fillStyle='#243b53';ctx.font='13px sans-serif';ctx.textAlign='left';
-    ctx.fillText('E = k|Q|/r² = '+k+'×'+Math.abs(Q).toFixed(1)+'/'+r.toFixed(1)+'² = '+e.toFixed(2)+' N/C',15,H-15);
+    ctx.fillText('E = k₀|Q|/r² = 8.99×10⁹×'+Math.abs(Q).toFixed(1)+'×10⁻⁶/'+r.toFixed(1)+'² = '+formatScientific(e)+' N/C；+q 的 a 与 E 同向',15,H-15);
   }
 
-  function step(dt){if(!running)return;t+=dt;draw();}
+  function stopMotion(){running=false;velocity=0;t=0;trail=[];document.getElementById('play-btn').textContent='释放 +q';}
+  function step(dt){
+    if(!running)return;
+    const e=calcE();
+    if(!Q){stopMotion();updateReadouts();draw();return;}
+    const simDt=dt*1.8,dir=Q>0?1:-1;
+    velocity+=dir*e*.09*simDt;
+    r+=velocity*simDt;
+    t+=simDt;trail.push(r);trail=trail.slice(-90);
+    if(r<=1||r>=6){r=Math.max(1,Math.min(6,r));running=false;document.getElementById('play-btn').textContent='重新释放 +q';}
+    document.getElementById('r').value=r;document.getElementById('r-display').textContent=r.toFixed(1);
+    updateReadouts();draw();
+  }
 
   function eventPos(ev){const rc=canvas.getBoundingClientRect();return {x:(ev.clientX-rc.left)*canvas.width/rc.width,y:(ev.clientY-rc.top)*canvas.height/rc.height};}
   canvas.addEventListener('pointerdown',ev=>{
     const p=eventPos(ev),cx=W/2,cy=H/2,testX=cx+r*scale;
-    if(Math.hypot(p.x-testX,p.y-cy)<20){dragTest=true;}
+    if(Math.hypot(p.x-testX,p.y-cy)<20){stopMotion();dragTest=true;}
   });
   canvas.addEventListener('pointermove',ev=>{
     if(!dragTest)return;const p=eventPos(ev),cx=W/2;
-    r=Math.max(1,Math.min(6,(p.x-cx)/scale));
+    r=Math.max(1,Math.min(6,(p.x-cx)/scale));trail=[r];
     document.getElementById('r').value=r;document.getElementById('r-display').textContent=r.toFixed(1);
     updateReadouts();draw();
   });
   window.addEventListener('pointerup',()=>dragTest=false);
-  document.getElementById('q').addEventListener('input',e=>{Q=parseFloat(e.target.value);document.getElementById('q-display').textContent=(Q>=0?'+':'')+Q.toFixed(1);updateReadouts();draw();});
-  document.getElementById('r').addEventListener('input',e=>{r=parseFloat(e.target.value);document.getElementById('r-display').textContent=r.toFixed(1);updateReadouts();draw();});
-  document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
-  document.getElementById('reset-btn').addEventListener('click',()=>{running=false;t=0;document.getElementById('play-btn').textContent='播放';draw();});
+  document.getElementById('q').addEventListener('input',e=>{stopMotion();Q=parseFloat(e.target.value);document.getElementById('q-display').textContent=(Q>=0?'+':'')+Q.toFixed(1);updateReadouts();draw();});
+  document.getElementById('r').addEventListener('input',e=>{stopMotion();r=parseFloat(e.target.value);document.getElementById('r-display').textContent=r.toFixed(1);updateReadouts();draw();});
+  document.getElementById('play-btn').addEventListener('click',()=>{running=!running;if(running){velocity=0;t=0;trail=[r];document.getElementById('play-btn').textContent='暂停运动';}else document.getElementById('play-btn').textContent='继续释放 +q';});
+  document.getElementById('reset-btn').addEventListener('click',()=>{stopMotion();Q=5;r=3;lastE=0;document.getElementById('q').value=Q;document.getElementById('r').value=r;document.getElementById('q-display').textContent='+5.0';document.getElementById('r-display').textContent='3.0';updateReadouts();draw();});
 
   let lastTime=performance.now();
   function loop(now){const dt=Math.min((now-lastTime)/1000,0.05);lastTime=now;step(dt);requestAnimationFrame(loop);}
   updateReadouts();draw();requestAnimationFrame(loop);
 })();
 </script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

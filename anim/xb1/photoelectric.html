@@ -67,6 +67,9 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
       ctx.strokeStyle=col;ctx.globalAlpha=0.5;ctx.lineWidth=2;
       const y=metalTop+ (k*11)% (metalBot-metalTop);
       ctx.beginPath();ctx.moveTo(20,y);ctx.lineTo(metalX-4,y+8);ctx.stroke();
+      // 光子包即使能量不足也会持续到达金属；是否逸出电子由频率阈值决定。
+      const packetX=20+(t*120+k*31)%(metalX-28);
+      ctx.fillStyle=col;ctx.globalAlpha=0.9;ctx.beginPath();ctx.arc(packetX,y+4,3,0,Math.PI*2);ctx.fill();
     }
     ctx.globalAlpha=1;
     ctx.fillStyle='#5a7a99';ctx.font='12px sans-serif';ctx.textAlign='center';ctx.fillText('入射光 ν',80,metalTop-14);
@@ -138,11 +141,13 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
   bind('w',v=>{w=v;document.getElementById('w-d').textContent=v.toFixed(1);});
   bind('int',v=>{inten=v;document.getElementById('int-d').textContent=['','低','中','高'][v];});
   document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
-  document.getElementById('reset-btn').addEventListener('click',()=>{electrons=[];t=0;nu=7.0;w=2.3;inten=2;sync();draw();});
+  document.getElementById('reset-btn').addEventListener('click',()=>{electrons=[];t=0;nu=7.0;w=2.3;inten=2;running=true;document.getElementById('play-btn').textContent='暂停';sync();draw();});
   let last=performance.now();
   function loop(now){const dt=Math.min((now-last)/1000,0.03);last=now;if(running)step(dt);draw();requestAnimationFrame(loop);}
   sync();draw();requestAnimationFrame(loop);
 })();
 </script>
+<script src="guided-lesson.js"></script>
+<script src="../xb3/guided-lesson.js"></script>
 </body>
 </html>

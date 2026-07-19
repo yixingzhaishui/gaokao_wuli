@@ -1,0 +1,219 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T17:57:52.694Z",
+  "commit": "41e31d9b7af5db174e83bd163bc12b9cc6475db4",
+  "module": "bx2",
+  "modules": [
+    "bx2"
+  ],
+  "summary": {
+    "total": 1,
+    "score": 100,
+    "pass": 1,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/bx2/vehicle-start.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:先恒牵引力",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:接近最大",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:阻力增大",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:临界前",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:临界后",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:恒功率",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:恒功率",
+          "text": "恒功率",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:先恒牵引力",
+          "text": "先恒牵引力",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:接近最大",
+          "text": "接近最大",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:阻力增大",
+          "text": "阻力增大",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:临界前",
+          "text": "临界前",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:临界后",
+          "text": "临界后",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "1f6f52ae",
+          "readout_hash": "37136179",
+          "physical_readout_hash": "37136179",
+          "readout": [
+            "牵引力 F7500 N 输出功率 P60.0 kW 加速度 a4.58 m/s² 最大速度30.0 m/s 临界速度 v112.0 m/s 当前速度 v8.0 m/s",
+            "恒功率阶段：v 变大使 F=P/v 变小，合力和加速度逐渐减小。"
+          ],
+          "physical_readout": [
+            "牵引力 F7500 N 输出功率 P60.0 kW 加速度 a4.58 m/s² 最大速度30.0 m/s 临界速度 v112.0 m/s 当前速度 v8.0 m/s",
+            "恒功率阶段：v 变大使 F=P/v 变小，合力和加速度逐渐减小。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "aeab7028",
+          "readout_hash": "132ee84f",
+          "physical_readout_hash": "132ee84f",
+          "readout": [
+            "牵引力 F4366 N 输出功率 P60.0 kW 加速度 a1.97 m/s² 最大速度30.0 m/s 临界速度 v112.0 m/s 当前速度 v13.7 m/s",
+            "恒功率阶段：v 变大使 F=P/v 变小，合力和加速度逐渐减小。"
+          ],
+          "physical_readout": [
+            "牵引力 F4366 N 输出功率 P60.0 kW 加速度 a1.97 m/s² 最大速度30.0 m/s 临界速度 v112.0 m/s 当前速度 v13.7 m/s",
+            "恒功率阶段：v 变大使 F=P/v 变小，合力和加速度逐渐减小。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "95732977",
+          "readout_hash": "2451a2c5",
+          "physical_readout_hash": "2451a2c5",
+          "readout": [
+            "牵引力 F4284 N 输出功率 P60.0 kW 加速度 a1.90 m/s² 最大速度30.0 m/s 临界速度 v112.0 m/s 当前速度 v14.0 m/s",
+            "恒功率阶段：v 变大使 F=P/v 变小，合力和加速度逐渐减小。"
+          ],
+          "physical_readout": [
+            "牵引力 F4284 N 输出功率 P60.0 kW 加速度 a1.90 m/s² 最大速度30.0 m/s 临界速度 v112.0 m/s 当前速度 v14.0 m/s",
+            "恒功率阶段：v 变大使 F=P/v 变小，合力和加速度逐渐减小。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "95732977",
+          "readout_hash": "2451a2c5",
+          "physical_readout_hash": "2451a2c5",
+          "readout": [
+            "牵引力 F4284 N 输出功率 P60.0 kW 加速度 a1.90 m/s² 最大速度30.0 m/s 临界速度 v112.0 m/s 当前速度 v14.0 m/s",
+            "恒功率阶段：v 变大使 F=P/v 变小，合力和加速度逐渐减小。"
+          ],
+          "physical_readout": [
+            "牵引力 F4284 N 输出功率 P60.0 kW 加速度 a1.90 m/s² 最大速度30.0 m/s 临界速度 v112.0 m/s 当前速度 v14.0 m/s",
+            "恒功率阶段：v 变大使 F=P/v 变小，合力和加速度逐渐减小。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "牵引力 F# N 输出功率 P# kW 加速度 a# m/s² 最大速度# m/s 临界速度 v# m/s 当前速度 v# m/s|恒功率阶段：v 变大使 F=P/v 变小，合力和加速度逐渐减小。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "牵引力 F# N 输出功率 P# kW 加速度 a# m/s² 最大速度# m/s 临界速度 v# m/s 当前速度 v# m/s|恒功率阶段：v 变大使 F=P/v 变小，合力和加速度逐渐减小。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

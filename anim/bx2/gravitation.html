@@ -45,6 +45,7 @@
         <button data-case="near">距离更近</button>
       </div>
     </div>
+    <div class="card"><button id="playBtn" type="button">暂停演示</button></div>
     <div class="card">
       <div class="title">实时读数</div>
       <div class="readout">
@@ -67,7 +68,7 @@
 (function(){
   'use strict';
   const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'),G=6.67e-11;
-  const state={M:6,m:7.3,r:6.4,drag:null,pulse:0};
+  const state={M:6,m:7.3,r:6.4,drag:null,pulse:0,running:true};
   const els={f:document.getElementById('fText'),f2:document.getElementById('f2Text'),r:document.getElementById('rText'),ratio:document.getElementById('ratioText'),status:document.getElementById('status')};
   const colors={red:'#dc2626',blue:'#2563eb',purple:'#7c3aed',green:'#0f766e',orange:'#f59e0b',ink:'#102a43'};
   const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
@@ -110,9 +111,34 @@
   function up(e){if(state.drag){state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}draw()}}
   canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
   document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='base'){state.M=6;state.m=7.3;state.r=6.4}if(c==='doubleR'){state.M=6;state.m=7.3;state.r=12}if(c==='doubleM'){state.M=8;state.m=7.3;state.r=6.4}if(c==='near'){state.M=6;state.m=7.3;state.r=2.8}draw()}));
-  function tick(){state.pulse=(state.pulse+.05)%(Math.PI*2);draw();requestAnimationFrame(tick)}
+  const playBtn=document.getElementById('playBtn');
+  playBtn.addEventListener('click',()=>{state.running=!state.running;playBtn.textContent=state.running?'暂停演示':'播放演示';if(state.running)draw()});
+  function tick(){if(state.running){state.pulse=(state.pulse+.05)%(Math.PI*2);draw()}requestAnimationFrame(tick)}
   draw();requestAnimationFrame(tick);
 })();
 </script>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script>
+<script>/* GKWL: unified full reset (2026-07-12 review remediation) */
+(function(){
+  var btns=[].slice.call(document.querySelectorAll('button'));
+  var resets=btns.filter(function(b){return /重置|复位/.test(b.textContent)});
+  if(!resets.length)return;
+  var scoped=/播放|时间|回放/;
+  var primary=resets[0];
+  if(scoped.test(primary.textContent)){
+    var nb=document.createElement('button');
+    nb.textContent='全部重置';
+    nb.className=primary.className;
+    nb.setAttribute('data-gkwl-full-reset','1');
+    nb.addEventListener('click',function(){location.reload()});
+    primary.parentNode.insertBefore(nb,primary.nextSibling);
+  }else{
+    resets.forEach(function(b){b.addEventListener('click',function(){setTimeout(function(){location.reload()},60)})});
+  }
+})();
+</script>
+<script>
+window.B2_GUIDE={id:'B2-09',question:'两天体质量不变，质心距离变为2倍，引力变为多少？',observe:'注意公式中的r是两质心距离，不是两表面间距。',options:[{value:'quarter',label:'变为原来的1/4'},{value:'half',label:'变为原来的1/2'},{value:'double',label:'变为原来的2倍'}],correct:'quarter',actions:[{selector:'[data-case="doubleR"]'}],result:'引力变为原来的1/4。',evidence:'F-r曲线红点下降到基准值的四分之一，两侧引力箭头同步缩短。',explanation:'质量不变时引力与质心距离的平方成反比。',transfer:'平方反比比较题先确认质量不变，再比较r的倍数；均匀球体外部可等效为质量集中在球心。'};
+</script><script src="guided-lesson.js"></script>
 </body>
 </html>

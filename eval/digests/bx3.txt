@@ -1,0 +1,1015 @@
+
+===== anim/bx3/capacitor-lab.html (148 lines, kept 56) =====
+27: <h2>电容器充放电：看电荷积累、电压上升、充电电流衰减（Q=CU，q=CE(1−e^(−t/RC))）</h2>
+28: <canvas id="cv" width="720" height="430" aria-label="电容充放电实验台：极板侧视装置、Uc-t图像和数据记录"></canvas>
+30: <span class="chip">电容器电压 U_C = <b id="uc">0</b> V</span>
+31: <span class="chip">电荷量 Q = CU = <b id="q">0</b> μC</span>
+32: <span class="chip">充电电流 i = <b id="i">0</b> mA</span>
+33: <span class="chip">储能 ½CU² = <b id="w">0</b> μJ</span>
+34: <span class="chip">充放电状态：<b id="statev">断开</b></span>
+35: <span class="chip">拖动曲线探针读数：t=<b id="probeT">—</b> s，U=<b id="probeU">—</b> V</span>
+38: <button class="btn on" id="charge">▶ 充电并播放</button>
+39: <button class="btn" id="discharge">▶ 放电并播放</button>
+42: <label>电源 E = <span id="El">6</span> V<input type="range" id="E" min="2" max="10" step="1" value="6"></label>
+43: <label>电阻 R = <span id="Rl">10</span> kΩ<input type="range" id="R" min="2" max="30" step="1" value="10"></label>
+44: <label>电容 C = <span id="Cl">100</span> μF<input type="range" id="C" min="20" max="200" step="10" value="100"></label>
+46: <div class="hint"><b>怎么玩</b>：点<b>充电</b>，对照极板侧视装置、Uc-t 图像和数据记录，看电荷逐个<b>积累</b>到极板上，电压 U_C 沿曲线<b>上升</b>逼近电源电压 E。拖<b>R</b> 或 <b>C</b> 看时间常数 τ=RC 怎样改变。</div>
+51: let E=6,R=10,C=100,mode='charge',Uc=0,t=0,hist=[],dragProbe=false,probeFrac=null,running=false;
+53: const capX=250,capTopY=120,capBotY=250,plateW=150; // plates
+54: const gx=470,gy=70,gw=220,gh=170; // graph
+56: const RC=R*1000*C*1e-6; // seconds
+58: if(mode!=='open'){ Uc += (target-Uc)*(1-Math.exp(-dt/RC)); }
+63: const q=C*Uc; // μC (C in μF, Uc in V)
+64: const RC=R*1000*C*1e-6;
+65: const i = mode==='charge'? (E-Uc)/(R*1000)*1e6 : (mode==='discharge'? -Uc/(R*1000)*1e6 : 0); // mA*... -> compute in mA
+66: const iMA = mode==='charge'? (E-Uc)/R : (mode==='discharge'? -Uc/R : 0); // since R in kΩ, V/kΩ = mA
+76: const rx=(60+capX-plateW/2)/2;ctx.strokeStyle='#0e1a2b';ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(rx-30,capTopY-20);ctx.lineTo(rx+30,capTopY-20);ctx.stroke();
+77: ctx.strokeStyle='#ffd166';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(rx-30,capTopY-20);for(let j=0;j<=6;j++)ctx.lineTo(rx-30+j*10,capTopY-20+(j%2?6:-6));ctx.l
+80: const frac=Uc/Math.max(E,0.001);
+85: const nq=Math.round(Math.abs(frac)*10);
+87: for(let j=0;j<nq;j++){const px=capX-plateW/2+12+j*(plateW-24)/9;
+91: const nl=Math.round(Math.abs(frac)*8);
+93: for(let j=0;j<nl;j++){const px=capX-plateW/2+16+j*(plateW-32)/Math.max(1,nl-1);
+96: ctx.fillStyle='#9fb3c8';ctx.font='12px system-ui';ctx.textAlign='left';ctx.fillText('C='+C+'μF',capX+plateW/2+8,(capTopY+capBotY)/2);
+98: if(Math.abs(iMA)>0.01){const dir=iMA>0?1:-1;const off=(t*iMA*40)%24;
+99: ctx.fillStyle='#ffd166';for(let s=0;s<10;s++){const yy=capTopY-20;const xx=60+((s*24+off*dir)%(capX-plateW/2-60));if(xx>60&&xx<capX-plateW/2)ctx.beginPath(),ctx
+102: ctx.strokeStyle='#3b5878';ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(gx,gy+gh-(E/10)*gh);ctx.lineTo(gx+gw,gy+gh-(E/10)*gh);ctx.stroke();ctx.setLineDash([
+103: ctx.fillStyle='#7fa8d8';ctx.font='11px system-ui';ctx.textAlign='left';ctx.fillText('U_C',gx+4,gy+12);ctx.fillText('E',gx+gw-14,gy+gh-(E/10)*gh-4);ctx.fillText(
+105: if(hist.length>1){ctx.strokeStyle='#2ecc71';ctx.lineWidth=2;ctx.beginPath();t0=hist[0].t;tspan=Math.max(2,t-t0);hist.forEach((p,idx)=>{const X=gx+((p.t-t0)/tspa
+107: const px=gx+probeFrac*gw,pt=t0+probeFrac*tspan;
+108: let nearest=hist[0];for(const p of hist)if(Math.abs(p.t-pt)<Math.abs(nearest.t-pt))nearest=p;
+111: ctx.fillStyle='#ffd166';ctx.beginPath();ctx.arc(gx+((nearest.t-t0)/tspan)*gw,gy+gh-(nearest.u/10)*gh,4,0,7);ctx.fill();
+115: ctx.fillStyle='#e6eef7';ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillText('τ = RC = '+(RC*1000).toFixed(0)+' ms　Q = CU',24,H-14);
+116D: document.getElementById('uc').textContent=Uc.toFixed(2);
+117D: document.getElementById('q').textContent=q.toFixed(0);
+118D: document.getElementById('i').textContent=iMA.toFixed(2);
+119: document.getElementById('w').textContent=(0.5*C*Uc*Uc).toFixed(0);
+119D: document.getElementById('w').textContent=(0.5*C*Uc*Uc).toFixed(0);
+120D: document.getElementById('statev').textContent=mode==='charge'?(running?'正在充电':'充电已暂停'):(mode==='discharge'?(running?'正在放电':'放电已暂停'):'断开（临界：电荷保持不变）');
+121D: document.getElementById('probeT').textContent=probeVal?probeVal.t.toFixed(2):'—';
+122D: document.getElementById('probeU').textContent=probeVal?probeVal.u.toFixed(2):'—';
+127D: document.getElementById('playBtn').textContent=running?'暂停演示':'播放演示';
+134D: function bind(id,cb,lab){document.getElementById(id).addEventListener('input',e=>{cb(parseFloat(e.target.value));document.getElementById(lab).textContent=e.target.value;});}
+136: function pos(e){const rc=cv.getBoundingClientRect(),s=cv.width/rc.width;return{x:(e.clientX-rc.left)*s,y:(e.clientY-rc.top)*s};}
+137: cv.addEventListener('pointerdown',e=>{const p=pos(e);if(p.x>=gx&&p.x<=gx+gw&&p.y>=gy&&p.y<=gy+gh){dragProbe=true;probeFrac=Math.max(0,Math.min(1,(p.x-gx)/gw));}
+138: cv.addEventListener('pointermove',e=>{if(!dragProbe)return;const p=pos(e);probeFrac=Math.max(0,Math.min(1,(p.x-gx)/gw));draw();});
+141D: document.getElementById('playBtn').onclick=function(){running=!running;this.textContent=running?'暂停演示':'播放演示';if(running)draw()};
+142: function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;if(running)step(dt);draw();requestAnimationFrame(loop);}
+146: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/bx3/capacitor.html (158 lines, kept 34) =====
+33: <div class="stage"><canvas id="cv" width="720" height="450" aria-label="平行板电容器交互实验台：极板侧视装置、C-d图像和数据记录"></canvas></div>
+35: <button id="playBtn" style="width:100%;margin-bottom:10px">▶ 播放：自动拉开/靠近极板</button>
+37: <button class="on" data-mode="battery">接电源 U不变</button>
+38: <button data-mode="isolated">断电源 Q不变</button>
+40: <button id="reset" style="width:100%;margin-bottom:10px">复位</button>
+42: <div class="chip">电容 C = <b id="cvv">0</b> pF</div>
+43: <div class="chip">电压 U = <b id="uv">0</b> V</div>
+44: <div class="chip">电量 Q = <b id="qv">0</b> pC</div>
+45: <div class="chip">场强 E≈U/d = <b id="ev">0</b> V/mm</div>
+46: <div class="chip">板距 d = <b id="dv">0</b> mm，面积 S = <b id="sv">0</b> cm²</div>
+47: <div class="chip">电容状态：<b id="statev">—</b></div>
+49: <div class="hint"><b>观察任务</b>：拖动蓝色下极板改变 d，对照极板侧视装置、C-d 图像和数据记录；在“接电源”和“断电源”间切换，看 d 变大时 U、Q、E 谁保持不变。</div>
+52: C=εS/d 绑定到极板面积和间距；接电源时 U 固定、Q=CU；断电源时 Q 固定、U=Q/C。
+71: function pos(e){const r=cv.getBoundingClientRect(),s=cv.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s}}
+73: const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=w||2.2;ctx.lineCap='round';
+75: ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-8*Math.cos(a-.45),y2-8*Math.sin(a-.45));ctx.lineTo(x2-8*Math.cos(a+.45),y2-8*Math.sin(a+.45));ctx.closePath();ct
+79: const cx=390,top=120,dpx=45+d*31,w=plateW(),x1=cx-w/2,x2=cx+w/2,y1=top,y2=top+dpx;
+86: const g=geometry();
+91: const dots=Math.max(2,Math.min(36,Math.round(Q()/30)));
+92: for(let i=0;i<dots;i++){const x=g.x1+g.w*(i+.5)/dots;drawCharge(x,g.y1-18,1);drawCharge(x,g.y2+24,-1)}
+95: ctx.fillStyle='#52677a';ctx.font='12px system-ui';ctx.textAlign='left';ctx.fillText('拖 d',g.x2+26,(g.y1+g.y2)/2);
+107: ctx.fillText('C=εS/d='+C().toFixed(1)+' pF，Q=CU='+Q().toFixed(0)+' pC',24,34);
+112: const y=404,x1=170,x2=560,t=mode==='battery'?(Uset-4)/26:(Qset-Q_MIN)/(Q_MAX-Q_MIN),x=x1+clamp(t,0,1)*(x2-x1);
+119: if(playing){playing=false;id('playBtn').textContent='▶ 播放：自动拉开/靠近极板'}
+119D: if(playing){playing=false;id('playBtn').textContent='▶ 播放：自动拉开/靠近极板'}
+120: const p=pos(e),g=geometry(),railY=404,railX=mode==='battery'?170+(Uset-4)/26*390:170+(Qset-Q_MIN)/(Q_MAX-Q_MIN)*390;
+123: if(Math.hypot(p.x-railX,p.y-railY)<24){drag='rail';cv.style.cursor='grabbing';return}
+127: if(drag==='d')d=clamp((p.y-g.y1-45)/31,.8,5.5);
+128: if(drag==='S'){const w=clamp((p.x-g.cx)*2,180,430);S=40+(w-180)/250*160}
+129: if(drag==='rail'){const t=(clamp(p.x,170,560)-170)/390;if(mode==='battery')Uset=4+t*26;else Qset=Q_MIN+t*(Q_MAX-Q_MIN)}
+140: id('reset').onclick=()=>{playing=false;id('playBtn').textContent='▶ 播放：自动拉开/靠近极板';mode='battery';d=2;S=100;Uset=12;Qset=531;document.querySelectorAll('#mode but
+144: d=clamp(3.15+2.35*Math.sin(playT),0.8,5.5);
+150: id('playBtn').textContent=playing?'⏸ 暂停':'▶ 播放：自动拉开/靠近极板';
+150D: id('playBtn').textContent=playing?'⏸ 暂停':'▶ 播放：自动拉开/靠近极板';
+
+===== anim/bx3/charge-electrification.html (151 lines, kept 49) =====
+39: <canvas id="canvas" aria-label="电荷与起电实验台：电子转移、金属球接触和静电感应"></canvas>
+40: <div class="hint">拖动黄色手柄；每个模式都把读数和画面同步显示</div>
+43: <div class="card task"><b>观察任务：</b>拖动手柄，先看电子从哪里到哪里，再看 qA、qB 和 q总如何变化。切换到感应模式后，按顺序操作“接地”“移开带电体”。</div>
+44: <button id="playBtn" style="width:100%">▶ 播放过程</button>
+46: <div class="title">选择起电过程</div>
+48: <button class="on" data-mode="friction">摩擦起电</button>
+49: <button data-mode="contact">接触起电</button>
+50: <button data-mode="induction">静电感应</button>
+51: <button data-mode="quantum">元电荷检查</button>
+53: <label class="param"><span id="nLabel">电子转移数 n <b id="nText">+6 个</b></span><input id="n" type="range" min="-12" max="12" step="1" value="6"></label>
+55: <button data-case="glass">玻璃棒失电子</button>
+56: <button data-case="rubber">橡胶棒得电子</button>
+57: <button data-case="share">接触平分</button>
+58: <button data-case="invalid">非整数尝试</button>
+60: <button id="inductionStep" style="display:none;width:100%;margin-top:8px">接地</button>
+62: <div class="readout" id="readout"></div>
+62D: <div class="readout" id="readout"></div>
+64: <div class="title">公式与画面</div>
+65: <div><b>q=ne：</b>手柄给出 n，元电荷检查只接受整数 n。</div>
+69: <div class="status" id="status"></div>
+79: const state = { mode:'friction', drag:false, hot:{}, invalid:false, inductionStage:0, playing:false, progress:0, raf:0, W:920, H:540, dpr:1 };
+84: function fmt(v){ const rounded = Math.round(v*10)/10; return (rounded > 0 ? '+' : '') + rounded + 'e'; }
+85: function formulaFmt(v){ const rounded=Math.round(v*10)/10; return rounded>0?'+'+rounded+'e':rounded<0?'−'+Math.abs(rounded)+'e':'0e'; }
+86: function setN(v){ els.n.value = String(Math.round(clamp(v,-12,12))); state.invalid=false; }
+88: const k=n();
+90: const initialB=-2, total=k+initialB, each=total/2;
+94: const ext=k, amount=Math.abs(k), dir=ext===0?1:Math.sign(ext);
+95: const near=-dir*amount, far=dir*amount;
+96: const final=-dir*amount;
+106: function arrow(x1,y1,x2,y2,color){ const a=Math.atan2(y2-y1,x2-x1); ctx.save(); ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=2.5; ctx.beginPath(); 
+108: function drawCharge(x,y,q,label,sub){ const color=chargeColor(q); ctx.save(); const g=ctx.createRadialGradient(x-9,y-9,4,x,y,30); g.addColorStop(0,q>=0?'#ff8a76
+109: function drawElectrons(count,x1,x2,y){ const total=Math.min(12,Math.abs(Math.round(count))); for(let i=0;i<total;i++){ const t=total===1?.5:i/(total-1); const x
+110: function responsive(){ const width=clamp(canvas.parentElement.getBoundingClientRect().width,320,920); state.W=width; state.H=width<600?620:540; state.dpr=Math.m
+112: const W=state.W,H=state.H,d=modeData(), mobile=W<600; ctx.clearRect(0,0,W,H); ctx.fillStyle='#f7f9fc'; ctx.fillRect(0,0,W,H); box(12,16,W-24,mobile?330:270,'#ff
+113: const ax=W*.28,bx=W*.72,y=mobile?170:160;
+115: drawCharge(ax,y,d.a,'物体 A',fmt(d.a)); drawCharge(bx,y,d.b,'物体 B',fmt(d.b)); const dir=n()>=0?1:-1; arrow(dir>0?ax+48:bx-48,y,dir>0?bx-48:ax+48,y,'#2c7be5'); tex
+117: drawCharge(ax,y,d.initialA,'A 接触前',fmt(d.initialA)); drawCharge(bx,y,d.initialB,'B 接触前',fmt(d.initialB)); arrow(ax+50,y,bx-50,y,'#087f5b'); text('金属球接触',W/2,y-3
+119: const ext=d.ext, bodyX=W*.48, bodyY=y+4; if(state.inductionStage<2) drawCharge(W*.82,y,ext,'外部带电体',fmt(ext)); else text('外部带电体已移开',W*.72,y,'#486581','center',13
+121: drawCharge(W/2,y,d.a,'带电体',fmt(d.a)); text(d.valid?'q=ne，n 为整数':'q=+1.5e，n 不是整数',W/2,y-46,d.valid?'#087f5b':'#c92a2a','center',15,'700'); text(d.valid?'每拖一格就是一个
+123: const trackY=mobile?470:355,left=W*.16,right=W*.84; box(W*.08,trackY-38,W*.84,150,'#fff','#d9e2ec'); text(state.mode==='contact'?'改变 A 接触前电荷':state.mode==='indu
+127: const k=n(); els.nText.textContent=(k>0?'+':'')+k+(state.mode==='friction'?' 个':' e'); els.nLabel.firstChild.textContent=state.mode==='contact'?'A 初始电荷 qA0/e ':
+128: let html=''; if(state.mode==='induction'){ const stage=['靠近（未接触）','接地','移开后'][state.inductionStage]; html='<div>步骤：<b>'+stage+'</b></div><div>外部带电体 q=<b>'+fmt(d
+129: else if(state.mode==='contact'){ html='<div>接触前：qA=<b>'+fmt(d.initialA)+'</b>，qB=<b>'+fmt(d.initialB)+'</b></div><div>接触前总电荷：<b>'+fmt(d.total)+'</b></div><div>接
+130: else { html='<div>qA=<b>'+fmt(d.a)+'</b>　qB=<b>'+fmt(d.b)+'</b></div><div>q总=<b>'+fmt(d.sum)+'</b>　n=<b>'+k+'</b></div><div>量子化检查：<b style="color:'+(d.valid?'#f
+133: function eventPos(ev){ const src=ev.touches&&ev.touches.length?ev.touches[0]:(ev.changedTouches&&ev.changedTouches.length?ev.changedTouches[0]:ev); const r=canv
+134: function setFromX(x){ const h=state.hot.knob; setN((x-h.left)/(h.right-h.left)*24-12); }
+135: function start(ev){ const p=eventPos(ev),h=state.hot.knob; if(Math.hypot(p.x-h.x,p.y-h.y)<28){ state.drag=true; setFromX(p.x); draw(); ev.preventDefault(); } }
+140: function playFrame(now){ if(!state.playing)return; if(!state.started)state.started=now; state.progress=clamp((now-state.started)/1400,0,1); draw(); if(state.pro
+149: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/bx3/charges-field.html (213 lines, kept 66) =====
+33: <h2>电荷与电场：拖动电荷，看整片电场怎么变（E = kQ/r²，矢量叠加）</h2>
+35: <button class="btn pos" id="addP"><span class="dot" style="background:#ff5b47"></span>加正电荷 +</button>
+36: <button class="btn neg" id="addN"><span class="dot" style="background:#4d9bff"></span>加负电荷 −</button>
+38: <button class="btn on" data-testq="1">试探 +q</button>
+39: <button class="btn" data-testq="-1">试探 −q</button>
+40: <button class="btn" data-testq="2">试探 2q</button>
+41: <span style="font-size:13px;color:#5a6b7b">显示：</span>
+43: <button data-m="vectors" class="on">场矢量</button>
+44: <button data-m="lines">电场线</button>
+48: <div class="stage-wrap"><canvas id="cv" width="720" height="440" aria-label="电荷与电场实验台：电荷俯视装置、场线图像和数据记录"></canvas></div>
+50: <span class="chip">测试点场强 E = <b id="ev">0</b> （相对）</span>
+51: <span class="chip">试探电荷 q = <b id="qtv">+q</b></span>
+52: <span class="chip">受力 F = qE = <b id="fv">0</b>，方向 <b id="fd">—</b></span>
+53: <span class="chip">电荷数 <b id="nc">2</b></span>
+54: <span class="chip">场强状态：<b id="trendv">—</b></span>
+56: <div class="hint"><b>怎么玩</b>：直接<b>拖动</b>画面里的圆形电荷（红=正、蓝=负），整片电场的箭头会<b>实时重排</b>——箭头方向是该点场强方向、颜色越暖(红)表示场越强。拖动黄色<b>试探电荷</b>，绿色箭头读 <b>E</b>，黄色箭头读 <b>F=qE</b>；换成负试探电荷
+66: const k=6000; // visual constant
+71: const dx=x-c.x, dy=y-c.y; let r2=dx*dx+dy*dy; if(r2<200)r2=200;
+72: const r=Math.sqrt(r2); const e=k*c.q/r2;
+73: ex+=e*dx/r; ey+=e*dy/r;
+75: return {ex,ey,mag:Math.hypot(ex,ey)};
+78: t=Math.max(0,Math.min(1,t));
+80: const seg=t*4, i=Math.min(3,Math.floor(seg)), f=seg-i;
+92: const r=Math.abs(c.q)*10+16;
+94: const g=ctx.createRadialGradient(c.x-r*0.3,c.y-r*0.3,2,c.x,c.y,r);
+106: let x=c.x+Math.cos(angle)*(Math.abs(c.q)*10+18), y=c.y+Math.sin(angle)*(Math.abs(c.q)*10+18);
+110: const f=field(x,y); if(f.mag<1e-3)break;
+111: const ux=dir*f.ex/f.mag, uy=dir*f.ey/f.mag;
+112: x+=ux*4; y+=uy*4;
+116: let hit=false; for(const o of charges){if(o.q<0&&Math.hypot(x-o.x,y-o.y)<Math.abs(o.q)*10+18){hit=true;break;}}
+132: for(let y=step/2;y<H;y+=step)for(let x=step/2;x<W;x+=step){
+133: let near=false;for(const c of charges)if(Math.hypot(x-c.x,y-c.y)<24){near=true;break;}
+135: const f=field(x,y); const m=f.mag;
+136: const t=Math.min(1,Math.log(1+m*0.06)/2.6);
+137: const len=8+t*18;
+138: drawArrow(x,y,Math.atan2(f.ey,f.ex),len,heat(t),1.4+t*1.4);
+143: const n=Math.round(8*Math.abs(c.q));
+144: for(let i=0;i<n;i++) fieldLineFrom(c,i/n*2*Math.PI);
+150: const f=field(test.x,test.y);
+156: const eAng=Math.atan2(f.ey,f.ex);
+157: const eLen=Math.min(76,16+Math.log(1+f.mag*0.06)*24);
+158: drawArrow(test.x+Math.cos(eAng)*14, test.y+Math.sin(eAng)*14, eAng, eLen, '#2ecc71', 2.4);
+160: ctx.fillText('E', test.x+Math.cos(eAng)*(18+eLen)+4, test.y+Math.sin(eAng)*(18+eLen));
+161: const fAng=test.q>0?eAng:eAng+Math.PI;
+162: const flen=Math.min(95,eLen*Math.abs(test.q));
+163: drawArrow(test.x+Math.cos(fAng)*14, test.y+Math.sin(fAng)*14, fAng, flen, '#ffd166', 3.2);
+165: ctx.fillText('F=qE', test.x+Math.cos(fAng)*(18+flen)+4, test.y+Math.sin(fAng)*(18+flen));
+168D: document.getElementById('ev').textContent=(f.mag).toFixed(2);
+169D: document.getElementById('qtv').textContent=test.q>0?(test.q===2?'+2q':'+q'):'−q';
+170: document.getElementById('fv').textContent=(Math.abs(test.q)*f.mag).toFixed(2);
+170D: document.getElementById('fv').textContent=(Math.abs(test.q)*f.mag).toFixed(2);
+171D: document.getElementById('fd').textContent=(f.mag<1e-3?'—':(test.q>0?'沿 E 方向':'反 E 方向'));
+172D: document.getElementById('nc').textContent=charges.length;
+174D: document.getElementById('trendv').textContent=trend;
+177: function pos(e){const r=cv.getBoundingClientRect();const s=cv.width/r.width;const X=e.touches?e.touches[0].clientX:e.clientX,Y=e.touches?e.touches[0].clientY:e.
+179: if(Math.hypot(p.x-test.x,p.y-test.y)<18){dragTest=true;cv.style.cursor='grabbing';return;}
+180: for(let i=charges.length-1;i>=0;i--){const c=charges[i];if(Math.hypot(p.x-c.x,p.y-c.y)<Math.abs(c.q)*10+18){drag=i;cv.style.cursor='grabbing';return;}}
+183: p.x=Math.max(20,Math.min(W-20,p.x));p.y=Math.max(20,Math.min(H-20,p.y));
+186: document.getElementById('addP').onclick=()=>{charges.push({x:120+Math.random()*480,y:80+Math.random()*280,q:1});render();};
+187: document.getElementById('addN').onclick=()=>{charges.push({x:120+Math.random()*480,y:80+Math.random()*280,q:-1});render();};
+192D: function stopPlay(){playing=false;document.getElementById('playBtn').textContent='▶ 播放：试探电荷自动巡游'}
+196: const cx=W/2,cy=H/2;
+197: test.x=cx+Math.cos(playT)*170;
+198: test.y=cy+Math.sin(playT)*130;
+204D: document.getElementById('playBtn').textContent=playing?'⏸ 暂停巡游':'▶ 播放：试探电荷自动巡游';
+211: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/bx3/closed-circuit-law.html (85 lines, kept 28) =====
+29: <div class="stage"><canvas id="cv" width="720" height="450" aria-label="闭合电路欧姆定律实验台：电路俯视装置、U-I图像和数据记录"></canvas><div style="padding:6px 10px;display:flex;gap:12
+32: <div class="chip">电动势 ε = <b id="ev">6.0</b> V</div>
+33: <div class="chip">内阻 r = <b id="rv">1.0</b> Ω</div>
+34: <div class="chip">外阻 R = <b id="Rv">5.0</b> Ω</div>
+35: <div class="chip">电流 I = <b id="iv">1.00</b> A</div>
+36: <div class="chip">路端电压 U = <b id="uv">5.00</b> V</div>
+37: <div class="chip">内压降 Ir = <b id="irv">1.00</b> V</div>
+39: <div class="hint"><b>观察任务</b>：拖金色 R 手柄，对照电路俯视装置、U-I 图像和数据记录，看 R 增大时 I 变小、U 变大；拖 ε 改纵截距，拖 r 改斜率。</div>
+40: <div class="formula"><b>画面绑定</b><br>U-I 图直线满足 U=ε-Ir，纵截距是 ε，斜率是 -r。外电路还满足 U=IR，所以工作点由电源直线和外阻关系共同决定。</div>
+47: let E=6,r=1,R=5,drag=null,phase=0,last=performance.now();
+53: function pos(e){const rc=cv.getBoundingClientRect(),s=cv.width/rc.width;return{x:(e.clientX-rc.left)*s,y:(e.clientY-rc.top)*s}}
+57: const rx=230+(R-1)/19*120;ctx.strokeStyle='#f0a500';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(175,105);for(let i=0;i<9;i++)ctx.lineTo(175+i*(rx-175)/8,105+(i%2
+58: const ey=280-(E-2)/10*115;ctx.strokeStyle='#e03131';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(60,280);ctx.lineTo(60,ey);ctx.stroke();drawKnob(60,ey,'拖 ε','#e03
+59: const ry=360-(r-.2)/4.8*120;ctx.strokeStyle='#7b2cbf';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(115,360);ctx.lineTo(250,360);ctx.stroke();drawKnob(115+(360-ry)
+60: for(let k=0;k<14;k++){const x=80+((phase+k*42)%300);ctx.fillStyle='#ffd166';ctx.beginPath();ctx.arc(x,315,4,0,7);ctx.fill()}
+61: ctx.fillStyle='#102a43';ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillText(`I=ε/(R+r)=${I().toFixed(2)}A，U=IR=${U().toFixed(2)}V`,95,345);
+64: const gx=430,gy=340,gw=245,gh=245,Imax=12,Umax=12,Is=E/r;
+66: ctx.fillStyle='#52677a';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText('I/A',gx+gw+18,gy+4);ctx.fillText('U/V',gx-12,gy-gh-8);
+67: for(let n=0;n<=12;n+=3){const x=gx+n/Imax*gw,y=gy-n/Umax*gh;ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,gy);ctx.lineTo(x,gy+4);ctx.mo
+68: const endI=Math.min(Imax,Is),endU=Math.max(0,E-r*endI);ctx.strokeStyle='#2c7be5';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(gx,gy-E/Umax*gh);ctx.lineTo(gx+endI/
+69: const px=gx+I()/Imax*gw,py=gy-U()/Umax*gh;ctx.fillStyle='#2c7be5';ctx.beginPath();ctx.arc(px,py,9,0,7);ctx.fill();ctx.strokeStyle='#102a43';ctx.lineWidth=1.5;ct
+71: ctx.fillStyle='#102a43';ctx.font='12px system-ui';ctx.textAlign='left';ctx.fillText('拖工作点',px+12,py-10);ctx.fillText('截距 ε='+E.toFixed(1)+'V；斜率 −r=−'+r.toFixed(
+73: function update(){els.ev.textContent=E.toFixed(1);els.rv.textContent=r.toFixed(1);els.Rv.textContent=R.toFixed(1);els.iv.textContent=I().toFixed(2);els.uv.textC
+74: function draw(){ctx.clearRect(0,0,cv.width,cv.height);const bg=ctx.createLinearGradient(0,0,0,cv.height);bg.addColorStop(0,'#f8fbff');bg.addColorStop(1,'#edf3f8
+75: cv.addEventListener('pointerdown',e=>{const p=pos(e),rx=230+(R-1)/19*120,ey=280-(E-2)/10*115,rkx=115+(360-(360-(r-.2)/4.8*120))/120*135;const gx=430,gy=340,gw=2
+76: cv.addEventListener('pointermove',e=>{if(!drag)return;const p=pos(e);if(drag==='R')R=clamp(1+(p.x-230)/120*19,1,20);if(drag==='E')E=clamp(2+(280-p.y)/115*10,2,1
+78: function loop(now){if(window.__paused){requestAnimationFrame(loop);return;}const dt=Math.min((now-last)/1000,.05);last=now;phase+=I()*55*dt;draw();requestAnimat
+83: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/bx3/closed-circuit.html (237 lines, kept 56) =====
+7: <link rel="stylesheet" href="../common/controls.css">
+25: <h2>闭合电路欧姆定律：I = ε/(R+r)，U = ε - Ir</h2>
+27: <label>外阻 R = <span id="r-display">10</span> Ω
+28: <input type="range" id="r" min="0.5" max="30" step="0.5" value="10"></label>
+29: <label>电动势 ε = <span id="emf-display">6</span> V
+30: <input type="range" id="emf" min="1" max="12" step="0.5" value="6"></label>
+31: <label>内阻 r = <span id="ri-display">2</span> Ω
+32: <input type="range" id="ri" min="0.5" max="8" step="0.5" value="2"></label>
+33: <button id="play-btn">播放</button>
+34: <button id="reset-btn">重置</button>
+36: <canvas id="canvas" width="600" height="400" aria-label="闭合电路实验台：电路俯视装置、U-I图像和数据记录"></canvas>
+38: <span class="r">电流 I = <b id="i-val">0.50</b> A</span>
+39: <span class="r">路端电压 U = <b id="u-val">5.0</b> V</span>
+40: <span class="r">内压降 Ir = <b id="ir-val">1.0</b> V</span>
+41: <span class="r">电源功率 = <b id="p-val">3.0</b> W</span>
+42: <span class="r">通过截面的电荷 Q = <b id="q-flow-val">0.00</b> C</span>
+43: <span class="r">演示时间 = <b id="t-val">0.00</b> s</span>
+54: let R=10,emf=6,ri=2;
+63D: document.getElementById('i-val').textContent=I.toFixed(2);
+64D: document.getElementById('u-val').textContent=U.toFixed(2);
+65: document.getElementById('ir-val').textContent=(ri*I).toFixed(2);
+65D: document.getElementById('ir-val').textContent=(ri*I).toFixed(2);
+66: document.getElementById('p-val').textContent=(emf*I).toFixed(1);
+66D: document.getElementById('p-val').textContent=(emf*I).toFixed(1);
+67: document.getElementById('q-flow-val').textContent=(I*t).toFixed(2);
+67D: document.getElementById('q-flow-val').textContent=(I*t).toFixed(2);
+68D: document.getElementById('t-val').textContent=t.toFixed(2);
+95: const y=cy-40+(i+0.5)*13.3;
+103: const arrowSize=Math.min(12,3+I*4);
+124: const phase=t*I*0.55;
+126: const u=(phase+n/8)%1;let x,y;
+127: if(u<.25){x=cx-60+u/.25*120;y=cy-80;}
+128: else if(u<.5){x=cx+60;y=cy-80+(u-.25)/.25*160;}
+129: else if(u<.75){x=cx+60-(u-.5)/.25*120;y=cy+80;}
+130: else{x=cx-60;y=cy+80-(u-.75)/.25*160;}
+131: ctx.fillStyle='#ffd166';ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();
+151: // U-I line: U = emf - r*I
+152: const Imax=emf/ri;
+153: const Ishort=emf/Math.max(ri,0.5);
+154: const scaleI=gw/Math.max(Ishort,0.5);
+155: const scaleU=gh/Math.max(emf,1);
+164: const px=gx+I*scaleI,py=gy+gh-U*scaleU;
+195: ctx.fillText('I = ε/(R+r) = '+emf+'/'+(R+ri).toFixed(1)+' = '+I.toFixed(2)+' A',15,H-30);
+201: function eventPos(ev){const rc=canvas.getBoundingClientRect();return{x:(ev.clientX-rc.left)*canvas.width/rc.width,y:(ev.clientY-rc.top)*canvas.height/rc.height}
+202: canvas.addEventListener('pointerdown',ev=>{const p=eventPos(ev);if(Math.hypot(p.x-pointHot.x,p.y-pointHot.y)<16)dragPoint=true;});
+205: const I=Math.max(0.02,Math.min(pointHot.Ishort,(p.x-pointHot.gx)/(pointHot.gw/pointHot.Ishort)));
+206: R=Math.max(0.5,Math.min(30,emf/I-ri));
+207D: document.getElementById('r').value=R;document.getElementById('r-display').textContent=R.toFixed(1);
+211D: document.getElementById('r').addEventListener('input',e=>{R=parseFloat(e.target.value);document.getElementById('r-display').textContent=R.toFixed(1);updateReadouts();draw();});
+212D: document.getElementById('emf').addEventListener('input',e=>{emf=parseFloat(e.target.value);document.getElementById('emf-display').textContent=emf.toFixed(1);updateReadouts();draw();});
+213D: document.getElementById('ri').addEventListener('input',e=>{ri=parseFloat(e.target.value);document.getElementById('ri-display').textContent=ri.toFixed(1);updateReadouts();draw();});
+214D: document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
+223D: document.getElementById('r-display').textContent=R.toFixed(1);
+224D: document.getElementById('emf-display').textContent=emf.toFixed(1);
+225D: document.getElementById('ri-display').textContent=ri.toFixed(1);
+231: function loop(now){const dt=Math.min((now-lastTime)/1000,0.05);lastTime=now;step(dt);requestAnimationFrame(loop);}
+
+===== anim/bx3/coulomb.html (273 lines, kept 74) =====
+7: <link rel="stylesheet" href="../common/controls.css">
+25: <h2>库仑定律：F = k·q₁q₂/r²</h2>
+27: <label>q₁ = <span id="q1-display">+3.0</span> μC
+28: <input type="range" id="q1" min="-10" max="10" step="0.5" value="3"></label>
+29: <label>q₂ = <span id="q2-display">+2.0</span> μC
+30: <input type="range" id="q2" min="-10" max="10" step="0.5" value="2"></label>
+31: <label>距离 r = <span id="r-display">3.0</span> m
+32: <input type="range" id="r" min="1" max="8" step="0.1" value="3"></label>
+33: <button id="play-btn">播放</button>
+34: <button id="reset-btn">重置</button>
+35: <button data-case="double">距离翻倍</button>
+36: <button data-case="opposite">异号相吸</button>
+38: <canvas id="canvas" width="600" height="340" aria-label="库仑定律实验台：两电荷俯视装置、F-r图像和数据记录"></canvas>
+40: <span class="r">距离 r = <b id="r-val">3.0</b> m</span>
+41: <span class="r">力 F = <b id="f-val">2.00</b> N</span>
+42: <span class="r">k·q₁q₂ = <b id="kq-val">18.0</b> N·m²</span>
+43: <span class="r" id="type-val">斥力（同号）</span>
+44: <span class="r">q₂ 速度 v = <b id="v-val">0.00</b> m/s</span>
+45: <span class="r">加速度 a = <b id="a-val">0.00</b> m/s²</span>
+46: <span class="r">演示时间 t = <b id="t-val">0.00</b> s</span>
+49: <p><b>观察任务</b>：先按“播放”释放 q₂：同号时它被推远、异号时它被拉近。看距离 r 改变后，力箭头、F=k|q₁q₂|/r²、速度和加速度怎样同步变化；拖动电荷可重新设定释放位置。</p>
+60: const k=9; // 简化 k=9 N·m²/μC² (实际 9×10⁹ N·m²/C²，这里 q 用 μC 简化)
+61: const scale=50; // px per meter
+62: const simMass=8; // kg：为便于观察，将 q₂ 视为 8 kg 小球
+66: const sign=q1*q2;
+67: const f=k*Math.abs(q1*q2)/(r*r);
+73D: document.getElementById('r-val').textContent=r.toFixed(2);
+74D: document.getElementById('f-val').textContent=res.f.toFixed(2);
+75: document.getElementById('kq-val').textContent=(k*Math.abs(q1*q2)).toFixed(1);
+75D: document.getElementById('kq-val').textContent=(k*Math.abs(q1*q2)).toFixed(1);
+76D: document.getElementById('v-val').textContent=velocity.toFixed(2);
+77: document.getElementById('a-val').textContent=(res.direction*res.f/simMass).toFixed(2);
+77D: document.getElementById('a-val').textContent=(res.direction*res.f/simMass).toFixed(2);
+78D: document.getElementById('t-val').textContent=elapsed.toFixed(2);
+87: const glow=ctx.createRadialGradient(x,y,3,x,y,18+Math.abs(q)*3);glow.addColorStop(0,q>0?'rgba(224,49,49,0.5)':'rgba(44,123,229,0.5)');glow.addColorStop(1,'rgba(
+88: ctx.fillStyle=glow;ctx.beginPath();ctx.arc(x,y,18+Math.abs(q)*3,0,7);ctx.fill();
+115: const ang=Math.atan2(y2-y1,x2-x1);
+118: ctx.lineTo(x2-8*Math.cos(ang-0.4),y2-8*Math.sin(ang-0.4));
+119: ctx.lineTo(x2-8*Math.cos(ang+0.4),y2-8*Math.sin(ang+0.4));
+128: const x2=x1+r*scale;
+132: ctx.globalAlpha=(index+1)/trail.length*.55;
+150: ctx.fillText('r = '+r.toFixed(1)+' m',W/2,cy-8);
+159: const fLen=Math.min(80,res.f*15+10);
+180: const vLen=Math.min(74,18+Math.abs(velocity)*24);
+184: ctx.fillText('v='+velocity.toFixed(2)+' m/s',(x2+vx2)/2,cy+82);
+190: ctx.fillText('F = k·|q₁q₂| / r² = '+k+'×|'+q1.toFixed(1)+'×'+q2.toFixed(1)+'|/'+r.toFixed(2)+'² = '+res.f.toFixed(2)+' N',15,226);
+191: ctx.fillText('q₂: a=F/m = '+(res.direction*res.f/simMass).toFixed(2)+' m/s²；'+(res.attractive?'向 q₁ 加速':'远离 q₁ 加速'),15,246);
+193: const gx=58,gy=324,gw=480,gh=54,maxF=Math.max(1,k*Math.abs(q1*q2));
+196: for(let rr=1;rr<=8;rr+=.08){const px=gx+(rr-1)/7*gw,py=gy-(k*Math.abs(q1*q2)/(rr*rr))/maxF*gh;if(rr===1)ctx.moveTo(px,py);else ctx.lineTo(px,py);}ctx.stroke();
+197: const px=gx+(r-1)/7*gw,py=gy-res.f/maxF*gh;
+198: ctx.fillStyle='#f0a500';ctx.beginPath();ctx.arc(px,py,5,0,Math.PI*2);ctx.fill();
+199: ctx.fillStyle='#486581';ctx.font='11px sans-serif';ctx.textAlign='left';ctx.fillText('F-r 图：黄点随 q₂ 的位置移动',gx,gy-gh-8);ctx.fillText('r/m',gx+gw-24,gy+15);ctx.fil
+208D: if(!res.direction){running=false;document.getElementById('play-btn').textContent='播放';updateReadouts();draw();return;}
+209: const simDt=dt*timeScale;
+210: velocity+=res.direction*res.f/simMass*simDt;
+211: r+=velocity*simDt;
+213: if(r<=1||r>=8){r=Math.max(1,Math.min(8,r));velocity=0;running=false;document.getElementById('play-btn').textContent='重新播放';}
+213D: if(r<=1||r>=8){r=Math.max(1,Math.min(8,r));velocity=0;running=false;document.getElementById('play-btn').textContent='重新播放';}
+216D: document.getElementById('r-display').textContent=r.toFixed(1);
+226D: document.getElementById('q1').addEventListener('input',e=>{stopMotion();q1=parseFloat(e.target.value);document.getElementById('q1-display').textContent=(q1>=0?'+':'')+q1.toFixed(1);updateReadouts();dr
+227D: document.getElementById('q2').addEventListener('input',e=>{stopMotion();q2=parseFloat(e.target.value);document.getElementById('q2-display').textContent=(q2>=0?'+':'')+q2.toFixed(1);updateReadouts();dr
+228D: document.getElementById('r').addEventListener('input',e=>{stopMotion();r=parseFloat(e.target.value);document.getElementById('r-display').textContent=r.toFixed(1);updateReadouts();draw();});
+229D: document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
+235D: document.getElementById('q1-display').textContent='+3.0';
+236D: document.getElementById('q2-display').textContent='+2.0';
+237D: document.getElementById('r-display').textContent='3.0';
+247D: document.getElementById('q1-display').textContent=(q1>=0?'+':'')+q1.toFixed(1);
+248D: document.getElementById('q2-display').textContent=(q2>=0?'+':'')+q2.toFixed(1);
+249D: document.getElementById('r-display').textContent=r.toFixed(1);
+253: function eventPos(ev){const b=canvas.getBoundingClientRect();const src=ev.touches&&ev.touches.length?ev.touches[0]:(ev.changedTouches&&ev.changedTouches.length?
+257: r=Math.max(1,Math.min(8,Math.abs(pos.x-fixed.x)/scale));
+259D: document.getElementById('r-display').textContent=r.toFixed(1);
+262: canvas.addEventListener('pointerdown',ev=>{const p=eventPos(ev);if(Math.hypot(p.x-hot.q1.x,p.y-hot.q1.y)<28)drag='q1';else if(Math.hypot(p.x-hot.q2.x,p.y-hot.q2
+267: function loop(now){const dt=Math.min((now-lastTime)/1000,0.05);lastTime=now;step(dt);requestAnimationFrame(loop);}
+
+===== anim/bx3/current.html (137 lines, kept 30) =====
+29: <h2>电流：看单位时间穿过截面的电荷量 I=Q/t=nqSv</h2>
+31: <div class="stage"><canvas id="cv" width="720" height="450" aria-label="电流交互实验台：导线侧视装置、截面图像和数据记录"></canvas><div style="padding:6px 10px;display:flex;gap:12px;al
+33: <button id="reset">复位</button>
+35: <div class="chip">定向速度 v = <b id="vv">1.5</b> mm/s</div>
+36: <div class="chip">截面积 S = <b id="sv">2.0</b> mm²</div>
+37: <div class="chip">载流子密度 n = <b id="nv">4.0</b> ×10²⁶ m⁻³</div>
+38: <div class="chip">最近 1.00 s 通过电量 Q = <b id="qv">1.92</b> C</div>
+39: <div class="chip">电流 I = Q/t = <b id="iv">1.92</b> A</div>
+41: <div class="record"><b>数据记录（每 1.00 s 自动取样）</b><br><span id="record">等待第一个计时窗口…</span></div>
+42: <div class="hint"><b>观察任务</b>：拖右侧蓝色速度手柄、底部金色截面积手柄或紫色密度手柄。看绿色截面处的累计电量、自动记录和公式：哪怕电子向左漂移，规定电流仍向右。</div>
+61: function pipe(){const h=48+S*36;return{left:95,right:625,cy:210,h,top:210-h/2,bottom:210+h/2}}
+62: function pos(e){const r=cv.getBoundingClientRect(),s=cv.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s}}
+64: const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=w||2.4;ctx.lineCap='round';
+66: ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-9*Math.cos(a-.45),y2-9*Math.sin(a-.45));ctx.lineTo(x2-9*Math.cos(a+.45),y2-9*Math.sin(a+.45));ctx.closePath();ct
+69: const y=404,x1=170,x2=560,x=x1+(n-1)/7*(x2-x1);
+86: const rows=Math.max(2,Math.round(S+1)),cols=Math.round(n*5),spacing=(p.right-p.left)/cols;
+88: const y=p.top+(r+.5)*p.h/rows;
+89: for(let c=0;c<cols;c++){
+90: let x=p.left+((c*spacing-phase%(spacing))+p.right-p.left)%(p.right-p.left);
+97: ctx.fillStyle='#2c7be5';ctx.beginPath();ctx.arc(590-v*38,122,10,0,7);ctx.fill();
+107D: els.vv.textContent=v.toFixed(1);els.sv.textContent=S.toFixed(1);els.nv.textContent=n.toFixed(1);els.qv.textContent=lastQ.toFixed(2);els.iv.textContent=I().toFixed(2);
+108D: els.record.textContent=samples.length?samples.slice(-3).map(s=>'t='+s.t+' s：Q='+s.q+' C，I='+s.i+' A').join('　｜　'):'正在累计：当前 Q='+windowQ.toFixed(2)+' C';
+111: const pnt=pos(e),p=pipe(),vx=590-v*38,nx=170+(n-1)/7*390;
+112: if(Math.hypot(pnt.x-vx,pnt.y-122)<24){drag='v';cv.style.cursor='grabbing';return}
+114: if(Math.hypot(pnt.x-nx,pnt.y-404)<24){drag='n';cv.style.cursor='grabbing';return}
+118: if(drag==='v')v=clamp((590-pnt.x)/38,.5,3.2);
+119: if(drag==='S')S=clamp((pnt.y-(210-24))/36,1,4);
+120: if(drag==='n')n=1+(clamp(pnt.x,170,560)-170)/390*7;
+127: windowT+=dt;windowQ+=I()*dt;
+130: function loop(now){if(window.__paused){last=now;requestAnimationFrame(loop);return;}const dt=Math.min((now-last)/1000,.05);last=now;phase+=v*35*dt;measure(dt);d
+
+===== anim/bx3/dc-circuit.html (142 lines, kept 41) =====
+24: <h2>闭合电路：拖动滑块，看电流"流"起来、灯泡亮起来（E=I(R+r)，U=IR）</h2>
+26: <label>电动势 E = <span id="eLab">6.0</span> V<input type="range" id="E" min="1" max="12" step="0.5" value="6"></label>
+27: <label>外电阻 R = <span id="rLab">5.0</span> Ω<input type="range" id="R" min="0.5" max="20" step="0.5" value="5"></label>
+28: <label>内阻 r = <span id="riLab">0.5</span> Ω<input type="range" id="ri" min="0" max="3" step="0.1" value="0.5"></label>
+29: <button class="hint" id="playBtn" style="cursor:pointer;border:1px solid #f0a500">⏸ 暂停电荷流动画</button>
+31: <canvas id="cv" width="720" height="420" aria-label="直流电路实验台：电路俯视装置、电表图像和数据记录"></canvas>
+33: <span class="chip">电流 I = E/(R+r) = <b id="cI">0</b> A</span>
+34: <span class="chip">路端电压 U = IR = <b id="cU">0</b> V</span>
+35: <span class="chip">灯泡功率 P = UI = <b id="cP">0</b> W</span>
+36: <span class="chip">内阻分压 U内 = Ir = <b id="cUr">0</b> V</span>
+37: <span class="chip">电路状态：<b id="cState">闭合</b></span>
+39: <div class="hint"><b>怎么玩</b>：黄色小球是电路里定向移动的电荷。对照电路俯视装置、电表图像和数据记录，拖<b>R</b> 变大看电流变小、灯变暗；拖<b>E</b> 变大看电流变大、灯变亮。</div>
+44: let E=6,R=5,r=0.5,t=0,switchOpen=false,switchDrag=false,playing=true;
+46: const L=90,Rt=630,T=110,B=330;
+47: const pts=[{x:L,y:B},{x:L,y:T},{x:Rt,y:T},{x:Rt,y:B}]; // battery(left) up, top=R, right=bulb down, bottom=ammeter
+48: const swX=(L+Rt)/2+90,swY=B; // switch lever pivot on bottom wire
+49: function seg(i){const a=pts[i],b=pts[(i+1)%4];return{a,b,len:Math.hypot(b.x-a.x,b.y-a.y)};}
+54: for(let i=0;i<4;i++){const s=seg(i);if(d<=s.len){const f=d/s.len;return{x:s.a.x+(s.b.x-s.a.x)*f,y:s.a.y+(s.b.y-s.a.y)*f};}d-=s.len;}
+64: function battery(){const cx=L,cy=(T+B)/2;
+69: ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(cx-7,cy+8);ctx.lineTo(cx+7,cy+8);ctx.stroke(); // short plate −
+73: function resistor(){const cx=(L+Rt)/2,cy=T; // zigzag on top wire
+76: for(let i=0;i<=8;i++){ctx.lineTo(cx-46+i*11.5,cy+(i%2?8:-8));}ctx.lineTo(cx+46,cy);ctx.stroke();
+78: function bulb(I){const cx=Rt,cy=(T+B)/2,P=I*I*R; // power in bulb (use I²R)
+79: const glow=Math.min(1,P/12);
+81: if(glow>0.02){const g=ctx.createRadialGradient(cx,cy,2,cx,cy,46);g.addColorStop(0,'rgba(255,240,170,'+glow+')');g.addColorStop(1,'rgba(255,220,120,0)');ctx.fill
+83: ctx.strokeStyle='rgba(255,'+(180+70*glow|0)+',80,'+(0.5+0.5*glow)+')';ctx.lineWidth=2.5;
+93: const ex=swX+Math.cos(Math.PI+ang)*30,ey=swY+Math.sin(Math.PI+ang)*30;
+102: const I=switchOpen?0:E/(R+r), U=I*R, Ur=I*r, P=U*I;
+108: const n=Math.round(perim/40);
+109: for(let i=0;i<n;i++){const d=(phase+ i*perim/n)%perim;const p=ptAt(d);
+122D: document.getElementById('cI').textContent=I.toFixed(2);
+123D: document.getElementById('cU').textContent=U.toFixed(2);
+124D: document.getElementById('cP').textContent=P.toFixed(2);
+125D: document.getElementById('cUr').textContent=Ur.toFixed(2);
+126D: document.getElementById('cState').textContent=switchOpen?'断开（临界断路，I=0）':(playing?'闭合，电流流动':'闭合，画面暂停');
+128D: function bind(id,cb,lab,dec){document.getElementById(id).addEventListener('input',e=>{cb(parseFloat(e.target.value));if(lab)document.getElementById(lab).textContent=parseFloat(e.target.value).toFixed(
+130: function pos(e){const rc=cv.getBoundingClientRect(),s=cv.width/rc.width;return{x:(e.clientX-rc.left)*s,y:(e.clientY-rc.top)*s};}
+131: cv.addEventListener('pointerdown',e=>{const p=pos(e);if(Math.hypot(p.x-swX,p.y-swY)<34)switchDrag=true;});
+134D: document.getElementById('playBtn').onclick=()=>{playing=!playing;document.getElementById('playBtn').textContent=playing?'⏸ 暂停电荷流动画':'▶ 播放电荷流动画';draw();};
+136: function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;if(playing&&!switchOpen){const I=E/(R+r);phase+=I*36*dt;}draw();requestAnimationFrame(loop);
+140: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/bx3/electric-field.html (220 lines, kept 64) =====
+7: <link rel="stylesheet" href="../common/controls.css">
+25: <h2>电场强度：E = kQ/r²</h2>
+27: <label>Q = <span id="q-display">+5.0</span> μC
+28: <input type="range" id="q" min="-10" max="10" step="0.5" value="5"></label>
+29: <label>试探距离 r = <span id="r-display">3.0</span> m
+30: <input type="range" id="r" min="1" max="6" step="0.1" value="3"></label>
+31: <button id="play-btn">释放 +q</button>
+32: <button id="reset-btn">重置</button>
+34: <canvas id="canvas" width="600" height="380" aria-label="电场强度实验台：点电荷俯视装置、场强图像和数据记录"></canvas>
+36: <span class="r">源电荷 Q = <b id="q-val">+5.0</b> μC</span>
+37: <span class="r">距离 r = <b id="r-val">3.0</b> m</span>
+38: <span class="r">场强 E = <b id="e-val">5.00</b> N/C</span>
+40: <span class="r">场强状态：<b id="trend-val">—</b></span>
+41: <span class="r">+q 速度：<b id="v-val">0.00</b> m/s</span>
+42: <span class="r">演示时间：<b id="t-val">0.00</b> s</span>
+55: const k=9;
+64D: document.getElementById('e-val').textContent=e.toFixed(2);
+65D: document.getElementById('q-val').textContent=(Q>=0?'+':'')+Q.toFixed(1);
+66D: document.getElementById('r-val').textContent=r.toFixed(1);
+67D: document.getElementById('dir-val').textContent=Q>0?'方向：向外（正电荷）':(Q<0?'方向：向内（负电荷）':'Q=0，无场');
+68D: document.getElementById('trend-val').textContent=e>lastE+0.01?'增强中':(e<lastE-0.01?'减弱中':'稳定');
+69D: document.getElementById('v-val').textContent=velocity.toFixed(2);
+70D: document.getElementById('t-val').textContent=t.toFixed(2);
+77: const ang=Math.atan2(y2-y1,x2-x1);
+79: ctx.lineTo(x2-7*Math.cos(ang-0.4),y2-7*Math.sin(ang-0.4));
+80: ctx.lineTo(x2-7*Math.cos(ang+0.4),y2-7*Math.sin(ang+0.4));
+86: const cx=W/2,cy=H/2;
+88: const nLines=Math.max(4,Math.round(Math.abs(Q)*2));
+91: const ang=(i/nLines)*Math.PI*2;
+94: const x1=cx+Math.cos(ang)*22;
+95: const y1=cy+Math.sin(ang)*22;
+96: const x2=cx+Math.cos(ang)*(22+lineLen);
+97: const y2=cy+Math.sin(ang)*(22+lineLen);
+104: const ax=cx+Math.cos(ang)*(22+lineLen*frac);
+105: const ay=cy+Math.sin(ang)*(22+lineLen*frac);
+106: drawArrow(ax-Math.cos(ang)*5,ay-Math.sin(ang)*5,ax,ay,'#e03131',1.5);
+113: const ax=cx+Math.cos(ang)*(22+lineLen*(1-frac));
+114: const ay=cy+Math.sin(ang)*(22+lineLen*(1-frac));
+115: drawArrow(ax+Math.cos(ang)*5,ay+Math.sin(ang)*5,ax,ay,'#2c7be5',1.5);
+134: const testX=cx+r*scale;
+141: ctx.fillText('r='+r.toFixed(1)+' m',(cx+testX)/2,cy-8);
+145: const x=cx+m*scale;ctx.beginPath();ctx.moveTo(x,cy+34);ctx.lineTo(x,cy+42);ctx.stroke();
+157: ctx.strokeStyle='rgba(240,165,0,.75)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(cx+trail[0]*scale,cy);
+158: trail.forEach(point=>ctx.lineTo(cx+point*scale,cy));ctx.stroke();
+162: const eLen=Math.min(100,e*10+10);
+173: const vLen=Math.min(70,18+Math.abs(velocity)*20),vx=testX+(velocity>0?vLen:-vLen);
+175: ctx.fillStyle='#7c3aed';ctx.font='11px sans-serif';ctx.textAlign='center';ctx.fillText('v='+velocity.toFixed(2)+' m/s',(testX+vx)/2,cy+96);
+179: ctx.fillText('E = k|Q|/r² = '+k+'×'+Math.abs(Q).toFixed(1)+'/'+r.toFixed(1)+'² = '+e.toFixed(2)+' N/C；+q 的 a 与 E 同向',15,H-15);
+182D: function stopMotion(){running=false;velocity=0;t=0;trail=[];document.getElementById('play-btn').textContent='释放 +q';}
+187: const simDt=dt*1.8,dir=Q>0?1:-1;
+188: velocity+=dir*e*.09*simDt;
+189: r+=velocity*simDt;
+191: if(r<=1||r>=6){r=Math.max(1,Math.min(6,r));running=false;document.getElementById('play-btn').textContent='重新释放 +q';}
+191D: if(r<=1||r>=6){r=Math.max(1,Math.min(6,r));running=false;document.getElementById('play-btn').textContent='重新释放 +q';}
+192D: document.getElementById('r').value=r;document.getElementById('r-display').textContent=r.toFixed(1);
+196: function eventPos(ev){const rc=canvas.getBoundingClientRect();return {x:(ev.clientX-rc.left)*canvas.width/rc.width,y:(ev.clientY-rc.top)*canvas.height/rc.height
+198: const p=eventPos(ev),cx=W/2,cy=H/2,testX=cx+r*scale;
+199: if(Math.hypot(p.x-testX,p.y-cy)<20){stopMotion();dragTest=true;}
+202: if(!dragTest)return;const p=eventPos(ev),cx=W/2;
+203: r=Math.max(1,Math.min(6,(p.x-cx)/scale));trail=[r];
+204D: document.getElementById('r').value=r;document.getElementById('r-display').textContent=r.toFixed(1);
+208D: document.getElementById('q').addEventListener('input',e=>{stopMotion();Q=parseFloat(e.target.value);document.getElementById('q-display').textContent=(Q>=0?'+':'')+Q.toFixed(1);updateReadouts();draw();
+209D: document.getElementById('r').addEventListener('input',e=>{stopMotion();r=parseFloat(e.target.value);document.getElementById('r-display').textContent=r.toFixed(1);updateReadouts();draw();});
+214: function loop(now){const dt=Math.min((now-lastTime)/1000,0.05);lastTime=now;step(dt);requestAnimationFrame(loop);}
+
+===== anim/bx3/electric-potential-energy.html (155 lines, kept 31) =====
+30: <h2>电势能：拖电荷位置和 q，观察 Ep=qφ 与 W=-ΔEp</h2>
+32: <div class="stage"><canvas id="cv" width="720" height="450" aria-label="电势能交互实验台：等势线侧视装置、能量柱状图像和数据记录"></canvas><div style="padding:6px 10px;display:flex;gap:12p
+35: <button id="play" data-audit-play>演示 A→B</button>
+36: <button id="reset">复位</button>
+39: <div class="chip">A 点电势 φA = <b id="phiA">0</b> V</div>
+40: <div class="chip">B 点电势 φB = <b id="phiB">0</b> V</div>
+41: <div class="chip">电荷 q = <b id="qv">+2.0</b> μC</div>
+42: <div class="chip">EpA = qφA = <b id="epa">0</b> μJ</div>
+43: <div class="chip">EpB = qφB = <b id="epb">0</b> μJ</div>
+44: <div class="chip">WAB = -ΔEp = <b id="work">0</b> μJ</div>
+46: <div class="hint"><b>观察任务</b>：拖动黄色 B 电荷到高/低电势处，对照等势线侧视装置、能量柱状图像和数据记录，比较正电荷和负电荷的 Ep 变化。</div>
+59: let q=2,playing=false,prog=1,drag=null;
+68: function setQFromX(x){q=clamp((clamp(x,170,560)-170)/390*10-5,-5,5)}
+69: function pos(e){const r=cv.getBoundingClientRect(),s=cv.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s}}
+71: const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=w||2.2;ctx.lineCap='round';
+73: ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-9*Math.cos(a-.45),y2-9*Math.sin(a-.45));ctx.lineTo(x2-9*Math.cos(a+.45),y2-9*Math.sin(a+.45));ctx.closePath();ct
+84: for(let i=1;i<6;i++){const y=top+(bottom-top)*i/6;ctx.beginPath();ctx.moveTo(left+12,y);ctx.lineTo(right-12,y);ctx.stroke();ctx.fillStyle='#2c7be5';ctx.font='12
+91: const x=A.x+(B.x-A.x)*prog,y=A.y+(B.y-A.y)*prog;
+96: const sign=q>=0?1:-1;arrow(B.x+18,B.y,B.x+18,B.y+sign*34,'#f0a500',3);
+110: const h=clamp(Math.abs(val)*scale,2,135);
+111: ctx.fillStyle=col;ctx.fillRect(x-w/2,val>=0?zero-h:zero,w,h);
+117D: els.phiA.textContent=phi(A).toFixed(1);els.phiB.textContent=phi(B).toFixed(1);
+118D: els.qv.textContent=(q>=0?'+':'')+q.toFixed(1);
+119D: els.epa.textContent=ep(A).toFixed(1);els.epb.textContent=ep(B).toFixed(1);els.work.textContent=work().toFixed(1);
+133: if(Math.hypot(p.x-A.x,p.y-A.y)<24){drag='A';prog=1;cv.style.cursor='grabbing';return}
+134: if(Math.hypot(p.x-B.x,p.y-B.y)<26){drag='B';prog=1;cv.style.cursor='grabbing';return}
+135: if(Math.hypot(p.x-qX(),p.y-404)<24){drag='q';cv.style.cursor='grabbing';return}
+142D: playing=false;id('play').textContent='演示 A→B';render();
+145D: id('play').onclick=()=>{playing=!playing;if(playing)prog=0;id('play').textContent=playing?'暂停':'演示 A→B';render()};
+146D: id('reset').onclick=()=>{q=2;A={x:300,y:135};B={x:430,y:265};prog=1;playing=false;id('play').textContent='演示 A→B';render()};
+148: function loop(now){if(window.__paused){requestAnimationFrame(loop);return;}const dt=Math.min((now-last)/1000,.05);last=now;if(playing){prog+=dt*.45;if(prog>=1){
+
+===== anim/bx3/electric-work.html (151 lines, kept 28) =====
+30: <h2>电场力做功：拖弯路径，验证 W=qU 只看起点和终点</h2>
+32: <div class="stage"><canvas id="cv" width="720" height="450" aria-label="电场力做功路径无关实验台：等势线俯视装置、路径图像和数据记录"></canvas><div style="padding:6px 10px;display:flex;gap:1
+35: <button id="play" data-audit-play>沿橙路演示</button>
+36: <button id="reset">复位</button>
+39: <div class="chip">UAB = φA-φB = <b id="uv">0</b> V</div>
+40: <div class="chip">电荷 q = <b id="qv">+2.0</b> μC</div>
+41: <div class="chip">直线路径 W1 = <b id="w1">0</b> μJ</div>
+42: <div class="chip">折线路径 W2 = <b id="w2">0</b> μJ</div>
+43: <div class="chip">弯曲路径 W3 = <b id="w3">0</b> μJ</div>
+44: <div class="chip">橙路长度约 <b id="len">0</b> px</div>
+46: <div class="hint"><b>观察任务</b>：拖动橙色控制点把路径拉长、拉弯，对照等势线俯视装置、路径图像和数据记录，看 W 是否变化；再拖 A 或 B 改变所在等势线。</div>
+66: function setQFromX(x){q=clamp((clamp(x,170,560)-170)/390*10-5,-5,5)}
+67: function pos(e){const r=cv.getBoundingClientRect(),s=cv.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s}}
+69: const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=w||2.2;ctx.lineCap='round';
+71: ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-9*Math.cos(a-.45),y2-9*Math.sin(a-.45));ctx.lineTo(x2-9*Math.cos(a+.45),y2-9*Math.sin(a+.45));ctx.closePath();ct
+73: function quad(t,p0,p1,p2){const u=1-t;return{x:u*u*p0.x+2*u*t*p1.x+t*t*p2.x,y:u*u*p0.y+2*u*t*p1.y+t*t*p2.y}}
+75: let len=0,last=A;for(let i=1;i<=40;i++){const p=quad(i/40,A,C,B);len+=Math.hypot(p.x-last.x,p.y-last.y);last=p}return len;
+86: for(let i=1;i<6;i++){const y=top+(bottom-top)*i/6;ctx.beginPath();ctx.moveTo(left+12,y);ctx.lineTo(right-12,y);ctx.stroke();ctx.fillStyle='#2c7be5';ctx.font='12
+112D: els.uv.textContent=U().toFixed(1);els.qv.textContent=(q>=0?'+':'')+q.toFixed(1);
+113D: els.w1.textContent=w;els.w2.textContent=w;els.w3.textContent=w;els.len.textContent=curveLen().toFixed(0);
+127: if(Math.hypot(p.x-A.x,p.y-A.y)<24){drag='A';cv.style.cursor='grabbing';return}
+128: if(Math.hypot(p.x-B.x,p.y-B.y)<24){drag='B';cv.style.cursor='grabbing';return}
+129: if(Math.hypot(p.x-C.x,p.y-C.y)<24){drag='C';cv.style.cursor='grabbing';return}
+130: if(Math.hypot(p.x-qX(),p.y-404)<24){drag='q';cv.style.cursor='grabbing';return}
+138D: playing=false;id('play').textContent='沿橙路演示';prog=0;render();
+141D: id('play').onclick=()=>{playing=!playing;if(playing)prog=0;id('play').textContent=playing?'暂停':'沿橙路演示';render()};
+142D: id('reset').onclick=()=>{A={x:250,y:135};B={x:505,y:270};C={x:360,y:94};q=2;prog=0;playing=false;id('play').textContent='沿橙路演示';render()};
+144: function loop(now){if(window.__paused){requestAnimationFrame(loop);return;}const dt=Math.min((now-last)/1000,.05);last=now;if(playing){prog+=dt*.45;if(prog>=1){
+
+===== anim/bx3/electrostatic-induction.html (28 lines, kept 10) =====
+13: <div class="root"><div class="stage"><canvas id="canvas" width="900" height="600" aria-label="静电感应实验台：带电棒导体侧视、法拉第笼剖面、电场线图像和验电器读数"></canvas></div><div class="pan
+14: <div class="card task"><b>观察任务：</b>拖动带电棒靠近导体；切换接地和法拉第笼，观察电荷分布、电场线和验电器张角。</div>
+15: <div class="card"><div class="title">实验条件</div><div class="buttons"><button data-mode="induce" class="active">感应</button><button data-mode="ground">接地</button><
+16: <div class="readout" id="readout"></div><div class="card formula"><div class="title">规律绑定</div><div>静电平衡：导体内部 E=0，净电荷分布在外表面。</div><div>接地可让电子流入或流出；法拉第笼用导体外壳实现静电
+16D: <div class="readout" id="readout"></div><div class="card formula"><div class="title">规律绑定</div><div>静电平衡：导体内部 E=0，净电荷分布在外表面。</div><div>接地可让电子流入或流出；法拉第笼用导体外壳实现静电屏蔽。</div></div><div class="status" id="s
+19: (function(){'use strict';const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');const el={dist:id('dist'),field:id('field'),dLab:id('dLab'),
+20: function charge(x,y,s,c){ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,11,0,Math.PI*2);ctx.fill();text(s,x,y,'#fff','center',14,'900')}function drawScene(v){box(4
+21: function drawGraph(v){box(42,396,810,130,'#fff');text('距离-感应强度图像',447,422,colors.ink,'center',15,'900');const gx=110,gy=492,gw=650,gh=62;line(gx,gy,gx+gw,gy,col
+22: function update(v){el.dLab.textContent=v.d;el.eLab.textContent=Math.round(v.E*100)+'%';const name={induce:'感应起电',ground:'接地感应',cage:'静电屏蔽',rod:'尖端放电/避雷'}[state.
+23: function draw(){const v=vals();ctx.clearRect(0,0,900,600);const bg=ctx.createLinearGradient(0,0,0,600);bg.addColorStop(0,'#fbfdff');bg.addColorStop(1,'#edf3f8')
+
+===== anim/bx3/em-wave-applications.html (283 lines, kept 61) =====
+38: <canvas id="canvas" width="900" height="620" aria-label="电磁波应用与现代通信：天线发射、空间传播、接收机、频谱图像、调制波形和数据读数"></canvas>
+41: <div class="card task"><b>观察任务：</b>切换广播、卫星、雷达、光纤通信，拖动画面中的接收机或频谱探针，看频率升高时波长如何变短、传播延迟如何由距离决定、信号强度如何随距离衰减。</div>
+43: <div class="title">应用场景</div>
+45: <button data-mode="radio" class="active">广播</button>
+46: <button data-mode="satellite">卫星</button>
+47: <button data-mode="radar">雷达</button>
+48: <button data-mode="fiber">光纤</button>
+51: <div class="card"><button id="playBtn" type="button">暂停演示</button></div>
+53: <div class="title">调参数</div>
+54: <label class="param"><span>频率 f <b id="fLabel">100 MHz</b></span><input id="freq" type="range" min="1" max="5" step="0.01" value="2"></label>
+55: <label class="param"><span>振幅 A <b id="aLabel">60%</b></span><input id="amp" type="range" min="20" max="100" step="1" value="60"></label>
+56: <label class="param"><span>距离 d <b id="dLabel">120 km</b></span><input id="dist" type="range" min="10" max="36000" step="10" value="120"></label>
+57: <label class="param"><span>带宽 B <b id="bLabel">8 MHz</b></span><input id="band" type="range" min="1" max="80" step="1" value="8"></label>
+59: <div class="readout" id="readout"></div>
+59D: <div class="readout" id="readout"></div>
+61: <div class="title">数据记录</div>
+64: <tbody id="rows"></tbody>
+68: <div class="title">公式与图像</div>
+69: <div>波速：c = λf，真空和空气中 c≈3.0×10<sup>8</sup> m/s。</div>
+70: <div>延迟：t = d/c；雷达测距：s = ct/2。</div>
+71: <div>能量与频率：E = hf；接收强度近似随距离增大而减弱。</div>
+73: <div class="status" id="status"></div>
+87: const C = 3e8;
+88: const state = { mode: 'radio', t: 0, receiverX: 690, probeX: 650, drag: null, records: [], running: true };
+98: return Math.round(Math.pow(10, x) * 10) / 10;
+105: function fmt(n, d=2) { return Math.abs(n) >= 100 ? n.toFixed(0) : n.toFixed(d); }
+118: const a=Math.atan2(y2-y1,x2-x1);
+121: ctx.lineTo(x2-10*Math.cos(a-.45), y2-10*Math.sin(a-.45));
+122: ctx.lineTo(x2-10*Math.cos(a+.45), y2-10*Math.sin(a+.45));
+136: const n = 180, amp = 18 + 34*p.amp, cycles = 3 + Math.log10(p.fMHz)*2.1;
+139: const u=i/n, x=x1+(x2-x1)*u, y=y1+(y2-y1)*u + Math.sin(u*Math.PI*2*cycles - state.t*3)*amp;
+144: text('电磁波传播：c=λf', (x1+x2)/2, y1-78, colors.green, 'center', 13, '900');
+154: const x=130+i*105+((state.t*24)%105);
+166: ctx.fillStyle='#e0f2fe'; ctx.beginPath(); ctx.arc(450,124,24,0,Math.PI*2); ctx.fill(); ctx.strokeStyle=colors.blue; ctx.stroke();
+189: const pos = Math.min(gw, Math.max(0, Math.log10(p.fMHz)/5*gw));
+192: const bw = Math.max(10, p.band/80*86);
+193: ctx.fillStyle='rgba(44,123,229,.18)'; ctx.fillRect(gx+pos-bw/2,gy-gh,gx+pos+bw/2>gx+gw?gx+gw-(gx+pos-bw/2):bw,gh);
+203: const u=i/220, carrier=Math.sin(u*Math.PI*34+state.t*4), info=0.55+0.35*Math.sin(u*Math.PI*4);
+204: const y=y0-carrier*info*(22+22*p.amp);
+205: const x=x0+u*w;
+209: const strength = Math.min(1, (p.amp*p.amp) / Math.max(0.08, Math.sqrt(p.dKm/80)));
+211: ctx.fillStyle=colors.green; ctx.fillRect(528,504,250*strength,28);
+213: const delayMs = p.dKm*1000/C*1000;
+214: text('传播延迟 t=d/c='+fmt(delayMs,2)+' ms',653,548,colors.purple,'center',13,'900');
+218: const lambda = C / p.fHz;
+219: const delayMs = p.dKm*1000/C*1000;
+220D: els.fLabel.textContent = fmt(p.fMHz,1)+' MHz';
+221: els.aLabel.textContent = Math.round(p.amp*100)+'%';
+221D: els.aLabel.textContent = Math.round(p.amp*100)+'%';
+222D: els.dLabel.textContent = p.dKm >= 1000 ? fmt(p.dKm,0)+' km' : fmt(p.dKm,0)+' km';
+223D: els.bLabel.textContent = p.band+' MHz';
+227: '传播延迟 t=d/c：<b>' + fmt(delayMs,2) + ' ms</b><br>' +
+229D: els.status.textContent = presets[state.mode].note;
+230D: els.rows.innerHTML = state.records.slice(-6).map(r =>
+254: const r=canvas.getBoundingClientRect(), x=(e.clientX-r.left)*canvas.width/r.width, y=(e.clientY-r.top)*canvas.height/r.height;
+261: const r=canvas.getBoundingClientRect(), x=(e.clientX-r.left)*canvas.width/r.width;
+263: state.receiverX = Math.max(560, Math.min(805, x));
+264: els.dist.value = Math.round(10 + (state.receiverX-560)/(805-560)*500);
+266: els.freq.value = Math.max(1, Math.min(5, (x-86)/300*5));
+272D: playBtn.addEventListener('click', () => { state.running = !state.running; playBtn.textContent = state.running ? '暂停演示' : '播放演示'; if (state.running) { drawScene(); updatePanel(); } });
+281: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/bx3/em-wave.html (186 lines, kept 45) =====
+7: <link rel="stylesheet" href="../common/controls.css">
+27: <label>频率 f = <span id="f-display">2.0</span> GHz
+28: <input type="range" id="freq" min="0.5" max="5" step="0.1" value="2"></label>
+29: <label>振幅 = <span id="a-display">40</span>
+30: <input type="range" id="amp" min="10" max="60" step="2" value="40"></label>
+31: <button id="play-btn">暂停</button>
+32: <button id="reset-btn">重置</button>
+34: <canvas id="canvas" width="600" height="380" aria-label="电磁波实验台：传播方向侧视装置、E-B图像和数据记录"></canvas>
+36: <span class="r">频率 f = <b id="f-val">2.0</b> GHz</span>
+37: <span class="r">波长 λ = <b id="lam-val">150</b> mm</span>
+38: <span class="r">周期 T = <b id="t-val">0.50</b> ns</span>
+39: <span class="r">相对光强 ∝ E₀² = <b id="intensity-val">1600</b></span>
+40: <span class="r">波前位置 x/λ = <b id="front-val">0.00</b></span>
+41: <span class="r">播放状态：<b id="state-val">播放中</b></span>
+54: const c=3e8; // speed of light
+57: const lambda=c/(freq*1e9)*1000; // mm
+58: const T=1/(freq*1e9)*1e9; // ns
+59D: document.getElementById('f-val').textContent=freq.toFixed(1);
+60D: document.getElementById('lam-val').textContent=lambda.toFixed(0);
+61D: document.getElementById('t-val').textContent=T.toFixed(2);
+62: document.getElementById('intensity-val').textContent=(amp*amp).toFixed(0);
+62D: document.getElementById('intensity-val').textContent=(amp*amp).toFixed(0);
+63: document.getElementById('front-val').textContent=((t*freq)%1).toFixed(2);
+63D: document.getElementById('front-val').textContent=((t*freq)%1).toFixed(2);
+64D: document.getElementById('state-val').textContent=running?'播放中：E、B 同频同相振动':'已暂停';
+69: const cx=80,cy=H/2;
+83: const sx=cx+((t*freq*160)%len);
+87: ctx.fillStyle=sg;ctx.beginPath();ctx.arc(sx,cy,7,0,Math.PI*2);ctx.fill();
+91: const screenLambda=300/freq; // px
+92: const phase=t*freq*2*Math.PI*2; // animation speed
+98: const y=cy-amp*Math.sin(2*Math.PI*i/screenLambda+phase);
+105: const y=cy-amp*Math.sin(2*Math.PI*i/screenLambda+phase);
+123: const b=Math.sin(2*Math.PI*i/screenLambda+phase);
+124: if(Math.abs(b)>.18){ctx.strokeStyle='#2c7be5';ctx.fillStyle='#2c7be5';ctx.lineWidth=1.7;ctx.beginPath();ctx.arc(x,cy,6,0,Math.PI*2);ctx.stroke();if(b>0){ctx.beg
+149: ctx.fillText('c = λ·f = '+(c/(freq*1e9)*1000).toFixed(0)+' mm × '+freq.toFixed(1)+' GHz = 3×10⁸ m/s',15,H-10);
+154: const dt=Math.min((now-lastTime)/1000,0.05);
+161D: document.getElementById('freq').addEventListener('input',e=>{freq=parseFloat(e.target.value);document.getElementById('f-display').textContent=freq.toFixed(1);updateReadouts();});
+162D: document.getElementById('amp').addEventListener('input',e=>{amp=parseFloat(e.target.value);document.getElementById('a-display').textContent=amp.toFixed(0);});
+163D: document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';updateReadouts();});
+167: function pointerPos(e){const r=canvas.getBoundingClientRect();const s=canvas.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s};}
+169: const p=pointerPos(e),cx=80,cy=H/2,screenLambda=300/freq,lamX2=cx+20+screenLambda,hy=cy+amp+30;
+170: if(Math.hypot(p.x-lamX2,p.y-hy)<24){dragLambda=true;canvas.style.cursor='grabbing';}
+175: const screenLambda=Math.max(60,Math.min(600,p.x-(cx+20)));
+176: freq=Math.max(0.5,Math.min(5,300/screenLambda));
+178D: document.getElementById('f-display').textContent=freq.toFixed(1);
+
+===== anim/bx3/emf.html (99 lines, kept 25) =====
+27: <h2>电源电动势：拖 q、ε、R，看 ε=W非/q 与 U=ε-Ir</h2>
+29: <div class="stage"><canvas id="cv" width="720" height="450" aria-label="电源电动势实验台：闭合电路侧视装置、电压表图像和数据记录"></canvas></div>
+31: <button id="playBtn" style="font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;width:100%;margin-bottom
+33: <div class="chip">电动势 ε = <b id="ev">6.0</b> V = J/C</div>
+34: <div class="chip">搬运电荷 q = <b id="qv">2.0</b> C</div>
+35: <div class="chip">非静电力做功 W非 = <b id="wv">12.0</b> J</div>
+36: <div class="chip">外阻 R = <b id="Rv">8.0</b> Ω，内阻 r=1Ω</div>
+37: <div class="chip">闭合时 I = <b id="iv">0.67</b> A</div>
+38: <div class="chip">路端电压 U = <b id="uv">5.33</b> V</div>
+39: <div class="chip">电路状态：<b id="statev">—</b></div>
+41: <div class="hint"><b>观察任务</b>：拖 q 看 W非 随电荷量成正比，但 ε 不变；对照闭合电路侧视装置、电压表图像和数据记录，拖 R 看接外电路后路端电压 U 会小于 ε。</div>
+42: <div class="formula"><b>公式绑定</b><br>电源内部绿色箭头表示非静电力把正电荷从负极搬到正极。ε=W非/q 是电源属性；接外电路后 U=ε-Ir。</div>
+42D: <div class="formula"><b>公式绑定</b><br>电源内部绿色箭头表示非静电力把正电荷从负极搬到正极。ε=W非/q 是电源属性；接外电路后 U=ε-Ir。</div>
+49: let E=6,q=2,R=8,r=1,drag=null,playing=false,loopT=0;
+53: const n=loop.length,f=((t%1)+1)%1*n,i=Math.floor(f),k=f-i,a=loop[i],b=loop[(i+1)%n];
+61: function pos(e){const rc=cv.getBoundingClientRect(),s=cv.width/rc.width;return{x:(e.clientX-rc.left)*s,y:(e.clientY-rc.top)*s}}
+63: function arrow(x1,y1,x2,y2,color,w){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=w||2.4;ctx.lineCap='round';ctx.begin
+70: const ex=410,ey=300-(E-2)/10*150,qx=115+(q-.5)/4.5*210,Rx=420+(R-1)/19*190;
+74: const base=320,scale=170/Math.max(Wn(),E*q,12);[['W非',Wn(),'#159a6b',500],['qε',E*q,'#e03131',565],['qU',q*U(),'#2c7be5',630]].forEach(([lab,val,col,x])=>{const
+75: ctx.fillStyle='#102a43';ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillText(`ε=W非/q=${Wn().toFixed(1)}/${q.toFixed(1)}=${E.toFixed(1)}V；闭合时 U=ε-Ir=${U()
+80: cv.addEventListener('pointerdown',e=>{const p=pos(e),ey=300-(E-2)/10*150,qx=115+(q-.5)/4.5*210,Rx=420+(R-1)/19*190;if(Math.hypot(p.x-410,p.y-ey)<24)drag='E';els
+81: cv.addEventListener('pointermove',e=>{if(!drag)return;const p=pos(e);if(drag==='E')E=clamp(2+(300-p.y)/150*10,2,12);if(drag==='q')q=clamp(.5+(p.x-115)/210*4.5,.
+85: loopT+=0.006*(0.4+I());
+91D: id('playBtn').textContent=playing?'⏸ 暂停':'▶ 播放：电荷搬运与电流循环';
+97: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/bx3/energy-sustainability.html (91 lines, kept 20) =====
+29: <div class="stage"><canvas id="cv" width="720" height="450" aria-label="能源与可持续发展实验台：能源流侧视装置、排放图像和数据记录"></canvas></div>
+32: <div class="chip">用电量 E用 = <b id="usev">100</b> kWh</div>
+33: <div class="chip">化石能源占比 = <b id="fossilv">70</b>%</div>
+34: <div class="chip">平均发电效率 = <b id="effv">40</b>%</div>
+35: <div class="chip">一次能源输入 = <b id="inputv">250</b> kWh</div>
+36: <div class="chip">废热/低品质能 = <b id="wastev">150</b> kWh</div>
+37: <div class="chip">碳排估算 = <b id="co2v">56</b> kg CO₂</div>
+39: <div class="hint"><b>观察任务</b>：拖化石占比，对照能源流侧视装置、排放图像和数据记录，看同样用电量下碳排如何变化；拖效率，看总能量守恒但废热如何减少。</div>
+40: <div class="hint" style="margin-top:8px"><button id="playBtn" style="font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#ff
+41: <div class="formula"><b>公式绑定</b><br>输入 = 有用电能 ÷ 效率；废热 = 输入 − 有用电能。能量总量守恒（输入=电能+废热），但废热更难再利用，体现能量品质降低；排放 ≈ 用电量×化石占比×排放系数。</div>
+41D: <div class="formula"><b>公式绑定</b><br>输入 = 有用电能 ÷ 效率；废热 = 输入 − 有用电能。能量总量守恒（输入=电能+废热），但废热更难再利用，体现能量品质降低；排放 ≈ 用电量×化石占比×排放系数。</div>
+55: function pos(e){const rc=cv.getBoundingClientRect(),s=cv.width/rc.width;return{x:(e.clientX-rc.left)*s,y:(e.clientY-rc.top)*s}}
+61: const ux=100+(use-20)/180*240,fx=100+fossil/100*240,ex=100+(eff-20)/60*240;drawRail(340,ux,0,'用电量','#2c7be5');drawRail(375,fx,0,'化石占比','#e03131');drawRail(410,e
+62: const x0=420,base=330,scale=230/Math.max(input(),260);[['一次输入',input(),'#8aa0b6'],['有用电能',use,'#2c7be5'],['废热',waste(),'#f0a500'],['CO₂×2',co2()*2,'#e03131']].f
+68: cv.addEventListener('pointerdown',e=>{stopPlay();const p=pos(e);const targets=[['use',100+(use-20)/180*240,340],['fossil',100+fossil/100*240,375],['eff',100+(ef
+69: cv.addEventListener('pointermove',e=>{if(!drag)return;const p=pos(e),x=clamp(p.x,100,340);if(drag==='use')use=20+(x-100)/240*180;if(drag==='fossil')fossil=(x-10
+71D: function stopPlay(){playing=false;id('playBtn').textContent='▶ 自动演示（能源转型第 '+year.toFixed(0)+' 年）'}
+78D: if(fossil<=20&&eff>=55){playing=false;id('playBtn').textContent='▶ 自动演示（能源转型第 '+year.toFixed(0)+' 年，已达目标）';return}
+84D: playing=true;id('playBtn').textContent='⏸ 暂停演示';animate();
+89: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/bx3/equipotential.html (215 lines, kept 43) =====
+33: <h2>等势面：拖动探针，看 φ、E、W=qΔφ 如何绑定到画面</h2>
+35: <div class="stage"><canvas id="cv" width="720" height="470" aria-label="等势面交互实验台"></canvas></div>
+38: <button class="on" data-mode="point">点电荷</button>
+39: <button data-mode="uniform">匀强电场</button>
+42: <button id="lock" class="active">锁定等势面拖动</button>
+43: <button id="free">自由拖动探针</button>
+45: <button id="reset">复位</button>
+48: <div class="chip">探针电势 φ = <b id="phi">0</b> V</div>
+49: <div class="chip">场强 E = <b id="emag">0</b> V/m，方向 <b id="edir">—</b></div>
+50: <div class="chip">A→B 电势差 Δφ = <b id="dphi">0</b> V</div>
+51: <div class="chip">做功 W=qΔφ = <b id="work">0</b> J（取 q=1 C）</div>
+52: <div class="chip">路径状态：<b id="state">—</b></div>
+54: <div class="hint"><b>观察任务</b>：先开“锁定等势面拖动”，用外力沿蓝色等势线拖黄色探针，看 Δφ 和 W 是否保持 0；再自由拖动到另一条等势线，看 φ、E 和做功如何改变。注意：这里显示的是测量路径，不是电荷自由释放后的运动轨迹。</div>
+82: const dx=p.x-charge.x,dy=p.y-charge.y,r=Math.max(34,Math.hypot(dx,dy));
+83: const phi=K/r, e=K/(r*r)*100;
+84: return {phi,e,ang:Math.atan2(dy,dx),dir:'径向向外'};
+87: const phi=12*(1-(x-left)/len), e=12/(len/100);
+96: function pos(e){const r=cv.getBoundingClientRect(),s=cv.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s}}
+99: if(mode==='point'&&Math.hypot(p.x-charge.x,p.y-charge.y)<28){drag='charge';cv.style.cursor='grabbing';return}
+100: if(Math.hypot(p.x-probe.x,p.y-probe.y)<24){drag='probe';anchor={x:probe.x,y:probe.y,phi:values(probe).phi};cv.style.cursor='grabbing';return}
+107: const r=Math.max(45,Math.hypot(anchor.x-charge.x,anchor.y-charge.y));
+108: const a=Math.atan2(p.y-charge.y,p.x-charge.x);
+109: probe.x=charge.x+Math.cos(a)*r;probe.y=charge.y+Math.sin(a)*r;
+120: const g=ctx.createRadialGradient(charge.x-10,charge.y-10,4,charge.x,charge.y,28);
+134: const x=left+(right-left)*i/6,phi=12*(1-i/6);
+143: const levels=[12,9,6,3]; // 等差电势线，便于用疏密判断场强
+145: const r=K/level;
+150: for(let a=0;a<Math.PI*2;a+=Math.PI/6){
+151: drawArrow(charge.x+Math.cos(a)*38,charge.y+Math.sin(a)*38,a,95,'rgba(224,49,49,.72)',2.2);
+152: drawArrow(charge.x+Math.cos(a)*150,charge.y+Math.sin(a)*150,a,48,'rgba(224,49,49,.42)',1.8);
+158: const eLen=Math.min(78,22+v.e*1.7);
+159: drawArrow(probe.x+Math.cos(v.ang)*14,probe.y+Math.sin(v.ang)*14,v.ang,eLen,'#e03131',3);
+167D: els.phi.textContent=v.phi.toFixed(2);
+168D: els.emag.textContent=v.e.toFixed(2);
+169D: els.edir.textContent=v.dir;
+170D: els.dphi.textContent=a.toFixed(2);
+171D: els.work.textContent=a.toFixed(2);
+172D: els.state.textContent=Math.abs(a)<0.05?'沿等势面巡航，W≈0（合格状态）':'跨越等势面，正在做功';
+185D: function stopPlay(){playing=false;gid('playBtn').textContent='▶ 自动演示（外力沿等势线拖探针）'}
+190: const r=Math.max(45,Math.hypot(anchor.x-charge.x,anchor.y-charge.y));
+191: probe.x=charge.x+Math.cos(playT)*r;probe.y=charge.y+Math.sin(playT)*r;
+193: probe.x=anchor.x;probe.y=150+90*Math.sin(playT);
+205D: if(playing){anchor={x:probe.x,y:probe.y,phi:values(probe).phi};playT=0;gid('playBtn').textContent='⏸ 暂停演示';animate()}
+
+===== anim/bx3/field-lines.html (114 lines, kept 37) =====
+28: <button class="btn on" data-preset="dipole">等量异种（偶极子）</button>
+29: <button class="btn" data-preset="pos">单个正电荷</button>
+30: <button class="btn" data-preset="neg">单个负电荷</button>
+31: <button class="btn" data-preset="like">等量同种</button>
+32: <button class="btn" id="release">▶ 从小磁针处释放 +q</button>
+33: <button class="btn" id="reset">重置</button>
+35: <canvas id="cv" width="720" height="440" aria-label="电场线实验台：电荷俯视装置、场线图像和数据记录"></canvas>
+37: <span class="chip">小磁针处场强方向：<b id="dir">—</b></span>
+38: <span class="chip">该点场强强弱：<b id="mag">—</b></span>
+39: <span class="chip">释放的电荷：<b id="pst">未释放</b></span>
+41: <div class="hint"><b>怎么玩</b>：拖动红/蓝电荷，对照电荷俯视装置、场线图像和数据记录，电场线实时重画；拖黄色<b>小磁针</b>到任意位置，绿箭头总沿<b>电场线切线</b>指向该点场强方向。</div>
+47: let particle=null; // {x,y,vx,vy}
+56: function field(x,y){let ex=0,ey=0;for(const c of charges){const dx=x-c.x,dy=y-c.y;let r2=dx*dx+dy*dy;if(r2<180)r2=180;const r=Math.sqrt(r2),e=k*c.q/r2;ex+=e*dx/
+59: for(let i=0;i<600;i++){const f=field(x,y);if(f.mag<1e-4)break;const ux=dir*f.ex/f.mag,uy=dir*f.ey/f.mag;x+=ux*3.5;y+=uy*3.5;if(x<-20||x>W+20||y<-20||y>H+20)brea
+60: if(--arrowAt===0){arrowAt=30;const a=Math.atan2(uy,ux);ctx.save();ctx.fillStyle='rgba(255,225,150,.9)';ctx.translate(x,y);ctx.rotate(a);ctx.beginPath();ctx.move
+61: let hit=false;for(const o of charges){if(o.q*dir<0&&Math.hypot(x-o.x,y-o.y)<16){hit=true;break;}}if(hit)break;}
+63: function drawCharge(c){const r=chargeR(c),col=c.q>0?['#ff8a76','#e8342a']:['#7bb6ff','#2f6fd0'];const g=ctx.createRadialGradient(c.x-r*.3,c.y-r*.3,2,c.x,c.y,r);
+73: if(c.q>0){const n=Math.round(10*Math.abs(c.q));for(let i=0;i<n;i++)trace(c.x+Math.cos(i/n*6.283)*(chargeR(c)+2),c.y+Math.sin(i/n*6.283)*(chargeR(c)+2),1);}
+74: else if(!hasPos){const n=Math.round(10*Math.abs(c.q));for(let i=0;i<n;i++)trace(c.x+Math.cos(i/n*6.283)*(chargeR(c)+2),c.y+Math.sin(i/n*6.283)*(chargeR(c)+2),-1
+81: const f=field(probe.x,probe.y);
+84: if(f.mag>1e-4){const a=Math.atan2(f.ey,f.ex);ctx.save();ctx.translate(probe.x,probe.y);ctx.rotate(a);ctx.strokeStyle='#38d9a9';ctx.fillStyle='#38d9a9';ctx.lineW
+85: const deg=f.mag>1e-4?(Math.atan2(f.ey,f.ex)*180/Math.PI):null;
+86D: document.getElementById('dir').textContent=deg==null?'—':(deg.toFixed(0)+'°');
+87D: document.getElementById('mag').textContent=f.mag<1e-4?'≈0':(f.mag>90?'强（线密）':(f.mag>30?'中':'弱（线疏）'));
+91: const f=field(particle.x,particle.y);
+92: particle.vx+=f.ex*0.02*dt;particle.vy+=f.ey*0.02*dt; // +q: a along E
+93: particle.x+=particle.vx*dt;particle.y+=particle.vy*dt;
+96: for(const c of charges)if(c.q<0&&Math.hypot(particle.x-c.x,particle.y-c.y)<chargeR(c)+4)done=true;
+97: if(done){document.getElementById('pst').textContent='已到达/离开';particle=null;}
+97D: if(done){document.getElementById('pst').textContent='已到达/离开';particle=null;}
+98: else document.getElementById('pst').textContent='v='+Math.hypot(particle.vx,particle.vy).toFixed(0)+'（沿线加速）';
+98D: else document.getElementById('pst').textContent='v='+Math.hypot(particle.vx,particle.vy).toFixed(0)+'（沿线加速）';
+100: function pos(e){const r=cv.getBoundingClientRect(),s=cv.width/r.width,X=e.touches?e.touches[0].clientX:e.clientX,Y=e.touches?e.touches[0].clientY:e.clientY;retu
+101: cv.addEventListener('pointerdown',e=>{const p=pos(e);if(Math.hypot(p.x-probe.x,p.y-probe.y)<16){dragProbe=true;return;}for(let i=charges.length-1;i>=0;i--)if(Ma
+102: cv.addEventListener('pointermove',e=>{if(drag===null&&!dragProbe)return;const p=pos(e);p.x=Math.max(16,Math.min(W-16,p.x));p.y=Math.max(16,Math.min(H-16,p.y));i
+106D: document.getElementById('reset').onclick=()=>{particle=null;trail=[];document.getElementById('pst').textContent='未释放';};
+108: function loop(now){const dt=Math.min((now-last)/1000,0.033)*60;last=now;step(dt);render();requestAnimationFrame(loop);}
+
+===== anim/bx3/household-circuit.html (28 lines, kept 9) =====
+13: <div class="root"><div class="stage"><canvas id="canvas" width="900" height="600" aria-label="家庭电路实验台：火线零线地线侧视、空气开关、漏电保护器、电流表和风险图像"></canvas></div><div class="p
+14: <div class="card task"><b>观察任务：</b>切换短路、过载、漏电和正常接线；看电流路径、空气开关/漏保是否动作，以及人体电流风险。</div>
+15: <div class="card"><div class="title">用电情境</div><div class="buttons"><button data-mode="normal" class="active">正常</button><button data-mode="overload">过载</button
+16: <div class="readout" id="readout"></div><div class="card formula"><div class="title">公式绑定</div><div>家庭电路电压约 U=220 V，I=P/U。</div><div>短路电阻很小，电流很大；漏电保护器比较火线与零线电流差
+16D: <div class="readout" id="readout"></div><div class="card formula"><div class="title">公式绑定</div><div>家庭电路电压约 U=220 V，I=P/U。</div><div>短路电阻很小，电流很大；漏电保护器比较火线与零线电流差。</div></div><div class="status" id="sta
+19: (function(){'use strict';const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');const el={power:id('power'),bodyR:id('bodyR'),pLab:id('pLab'
+20: function drawCircuit(v){box(42,72,810,300,'#fff');text('家庭电路侧视：火线-开关-用电器-零线，地线保护金属外壳',447,100,colors.ink,'center',16,'900');const yL=158,yN=242,yE=308;line(120,
+22: function update(v){el.pLab.textContent=v.P+' W';el.rLab.textContent=v.R+' Ω';const current=state.mode==='short'?'>80 A':state.mode==='leak'?fmt(v.leakI,3)+' A':
+23: function draw(){const v=vals();ctx.clearRect(0,0,900,600);const bg=ctx.createLinearGradient(0,0,0,600);bg.addColorStop(0,'#fbfdff');bg.addColorStop(1,'#edf3f8')
+
+===== anim/bx3/joule-law.html (98 lines, kept 27) =====
+31: <h2>焦耳定律：拖 I、R、t，看 Q=I²Rt 和非纯电阻分流</h2>
+33: <div class="stage"><canvas id="cv" width="720" height="450" aria-label="焦耳定律实验台：电阻丝侧视装置、热量图像和数据记录"></canvas></div>
+35: <button id="playBtn" style="font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;width:100%;margin-bottom
+36: <div class="seg" id="mode"><button class="on" data-mode="pure">纯电阻</button><button data-mode="motor">电动机</button></div>
+38: <div class="chip">电流 I = <b id="iv">2.0</b> A</div>
+39: <div class="chip">电阻 R = <b id="rv">5.0</b> Ω</div>
+40: <div class="chip">设定终止时间 t目标 = <b id="tv">10</b> s</div>
+41: <div class="chip">已累计时间 t = <b id="etv">0.0</b> s</div>
+42: <div class="chip">电热 Q = I²Rt = <b id="qv">0</b> J</div>
+43: <div class="chip">输入电能 W = <b id="wv">0</b> J</div>
+44: <div class="chip">其他能量 = <b id="ov">0</b> J</div>
+45: <div class="chip">发热状态：<b id="statev">静止</b></div>
+47: <div class="hint"><b>观察任务</b>：拖 I 对照电阻丝侧视装置、热量图像和数据记录，看热量按平方增长；拖 R、t 看 Q 按正比增长。切到电动机模式，看线圈发热仍只按 I²Rt 算。</div>
+48: <div class="formula"><b>公式绑定</b><br>红色热量柱读 Q=I²Rt；绿色柱读非纯电阻的其他能量。纯电阻时 W=Q；电动机时 W&gt;Q。</div>
+48D: <div class="formula"><b>公式绑定</b><br>红色热量柱读 Q=I²Rt；绿色柱读非纯电阻的其他能量。纯电阻时 W=Q；电动机时 W&gt;Q。</div>
+63: function pos(e){const r=cv.getBoundingClientRect(),s=cv.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s}}
+69: const glow=Math.min(1,Qnow()/1000);const g=ctx.createRadialGradient(238,110,5,238,110,80);g.addColorStop(0,'rgba(224,49,49,'+(0.25+glow*.45)+')');g.addColorStop
+70: ctx.strokeStyle='#f0a500';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(180,110);for(let i=0;i<10;i++)ctx.lineTo(180+i*12,110+(i%2?10:-10));ctx.stroke();ctx.fillSt
+72: const ix=90+I/5*210,rx=90+R/12*210,tx=90+t/30*210;ctx.strokeStyle='#ccd6e0';ctx.lineWidth=6;[['I',350,ix,'#e03131'],['R',380,rx,'#f0a500'],['t',410,tx,'#2c7be5'
+73: const base=342,scale=220/Math.max(Wnow(),Qnow(),200);[['Q热',Qnow(),'#e03131',455],['W电',Wnow(),'#2c7be5',520],['其他',other(),'#159a6b',585]].forEach(([lab,val,co
+78: cv.addEventListener('pointerdown',e=>{const p=pos(e);const tests=[['I',90+I/5*210,350],['R',90+R/12*210,380],['t',90+t/30*210,410]];for(const a of tests)if(Math
+79: cv.addEventListener('pointermove',e=>{if(!drag)return;const p=pos(e),x=clamp(p.x,90,300);if(drag==='I')I=(x-90)/210*5;if(drag==='R')R=(x-90)/210*12;if(drag==='t
+84: elapsed+=t/180;
+85D: if(elapsed>=t){elapsed=t;playing=false;id('playBtn').textContent='▶ 播放：随时间累积发热';draw();return}
+90D: if(playing){playing=false;id('playBtn').textContent='▶ 播放：随时间累积发热';draw();return}
+91D: if(elapsed>=t)elapsed=0;playing=true;id('playBtn').textContent='⏸ 暂停';animate();
+96: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/bx3/ohm-law.html (139 lines, kept 45) =====
+32: <h2>欧姆定律：拖 U、R 和 I-U 图工作点，看 I=U/R</h2>
+34: <div class="stage"><canvas id="cv" width="720" height="450" aria-label="欧姆定律交互实验台：电路俯视装置、I-U图像和数据记录"></canvas><div style="padding:6px 10px;display:flex;gap:12px
+37: <button class="on" data-mode="linear">线性电阻</button>
+38: <button data-mode="lamp">灯泡非线性</button>
+40: <label class="slider"><span>电压 U（看电池高度、伏特表和工作点）<b id="uslider">6.0 V</b></span><input id="u" type="range" min="0" max="12" step="0.1" value="6"></label>
+41: <label class="slider"><span>电阻 R（看电阻长度、安培表和直线斜率）<b id="rslider">10.0 Ω</b></span><input id="r" type="range" min="2" max="30" step="0.1" value="10"></label>
+43: <div class="chip">电压 U = <b id="uv">6.0</b> V</div>
+44: <div class="chip">电阻 R = <b id="rv">10.0</b> Ω</div>
+45: <div class="chip">电流 I = <b id="iv">0.60</b> A</div>
+46: <div class="chip">I-U 斜率 = <b id="kv">0.100</b> A/V</div>
+47: <div class="chip">判断：<b id="judge">I=U/R 成立</b></div>
+49: <div class="hint"><b>观察任务</b>：拖红色电压手柄，对照电路俯视装置、I-U 图像和数据记录，在线性电阻模式下 I 和 U 成正比；切到灯泡模式看曲线弯曲。</div>
+50: <div class="formula"><b>画面绑定</b><br>电池高度读 U，电阻长度读 R，蓝色工作点在 I-U 图上。线性元件图线过原点且为直线，斜率 k=I/U=1/R。</div>
+61: function current(){return mode==='linear'?U/R:0.22*Math.pow(U,0.72)}
+63: function pos(e){const r=cv.getBoundingClientRect(),s=cv.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s}}
+65: const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=w||2.2;ctx.lineCap='round';
+67: ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-8*Math.cos(a-.45),y2-8*Math.sin(a-.45));ctx.lineTo(x2-8*Math.cos(a+.45),y2-8*Math.sin(a+.45));ctx.closePath();ct
+73: const uh=35+U/12*110;ctx.strokeStyle='#e03131';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(x0-18,y0+160);ctx.lineTo(x0-18,y0+160-uh);ctx.stroke();
+75: const rx=x0+w/2,ry=y0,rl=48+R/30*110;
+77: ctx.strokeStyle='#f0a500';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(rx-rl/2,ry);
+78: for(let i=0;i<=8;i++)ctx.lineTo(rx-rl/2+i*rl/8,ry+(i%2?9:-9));
+79: ctx.stroke();ctx.fillStyle='#f0a500';ctx.beginPath();ctx.arc(rx+rl/2,ry,9,0,7);ctx.fill();ctx.fillStyle='#8a5a00';ctx.font='12px system-ui';ctx.fillText('拖 R',r
+80: for(let i=0;i<16;i++){const t=(phase+i*60)%1010;let p;if(t<285)p={x:x0+t,y:y0};else if(t<505)p={x:x0+w,y:y0+t-285};else if(t<790)p={x:x0+w-(t-505),y:y0+h};else 
+81: const glow=Math.min(1,I/1.2);
+82: ctx.fillStyle='rgba(255,210,80,'+(0.15+glow*.35)+')';ctx.beginPath();ctx.arc(x0+w,y0+h/2,35,0,7);ctx.fill();
+83: ctx.strokeStyle='#334e68';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x0+w,y0+h/2,18,0,7);ctx.stroke();
+91: ctx.fillStyle='#52677a';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText('U/V',gx+gw+18,gy+4);ctx.fillText('I/A',gx-12,gy-gh-8);
+93: for(let u=0;u<=12;u+=.2){const i=mode==='linear'?u/R:0.22*Math.pow(u,0.72);const x=gx+u/12*gw,y=gy-clamp(i/1.5,0,1)*gh;if(u===0)ctx.moveTo(x,y);else ctx.lineTo(
+95: const px=gx+U/12*gw,py=gy-clamp(I/1.5,0,1)*gh;
+101: const I=current(),k=U>0?I/U:1/R;
+102D: els.uv.textContent=U.toFixed(1);els.rv.textContent=(mode==='linear'?R:effR()).toFixed(1);els.iv.textContent=I.toFixed(2);els.kv.textContent=k.toFixed(3);
+103: els.judge.textContent=mode==='linear'?'I=U/R 成立':'非线性：R 随工作点变';
+103D: els.judge.textContent=mode==='linear'?'I=U/R 成立':'非线性：R 随工作点变';
+104D: els.u.value=U;els.r.value=R;els.uslider.textContent=U.toFixed(1)+' V';els.rslider.textContent=(mode==='linear'?R:effR()).toFixed(1)+' Ω';
+112: ctx.fillText(mode==='linear'?('I=U/R='+U.toFixed(1)+'/'+R.toFixed(1)+'='+I.toFixed(2)+' A，I-U 斜率=1/R'):('灯泡曲线弯曲：当前等效 R=U/I='+effR().toFixed(1)+' Ω，不是定值'),24,34)
+116: const p=pos(e),uh=35+U/12*110,ux=67,uy=270-uh,rx=227,rl=48+R/30*110;
+117: const gx=430,gy=342,gw=245,gh=245,I=current(),px=gx+U/12*gw,py=gy-clamp(I/1.5,0,1)*gh;
+118: if(Math.hypot(p.x-ux,p.y-uy)<24){drag='U';return}
+119: if(mode==='linear'&&Math.hypot(p.x-(rx+rl/2),p.y-110)<24){drag='R';return}
+120: if(Math.hypot(p.x-px,p.y-py)<24){drag='point';return}
+124: if(drag==='U')U=clamp((270-p.y-35)/110*12,0,12);
+125: if(drag==='R')R=clamp(((p.x-227)*2-48)/110*30,2,30);
+126: if(drag==='point')U=clamp((p.x-430)/245*12,0,12);
+132: function loop(now){if(window.__paused){requestAnimationFrame(loop);return;}const dt=Math.min((now-last)/1000,.05);last=now;phase+=current()*75*dt;draw();request
+137: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/bx3/potential-difference.html (164 lines, kept 30) =====
+30: <h2>电势差：拖 B 点、E 箭头和 q 滑钮，看 U=Ed 与 W=qU</h2>
+32: <div class="stage"><canvas id="cv" width="720" height="450" aria-label="电势差与做功交互实验台"></canvas><div style="padding:6px 10px;display:flex;gap:12px;align-items:cen
+35: <button id="play" data-audit-play>演示 A→B</button>
+36: <button id="reset">复位</button>
+39: <div class="chip">场强 E = <b id="ev">200</b> V/m</div>
+40: <div class="chip">沿 E 距离 d = <b id="dv">0.080</b> m</div>
+41: <div class="chip">电势差 UAB = φA-φB = <b id="uv">16.0</b> V</div>
+42: <div class="chip">电荷 q = <b id="qv">+2.0</b> μC</div>
+43: <div class="chip">电场力做功 WAB = qUAB = <b id="wv">32.0</b> μJ</div>
+45: <div class="hint"><b>观察任务</b>：拖动蓝色 B 点，先横向拖、再沿红色 E 方向拖，比较 U 的变化；拖动紫色 E 箭头端点看 U=Ed；拖动底部 q 滑钮，看 q 只改 W，不改 U。</div>
+57: let E=200,q=2,playing=false,prog=0,drag=null;
+67: function setEFromLen(len){E=clamp(minE+(clamp(len,46,172)-46)/126*(maxE-minE),minE,maxE)}
+69: function setQFromX(x){q=clamp((clamp(x,170,560)-170)/390*10-5,-5,5)}
+70: function pos(e){const r=cv.getBoundingClientRect(),s=cv.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s}}
+72: const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=w||2.2;ctx.lineCap='round';
+74: ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-9*Math.cos(a-.45),y2-9*Math.sin(a-.45));ctx.lineTo(x2-9*Math.cos(a+.45),y2-9*Math.sin(a+.45));ctx.closePath();ct
+115: const x=A.x+(B.x-A.x)*prog,y=A.y+(B.y-A.y)*prog;
+119: const sign=q>=0?1:-1;arrow(x+18,y,x+18,y+sign*34,'#f0a500',3);
+122D: els.ev.textContent=E.toFixed(0);
+123D: els.dv.textContent=dPar().toFixed(3);
+124D: els.uv.textContent=U().toFixed(1);
+125D: els.qv.textContent=(q>=0?'+':'')+q.toFixed(1);
+126D: els.wv.textContent=Wj().toFixed(1);
+142: if(Math.hypot(p.x-B.x,p.y-B.y)<24){drag='B';cv.style.cursor='grabbing';return}
+143: if(Math.hypot(p.x-ex,p.y-ey)<24){drag='E';cv.style.cursor='grabbing';return}
+144: if(Math.hypot(p.x-qX(),p.y-404)<24){drag='q';cv.style.cursor='grabbing';return}
+151D: playing=false;id('play').textContent='演示 A→B';prog=drag==='B'?prog:0;render();
+154D: id('play').onclick=()=>{playing=!playing;id('play').textContent=playing?'暂停':'演示 A→B'};
+155D: id('reset').onclick=()=>{E=200;q=2;A={x:295,y:145};B={x:440,y:265};prog=0;playing=false;id('play').textContent='演示 A→B';render()};
+157: function loop(now){if(window.__paused){requestAnimationFrame(loop);return;}const dt=Math.min((now-last)/1000,.05);last=now;if(playing){prog+=dt*.45;if(prog>=1){
+
+===== anim/bx3/resistance-law.html (98 lines, kept 26) =====
+33: <div class="stage"><canvas id="cv" width="720" height="450" aria-label="电阻定律交互实验台：导线侧视装置、R-L图像和数据记录"></canvas><div style="padding:6px 10px;display:flex;gap:12px
+36: <button class="on" data-rho="1.7" data-name="铜">铜</button>
+37: <button data-rho="2.8" data-name="铝">铝</button>
+38: <button data-rho="10" data-name="镍铬">镍铬</button>
+41: <div class="chip">材料电阻率 ρ = <b id="rv">1.7</b> ×10⁻⁸ Ω·m</div>
+42: <div class="chip">长度 L = <b id="lv">1.0</b> m</div>
+43: <div class="chip">截面积 S = <b id="sv">1.0</b> mm²</div>
+44: <div class="chip">电阻 R = ρL/S = <b id="resv">0.017</b> Ω</div>
+45: <div class="chip">接 0.03V 测量源时 I=U/R = <b id="iv">1.76</b> A</div>
+47: <div class="hint"><b>观察任务</b>：拖右端红色手柄把导线拉长，对照导线侧视装置、R-L 图像和数据记录，看 R 如何增大；拖金色管壁把导线变粗，看 R 如何减小。</div>
+48: <div class="formula"><b>画面绑定</b><br>导线长度对应 L，粗细对应 S，材料按钮对应 ρ。固定电压下，R 越大，电子漂移越慢，电流越小。</div>
+55: let L=1.0,S=1.0,rho=1.7,mat='铜',drag=null,phase=0,last=performance.now();
+56: const Utest=.03; // low-voltage measurement supply: avoids pretending a thin wire can safely take 3 V.
+62: function geom(){const x1=130,w=150+L/3*410,h=30+S*28,cy=220;return{x1,x2:x1+w,w,h,cy,y1:cy-h/2,y2:cy+h/2}}
+63: function pos(e){const r=cv.getBoundingClientRect(),s=cv.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s}}
+65: const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=w||2.2;ctx.lineCap='round';
+67: ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-8*Math.cos(a-.45),y2-8*Math.sin(a-.45));ctx.lineTo(x2-8*Math.cos(a+.45),y2-8*Math.sin(a+.45));ctx.closePath();ct
+78: ctx.strokeStyle='#159a6b';ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(g.x1,g.y1-30);ctx.lineTo(g.x2,g.y1-30);ctx.stroke();ctx.setLineDash([]);ctx.fillStyl
+79: for(let i=0;i<20;i++){const x=g.x1+((i*35+phase)%(g.w));const y=g.cy+(i%3-1)*g.h/4;ctx.fillStyle='#2c7be5';ctx.beginPath();ctx.arc(x,y,5,0,7);ctx.fill()}
+80: arrow(g.x1+20,g.y1-66,g.x2-20,g.y1-66,'#e03131',3);ctx.fillStyle='#e03131';ctx.font='700 13px system-ui';ctx.fillText('接 0.03V 测量源，电流方向',g.x1+g.w/2,g.y1-76);
+82: ctx.fillText('R=ρL/S = '+R().toFixed(3)+' Ω；U='+Utest.toFixed(2)+'V 时 I='+I().toFixed(2)+' A',24,34);
+86D: function update(){els.rv.textContent=rho.toFixed(1);els.lv.textContent=L.toFixed(1);els.sv.textContent=S.toFixed(1);els.resv.textContent=R().toFixed(3);els.iv.textContent=I().toFixed(2)}
+87: cv.addEventListener('pointerdown',e=>{const p=pos(e),g=geom();if(Math.hypot(p.x-g.x2,p.y-g.cy)<24){drag='L';return}if(Math.abs(p.y-g.y2)<22&&p.x>g.x1&&p.x<g.x2)
+88: cv.addEventListener('pointermove',e=>{if(!drag)return;const p=pos(e),g=geom();if(drag==='L')L=clamp((p.x-g.x1-150)/410*3,.4,3.2);if(drag==='S')S=clamp((p.y-(g.c
+91: function loop(now){if(window.__paused){requestAnimationFrame(loop);return;}const dt=Math.min((now-last)/1000,.05);last=now;phase+=Math.min(70,I())*dt;draw();req
+96: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/bx3/series-parallel.html (112 lines, kept 30) =====
+34: <div class="stage"><canvas id="cv" width="720" height="450" aria-label="串并联电路实验台：电路俯视装置、电流图像和数据记录"></canvas><div style="padding:6px 10px;display:flex;gap:12px;a
+36: <div class="seg" id="mode"><button class="on" data-mode="series">串联</button><button data-mode="parallel">并联</button></div>
+37: <label class="slider"><span>R1（拖动后看蓝色支路/元件读数）<b id="r1slider">3.0 Ω</b></span><input id="r1" type="range" min="1" max="12" step="0.1" value="3"></label>
+38: <label class="slider"><span>R2（拖动后看紫色支路/元件读数）<b id="r2slider">6.0 Ω</b></span><input id="r2" type="range" min="1" max="12" step="0.1" value="6"></label>
+39: <label class="slider"><span>电源 U（拖动后看所有表的变化）<b id="uslider">12.0 V</b></span><input id="u" type="range" min="2" max="24" step="0.1" value="12"></label>
+41: <div class="chip">电源 U = <b id="uv">12.0</b> V</div>
+42: <div class="chip">R1 = <b id="r1v">3.0</b> Ω，R2 = <b id="r2v">6.0</b> Ω</div>
+43: <div class="chip">等效电阻 R = <b id="reqv">9.0</b> Ω</div>
+44: <div class="chip">总电流 I = <b id="itv">1.33</b> A</div>
+45: <div class="chip">支路/元件：<b id="detail">U1=4.0V, U2=8.0V</b></div>
+47: <div class="hint"><b>观察任务</b>：串联时拖 R1/R2，对照电路俯视装置、电流图像和数据记录，看同一电流下电阻越大分压越多；并联时看两支路电压相同。</div>
+48: <div class="formula"><b>画面绑定</b><br>金色手柄读 R1/R2，红色手柄读电源 U。串联：R=R1+R2，I 相同；并联：1/R=1/R1+1/R2，U 相同。</div>
+61: function pos(e){const r=cv.getBoundingClientRect(),s=cv.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s}}
+62: function arrow(x1,y1,x2,y2,color,w){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=w||2.2;ctx.lineCap='round';ctx.begin
+63: function resistor(x,y,r,label,color,measure){const len=50+r/12*80;ctx.save();ctx.shadowColor=color;ctx.shadowBlur=8+measure*2;ctx.strokeStyle=color;ctx.lineWidt
+64: function meter(x,y,label,value,unit,color){ctx.fillStyle='#fff';ctx.strokeStyle=color;ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,29,0,Math.PI*2);ctx.fill();ctx
+65: function battery(){const x=105,y=220,h=40+U/24*32;ctx.strokeStyle='#f3f6fa';ctx.lineWidth=10;ctx.beginPath();ctx.moveTo(x,y-38);ctx.lineTo(x,y+38);ctx.stroke();
+67: function dots(points,rate,color){const count=Math.max(4,Math.round(rate*4));for(let i=0;i<count;i++){const raw=phase*(.08+rate*.08)+i/count,p=((raw%1)+1)%1,idx=
+70: const I=totalI(),I1=U/R1,I2=U/R2,U1=I*R1,U2=I*R2;
+86: let vals=mode==='series'?[['U1',totalI()*R1,'#2c7be5'],['U2',totalI()*R2,'#7b2cbf']]:[['I1',U/R1,'#2c7be5'],['I2',U/R2,'#7b2cbf']];
+88: vals.forEach((v,i)=>{const h=clamp(v[1]*scale,2,150);ctx.fillStyle=v[2];ctx.fillRect(x+i*34,y-h,22,h);ctx.fillStyle='#334e68';ctx.font='11px system-ui';ctx.text
+91D: const I=totalI();els.uv.textContent=U.toFixed(1);els.r1v.textContent=R1.toFixed(1);els.r2v.textContent=R2.toFixed(1);els.reqv.textContent=req().toFixed(2);els.itv.textContent=I.toFixed(2);
+92: els.detail.textContent=mode==='series'?`U1=${(I*R1).toFixed(1)}V, U2=${(I*R2).toFixed(1)}V`:`I1=${(U/R1).toFixed(2)}A, I2=${(U/R2).toFixed(2)}A`;
+92D: els.detail.textContent=mode==='series'?`U1=${(I*R1).toFixed(1)}V, U2=${(I*R2).toFixed(1)}V`:`I1=${(U/R1).toFixed(2)}A, I2=${(U/R2).toFixed(2)}A`;
+93D: els.r1.value=R1;els.r2.value=R2;els.u.value=U;els.r1slider.textContent=R1.toFixed(1)+' Ω';els.r2slider.textContent=R2.toFixed(1)+' Ω';els.uslider.textContent=U.toFixed(1)+' V';
+98: drawCircuit();drawBars();ctx.fillStyle='#102a43';ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillText(mode==='series'?`串联：R=R1+R2=${req().toFixed(1)}Ω，I处
+100: cv.addEventListener('pointerdown',e=>{const p=pos(e);if(Math.hypot(p.x-105,p.y-220)<48){drag='U';return}const targets=mode==='series'?[{x:260+(50+R1/12*80)/2,y:
+101: cv.addEventListener('pointermove',e=>{if(!drag)return;const p=pos(e);if(drag==='U')U=clamp(24-(p.y-170)/100*22,2,24);if(drag==='R1')R1=clamp(((p.x-(mode==='seri
+105: function loop(now){if(window.__paused){requestAnimationFrame(loop);return;}const dt=Math.min((now-last)/1000,.05);last=now;phase+=totalI()*50*dt;draw();requestA
+110: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au

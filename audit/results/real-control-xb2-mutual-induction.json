@@ -1,0 +1,223 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T17:32:53.878Z",
+  "commit": "7b3d39da66c7b6a4560020a47c9a49c0a907148e",
+  "module": "xb2",
+  "modules": [
+    "xb2"
+  ],
+  "summary": {
+    "total": 1,
+    "score": 100,
+    "pass": 1,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/xb2/mutual-induction.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#freqInput",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:单步",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:直流：稳定",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:通断瞬间",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:交流：持续变化",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#stepBtn",
+          "text": "单步",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#acBtn",
+          "text": "交流：持续变化",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#dcBtn",
+          "text": "直流：稳定",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#pulseBtn",
+          "text": "通断瞬间",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.68,
+          "py": 0.32
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "7b6c37a9",
+          "readout_hash": "795703d6",
+          "physical_readout_hash": "795703d6",
+          "readout": [
+            "原线圈 I₁0.87 A dI₁/dt3.10 A/s 副线圈 Φ₂0.52 副线圈 E₂-0.70 V",
+            "交流频率 f1.0 Hz",
+            "I₁ 正在变化 → B 正在变化 → Φ₂ 正在变化 → E₂=-0.70 V，副线圈电流计偏转。"
+          ],
+          "physical_readout": [
+            "原线圈 I₁0.87 A dI₁/dt3.10 A/s 副线圈 Φ₂0.52 副线圈 E₂-0.70 V",
+            "交流频率 f1.0 Hz",
+            "I₁ 正在变化 → B 正在变化 → Φ₂ 正在变化 → E₂=-0.70 V，副线圈电流计偏转。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "d54aab9f",
+          "readout_hash": "e12f5ede",
+          "physical_readout_hash": "e12f5ede",
+          "readout": [
+            "原线圈 I₁-0.17 A dI₁/dt-6.20 A/s 副线圈 Φ₂-0.10 副线圈 E₂1.40 V",
+            "交流频率 f1.0 Hz",
+            "I₁ 正在变化 → B 正在变化 → Φ₂ 正在变化 → E₂=1.40 V，副线圈电流计偏转。"
+          ],
+          "physical_readout": [
+            "原线圈 I₁-0.17 A dI₁/dt-6.20 A/s 副线圈 Φ₂-0.10 副线圈 E₂1.40 V",
+            "交流频率 f1.0 Hz",
+            "I₁ 正在变化 → B 正在变化 → Φ₂ 正在变化 → E₂=1.40 V，副线圈电流计偏转。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "91dfc6bf",
+          "readout_hash": "1a321979",
+          "physical_readout_hash": "1a321979",
+          "readout": [
+            "原线圈 I₁-0.32 A dI₁/dt-5.95 A/s 副线圈 Φ₂-0.19 副线圈 E₂1.35 V",
+            "交流频率 f1.0 Hz",
+            "I₁ 正在变化 → B 正在变化 → Φ₂ 正在变化 → E₂=1.35 V，副线圈电流计偏转。"
+          ],
+          "physical_readout": [
+            "原线圈 I₁-0.32 A dI₁/dt-5.95 A/s 副线圈 Φ₂-0.19 副线圈 E₂1.35 V",
+            "交流频率 f1.0 Hz",
+            "I₁ 正在变化 → B 正在变化 → Φ₂ 正在变化 → E₂=1.35 V，副线圈电流计偏转。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "91dfc6bf",
+          "readout_hash": "1a321979",
+          "physical_readout_hash": "1a321979",
+          "readout": [
+            "原线圈 I₁-0.32 A dI₁/dt-5.95 A/s 副线圈 Φ₂-0.19 副线圈 E₂1.35 V",
+            "交流频率 f1.0 Hz",
+            "I₁ 正在变化 → B 正在变化 → Φ₂ 正在变化 → E₂=1.35 V，副线圈电流计偏转。"
+          ],
+          "physical_readout": [
+            "原线圈 I₁-0.32 A dI₁/dt-5.95 A/s 副线圈 Φ₂-0.19 副线圈 E₂1.35 V",
+            "交流频率 f1.0 Hz",
+            "I₁ 正在变化 → B 正在变化 → Φ₂ 正在变化 → E₂=1.35 V，副线圈电流计偏转。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "原线圈 I₁# A dI₁/dt# A/s 副线圈 Φ₂# 副线圈 E₂# V|交流频率 f# Hz|I₁ 正在变化 → B 正在变化 → Φ₂ 正在变化 → E₂=# V，副线圈电流计偏转。",
+          "controls": [
+            {
+              "id": "freqInput",
+              "value": "1",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "原线圈 I₁# A dI₁/dt# A/s 副线圈 Φ₂# 副线圈 E₂# V|交流频率 f# Hz|I₁ 正在变化 → B 正在变化 → Φ₂ 正在变化 → E₂=# V，副线圈电流计偏转。",
+          "controls": [
+            {
+              "id": "freqInput",
+              "value": "1",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

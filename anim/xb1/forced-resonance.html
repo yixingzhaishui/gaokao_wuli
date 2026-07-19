@@ -15,6 +15,7 @@ h2{font-size:17px;margin:0 0 10px}
 canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab;background:#fff}
 .panel{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px}
 button{font:inherit;border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 10px;cursor:pointer;width:100%;margin-bottom:10px}
+.control{display:grid;gap:4px;font-size:12px;color:#486581;margin:0 0 10px}.control input{width:100%;accent-color:var(--gold)}
 .read{display:grid;gap:7px}
 .chip{background:#102a43;color:#eef4ff;border-radius:8px;padding:8px 10px;font-size:13px;line-height:1.45}
 .chip b{color:#ffd166}.chip.ok{background:#0b7285}.chip.warn{background:#7b341e}
@@ -27,21 +28,24 @@ button{font:inherit;border:1px solid var(--line);background:#fff;border-radius:8
 <div class="wrap">
   <h2>共振：拖驱动频率探针，看何时振幅最大</h2>
   <div class="lab">
-    <div class="stage"><canvas id="cv" width="720" height="470" aria-label="受迫振动与共振交互实验台：振子侧视装置、共振曲线图像和数据记录"></canvas></div>
+    <div class="stage"><canvas id="cv" width="720" height="470" data-resonance-model="damped-displacement-amplitude" aria-label="受迫振动与共振交互实验台：振子侧视装置、阻尼相关的共振曲线和数据记录"></canvas></div>
     <section class="panel">
       <button id="play">⏸ 暂停</button>
       <button id="reset">复位</button>
+      <label class="control">阻尼比 ζ = <b id="zout">0.10</b><input id="damping" type="range" min="0.05" max="0.45" step="0.05" value="0.10"></label>
+      <label class="control">驱动频率 f驱 = <b id="fdcontrol">2.00 Hz</b><input id="drive-frequency" type="range" min="0.5" max="4.5" step="0.05" value="2.00"></label>
       <div class="read">
         <div class="chip">固有频率 f固 = <b id="f0out">2.0</b> Hz</div>
+        <div class="chip">位移振幅峰频率 f峰 = <b id="fpeakout">1.98</b> Hz</div>
         <div class="chip">驱动频率 f驱 = <b id="fdout">2.0</b> Hz</div>
         <div class="chip ok">稳定后频率 = <b id="fout">2.0</b> Hz</div>
         <div class="chip">稳态振幅 = <b id="Aout">5.0</b> 倍</div>
-        <div class="chip warn">状态：<b id="stateout">共振附近：振幅最大</b></div>
+        <div class="chip warn">状态：<b id="stateout">位移振幅峰附近</b></div>
       </div>
-      <div class="hint"><b>观察任务</b>：拖红色竖线改变驱动频率，对照振子侧视装置、共振曲线图像和数据记录，观察红点和振子振幅。红线靠近 f固 时振幅最大。</div>
+      <div class="hint"><b>观察任务</b>：改变驱动频率和阻尼，比较红点与整条响应曲线的最高点。弱阻尼时峰值接近 f固；阻尼增大时峰值降低、变宽，并向较低频率移动。</div>
       <div class="formula">
         <b>画面绑定</b><br>
-        稳定后振动频率等于 f驱。共振条件是 f驱=f固；加大阻尼不会改变共振条件，但会降低峰值、拓宽峰。
+        稳定后振动频率等于 f驱。本页画的是位移振幅响应，峰值频率 f峰=f固√(1−2ζ²)（ζ&lt;1/√2）；只有弱阻尼近似下才可说 f峰≈f固。
       </div>
     </section>
   </div>
@@ -51,18 +55,20 @@ button{font:inherit;border:1px solid var(--line);background:#fff;border-radius:8
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 const W=cv.width,H=cv.height;
 let f0=2,fd=2,z=.10,drag=null,phase=0,running=true,last=performance.now();
-const els={f0:id('f0out'),fd:id('fdout'),f:id('fout'),A:id('Aout'),state:id('stateout')};
+const els={f0:id('f0out'),peak:id('fpeakout'),fd:id('fdout'),fdControl:id('fdcontrol'),drive:id('drive-frequency'),f:id('fout'),A:id('Aout'),z:id('zout'),damping:id('damping'),state:id('stateout')};
 function id(s){return document.getElementById(s)}
 function clamp(x,a,b){return Math.max(a,Math.min(b,x))}
 function ampAt(f){
   const r=f/f0,den=Math.sqrt(Math.pow(1-r*r,2)+Math.pow(2*z*r,2));
   return clamp(1/Math.max(den,.12),.15,8);
 }
+function peakFrequency(){return z<Math.SQRT1_2?f0*Math.sqrt(1-2*z*z):0;}
 function state(){
-  const rel=Math.abs(fd-f0)/f0;
-  if(rel<.08)return '共振附近：振幅最大';
-  if(fd<f0)return '低于固有频率：跟随驱动';
-  return '高于固有频率：振幅变小';
+  const peak=peakFrequency();
+  const rel=Math.abs(fd-peak)/f0;
+  if(rel<.035)return '位移振幅峰附近';
+  if(fd<peak)return '低于位移振幅峰频率';
+  return '高于位移振幅峰频率';
 }
 function pos(e){const r=cv.getBoundingClientRect(),s=cv.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s}}
 function drawGrid(){
@@ -79,9 +85,10 @@ function drawCurve(){
   ctx.strokeStyle='#2c7be5';ctx.lineWidth=2.6;ctx.beginPath();
   for(let i=0;i<=gw;i++){const f=.5+i/gw*4,a=ampAt(f),y=aToY(a);if(i===0)ctx.moveTo(gx+i,y);else ctx.lineTo(gx+i,y)}
   ctx.stroke();
-  const x0=fToX(f0),xd=fToX(fd),ad=ampAt(fd),yd=aToY(ad);
+  const x0=fToX(f0),xp=fToX(Math.max(.5,peakFrequency())),xd=fToX(fd),ad=ampAt(fd),yd=aToY(ad);
   ctx.strokeStyle='#829ab1';ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(x0,gy-gh);ctx.lineTo(x0,gy+8);ctx.stroke();ctx.setLineDash([]);
   ctx.fillStyle='#829ab1';ctx.fillText('f固',x0,gy+24);
+  ctx.strokeStyle='#159a6b';ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(xp,gy-gh);ctx.lineTo(xp,gy+8);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#087f5b';ctx.fillText('f峰',xp,gy+40);
   ctx.strokeStyle='#e03131';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(xd,gy-gh);ctx.lineTo(xd,gy+8);ctx.stroke();
   ctx.fillStyle='#e03131';ctx.beginPath();ctx.arc(xd,yd,7,0,7);ctx.fill();
   ctx.fillText('拖 f驱',xd,gy-gh-10);
@@ -100,7 +107,7 @@ function drawOscillator(){
 function draw(){
   drawGrid();drawCurve();drawOscillator();update();
 }
-function update(){els.f0.textContent=f0.toFixed(1);els.fd.textContent=fd.toFixed(1);els.f.textContent=fd.toFixed(1);els.A.textContent=ampAt(fd).toFixed(1);els.state.textContent=state()}
+function update(){const peak=peakFrequency();els.f0.textContent=f0.toFixed(1);els.peak.textContent=peak.toFixed(2);els.fd.textContent=fd.toFixed(2);els.fdControl.textContent=fd.toFixed(2)+' Hz';els.f.textContent=fd.toFixed(2);els.A.textContent=ampAt(fd).toFixed(2);els.z.textContent=z.toFixed(2);els.state.textContent=state();cv.dataset.dampingRatio=z.toFixed(2);cv.dataset.peakFrequency=peak.toFixed(3);cv.dataset.currentAmplitude=ampAt(fd).toFixed(3)}
 cv.addEventListener('pointerdown',e=>{
   const p=pos(e),xd=fToX(fd),vy=112+z/.45*200;
   if(Math.abs(p.x-xd)<24&&p.y>gy-gh-10&&p.y<gy+22){drag='fd';cv.style.cursor='grabbing';return}
@@ -108,16 +115,19 @@ cv.addEventListener('pointerdown',e=>{
 });
 cv.addEventListener('pointermove',e=>{
   if(!drag)return;const p=pos(e);
-  if(drag==='fd')fd=clamp(.5+(p.x-gx)/gw*4,.5,4.5);
-  if(drag==='z')z=clamp((p.y-112)/200*.45,.05,.45);
+  if(drag==='fd'){fd=clamp(.5+(p.x-gx)/gw*4,.5,4.5);els.drive.value=fd;}
+  if(drag==='z'){z=clamp((p.y-112)/200*.45,.05,.45);els.damping.value=z;}
   draw();
 });
 window.addEventListener('pointerup',()=>{drag=null;cv.style.cursor='grab'});
 id('play').onclick=function(){running=!running;this.textContent=running?'⏸ 暂停':'▶ 播放';};
-id('reset').onclick=()=>{f0=2;fd=2;z=.10;draw()};
+els.damping.addEventListener('input',()=>{z=Number(els.damping.value);draw()});
+els.drive.addEventListener('input',()=>{fd=Number(els.drive.value);draw()});
+id('reset').onclick=()=>{f0=2;fd=2;z=.10;phase=0;running=true;els.damping.value=z;els.drive.value=fd;id('play').textContent='⏸ 暂停';draw()};
 function loop(now){const dt=Math.min((now-last)/1000,.05);last=now;if(running)phase+=2*Math.PI*fd*dt;draw();requestAnimationFrame(loop)}
 draw();requestAnimationFrame(loop);
 })();
 </script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

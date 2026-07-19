@@ -15,10 +15,11 @@
   h2{font-size:14px;margin:12px 0 7px}
   p{margin:0}
   .hint{font-size:12px;line-height:1.55;color:var(--muted)}
-  .search{width:100%;border:1px solid var(--line);border-radius:7px;padding:8px 9px;margin:9px 0;background:#fff;color:var(--ink)}
-  .chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
-  .chip{border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);font-size:11px;padding:4px 7px;cursor:pointer}
-  .chip.on{background:#e8f1ff;border-color:var(--blue);color:var(--blue);font-weight:800}
+  .facts{display:grid;gap:8px;margin:10px 0}
+  .facts select{width:100%;border:1px solid var(--line);border-radius:7px;padding:8px;background:#fff;color:var(--ink)}
+  .diagnose-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:9px 0}
+  .diagnose-actions button{border:1px solid var(--blue);border-radius:7px;padding:8px;background:var(--blue);color:#fff;font-weight:800;cursor:pointer}
+  .diagnose-actions button:last-child{background:#fff;color:var(--blue)}
   .list{display:grid;gap:7px;max-height:430px;overflow:auto;padding-right:3px}
   button{font:inherit}
   .model-btn{border:1px solid var(--line);background:#fff;border-radius:7px;padding:8px 9px;text-align:left;cursor:pointer;color:var(--ink)}
@@ -48,9 +49,11 @@
   .step{display:grid;grid-template-columns:22px 1fr;gap:7px;border:1px solid var(--line);border-radius:7px;background:#fff;padding:8px;font-size:12px;line-height:1.45;color:var(--muted)}
   .num{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--blue);color:#fff;font-weight:900}
   .formula{margin-top:8px;border-radius:7px;background:#102a43;color:#f8f9fa;padding:10px;font-size:12px;line-height:1.6;white-space:pre-line}
+  [hidden]{display:none!important}
   .link{display:block;text-align:center;text-decoration:none;margin-top:8px;padding:9px 10px;border-radius:7px;background:var(--blue);color:#fff;font-weight:800;font-size:13px}
   .compare{display:grid;gap:6px;margin-top:8px;max-height:230px;overflow:auto}
   .candidate{border:1px solid var(--line);border-radius:7px;background:#fff;padding:7px 8px;font-size:12px;line-height:1.4;cursor:pointer}
+  .candidate.on{border-color:var(--blue);background:#e8f1ff;box-shadow:inset 3px 0 0 var(--blue)}
   .candidate b{color:var(--blue)}
   @media(min-width:1120px){
     .app{grid-template-columns:250px minmax(0,1fr)300px;grid-template-areas:"left main right"}
@@ -63,17 +66,25 @@
     main{min-height:700px}
     .score-row,.controls{grid-template-columns:1fr}
   }
+  @media(prefers-reduced-motion:reduce){
+    canvas{cursor:default}
+    *,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}
+  }
 </style>
 </head>
 <body>
 <div class="app">
   <aside>
     <h1>高频模型诊断台</h1>
-    <p class="hint">不是背模型名，而是从题眼出发：信号是什么、第一步列什么、哪个临界最容易错。</p>
-    <input id="search" class="search" placeholder="输入题眼：轻绳 / 传送带 / 导轨 / p-V / 半衰期">
-    <h2>题眼信号</h2>
-    <div class="chips" id="signalChips"></div>
-    <h2>匹配模型</h2>
+    <p class="hint">依次补充研究对象、过程、约束和目标量。至少三项事实一致且候选唯一时，系统才给出推荐；否则明确提示信息不足。</p>
+    <div class="facts" aria-label="结构化建模事实">
+      <label>研究对象<select id="factObject"><option value="">请选择</option></select></label>
+      <label>物理过程<select id="factProcess"><option value="">请选择</option></select></label>
+      <label>关键约束<select id="factConstraint"><option value="">请选择</option></select></label>
+      <label>目标量<select id="factTarget"><option value="">请选择</option></select></label>
+    </div>
+    <div class="diagnose-actions"><button id="diagnoseBtn" type="button">检查建模信息</button><button id="clearDiagnosis" type="button">清空</button></div>
+    <h2>模型目录（仅供手动浏览）</h2>
     <div class="list" id="modelList"></div>
   </aside>
 
@@ -92,6 +103,7 @@
     </section>
     <canvas id="canvas" width="920" height="430" aria-label="高频模型诊断台：实物场景、判据图像、仪器读数和数据记录"></canvas>
     <section class="controls">
+      <button id="playBtn" data-audit-play type="button">播放演示</button>
       <label><span id="la"></span><input id="a" type="range"><span class="val" id="va"></span></label>
       <label><span id="lb"></span><input id="b" type="range"><span class="val" id="vb"></span></label>
       <label><span id="lc"></span><input id="c" type="range"><span class="val" id="vc"></span></label>
@@ -110,12 +122,13 @@
     </div>
     <h2>第一步流程</h2>
     <div class="steps" id="steps"></div>
-    <div class="formula" id="formula"></div>
+    <div class="formula" id="formula" hidden></div>
+    <div class="card"><div class="k">观察任务</div><div>先补全结构化事实。系统给出唯一推荐后，再播放或拖动参数，用判据读数核对模型边界。手动浏览目录不等于诊断结论。</div></div>
     <div class="card warn">
       <div class="k">最容易错</div>
       <div class="strong" id="trap"></div>
     </div>
-    <a id="openLink" class="link" target="_top" href="../../#/models">进入对应模型复习</a>
+    <a id="openLink" class="link" target="_top" href="../../#/models" hidden>进入对应模型复习</a>
     <h2>候选对比</h2>
     <div class="compare" id="candidates"></div>
   </aside>
@@ -134,55 +147,89 @@ const models=[
   {id:'M-09',name:'功能关系综合',anchor:'model-work-energy',family:'energy',signals:['全过程','非保守力','摩擦生热','高度变化','能量账本'],desc:'复杂过程先建能量账本，保守力用势能，非保守力用功。',reaction:'先写初末能量账本',criterion:'除重力弹力外谁做功',formula:['W非保=ΔE机','Q=f·s相对','Ek1+Ep1+W外=Ek2+Ep2'],steps:['选系统和初末状态','区分保守力与非保守力','把摩擦热或外力功放到账本里'],trap:'摩擦生热用对地位移而不是相对位移。',sliders:[['高度差 h',0,5,2,'m'],['摩擦力 f',0,20,8,'N'],['相对位移 s',0,8,3,'m']],draw:'energy'},
   {id:'M-10',name:'碰撞模型',anchor:'model-collision',family:'momentum',signals:['碰撞','爆炸','反冲','短时间','动量守恒'],desc:'短时间内内力远大于外力，优先写动量守恒。',reaction:'先判断外力冲量能否忽略',criterion:'系统总动量守恒',formula:['m1v1+m2v2=m1v1′+m2v2′','e=(v2′-v1′)/(v1-v2)'],steps:['圈定系统','判断外力冲量是否可忽略','按弹性/粘连/反冲补条件'],trap:'动量守恒不等于机械能一定守恒。',sliders:[['m1',1,8,2,'kg'],['m2',1,8,3,'kg'],['恢复系数 e',0,1,.7,'']],draw:'collision'},
   {id:'M-11',name:'导轨模型',anchor:'model-rail-rod',family:'em',signals:['导轨','金属棒','切割磁感线','灯泡','安培阻力'],desc:'棒是运动电源，电流后又受安培阻力。',reaction:'先定 B、L、v，再写 E=BLv',criterion:'电动势、电流、安培力闭环',formula:['E=BLv','I=E/R','F安=BIL'],steps:['判断棒是否垂直切割磁感线','用右手定则判电流方向','用安培力和能量守恒校验'],trap:'只算电动势，漏掉安培力反过来影响运动。',sliders:[['B',.2,1.2,.6,'T'],['L',.3,1.2,.8,'m'],['v',.5,8,3,'m/s']],draw:'rail'},
-  {id:'M-12',name:'交流电综合',anchor:'model-ac-transformer',family:'em',signals:['有效值','峰值','变压器','输电','匝数比'],desc:'交流电先区分瞬时值、峰值、有效值，再看理想变压器关系。',reaction:'先把题目给的是峰值还是有效值说清',criterion:'U1/U2=n1/n2',formula:['U=Um/√2','U1/U2=n1/n2','P入≈P出'],steps:['标清峰值/有效值','按匝数比变压','输电题用 P=UI 和 I²R'],trap:'把峰值直接代入有效值公式。',sliders:[['原线圈 n1',100,1000,500,'匝'],['副线圈 n2',50,1000,250,'匝'],['输入 U1',110,380,220,'V']],draw:'ac'},
-  {id:'M-13',name:'复合场粒子模型',anchor:'model-compound-field-particle',family:'em',signals:['速度选择器','复合场','偏转','带电粒子','圆周'],desc:'先看电场力和洛伦兹力方向，再判断直线、偏转或圆周。',reaction:'先比较 qE 与 qvB',criterion:'v 是否等于 E/B',formula:['qE=qvB','v=E/B','R=mv/qB'],steps:['定电荷正负和受力方向','比较电场力与磁场力','离开选择器后再列圆周'],trap:'负电荷方向忘记反向。',sliders:[['E',1,8,4,'kV/m'],['B',.2,1.5,.8,'T'],['v',1,10,5,'km/s']],draw:'compound'},
-  {id:'M-14',name:'气体状态变化模型',anchor:'model-gas-state-change',family:'thermal',signals:['p-V图','等温','等压','等容','做功'],desc:'先识别过程类型，再用状态方程和 p-V 面积。',reaction:'先在 p-V 图上读过程',criterion:'面积代表气体做功',formula:['pV/T=常量','W=∫p dV','ΔU=Q+W外'],steps:['判等温/等压/等容','用状态方程连初末态','p-V 图面积判断做功'],trap:'把 p-V 竖线也算出体积功。',sliders:[['初始 p',1,5,2,'p0'],['体积倍率',.5,3,1.8,''],['温度倍率',.5,3,1.4,'']],draw:'gas'},
+  {id:'M-12',name:'交流电综合',anchor:'model-ac-transformer',family:'em',signals:['有效值','峰值','变压器','输电','匝数比'],desc:'交流电先区分瞬时值、峰值、有效值，再看理想变压器关系。',reaction:'先把题目给的是峰值还是有效值说清',criterion:'U1/U2=n1/n2',formula:['正弦交流：U=Um/√2','理想变压器：U1/U2=n1/n2','P=UI 仅直接适用于纯电阻或已给功率因数的情形'],steps:['标清峰值/有效值','按匝数比变压','输电题用 P=UI 和 I²R，并核对负载条件'],trap:'把峰值直接代入有效值公式，或把一般交流负载都写成 P=UI。',sliders:[['原线圈 n1',100,1000,500,'匝'],['副线圈 n2',50,1000,250,'匝'],['输入 U1',110,380,220,'V']],draw:'ac'},
+  {id:'M-13',name:'复合场粒子模型',anchor:'model-compound-field-particle',family:'em',signals:['速度选择器','复合场','偏转','带电粒子','圆周'],desc:'先看电场力和洛伦兹力方向，再判断直线、偏转或圆周。',reaction:'先比较 |q|E 与 |q|vB',criterion:'v 是否等于 E/B',formula:['|q|E=|q|vB','v=E/B','R=mv/(|q|B)'],steps:['定电荷正负和受力方向','比较电场力与磁场力','离开选择器后再列圆周'],trap:'负电荷方向忘记反向，或把带符号 q 代入半径大小。',sliders:[['E',1,8,4,'kV/m'],['B',.2,1.5,.8,'T'],['v',1,10,5,'km/s']],draw:'compound'},
+  {id:'M-14',name:'气体状态变化模型',anchor:'model-gas-state-change',family:'thermal',signals:['p-V图','等温','等压','等容','做功'],desc:'先识别过程类型，再用状态方程和 p-V 面积。',reaction:'先在 p-V 图上读过程',criterion:'路径下有向面积代表气体做功',formula:['高中判据：W 等于 p-V 路径下有向面积','[拓展] 准静态过程 W=∫p dV','ΔU=Q+W外'],steps:['判等温/等压/等容','用状态方程连初末态','按具体 p-V 路径的有向面积判断做功'],trap:'只凭初末状态算功，或把 p-V 竖线也算出体积功。',sliders:[['初始 p',1,5,2,'p0'],['体积倍率',.5,3,1.8,''],['温度倍率',.5,3,1.4,'']],draw:'gas'},
   {id:'M-15',name:'核反应与质能方程',anchor:'model-nuclear-energy',family:'nuclear',signals:['核反应方程','质量亏损','结合能','半衰期','质能方程'],desc:'先守恒 A、Z，再用质量亏损换能量。',reaction:'先配平 ΣA、ΣZ',criterion:'Δm 正负决定放能/吸能',formula:['ΣA前=ΣA后','ΣZ前=ΣZ后','E=Δmc²≈Δm×931.5MeV'],steps:['列 A 和 Z 守恒','计算反应前后静止质量差','判断放能并换算 MeV'],trap:'把质量数守恒误解成静止质量完全相等。',sliders:[['Δm',-.04,.32,.18,'u'],['反应次数',1,80,12,'×10²⁰'],['结合能',6.5,8.8,8.4,'MeV']],draw:'nuclear'}
 ];
-const signalBank=['轻绳','木板','传送带','剪断','水平初速度','最高点','卫星','恒定功率','摩擦生热','碰撞','导轨','变压器','复合场','p-V图','质量亏损'];
+const profiles={
+  'M-01':['multi-body','joint-motion','fixed-link','internal-force'],
+  'M-02':['block-board','relative-slip','static-friction','critical'],
+  'M-03':['block-belt','relative-slip','kinetic-friction','co-speed'],
+  'M-04':['spring-body','instant-change','state-continuity','acceleration'],
+  'M-05':['particle','two-axis','constant-acc','trajectory'],
+  'M-06':['particle','circular','contact-nonnegative','critical'],
+  'M-07':['satellite','circular','gravity-only','period'],
+  'M-08':['vehicle','powered','power-force','terminal'],
+  'M-09':['system','energy-transfer','work-energy','energy-change'],
+  'M-10':['system','collision','impulse-negligible','post-velocity'],
+  'M-11':['conductor','induction','closed-circuit','power'],
+  'M-12':['transformer','ac-transform','ideal-transformer','voltage'],
+  'M-13':['charge','field-crossing','force-balance','velocity'],
+  'M-14':['gas','state-change','path-specified','work'],
+  'M-15':['nucleus','reaction','az-conservation','energy']
+};
+const factLabels={
+  'multi-body':'多个连接物体','block-board':'物块与木板','block-belt':'物块与传送带','spring-body':'弹簧与物体','particle':'质点','satellite':'卫星','vehicle':'机车','system':'物理系统','conductor':'导体棒与电路','transformer':'变压器','charge':'带电粒子','gas':'一定质量气体','nucleus':'原子核',
+  'joint-motion':'共同运动','relative-slip':'相对滑动','instant-change':'瞬时突变','two-axis':'二维分运动','circular':'圆周运动','powered':'动力启动','energy-transfer':'能量转化','collision':'碰撞短过程','induction':'电磁感应','ac-transform':'交流变压','field-crossing':'穿越复合场','state-change':'状态变化','reaction':'核反应',
+  'fixed-link':'定长约束','static-friction':'静摩擦上限','kinetic-friction':'滑动摩擦','state-continuity':'状态量连续','constant-acc':'单向恒加速度','contact-nonnegative':'约束力非负','gravity-only':'引力供向心力','power-force':'P=Fv','work-energy':'功能关系','impulse-negligible':'外力冲量可忽略','closed-circuit':'闭合电路','ideal-transformer':'理想变压器','force-balance':'电磁力平衡','path-specified':'p-V路径已知','az-conservation':'A与Z守恒',
+  'internal-force':'内力','critical':'临界条件','co-speed':'共速时刻','acceleration':'瞬时加速度','trajectory':'轨迹','period':'周期','terminal':'终端速度','energy-change':'机械能变化','post-velocity':'碰后速度','power':'功率','voltage':'副边电压','velocity':'筛选速度','work':'气体做功','energy':'反应能'
+};
+const factIds=['factObject','factProcess','factConstraint','factTarget'];
 const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
 const ctrls=[document.getElementById('a'),document.getElementById('b'),document.getElementById('c')];
-let active=0,query='',signal='',running=true,t=0,drag=null,records=[];
+const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+document.documentElement.dataset.modelMotion=reduceMotion?'reduce':'full';
+let active=0,running=false,t=0,drag=null,records=[],diagnosed=false,recommendation=null,browse=false;
 function fmt(v){return Math.abs(v)>=10?Number(v).toFixed(0):Number(v).toFixed(2).replace(/0$/,'').replace(/\.0$/,'')}
 function vals(){return ctrls.map(x=>+x.value)}
-function matchScore(m){const q=(query+' '+signal).trim();if(!q)return active===models.indexOf(m)?100:60;let s=0;for(const w of m.signals){if(q.includes(w))s+=35}if(m.name.includes(q)||m.desc.includes(q))s+=30;if(m.family.includes(q))s+=15;return s}
+function selectedFacts(){return factIds.map(id=>document.getElementById(id).value)}
+function matchScore(m){const selected=selectedFacts();const profile=profiles[m.id];return selected.reduce((score,value,i)=>score+(value&&profile[i]===value?1:0),0)}
 function ranked(){return models.map((m,i)=>({...m,_i:i,_score:matchScore(m)})).sort((a,b)=>b._score-a._score||a._i-b._i)}
 function init(){
-  document.getElementById('signalChips').innerHTML=signalBank.map(s=>`<button class="chip" data-s="${s}">${s}</button>`).join('');
-  document.getElementById('signalChips').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;signal=signal===b.dataset.s?'':b.dataset.s;const top=ranked()[0];active=top._i;render()});
-  document.getElementById('search').addEventListener('input',e=>{query=e.target.value.trim();const top=ranked()[0];active=top._i;render()});
+  factIds.forEach((id,column)=>{const select=document.getElementById(id);const values=[...new Set(Object.values(profiles).map(p=>p[column]))];select.insertAdjacentHTML('beforeend',values.map(value=>`<option value="${value}">${factLabels[value]}</option>`).join(''));select.addEventListener('change',()=>{diagnosed=false;recommendation=null;browse=false;running=false;render()})});
+  document.getElementById('diagnoseBtn').addEventListener('click',diagnose);
+  document.getElementById('clearDiagnosis').addEventListener('click',()=>{factIds.forEach(id=>document.getElementById(id).value='');diagnosed=false;recommendation=null;browse=false;running=false;render()});
   ctrls.forEach(c=>c.addEventListener('input',render));
   canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
   render();requestAnimationFrame(loop);
 }
+function diagnose(){
+  diagnosed=true;browse=false;running=false;recommendation=null;
+  const selected=selectedFacts().filter(Boolean).length,ranking=ranked();
+  if(selected>=3&&ranking[0]._score>=3&&ranking[0]._score>ranking[1]._score){recommendation=ranking[0];active=recommendation._i}
+  render();
+}
 function render(){
   const m=models[active];
-  document.querySelectorAll('.chip').forEach(b=>b.classList.toggle('on',b.dataset.s===signal));
-  document.getElementById('modelList').innerHTML=ranked().map(r=>`<button class="model-btn ${r._i===active?'on':''}" data-i="${r._i}"><b>${r.id} ${r.name}</b><span>${r.signals.slice(0,4).join(' / ')} · 匹配 ${Math.min(100,r._score)}%</span></button>`).join('');
-  document.querySelectorAll('.model-btn').forEach(b=>b.onclick=()=>{active=+b.dataset.i;query='';signal='';document.getElementById('search').value='';render()});
-  document.getElementById('title').textContent=`${m.id} ${m.name}`;
-  document.getElementById('subtitle').textContent=m.desc;
-  document.getElementById('signalBox').textContent=m.signals.slice(0,3).join(' / ');
-  document.getElementById('reactionBox').textContent=m.reaction;
-  document.getElementById('recommend').textContent=`${m.id} ${m.name}`;
-  document.getElementById('whyNot').textContent=whyNot(m);
-  document.getElementById('steps').innerHTML=m.steps.map((s,i)=>`<div class="step"><span class="num">${i+1}</span><span>${s}</span></div>`).join('');
-  document.getElementById('formula').textContent=m.formula.join('\n');
-  document.getElementById('trap').textContent=m.trap;
-  document.getElementById('openLink').href='../../#/models?id='+m.anchor;
-  document.getElementById('candidates').innerHTML=ranked().slice(0,4).map(r=>`<button class="candidate" data-i="${r._i}"><b>${r.id}</b> ${r.name}<br>${r.reaction}</button>`).join('');
-  document.querySelectorAll('.candidate').forEach(b=>b.onclick=()=>{active=+b.dataset.i;render()});
+  const selected=selectedFacts(),selectedCount=selected.filter(Boolean).length,reveal=Boolean(recommendation)||browse;
+  document.getElementById('modelList').innerHTML=ranked().map(r=>`<button class="model-btn ${reveal&&r._i===active?'on':''}" data-i="${r._i}"><b>${r.id} ${r.name}</b><span>${r.signals.slice(0,4).join(' / ')} · 事实一致 ${selectedCount?r._score+'/4':'—'}</span></button>`).join('');
+  document.querySelectorAll('.model-btn').forEach(b=>b.onclick=()=>{active=+b.dataset.i;browse=true;diagnosed=false;recommendation=null;running=false;render()});
+  document.getElementById('title').textContent=reveal?`${m.id} ${m.name}`:'等待结构化建模事实';
+  document.getElementById('subtitle').textContent=reveal?m.desc:'至少选择三项，再点击“检查建模信息”。信息不足或候选并列时不会推荐。';
+  document.getElementById('signalBox').textContent=selectedCount?`${selectedCount}/4 项已填写`:'尚未填写';
+  document.getElementById('reactionBox').textContent=reveal?m.reaction:'先补研究对象、过程、约束和目标量';
+  document.getElementById('recommend').textContent=recommendation?`${m.id} ${m.name}`:browse?'手动浏览（非诊断结论）':diagnosed?`信息不足或候选并列（${selectedCount}/4）`:'尚未诊断';
+  document.getElementById('whyNot').textContent=whyNot(m,reveal,selectedCount);
+  document.getElementById('steps').innerHTML=reveal?m.steps.map((s,i)=>`<div class="step"><span class="num">${i+1}</span><span>${s}</span></div>`).join(''):'<div class="step"><span class="num">1</span><span>补充至少三项结构化事实，且必须形成唯一候选。</span></div>';
+  const formula=document.getElementById('formula');formula.hidden=!reveal;formula.textContent=reveal?m.formula.join('\n'):'';
+  document.getElementById('trap').textContent=reveal?m.trap:'信息不足时强行套模型，本身就是首要风险。';
+  const openLink=document.getElementById('openLink');openLink.hidden=!reveal;openLink.href='../../#/models?id='+m.anchor;
+  document.getElementById('candidates').innerHTML=diagnosed?ranked().slice(0,4).map(r=>`<div class="candidate ${recommendation&&r._i===active?'on':''}"><b>${r.id}</b> ${r.name}<br>事实一致 ${r._score}/4</div>`).join(''):'<div class="candidate">完成诊断后显示结构化事实得分。</div>';
   m.sliders.forEach((s,i)=>{const c=ctrls[i];if(c.dataset.model!==m.id){c.min=s[1];c.max=s[2];c.step=(s[2]-s[1])>30?1:.01;c.value=s[3];c.dataset.model=m.id}document.getElementById(['la','lb','lc'][i]).textContent=s[0];document.getElementById(['va','vb','vc'][i]).textContent=fmt(c.value)+(s[4]?' '+s[4]:'')});
+  document.getElementById('playBtn').disabled=!reveal;
   draw();
 }
-function whyNot(m){
-  const other=ranked().filter(x=>x._i!==active).slice(0,2).map(x=>x.name).join('、');
-  return `先看题眼“${m.signals.slice(0,3).join('、')}”，它们指向${m.reaction}。若误选${other||'其他模型'}，通常是还没判断临界、约束或守恒对象。`;
+function whyNot(m,reveal,selectedCount){
+  if(!reveal)return selectedCount<3?'少于三项事实，不能排除其他模型。':'当前最高分并列或不足三项一致，请补充/修正事实。';
+  const facts=profiles[m.id].map(value=>factLabels[value]).join('、');
+  return browse?`当前只是手动浏览。${m.name}的完整事实组合是：${facts}。`:`四类事实共同指向：${facts}；推荐不是关键词命中。`;
 }
 function setStatus(criterion,state){document.getElementById('criterionBox').textContent=criterion;document.getElementById('stateBox').textContent=state}
-function loop(ts){if(running)t=ts/1000;draw();requestAnimationFrame(loop)}
+function loop(ts){if(running&&!reduceMotion){t=ts/1000;const m=models[active],s=m.sliders[0],mid=(s[1]+s[2])/2,amp=(s[2]-s[1])*.25;ctrls[0].value=Math.max(s[1],Math.min(s[2],mid+amp*Math.sin(t*1.6)))}draw();requestAnimationFrame(loop)}
+document.getElementById('playBtn').addEventListener('click',e=>{if(e.currentTarget.disabled)return;if(reduceMotion){t+=.25;draw();e.currentTarget.textContent='单步演示（减少动态）';return}running=!running;e.currentTarget.textContent=running?'暂停演示':'播放演示';if(running)draw()});
 function clear(){ctx.clearRect(0,0,920,430);ctx.strokeStyle='#eef2f7';ctx.lineWidth=1;for(let x=40;x<920;x+=40)line(x,0,x,430);for(let y=40;y<430;y+=40)line(0,y,920,y);text('实物/受力视图',48,28,'#486581',13,'left',true);text('判据图像与仪器读数',680,28,'#486581',13,'left',true)}
-function draw(){clear();const m=models[active];drawers[m.draw](vals())}
+function draw(){clear();if(!recommendation&&!browse){text('请先补充结构化事实；信息不足时不展示公式或模型动画',460,210,'#486581',18,'center',true);setStatus('等待诊断',reduceMotion?'减少动态模式':'未开始');return}const m=models[active];drawers[m.draw](vals());const stateBox=document.getElementById('stateBox');stateBox.textContent+=` · 演示 t=${t.toFixed(2)} s${reduceMotion?' · 减少动态':''}`}
 function text(s,x,y,c='#102a43',size=14,align='left',bold=false){ctx.fillStyle=c;ctx.font=`${bold?800:500} ${size}px system-ui,-apple-system,"PingFang SC",sans-serif`;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
 function line(x1,y1,x2,y2,c,w=2,dash){ctx.save();ctx.strokeStyle=c||ctx.strokeStyle;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}
 function arrow(x1,y1,x2,y2,c,label){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,4);ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-12*Math.cos(a-.45),y2-12*Math.sin(a-.45));ctx.lineTo(x2-12*Math.cos(a+.45),y2-12*Math.sin(a+.45));ctx.closePath();ctx.fill();if(label)text(label,(x1+x2)/2,(y1+y2)/2-13,c,13,'center',true)}
@@ -204,7 +251,7 @@ const drawers={
   rail([B,L,v]){const E=B*L*v,I=E/2,F=B*I*L;setStatus(`E=${fmt(E)} V`,`F安=${fmt(F)} N`);line(210,170,710,170,'#334e68',5);line(210,310,710,310,'#334e68',5);const x=330+((t*v*18)%260);line(x,160,x,320,'#2c7be5',10);for(let i=250;i<700;i+=52){text('×',i,110,'#7048e8',28,'center',true);text('×',i,370,'#7048e8',28,'center',true)}arrow(x,240,x+95,240,'#e03131','v');handle(x+95,240,'拖 v');arrow(x-10,255,x-85,255,'#f0a500','F安');text(`E=BLv=${fmt(E)} V`,460,90,'#102a43',18,'center',true);gauge([E,I,F],['E','I','F安'])},
   ac([n1,n2,U1]){const U2=U1*n2/n1;setStatus(`U2=${fmt(U2)} V`,n2>n1?'升压':'降压');box(230,150,90,170,'#2c7be5','n1');box(560,150,90,170,'#38b2ac','n2');for(let i=0;i<6;i++){line(320,175+i*22,390,175+i*22,'#829ab1',3);line(490,175+i*22,560,175+i*22,'#829ab1',3)}arrow(150,235,230,235,'#e03131','U1');arrow(650,235,750,235,'#7048e8','U2');text('理想变压器：电压比等于匝数比',460,86,'#102a43',18,'center',true);gauge([U1,U2,n2/n1],['U1','U2','比值'])},
   compound([E,B,v]){const v0=E/B,dev=v-v0;setStatus(`v0=E/B=${fmt(v0)}`,Math.abs(dev)<.25?'直线通过':dev>0?'磁场力较大':'电场力较大');box(210,120,420,210,'#eef4ff','');for(let x=250;x<600;x+=54)for(let y=160;y<310;y+=48)text('×',x,y,'#7048e8',20,'center',true);const px=350+(t*80%150),py=225+dev*18;ctx.fillStyle='#2c7be5';ctx.beginPath();ctx.arc(px,py,12,0,7);ctx.fill();arrow(px,py,px+80,py,'#2c7be5','v');arrow(px-16,py,px-16,py+58,'#e03131','qE');arrow(px+16,py,px+16,py-58*v/v0,'#7048e8','qvB');text('速度选择器看 qE 与 qvB 是否抵消',460,82,'#102a43',18,'center',true);gauge([E,B,v0],['E','B','v0'])},
-  gas([p,vr,tr]){const p2=p*tr/vr,W=p*(vr-1);setStatus(`p2=${fmt(p2)}p0`,`W≈pΔV=${fmt(W)}`);const gx=210,gy=320;line(gx,gy,gx+360,gy,'#334e68',2);line(gx,gy,gx,gy-230,'#334e68',2);ctx.strokeStyle='#2c7be5';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(gx+70,gy-p*35);ctx.lineTo(gx+70*vr,gy-p2*35);ctx.stroke();ctx.fillStyle='rgba(44,123,229,.18)';ctx.fillRect(gx+70,gy-Math.max(p,p2)*35,(vr-1)*70,Math.max(p,p2)*35);text('p-V 图面积表示气体对外做功',460,82,'#102a43',18,'center',true);gauge([p,p2,W],['p1','p2','W'])},
+  gas([p,vr,tr]){const p2=p*tr/vr,W=.5*(p+p2)*(vr-1);setStatus(`p2=${fmt(p2)}p0`,`直线路径 W=${fmt(W)} p0V0`);const gx=210,gy=320,x1=gx+70,x2=gx+70*vr,y1=gy-p*35,y2=gy-p2*35;line(gx,gy,gx+360,gy,'#334e68',2);line(gx,gy,gx,gy-230,'#334e68',2);ctx.fillStyle='rgba(44,123,229,.18)';ctx.beginPath();ctx.moveTo(x1,gy);ctx.lineTo(x1,y1);ctx.lineTo(x2,y2);ctx.lineTo(x2,gy);ctx.closePath();ctx.fill();line(x1,y1,x2,y2,'#2c7be5',4);text('直线路径下梯形有向面积表示气体对外做功',460,82,'#102a43',18,'center',true);gauge([p,p2,W],['p1','p2','W'])},
   nuclear([dm,N,eb]){const Q=dm*931.5,J=Q*1.602e-13*N*1e20;setStatus(`Q=${fmt(Q)} MeV`,dm>=0?'放能':'吸能');box(230,210,90,58,'#2c7be5','反应前');arrow(340,240,470,240,'#334e68','ΣA/ΣZ');box(500,210,120,58,'#38b2ac','反应后');arrow(620,220,720,170,dm>=0?'#f0a500':'#e03131',dm>=0?'Q':'吸能');text('先配平 A、Z，再算质量亏损',460,86,'#102a43',18,'center',true);gauge([Math.abs(Q),N,eb],['|Q|','N','Eb/A'])}
 };
 function spring(x1,y1,x2,y2){ctx.strokeStyle='#334e68';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(x1,y1);for(let i=1;i<=8;i++){const y=y1+(y2-y1)*i/8,x=x1+(i%2?-18:18);ctx.lineTo(x,y)}ctx.lineTo(x2,y2);ctx.stroke()}
@@ -215,5 +262,5 @@ function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.lef
 function findHandle(p){const m=models[active],v=vals();let hs=[];if(m.draw==='connecting')hs=[{x:550+v[0]*8,y:249,i:0,fn:p=>(p.x-550)/8}];if(m.draw==='plank')hs=[{x:420+v[0]*7,y:192,i:0,fn:p=>(p.x-420)/7}];if(m.draw==='belt')hs=[{x:430,y:325,i:0,fn:p=>(p.x-260)/34}];if(m.draw==='spring'){const x=(v[0]*10+v[1])/v[2];hs=[{x:308,y:305+x*80,i:1,fn:p=>(p.y-305)*v[2]/80-v[0]*10}]}if(m.draw==='collision')hs=[{x:260+v[2]*180,y:330,i:2,fn:p=>(p.x-260)/180}];if(m.draw==='rail')hs=[{x:425,y:240,i:2,fn:p=>(p.x-330)/12}];return hs.find(h=>Math.hypot(p.x-h.x,p.y-h.y)<32)}
 init();
 </script>
-</body>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script></body>
 </html>

@@ -206,11 +206,12 @@ document.getElementById('play-btn').onclick=function(){auto=!auto;this.classList
 document.getElementById('n-btn').onclick=function(){polarity=1;trace=[];this.classList.add('on');document.getElementById('s-btn').classList.remove('on');draw()};
 document.getElementById('s-btn').onclick=function(){polarity=-1;trace=[];this.classList.add('on');document.getElementById('n-btn').classList.remove('on');draw()};
 document.getElementById('speed').oninput=e=>{document.getElementById('speed-d').textContent=e.target.value};
-document.getElementById('reset-btn').onclick=()=>{magnetX=120;lastMagnetX=120;lastPhi=phiAt(magnetX);polarity=1;auto=false;autoDir=1;trace=[];needle=0;document.getElementById('n-btn').classList.add('on');document.getElementById('s-btn').classList.remove('on');document.getElementById('play-btn').classList.remove('on');document.getElementById('play-btn').textContent='自动靠近/远离';draw()};
+document.getElementById('reset-btn').onclick=()=>{magnetX=120;lastMagnetX=120;lastPhi=phiAt(magnetX);polarity=1;auto=false;autoDir=1;trace=[];needle=0;document.getElementById('speed').value=2;document.getElementById('speed-d').textContent='2';document.getElementById('n-btn').classList.add('on');document.getElementById('s-btn').classList.remove('on');document.getElementById('play-btn').classList.remove('on');document.getElementById('play-btn').textContent='自动靠近/远离';draw()};
 let last=performance.now();
 function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;if(auto){magnetX+=autoDir*(Number(document.getElementById('speed').value)+1)*55*dt;if(magnetX>coilX-42){magnetX=coilX-42;autoDir=-1}if(magnetX<62){magnetX=62;autoDir=1}}draw();requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
 })();
 </script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

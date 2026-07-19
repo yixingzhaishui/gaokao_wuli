@@ -1,0 +1,341 @@
+
+===== anim/skill/circuit-experiment-design.html (63 lines, kept 23) =====
+14: <div class="stage"><canvas id="canvas" width="930" height="620" aria-label="电路实验设计专题实验台：电源、电流表、电压表、滑动变阻器、内接外接、分压限流、电路图像和数据记录"></canvas></div>
+16: <div class="card task"><b>观察任务：</b>拖动滑片，切换内接/外接与分压/限流，看电表读数、调节范围和测量误差如何改变。</div>
+18: <div class="title">方案选择</div>
+19: <div class="tabs"><button id="inner">内接法</button><button id="outer" class="active">外接法</button></div>
+20: <div class="tabs" style="margin-top:6px"><button id="divider" class="active">分压式</button><button id="limiter">限流式</button></div>
+21: <label class="param"><span>待测电阻 Rx <b id="rxLabel">20.0 Ω</b></span><input id="rx" type="range" min="2" max="80" step="1" value="20"></label>
+22: <label class="param"><span>滑片位置 <b id="posLabel">0.50</b></span><input id="pos" type="range" min="0.05" max="0.95" step="0.01" value="0.5"></label>
+23: <label class="param"><span>电源电压 <b id="eLabel">6.0 V</b></span><input id="emf" type="range" min="2" max="12" step="0.1" value="6"></label>
+24: <div class="buttons"><button id="play">暂停</button><button id="record">记录方案</button></div>
+26: <div class="readout" id="readout"></div>
+26D: <div class="readout" id="readout"></div>
+27: <div class="card"><div class="title">方案记录</div><table><thead><tr><th>接法</th><th>调节</th><th>R测</th></tr></thead><tbody id="rows"></tbody></table></div>
+29: <div class="title">设计判据</div>
+34: <div class="status" id="status"></div>
+41: const E={inner:document.getElementById('inner'),outer:document.getElementById('outer'),divider:document.getElementById('divider'),limiter:document.getElementByI
+42: const C={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',green:'#087f5b',gold:'#f0a500',purple:'#7048e8'};
+48: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.
+49: function values(){const rx=+E.rx.value,e=+E.emf.value,p=+E.pos.value;let ux=S.divider?e*p:e*rx/(rx+RP*(1-p));let ix=ux/rx;let u=ux,i=ix;if(S.inner){u=ux+ix*RA;i
+52: function drawCircuit(v){box(70,88,560,250,'#fbfdff');text('电路装置与原理图：电表、滑动变阻器、待测电阻同步显示',350,112,C.muted,'center',12,'900');const x=140,y=218;line(x,y,x+380,y,C.i
+53: function drawGraph(v){box(70,360,560,170,'#fff');text('数据图像：U-I 点与 R测=U/I',350,382,C.muted,'center',12,'900');const x0=112,y0=496,w=455,h=86;arrow(x0,y0,x0+w+18
+55: function update(v){E.inner.classList.toggle('active',S.inner);E.outer.classList.toggle('active',!S.inner);E.divider.classList.toggle('active',S.divider);E.limit
+57: E.inner.onclick=()=>{S.inner=true;draw()};E.outer.onclick=()=>{S.inner=false;draw()};E.divider.onclick=()=>{S.divider=true;draw()};E.limiter.onclick=()=>{S.divi
+61: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/skill/electromagnetic-induction-combo.html (103 lines, kept 34) =====
+40: <div class="stage"><canvas id="canvas" width="960" height="620" aria-label="电磁感应综合实验台：导体棒在磁场中运动，磁通量、感应电流、安培力和能量读数同步变化"></canvas></div>
+42: <div class="card task"><b>只追一条链：</b>导体棒移动 → 回路面积和磁通量 Φ 改变 → 感应电流 I 出现 → 安培力反向阻碍运动 → 机械功转成电热。<b>拖动橙色导体棒时，观察电流方向如何反转。</b></div>
+43: <div class="toolbar"><button id="play" class="primary">播放</button><button id="step">单步</button><button id="reset">重置</button></div>
+45: <label class="param"><span>磁感应强度 B <b id="bLabel">0.60 T</b></span><input id="B" type="range" min="0.1" max="1.2" step="0.05" value="0.6"></label>
+46: <label class="param"><span>导体棒长度 L <b id="lLabel">0.50 m</b></span><input id="L" type="range" min="0.2" max="1" step="0.05" value="0.5"></label>
+47: <label class="param"><span>速度大小 |v| <b id="vLabel">3.0 m/s</b></span><input id="v" type="range" min="0" max="5" step="0.1" value="3"></label>
+48: <label class="param"><span>电阻 R <b id="rLabel">2.0 Ω</b></span><input id="R" type="range" min="0.5" max="8" step="0.1" value="2"></label>
+50: <div class="readout" id="readout"></div>
+50D: <div class="readout" id="readout"></div>
+51: <div class="card formula"><b>公式和画面绑定</b><div>磁通量：Φ=B·S，S 对应导体棒位置围成的面积</div><div>动生电动势：|ε|=BL|v|=|ΔΦ/Δt|</div><div>安培力：F安=BIL，方向总是阻碍相对运动</div><div>能量：P机械=|F安·v|=
+51D: <div class="card formula"><b>公式和画面绑定</b><div>磁通量：Φ=B·S，S 对应导体棒位置围成的面积</div><div>动生电动势：|ε|=BL|v|=|ΔΦ/Δt|</div><div>安培力：F安=BIL，方向总是阻碍相对运动</div><div>能量：P机械=|F安·v|=I²R</div></div>
+52: <div class="status" id="status"></div>
+60: const C={ink:'#102a43',muted:'#64748b',grid:'#dbe5ef',blue:'#2563eb',orange:'#ea580c',green:'#059669',gold:'#d97706',purple:'#7c3aed',red:'#dc2626',pink:'#db277
+63: const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+68: function arrow(x1,y1,x2,y2,color=C.blue,width=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,color,width);ctx.save();ctx.fillStyle=color;ctx.beginPath();ct
+70: function model(){const B=+el.B.value,L=+el.L.value,vSetting=+el.v.value,R=+el.R.value,actualV=S.drag?S.manualV:vSetting*S.heading,flux=B*L*S.position,fluxRate=B
+71: function drawField(x,y,w,h){ctx.save();ctx.fillStyle='#e0f2fe';ctx.fillRect(x,y,w,h);for(let i=0;i<6;i++)for(let j=0;j<4;j++)text('×',x+45+i*58,y+30+j*40,C.blue
+73: function drawAmmeter(x,y,value,dir){box(x,y,72,74,'#0f172a','#334155');ctx.strokeStyle='#94a3b8';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x+36,y+35,23,Math.PI,Ma
+77: const rodX=x0+clamp(S.position,0,1)*(x1-x0);drawRod(rodX,L.railY,m.drag?C.gold:C.orange);
+78: const motionColor=m.actualV===0?C.muted:m.actualV>0?C.green:C.red;arrow(rodX+18,L.railY-79,rodX+18+m.actualV*12,L.railY-79,motionColor,3);if(!L.small)text('v='+
+79: const currentColor=m.I===0?C.muted:m.I>0?C.purple:C.pink;arrow(x0+34,railTop+12,x0+105,railTop+12,currentColor,3);arrow(x1-105,railBottom-12,x1-34,railBottom-12
+80: const forceColor=m.F===0?C.muted:m.F>0?C.red:C.green;arrow(rodX,L.railY+88,rodX-m.F*18,L.railY+88,forceColor,3);text(L.small?'F安阻碍运动':'F安='+fmt(Math.abs(m.F),2)
+83: function drawGraph(m,L){const x=24,y=L.graphY,w=W-48,h=L.chartH;box(x,y,w,h,'#fff');text(L.small?'磁通量记录：斜率=ΔΦ/Δt，ε随斜率变':'磁通量—时间记录：曲线斜率就是 ΔΦ/Δt，ε 与斜率同步',W/2,y+17
+84: function bars(m,L){const small=L.small,x=24,y=L.small?428:540,w=W-48,h=L.small?132:66;box(x,y,w,h,'#fff');const labels=['|ε| V','|I| A','|F安| N','P热 W'],vals=[M
+85: function update(m){el.bLabel.textContent=fmt(m.B,2)+' T';el.lLabel.textContent=fmt(m.L,2)+' m';el.vLabel.textContent=fmt(Math.abs(m.vSetting),1)+' m/s';el.rLabe
+86: function draw(){const m=model(),L=layout();ctx.clearRect(0,0,W,H);const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#ffffff');bg.addColorStop(1,'#ee
+88D: function reset(){S.running=false;S.position=.28;S.heading=1;S.manualV=0;S.drag=false;S.history=[];S.lastHistory=-1;el.play.textContent='播放';draw()}
+89: function stepBy(dt){const m=model();if(!S.drag){const speed=Math.abs(+el.v.value);S.position+=Math.sign(+el.v.value||1)*S.heading*dt*speed/4;if(S.position<=.03|
+91D: el.play.onclick=()=>{S.running=!S.running;el.play.textContent=S.running?'暂停':'播放';draw()};el.step.onclick=()=>{S.running=false;el.play.textContent='播放';stepBy(.25)};el.reset.onclick=reset;
+92: function point(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}}
+93: canvas.addEventListener('pointerdown',e=>{const p=point(e),L=layout(),x0=L.left+30,x1=L.right-80,rodX=x0+S.position*(x1-x0);if(Math.abs(p.x-rodX)<34&&p.y>L.rail
+94: canvas.addEventListener('pointermove',e=>{if(!S.drag)return;const p=point(e),L=layout(),x0=L.left+30,x1=L.right-80,dx=p.x-S.lastX;S.position=clamp(S.position+dx
+96: function resize(){const r=canvas.getBoundingClientRect();W=clamp(r.width||960,320,960);H=W<640?590:620;dpr=Math.min(window.devicePixelRatio||1,2);canvas.style.h
+97: function loop(now){const dt=Math.min(Math.max((now-last)/1000,0),.04);last=now;if(S.running&&!S.drag){const speed=+el.v.value;S.position+=Math.sign(speed||1)*S.
+
+===== anim/skill/energy-momentum-combo.html (111 lines, kept 35) =====
+40: <div class="stage"><canvas id="canvas" width="960" height="620" aria-label="能量与动量综合实验台：小车碰撞、动量对照、能量转化和弹簧压缩同步变化"></canvas></div>
+42: <div class="card task"><b>先看两段：</b>蓝色小车撞上金色木块的瞬间，读“碰前 p / 碰后 p”；碰后一起压缩弹簧时，读“当前动能 K / 弹性势能 Ep”。<b>拖动画面里的蓝色小车改变 v₀。</b></div>
+43: <div class="toolbar"><button id="play" class="primary">播放</button><button id="step">单步</button><button id="reset">重置</button></div>
+45: <label class="param"><span>小车质量 m₁ <b id="m1Label">1.0 kg</b></span><input id="m1" type="range" min="0.5" max="4" step="0.1" value="1"></label>
+46: <label class="param"><span>木块质量 m₂ <b id="m2Label">2.0 kg</b></span><input id="m2" type="range" min="0.5" max="5" step="0.1" value="2"></label>
+47: <label class="param"><span>入射速度 v₀ <b id="v0Label">6.0 m/s</b></span><input id="v0" type="range" min="1" max="10" step="0.1" value="6"></label>
+48: <label class="param"><span>弹簧劲度系数 k <b id="kLabel">120 N/m</b></span><input id="k" type="range" min="40" max="240" step="5" value="120"></label>
+50: <div class="readout" id="readout"></div>
+50D: <div class="readout" id="readout"></div>
+51: <div class="card formula"><b>公式和画面绑定</b><div>碰撞瞬间：p 前 = p 后，m₁v₀=(m₁+m₂)v</div><div>压簧阶段：K+Ep=常量，½Mv²+½kx²=½Mv'²</div><div>注意：弹簧有外力冲量，压簧阶段不能继续套动量守恒。</div></div>
+51D: <div class="card formula"><b>公式和画面绑定</b><div>碰撞瞬间：p 前 = p 后，m₁v₀=(m₁+m₂)v</div><div>压簧阶段：K+Ep=常量，½Mv²+½kx²=½Mv'²</div><div>注意：弹簧有外力冲量，压簧阶段不能继续套动量守恒。</div></div>
+52: <div class="status" id="status"></div>
+64: const C={ink:'#102a43',muted:'#64748b',grid:'#dbe5ef',blue:'#2563eb',gold:'#d97706',green:'#059669',red:'#dc2626',purple:'#7c3aed',pink:'#db2777'};
+68: const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+73: function arrow(x1,y1,x2,y2,color=C.blue,width=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,color,width);ctx.save();ctx.fillStyle=color;ctx.beginPath();ct
+74: function calc(){const m1=+el.m1.value,m2=+el.m2.value,v0=+el.v0.value,k=+el.k.value,M=m1+m2,pBefore=m1*v0,vAfter=pBefore/M,K0=.5*m1*v0*v0,KAfter=.5*M*vAfter*vAf
+75: function stateAt(t,q){const time=clamp(t,0,TOTAL);if(time<2){const u=time/2;return{stage:'碰撞前',color:C.blue,progress:u,p:q.pBefore,K:q.K0,Ep:0,loss:0,v:q.v0,car
+78: function drawCart(x,y,color,label,joined,scale=1){ctx.save();ctx.fillStyle=color;ctx.strokeStyle='#7c2d12';ctx.lineWidth=2;const w=joined?78:42;ctx.beginPath();
+79: function drawSpring(x,y,compression,color){const length=92-compression;line(x-96,y,x-length,y,C.muted,4);line(x-96,y-22,x-96,y+22,C.muted,3);ctx.save();ctx.stro
+83: const collisionX=L.left+(L.right-L.left)*.38,springX=L.right-34;
+85: const springCompression=s.cart==='spring'?s.Ep/q.KAfter*54:0;drawSpring(springX,L.trackY,springCompression,s.stage==='转化完成'?C.pink:C.purple);
+86: S.trail.slice(-80).forEach(mark=>{ctx.fillStyle=mark.color;ctx.globalAlpha=.18+mark.alpha*.45;ctx.beginPath();ctx.arc(mark.x,L.trackY-7,3,0,Math.PI*2);ctx.fill(
+87: let cartX=collisionX;if(s.cart==='separate')cartX=L.left+(collisionX-L.left)*s.progress;else if(s.cart==='joined'&&S.time<5)cartX=collisionX+(springX-110-collis
+89: const labels=['① 碰撞：先看 p','② 运动：p 保持','③ 压簧：看 K→Ep'],ends=[0,2,5,TOTAL],colors=[C.gold,C.green,C.purple];labels.forEach((label,i)=>{const x=timeX(ends[i],q,L),w
+90: const cursor=timeX(S.time,q,L);line(cursor,L.trackY+48,cursor,L.trackY+84,C.gold,3,[4,3]);text('现在',cursor,L.trackY+99,C.gold,'center',10,'900');text('直接拖动蓝色小车，
+92: function barChart(x,y,w,h,title,labels,values,colors,maxValue,footer){box(x,y,w,h,'#fff');text(title,x+w/2,y+17,C.ink,'center',Math.max(11,Math.min(14,w/35)),'9
+93: function drawDashboard(q,s,L){const small=L.small,fullW=W-48;if(small){const y=L.energyY;barChart(24,y,fullW,L.chartH,'能量账本：碰撞损失 + K → Ep',['碰前K₀','碰后K','当前K','
+94: function update(q,s){el.m1Label.textContent=fmt(q.m1,1)+' kg';el.m2Label.textContent=fmt(q.m2,1)+' kg';el.v0Label.textContent=fmt(q.v0,1)+' m/s';el.kLabel.textC
+95: function draw(){const q=calc(),s=stateAt(S.time,q),L=layout();ctx.clearRect(0,0,W,H);const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#ffffff');bg.
+96: function addTrail(){const q=calc(),s=stateAt(S.time,q),L=layout(),collisionX=L.left+(L.right-L.left)*.38,springX=L.right-34,springCompression=s.cart==='spring'?
+97D: function reset(){S.running=false;S.time=0;S.trail=[];S.lastTrail=-1;el.play.textContent='播放';draw()}
+101: function point(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}}
+102: function setV(p){const q=calc(),L=layout();const v=clamp(1+(p.x-L.left)/Math.max(1,L.right-L.left)*9,1,10);el.v0.value=v.toFixed(1);S.time=0;S.trail=[];S.lastTr
+104: function resize(){const r=canvas.getBoundingClientRect();W=clamp(r.width||960,320,960);H=W<640?590:620;dpr=Math.min(window.devicePixelRatio||1,2);canvas.style.h
+105: function loop(now){const dt=Math.min(Math.max((now-last)/1000,0),.04);last=now;if(S.running){S.time+=dt;if(S.time>=TOTAL){S.time=TOTAL;S.running=false;el.play.t
+
+===== anim/skill/error-analysis.html (60 lines, kept 24) =====
+14: <div class="stage"><canvas id="canvas" width="930" height="620" aria-label="误差分析专题实验台：装置读数、数据散点、平均值、系统误差、偶然误差、相对误差、多视角图像记录"></canvas></div>
+16: <div class="card task"><b>观察任务：</b>拖动红色零点指针，比较“平均值变稳”和“系统偏差仍在”的区别。</div>
+18: <div class="title">误差来源</div>
+19: <label class="param"><span>真实值 <b id="trueLabel">10.00</b></span><input id="trueValue" type="range" min="6" max="14" step="0.1" value="10"></label>
+20: <label class="param"><span>系统误差 <b id="sysLabel">0.60</b></span><input id="sys" type="range" min="-2" max="2" step="0.05" value="0.6"></label>
+21: <label class="param"><span>偶然误差幅度 <b id="ranLabel">0.45</b></span><input id="random" type="range" min="0" max="1.5" step="0.05" value="0.45"></label>
+22: <label class="param"><span>测量次数 <b id="nLabel">5</b></span><input id="n" type="range" min="1" max="8" step="1" value="5"></label>
+23: <div class="buttons"><button id="play">暂停</button><button id="correct">零误差修正</button></div>
+25: <div class="readout" id="readout"></div>
+25D: <div class="readout" id="readout"></div>
+26: <div class="card"><div class="title">测量记录</div><table><thead><tr><th>次序</th><th>读数</th><th>偏差</th></tr></thead><tbody id="rows"></tbody></table></div>
+28: <div class="title">误差公式</div>
+31: <div>修正值：x=读数-零误差</div>
+33: <div class="status" id="status"></div>
+40: const E={trueValue:document.getElementById('trueValue'),sys:document.getElementById('sys'),random:document.getElementById('random'),n:document.getElementById('n
+41: const C={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',green:'#087f5b',gold:'#f0a500',purple:'#7048e8'};
+46: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.
+47: function readings(){const tv=+E.trueValue.value,sys=+E.sys.value,ran=+E.random.value,n=+E.n.value;return S.seed.slice(0,n).map((e,i)=>{const raw=tv+sys+e*ran+(S
+48: function stats(arr){const xs=arr.map(p=>p.fix),avg=xs.reduce((a,b)=>a+b,0)/xs.length,tv=+E.trueValue.value,abs=Math.abs(avg-tv),rel=abs/tv*100;return{avg,abs,re
+51: function drawApparatus(arr,st){box(70,88,560,170,'#fbfdff');text('侧视装置：刻度尺零点偏移会造成系统误差',350,112,C.muted,'center',12,'900');const x0=112,y=184;line(x0,y,x0+440,y,
+52: function drawPlot(arr,st){box(70,282,560,250,'#fbfdff');text('俯视数据图像：散点宽度=偶然误差，整体偏移=系统误差',350,304,C.muted,'center',12,'900');const x0=118,y0=500,w=450,h=180;arr
+54: function update(arr,st){E.trueLabel.textContent=(+E.trueValue.value).toFixed(2);E.sysLabel.textContent=(+E.sys.value).toFixed(2);E.ranLabel.textContent=(+E.rand
+55: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}function set
+58: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/skill/experiment-data-processing.html (65 lines, kept 29) =====
+14: <div class="stage"><canvas id="canvas" width="930" height="620" aria-label="实验数据处理专题实验台：装置读数、数据记录、坐标图像、斜率截距、异常点和误差分析多视角"></canvas></div>
+16: <div class="card task"><b>观察任务：</b>拖动作图中的异常点，再切换“保留/剔除”，看最佳拟合线的斜率、截距和结论如何变化。</div>
+18: <div class="title">数据生成与处理</div>
+19: <label class="param"><span>真实斜率 k <b id="kLabel">2.50</b></span><input id="k" type="range" min="1.2" max="4.2" step="0.05" value="2.5"></label>
+20: <label class="param"><span>截距 b <b id="bLabel">0.50</b></span><input id="b" type="range" min="-1" max="2" step="0.05" value="0.5"></label>
+21: <label class="param"><span>随机误差 <b id="nLabel">0.35</b></span><input id="noise" type="range" min="0" max="1.2" step="0.05" value="0.35"></label>
+22: <label class="param"><span>异常点偏差 <b id="oLabel">2.00</b></span><input id="outlier" type="range" min="-3" max="3" step="0.1" value="2"></label>
+23: <div class="buttons"><button id="play">暂停</button><button id="toggle">剔除异常点</button></div>
+25: <div class="readout" id="readout"></div>
+25D: <div class="readout" id="readout"></div>
+27: <div class="title">读数记录表</div>
+28: <table><thead><tr><th>x</th><th>y</th><th>备注</th></tr></thead><tbody id="rows"></tbody></table>
+31: <div class="title">处理公式</div>
+33: <div>拟合线：y=kx+b，k=Δy/Δx</div>
+36: <div class="status" id="status"></div>
+43: const E={k:document.getElementById('k'),b:document.getElementById('b'),noise:document.getElementById('noise'),outlier:document.getElementById('outlier'),kLabel:
+44: const C={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',green:'#087f5b',gold:'#f0a500',purple:'#7048e8'};
+49: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.
+50: function data(){const k=+E.k.value,b=+E.b.value,n=+E.noise.value,o=+E.outlier.value;return[1,2,3,4,5,6].map((x,i)=>({x,y:b+k*x+S.seed[i]*n+(i===S.dragPoint?o:0)
+51: function fit(points){const use=points.filter(p=>!S.drop||!p.bad),n=use.length,sx=use.reduce((a,p)=>a+p.x,0),sy=use.reduce((a,p)=>a+p.y,0),sxx=use.reduce((a,p)=>
+52: const gx=92,gy=500,gw=520,gh=350;function mx(x){return gx+x/7*gw}function my(y){return gy-y/28*gh}
+53: function draw(){const pts=data(),f=fit(pts);ctx.clearRect(0,0,930,620);box(34,30,862,548,'#fff');text('G-02 实验数据处理：读数 → 记录 → 作图 → 斜率/截距 → 误差分析',465,56,C.ink,'ce
+54: function drawApparatus(pts){box(70,86,235,150,'#fbfdff');text('侧视实验装置',188,108,C.muted,'center',12,'900');line(98,188,275,188,'#52606d',5);for(let i=0;i<6;i++){
+55: function drawGraph(pts,f){box(64,252,570,296,'#fbfdff');text('俯视/坐标图像：异常点会拉偏斜率和截距',349,274,C.muted,'center',12,'900');arrow(gx,gy,gx+gw+25,gy,'#52606d',2);arrow
+56: function drawTable(pts,f){box(664,88,196,460,'#fff');text('数据处理流程',762,114,C.ink,'center',14,'900');const steps=['1 调仪器并读数','2 记录原始数据','3 作 y-x 图像','4 判断异常点','5
+57: function update(pts,f){E.kLabel.textContent=(+E.k.value).toFixed(2);E.bLabel.textContent=(+E.b.value).toFixed(2);E.nLabel.textContent=(+E.noise.value).toFixed(2
+58: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}function set
+59: canvas.addEventListener('pointerdown',e=>{const pts=data(),bad=pts[S.dragPoint],p0=pos(e);if(Math.hypot(p0.x-mx(bad.x),p0.y-my(bad.y))<28){S.drag=true;canvas.se
+63: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/skill/extreme-critical.html (61 lines, kept 25) =====
+14: <div class="stage"><canvas id="canvas" width="930" height="620" aria-label="极值与临界专题实验台：圆周最高点、抛体最远射程、临界速度、图像顶点、轨迹和数据记录多视角"></canvas></div>
+16: <div class="card task"><b>观察任务：</b>拖动小球或角度指针，观察“刚好不脱离”“射程最大”对应的力、速度和图像顶点。</div>
+18: <div class="title">模型选择</div>
+19: <div class="tabs"><button id="circle" class="active">圆周临界</button><button id="projectile">射程极值</button></div>
+20: <label class="param"><span>速度/角度 <b id="mainLabel">6.0</b></span><input id="main" type="range" min="1" max="12" step="0.05" value="6"></label>
+21: <label class="param"><span>半径/初速 <b id="scaleLabel">3.0</b></span><input id="scale" type="range" min="1" max="8" step="0.05" value="3"></label>
+22: <label class="param"><span>高度/重力 <b id="gLabel">9.8</b></span><input id="grav" type="range" min="4" max="12" step="0.1" value="9.8"></label>
+23: <div class="buttons"><button id="play">暂停</button><button id="record">记录临界</button></div>
+25: <div class="readout" id="readout"></div>
+25D: <div class="readout" id="readout"></div>
+26: <div class="card"><div class="title">临界记录</div><table><thead><tr><th>模型</th><th>判据</th><th>状态</th></tr></thead><tbody id="rows"></tbody></table></div>
+28: <div class="title">常用判据</div>
+29: <div>圆周最高点：N=0，v临=√(gR)</div>
+31: <div>抛体同高射程：R=v0²sin2θ/g，θ=45° 最大</div>
+33: <div class="status" id="status"></div>
+40: const E={circle:document.getElementById('circle'),projectile:document.getElementById('projectile'),main:document.getElementById('main'),scale:document.getElemen
+41: const C={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',green:'#087f5b',gold:'#f0a500',purple:'#7048e8'};
+46: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.
+47: function values(){const g=+E.grav.value;if(S.mode==='circle'){const v=+E.main.value,R=+E.scale.value,vc=Math.sqrt(g*R),N=v*v/R-g;return{g,v,R,vc,N,state:N>=0?'不
+49: function drawCircle(v){box(70,88,560,252,'#fbfdff');text('圆周最高点侧视装置：临界状态是支持力 N=0',350,112,C.muted,'center',12,'900');const cx=350,cy=222,R=92;ctx.strokeStyle='#
+50: function drawProjectile(v){box(70,88,560,252,'#fbfdff');text('抛体实验台：同高射程的极值在 θ=45°',350,112,C.muted,'center',12,'900');const x0=120,y0=286,scale=16;line(x0,y0,x
+51: function drawGraph(v){box(70,366,560,166,'#fff');text('图像视角：极值看顶点，临界看边界',350,388,C.muted,'center',12,'900');const x0=116,y0=496,w=450,h=78;arrow(x0,y0,x0+w+18,y
+53: function update(v){E.circle.classList.toggle('active',S.mode==='circle');E.projectile.classList.toggle('active',S.mode==='projectile');E.mainLabel.textContent=S
+55: E.circle.onclick=()=>{S.mode='circle';E.main.min=1;E.main.max=12;E.main.value=6;E.scale.value=3;record();draw()};E.projectile.onclick=()=>{S.mode='projectile';E
+59: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/skill/graph-slope-area.html (58 lines, kept 27) =====
+14: <div class="stage"><canvas id="canvas" width="920" height="610" aria-label="高考图像能力实验台装置：多视角坐标图像、斜率三角形、面积涂色、截距读数、运动电学热学图像记录"></canvas></div>
+16: <div class="card task"><b>观察任务：</b>切换 v-t、F-x、I-U 图像，直接拖动两点探针，看斜率、面积、截距各代表什么物理量。</div>
+18: <div class="title">选择图像类型</div>
+19: <div class="tabs"><button id="vt" class="active">v-t</button><button id="fx">F-x</button><button id="iu">I-U</button></div>
+20: <label class="param"><span>点 A 横坐标 <b id="aLabel">1.0</b></span><input id="a" type="range" min="0" max="8" step="0.1" value="1"></label>
+21: <label class="param"><span>点 B 横坐标 <b id="bLabel">6.0</b></span><input id="b" type="range" min="1" max="10" step="0.1" value="6"></label>
+22: <label class="param"><span>截距/初值 <b id="cLabel">2.0</b></span><input id="c" type="range" min="0" max="5" step="0.1" value="2"></label>
+23: <div class="buttons"><button id="play">暂停</button><button id="record">记录读数</button></div>
+25: <div class="readout" id="readout"></div>
+25D: <div class="readout" id="readout"></div>
+26: <div class="card"><div class="title">读图记录</div><table><thead><tr><th>图像</th><th>斜率</th><th>面积</th><th>截距</th></tr></thead><tbody id="rows"></tbody></table></div
+27: <div class="card formula"><div class="title">读图三问</div><div>斜率：纵轴量/横轴量。</div><div>面积：纵轴量 × 横轴量。</div><div>截距：横轴为 0 时的初始量或参数。</div></div>
+28: <div class="status" id="status"></div>
+36: const C={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',green:'#087f5b',gold:'#f0a500',purple:'#7c3aed'};
+38: function y(x){const c=+els.c.value;if(S.mode==='vt')return c+.8*x;if(S.mode==='fx')return Math.max(0,c+1.5*Math.sin(x/10*Math.PI));return c+.45*x}
+42: function normalizePoints(changed){let a=+els.a.value,b=+els.b.value;if(b<=a){if(changed==='b')els.a.value=Math.max(+els.a.min,b-.1).toFixed(1);else els.b.value=
+43: function p(){const points=normalizePoints(),a=points.a,b=points.b;const ya=y(a),yb=y(b),slope=(yb-ya)/(b-a);let area=0;for(let i=0;i<100;i++){const x=a+(b-a)*(i
+44: function box(x,y,w,h,f='#fff',s='#d9e2ec'){ctx.save();ctx.fillStyle=f;ctx.strokeStyle=s;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.res
+45: function mapX(x){return 106+x/10*500}function mapY(v){return 480-v/12*330}
+46: function draw(){const q=p();ctx.clearRect(0,0,920,610);box(34,34,852,528,'#fff');text('G-01 图像斜率、面积、截距：先看轴，再读意义',460,60,C.ink,'center',17,'900');drawGraph(q);dr
+47: function drawGraph(q){box(72,92,560,430,'#fbfdff');text('多视角坐标图像实验台：斜率三角形 + 面积涂色 + 截距读数',352,118,C.muted,'center',12,'800');const x0=106,y0=480,w=500,h=330;arro
+48: ctx.fillStyle='rgba(44,123,229,.16)';ctx.beginPath();ctx.moveTo(mapX(q.a),y0);for(let i=0;i<=80;i++){const x=q.a+(q.b-q.a)*i/80;ctx.lineTo(mapX(x),mapY(y(x)))}c
+49: function drawMeaning(q){box(662,98,198,424,'#fff');text('读图翻译器',761,124,C.ink,'center',14,'900');const items=S.mode==='vt'?['斜率 a','面积 位移','截距 初速度']:S.mode==='f
+50: function update(q){els.vt.classList.toggle('active',S.mode==='vt');els.fx.classList.toggle('active',S.mode==='fx');els.iu.classList.toggle('active',S.mode==='iu
+51: function record(){const q=p();S.records.push({m:S.mode,k:q.slope.toFixed(2),s:q.area.toFixed(1),c:q.c.toFixed(1)});if(S.records.length>8)S.records.shift();updat
+52: function mode(m){S.mode=m;record();draw()}els.vt.onclick=()=>mode('vt');els.fx.onclick=()=>mode('fx');els.iu.onclick=()=>mode('iu');els.a.addEventListener('inpu
+56: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/skill/instrument-reading.html (61 lines, kept 25) =====
+14: <div class="stage"><canvas id="canvas" width="930" height="620" aria-label="仪器读数专题实验台：游标卡尺、螺旋测微器、多用电表、量程、刻度、估读、零误差、多视角记录"></canvas></div>
+16: <div class="card task"><b>观察任务：</b>切换仪器并拖动红色读数指针，看主尺、游标、旋钮和电表量程如何共同决定最终读数。</div>
+18: <div class="title">选择仪器</div>
+19: <div class="tabs"><button id="caliper" class="active">卡尺</button><button id="micrometer">测微器</button><button id="meter">电表</button></div>
+20: <label class="param"><span>被测量/指针位置 <b id="valueLabel">23.40</b></span><input id="value" type="range" min="0" max="100" step="0.1" value="46.8"></label>
+21: <label class="param"><span>零误差/倍率 <b id="zeroLabel">0.00</b></span><input id="zero" type="range" min="-2" max="2" step="0.1" value="0"></label>
+22: <div class="buttons"><button id="play">暂停</button><button id="record">记录读数</button></div>
+24: <div class="readout" id="readout"></div>
+24D: <div class="readout" id="readout"></div>
+25: <div class="card"><div class="title">读数记录</div><table><thead><tr><th>仪器</th><th>原读数</th><th>修正后</th></tr></thead><tbody id="rows"></tbody></table></div>
+27: <div class="title">读数公式</div>
+28: <div>卡尺：L=主尺读数+游标格数×精度-零误差</div>
+29: <div>测微器：L=固定尺+可动刻度×0.01 mm-零误差</div>
+32: <div class="status" id="status"></div>
+39: const E={caliper:document.getElementById('caliper'),micrometer:document.getElementById('micrometer'),meter:document.getElementById('meter'),value:document.getEl
+40: const C={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',green:'#087f5b',gold:'#f0a500',purple:'#7048e8'};
+45: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.
+46: function raw(){const v=+E.value.value,z=+E.zero.value;if(S.mode==='caliper'){const L=v/2;return{raw:L,fix:L-z*.02,unit:'mm',hint:'主尺+游标'}}if(S.mode==='micromete
+48: function drawCaliper(r){box(70,92,560,210,'#fbfdff');text('游标卡尺装置正视图：主尺读数 + 游标重合刻度',350,116,C.muted,'center',12,'900');const x0=106,y=180;line(x0,y,x0+470,y,'#5
+49: function drawMicrometer(r){box(70,92,560,210,'#fbfdff');text('螺旋测微器侧视图：固定尺 + 可动刻度',350,116,C.muted,'center',12,'900');const base=145+r.raw/40*360;box(120,158,39
+50: function drawMeter(r){box(70,92,560,275,'#fbfdff');text('多用电表/电压表表盘：先看量程，再按满偏比例换算',350,116,C.muted,'center',12,'900');const cx=350,cy=278,R=150;ctx.strokeStyle=
+51: function drawMiniChart(r){box(86,330,530,180,'#fff');text('读数记录图像：原读数、零误差/倍率、最终值',351,354,C.muted,'center',12,'900');const x0=132,y0=472,w=410,h=82;arrow(x0,y0,
+53: function update(r){E.caliper.classList.toggle('active',S.mode==='caliper');E.micrometer.classList.toggle('active',S.mode==='micrometer');E.meter.classList.toggl
+55: function mode(m){S.mode=m;record();draw()}E.caliper.onclick=()=>mode('caliper');E.micrometer.onclick=()=>mode('micrometer');E.meter.onclick=()=>mode('meter');[E
+59: <div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-au
+
+===== anim/skill/multi-process-motion.html (118 lines, kept 36) =====
+40: <div class="stage"><canvas id="canvas" width="960" height="620" aria-label="多过程运动实验台：橙色小车依次加速、匀速、制动，车辆位置、v-t图像游标和分段面积同步变化"></canvas></div>
+42: <div class="card task"><b>先按播放看全程：</b>同一辆橙色小车会依次经历“加速 → 匀速 → 制动”。观察小车位置、上方阶段条、<b>v-t 图像金色游标</b>是否同步移动；拖动图像中的金色游标可直接跳到任意时刻。</div>
+43: <div class="toolbar"><button id="play" class="primary">播放</button><button id="step">单步</button><button id="reset">重置</button></div>
+45: <label class="param"><span>加速度 a₁ <b id="a1Label">2.0 m/s²</b></span><input id="a1" type="range" min="0.5" max="4" step="0.1" value="2"></label>
+46: <label class="param"><span>加速时长 t₁ <b id="t1Label">3.0 s</b></span><input id="t1" type="range" min="1" max="5" step="0.1" value="3"></label>
+47: <label class="param"><span>匀速时长 t₂ <b id="t2Label">3.0 s</b></span><input id="t2" type="range" min="1" max="5" step="0.1" value="3"></label>
+48: <label class="param"><span>制动加速度大小 a₃ <b id="a3Label">3.0 m/s²</b></span><input id="a3" type="range" min="1" max="6" step="0.1" value="3"></label>
+50: <div class="readout" id="readout"></div>
+50D: <div class="readout" id="readout"></div>
+51: <div class="card formula"><b>公式和画面绑定</b><div>接续：后一段初速度 = 前一段末速度</div><div>总位移：x = ∫vdt = v-t 图像下方面积</div><div>匀变速：v=v₀+at，x=v₀t+½at²</div></div>
+51D: <div class="card formula"><b>公式和画面绑定</b><div>接续：后一段初速度 = 前一段末速度</div><div>总位移：x = ∫vdt = v-t 图像下方面积</div><div>匀变速：v=v₀+at，x=v₀t+½at²</div></div>
+52: <div class="status" id="status"></div>
+64: const C={ink:'#102a43',muted:'#64748b',grid:'#dbe5ef',blue:'#2563eb',orange:'#ea580c',green:'#059669',gold:'#d97706',red:'#dc2626',purple:'#7c3aed',road:'#64748
+67: const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+72: function arrow(x1,y1,x2,y2,color=C.blue,width=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,color,width);ctx.save();ctx.fillStyle=color;ctx.beginPath();ct
+73: function calc(){const a1=+el.a1.value,t1=+el.t1.value,t2=+el.t2.value,a3=+el.a3.value,v1=a1*t1,t3=v1/a3,T=t1+t2+t3,x1=.5*a1*t1*t1,x2=v1*t2,x3=.5*v1*t3;return{a1
+74: function at(t,q){const time=clamp(t,0,q.T);if(time<=q.t1)return{stage:'加速',color:C.green,v:q.a1*time,x:.5*q.a1*time*time,a:q.a1};if(time<=q.t1+q.t2){const u=tim
+75: function resize(){const rect=canvas.getBoundingClientRect();W=clamp(rect.width||960,320,960);H=W<640?590:620;dpr=Math.min(window.devicePixelRatio||1,2);canvas.s
+79: function drawCar(x,y,v,color){ctx.save();ctx.fillStyle=color;ctx.strokeStyle='#9a3412';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(x-25,y-29,50,27,7);ctx.fill
+85: S.trail.slice(-90).forEach(p=>{const px=mapX(p.x,q,L);ctx.fillStyle=p.color;ctx.globalAlpha=.16+.55*(p.age||0);ctx.beginPath();ctx.arc(px,L.trackY-5,3,0,Math.PI
+87: const stageW=L.graphW/3;['① 加速','② 匀速','③ 制动'].forEach((label,i)=>{const x=L.left+i*stageW;ctx.fillStyle=[C.green,C.gold,C.red][i];ctx.globalAlpha=.14;ctx.fillR
+91: const gx=L.graphX,gy=L.graphY,gw=L.graphW,gh=L.graphH,left=gx+34,right=gx+6+gw,bottom=gy+gh-28,top=gy+35,maxV=Math.max(2,q.v1*1.25);box(24,272,W-48,H-294,'#fff'
+92: const boundaries=[0,q.t1,q.t1+q.t2,q.T],colors=[C.green,C.gold,C.red];for(let seg=0;seg<3;seg++){const lo=boundaries[seg],hi=boundaries[seg+1];ctx.save();ctx.fi
+93: ctx.save();ctx.strokeStyle=C.blue;ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=180;i++){const t=q.T*i/180,cur=at(t,q),x=timeX(t,q,L),y=bottom-(cur.v/maxV)*(bo
+95: const cur=at(S.time,q),cursor=timeX(S.time,q,L),pointY=bottom-(cur.v/maxV)*(bottom-top);line(cursor,top,cursor,bottom,C.gold,3,[5,3]);ctx.fillStyle=C.gold;ctx.b
+98: function draw(){const q=calc(),L=layout(),cur=at(S.time,q,L);ctx.clearRect(0,0,W,H);const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#ffffff');bg.a
+99: function update(q,cur){el.a1Label.textContent=fmt(q.a1,1)+' m/s²';el.t1Label.textContent=fmt(q.t1,1)+' s';el.t2Label.textContent=fmt(q.t2,1)+' s';el.a3Label.tex
+100: function addTrail(){const q=calc(),cur=at(S.time,q);if(S.lastTrail<0||S.time-S.lastTrail>.08){S.trail.push({x:cur.x,color:cur.color,age:1});S.trail=S.trail.slic
+101: function stepBy(dt){const q=calc();S.time=clamp(S.time+dt,0,q.T);addTrail();draw()}
+102D: function reset(){S.running=false;S.time=0;S.trail=[];S.lastTrail=-1;el.play.textContent='播放';draw()}
+104D: el.play.onclick=()=>{if(S.time>=calc().T){S.time=0;S.trail=[];S.lastTrail=-1}S.running=!S.running;el.play.textContent=S.running?'暂停':'播放';draw()};
+105D: el.step.onclick=()=>{S.running=false;el.play.textContent='播放';stepBy(.25)};
+107: function point(e){const rect=canvas.getBoundingClientRect();return{x:(e.clientX-rect.left)*W/rect.width,y:(e.clientY-rect.top)*H/rect.height}}
+108: function dragTime(p){const L=layout(),q=calc();if(p.y>L.graphY-4&&p.y<L.graphY+L.graphH){S.time=clamp((p.x-L.graphX-34)/(L.graphW-28)*q.T,0,q.T);S.running=false
+108D: function dragTime(p){const L=layout(),q=calc();if(p.y>L.graphY-4&&p.y<L.graphY+L.graphH){S.time=clamp((p.x-L.graphX-34)/(L.graphW-28)*q.T,0,q.T);S.running=false;el.play.textContent='播放';addTrail();dra
+112: function loop(now){const dt=Math.min(Math.max((now-last)/1000,0),.04);last=now;const q=calc();if(S.running){S.time+=dt;if(S.time>=q.T){S.time=q.T;S.running=fals
+
+===== anim/skill/real-world-modeling.html (98 lines, kept 30) =====
+42: <div class="stage"><canvas id="canvas" width="960" height="620" aria-label="真实情境建模实验台：汽车制动和无人机投放的真实场景、抽象模型、过程图像和结果读数"></canvas></div>
+44: <div class="card task"><b>建模不是套公式：</b>先认出真实对象，再决定保留什么、忽略什么，最后把过程翻译成图像和方程。<b>拖动画面里的汽车或无人机，改变初速度。</b></div>
+45: <div class="card tabs"><button id="brake" class="active">汽车制动</button><button id="drop">无人机投放</button></div>
+46: <div class="toolbar"><button id="play" class="primary">播放</button><button id="step">单步</button><button id="reset">重置</button></div>
+48: <label class="param"><span id="vName">初速度 v₀ <b id="vLabel">20.0 m/s</b></span><input id="v" type="range" min="5" max="35" step="0.5" value="20"></label>
+49: <label class="param"><span id="p1Name">反应时间 tᵣ <b id="p1Label">1.0 s</b></span><input id="p1" type="range" min="0.2" max="3" step="0.1" value="1"></label>
+50: <label class="param"><span id="p2Name">路面摩擦因数 μ <b id="p2Label">0.70</b></span><input id="p2" type="range" min="0.2" max="1.2" step="0.05" value="0.7"></label>
+52: <div class="readout" id="readout"></div>
+52D: <div class="readout" id="readout"></div>
+53: <div class="card formula"><b>模型翻译</b><div id="formula1">汽车 → 质点；反应段匀速，制动段匀减速</div><div id="formula2">a=μg，x总=v₀tᵣ+v₀²/(2μg)</div><div id="formula3">检查：距离单位 m，结果
+54: <div class="status" id="status"></div>
+62: const C={ink:'#102a43',muted:'#64748b',grid:'#dbe5ef',blue:'#2563eb',orange:'#ea580c',green:'#059669',gold:'#d97706',red:'#dc2626',purple:'#7c3aed',pink:'#db277
+64: const g=9.8;
+66: const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+71: function arrow(x1,y1,x2,y2,color=C.blue,width=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,color,width);ctx.save();ctx.fillStyle=color;ctx.beginPath();ct
+72: function calc(){const v=+el.v.value,p1=+el.p1.value,p2=+el.p2.value;if(S.mode==='brake'){const a=p2*g,reaction=v*p1,brake=v*v/(2*a),total=reaction+brake,tStop=p
+73: function stateAt(t,q){const time=clamp(t,0,q.T);if(q.mode==='brake'){if(time<=q.tr){return{phase:'反应段：匀速',color:C.gold,t:time,x:q.v*time,v:q.v,a:0}}const u=Math
+75: function drawCar(x,y,color){ctx.save();ctx.fillStyle=color;ctx.strokeStyle='#9a3412';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(x-32,y-24,64,28,6);ctx.fill()
+79: if(q.mode==='brake'){const roadY=L.sceneY,roadLeft=L.left,roadRight=L.right;line(roadLeft,roadY,roadRight,roadY,C.muted,5);line(roadLeft,roadY+10,roadRight,road
+80: function drawModel(q,s,L){const y=272,h=78,w=W-48;box(24,y,w,h,'#fff');text('把情境翻译成模型',W/2,y+15,C.ink,'center',12,'900');const labels=q.mode==='brake'?['汽车→质点',
+81: function drawGraph(q,s,L){const x=24,y=L.graphY,w=W-48,h=L.graphH;box(x,y,w,h,'#fff');text(q.mode==='brake'?(L.small?'v-t图像：反应水平，制动斜降':'v-t 图像：反应段水平，制动段斜率为 −μg'
+82: function update(q,s){el.brake.classList.toggle('active',q.mode==='brake');el.drop.classList.toggle('active',q.mode==='drop');if(q.mode==='brake'){el.vName.first
+83: function draw(){const q=calc(),s=stateAt(S.time,q),L=layout();ctx.clearRect(0,0,W,H);const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#ffffff');bg.
+84: function addTrail(q,s){const L=layout();if(S.lastTrail<0||S.time-S.lastTrail>.08){S.trail.push(q.mode==='brake'?{ratio:clamp(s.x/q.total,0,1),color:s.color,alph
+85D: function reset(){S.running=false;S.time=0;S.trail=[];S.lastTrail=-1;el.play.textContent='播放';draw()}
+87: [el.v,el.p1,el.p2].forEach(input=>input.addEventListener('input',()=>{S.time=0;S.trail=[];S.lastTrail=-1;draw()}));el.brake.onclick=()=>switchMode('brake');el.d
+88: function point(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}}
+89: function setV(p){const L=layout(),v=clamp(5+(p.x-L.left)/Math.max(1,L.right-L.left)*30,5,35);el.v.value=v.toFixed(1);S.time=0;S.trail=[];S.lastTrail=-1;draw()}
+91: function resize(){const r=canvas.getBoundingClientRect();W=clamp(r.width||960,320,960);H=W<640?590:620;dpr=Math.min(window.devicePixelRatio||1,2);canvas.style.h
+92: function loop(now){const dt=Math.min(Math.max((now-last)/1000,0),.04);last=now;const q=calc();if(S.running){S.time+=dt;if(S.time>=q.T){S.time=q.T;S.running=fals
+
+===== anim/skill/science-info-problem.html (97 lines, kept 31) =====
+30: <div class="stage"><canvas id="canvas" width="960" height="620" aria-label="信息题训练台：航天周期和太阳能电池的信息提取、单位换算、模型公式与图像"></canvas></div>
+32: <div class="card task"><b>训练顺序：</b>先从材料圈出数据和单位，再翻译成物理量，最后选旧模型。“装置动画”只帮助观察材料过程；<b>得分只在点击“提交答案”后改变。</b></div>
+33: <div class="card tabs"><button id="orbit" class="active">航天周期</button><button id="solar">太阳能电池</button></div>
+34: <div class="toolbar"><button id="play" class="primary">装置动画：播放</button><button id="step">装置单步</button><button id="reset">重置本轮</button></div>
+36: <label class="param"><span><span id="aName">轨道高度 h</span><b id="aLabel">400 km</b></span><input id="a" type="range" min="200" max="2000" step="50" value="400"><
+37: <label class="param"><span><span id="bName">轨道速度 v</span><b id="bLabel">7.7 km/s</b></span><input id="b" type="range" min="1" max="12" step="0.1" value="7.7"></
+38: <label class="param"><span><span id="etaName">附加比例 η</span><b id="etaLabel">20%</b></span><input id="eta" type="range" min="5" max="45" step="1" value="20"></la
+40: <div class="readout" id="readout"></div>
+40D: <div class="readout" id="readout"></div>
+41: <div class="card question"><div class="scoreline"><b id="scoreText">得分 0 / 3</b><span id="questionText">第 1 / 3 题</span></div><div id="questionArea"></div></div
+42: <div class="card formula"><b>答题策略</b><div>新名词 → 熟悉物理量</div><div>所有单位 → SI 制</div><div>比例/效率/斜率/面积 → 旧模型入口</div></div>
+43: <div class="status" id="status"></div>
+51: const C={ink:'#102a43',muted:'#64748b',grid:'#dbe5ef',blue:'#2563eb',orange:'#ea580c',green:'#059669',gold:'#d97706',purple:'#7c3aed',red:'#dc2626',pink:'#db277
+52: const bank={orbit:[{q:'材料给出“轨道高度 400 km”。换算成 SI 制高度是多少？',o:['4.0×10² m','4.0×10⁵ m','4.0×10⁶ m','4.0×10⁸ m'],a:1,e:'1 km=10³ m，所以 400 km=4.0×10⁵ m。'},{q:'已知轨道半径
+55: const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));const fmt=(v,d=2)=>Number.isFinite(v)?v.toFixed(d):'—';
+59: function arrow(x1,y1,x2,y2,color=C.blue,width=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,color,width);ctx.save();ctx.fillStyle=color;ctx.beginPath();ct
+60: function calc(){const a=+el.a.value,b=+el.b.value,eta=+el.eta.value/100;if(S.mode==='orbit'){const h=a*1000,v=b*1000,r=6.37e6+h,T=2*Math.PI*r/v/60;return{mode:'
+62: function drawOrbit(q,L){const x=24,y=34,w=W-48,h=220;box(x,y,w,h,'#fbfdff');text(L.small?'航天器：高度→半径→周期':'材料场景：空间站绕地球运行，先把高度换成轨道半径',W/2,58,C.ink,'center',Math.ma
+63: function drawSolar(q,L){const x=24,y=34,w=W-48,h=220;box(x,y,w,h,'#fbfdff');text(L.small?'光伏：辐照度×面积×效率':'材料场景：太阳能电池把入射能流转成电功率',W/2,58,C.ink,'center',Math.max(13
+64: function drawModel(q,L){const x=24,y=L.modelY,w=W-48,h=72;box(x,y,w,h,'#fff');text('材料信息 → 单位/物理量 → 旧模型公式 → 数值结果',W/2,y+14,C.ink,'center',12,'900');const labels
+65: function drawBars(q,L){const x=24,y=L.graphY,w=W-48,h=L.graphH;box(x,y,w,h,'#fff');text(q.mode==='orbit'?(L.small?'读数：r、v、T':'读数图：改变高度或速度，看周期怎样变'):(L.small?'读数：
+66: function update(q){el.orbit.classList.toggle('active',S.mode==='orbit');el.solar.classList.toggle('active',S.mode==='solar');if(q.mode==='orbit'){el.aName.textC
+67: function renderQuestion(){const qs=bank[S.mode],q=qs[S.index];el.scoreText.textContent='得分 '+S.score+' / '+qs.length;el.questionText.textContent=S.index<qs.leng
+68: function draw(){const q=calc(),L=layout();ctx.clearRect(0,0,W,H);const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#ffffff');bg.addColorStop(1,'#eef
+69D: function reset(){S.running=false;S.time=0;S.history=[];S.lastHistory=-1;S.score=0;S.index=0;S.selected=null;S.answered=false;el.play.textContent='装置动画：播放';renderQuestion();draw()}
+72: function point(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}}
+73: function setA(p){const L=layout(),min=+el.a.min,max=+el.a.max;el.a.value=(min+clamp((p.x-L.left)/Math.max(1,L.right-L.left),0,1)*(max-min)).toFixed(S.mode==='or
+75: function resize(){const r=canvas.getBoundingClientRect();W=clamp(r.width||960,320,960);H=W<640?590:620;dpr=Math.min(window.devicePixelRatio||1,2);canvas.style.h
+76: function loop(now){const dt=Math.min(Math.max((now-last)/1000,0),.04);last=now;if(S.running){S.time+=dt;if(S.mode==='orbit'&&performance.now()-S.lastHistory>100
+83D: if(S.selected!==null) el.status.textContent='当前选择：'+String.fromCharCode(65+S.selected)+'。请提交答案查看解析。';
+91D: if(S.selected!==null&&!S.answered) el.status.textContent='当前选择：'+String.fromCharCode(65+S.selected)+'。请提交答案查看解析。';

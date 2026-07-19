@@ -111,7 +111,7 @@ cv.addEventListener('pointerdown',e=>{const p=pos(e);if(Math.abs(p.x-slitX)<24){
 cv.addEventListener('pointermove',e=>{if(!dragEdge)return;const p=pos(e);const half=Math.abs(p.y-cy);a=Math.max(0.02,Math.min(0.30,half/260));document.getElementById('ar').value=a;document.getElementById('al').textContent=a.toFixed(2);});
 window.addEventListener('pointerup',()=>dragEdge=0);
 document.getElementById('play').onclick=function(){playing=!playing;this.classList.toggle('on',playing);this.textContent=playing?'⏸ 暂停':'▶ 播放';};
-document.getElementById('reset').onclick=function(){t=0;lam=550;a=0.10;document.getElementById('lamr').value=550;document.getElementById('ar').value=0.10;document.getElementById('ll').textContent=550;document.getElementById('al').textContent='0.10';};
+document.getElementById('reset').onclick=function(){t=0;lam=550;a=0.10;playing=true;document.getElementById('lamr').value=550;document.getElementById('ar').value=0.10;document.getElementById('ll').textContent=550;document.getElementById('al').textContent='0.10';document.getElementById('play').classList.add('on');document.getElementById('play').textContent='⏸ 暂停';};
 document.getElementById('lamr').addEventListener('input',e=>{lam=parseInt(e.target.value);document.getElementById('ll').textContent=lam;});
 document.getElementById('ar').addEventListener('input',e=>{a=parseFloat(e.target.value);document.getElementById('al').textContent=a.toFixed(2);});
 let last=performance.now();
@@ -119,5 +119,6 @@ function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;if(playing)t
 requestAnimationFrame(loop);
 })();
 </script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

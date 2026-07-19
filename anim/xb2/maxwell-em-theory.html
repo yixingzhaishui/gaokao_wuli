@@ -22,7 +22,7 @@
     </div>
     <div class="readout" id="readout"></div>
     <div class="card"><div class="title">数据记录</div><table><thead><tr><th>x</th><th>E</th><th>B</th><th>方向</th></tr></thead><tbody id="rows"></tbody></table></div>
-    <div class="card formula"><div class="title">公式与图像</div><div>变化电场产生磁场，变化磁场产生电场。</div><div>电磁波中 E、B 与传播方向两两垂直。</div><div>真空中传播速度 c≈3.0×10⁸ m/s，且 c=λf。</div></div>
+    <div class="card formula"><div class="title">公式与图像</div><div>变化电场产生磁场，变化磁场产生电场。</div><div>电磁波中 E、B 与传播方向两两垂直，E×B 指向传播方向。</div><div>真空中 c≈3.0×10⁸ m/s，c=λf，且幅值满足 E₀=cB₀。</div></div>
     <div class="status" id="status"></div>
   </div>
 </div>
@@ -37,11 +37,32 @@ function fmt(n,d=2){return n.toFixed(d)}function line(x1,y1,x2,y2,c='#9fb3c8',w=
 function draw(){const q=p();ctx.clearRect(0,0,900,600);box(34,34,832,520,'#fff');text('麦克斯韦图像：变化电场和变化磁场互相激发',450,60,C.ink,'center',16,'800');drawWave(q);drawPanels(q);update()}
 function drawWave(q){box(62,92,520,310,'#fbfdff');text('三维空间传播图：E、B、传播方向两两垂直',322,116,C.ink,'center',14,'800');arrow(110,330,520,330,C.green,3);text('传播方向 x',536,330,C.green,'left',12,'900');for(let i=0;i<18;i++){const x=120+i*23,ph=i*.55-S.t*q.f*1.6,E=Math.sin(ph)*80*q.E0,B=Math.sin(ph)*50*q.E0;line(x,330,x,330-E,C.blue,3);line(x,330,x+B,330+B*.45,C.red,3);if(i%3===0){text('E',x,330-E-12,C.blue,'center',11,'900');text('B',x+B+10,330+B*.45,C.red,'left',11,'900')}}const px=120+q.xp*410;line(px,160,px,390,C.purple,3,[5,4]);ctx.fillStyle=C.purple;ctx.beginPath();ctx.arc(px,330,9,0,Math.PI*2);ctx.fill();text('探针',px,145,C.purple,'center',12,'900');box(112,160,90,44,'#eef2ff','#9fb3c8');text('变化 E',157,178,C.blue,'center',12,'900');text('→ 产生 B',157,194,C.red,'center',12,'900');box(430,160,90,44,'#fff7e6','#f0a500');text('变化 B',475,178,C.red,'center',12,'900');text('→ 产生 E',475,194,C.blue,'center',12,'900')}
 function drawPanels(q){box(615,92,210,145,'#fff');text('E 场侧视图',720,114,C.blue,'center',14,'800');line(650,180,790,180,C.muted,2);arrow(720,210,720,150,q.E>=0?C.blue:C.gold,4);text(q.E>=0?'E 向上':'E 向下',720,224,C.blue,'center',12,'900');box(615,255,210,145,'#fff');text('B 场俯视图',720,277,C.red,'center',14,'800');for(let k=0;k<5;k++){ctx.strokeStyle=C.red;ctx.beginPath();ctx.arc(720,330,18+k*10,0,Math.PI*2);ctx.stroke()}text(q.B>=0?'B：⊙ 出屏':'B：⊗ 入屏',720,382,C.red,'center',12,'900');drawGraph(q)}
-function drawGraph(q){box(62,425,763,96,'#fff');const gx=100,gy=485,gw=670,gh=34;line(gx,gy,gx+gw,gy,C.ink,2);let lx,le,lb;for(let i=0;i<=160;i++){const u=i/160,x=gx+u*gw,val=Math.sin(2*Math.PI*(u-S.t*q.f*.22))*gh*q.E0,yE=gy-val,yB=gy+val*.75;if(i){line(lx,le,x,yE,C.blue,2);line(lx,lb,x,yB,C.red,2)}lx=x;le=yE;lb=yB}text('蓝 E 波形，红 B 波形；同相并随 x 传播',435,506,C.muted,'center',12,'800')}
-function update(){const q=p();els.fLabel.textContent=fmt(q.f,1)+' Hz';els.eLabel.textContent=Math.round(q.E0*100)+'%';els.xLabel.textContent=Math.round(q.xp*100)+'%';els.readout.innerHTML='探针处 E：<b>'+fmt(q.E,2)+'</b><br>探针处 B：<b>'+fmt(q.B,2)+'</b><br>关系：<b>E、B 同相且垂直</b><br>波速：<b>c=λf</b>';els.status.textContent='电磁波不需要介质：变化电场和变化磁场互相激发，能脱离振荡电路向外传播。';els.rows.innerHTML=S.records.slice(-6).map(r=>'<tr><td>'+r.x+'</td><td>'+r.e+'</td><td>'+r.b+'</td><td>x</td></tr>').join('')||'<tr><td colspan="4">暂无记录</td></tr>'}
+function drawGraph(q){box(62,425,763,96,'#fff');const gx=100,gy=485,gw=670,gh=34;line(gx,gy,gx+gw,gy,C.ink,2);let lx,le,lb;for(let i=0;i<=160;i++){const u=i/160,x=gx+u*gw,val=Math.sin(2*Math.PI*(u-S.t*q.f*.22))*gh*q.E0,yE=gy-val,yB=gy-val*.75;if(i){line(lx,le,x,yE,C.blue,2);line(lx,lb,x,yB,C.red,2)}lx=x;le=yE;lb=yB}text('蓝 E/E₀、红 B/B₀：同相并随 x 传播',435,506,C.muted,'center',12,'800')}
+function update(){const q=p();els.fLabel.textContent=fmt(q.f,1)+' Hz';els.eLabel.textContent=Math.round(q.E0*100)+'%';els.xLabel.textContent=Math.round(q.xp*100)+'%';els.readout.innerHTML='探针处 E/E₀：<b>'+fmt(q.E,2)+'</b><br>探针处 B/B₀：<b>'+fmt(q.B,2)+'</b><br>关系：<b>同相且垂直，E₀=cB₀</b><br>传播：<b>E×B 指向 +x，c=λf</b>';els.status.textContent='电磁波不需要介质：变化电场和变化磁场互相激发，能脱离振荡电路向外传播。';els.rows.innerHTML=S.records.slice(-6).map(r=>'<tr><td>'+r.x+'</td><td>'+r.e+'</td><td>'+r.b+'</td><td>+x</td></tr>').join('')||'<tr><td colspan="4">暂无记录</td></tr>';canvas.dataset.phaseRelation='in-phase';canvas.dataset.amplitudeRelation='E0=cB0';canvas.dataset.poyntingDirection='E-cross-B-plus-x';window.__ANIM_TEST_STATE__={...q,phaseRelation:'in-phase',poyntingDirection:'E-cross-B-plus-x'}}
 function record(){const q=p();S.records.push({x:Math.round(q.xp*100)+'%',e:fmt(q.E,2),b:fmt(q.B,2)});if(S.records.length>8)S.records.shift();update()}
 [els.f,els.e,els.x].forEach(el=>el.addEventListener('input',()=>{draw();update()}));els.play.addEventListener('click',()=>{S.run=!S.run;els.play.textContent=S.run?'暂停':'播放'});els.record.addEventListener('click',record);canvas.addEventListener('pointerdown',e=>{S.drag=true;canvas.setPointerCapture(e.pointerId)});canvas.addEventListener('pointermove',e=>{if(!S.drag)return;const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width;els.x.value=Math.max(0,Math.min(100,(x-120)/410*100));draw()});canvas.addEventListener('pointerup',e=>{S.drag=false;record();try{canvas.releasePointerCapture(e.pointerId)}catch(_){}});function loop(){if(S.run)S.t+=.016;draw();requestAnimationFrame(loop)}record();loop();
 })();
 </script>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script>
+<script>/* GKWL: unified full reset (2026-07-12 review remediation) */
+(function(){
+  var btns=[].slice.call(document.querySelectorAll('button'));
+  var resets=btns.filter(function(b){return /重置|复位/.test(b.textContent)});
+  if(!resets.length)return;
+  var scoped=/播放|时间|回放/;
+  var primary=resets[0];
+  if(scoped.test(primary.textContent)){
+    var nb=document.createElement('button');
+    nb.textContent='全部重置';
+    nb.className=primary.className;
+    nb.setAttribute('data-gkwl-full-reset','1');
+    nb.addEventListener('click',function(){location.reload()});
+    primary.parentNode.insertBefore(nb,primary.nextSibling);
+  }else{
+    resets.forEach(function(b){b.addEventListener('click',function(){setTimeout(function(){location.reload()},60)})});
+  }
+})();
+</script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

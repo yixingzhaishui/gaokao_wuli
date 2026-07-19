@@ -1,0 +1,1459 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T05:13:24.359Z",
+  "commit": "e355ceafd3f3da33a27b9a455352ea43aa630e5c",
+  "module": "model",
+  "modules": [
+    "model"
+  ],
+  "summary": {
+    "total": 3,
+    "score": 100,
+    "pass": 3,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/model/compound-field-particle.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#charge",
+          "kind": "select-one",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#electric",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#magnetic",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#speed",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#mass",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#recordBtn",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "3126c42d",
+          "readout_hash": "d02f9e1f",
+          "physical_readout_hash": "d02f9e1f",
+          "readout": [
+            "电荷性质：正电荷",
+            "电场强度 E/(10^3 V/m)：4.0",
+            "磁感应强度 B/T：0.8",
+            "入射速度 v/(10^3 m/s)：5.0",
+            "质量 m/(10^-15 kg)：2.0",
+            "公式绑定：qE=4.00e-9 N，qvB=4.00e-9 N选择速度 v0=E/B=5.00 x 10^3 m/s当前 v=5.00 x 10^3 m/s，偏差=0.0%纯磁场半径 R=mv/(|q|B)=12.50 m时间演化：轨迹点、力表盘、半径尺、图像游标正在联动",
+            "判定：接近临界直线通过，qE 与 qvB 等大反向。",
+            "点击“记录”保存一次测量"
+          ],
+          "physical_readout": [
+            "电荷性质：正电荷",
+            "电场强度 E/(10^3 V/m)：4.0",
+            "磁感应强度 B/T：0.8",
+            "入射速度 v/(10^3 m/s)：5.0",
+            "质量 m/(10^-15 kg)：2.0",
+            "公式绑定：qE=4.00e-9 N，qvB=4.00e-9 N选择速度 v0=E/B=5.00 x 10^3 m/s当前 v=5.00 x 10^3 m/s，偏差=0.0%纯磁场半径 R=mv/(|q|B)=12.50 m时间演化：轨迹点、力表盘、半径尺、图像游标正在联动",
+            "判定：接近临界直线通过，qE 与 qvB 等大反向。",
+            "点击“记录”保存一次测量"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "fdbb3c4f",
+          "readout_hash": "d02f9e1f",
+          "physical_readout_hash": "d02f9e1f",
+          "readout": [
+            "电荷性质：正电荷",
+            "电场强度 E/(10^3 V/m)：4.0",
+            "磁感应强度 B/T：0.8",
+            "入射速度 v/(10^3 m/s)：5.0",
+            "质量 m/(10^-15 kg)：2.0",
+            "公式绑定：qE=4.00e-9 N，qvB=4.00e-9 N选择速度 v0=E/B=5.00 x 10^3 m/s当前 v=5.00 x 10^3 m/s，偏差=0.0%纯磁场半径 R=mv/(|q|B)=12.50 m时间演化：轨迹点、力表盘、半径尺、图像游标正在联动",
+            "判定：接近临界直线通过，qE 与 qvB 等大反向。",
+            "点击“记录”保存一次测量"
+          ],
+          "physical_readout": [
+            "电荷性质：正电荷",
+            "电场强度 E/(10^3 V/m)：4.0",
+            "磁感应强度 B/T：0.8",
+            "入射速度 v/(10^3 m/s)：5.0",
+            "质量 m/(10^-15 kg)：2.0",
+            "公式绑定：qE=4.00e-9 N，qvB=4.00e-9 N选择速度 v0=E/B=5.00 x 10^3 m/s当前 v=5.00 x 10^3 m/s，偏差=0.0%纯磁场半径 R=mv/(|q|B)=12.50 m时间演化：轨迹点、力表盘、半径尺、图像游标正在联动",
+            "判定：接近临界直线通过，qE 与 qvB 等大反向。",
+            "点击“记录”保存一次测量"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "3126c42d",
+          "readout_hash": "d02f9e1f",
+          "physical_readout_hash": "d02f9e1f",
+          "readout": [
+            "电荷性质：正电荷",
+            "电场强度 E/(10^3 V/m)：4.0",
+            "磁感应强度 B/T：0.8",
+            "入射速度 v/(10^3 m/s)：5.0",
+            "质量 m/(10^-15 kg)：2.0",
+            "公式绑定：qE=4.00e-9 N，qvB=4.00e-9 N选择速度 v0=E/B=5.00 x 10^3 m/s当前 v=5.00 x 10^3 m/s，偏差=0.0%纯磁场半径 R=mv/(|q|B)=12.50 m时间演化：轨迹点、力表盘、半径尺、图像游标正在联动",
+            "判定：接近临界直线通过，qE 与 qvB 等大反向。",
+            "点击“记录”保存一次测量"
+          ],
+          "physical_readout": [
+            "电荷性质：正电荷",
+            "电场强度 E/(10^3 V/m)：4.0",
+            "磁感应强度 B/T：0.8",
+            "入射速度 v/(10^3 m/s)：5.0",
+            "质量 m/(10^-15 kg)：2.0",
+            "公式绑定：qE=4.00e-9 N，qvB=4.00e-9 N选择速度 v0=E/B=5.00 x 10^3 m/s当前 v=5.00 x 10^3 m/s，偏差=0.0%纯磁场半径 R=mv/(|q|B)=12.50 m时间演化：轨迹点、力表盘、半径尺、图像游标正在联动",
+            "判定：接近临界直线通过，qE 与 qvB 等大反向。",
+            "点击“记录”保存一次测量"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "3126c42d",
+          "readout_hash": "d02f9e1f",
+          "physical_readout_hash": "d02f9e1f",
+          "readout": [
+            "电荷性质：正电荷",
+            "电场强度 E/(10^3 V/m)：4.0",
+            "磁感应强度 B/T：0.8",
+            "入射速度 v/(10^3 m/s)：5.0",
+            "质量 m/(10^-15 kg)：2.0",
+            "公式绑定：qE=4.00e-9 N，qvB=4.00e-9 N选择速度 v0=E/B=5.00 x 10^3 m/s当前 v=5.00 x 10^3 m/s，偏差=0.0%纯磁场半径 R=mv/(|q|B)=12.50 m时间演化：轨迹点、力表盘、半径尺、图像游标正在联动",
+            "判定：接近临界直线通过，qE 与 qvB 等大反向。",
+            "点击“记录”保存一次测量"
+          ],
+          "physical_readout": [
+            "电荷性质：正电荷",
+            "电场强度 E/(10^3 V/m)：4.0",
+            "磁感应强度 B/T：0.8",
+            "入射速度 v/(10^3 m/s)：5.0",
+            "质量 m/(10^-15 kg)：2.0",
+            "公式绑定：qE=4.00e-9 N，qvB=4.00e-9 N选择速度 v0=E/B=5.00 x 10^3 m/s当前 v=5.00 x 10^3 m/s，偏差=0.0%纯磁场半径 R=mv/(|q|B)=12.50 m时间演化：轨迹点、力表盘、半径尺、图像游标正在联动",
+            "判定：接近临界直线通过，qE 与 qvB 等大反向。",
+            "点击“记录”保存一次测量"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "电荷性质：正电荷|电场强度 E/(#^# V/m)：#|磁感应强度 B/T：#|入射速度 v/(#^# m/s)：#|质量 m/(#^# kg)：#|公式绑定：qE=#e# N，qvB=#e# N选择速度 v#=E/B=# x #^# m/s当前 v=# x #^# m/s，偏差=#%纯磁场半径 R=mv/(|q|B)=# m时间演化：轨迹点、力表盘、半径尺、图像游标正在联动|判定：接近临界直线通过，qE 与 qvB 等大反向。",
+          "controls": [
+            {
+              "id": "charge",
+              "value": "1",
+              "selectedIndex": 0
+            },
+            {
+              "id": "electric",
+              "value": "4",
+              "checked": false
+            },
+            {
+              "id": "magnetic",
+              "value": "0.8",
+              "checked": false
+            },
+            {
+              "id": "speed",
+              "value": "5",
+              "checked": false
+            },
+            {
+              "id": "mass",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "电荷性质：正电荷|电场强度 E/(#^# V/m)：#|磁感应强度 B/T：#|入射速度 v/(#^# m/s)：#|质量 m/(#^# kg)：#|公式绑定：qE=#e# N，qvB=#e# N选择速度 v#=E/B=# x #^# m/s当前 v=# x #^# m/s，偏差=#%纯磁场半径 R=mv/(|q|B)=# m时间演化：轨迹点、力表盘、半径尺、图像游标正在联动|判定：接近临界直线通过，qE 与 qvB 等大反向。",
+          "controls": [
+            {
+              "id": "charge",
+              "value": "1",
+              "selectedIndex": 0
+            },
+            {
+              "id": "electric",
+              "value": "4",
+              "checked": false
+            },
+            {
+              "id": "magnetic",
+              "value": "0.8",
+              "checked": false
+            },
+            {
+              "id": "speed",
+              "value": "5",
+              "checked": false
+            },
+            {
+              "id": "mass",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/model/model-selector.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#a",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#b",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#c",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:轻绳",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:木板",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:传送带",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:剪断",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:水平初速度",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:最高点",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:卫星",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:恒定功率",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:摩擦生热",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:碰撞",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:导轨",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:变压器",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:复合场",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:p-V图",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:质量亏损",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:M-02 板块模型木板 / 物块 / 相对滑动 / 滑痕 · 匹配 60%",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:M-03 传送带模型传送带 / 共速 / 划痕 / 相对位移 · 匹配 60%",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:M-04 弹簧瞬时问题剪断 / 撤去支撑 / 瞬时加速度 / 弹簧 · 匹配 6",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:M-05 平抛与类平抛水平初速度 / 竖直加速度 / 偏转 / 类平抛 · 匹配",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:M-06 圆周临界模型最高点 / 恰好过顶 / 绳松 / 杆支持 · 匹配 60",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:M-07 天体运动模型卫星 / 轨道半径 / 周期 / 双星 · 匹配 60%",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:M-08 机车启动模型恒定功率 / 额定功率 / 牵引力 / 最大速度 · 匹配",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:M-09 功能关系综合全过程 / 非保守力 / 摩擦生热 / 高度变化 · 匹配",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:M-10 碰撞模型碰撞 / 爆炸 / 反冲 / 短时间 · 匹配 60%",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:M-11 导轨模型导轨 / 金属棒 / 切割磁感线 / 灯泡 · 匹配 60%",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:M-12 交流电综合有效值 / 峰值 / 变压器 / 输电 · 匹配 60%",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:M-13 复合场粒子模型速度选择器 / 复合场 / 偏转 / 带电粒子 · 匹配",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:M-14 气体状态变化模型p-V图 / 等温 / 等压 / 等容 · 匹配 60",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:M-15 核反应与质能方程核反应方程 / 质量亏损 / 结合能 / 半衰期 · ",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:M-02 板块模型先假设共同运动，比较 f需 与 fmax",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:M-03 传送带模型先比较 v物 与 v带",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:M-04 弹簧瞬时问题保留弹簧力，删掉断绳/支撑",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:M-01 连接体模型轻绳 / 轻杆 / 共同加速度 / 张力 · 匹配 100%",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": false
+        },
+        {
+          "selector": "button:M-01 连接体模型先整体求 a，再隔离求内力",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": false
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "button:轻绳",
+          "text": "轻绳",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:木板",
+          "text": "木板",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:传送带",
+          "text": "传送带",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:剪断",
+          "text": "剪断",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:水平初速度",
+          "text": "水平初速度",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:最高点",
+          "text": "最高点",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:卫星",
+          "text": "卫星",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:恒定功率",
+          "text": "恒定功率",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:摩擦生热",
+          "text": "摩擦生热",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:碰撞",
+          "text": "碰撞",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:导轨",
+          "text": "导轨",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:变压器",
+          "text": "变压器",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:复合场",
+          "text": "复合场",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:p-V图",
+          "text": "p-V图",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:质量亏损",
+          "text": "质量亏损",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:M-01 连接体模型轻绳 / 轻杆 / 共同加速度 / 张力 · 匹配 100%",
+          "text": "M-01 连接体模型轻绳 / 轻杆 / 共同加速度 / 张力 · 匹配 100%",
+          "role": "condition",
+          "checked": true,
+          "worked": "already_selected"
+        },
+        {
+          "selector": "button:M-02 板块模型木板 / 物块 / 相对滑动 / 滑痕 · 匹配 60%",
+          "text": "M-02 板块模型木板 / 物块 / 相对滑动 / 滑痕 · 匹配 60%",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:M-03 传送带模型传送带 / 共速 / 划痕 / 相对位移 · 匹配 60%",
+          "text": "M-03 传送带模型传送带 / 共速 / 划痕 / 相对位移 · 匹配 60%",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:M-04 弹簧瞬时问题剪断 / 撤去支撑 / 瞬时加速度 / 弹簧 · 匹配 6",
+          "text": "M-04 弹簧瞬时问题剪断 / 撤去支撑 / 瞬时加速度 / 弹簧 · 匹配 60%",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:M-05 平抛与类平抛水平初速度 / 竖直加速度 / 偏转 / 类平抛 · 匹配",
+          "text": "M-05 平抛与类平抛水平初速度 / 竖直加速度 / 偏转 / 类平抛 · 匹配 60%",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:M-06 圆周临界模型最高点 / 恰好过顶 / 绳松 / 杆支持 · 匹配 60",
+          "text": "M-06 圆周临界模型最高点 / 恰好过顶 / 绳松 / 杆支持 · 匹配 60%",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:M-07 天体运动模型卫星 / 轨道半径 / 周期 / 双星 · 匹配 60%",
+          "text": "M-07 天体运动模型卫星 / 轨道半径 / 周期 / 双星 · 匹配 60%",
+          "role": "other",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:M-08 机车启动模型恒定功率 / 额定功率 / 牵引力 / 最大速度 · 匹配",
+          "text": "M-08 机车启动模型恒定功率 / 额定功率 / 牵引力 / 最大速度 · 匹配 60%",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:M-09 功能关系综合全过程 / 非保守力 / 摩擦生热 / 高度变化 · 匹配",
+          "text": "M-09 功能关系综合全过程 / 非保守力 / 摩擦生热 / 高度变化 · 匹配 60%",
+          "role": "other",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:M-10 碰撞模型碰撞 / 爆炸 / 反冲 / 短时间 · 匹配 60%",
+          "text": "M-10 碰撞模型碰撞 / 爆炸 / 反冲 / 短时间 · 匹配 60%",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:M-11 导轨模型导轨 / 金属棒 / 切割磁感线 / 灯泡 · 匹配 60%",
+          "text": "M-11 导轨模型导轨 / 金属棒 / 切割磁感线 / 灯泡 · 匹配 60%",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:M-12 交流电综合有效值 / 峰值 / 变压器 / 输电 · 匹配 60%",
+          "text": "M-12 交流电综合有效值 / 峰值 / 变压器 / 输电 · 匹配 60%",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:M-13 复合场粒子模型速度选择器 / 复合场 / 偏转 / 带电粒子 · 匹配",
+          "text": "M-13 复合场粒子模型速度选择器 / 复合场 / 偏转 / 带电粒子 · 匹配 60%",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:M-14 气体状态变化模型p-V图 / 等温 / 等压 / 等容 · 匹配 60",
+          "text": "M-14 气体状态变化模型p-V图 / 等温 / 等压 / 等容 · 匹配 60%",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:M-15 核反应与质能方程核反应方程 / 质量亏损 / 结合能 / 半衰期 · ",
+          "text": "M-15 核反应与质能方程核反应方程 / 质量亏损 / 结合能 / 半衰期 · 匹配 60%",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#playBtn",
+          "text": "播放演示",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:M-01 连接体模型先整体求 a，再隔离求内力",
+          "text": "M-01 连接体模型先整体求 a，再隔离求内力",
+          "role": "condition",
+          "checked": true,
+          "worked": "already_selected"
+        },
+        {
+          "selector": "button:M-02 板块模型先假设共同运动，比较 f需 与 fmax",
+          "text": "M-02 板块模型先假设共同运动，比较 f需 与 fmax",
+          "role": "other",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:M-03 传送带模型先比较 v物 与 v带",
+          "text": "M-03 传送带模型先比较 v物 与 v带",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:M-04 弹簧瞬时问题保留弹簧力，删掉断绳/支撑",
+          "text": "M-04 弹簧瞬时问题保留弹簧力，删掉断绳/支撑",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.32,
+          "py": 0.68
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": true,
+        "auditReset": false,
+        "text": "播放演示"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "3b97d6b8",
+          "readout_hash": "e72c5673",
+          "physical_readout_hash": "72c1566d",
+          "readout": [
+            "轻绳",
+            "木板",
+            "传送带",
+            "剪断",
+            "水平初速度",
+            "最高点",
+            "卫星",
+            "恒定功率",
+            "摩擦生热",
+            "碰撞",
+            "导轨",
+            "变压器",
+            "复合场",
+            "p-V图",
+            "质量亏损",
+            "M-01 连接体模型轻绳 / 轻杆 / 共同加速度 / 张力 · 匹配 100%",
+            "M-02 板块模型木板 / 物块 / 相对滑动 / 滑痕 · 匹配 60%",
+            "M-03 传送带模型传送带 / 共速 / 划痕 / 相对位移 · 匹配 60%",
+            "M-04 弹簧瞬时问题剪断 / 撤去支撑 / 瞬时加速度 / 弹簧 · 匹配 60%",
+            "M-05 平抛与类平抛水平初速度 / 竖直加速度 / 偏转 / 类平抛 · 匹配 60%",
+            "M-06 圆周临界模型最高点 / 恰好过顶 / 绳松 / 杆支持 · 匹配 60%",
+            "M-07 天体运动模型卫星 / 轨道半径 / 周期 / 双星 · 匹配 60%",
+            "M-08 机车启动模型恒定功率 / 额定功率 / 牵引力 / 最大速度 · 匹配 60%",
+            "M-09 功能关系综合全过程 / 非保守力 / 摩擦生热 / 高度变化 · 匹配 60%",
+            "M-10 碰撞模型碰撞 / 爆炸 / 反冲 / 短时间 · 匹配 60%",
+            "M-11 导轨模型导轨 / 金属棒 / 切割磁感线 / 灯泡 · 匹配 60%",
+            "M-12 交流电综合有效值 / 峰值 / 变压器 / 输电 · 匹配 60%",
+            "M-13 复合场粒子模型速度选择器 / 复合场 / 偏转 / 带电粒子 · 匹配 60%",
+            "M-14 气体状态变化模型p-V图 / 等温 / 等压 / 等容 · 匹配 60%",
+            "M-15 核反应与质能方程核反应方程 / 质量亏损 / 结合能 / 半衰期 · 匹配 60%",
+            "题眼信号轻绳 / 轻杆 / 共同加速度",
+            "第一反应先整体求 a，再隔离求内力",
+            "判据读数a=2.67 m/s²",
+            "当前状态T=5.33 N · 演示 t=0.00 s",
+            "外力 F16 N",
+            "m12 kg",
+            "m24 kg"
+          ],
+          "physical_readout": [
+            "轻绳",
+            "木板",
+            "传送带",
+            "剪断",
+            "水平初速度",
+            "最高点",
+            "卫星",
+            "恒定功率",
+            "摩擦生热",
+            "碰撞",
+            "导轨",
+            "变压器",
+            "复合场",
+            "p-V图",
+            "质量亏损",
+            "M-01 连接体模型轻绳 / 轻杆 / 共同加速度 / 张力 · 匹配 100%",
+            "M-02 板块模型木板 / 物块 / 相对滑动 / 滑痕 · 匹配 60%",
+            "M-03 传送带模型传送带 / 共速 / 划痕 / 相对位移 · 匹配 60%",
+            "M-04 弹簧瞬时问题剪断 / 撤去支撑 / 瞬时加速度 / 弹簧 · 匹配 60%",
+            "M-05 平抛与类平抛水平初速度 / 竖直加速度 / 偏转 / 类平抛 · 匹配 60%",
+            "M-06 圆周临界模型最高点 / 恰好过顶 / 绳松 / 杆支持 · 匹配 60%",
+            "M-07 天体运动模型卫星 / 轨道半径 / 周期 / 双星 · 匹配 60%",
+            "M-08 机车启动模型恒定功率 / 额定功率 / 牵引力 / 最大速度 · 匹配 60%",
+            "M-09 功能关系综合全过程 / 非保守力 / 摩擦生热 / 高度变化 · 匹配 60%",
+            "M-10 碰撞模型碰撞 / 爆炸 / 反冲 / 短时间 · 匹配 60%",
+            "M-11 导轨模型导轨 / 金属棒 / 切割磁感线 / 灯泡 · 匹配 60%",
+            "M-12 交流电综合有效值 / 峰值 / 变压器 / 输电 · 匹配 60%",
+            "M-13 复合场粒子模型速度选择器 / 复合场 / 偏转 / 带电粒子 · 匹配 60%",
+            "M-14 气体状态变化模型p-V图 / 等温 / 等压 / 等容 · 匹配 60%",
+            "M-15 核反应与质能方程核反应方程 / 质量亏损 / 结合能 / 半衰期 · 匹配 60%",
+            "题眼信号轻绳 / 轻杆 / 共同加速度",
+            "第一反应先整体求 a，再隔离求内力",
+            "判据读数a=2.67 m/s²",
+            "当前状态T=5.33 N ·",
+            "外力 F16 N",
+            "m12 kg",
+            "m24 kg"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "cb697fc0",
+          "readout_hash": "b0dbdec4",
+          "physical_readout_hash": "3273e768",
+          "readout": [
+            "轻绳",
+            "木板",
+            "传送带",
+            "剪断",
+            "水平初速度",
+            "最高点",
+            "卫星",
+            "恒定功率",
+            "摩擦生热",
+            "碰撞",
+            "导轨",
+            "变压器",
+            "复合场",
+            "p-V图",
+            "质量亏损",
+            "M-01 连接体模型轻绳 / 轻杆 / 共同加速度 / 张力 · 匹配 100%",
+            "M-02 板块模型木板 / 物块 / 相对滑动 / 滑痕 · 匹配 60%",
+            "M-03 传送带模型传送带 / 共速 / 划痕 / 相对位移 · 匹配 60%",
+            "M-04 弹簧瞬时问题剪断 / 撤去支撑 / 瞬时加速度 / 弹簧 · 匹配 60%",
+            "M-05 平抛与类平抛水平初速度 / 竖直加速度 / 偏转 / 类平抛 · 匹配 60%",
+            "M-06 圆周临界模型最高点 / 恰好过顶 / 绳松 / 杆支持 · 匹配 60%",
+            "M-07 天体运动模型卫星 / 轨道半径 / 周期 / 双星 · 匹配 60%",
+            "M-08 机车启动模型恒定功率 / 额定功率 / 牵引力 / 最大速度 · 匹配 60%",
+            "M-09 功能关系综合全过程 / 非保守力 / 摩擦生热 / 高度变化 · 匹配 60%",
+            "M-10 碰撞模型碰撞 / 爆炸 / 反冲 / 短时间 · 匹配 60%",
+            "M-11 导轨模型导轨 / 金属棒 / 切割磁感线 / 灯泡 · 匹配 60%",
+            "M-12 交流电综合有效值 / 峰值 / 变压器 / 输电 · 匹配 60%",
+            "M-13 复合场粒子模型速度选择器 / 复合场 / 偏转 / 带电粒子 · 匹配 60%",
+            "M-14 气体状态变化模型p-V图 / 等温 / 等压 / 等容 · 匹配 60%",
+            "M-15 核反应与质能方程核反应方程 / 质量亏损 / 结合能 / 半衰期 · 匹配 60%",
+            "题眼信号轻绳 / 轻杆 / 共同加速度",
+            "第一反应先整体求 a，再隔离求内力",
+            "判据读数a=3.9 m/s²",
+            "当前状态T=7.79 N · 演示 t=0.55 s",
+            "外力 F16 N",
+            "m12 kg",
+            "m24 kg"
+          ],
+          "physical_readout": [
+            "轻绳",
+            "木板",
+            "传送带",
+            "剪断",
+            "水平初速度",
+            "最高点",
+            "卫星",
+            "恒定功率",
+            "摩擦生热",
+            "碰撞",
+            "导轨",
+            "变压器",
+            "复合场",
+            "p-V图",
+            "质量亏损",
+            "M-01 连接体模型轻绳 / 轻杆 / 共同加速度 / 张力 · 匹配 100%",
+            "M-02 板块模型木板 / 物块 / 相对滑动 / 滑痕 · 匹配 60%",
+            "M-03 传送带模型传送带 / 共速 / 划痕 / 相对位移 · 匹配 60%",
+            "M-04 弹簧瞬时问题剪断 / 撤去支撑 / 瞬时加速度 / 弹簧 · 匹配 60%",
+            "M-05 平抛与类平抛水平初速度 / 竖直加速度 / 偏转 / 类平抛 · 匹配 60%",
+            "M-06 圆周临界模型最高点 / 恰好过顶 / 绳松 / 杆支持 · 匹配 60%",
+            "M-07 天体运动模型卫星 / 轨道半径 / 周期 / 双星 · 匹配 60%",
+            "M-08 机车启动模型恒定功率 / 额定功率 / 牵引力 / 最大速度 · 匹配 60%",
+            "M-09 功能关系综合全过程 / 非保守力 / 摩擦生热 / 高度变化 · 匹配 60%",
+            "M-10 碰撞模型碰撞 / 爆炸 / 反冲 / 短时间 · 匹配 60%",
+            "M-11 导轨模型导轨 / 金属棒 / 切割磁感线 / 灯泡 · 匹配 60%",
+            "M-12 交流电综合有效值 / 峰值 / 变压器 / 输电 · 匹配 60%",
+            "M-13 复合场粒子模型速度选择器 / 复合场 / 偏转 / 带电粒子 · 匹配 60%",
+            "M-14 气体状态变化模型p-V图 / 等温 / 等压 / 等容 · 匹配 60%",
+            "M-15 核反应与质能方程核反应方程 / 质量亏损 / 结合能 / 半衰期 · 匹配 60%",
+            "题眼信号轻绳 / 轻杆 / 共同加速度",
+            "第一反应先整体求 a，再隔离求内力",
+            "判据读数a=3.9 m/s²",
+            "当前状态T=7.79 N ·",
+            "外力 F16 N",
+            "m12 kg",
+            "m24 kg"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "ceaa72b6",
+          "readout_hash": "1c4a8f1c",
+          "physical_readout_hash": "cdb6a8a6",
+          "readout": [
+            "轻绳",
+            "木板",
+            "传送带",
+            "剪断",
+            "水平初速度",
+            "最高点",
+            "卫星",
+            "恒定功率",
+            "摩擦生热",
+            "碰撞",
+            "导轨",
+            "变压器",
+            "复合场",
+            "p-V图",
+            "质量亏损",
+            "M-01 连接体模型轻绳 / 轻杆 / 共同加速度 / 张力 · 匹配 100%",
+            "M-02 板块模型木板 / 物块 / 相对滑动 / 滑痕 · 匹配 60%",
+            "M-03 传送带模型传送带 / 共速 / 划痕 / 相对位移 · 匹配 60%",
+            "M-04 弹簧瞬时问题剪断 / 撤去支撑 / 瞬时加速度 / 弹簧 · 匹配 60%",
+            "M-05 平抛与类平抛水平初速度 / 竖直加速度 / 偏转 / 类平抛 · 匹配 60%",
+            "M-06 圆周临界模型最高点 / 恰好过顶 / 绳松 / 杆支持 · 匹配 60%",
+            "M-07 天体运动模型卫星 / 轨道半径 / 周期 / 双星 · 匹配 60%",
+            "M-08 机车启动模型恒定功率 / 额定功率 / 牵引力 / 最大速度 · 匹配 60%",
+            "M-09 功能关系综合全过程 / 非保守力 / 摩擦生热 / 高度变化 · 匹配 60%",
+            "M-10 碰撞模型碰撞 / 爆炸 / 反冲 / 短时间 · 匹配 60%",
+            "M-11 导轨模型导轨 / 金属棒 / 切割磁感线 / 灯泡 · 匹配 60%",
+            "M-12 交流电综合有效值 / 峰值 / 变压器 / 输电 · 匹配 60%",
+            "M-13 复合场粒子模型速度选择器 / 复合场 / 偏转 / 带电粒子 · 匹配 60%",
+            "M-14 气体状态变化模型p-V图 / 等温 / 等压 / 等容 · 匹配 60%",
+            "M-15 核反应与质能方程核反应方程 / 质量亏损 / 结合能 / 半衰期 · 匹配 60%",
+            "题眼信号轻绳 / 轻杆 / 共同加速度",
+            "第一反应先整体求 a，再隔离求内力",
+            "判据读数a=3.93 m/s²",
+            "当前状态T=7.85 N · 演示 t=0.57 s",
+            "外力 F16 N",
+            "m12 kg",
+            "m24 kg"
+          ],
+          "physical_readout": [
+            "轻绳",
+            "木板",
+            "传送带",
+            "剪断",
+            "水平初速度",
+            "最高点",
+            "卫星",
+            "恒定功率",
+            "摩擦生热",
+            "碰撞",
+            "导轨",
+            "变压器",
+            "复合场",
+            "p-V图",
+            "质量亏损",
+            "M-01 连接体模型轻绳 / 轻杆 / 共同加速度 / 张力 · 匹配 100%",
+            "M-02 板块模型木板 / 物块 / 相对滑动 / 滑痕 · 匹配 60%",
+            "M-03 传送带模型传送带 / 共速 / 划痕 / 相对位移 · 匹配 60%",
+            "M-04 弹簧瞬时问题剪断 / 撤去支撑 / 瞬时加速度 / 弹簧 · 匹配 60%",
+            "M-05 平抛与类平抛水平初速度 / 竖直加速度 / 偏转 / 类平抛 · 匹配 60%",
+            "M-06 圆周临界模型最高点 / 恰好过顶 / 绳松 / 杆支持 · 匹配 60%",
+            "M-07 天体运动模型卫星 / 轨道半径 / 周期 / 双星 · 匹配 60%",
+            "M-08 机车启动模型恒定功率 / 额定功率 / 牵引力 / 最大速度 · 匹配 60%",
+            "M-09 功能关系综合全过程 / 非保守力 / 摩擦生热 / 高度变化 · 匹配 60%",
+            "M-10 碰撞模型碰撞 / 爆炸 / 反冲 / 短时间 · 匹配 60%",
+            "M-11 导轨模型导轨 / 金属棒 / 切割磁感线 / 灯泡 · 匹配 60%",
+            "M-12 交流电综合有效值 / 峰值 / 变压器 / 输电 · 匹配 60%",
+            "M-13 复合场粒子模型速度选择器 / 复合场 / 偏转 / 带电粒子 · 匹配 60%",
+            "M-14 气体状态变化模型p-V图 / 等温 / 等压 / 等容 · 匹配 60%",
+            "M-15 核反应与质能方程核反应方程 / 质量亏损 / 结合能 / 半衰期 · 匹配 60%",
+            "题眼信号轻绳 / 轻杆 / 共同加速度",
+            "第一反应先整体求 a，再隔离求内力",
+            "判据读数a=3.93 m/s²",
+            "当前状态T=7.85 N ·",
+            "外力 F16 N",
+            "m12 kg",
+            "m24 kg"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "ceaa72b6",
+          "readout_hash": "1c4a8f1c",
+          "physical_readout_hash": "cdb6a8a6",
+          "readout": [
+            "轻绳",
+            "木板",
+            "传送带",
+            "剪断",
+            "水平初速度",
+            "最高点",
+            "卫星",
+            "恒定功率",
+            "摩擦生热",
+            "碰撞",
+            "导轨",
+            "变压器",
+            "复合场",
+            "p-V图",
+            "质量亏损",
+            "M-01 连接体模型轻绳 / 轻杆 / 共同加速度 / 张力 · 匹配 100%",
+            "M-02 板块模型木板 / 物块 / 相对滑动 / 滑痕 · 匹配 60%",
+            "M-03 传送带模型传送带 / 共速 / 划痕 / 相对位移 · 匹配 60%",
+            "M-04 弹簧瞬时问题剪断 / 撤去支撑 / 瞬时加速度 / 弹簧 · 匹配 60%",
+            "M-05 平抛与类平抛水平初速度 / 竖直加速度 / 偏转 / 类平抛 · 匹配 60%",
+            "M-06 圆周临界模型最高点 / 恰好过顶 / 绳松 / 杆支持 · 匹配 60%",
+            "M-07 天体运动模型卫星 / 轨道半径 / 周期 / 双星 · 匹配 60%",
+            "M-08 机车启动模型恒定功率 / 额定功率 / 牵引力 / 最大速度 · 匹配 60%",
+            "M-09 功能关系综合全过程 / 非保守力 / 摩擦生热 / 高度变化 · 匹配 60%",
+            "M-10 碰撞模型碰撞 / 爆炸 / 反冲 / 短时间 · 匹配 60%",
+            "M-11 导轨模型导轨 / 金属棒 / 切割磁感线 / 灯泡 · 匹配 60%",
+            "M-12 交流电综合有效值 / 峰值 / 变压器 / 输电 · 匹配 60%",
+            "M-13 复合场粒子模型速度选择器 / 复合场 / 偏转 / 带电粒子 · 匹配 60%",
+            "M-14 气体状态变化模型p-V图 / 等温 / 等压 / 等容 · 匹配 60%",
+            "M-15 核反应与质能方程核反应方程 / 质量亏损 / 结合能 / 半衰期 · 匹配 60%",
+            "题眼信号轻绳 / 轻杆 / 共同加速度",
+            "第一反应先整体求 a，再隔离求内力",
+            "判据读数a=3.93 m/s²",
+            "当前状态T=7.85 N · 演示 t=0.57 s",
+            "外力 F16 N",
+            "m12 kg",
+            "m24 kg"
+          ],
+          "physical_readout": [
+            "轻绳",
+            "木板",
+            "传送带",
+            "剪断",
+            "水平初速度",
+            "最高点",
+            "卫星",
+            "恒定功率",
+            "摩擦生热",
+            "碰撞",
+            "导轨",
+            "变压器",
+            "复合场",
+            "p-V图",
+            "质量亏损",
+            "M-01 连接体模型轻绳 / 轻杆 / 共同加速度 / 张力 · 匹配 100%",
+            "M-02 板块模型木板 / 物块 / 相对滑动 / 滑痕 · 匹配 60%",
+            "M-03 传送带模型传送带 / 共速 / 划痕 / 相对位移 · 匹配 60%",
+            "M-04 弹簧瞬时问题剪断 / 撤去支撑 / 瞬时加速度 / 弹簧 · 匹配 60%",
+            "M-05 平抛与类平抛水平初速度 / 竖直加速度 / 偏转 / 类平抛 · 匹配 60%",
+            "M-06 圆周临界模型最高点 / 恰好过顶 / 绳松 / 杆支持 · 匹配 60%",
+            "M-07 天体运动模型卫星 / 轨道半径 / 周期 / 双星 · 匹配 60%",
+            "M-08 机车启动模型恒定功率 / 额定功率 / 牵引力 / 最大速度 · 匹配 60%",
+            "M-09 功能关系综合全过程 / 非保守力 / 摩擦生热 / 高度变化 · 匹配 60%",
+            "M-10 碰撞模型碰撞 / 爆炸 / 反冲 / 短时间 · 匹配 60%",
+            "M-11 导轨模型导轨 / 金属棒 / 切割磁感线 / 灯泡 · 匹配 60%",
+            "M-12 交流电综合有效值 / 峰值 / 变压器 / 输电 · 匹配 60%",
+            "M-13 复合场粒子模型速度选择器 / 复合场 / 偏转 / 带电粒子 · 匹配 60%",
+            "M-14 气体状态变化模型p-V图 / 等温 / 等压 / 等容 · 匹配 60%",
+            "M-15 核反应与质能方程核反应方程 / 质量亏损 / 结合能 / 半衰期 · 匹配 60%",
+            "题眼信号轻绳 / 轻杆 / 共同加速度",
+            "第一反应先整体求 a，再隔离求内力",
+            "判据读数a=3.93 m/s²",
+            "当前状态T=7.85 N ·",
+            "外力 F16 N",
+            "m12 kg",
+            "m24 kg"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "轻绳|木板|传送带|剪断|水平初速度|最高点|卫星|恒定功率|摩擦生热|碰撞|导轨|变压器|复合场|p-V图|质量亏损|M# 连接体模型轻绳 / 轻杆 / 共同加速度 / 张力 · 匹配 #%|M# 板块模型木板 / 物块 / 相对滑动 / 滑痕 · 匹配 #%|M# 传送带模型传送带 / 共速 / 划痕 / 相对位移 · 匹配 #%|M# 弹簧瞬时问题剪断 / 撤去支撑 / 瞬时加速度 / 弹簧 · 匹配 #%|M# 平抛与类平抛水平初速度 / 竖直加速度 / 偏转 / 类平抛 · 匹配 #%|M# 圆周临界模型最高点 / 恰好过顶 / 绳松 / 杆支持 · 匹配 #%|M# 天体运动模型卫星 / 轨道半径 / 周期 / 双星 · 匹配 #%|M# 机车启动模型恒定功率 / 额定功率 / 牵引力 / 最大速度 · 匹配 #%|M# 功能关系综合全过程 / 非保守力 / 摩擦生热 / 高度变化 · 匹配 #%|M# 碰撞模型碰撞 / 爆炸 / 反冲 / 短时间 · 匹配 #%|M# 导轨模型导轨 / 金属棒 / 切割磁感线 / 灯泡 · 匹配 #%|M# 交流电综合有效值 / 峰值 / 变压器 / 输电 · 匹配 #%|M# 复合场粒子模型速度选择器 / 复合场 / 偏转 / 带电粒子 · 匹配 #%|M# 气体状态变化模型p-V图 / 等温 / 等压 / 等容 · 匹配 #%|M# 核反应与质能方程核反应方程 / 质量亏损 / 结合能 / 半衰期 · 匹配 #%|题眼信号轻绳 / 轻杆 / 共同加速度|第一反应先整体求 a，再隔离求内力|判据读数a=# m/s²|当前状态T=# N · 演示 t=# s|外力 F# N|m# kg|m# kg",
+          "controls": [
+            {
+              "id": "search",
+              "value": "",
+              "checked": false
+            },
+            {
+              "id": "a",
+              "value": "16",
+              "checked": false
+            },
+            {
+              "id": "b",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "c",
+              "value": "4",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "轻绳|木板|传送带|剪断|水平初速度|最高点|卫星|恒定功率|摩擦生热|碰撞|导轨|变压器|复合场|p-V图|质量亏损|M# 连接体模型轻绳 / 轻杆 / 共同加速度 / 张力 · 匹配 #%|M# 板块模型木板 / 物块 / 相对滑动 / 滑痕 · 匹配 #%|M# 传送带模型传送带 / 共速 / 划痕 / 相对位移 · 匹配 #%|M# 弹簧瞬时问题剪断 / 撤去支撑 / 瞬时加速度 / 弹簧 · 匹配 #%|M# 平抛与类平抛水平初速度 / 竖直加速度 / 偏转 / 类平抛 · 匹配 #%|M# 圆周临界模型最高点 / 恰好过顶 / 绳松 / 杆支持 · 匹配 #%|M# 天体运动模型卫星 / 轨道半径 / 周期 / 双星 · 匹配 #%|M# 机车启动模型恒定功率 / 额定功率 / 牵引力 / 最大速度 · 匹配 #%|M# 功能关系综合全过程 / 非保守力 / 摩擦生热 / 高度变化 · 匹配 #%|M# 碰撞模型碰撞 / 爆炸 / 反冲 / 短时间 · 匹配 #%|M# 导轨模型导轨 / 金属棒 / 切割磁感线 / 灯泡 · 匹配 #%|M# 交流电综合有效值 / 峰值 / 变压器 / 输电 · 匹配 #%|M# 复合场粒子模型速度选择器 / 复合场 / 偏转 / 带电粒子 · 匹配 #%|M# 气体状态变化模型p-V图 / 等温 / 等压 / 等容 · 匹配 #%|M# 核反应与质能方程核反应方程 / 质量亏损 / 结合能 / 半衰期 · 匹配 #%|题眼信号轻绳 / 轻杆 / 共同加速度|第一反应先整体求 a，再隔离求内力|判据读数a=# m/s²|当前状态T=# N · 演示 t=# s|外力 F# N|m# kg|m# kg",
+          "controls": [
+            {
+              "id": "search",
+              "value": "",
+              "checked": false
+            },
+            {
+              "id": "a",
+              "value": "16",
+              "checked": false
+            },
+            {
+              "id": "b",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "c",
+              "value": "4",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/model/nuclear-mass-energy.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#template",
+          "kind": "select-one",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#dm",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#count",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#binding",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#probeA",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#recordBtn",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "c89be1f4",
+          "readout_hash": "91fa1ec6",
+          "physical_readout_hash": "91fa1ec6",
+          "readout": [
+            "反应模板：中子诱发裂变",
+            "质量亏损 Δm/u：0.210",
+            "反应次数 N/(10^20 次)：12",
+            "产物平均结合能 Eb/A/MeV：8.45",
+            "结合能曲线探针 A：56",
+            "守恒检查：ΣA 236=236，ΣZ 92=92质能换算：Q=Δm×931.5=195.61 MeV总能量：N=12×10^20 次，E=3.76e+10 J结合能读数：Eb/A=8.45 MeV，探针 A=56公式绑定：E=Δmc²，E/MeV≈Δm/u×931.5；Δm>0 放能，Δm<0 吸能",
+            "判定：A、Z 守恒且 Δm>0，反应释放能量。",
+            "点击“记录”保存一次读数"
+          ],
+          "physical_readout": [
+            "反应模板：中子诱发裂变",
+            "质量亏损 Δm/u：0.210",
+            "反应次数 N/(10^20 次)：12",
+            "产物平均结合能 Eb/A/MeV：8.45",
+            "结合能曲线探针 A：56",
+            "守恒检查：ΣA 236=236，ΣZ 92=92质能换算：Q=Δm×931.5=195.61 MeV总能量：N=12×10^20 次，E=3.76e+10 J结合能读数：Eb/A=8.45 MeV，探针 A=56公式绑定：E=Δmc²，E/MeV≈Δm/u×931.5；Δm>0 放能，Δm<0 吸能",
+            "判定：A、Z 守恒且 Δm>0，反应释放能量。",
+            "点击“记录”保存一次读数"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "172fced1",
+          "readout_hash": "91fa1ec6",
+          "physical_readout_hash": "91fa1ec6",
+          "readout": [
+            "反应模板：中子诱发裂变",
+            "质量亏损 Δm/u：0.210",
+            "反应次数 N/(10^20 次)：12",
+            "产物平均结合能 Eb/A/MeV：8.45",
+            "结合能曲线探针 A：56",
+            "守恒检查：ΣA 236=236，ΣZ 92=92质能换算：Q=Δm×931.5=195.61 MeV总能量：N=12×10^20 次，E=3.76e+10 J结合能读数：Eb/A=8.45 MeV，探针 A=56公式绑定：E=Δmc²，E/MeV≈Δm/u×931.5；Δm>0 放能，Δm<0 吸能",
+            "判定：A、Z 守恒且 Δm>0，反应释放能量。",
+            "点击“记录”保存一次读数"
+          ],
+          "physical_readout": [
+            "反应模板：中子诱发裂变",
+            "质量亏损 Δm/u：0.210",
+            "反应次数 N/(10^20 次)：12",
+            "产物平均结合能 Eb/A/MeV：8.45",
+            "结合能曲线探针 A：56",
+            "守恒检查：ΣA 236=236，ΣZ 92=92质能换算：Q=Δm×931.5=195.61 MeV总能量：N=12×10^20 次，E=3.76e+10 J结合能读数：Eb/A=8.45 MeV，探针 A=56公式绑定：E=Δmc²，E/MeV≈Δm/u×931.5；Δm>0 放能，Δm<0 吸能",
+            "判定：A、Z 守恒且 Δm>0，反应释放能量。",
+            "点击“记录”保存一次读数"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "c89be1f4",
+          "readout_hash": "91fa1ec6",
+          "physical_readout_hash": "91fa1ec6",
+          "readout": [
+            "反应模板：中子诱发裂变",
+            "质量亏损 Δm/u：0.210",
+            "反应次数 N/(10^20 次)：12",
+            "产物平均结合能 Eb/A/MeV：8.45",
+            "结合能曲线探针 A：56",
+            "守恒检查：ΣA 236=236，ΣZ 92=92质能换算：Q=Δm×931.5=195.61 MeV总能量：N=12×10^20 次，E=3.76e+10 J结合能读数：Eb/A=8.45 MeV，探针 A=56公式绑定：E=Δmc²，E/MeV≈Δm/u×931.5；Δm>0 放能，Δm<0 吸能",
+            "判定：A、Z 守恒且 Δm>0，反应释放能量。",
+            "点击“记录”保存一次读数"
+          ],
+          "physical_readout": [
+            "反应模板：中子诱发裂变",
+            "质量亏损 Δm/u：0.210",
+            "反应次数 N/(10^20 次)：12",
+            "产物平均结合能 Eb/A/MeV：8.45",
+            "结合能曲线探针 A：56",
+            "守恒检查：ΣA 236=236，ΣZ 92=92质能换算：Q=Δm×931.5=195.61 MeV总能量：N=12×10^20 次，E=3.76e+10 J结合能读数：Eb/A=8.45 MeV，探针 A=56公式绑定：E=Δmc²，E/MeV≈Δm/u×931.5；Δm>0 放能，Δm<0 吸能",
+            "判定：A、Z 守恒且 Δm>0，反应释放能量。",
+            "点击“记录”保存一次读数"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "c89be1f4",
+          "readout_hash": "91fa1ec6",
+          "physical_readout_hash": "91fa1ec6",
+          "readout": [
+            "反应模板：中子诱发裂变",
+            "质量亏损 Δm/u：0.210",
+            "反应次数 N/(10^20 次)：12",
+            "产物平均结合能 Eb/A/MeV：8.45",
+            "结合能曲线探针 A：56",
+            "守恒检查：ΣA 236=236，ΣZ 92=92质能换算：Q=Δm×931.5=195.61 MeV总能量：N=12×10^20 次，E=3.76e+10 J结合能读数：Eb/A=8.45 MeV，探针 A=56公式绑定：E=Δmc²，E/MeV≈Δm/u×931.5；Δm>0 放能，Δm<0 吸能",
+            "判定：A、Z 守恒且 Δm>0，反应释放能量。",
+            "点击“记录”保存一次读数"
+          ],
+          "physical_readout": [
+            "反应模板：中子诱发裂变",
+            "质量亏损 Δm/u：0.210",
+            "反应次数 N/(10^20 次)：12",
+            "产物平均结合能 Eb/A/MeV：8.45",
+            "结合能曲线探针 A：56",
+            "守恒检查：ΣA 236=236，ΣZ 92=92质能换算：Q=Δm×931.5=195.61 MeV总能量：N=12×10^20 次，E=3.76e+10 J结合能读数：Eb/A=8.45 MeV，探针 A=56公式绑定：E=Δmc²，E/MeV≈Δm/u×931.5；Δm>0 放能，Δm<0 吸能",
+            "判定：A、Z 守恒且 Δm>0，反应释放能量。",
+            "点击“记录”保存一次读数"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "反应模板：中子诱发裂变|质量亏损 Δm/u：#|反应次数 N/(#^# 次)：#|产物平均结合能 Eb/A/MeV：#|结合能曲线探针 A：#|守恒检查：ΣA #=#，ΣZ #=#质能换算：Q=Δm×#=# MeV总能量：N=#×#^# 次，E=#e# J结合能读数：Eb/A=# MeV，探针 A=#公式绑定：E=Δmc²，E/MeV≈Δm/u×#；Δm># 放能，Δm<# 吸能|判定：A、Z 守恒且 Δm>#，反应释放能量。",
+          "controls": [
+            {
+              "id": "template",
+              "value": "fission",
+              "selectedIndex": 0
+            },
+            {
+              "id": "dm",
+              "value": "0.21",
+              "checked": false
+            },
+            {
+              "id": "count",
+              "value": "12",
+              "checked": false
+            },
+            {
+              "id": "binding",
+              "value": "8.45",
+              "checked": false
+            },
+            {
+              "id": "probeA",
+              "value": "56",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "反应模板：中子诱发裂变|质量亏损 Δm/u：#|反应次数 N/(#^# 次)：#|产物平均结合能 Eb/A/MeV：#|结合能曲线探针 A：#|守恒检查：ΣA #=#，ΣZ #=#质能换算：Q=Δm×#=# MeV总能量：N=#×#^# 次，E=#e# J结合能读数：Eb/A=# MeV，探针 A=#公式绑定：E=Δmc²，E/MeV≈Δm/u×#；Δm># 放能，Δm<# 吸能|判定：A、Z 守恒且 Δm>#，反应释放能量。",
+          "controls": [
+            {
+              "id": "template",
+              "value": "fission",
+              "selectedIndex": 0
+            },
+            {
+              "id": "dm",
+              "value": "0.21",
+              "checked": false
+            },
+            {
+              "id": "count",
+              "value": "12",
+              "checked": false
+            },
+            {
+              "id": "binding",
+              "value": "8.45",
+              "checked": false
+            },
+            {
+              "id": "probeA",
+              "value": "56",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

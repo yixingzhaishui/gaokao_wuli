@@ -37,7 +37,7 @@
 <div class="root">
   <div class="stage"><canvas id="canvas" width="920" height="540" aria-label="同步卫星交互实验台：地球轨道俯视装置、条件图像和数据记录"></canvas></div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>抓卫星向内外拖，对照地球轨道俯视装置、条件图像和数据记录，看 T 是否仍为 24h。</div>
+    <div class="card task"><b>观察任务：</b>抓卫星向内外拖，对照地球轨道俯视装置、条件图像和数据记录，看 T 是否仍等于地球自转周期（高中近似 24 h，严格为一个恒星日）。</div>
     <button id="playBtn" class="primary">播放</button>
     <div class="card">
       <div class="title">快速情境</div>
@@ -59,7 +59,7 @@
     </div>
     <div class="card formula">
       <div><span>周期半径</span><b>T²=4π²r³/GM</b></div>
-      <div><span>同步条件</span><b>T=24h</b></div>
+      <div><span>同步条件</span><b>T≈24h（恒星日）</b></div>
       <div><span>静止条件</span><b>赤道 + 同向</b></div>
     </div>
     <div class="card small"><b>可直接操作：</b>拖卫星改半径和经度；拖底部 r、i、经度手柄；点“反向同步”看周期相同但方向错误时仍不静止。</div>
@@ -157,7 +157,7 @@
     roundRect(642,76,214,256,8,'#fff','#d7dee8');
     text('地球静止卫星三条件',749,106,'#0f172a','center',15,'900');
     [
-      ['T=24h',v.periodOk],
+      ['T≈24h（恒星日）',v.periodOk],
       ['轨道在赤道平面',v.equatorOk],
       ['与地球自转同向',v.directionOk]
     ].forEach((row,k)=>{
@@ -174,14 +174,14 @@
     els.speed.textContent=`${fmt(v.v,2)} km/s`;
     els.drift.textContent=`${fmt(v.drift,0)}°/日`;
     els.status.classList.toggle('bad',!v.stationary);
-    els.status.textContent=v.stationary?'同步、赤道、同向同时满足：卫星固定在同一经度上空。':(!v.periodOk?'半径改变后 T 不再等于 24h，卫星相对地面产生东西向漂移。':(!v.equatorOk?'周期同步但轨道倾斜，地面投影会上下摆动，不是静止卫星。':'周期同步但方向相反，相对地面快速掠过。'));
+    els.status.textContent=v.stationary?'同步、赤道、同向同时满足：卫星固定在同一经度上空。':(!v.periodOk?'半径改变后 T 不再等于地球自转周期，卫星相对地面产生东西向漂移。':(!v.equatorOk?'周期同步但轨道倾斜，地面投影会上下摆动，不是静止卫星。':'周期同步但方向相反，相对地面快速掠过。'));
     els.play.textContent=state.running?'暂停':'播放';
   }
   function draw(){
     const v=values(),h=handles();ctx.clearRect(0,0,920,540);var _bg=ctx.createLinearGradient(0,0,0,540);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,920,540);
     text('同步卫星实验台：轨道俯视装置 + 条件图像 + 数据记录',460,30,'#0f172a','center',19,'900');
     drawOrbit(v);drawCondition(v);
-    text('公式：T = 2π√(r³/GM)，同步卫星 T=24h 唯一确定 r≈6.6R（必在赤道上空）',460,448,'#334e68','center',13,'700');
+    text('T = 2π√(r³/GM)；同步周期≈24 h（严格为恒星日），唯一确定 r≈6.6R',460,448,'#334e68','center',13,'700');
     roundRect(48,458,820,62,8,'#fff','#d7dee8');
     ruler(90,494,280,'r/R',colors.orange);handle(h.r.x,h.r.y,`r=${fmt(state.rR,2)}R`,state.drag==='r',colors.orange);
     ruler(340,494,500,'倾角 i',colors.purple);handle(h.inc.x,h.inc.y,`i=${fmt(state.inc,0)}°`,state.drag==='inc',colors.purple);
@@ -236,6 +236,26 @@
     draw();requestAnimationFrame(tick);
   }
   draw();requestAnimationFrame(tick);
+})();
+</script>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script>
+<script>/* GKWL: unified full reset (2026-07-12 review remediation) */
+(function(){
+  var btns=[].slice.call(document.querySelectorAll('button'));
+  var resets=btns.filter(function(b){return /重置|复位/.test(b.textContent)});
+  if(!resets.length)return;
+  var scoped=/播放|时间|回放/;
+  var primary=resets[0];
+  if(scoped.test(primary.textContent)){
+    var nb=document.createElement('button');
+    nb.textContent='全部重置';
+    nb.className=primary.className;
+    nb.setAttribute('data-gkwl-full-reset','1');
+    nb.addEventListener('click',function(){location.reload()});
+    primary.parentNode.insertBefore(nb,primary.nextSibling);
+  }else{
+    resets.forEach(function(b){b.addEventListener('click',function(){setTimeout(function(){location.reload()},60)})});
+  }
 })();
 </script>
 </body>

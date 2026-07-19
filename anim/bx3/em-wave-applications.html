@@ -35,7 +35,7 @@
 <body>
 <div class="root">
   <div class="stage">
-    <canvas id="canvas" width="900" height="620" aria-label="电磁波应用与现代通信：天线发射、空间传播、接收机、频谱图像、调制波形和数据读数"></canvas>
+    <canvas id="canvas" width="900" height="620" aria-label="电磁波应用与现代通信：天线发射、空间传播、接收机、频谱图像、调制波形和数据读数" data-fiber-speed-model="2.0e8-m-per-s" data-carrier-bandwidth-distinct="true"></canvas>
   </div>
   <div class="panel">
     <div class="card task"><b>观察任务：</b>切换广播、卫星、雷达、光纤通信，拖动画面中的接收机或频谱探针，看频率升高时波长如何变短、传播延迟如何由距离决定、信号强度如何随距离衰减。</div>
@@ -48,12 +48,13 @@
         <button data-mode="fiber">光纤</button>
       </div>
     </div>
+    <div class="card"><button id="playBtn" type="button">暂停演示</button></div>
     <div class="card">
       <div class="title">调参数</div>
-      <label class="param"><span>频率 f <b id="fLabel">100 MHz</b></span><input id="freq" type="range" min="1" max="5" step="0.01" value="2"></label>
+      <label class="param"><span>载波频率 f <b id="fLabel">100 MHz</b></span><input id="freq" type="range" min="1" max="9" step="0.01" value="2"></label>
       <label class="param"><span>振幅 A <b id="aLabel">60%</b></span><input id="amp" type="range" min="20" max="100" step="1" value="60"></label>
       <label class="param"><span>距离 d <b id="dLabel">120 km</b></span><input id="dist" type="range" min="10" max="36000" step="10" value="120"></label>
-      <label class="param"><span>带宽 B <b id="bLabel">8 MHz</b></span><input id="band" type="range" min="1" max="80" step="1" value="8"></label>
+      <label class="param"><span>可用带宽 B <b id="bLabel">8 MHz</b></span><input id="band" type="range" min="1" max="100000" step="1" value="8"></label>
     </div>
     <div class="readout" id="readout"></div>
     <div class="card">
@@ -65,9 +66,9 @@
     </div>
     <div class="card formula">
       <div class="title">公式与图像</div>
-      <div>波速：c = λf，真空和空气中 c≈3.0×10<sup>8</sup> m/s。</div>
-      <div>延迟：t = d/c；雷达测距：s = ct/2。</div>
-      <div>能量与频率：E = hf；接收强度近似随距离增大而减弱。</div>
+      <div>一般关系：v = λf；真空和空气中 v≈c=3.0×10<sup>8</sup> m/s，光纤教学近似取 v≈2.0×10<sup>8</sup> m/s。</div>
+      <div>延迟：t = d/v；空气中雷达测距近似为 s = ct/2。</div>
+      <div>载波频率与可用带宽不是同一个量；容量还受信噪比和调制编码限制。</div>
     </div>
     <div class="status" id="status"></div>
   </div>
@@ -84,13 +85,13 @@
   };
   const buttons = Array.from(document.querySelectorAll('button[data-mode]'));
   const C = 3e8;
-  const state = { mode: 'radio', t: 0, receiverX: 690, probeX: 650, drag: null, records: [] };
+  const state = { mode: 'radio', t: 0, receiverX: 690, probeX: 650, drag: null, records: [], running: true };
   const colors = { ink:'#102a43', muted:'#486581', blue:'#2c7be5', red:'#e03131', green:'#087f5b', gold:'#f0a500', purple:'#7c3aed', sky:'#0ea5e9' };
   const presets = {
     radio: { f: 2, d: 120, b: 8, note: '广播：用调制把声音信息加载到电磁波上，接收机再解调。' },
     satellite: { f: 4.1, d: 36000, b: 36, note: '卫星通信：距离远，延迟明显，需定向天线提高接收质量。' },
     radar: { f: 4.4, d: 80, b: 20, note: '雷达：发射脉冲并接收回波，用往返时间求距离。' },
-    fiber: { f: 5, d: 40, b: 80, note: '光纤通信：红外光在光纤中传播，频率高、带宽大、抗干扰强。' }
+    fiber: { f: 8.3, d: 40, b: 100000, note: '光纤通信：约 2×10¹⁴ Hz 的红外载波在介质中以约 2.0×10⁸ m/s 传播；大容量来自可用带宽、信噪比和调制编码，不是“频率高”单独决定。' }
   };
   function freqMHz() {
     const x = +els.freq.value;
@@ -99,9 +100,10 @@
   function params() {
     const fMHz = freqMHz();
     const dKm = +els.dist.value;
-    return { fMHz, fHz: fMHz * 1e6, amp: +els.amp.value / 100, dKm, band: +els.band.value };
+    const speed = state.mode === 'fiber' ? 2e8 : C;
+    return { fMHz, fHz: fMHz * 1e6, amp: +els.amp.value / 100, dKm, band: +els.band.value, speed };
   }
-  function fmt(n, d=2) { return Math.abs(n) >= 100 ? n.toFixed(0) : n.toFixed(d); }
+  function fmt(n, d=2) { const a=Math.abs(n); if(a>0&&a<.01)return n.toExponential(2); return a >= 100 ? n.toFixed(0) : n.toFixed(d); }
   function line(x1,y1,x2,y2,c='#9fb3c8',w=2,dash) {
     ctx.save(); ctx.strokeStyle=c; ctx.lineWidth=w; if (dash) ctx.setLineDash(dash);
     ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); ctx.restore();
@@ -140,7 +142,7 @@
     }
     ctx.stroke(); ctx.restore();
     arrow(x1+70,y1-56,x2-70,y2-56,colors.green,2);
-    text('电磁波传播：c=λf', (x1+x2)/2, y1-78, colors.green, 'center', 13, '900');
+    text('电磁波传播：v=λf（空气中 v≈c）', (x1+x2)/2, y1-78, colors.green, 'center', 13, '900');
   }
   function drawScene() {
     const p=params();
@@ -178,17 +180,17 @@
   }
   function drawSpectrum(p) {
     box(52,350,376,214,'#fff');
-    text('频谱图像：频率越高，波长越短',240,374,colors.ink,'center',15,'800');
+    text('频谱图像：同一介质中频率越高，波长越短',240,374,colors.ink,'center',14,'800');
     const gx=86, gy=520, gw=300, gh=104;
     line(gx,gy,gx+gw,gy,colors.ink,2); line(gx,gy,gx,gy-gh,colors.ink,2);
     const marks = [
-      ['无线电',20,colors.green], ['微波',120,colors.blue], ['红外/光',235,colors.purple]
+      ['无线电',28,colors.green], ['微波',126,colors.blue], ['红外/光',260,colors.purple]
     ];
     marks.forEach(m=>{ box(gx+m[1]-28,gy+14,58,24,'#f8fafc','#d9e2ec'); text(m[0],gx+m[1],gy+26,m[2],'center',11,'800'); });
-    const pos = Math.min(gw, Math.max(0, Math.log10(p.fMHz)/5*gw));
+    const pos = Math.min(gw, Math.max(0, Math.log10(p.fMHz)/9*gw));
     line(gx+pos,gy,gx+pos,gy-gh,colors.gold,3);
     text('探针 f='+fmt(p.fMHz,1)+' MHz',gx+pos,gy-gh-18,colors.gold,'center',12,'900');
-    const bw = Math.max(10, p.band/80*86);
+    const bw = Math.max(10, Math.log10(p.band+1)/5*86);
     ctx.fillStyle='rgba(44,123,229,.18)'; ctx.fillRect(gx+pos-bw/2,gy-gh,gx+pos+bw/2>gx+gw?gx+gw-(gx+pos-bw/2):bw,gh);
     text('带宽 B',gx+pos,gy-gh/2,colors.blue,'center',12,'900');
   }
@@ -209,22 +211,24 @@
     box(528,504,250,28,'#eef2ff','#9fb3c8');
     ctx.fillStyle=colors.green; ctx.fillRect(528,504,250*strength,28);
     text('接收强度 '+Math.round(strength*100)+'%',653,518,colors.ink,'center',12,'900');
-    const delayMs = p.dKm*1000/C*1000;
-    text('传播延迟 t=d/c='+fmt(delayMs,2)+' ms',653,548,colors.purple,'center',13,'900');
+    const delayMs = p.dKm*1000/p.speed*1000;
+    text('传播延迟 t=d/v='+fmt(delayMs,2)+' ms',653,548,colors.purple,'center',13,'900');
   }
   function updatePanel() {
     const p=params();
-    const lambda = C / p.fHz;
-    const delayMs = p.dKm*1000/C*1000;
+    const lambda = p.speed / p.fHz;
+    const delayMs = p.dKm*1000/p.speed*1000;
     els.fLabel.textContent = fmt(p.fMHz,1)+' MHz';
     els.aLabel.textContent = Math.round(p.amp*100)+'%';
     els.dLabel.textContent = p.dKm >= 1000 ? fmt(p.dKm,0)+' km' : fmt(p.dKm,0)+' km';
-    els.bLabel.textContent = p.band+' MHz';
+    els.bLabel.textContent = p.band>=1000?fmt(p.band/1000,1)+' GHz':p.band+' MHz';
     els.readout.innerHTML =
       '场景：<b>' + modeName() + '</b><br>' +
-      '波长 λ=c/f：<b>' + fmt(lambda,2) + ' m</b><br>' +
-      '传播延迟 t=d/c：<b>' + fmt(delayMs,2) + ' ms</b><br>' +
-      '带宽越大：<b>可承载信息量越大</b>';
+      '介质波速 v：<b>' + fmt(p.speed,0) + ' m/s</b><br>' +
+      '波长 λ=v/f：<b>' + fmt(lambda,2) + ' m</b><br>' +
+      '传播延迟 t=d/v：<b>' + fmt(delayMs,2) + ' ms</b><br>' +
+      '容量判断：<b>结合带宽、信噪比与调制编码</b>';
+    canvas.dataset.mode=state.mode;canvas.dataset.propagationSpeed=String(p.speed);canvas.dataset.frequencyHz=String(p.fHz);canvas.dataset.wavelengthM=String(lambda);canvas.dataset.delayMs=String(delayMs);
     els.status.textContent = presets[state.mode].note;
     els.rows.innerHTML = state.records.slice(-6).map(r =>
       '<tr><td>'+r.mode+'</td><td>'+fmt(r.f,1)+'</td><td>'+fmt(r.l,2)+'</td><td>'+fmt(r.t,2)+'</td></tr>'
@@ -235,7 +239,7 @@
   }
   function record() {
     const p=params();
-    state.records.push({ mode: modeName(), f: p.fMHz, l: C/p.fHz, t: p.dKm*1000/C*1000 });
+    state.records.push({ mode: modeName(), f: p.fMHz, l: p.speed/p.fHz, t: p.dKm*1000/p.speed*1000 });
     if (state.records.length > 9) state.records.shift();
   }
   function setMode(mode) {
@@ -244,6 +248,8 @@
     els.freq.value = pre.f; els.dist.value = pre.d; els.band.value = pre.b;
     buttons.forEach(b=>b.classList.toggle('active', b.dataset.mode===mode));
     record();
+    drawScene();
+    updatePanel();
   }
   buttons.forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
   [els.freq, els.amp, els.dist, els.band].forEach(el=>el.addEventListener('input',()=>{ record(); drawScene(); updatePanel(); }));
@@ -260,19 +266,41 @@
       state.receiverX = Math.max(560, Math.min(805, x));
       els.dist.value = Math.round(10 + (state.receiverX-560)/(805-560)*500);
     } else {
-      els.freq.value = Math.max(1, Math.min(5, (x-86)/300*5));
+      els.freq.value = Math.max(1, Math.min(9, (x-86)/300*9));
     }
     drawScene(); updatePanel();
   });
   canvas.addEventListener('pointerup', e => { state.drag=null; record(); try { canvas.releasePointerCapture(e.pointerId); } catch(_) {} });
+  const playBtn = document.getElementById('playBtn');
+  playBtn.addEventListener('click', () => { state.running = !state.running; playBtn.textContent = state.running ? '暂停演示' : '播放演示'; if (state.running) { drawScene(); updatePanel(); } });
   function loop() {
-    state.t += 0.035;
-    drawScene(); updatePanel();
+    if (state.running) { state.t += 0.035; drawScene(); updatePanel(); }
     requestAnimationFrame(loop);
   }
   setMode('radio');
   loop();
 })();
 </script>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script>
+<script>/* GKWL: unified full reset (2026-07-12 review remediation) */
+(function(){
+  var btns=[].slice.call(document.querySelectorAll('button'));
+  var resets=btns.filter(function(b){return /重置|复位/.test(b.textContent)});
+  if(!resets.length)return;
+  var scoped=/播放|时间|回放/;
+  var primary=resets[0];
+  if(scoped.test(primary.textContent)){
+    var nb=document.createElement('button');
+    nb.textContent='全部重置';
+    nb.className=primary.className;
+    nb.setAttribute('data-gkwl-full-reset','1');
+    nb.addEventListener('click',function(){location.reload()});
+    primary.parentNode.insertBefore(nb,primary.nextSibling);
+  }else{
+    resets.forEach(function(b){b.addEventListener('click',function(){setTimeout(function(){location.reload()},60)})});
+  }
+})();
+</script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

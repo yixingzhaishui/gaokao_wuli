@@ -1,0 +1,70 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-07-19T02:19:04.000Z",
+  "review_date_local": "2026-07-18",
+  "commit": "9acbf51f540b0ade94638c6e796bf62cab86d64a",
+  "branch": "codex/repository-fixes",
+  "chapter": "X3",
+  "input_method": "Playwright real keyboard range input and real button clicks; no DOM value injection",
+  "probes": [
+    {
+      "id": "X3-13",
+      "file": "anim/xb3/first-law.html",
+      "severity": "CRITICAL",
+      "operation": "Focus the V range, press Home, then press End while Q=500 J and W=200 J remain unchanged.",
+      "observed": {
+        "at_V_1_0_L": "W=200 J; delta_U=700 J",
+        "at_V_4_0_L": "W=200 J; delta_U=700 J"
+      },
+      "failure": "The p-V path and shaded area change with piston position, but the displayed external work is an independent control and does not equal the negative p-V area."
+    },
+    {
+      "id": "X3-18",
+      "file": "anim/xb3/surface-tension.html",
+      "severity": "CRITICAL",
+      "operation": "Load the default state and read the force ledger and verdict.",
+      "observed": "F=sigma*L=0.0140 N, G=0.0100 N, verdict: the liquid surface can support the object.",
+      "failure": "The verdict compares the total tangential magnitude sigma*L directly with weight without defining contact lines, surface slope/contact angle, vertical components, or buoyancy."
+    },
+    {
+      "id": "X3-29",
+      "file": "anim/xb3/binding-energy.html",
+      "severity": "CRITICAL",
+      "operation": "Focus A and press Home; focus Eb and press End; focus comparison energy and press Home.",
+      "observed": "A=2, Eb=2000 MeV, Eb/A=1000.00 MeV per nucleon, delta_m=2.147 u; verdict: current nucleus is more stable.",
+      "failure": "A and total binding energy are independent arbitrary controls, so the page turns nonphysical combinations into precise mass defects and stability claims."
+    },
+    {
+      "id": "X3-31",
+      "file": "anim/xb3/nuclear-fusion.html",
+      "severity": "MAJOR",
+      "operation": "Focus temperature and confinement ranges and press End.",
+      "observed": "Temperature level=10, confinement level=10, fusion probability index about 94%, conditions sufficient.",
+      "failure": "The exact percentage and pass threshold come from an uncalibrated linear toy expression without temperature, density, confinement-time units, or a declared empirical model."
+    },
+    {
+      "id": "X3-32",
+      "file": "anim/xb3/particle-physics.html",
+      "severity": "MAJOR",
+      "operation": "Load the default proton and target-charge state.",
+      "observed": "Proton charge=+1e, target charge=1e, difference=0.00e; verdict: charge-conservation check passed.",
+      "failure": "The chapter task uses this single check to judge whether a reaction channel is valid, although energy, momentum, baryon/lepton number and actual initial/final states are absent."
+    },
+    {
+      "id": "X3-37",
+      "file": "anim/xb3/radioisotope-applications.html",
+      "severity": "CRITICAL",
+      "operation": "Click Pause, then click the archaeology-dating tab.",
+      "observed": "Ancient-wood sample; half-life=80 h; elapsed time=160 h; remaining=25%; recommended radiation=beta.",
+      "failure": "The archaeology preset and entire control range use hours, so the central ancient-wood dating scenario cannot represent radiocarbon timescales."
+    },
+    {
+      "id": "X3-38",
+      "file": "anim/xb3/radiation-protection.html",
+      "severity": "MAJOR",
+      "operation": "Click Pause, click gamma, and read the default state.",
+      "observed": "d=2.0 m, x=2.0 mm, t=11 min, relative dose=1.919, penetration=100%, ionization=22%; verdict: dose is high.",
+      "failure": "Arbitrary radiation percentages, attenuation coefficients and a 0.15 threshold produce a safety verdict without isotope energy, source activity, material, dose unit or calibration."
+    }
+  ]
+}

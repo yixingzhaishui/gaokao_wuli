@@ -1,0 +1,37 @@
+{
+  "problems": [
+    {
+      "id": "GT-2025-SH-20",
+      "source": "2025年上海市普通高中学业水平等级性考试物理试卷",
+      "source_kind": "official_exam",
+      "source_verified": true,
+      "source_detail": "物理第20题；锦宏教育试卷PDF含原题、气缸活塞图和同PDF答案页；答案由玻意耳定律、小位移线性化和简谐运动频率公式独立核验。",
+      "source_urls": ["https://www.jhgk.cn/upload/file/20250612/1749695610079025886.pdf"],
+      "verification": "原题第20题与同PDF答案页核对：（1）F=p0S²X/(V0+SX)；（3）C。第（2）问答案页OCR丢失根号，按题干给出的弹簧振子公式f=(1/2π)√(k/m)独立核验：等温微小位移下等效劲度系数k_eff=p0S²/V0，故f=(1/2π)√(p0S²/(MV0))。绝热过程压强随体积变化更剧烈，等效劲度更大，故f2>f1，选C。",
+      "verified_at": "2026-07-11",
+      "year": 2025,
+      "exam": "上海等级考·物理",
+      "question_no": "20",
+      "type": "计算",
+      "difficulty": "较难",
+      "knowledge_ids": ["X3-10", "X1-08", "E-26"],
+      "model_ids": [],
+      "stem": "如图，大气压强为p0，一个气缸内部体积为V0，初始压强为p0，内有一活塞横截面积为S，质量为M。（1）等温情况下，向右拉开活塞移动距离X，求活塞受拉力F。（2）在水平弹簧振子中，弹簧劲度系数为k，小球质量为m，则弹簧振子做简谐运动振动频率为f=(1/2π)√(k/m)，论证拉开微小位移X时，活塞做简谐振动，并求出振动频率f。（3）若气缸绝热，活塞在该情况下振动频率为f2，上题中等温情况下，活塞在气缸中的振动频率为f1，则两者的大小关系为（ ）",
+      "diagram_required": true,
+      "diagram": {
+        "type": "inline-svg",
+        "title": "原卷第20题气缸活塞小振动示意",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 700 300\" role=\"img\" aria-label=\"气缸内活塞被向右拉开位移X，内外气压形成回复力\"><rect x=\"90\" y=\"90\" width=\"430\" height=\"120\" fill=\"#f8fafc\" stroke=\"#334155\" stroke-width=\"5\"/><rect x=\"470\" y=\"85\" width=\"34\" height=\"130\" fill=\"#cbd5e1\" stroke=\"#334155\" stroke-width=\"4\"/><path d=\"M504 150h90\" stroke=\"#dc2626\" stroke-width=\"5\" marker-end=\"url(#arrow)\"/><text x=\"545\" y=\"135\" font-size=\"20\" fill=\"#dc2626\">F</text><text x=\"240\" y=\"155\" font-size=\"22\" fill=\"#2563eb\">p, V₀+SX</text><text x=\"82\" y=\"75\" font-size=\"20\" fill=\"#334155\">p₀</text><path d=\"M470 235h34\" stroke=\"#334155\" stroke-width=\"3\"/><path d=\"M470 245h75\" stroke=\"#334155\" stroke-width=\"3\" marker-end=\"url(#arrowDark)\"/><text x=\"505\" y=\"270\" font-size=\"20\" fill=\"#334155\">X</text><text x=\"510\" y=\"155\" font-size=\"18\" fill=\"#334155\">S,M</text><defs><marker id=\"arrow\" markerWidth=\"10\" markerHeight=\"10\" refX=\"8\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L0,6 L9,3 z\" fill=\"#dc2626\"/></marker><marker id=\"arrowDark\" markerWidth=\"10\" markerHeight=\"10\" refX=\"8\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L0,6 L9,3 z\" fill=\"#334155\"/></marker></defs></svg>"
+      },
+      "options": [
+        "A. f1>f2",
+        "B. f1=f2",
+        "C. f1<f2"
+      ],
+      "answer": "（1）F=p0S²X/(V0+SX)；（2）f=(1/2π)√(p0S²/(MV0))；（3）C",
+      "solution": "（1）等温过程满足pV=p0V0，活塞右移X后气体体积为V0+SX，内部压强p=p0V0/(V0+SX)。活塞受外界大气向左的压力p0S、气体向右的压力pS和外拉力F。缓慢平衡时F+pS=p0S，故F=(p0-p)S=p0S²X/(V0+SX)。（2）若位移X很小，F≈(p0S²/V0)X，方向总指向平衡位置，满足F=-k_eff X的简谐运动条件，等效劲度系数k_eff=p0S²/V0，所以f=(1/2π)√(k_eff/M)=(1/2π)√(p0S²/(MV0))。（3）绝热压缩或膨胀时压强对体积变化更敏感，等效劲度系数更大，故绝热频率f2更大，f1<f2，选C。",
+      "method": "大位移用等温状态方程求压强差；小振动用一阶近似把压强差写成与位移成正比的回复力，再套弹簧振子频率。",
+      "traps": ["把外拉力方向和平衡方程写反", "小位移频率公式漏掉根号", "认为绝热和等温压强变化一样快"]
+    }
+  ]
+}

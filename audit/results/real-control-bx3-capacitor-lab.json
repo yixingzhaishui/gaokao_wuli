@@ -1,0 +1,290 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T17:20:54.199Z",
+  "commit": "8976bfdb85b5d7fe3d7884dfbe073c82beae3137",
+  "module": "bx3",
+  "modules": [
+    "bx3"
+  ],
+  "summary": {
+    "total": 1,
+    "score": 100,
+    "pass": 1,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/bx3/capacitor-lab.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#E",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#R",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#C",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:▶ 放电并播放",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:断开",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:▶ 充电并播放",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#charge",
+          "text": "▶ 充电并播放",
+          "role": "other",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#discharge",
+          "text": "▶ 放电并播放",
+          "role": "other",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#open",
+          "text": "断开",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#playBtn",
+          "text": "播放演示",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放演示"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "98f5794b",
+          "readout_hash": "c6ee1b70",
+          "physical_readout_hash": "c15c6c30",
+          "readout": [
+            "电容器电压 U_C = 0.00 V",
+            "电荷量 Q = CU = 0 μC",
+            "充电电流 i = 0.60 mA",
+            "储能 ½CU² = 0 μJ",
+            "充放电状态：充电已暂停",
+            "拖动曲线探针读数：t=— s，U=— V",
+            "电源 E = 6 V",
+            "电阻 R = 10 kΩ",
+            "电容 C = 100 μF"
+          ],
+          "physical_readout": [
+            "电容器电压 U_C = 0.00 V",
+            "电荷量 Q = CU = 0 μC",
+            "充电电流 i = 0.60 mA",
+            "储能 ½CU² = 0 μJ",
+            "充放电状态：充电",
+            "拖动曲线探针读数：t=— s，U=— V",
+            "电源 E = 6 V",
+            "电阻 R = 10 kΩ",
+            "电容 C = 100 μF"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "8f1be11b",
+          "readout_hash": "d83b3c9e",
+          "physical_readout_hash": "d83b3c9e",
+          "readout": [
+            "电容器电压 U_C = 1.88 V",
+            "电荷量 Q = CU = 188 μC",
+            "充电电流 i = 0.41 mA",
+            "储能 ½CU² = 176 μJ",
+            "充放电状态：正在充电",
+            "拖动曲线探针读数：t=— s，U=— V",
+            "电源 E = 6 V",
+            "电阻 R = 10 kΩ",
+            "电容 C = 100 μF"
+          ],
+          "physical_readout": [
+            "电容器电压 U_C = 1.88 V",
+            "电荷量 Q = CU = 188 μC",
+            "充电电流 i = 0.41 mA",
+            "储能 ½CU² = 176 μJ",
+            "充放电状态：正在充电",
+            "拖动曲线探针读数：t=— s，U=— V",
+            "电源 E = 6 V",
+            "电阻 R = 10 kΩ",
+            "电容 C = 100 μF"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "27be7a27",
+          "readout_hash": "6fbc4fb9",
+          "physical_readout_hash": "b02bd63",
+          "readout": [
+            "电容器电压 U_C = 1.98 V",
+            "电荷量 Q = CU = 198 μC",
+            "充电电流 i = 0.40 mA",
+            "储能 ½CU² = 195 μJ",
+            "充放电状态：充电已暂停",
+            "拖动曲线探针读数：t=— s，U=— V",
+            "电源 E = 6 V",
+            "电阻 R = 10 kΩ",
+            "电容 C = 100 μF"
+          ],
+          "physical_readout": [
+            "电容器电压 U_C = 1.98 V",
+            "电荷量 Q = CU = 198 μC",
+            "充电电流 i = 0.40 mA",
+            "储能 ½CU² = 195 μJ",
+            "充放电状态：充电",
+            "拖动曲线探针读数：t=— s，U=— V",
+            "电源 E = 6 V",
+            "电阻 R = 10 kΩ",
+            "电容 C = 100 μF"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "27be7a27",
+          "readout_hash": "6fbc4fb9",
+          "physical_readout_hash": "b02bd63",
+          "readout": [
+            "电容器电压 U_C = 1.98 V",
+            "电荷量 Q = CU = 198 μC",
+            "充电电流 i = 0.40 mA",
+            "储能 ½CU² = 195 μJ",
+            "充放电状态：充电已暂停",
+            "拖动曲线探针读数：t=— s，U=— V",
+            "电源 E = 6 V",
+            "电阻 R = 10 kΩ",
+            "电容 C = 100 μF"
+          ],
+          "physical_readout": [
+            "电容器电压 U_C = 1.98 V",
+            "电荷量 Q = CU = 198 μC",
+            "充电电流 i = 0.40 mA",
+            "储能 ½CU² = 195 μJ",
+            "充放电状态：充电",
+            "拖动曲线探针读数：t=— s，U=— V",
+            "电源 E = 6 V",
+            "电阻 R = 10 kΩ",
+            "电容 C = 100 μF"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "电容器电压 U_C = # V|电荷量 Q = CU = # μC|充电电流 i = # mA|储能 ½CU² = # μJ|充放电状态：充电已暂停|拖动曲线探针读数：t=— s，U=— V|电源 E = # V|电阻 R = # kΩ|电容 C = # μF",
+          "controls": [
+            {
+              "id": "E",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "R",
+              "value": "10",
+              "checked": false
+            },
+            {
+              "id": "C",
+              "value": "100",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "电容器电压 U_C = # V|电荷量 Q = CU = # μC|充电电流 i = # mA|储能 ½CU² = # μJ|充放电状态：充电已暂停|拖动曲线探针读数：t=— s，U=— V|电源 E = # V|电阻 R = # kΩ|电容 C = # μF",
+          "controls": [
+            {
+              "id": "E",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "R",
+              "value": "10",
+              "checked": false
+            },
+            {
+              "id": "C",
+              "value": "100",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

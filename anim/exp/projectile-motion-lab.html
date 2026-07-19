@@ -377,7 +377,9 @@ els.playBtn.addEventListener('click', () => {
 els.resetBtn.addEventListener('click', () => {
   state.running = false;
   state.time = 0;
+  state.records = [];
   setValues({ v0: 4, h: 1.8, dt: 0.10, n: 4, tilt: 0 });
+  renderRecords();
   draw();
 });
 els.recordBtn.addEventListener('click', () => {
@@ -395,5 +397,6 @@ for (const id of ['speed', 'height', 'dt', 'point', 'tilt']) els[id].addEventLis
 renderRecords();
 requestAnimationFrame(loop);
 </script>
+<script src="guided-experiment.js"></script>
 </body>
 </html>

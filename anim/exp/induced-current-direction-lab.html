@@ -31,8 +31,8 @@
       <div class="title">实验条件</div>
       <div class="buttons"><button data-pole="N" class="active">N 极朝线圈</button><button data-pole="S">S 极朝线圈</button><button id="flip">反向运动</button></div>
       <label class="param"><span>线圈匝数 N <b id="turnLabel">60</b></span><input id="turns" type="range" min="20" max="120" step="10" value="60"></label>
-      <label class="param"><span>拖动速度 <b id="speedLabel">1.0</b></span><input id="speed" type="range" min="0.3" max="2.5" step="0.1" value="1"></label>
-      <div class="buttons"><button id="play">暂停演示</button><button id="left">预测左偏</button><button id="right">预测右偏</button></div>
+      <label class="param"><span>自动演示速度 <b id="speedLabel">1.0</b></span><input id="speed" type="range" min="0.3" max="2.5" step="0.1" value="1"></label>
+      <div class="buttons"><button id="play">播放演示</button><button id="left">预测左偏</button><button id="right">预测右偏</button></div>
       <div class="buttons"><button id="record">记录</button><button id="flip2">反向验证</button><button id="zero">回到零位</button></div>
     </div>
     <div class="readout" id="readout"></div>
@@ -46,7 +46,7 @@
   'use strict';
   const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
   const els={turns:id('turns'),speed:id('speed'),turnLabel:id('turnLabel'),speedLabel:id('speedLabel'),readout:id('readout'),rows:id('rows'),status:id('status')};
-  const state={pole:'N',x:205,v:1,dir:1,drag:null,pred:null,history:[],records:[],t:0,playing:true};
+  const state={pole:'N',x:205,dir:1,drag:null,pred:null,history:[],records:[],t:0,playing:false,current:null,lastFrame:0,lastDragTs:0};
   const colors={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',gold:'#f0a500',green:'#087f5b',purple:'#7c3aed'};
   function id(s){return document.getElementById(s)} function fmt(n,d=2){return(Math.abs(n)<1e-9?0:n).toFixed(d)}
   function text(s,x,y,c=colors.ink,a='center',size=13,w='700'){ctx.fillStyle=c;ctx.font=w+' '+size+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
@@ -54,26 +54,48 @@
   function box(x,y,w,h,fill='#fff',stroke='#d9e2ec'){ctx.save();ctx.fillStyle=fill;ctx.strokeStyle=stroke;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.restore()}
   function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.45),y2-10*Math.sin(a-.45));ctx.lineTo(x2-10*Math.cos(a+.45),y2-10*Math.sin(a+.45));ctx.closePath();ctx.fill();ctx.restore()}
   function fluxAt(x){const d=(455-x)/115;const sign=state.pole==='N'?1:-1;return sign*Math.exp(-d*d)}
-  function calc(){const N=+els.turns.value, speed=+els.speed.value, phi=fluxAt(state.x), prev=state.history[state.history.length-1];const oldPhi=prev?prev.phi:phi;const dPhi=phi-oldPhi;const e=-N*dPhi*speed;return{N,speed,phi,dPhi,e,deflect:e>0?'右偏':e<0?'左偏':'零位',motion:state.dir>0?'插入':'拔出'}}
+  function zeroReading(){const N=+els.turns.value,speed=+els.speed.value,phi=fluxAt(state.x);return{N,speed,phi,dPhi:0,dt:0,e:0,deflect:'零位',motion:state.dir>0?'插入':'拔出'}}
+  function sample(nextX,dt){const oldPhi=fluxAt(state.x);state.dir=nextX>=state.x?1:-1;state.x=Math.max(120,Math.min(575,nextX));const phi=fluxAt(state.x),safeDt=Math.max(0.008,dt),dPhi=phi-oldPhi,N=+els.turns.value,e=-N*dPhi/safeDt;state.t+=safeDt;state.current={N,speed:+els.speed.value,phi,dPhi,dt:safeDt,e,deflect:e>0?'右偏':e<0?'左偏':'零位',motion:state.dir>0?'插入':'拔出'};state.history.push({phi,e});if(state.history.length>220)state.history.shift();return state.current}
+  function calc(){return state.current||zeroReading()}
   function drawCoil(){box(365,105,230,220,'#fbfdff');text('线圈侧视装置',480,132,colors.ink,'center',15,'900');for(let i=0;i<9;i++){ctx.strokeStyle=colors.blue;ctx.lineWidth=4;ctx.beginPath();ctx.ellipse(455+i*10,225,22,78,0,0,Math.PI*2);ctx.stroke()}line(478,302,478,352,colors.ink,3);line(478,352,700,352,colors.ink,3);line(700,352,700,302,colors.ink,3);text('灵敏电流计',690,132,colors.ink,'center',14,'900');ctx.save();ctx.translate(690,220);ctx.strokeStyle='#334e68';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,58,Math.PI,0);ctx.stroke();for(let i=-4;i<=4;i++){const a=-Math.PI/2+i*Math.PI/10;line(48*Math.sin(a),-48*Math.cos(a),56*Math.sin(a),-56*Math.cos(a),'#334e68',1)}const c=calc();const ang=Math.max(-0.9,Math.min(0.9,c.e/3));arrow(0,0,52*Math.sin(ang),-52*Math.cos(ang),c.e>=0?colors.red:colors.blue,3);ctx.restore();text('左偏',635,282,colors.blue,'center',12,'800');text('右偏',745,282,colors.red,'center',12,'800')}
-  function drawMagnet(){const x=state.x,y=225;const grad=ctx.createLinearGradient(x-70,y,x+70,y);if(state.pole==='N'){grad.addColorStop(0,'#e03131');grad.addColorStop(1,'#2c7be5')}else{grad.addColorStop(0,'#2c7be5');grad.addColorStop(1,'#e03131')}ctx.fillStyle=grad;ctx.strokeStyle='#334e68';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(x-70,y-34,140,68,9);ctx.fill();ctx.stroke();text(state.pole,x-43,y,'#fff','center',20,'900');text(state.pole==='N'?'S':'N',x+43,y,'#fff','center',20,'900');arrow(x+70,y,x+70+state.dir*58,y,state.dir>0?colors.green:colors.gold,4);text(state.dir>0?'插入':'拔出',x+80+state.dir*40,y-30,state.dir>0?colors.green:colors.gold,'center',13,'900');ctx.fillStyle=colors.purple;ctx.beginPath();ctx.arc(x,y+58,10,0,Math.PI*2);ctx.fill();text('拖磁铁',x,y+82,colors.purple,'center',12,'900')}
-  function drawField(c){for(let i=0;i<7;i++){const y=155+i*23;arrow(state.x+65,y,405,y,state.pole==='N'?colors.red:colors.blue,1.5)}const induced=c.e>0?'逆时针':'顺时针';text('感应电流：'+(Math.abs(c.e)<0.02?'几乎为0':induced),480,322,Math.abs(c.e)<0.02?colors.muted:colors.purple,'center',13,'900')}
+  function drawMagnet(){const x=state.x,y=225,leftPole=state.pole==='N'?'S':'N',rightPole=state.pole;const grad=ctx.createLinearGradient(x-70,y,x+70,y);if(rightPole==='N'){grad.addColorStop(0,'#2c7be5');grad.addColorStop(1,'#e03131')}else{grad.addColorStop(0,'#e03131');grad.addColorStop(1,'#2c7be5')}ctx.fillStyle=grad;ctx.strokeStyle='#334e68';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(x-70,y-34,140,68,9);ctx.fill();ctx.stroke();text(leftPole,x-43,y,'#fff','center',20,'900');text(rightPole,x+43,y,'#fff','center',20,'900');arrow(x+70,y,x+70+state.dir*58,y,state.dir>0?colors.green:colors.gold,4);text(state.dir>0?'插入':'拔出',x+80+state.dir*40,y-30,state.dir>0?colors.green:colors.gold,'center',13,'900');ctx.fillStyle=colors.purple;ctx.beginPath();ctx.arc(x,y+58,10,0,Math.PI*2);ctx.fill();text('拖磁铁',x,y+82,colors.purple,'center',12,'900')}
+  function drawField(c){for(let i=0;i<7;i++){const y=155+i*23;if(state.pole==='N')arrow(state.x+65,y,405,y,colors.red,1.5);else arrow(405,y,state.x+65,y,colors.blue,1.5)}const induced=c.e>0?'逆时针':'顺时针';text('感应电流（从磁铁一侧观察）：'+(Math.abs(c.e)<0.02?'几乎为0':induced),480,322,Math.abs(c.e)<0.02?colors.muted:colors.purple,'center',13,'900')}
   function drawGraphs(){box(42,360,810,210,'#fff');text('Φ-t / e-t 图像 + 数据记录',447,386,colors.ink,'center',15,'900');const gx=86,gy=535,gw=700,gh=120;line(gx,gy,gx+gw,gy,colors.ink,2);line(gx,gy,gx,gy-gh,colors.ink,2);function px(i){return gx+i/119*gw}function py(v){return gy-gh/2-v*gh/2}ctx.strokeStyle=colors.blue;ctx.lineWidth=2.5;ctx.beginPath();state.history.slice(-120).forEach((h,i)=>{const x=px(i),y=py(h.phi);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)});ctx.stroke();ctx.strokeStyle=colors.red;ctx.beginPath();state.history.slice(-120).forEach((h,i)=>{const x=px(i),y=py(Math.max(-1,Math.min(1,h.e/4)));if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)});ctx.stroke();text('蓝：磁通量Φ',150,410,colors.blue,'left',12,'900');text('红：感应电动势e',265,410,colors.red,'left',12,'900');}
-  function updatePanel(c){els.turnLabel.textContent=c.N;els.speedLabel.textContent=fmt(c.speed,1);els.readout.innerHTML='动作：<b>'+c.motion+'</b><br>磁极：<b>'+state.pole+' 极朝线圈</b><br>ΔΦ：<b>'+fmt(c.dPhi,3)+'</b><br>e=-NΔΦ/Δt：<b>'+fmt(c.e,2)+'</b><br>电流计：<b>'+c.deflect+'</b>';els.rows.innerHTML=state.records.slice(-6).map(r=>'<tr><td>'+r.motion+'</td><td>'+fmt(r.dPhi,3)+'</td><td>'+fmt(r.e,2)+'</td><td>'+r.deflect+'</td></tr>').join('')||'<tr><td colspan=\"4\">暂无记录</td></tr>';const ok=!state.pred||state.pred===c.deflect;els.status.textContent=state.pred?'预测'+state.pred+'，当前'+c.deflect+'：'+(ok?'验证通过':'预测不符，重新用楞次定律判断'):'先预测再拖动验证：感应电流总要阻碍磁通量变化。';els.status.style.background=state.pred&&!ok?'#fff0f0':'#e6fffa';els.status.style.color=state.pred&&!ok?'#c92a2a':'#087f5b'}
+  function updatePanel(c){els.turnLabel.textContent=c.N;els.speedLabel.textContent=fmt(c.speed,1);els.readout.innerHTML='动作：<b>'+c.motion+'</b><br>朝向线圈的磁极：<b>'+state.pole+' 极</b><br>ΔΦ：<b>'+fmt(c.dPhi,3)+' Wb</b><br>Δt：<b>'+fmt(c.dt,3)+' s</b><br>e=-NΔΦ/Δt：<b>'+fmt(c.e,2)+' V</b><br>电流计：<b>'+c.deflect+'</b>';els.rows.innerHTML=state.records.slice(-6).map(r=>'<tr><td>'+r.motion+'</td><td>'+fmt(r.dPhi,3)+'</td><td>'+fmt(r.e,2)+'</td><td>'+r.deflect+'</td></tr>').join('')||'<tr><td colspan=\"4\">暂无记录</td></tr>';const measurable=c.deflect!=='零位',ok=!state.pred||state.pred===c.deflect;if(!measurable){els.status.textContent=state.pred?'已预测'+state.pred+'；请真实拖动磁铁后再验证。':'先预测，再真实拖动磁铁；速度由实际位移/时间决定。'}else{els.status.textContent=state.pred?'预测'+state.pred+'，当前'+c.deflect+'：'+(ok?'验证通过':'预测不符，重新用楞次定律判断'):'已测得偏转；补做预测后反向验证。'}els.status.style.background=state.pred&&measurable&&!ok?'#fff0f0':'#e6fffa';els.status.style.color=state.pred&&measurable&&!ok?'#c92a2a':'#087f5b';window.__EXP_TEST_STATE__={facingPole:state.pole,x:state.x,dPhi:c.dPhi,dt:c.dt,e:c.e,deflect:c.deflect,playing:state.playing}}
   function draw(){const c=calc();ctx.clearRect(0,0,900,620);const bg=ctx.createLinearGradient(0,0,0,620);bg.addColorStop(0,'#fbfdff');bg.addColorStop(1,'#edf3f8');ctx.fillStyle=bg;ctx.fillRect(0,0,900,620);text('E-23 感应电流方向实验台：磁铁线圈侧视 + Φ-t/e-t图像 + 电流计数据记录',450,32,colors.ink,'center',18,'900');box(42,72,810,270,'#fff');drawCoil();drawMagnet();drawField(c);drawGraphs();updatePanel(c)}
-  function push(){const c=calc();state.t+=0.04;state.history.push({phi:c.phi,e:c.e});if(state.history.length>220)state.history.shift()}
   function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
-  canvas.addEventListener('pointerdown',e=>{const p=pos(e);if(Math.hypot(p.x-state.x,p.y-283)<42||Math.abs(p.x-state.x)<90&&p.y>170&&p.y<280){state.drag='magnet';canvas.setPointerCapture(e.pointerId);move(e);e.preventDefault()}});
-  canvas.addEventListener('pointermove',move);function move(e){if(!state.drag)return;const p=pos(e);const old=state.x;state.x=Math.max(120,Math.min(575,p.x));state.dir=state.x>=old?1:-1;push();draw();e.preventDefault()}
+  canvas.addEventListener('pointerdown',e=>{const p=pos(e);if(Math.hypot(p.x-state.x,p.y-283)<42||Math.abs(p.x-state.x)<90&&p.y>170&&p.y<280){state.drag='magnet';state.playing=false;id('play').textContent='播放演示';state.lastDragTs=e.timeStamp;canvas.setPointerCapture(e.pointerId);e.preventDefault()}});
+  canvas.addEventListener('pointermove',move);function move(e){if(!state.drag)return;const p=pos(e),dt=Math.max(.008,(e.timeStamp-state.lastDragTs)/1000);state.lastDragTs=e.timeStamp;sample(p.x,dt);draw();e.preventDefault()}
   canvas.addEventListener('pointerup',e=>{state.drag=null;try{canvas.releasePointerCapture(e.pointerId)}catch(err){}});canvas.addEventListener('pointercancel',()=>state.drag=null);
-  document.querySelectorAll('[data-pole]').forEach(b=>b.addEventListener('click',()=>{state.pole=b.dataset.pole;document.querySelectorAll('[data-pole]').forEach(x=>x.classList.toggle('active',x===b));state.history=[];draw()}));
+  document.querySelectorAll('[data-pole]').forEach(b=>b.addEventListener('click',()=>{state.pole=b.dataset.pole;document.querySelectorAll('[data-pole]').forEach(x=>x.classList.toggle('active',x===b));state.history=[];state.current=null;draw()}));
   id('play').onclick=()=>{state.playing=!state.playing;id('play').textContent=state.playing?'暂停演示':'播放演示';draw()};
-  id('flip').onclick=()=>{state.dir*=-1};id('flip2').onclick=()=>{state.dir*=-1;draw()};id('zero').onclick=()=>{state.x=250;state.history=[];push();draw()};
+  id('flip').onclick=()=>{state.dir*=-1;state.current=null;draw()};id('flip2').onclick=()=>{state.dir*=-1;state.current=null;draw()};id('zero').onclick=()=>{state.x=250;state.history=[];state.current=null;draw()};
   id('left').onclick=()=>{state.pred='左偏';draw()};id('right').onclick=()=>{state.pred='右偏';draw()};
   id('record').onclick=()=>{const c=calc();state.records.push(c);draw()};[els.turns,els.speed].forEach(e=>e.addEventListener('input',draw));
-  function loop(){if(state.playing&&!state.drag){state.x+=state.dir*(0.8+ +els.speed.value);if(state.x>575){state.x=575;state.dir=-1}if(state.x<120){state.x=120;state.dir=1}push()}draw();requestAnimationFrame(loop)}
+  function loop(ts){const dt=state.lastFrame?Math.min(.05,(ts-state.lastFrame)/1000):.016;state.lastFrame=ts;if(state.playing&&!state.drag){let next=state.x+state.dir*(30+25*+els.speed.value)*dt;if(next>575){next=575;state.dir=-1}if(next<120){next=120;state.dir=1}sample(next,dt)}draw();requestAnimationFrame(loop)}
   draw();requestAnimationFrame(loop);
 })();
 </script>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script>
+<script>/* GKWL: unified full reset (2026-07-12 review remediation) */
+(function(){
+  var btns=[].slice.call(document.querySelectorAll('button'));
+  var resets=btns.filter(function(b){return /重置|复位/.test(b.textContent)});
+  if(!resets.length)return;
+  var scoped=/播放|时间|回放/;
+  var primary=resets[0];
+  if(scoped.test(primary.textContent)){
+    var nb=document.createElement('button');
+    nb.textContent='全部重置';
+    nb.className=primary.className;
+    nb.setAttribute('data-gkwl-full-reset','1');
+    nb.addEventListener('click',function(){location.reload()});
+    primary.parentNode.insertBefore(nb,primary.nextSibling);
+  }else{
+    resets.forEach(function(b){b.addEventListener('click',function(){setTimeout(function(){location.reload()},60)})});
+  }
+})();
+</script>
+<script src="guided-experiment.js"></script>
 </body>
 </html>

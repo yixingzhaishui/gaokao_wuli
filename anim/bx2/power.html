@@ -130,5 +130,28 @@
   draw();requestAnimationFrame(tick);
 })();
 </script>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script>
+<script>/* GKWL: unified full reset (2026-07-12 review remediation) */
+(function(){
+  var btns=[].slice.call(document.querySelectorAll('button'));
+  var resets=btns.filter(function(b){return /重置|复位/.test(b.textContent)});
+  if(!resets.length)return;
+  var scoped=/播放|时间|回放/;
+  var primary=resets[0];
+  if(scoped.test(primary.textContent)){
+    var nb=document.createElement('button');
+    nb.textContent='全部重置';
+    nb.className=primary.className;
+    nb.setAttribute('data-gkwl-full-reset','1');
+    nb.addEventListener('click',function(){location.reload()});
+    primary.parentNode.insertBefore(nb,primary.nextSibling);
+  }else{
+    resets.forEach(function(b){b.addEventListener('click',function(){setTimeout(function(){location.reload()},60)})});
+  }
+})();
+</script>
+<script>
+window.B2_GUIDE={id:'B2-16',question:'完成相同的功，用时缩短为原来的1/4，平均功率怎样？',observe:'两种情境都做120 J的功，只比较2 s和8 s。',options:[{value:'quadruple',label:'用时短的平均功率是4倍'},{value:'same',label:'平均功率相同'},{value:'quarter',label:'用时短的平均功率是1/4'}],correct:'quadruple',actions:[{selector:'[data-case="slow"]'},{selector:'[data-case="fast"]'}],result:'2 s完成时平均功率是8 s完成时的4倍。',evidence:'功保持120 J，时间由8 s变为2 s，W-t图斜率和平均功率读数变为4倍。',explanation:'平均功率描述一段时间内做功快慢，等于该段功除以该段时间。',transfer:'P=W/t是平均功率；P=Fv cosα是某时刻功率，必须使用力在速度方向的分量。'};
+</script><script src="guided-lesson.js"></script>
 </body>
 </html>

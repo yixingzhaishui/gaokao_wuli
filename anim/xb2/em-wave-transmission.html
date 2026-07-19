@@ -32,16 +32,37 @@
 const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
 const els={carrier:document.getElementById('carrier'),tune:document.getElementById('tune'),mod:document.getElementById('mod'),dist:document.getElementById('dist'),carrierLabel:document.getElementById('carrierLabel'),tuneLabel:document.getElementById('tuneLabel'),modLabel:document.getElementById('modLabel'),dLabel:document.getElementById('dLabel'),readout:document.getElementById('readout'),rows:document.getElementById('rows'),status:document.getElementById('status'),play:document.getElementById('play'),record:document.getElementById('record')};
 const S={t:0,run:true,drag:false,records:[]},C={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',green:'#087f5b',gold:'#f0a500',purple:'#7c3aed'};
-function p(){const f0=+els.carrier.value,fr=+els.tune.value,mod=+els.mod.value/100,d=+els.dist.value,delta=Math.abs(f0-fr),strength=Math.exp(-delta*delta/18)/(1+d/120);return{f0,fr,mod,d,delta,strength,lambda:300/f0,delay:d*1000/3e8*1000}}
+function p(){const f0=+els.carrier.value,fr=+els.tune.value,mod=+els.mod.value/100,d=+els.dist.value,delta=Math.abs(f0-fr),tuned=delta<=2,attenuation=1/(1+d/120),selectivity=Math.exp(-delta*delta/18),strength=selectivity*attenuation;return{f0,fr,mod,d,delta,tuned,attenuation,selectivity,strength,lambda:300/f0,delay:d*1000/3e8*1000}}
 function fmt(n,d=1){return n.toFixed(d)}function line(x1,y1,x2,y2,c='#9fb3c8',w=2,d){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(d)ctx.setLineDash(d);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}function box(x,y,w,h,f='#fff',s='#d9e2ec'){ctx.save();ctx.fillStyle=f;ctx.strokeStyle=s;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.restore()}function text(s,x,y,c=C.ink,a='center',z=13,w='700'){ctx.fillStyle=c;ctx.font=w+' '+z+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-10*Math.cos(a-.45),y2-10*Math.sin(a-.45));ctx.lineTo(x2-10*Math.cos(a+.45),y2-10*Math.sin(a+.45));ctx.closePath();ctx.fill()}
 function draw(){const q=p();ctx.clearRect(0,0,900,600);box(34,34,832,520,'#fff');text('电磁波通信流程：调制 → 发射 → 传播 → 调谐 → 解调',450,60,C.ink,'center',16,'800');drawChain(q);drawWave(q);drawTune(q);update()}
 function drawChain(q){box(62,92,760,175,'#fbfdff');const xs=[125,275,450,625,760],names=['信号源','调制器','发射天线','接收机','解调输出'];xs.forEach((x,i)=>{box(x-48,155,96,48,i===3?'#e0f2fe':'#fff','#9fb3c8');text(names[i],x,179,C.ink,'center',12,'900');if(i<xs.length-1)arrow(x+52,179,xs[i+1]-55,179,C.green,3)});line(450,155,450,100,C.ink,4);line(625,155,625,105,C.ink,4);text('侧视天线装置',450,122,C.muted,'center',12,'800');text('调谐表盘',625,124,C.blue,'center',12,'800')}
 function drawWave(q){box(62,292,500,205,'#fff');text('空间传播俯视图 + 调制波形图像',312,315,C.ink,'center',14,'800');const x0=100,y0=395,w=420;ctx.strokeStyle=C.blue;ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=260;i++){const u=i/260,env=1+q.mod*.55*Math.sin(u*Math.PI*6),y=y0-Math.sin(u*Math.PI*42-S.t*6)*env*28,x=x0+u*w;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke();arrow(115,455,510,455,C.green,3);text('传播方向',315,476,C.green,'center',12,'900');const pulse=100+((S.t*80)%(400));ctx.fillStyle='rgba(44,123,229,.25)';ctx.beginPath();ctx.arc(pulse,455,18,0,Math.PI*2);ctx.fill();text('调制让信息进入载波包络',312,348,C.purple,'center',12,'900')}
 function drawTune(q){box(590,292,232,205,'#fff');text('接收调谐读数',706,315,C.ink,'center',14,'800');ctx.strokeStyle='#d9e2ec';ctx.lineWidth=14;ctx.beginPath();ctx.arc(706,392,62,Math.PI*.15,Math.PI*.85);ctx.stroke();ctx.strokeStyle=q.strength>.65?C.green:q.strength>.25?C.gold:C.red;ctx.beginPath();ctx.arc(706,392,62,Math.PI*.15,Math.PI*(.15+.7*q.strength));ctx.stroke();text(Math.round(q.strength*100)+'%',706,392,q.strength>.65?C.green:C.red,'center',24,'900');const angle=Math.PI*.85-(q.fr-80)/40*Math.PI*.7;arrow(706,392,706+58*Math.cos(angle),392-58*Math.sin(angle),C.purple,4);text('拖调谐旋钮',706,472,C.purple,'center',12,'900')}
-function update(){const q=p();els.carrierLabel.textContent=q.f0+' MHz';els.tuneLabel.textContent=q.fr+' MHz';els.modLabel.textContent=Math.round(q.mod*100)+'%';els.dLabel.textContent=q.d+' km';els.readout.innerHTML='波长 λ：<b>'+fmt(q.lambda,2)+' m</b><br>传播延迟：<b>'+fmt(q.delay,3)+' ms</b><br>频差 |f₀-fᵣ|：<b>'+q.delta+' MHz</b><br>接收强度：<b>'+Math.round(q.strength*100)+'%</b>';els.status.textContent=q.strength>.65?'调谐接近载波频率，接收强，解调输出清晰。':'调谐偏离载波频率，接收弱，信息难以还原。';els.rows.innerHTML=S.records.slice(-6).map(r=>'<tr><td>'+r.f0+'</td><td>'+r.fr+'</td><td>'+r.s+'</td><td>'+r.st+'</td></tr>').join('')||'<tr><td colspan="4">暂无记录</td></tr>'}
-function record(){const q=p();S.records.push({f0:q.f0,fr:q.fr,s:Math.round(q.strength*100)+'%',st:q.strength>.65?'成功':'偏离'});if(S.records.length>8)S.records.shift();update()}
+function update(){const q=p();els.carrierLabel.textContent=q.f0+' MHz';els.tuneLabel.textContent=q.fr+' MHz';els.modLabel.textContent=Math.round(q.mod*100)+'%';els.dLabel.textContent=q.d+' km';els.readout.innerHTML='波长 λ：<b>'+fmt(q.lambda,2)+' m</b><br>传播延迟：<b>'+fmt(q.delay,3)+' ms</b><br>频差 |f₀-fᵣ|：<b>'+q.delta+' MHz</b><br>距离衰减因子：<b>'+Math.round(q.attenuation*100)+'%</b><br>综合接收强度：<b>'+Math.round(q.strength*100)+'%</b>';els.status.textContent=!q.tuned?'频率失配：接收回路没有选中载波；这与传播距离造成的衰减是两件事。':q.attenuation>.65?'已调谐且传播衰减较小，解调输出清晰。':'已调谐，但距离导致传播衰减；不能把弱信号误判为频率失配。';els.rows.innerHTML=S.records.slice(-6).map(r=>'<tr><td>'+r.f0+'</td><td>'+r.fr+'</td><td>'+r.s+'</td><td>'+r.st+'</td></tr>').join('')||'<tr><td colspan="4">暂无记录</td></tr>';canvas.dataset.tuningState=q.tuned?'matched':'mismatched';canvas.dataset.propagationState=q.attenuation>.65?'strong':'attenuated';canvas.dataset.attenuation=q.attenuation.toFixed(4);window.__ANIM_TEST_STATE__={...q,tuningState:canvas.dataset.tuningState,propagationState:canvas.dataset.propagationState}}
+function record(){const q=p();S.records.push({f0:q.f0,fr:q.fr,s:Math.round(q.strength*100)+'%',st:!q.tuned?'失配':q.attenuation>.65?'已调谐':'调谐/衰减'});if(S.records.length>8)S.records.shift();update()}
 [els.carrier,els.tune,els.mod,els.dist].forEach(el=>el.addEventListener('input',()=>{draw();update()}));els.play.addEventListener('click',()=>{S.run=!S.run;els.play.textContent=S.run?'暂停':'播放'});els.record.addEventListener('click',record);canvas.addEventListener('pointerdown',e=>{S.drag=true;canvas.setPointerCapture(e.pointerId)});canvas.addEventListener('pointermove',e=>{if(!S.drag)return;const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width;els.tune.value=Math.max(80,Math.min(120,80+(x-648)/116*40));draw()});canvas.addEventListener('pointerup',e=>{S.drag=false;record();try{canvas.releasePointerCapture(e.pointerId)}catch(_){}});function loop(){if(S.run)S.t+=.016;draw();requestAnimationFrame(loop)}record();loop();
 })();
 </script>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script>
+<script>/* GKWL: unified full reset (2026-07-12 review remediation) */
+(function(){
+  var btns=[].slice.call(document.querySelectorAll('button'));
+  var resets=btns.filter(function(b){return /重置|复位/.test(b.textContent)});
+  if(!resets.length)return;
+  var scoped=/播放|时间|回放/;
+  var primary=resets[0];
+  if(scoped.test(primary.textContent)){
+    var nb=document.createElement('button');
+    nb.textContent='全部重置';
+    nb.className=primary.className;
+    nb.setAttribute('data-gkwl-full-reset','1');
+    nb.addEventListener('click',function(){location.reload()});
+    primary.parentNode.insertBefore(nb,primary.nextSibling);
+  }else{
+    resets.forEach(function(b){b.addEventListener('click',function(){setTimeout(function(){location.reload()},60)})});
+  }
+})();
+</script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

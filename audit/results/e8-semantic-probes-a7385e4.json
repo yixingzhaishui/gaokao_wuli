@@ -1,0 +1,112 @@
+{
+  "review": "E8 experiment chapter semantic probes",
+  "baseline_head": "a7385e49420ff77a3cd7346064614b57ad4379bb",
+  "review_date": "2026-07-18",
+  "chapter_mapping": "第八大章 = 实验专题 = E-01..E-26",
+  "browser_method": "Playwright Chromium with real button clicks, keyboard range changes, and canvas pointer drag",
+  "generic_interaction_report": "audit/results/exp-current-a7385e4.json",
+  "static_inventory": {
+    "nodes": 26,
+    "unique_animation_pages": 26,
+    "generic_pass": 26,
+    "mobile_390x844_pass": 26,
+    "formula_first_use_cards": 26,
+    "formula_cards_before_iframe": 26,
+    "formula_cards_with_literal_corruption": 19,
+    "quarantined_source_sections": 26,
+    "guided_lesson_pages": 2,
+    "native_prediction_pages": 1,
+    "reduced_motion_pages": 2,
+    "pages_without_reduced_motion": 24,
+    "auto_running_pages": [
+      "E-21",
+      "E-23"
+    ]
+  },
+  "probes": [
+    {
+      "id": "E-03-elastic-limit-record",
+      "result": "FAIL",
+      "input_method": "keyboard Home/End on k, mass, count, limit; real click Record",
+      "controls": {
+        "k_N_per_m": 10,
+        "mass_g": 100,
+        "count": 8,
+        "elastic_limit_cm": 4
+      },
+      "visible_readout": "F=7.84 N; ideal x=0.784 m; displayed extension=0.300 m; elastic limit=0.04 m; status says the point cannot be used for k",
+      "recorded_row": "F=7.84 N; x=0.784 m; k=10 N/m",
+      "failure": "The invalid beyond-limit point is recorded with the ideal F/k value and reproduces the target k exactly."
+    },
+    {
+      "id": "E-10-meter-settling",
+      "result": "FAIL",
+      "input_method": "real click Play; read after 20 ms",
+      "visible_readout": "F_theory=0.539 mN; F_read=0.059 mN; inferred k=8.81e9; relative error=2.0%",
+      "visible_status": "PASS: inferred electrostatic constant is close to 9.0e9",
+      "failure": "The inferred k and PASS status use the settled theoretical reading rather than the currently displayed meter reading."
+    },
+    {
+      "id": "E-15-ohmmeter-scale",
+      "result": "FAIL",
+      "method": "source-to-visible-scale semantic inspection",
+      "evidence": "Equal angular divisions are labelled with linearly decreasing resistance and needle ratio is computed as 1 - scale/100.",
+      "failure": "An analog ohmmeter scale is nonlinear because pointer current follows the meter battery and series resistance; the page teaches a linear resistance scale."
+    },
+    {
+      "id": "E-18-refraction-graph-slope",
+      "result": "FAIL",
+      "method": "source-to-canvas semantic inspection",
+      "visible_axes": "x=sin(i), y=sin(r)",
+      "drawn_relation": "sin(r)=sin(i)/n",
+      "visible_label": "slope n",
+      "failure": "With these axes the slope is 1/n, not n."
+    },
+    {
+      "id": "E-23-induced-current-readout",
+      "result": "FAIL",
+      "input_method": "real click Pause and Zero; keyboard-set speed; fixed canvas drag from logical x=250 to x=330",
+      "speed_1_readout": "DeltaPhi=0.000; e=0.00; galvanometer=zero",
+      "speed_2_readout": "DeltaPhi=0.000; e=0.00; galvanometer=zero",
+      "generic_audit_motion_evidence": {
+        "canvas_changed": true,
+        "physical_readout_changed": false
+      },
+      "implementation_evidence": "calc uses e=-N*dPhi*speed without dt; push stores the new phi before draw recalculates, so the panel compares current phi with itself; the state auto-runs before prediction.",
+      "failure": "The core Phi change, emf, deflection, prediction, and record evidence is zero or dimensionally inconsistent."
+    },
+    {
+      "id": "E-25-comparator-logic",
+      "result": "FAIL",
+      "input_method": "keyboard-set hysteresis=0, threshold=70, then light=40 and light=80",
+      "state_1": "L=40; Us=3.00 V; Uref=3.50 V; lamp working",
+      "state_2": "L=80; Us=1.00 V; Uref=3.50 V; lamp stopped",
+      "failure": "Both states have Us<Uref but produce opposite outputs because the implementation switches on L versus T rather than on the displayed comparator voltages."
+    },
+    {
+      "id": "reduced-motion",
+      "result": "FAIL",
+      "input_method": "Playwright emulateMedia(reducedMotion=reduce)",
+      "observations": {
+        "E-15": "data-b3-motion=reduce; play button is Play",
+        "E-21": "data-b3-motion=reduce; play button is Play",
+        "E-23": "no reduced-motion marker; button remains Pause demo"
+      },
+      "failure": "Only the two pages that load the shared B3 guide support reduced motion; the other 24 experiment pages do not."
+    }
+  ],
+  "decision": {
+    "engineering_interaction": "PASS 26/26",
+    "physics_semantics": "FAIL",
+    "pedagogy": "REVISE",
+    "release_gate": "BLOCKED",
+    "critical_nodes": [
+      "E-03",
+      "E-10",
+      "E-15",
+      "E-18",
+      "E-23",
+      "E-25"
+    ]
+  }
+}

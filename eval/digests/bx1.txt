@@ -1,0 +1,1390 @@
+
+===== anim/bx1/acceleration.html (211 lines, kept 37) =====
+33: <canvas id="canvas" width="940" height="560" aria-label="加速度交互实验台：速度箭头侧视装置、Δv图像和数据记录"></canvas>
+34: <div class="tip">可拖动 v1、v2 两个速度端点和 Δt 时间手柄</div>
+37: <div class="card task"><b>观察任务：</b>拖两根蓝色速度箭头，对照速度箭头侧视装置、Δv 图像和数据记录，先看紫色 Δv；再拖 Δt 手柄。</div>
+39: <div class="title">典型场景</div>
+40: <div class="controls"><button id="speedUpBtn">同向加速</button><button id="brakeBtn">刹车减速</button><button id="reverseBtn">反向加速</button><button id="zeroBtn">v=0,a≠0<
+43: <div class="controls"><button id="playBtn">▶ 播放：按 a 匀变速运动</button><button id="resetBtn">重置播放</button></div>
+45: <div class="readout" id="readout"></div>
+45D: <div class="readout" id="readout"></div>
+47: <div class="title">公式绑定</div>
+48: <div>`Δv = v2 - v1`：紫色速度变化箭头。</div>
+49: <div>`a = Δv / Δt`：v-t 图绿色斜率。</div>
+52: <div class="status" id="status"></div>
+74: const a=Math.atan2(y2-y1,x2-x1);
+77: if(Math.hypot(x2-x1,y2-y1)>8){
+79: ctx.lineTo(x2-11*Math.cos(a-.45),y2-11*Math.sin(a-.45));
+80: ctx.lineTo(x2-11*Math.cos(a+.45),y2-11*Math.sin(a+.45));
+102: ctx.fillStyle='#334e68';ctx.beginPath();ctx.arc(x-14,y+12,5,0,Math.PI*2);ctx.arc(x+14,y+12,5,0,Math.PI*2);ctx.fill();
+108: const dv=v2-v1,a=dv/dt;
+123: arrow(dvStart,290,dvEnd,290,'#7b2cbf','Δv=v2-v1='+dv.toFixed(1)+' m/s',3.5);
+129: for(let i=0;i<=6;i++){const x=132+i*54;line(x,390,x,402,'#829ab1',1.5);text(String(i),x,418,'#486581','center',11);}
+132: layout.dt={x:132+dt*54,y:374,baseX:132};
+147: const tt=playT%dt,vNow=v1+a*tt;
+149: ctx.fillStyle='#f0a500';ctx.beginPath();ctx.arc(sx(tt),sy(vNow),7,0,Math.PI*2);ctx.fill();
+151: text('当前 t='+tt.toFixed(1)+'s，v='+vNow.toFixed(1)+'m/s',728,100,'#9a6700','center',12,'700');
+152D: document.getElementById('liveV').textContent=vNow.toFixed(1);
+154: text('斜率 a=Δv/Δt='+a.toFixed(2)+' m/s²',728,118,'#1a7a1a','center',13,'700');
+158: text('a = (v2 - v1) / Δt = ('+v2.toFixed(1)+' - '+v1.toFixed(1)+') / '+dt.toFixed(1)+' = '+a.toFixed(2)+' m/s²',470,488,'#334e68','center',16,'700');
+163: document.getElementById('readout').innerHTML='v1=<b>'+v1.toFixed(1)+' m/s</b><br>v2=<b>'+v2.toFixed(1)+' m/s</b><br>Δv=v2-v1=<b>'+dv.toFixed(1)+' m/s</b><br>Δt=
+171D: st.textContent=msg;
+173: function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
+176: for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30){drag=k;canvas.setPointerCapture(e.pointerId);break;}}
+181: if(drag==='v1') v1=snap(clamp((p.x-layout.v1.baseX)/12,-10,12),0.5);
+182: if(drag==='v2') v2=snap(clamp((p.x-layout.v2.baseX)/12,-10,12),0.5);
+183: if(drag==='dt') dt=snap(clamp((p.x-layout.dt.baseX)/54,0.5,6),0.5);
+186: let hit=false;for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30)hit=true;}
+202D: document.getElementById('playBtn').textContent=playing?'⏸ 暂停':'▶ 播放：按 a 匀变速运动';
+205D: document.getElementById('resetBtn').onclick=()=>{playing=false;playT=0;document.getElementById('playBtn').textContent='▶ 播放：按 a 匀变速运动';draw();};
+
+===== anim/bx1/braking.html (213 lines, kept 39) =====
+30: <canvas id="canvas" width="940" height="560" aria-label="刹车问题交互实验台"></canvas>
+31: <div class="hint">可拖动 v0 点、停车点 t停 和橙色观察时间；红色虚线是错误的继续代入</div>
+34: <div class="box task"><b>观察任务：</b>拖橙色时间游标越过 t停，看蓝车是否继续动；比较蓝色真实位置和红色错误外推位置，体会为什么不能再代 t。</div>
+38: <button id="mOver" class="active">超时错误区</button><button id="mExact">恰好停下</button>
+39: <button id="mFast">高速刹车</button><button id="mSoft">减速较小</button>
+42: <div class="box"><div class="buttons"><button id="play">▶ 播放运动</button><button id="resetBtn">重置</button></div></div>
+43: <div class="readout" id="readout"></div>
+43D: <div class="readout" id="readout"></div>
+47: t<=t停：x=v0t-1/2|a|t²。<br>
+48: t>t停：x=x停=v0²/(2|a|)。
+50: <div class="box warn" id="status"></div>
+57D: const readout=document.getElementById('readout');
+65: const state={v0:20,a:5,t:6,mode:'over'};
+66: const g={ox:82,oy:380,w:520,h:260,tMax:10,vMin:-16,vMax:42};
+74: function xWrong(t){return state.v0*t-0.5*state.a*t*t;}
+83: function pxOf(x){const m=xDomain();return track.x+x/m*track.w;}
+84: function xGraphY(x){const max=xDomain();return gx.oy-x/max*gx.h;}
+99: const a=Math.atan2(y2-y1,x2-x1),l=10;
+101: ctx.lineTo(x2-l*Math.cos(a-0.55),y2-l*Math.sin(a-0.55));
+102: ctx.lineTo(x2-l*Math.cos(a+0.55),y2-l*Math.sin(a+0.55));
+115: for(let m=0;m<=xd;m+=Math.max(10,Math.ceil(xd/8/10)*10)){const px=pxOf(m);line(px,track.y-8,px,track.y+8,'#bcccdc');text(String(m),px,track.y+25,'#7b8794',10,'c
+123: ctx.fillStyle='#243b53';ctx.beginPath();ctx.arc(realPx-15,track.y-18,5,0,Math.PI*2);ctx.arc(realPx+15,track.y-18,5,0,Math.PI*2);ctx.fill();
+145: const zero=gyv(0), tEnd=Math.min(state.t,tStop()), steps=120;
+147: const t1=tEnd*i/steps,t2=tEnd*(i+1)/steps,v1=vWrong(t1),v2=vWrong(t2),x1=gxv(t1),x2=gxv(t2),y1=gyv(v1),y2=gyv(v2);
+165: for(let i=0;i<=100;i++){const t=g.tMax*i/100,x=xReal(t),sx=gx.ox+t/gx.tMax*gx.w,sy=xGraphY(x);if(i===0)ctx.moveTo(sx,sy);else ctx.lineTo(sx,sy);}
+168: for(let i=0;i<=100;i++){const t=g.tMax*i/100,x=xWrong(t),sx=gx.ox+t/gx.tMax*gx.w,sy=xGraphY(x);if(i===0)ctx.moveTo(sx,sy);else ctx.lineTo(sx,sy);}
+187: readout.innerHTML=`v0=<b>${state.v0.toFixed(1)}</b> m/s<br>|a|=<b>${state.a.toFixed(2)}</b> m/s²<br>t=<b>${state.t.toFixed(2)}</b> s<br>t停=<b>${ts.toFixed(2)}</
+188D: if(stopped()) status.textContent='t 已超过 t停：真实车停在 x停，红色错误外推会让位移变小甚至倒退。';
+189: else if(Math.abs(state.t-ts)<0.06) status.textContent='临界点：t=t停，v 刚好为 0，刹车距离就是 v0²/(2|a|)。';
+189D: else if(Math.abs(state.t-ts)<0.06) status.textContent='临界点：t=t停，v 刚好为 0，刹车距离就是 v0²/(2|a|)。';
+190: else status.textContent='还没停：可以用 v=v0-|a|t 和 x=v0t-1/2|a|t²；但仍要先算 t停。';
+190D: else status.textContent='还没停：可以用 v=v0-|a|t 和 x=v0t-1/2|a|t²；但仍要先算 t停。';
+192: function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
+195: for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30){drag=k;canvas.setPointerCapture(e.pointerId);break;}}
+199: if(drag==='v0') state.v0=Math.round(vFromGraph(p.y)*10)/10;
+200: if(drag==='stop'){const ts=clamp(tFromGraph(p.x),0.8,9.5);state.a=Math.round((state.v0/ts)*100)/100;}
+201: if(drag==='time') state.t=Math.round(tFromGraph(p.x)*20)/20;
+203: let hit=false;for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30)hit=true;}
+208: const playBtn=document.getElementById("play");const resetBtn=document.getElementById("resetBtn");let __run=false,__last=performance.now();playBtn.addEventListen
+
+===== anim/bx1/connecting-body.html (221 lines, kept 53) =====
+39: <div class="stage"><canvas id="canvas" width="960" height="760" aria-label="连接体模型交互实验台"></canvas></div>
+41: <div class="card task"><b>观察任务：</b>切换连接方式，先看哪些力是整体外力；再隔离 m1，看绳张力 T 为什么不能在整体方程里重复写。</div>
+42: <div class="chips"><button id="playBtn">播放过程</button><button id="resetBtn">重置</button></div>
+44: <div class="title">连接方式</div>
+46: <button data-mode="horizontal" class="active">水平轻绳</button>
+47: <button data-mode="incline">斜面-水平</button>
+48: <button data-mode="pulley">滑轮悬挂</button>
+49: <button data-mode="rough">粗糙水平</button>
+53: <div class="title">实时读数</div>
+55: <div class="meter"><span>共同加速度 a</span><b id="aText">2.00 m/s²</b></div>
+56: <div class="meter"><span>绳张力 T</span><b id="tText">4.00 N</b></div>
+57: <div class="meter"><span>整体净外力</span><b id="netText">6.00 N</b></div>
+58: <div class="meter"><span>约束关系</span><b id="constraintText">a1=a2</b></div>
+62: <div><span>整体法</span><b id="formulaWhole">F外=(m1+m2)a</b></div>
+63: <div><span>隔离法</span><b id="formulaLocal">T-f1=m1a</b></div>
+64: <div><span>摩擦</span><b>f=μN</b></div>
+67: <div class="card small"><b>三视图绑定：</b>左侧是实物连接，右侧是整体/隔离方程和 a-F 图；底部刻度尺拖 `m1、m2、μ、θ、g`，红色箭头拖外力 `F`。</div>
+68: <div class="status" id="status">整体法求 a，隔离法求 T；绳张力是内力，不进整体方程。</div>
+76: const state={mode:'horizontal',m1:2,m2:1,F:8,mu:0,theta:30,g:10,t:0,drag:null,playing:false};
+82: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+86: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(
+88: function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#b45309':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(
+89: function car(x,y,w,h,fill,label){box(x,y,w,h,6,fill,'#334155');text(label,x+w/2,y+h/2,'#fff','center',12,'900');ctx.fillStyle='#0f172a';ctx.beginPath();ctx.arc(
+91: const m1=state.m1,m2=state.m2,g=state.g,mu=state.mu,th=state.theta*Math.PI/180;
+94: f1=mu*m1*g; net=m2*g-f1; a=net/(m1+m2); if(a<0)a=0; T=m1*a+f1;
+97: f1=mu*m1*g*Math.cos(th); f2=mu*m2*g; net=state.F-m1*g*Math.sin(th)-f1-f2; a=net/(m1+m2); if(a<0)a=0; T=m1*a+m1*g*Math.sin(th)+f1;
+100: f1=mu*m1*g; f2=mu*m2*g; net=state.F-f1-f2; a=net/(m1+m2); if(a<0)a=0; T=m1*a+f1;
+116: const off=state.playing?Math.min(70,.5*v.a*state.t*state.t*18):0,ground=300,x1=138+off,w1=78+state.m1*8,x2=x1+w1+54,w2=78+state.m2*8,h=48;
+125: const th=state.theta*Math.PI/180,baseX=92,baseY=318,len=220,ux=Math.cos(-th),uy=Math.sin(-th),off=state.playing?Math.min(60,.5*v.a*state.t*state.t*15):0;
+127: const bx=baseX+60*ux+off*ux,by=baseY+60*uy+off*uy;box(bx-28,by-20,58,40,6,colors.blue,'#102a43');text('m1',bx,by,'#fff');
+136: const off=state.playing?Math.min(64,.5*v.a*state.t*state.t*16):0,ground=305,x1=150+off,y1=ground-48,pX=430,pY=185;
+138: ctx.strokeStyle='#334155';ctx.lineWidth=4;ctx.beginPath();ctx.arc(pX,pY,28,0,Math.PI*2);ctx.stroke();
+147: text(v.formula,745,128,colors.red,'center',13,'900');text(`F净=${fmt(v.net,2)}N`,745,160,colors.purple,'center',13,'900');text(`a=${fmt(v.a,2)}m/s²`,745,192,colo
+154: ctx.beginPath();for(let i=0;i<=60;i++){const old=state.F;state.F=30*i/60;const r=values();state.F=old;const x=gx+gw*i/60,y=gy-Math.min(1,r.a/8)*gh;if(i===0)ctx.
+155: const px=gx+gw*state.F/30,py=gy-Math.min(1,v.a/8)*gh;ctx.fillStyle=colors.red;ctx.beginPath();ctx.arc(px,py,5,0,Math.PI*2);ctx.fill();
+157: function ruler(x1,y,x2,label,c,hx,txt,active){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(labe
+167: els.a.textContent=`${fmt(v.a,2)} m/s²`;els.T.textContent=`${fmt(v.T,2)} N`;els.net.textContent=`${fmt(v.net,2)} N`;els.constraint.textContent=v.constraint;
+167D: els.a.textContent=`${fmt(v.a,2)} m/s²`;els.T.textContent=`${fmt(v.T,2)} N`;els.net.textContent=`${fmt(v.net,2)} N`;els.constraint.textContent=v.constraint;
+168D: els.whole.textContent=v.formula;els.local.textContent=v.local;
+170D: els.status.textContent=(v.net<=0?'净外力不足：当前约束方向上不能按设定方向共同加速。':'整体法求 a，隔离法求 T；绳张力是内力，不进整体方程。')+(state.playing?'（播放中）':'');
+181: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+182: function near(p,h,rad=26){return Math.hypot(p.x-h.x,p.y-h.y)<=rad}
+185D: document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));state.t=0;state.playing=false;document.getElementById('playBtn').textContent='播放过程';draw();
+188D: state.playing=false;document.getElementById('playBtn').textContent='播放过程';
+196: if(state.drag==='F')state.F=clamp((p.x-430)/180*30,0,30);
+197: if(state.drag==='m1')state.m1=clamp(.5+(p.x-70)/155*4.5,.5,5);
+198: if(state.drag==='m2')state.m2=clamp(.5+(p.x-250)/155*4.5,.5,5);
+199: if(state.drag==='mu')state.mu=clamp((p.x-430)/155*.35,0,.35);
+200: if(state.drag==='theta')state.theta=clamp((p.x-610)/155*45,0,45);
+201: if(state.drag==='g')state.g=clamp(2+(p.x-790)/110*8,2,10);
+207D: function animate(){if(!state.playing)return;state.t+=.035;draw();if(state.t>2.4){state.playing=false;document.getElementById('playBtn').textContent='播放过程';draw();return}requestAnimationFrame(animate)}
+208D: document.getElementById('playBtn').addEventListener('click',()=>{state.playing=!state.playing;document.getElementById('playBtn').textContent=state.playing?'暂停':'播放过程';if(state.playing){state.t=0;anima
+214D: document.getElementById('playBtn').textContent='播放过程';draw();
+
+===== anim/bx1/conveyor-belt.html (346 lines, kept 84) =====
+39: <div class="stage"><canvas id="canvas" width="960" height="760" aria-label="传送带模型交互实验台"></canvas></div>
+41: <div class="card task"><b>观察任务：</b>先比较 v物 与 v带 的大小和方向；再拖 `g`、`μ`、`L`，看红色摩擦箭头、共速点、划痕 Δx 和生热 Q 如何同步改变。</div>
+42: <div class="chips"><button id="playBtn">播放过程</button><button id="resetBtn">重置时间</button></div>
+44: <div class="title">实验模式</div>
+46: <button id="horizontalMode" class="active">水平传送带</button>
+47: <button id="inclineMode">倾斜传送带</button>
+51: <div class="title">direction 传送方向</div>
+53: <button id="dirForward" class="active">向右 / 向上</button>
+58: <div class="title">快速情境</div>
+60: <button data-case="slow">轻放加速</button>
+61: <button data-case="fast">同向初速更快</button>
+62: <button data-case="reverse">反向初速度</button>
+63: <button data-case="short">短带未共速</button>
+67: <div class="title">实时读数</div>
+69: <div class="meter"><span>v_belt / v物</span><b id="vText">4.0 / 0.0 m/s</b></div>
+70: <div class="meter"><span>阶段</span><b id="phaseText">滑动</b></div>
+71: <div class="meter"><span>t共 / s物</span><b id="syncText">2.00 s / 4.0 m</b></div>
+72: <div class="meter"><span>划痕 / 生热</span><b id="heatText">4.0 m / 8 J</b></div>
+77: <div><span>水平滑动</span><b>a=μg</b></div>
+80: <div><span>摩擦生热</span><b>Q=μmg·s相对</b></div>
+82: <div class="card small"><b>三视图绑定：</b>左侧是侧视过程，底部是物块位移与划痕尺；右侧 v-t、Δx-t 图像用同一时间游标取读数。</div>
+83: <div class="status" id="status">先比较速度：物块比传送带慢，摩擦力沿带运动方向。</div>
+91: const state={mode:'horizontal',direction:1,vb:4,v0:0,mu:.2,L:10,g:10,theta:24,t:0,drag:null,playing:false};
+99: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+109: const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.s
+111: function arrowVec(x,y,ux,uy,len,c,w=3){if(Math.abs(len)<1) return;arrow(x,y,x+ux*len,y+uy*len,c,w)}
+116: ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#b45309':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.s
+122: const theta=state.theta*Math.PI/180;
+123: return state.g*Math.sin(theta)<=state.mu*state.g*Math.cos(theta);
+126: const theta=(state.mode==='incline'?state.theta:0)*Math.PI/180;
+127: const sin=Math.sin(theta),cos=Math.cos(theta),fAcc=state.mu*state.g*cos,gravity=-state.g*sin,vb=beltVelocity();
+129: const dt=.006,steps=Math.ceil(Math.min(t,12)/dt);
+131: const h=Math.min(dt,t-i*dt),rel=v-vb;
+134: p+=v*h;disp+=v*h;
+139: fricDir=-sign(rel);a=fricDir*fAcc+gravity;phase=fricDir===state.direction?'摩擦沿带运动方向':'摩擦反向';
+142: p+=oldV*h+.5*a*h*h;disp+=oldV*h+.5*a*h*h;v+=a*h;
+144: slip+=(Math.abs(oldRel)+Math.abs(newRel))*.5*h;
+150: const heat=state.mu*state.g*cos*slip;
+154: const vb=beltVelocity(),rel0=state.v0-vb,dir=-sign(rel0),a=dir*state.mu*state.g;
+156: const tSync=(vb-state.v0)/a;
+157: const sSync=state.v0*tSync+.5*a*tSync*tSync;
+163: for(let t=.04;t<=12;t+=.04){const r=simulateAt(t);last=t;if(r.end)return t;if(r.hitSync&&state.mode==='horizontal'){const rem=state.direction>0?state.L-r.p:r.p;
+187: const baseX=110,baseY=304,lenPx=330,ang=state.mode==='incline'?-state.theta*Math.PI/180:0;
+188: const ux=Math.cos(ang),uy=Math.sin(ang),nx=-uy,ny=ux,dir=state.direction;
+189: const x0=baseX,y0=baseY,x1=baseX+lenPx*ux,y1=baseY+lenPx*uy;
+193: const s=i/8,px=x0+lenPx*s*ux,py=y0+lenPx*s*uy;
+196: const ratio=clamp(v.p/state.L,0,1),bx=x0+lenPx*ratio*ux+nx*-28,by=y0+lenPx*ratio*uy+ny*-28;
+210: const pLine=x0+lenPx*ratio;
+227: const gx=615,gw=260,end=Math.max(.2,v.endT),maxV=Math.max(8,Math.abs(state.v0),state.vb,Math.abs(v.v),1);
+229: const gy=354,gh=82,zero=gy-gh/2;
+232: const mapV=vv=>zero-vv/maxV*(gh/2);
+235: for(let i=0;i<=90;i++){const tt=end*i/90,r=simulateAt(tt);const x=gx+gw*i/90,y=mapV(r.v);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}
+237: const tx=gx+gw*v.t/end;line(tx,gy,tx,gy-gh-8,colors.orange,2,[4,4]);text(`t=${fmt(v.t,2)}s`,tx,gy+16,colors.orange,'center',12,'900');
+239: const sy=548,sh=108,maxS=Math.max(state.L,v.slip,1);
+242: for(let i=0;i<=90;i++){const tt=end*i/90,r=simulateAt(tt);const x=gx+gw*i/90,y=sy-Math.min(1,r.slip/maxS)*sh;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}
+244: const tx2=gx+gw*v.t/end;line(tx2,sy,tx2,sy-sh-8,colors.orange,2,[4,4]);
+248: line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=5;i++){const x=x1+(x2-x1)*i/5;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-18,c,'center',12,'900');handle(hx,
+259: line(78,722,408,722,'#0f172a',2);for(let i=0;i<=10;i++)line(78+i*33,717,78+i*33,727,'#0f172a',1);
+263: els.v.textContent=`${fmt(v.vb,1)} / ${fmt(v.v,2)} m/s`;
+263D: els.v.textContent=`${fmt(v.vb,1)} / ${fmt(v.v,2)} m/s`;
+264D: els.phase.textContent=v.phase;
+265: els.sync.textContent=`${Number.isFinite(v.tSync)?fmt(v.tSync,2):'--'} s / ${Number.isFinite(v.sSync)?fmt(v.sSync,2):'--'} m`;
+265D: els.sync.textContent=`${Number.isFinite(v.tSync)?fmt(v.tSync,2):'--'} s / ${Number.isFinite(v.sSync)?fmt(v.sSync,2):'--'} m`;
+266: els.heat.textContent=`${fmt(v.slip,2)} m / ${fmt(v.heat,2)} J`;
+266D: els.heat.textContent=`${fmt(v.slip,2)} m / ${fmt(v.heat,2)} J`;
+271D: els.status.textContent=`${dirText}。Q=μmgcosθ·s相对=${fmt(v.heat,2)} J；短带先比较 s物 与 L。`;
+280: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+281: function near(p,h,rad=25){return Math.hypot(p.x-h.x,p.y-h.y)<=rad}
+288D: function setMode(mode){state.mode=mode;state.t=0;state.playing=false;playBtn.textContent='播放过程';refreshButtons();draw()}
+289D: function setDirection(direction){state.direction=direction;state.t=0;state.playing=false;playBtn.textContent='播放过程';refreshButtons();draw()}
+291D: state.playing=false;playBtn.textContent='播放过程';
+305: if(state.drag==='time')state.t=clamp((p.x-78)/330*Math.max(.2,v.endT),0,v.endT);
+306: if(state.drag==='vb')state.vb=clamp(1+(p.x-60)/150*7,1,8);
+307: if(state.drag==='v0')state.v0=clamp(-8+(p.x-240)/150*16,-8,8);
+308: if(state.drag==='mu')state.mu=clamp(.08+(p.x-420)/150*.52,.08,.6);
+309: if(state.drag==='L')state.L=clamp(4+(p.x-600)/150*12,4,16);
+310: if(state.drag==='g')state.g=clamp(2+(p.x-780)/150*10,2,12);
+311: if(state.drag==='theta')state.theta=clamp((p.x-600)/150*37,0,37);
+321: const c=btn.dataset.case;state.playing=false;playBtn.textContent='播放过程';
+321D: const c=btn.dataset.case;state.playing=false;playBtn.textContent='播放过程';
+329D: state.playing=!state.playing;playBtn.textContent=state.playing?'暂停':'播放过程';
+333: const dt=(now-last)/1000;last=now;state.t+=dt;
+335D: if(state.t>=v.endT){state.t=v.endT;state.playing=false;playBtn.textContent='播放过程';draw();return}
+340D: document.getElementById('resetBtn').addEventListener('click',()=>{state.playing=false;state.t=0;playBtn.textContent='播放过程';draw()});
+
+===== anim/bx1/displacement.html (178 lines, kept 36) =====
+32: <canvas id="canvas" width="940" height="560" aria-label="路程与位移交互实验台：路径俯视装置、位移图像和数据记录"></canvas>
+33: <div class="tip">可拖动 B 终点和蓝色绕路点；播放时紫点沿真实轨迹走</div>
+36: <div class="card task"><b>观察任务：</b>拖蓝色绕路点，对照路径俯视装置、位移图像和数据记录，看路程变大而红色位移不变；拖 B 终点。</div>
+38: <div class="title">实验控制</div>
+39: <div class="controls"><button id="playBtn">播放</button><button id="resetBtn">重置</button><button id="straightBtn">拉直路线</button><button id="loopBtn">回到起点</button><
+41: <div class="readout" id="readout"></div>
+41D: <div class="readout" id="readout"></div>
+43: <div class="title">公式绑定</div>
+48: <div class="status" id="status"></div>
+57: let B={x:690,y:210};
+58: let C={x:410,y:110};
+71: const a=Math.atan2(y2-y1,x2-x1);
+74: if(Math.hypot(x2-x1,y2-y1)>8){
+76: ctx.lineTo(x2-12*Math.cos(a-.45),y2-12*Math.sin(a-.45));
+77: ctx.lineTo(x2-12*Math.cos(a+.45),y2-12*Math.sin(a+.45));
+92: function clampPoint(p){p.x=Math.max(70,Math.min(830,p.x));p.y=Math.max(70,Math.min(455,p.y));}
+100: const p=bez(end*i/steps);
+101: len+=Math.hypot(p.x-prev.x,p.y-prev.y);
+107: const dx=(B.x-A.x)/meter;
+108: const dy=(A.y-B.y)/meter;
+109: return {dx,dy,mag:Math.hypot(dx,dy),ang:Math.atan2(dy,dx)*180/Math.PI};
+129: text('Δx='+d.dx.toFixed(1)+' m',(A.x+B.x)/2,A.y+22,'#486581','center',12,'700');
+130: text('Δy='+d.dy.toFixed(1)+' m',B.x+52,(A.y+B.y)/2,'#486581','center',12,'700');
+136: for(let i=1;i<=160;i++){const p=bez(prog*i/160);ctx.lineTo(p.x,p.y);}ctx.stroke();
+141: ctx.fillStyle='#102a43';ctx.beginPath();ctx.arc(A.x,A.y,7,0,Math.PI*2);ctx.fill();
+143: ctx.fillStyle='#8a3ffb';ctx.beginPath();ctx.arc(dot.x,dot.y,8,0,Math.PI*2);ctx.fill();
+152: document.getElementById('readout').innerHTML='已走路程=<b>'+walked.toFixed(1)+' m</b><br>全程路程 s=<b>'+totalS.toFixed(1)+' m</b><br>Δx=<b>'+d.dx.toFixed(1)+' m</b>，Δy
+153D: document.getElementById('status').textContent='拖绕路点只改变蓝色轨迹长度；拖 B 终点才会改变红色位移箭头和 Δx、Δy。';
+155: function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
+158: for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<32){drag=k;canvas.setPointerCapture(e.pointerId);break;}}
+163: let hit=false;for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<32)hit=true;}
+167D: document.getElementById('playBtn').onclick=()=>{running=!running;if(prog>=1)prog=0;document.getElementById('playBtn').textContent=running?'暂停':'播放';};
+168D: document.getElementById('resetBtn').onclick=()=>{B={x:690,y:210};C={x:410,y:110};prog=0;running=false;document.getElementById('playBtn').textContent='播放';draw();};
+169: document.getElementById('straightBtn').onclick=()=>{C={x:(A.x+B.x)/2,y:(A.y+B.y)/2};prog=0;draw();};
+172: function loop(ts){const dt=Math.min(.05,(ts-last)/1000);last=ts;if(running){prog+=dt*.28;if(prog>=1){prog=1;running=false;document.getElementById('playBtn').tex
+172D: function loop(ts){const dt=Math.min(.05,(ts-last)/1000);last=ts;if(running){prog+=dt*.28;if(prog>=1){prog=1;running=false;document.getElementById('playBtn').textContent='播放';}draw();}requestAnimationF
+
+===== anim/bx1/dynamic-equilibrium.html (293 lines, kept 58) =====
+37: <div class="stage"><canvas id="canvas" width="920" height="520" aria-label="动态平衡交互实验台：绳结侧视装置、T-θ图像和数据记录"></canvas></div>
+39: <div class="card task"><b>观察任务：</b>抓住任意蓝色绳端，对照绳结侧视装置、T-θ 图像和数据记录，把两根绳对称拉平；看 G 不变时 T 为什么会变大。</div>
+40: <div class="chips"><button id="playBtn">▶ 播放：θ 自动放平</button><button id="resetBtn">重置</button></div>
+42: <div class="title">快速情境</div>
+44: <button data-theta="20">接近水平</button>
+45: <button data-theta="45" class="active">45° 常规</button>
+46: <button data-theta="70">接近竖直</button>
+47: <button data-heavy="1">重物加重</button>
+51: <div class="title">实时读数</div>
+53: <div class="meter"><span>绳角 θ</span><b id="thetaText">45°</b></div>
+54: <div class="meter"><span>重力 G</span><b id="gText">20.0 N</b></div>
+55: <div class="meter"><span>每根绳 T</span><b id="tText">14.1 N</b></div>
+56: <div class="meter"><span>每根竖直分量</span><b id="tyText">10.0 N</b></div>
+61: <div><span>拉力大小</span><b>T=G/(2sinθ)</b></div>
+64: <div class="card small"><b>可直接操作：</b>抓任意蓝色绳端改变 θ，另一侧自动对称；抓红色重物上下拖动改变 G。曲线红点记录当前拉力。</div>
+65: <div class="status" id="status">平衡仍成立：两根绳的竖直分量之和等于重力。</div>
+73: const state={theta:45,G:20,drag:null,playing:false,playDir:-1};
+82: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+99: const a=Math.atan2(y2-y1,x2-x1);
+105: ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));
+106: ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));
+122: const rad=state.theta*Math.PI/180;
+123: const L={x:O.x-len*Math.cos(rad),y:O.y-len*Math.sin(rad)};
+124: const R={x:O.x+len*Math.cos(rad),y:O.y-len*Math.sin(rad)};
+125: const weightY=322+(state.G-5)/(80-5)*86;
+129: const rad=state.theta*Math.PI/180;
+130: const T=state.G/(2*Math.sin(rad));
+131: const Ty=T*Math.sin(rad);
+152: ctx.fillStyle='#0f172a';ctx.beginPath();ctx.arc(g.O.x,g.O.y,7,0,Math.PI*2);ctx.fill();
+156: const scale=Math.min(4.8,132/Math.max(v.T,state.G));
+157: arrow(g.O.x,g.O.y,g.O.x-v.T*Math.cos(g.rad)*scale,g.O.y-v.T*Math.sin(g.rad)*scale,colors.blue,4);
+158: arrow(g.O.x,g.O.y,g.O.x+v.T*Math.cos(g.rad)*scale,g.O.y-v.T*Math.sin(g.rad)*scale,colors.blue,4);
+166: return G/(2*Math.sin(theta*Math.PI/180));
+173: const px=ox+(x-xMin)/(xMax-xMin)*w;
+177: const py=oy-y/yMax*h;
+188: const T=graphPoint(i,state.G);
+189: const x=ox+(i-xMin)/(xMax-xMin)*w;
+190: const y=oy-clamp(T,0,yMax)/yMax*h;
+195: const px=ox+(state.theta-xMin)/(xMax-xMin)*w;
+196: const py=oy-clamp(v.T,0,yMax)/yMax*h;
+197: ctx.fillStyle=colors.red;ctx.beginPath();ctx.arc(px,py,6,0,Math.PI*2);ctx.fill();
+203: const total=v.Ty*2;
+205: const leftW=v.Ty/max*105,rightW=v.Ty/max*105,gW=state.G/max*210;
+215D: els.theta.textContent=`${fmt(state.theta,0)}°`;
+216D: els.g.textContent=`${fmt(state.G)} N`;
+217D: els.t.textContent=`${fmt(v.T)} N`;
+218D: els.ty.textContent=`${fmt(v.Ty)} N`;
+219: document.querySelectorAll('[data-theta]').forEach(btn=>btn.classList.toggle('active',Math.abs(+btn.dataset.theta-state.theta)<.5));
+222D: els.status.textContent=(warn?'绳接近水平：为了让 2Tsinθ 仍等于 G，T 会急剧增大，绳更容易断。':'平衡仍成立：两根绳的竖直分量之和等于重力。')+(state.playing?'（播放中：θ 正在自动变化）':'');
+225: const g=geom(),v=values();
+238: function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+240D: if(state.playing){state.playing=false;document.getElementById('playBtn').textContent='▶ 播放：θ 自动放平'}
+252: state.theta=clamp(Math.atan2(g.O.y-p.y,g.O.x-p.x)*180/Math.PI,10,80);
+254: state.theta=clamp(Math.atan2(g.O.y-p.y,p.x-g.O.x)*180/Math.PI,10,80);
+256: state.G=clamp(5+((p.y-36)-322)/86*(80-5),5,80);
+276: state.theta+=state.playDir*0.4;
+284D: playBtn.textContent=state.playing?'⏸ 暂停':'▶ 播放：θ 自动放平';
+287D: document.getElementById('resetBtn').addEventListener('click',()=>{state.playing=false;state.theta=45;state.G=20;playBtn.textContent='▶ 播放：θ 自动放平';draw();});
+
+===== anim/bx1/elastic-force.html (41 lines, kept 20) =====
+13: <div class="stage"><canvas id="canvas" width="940" height="560" aria-label="弹力与形变交互实验台：弹簧侧视装置、F-x图像和数据记录"></canvas><div class="hint">可直接拖压块、绳端或弹簧端点；x=0 时弹力消失</d
+15: <div class="box task"><b>观察任务：</b>把形变拖到 0，对照弹簧侧视装置、F-x 图像和数据记录，看弹力是否消失；再增大形变，看箭头和读数变大。</div>
+16: <div class="box"><b>场景</b><div class="buttons" style="margin-top:7px"><button id="mSupport" class="active">支持力</button><button id="mRope">绳拉力</button><button id
+17: <div class="box"><div class="buttons"><button id="play">▶ 释放回弹</button><button id="resetBtn">重置</button></div></div>
+18: <div class="readout" id="readout"></div>
+18D: <div class="readout" id="readout"></div>
+19: <div class="box formula"><b>判据</b><br>弹力产生：接触/连接 + 弹性形变。<br>方向：指向恢复原状。<br>本节看条件和方向，精确定量到胡克定律。</div>
+20: <div class="box warn" id="status"></div>
+24: (()=>{const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'),readout=document.getElementById('readout'),status=document.getElementById('stat
+25: function drawSupport(){const tableY=352,blockY=238+s.x*4;box(145,tableY,650,42,'#edf2f7');ctx.fillStyle='#bcccdc';ctx.beginPath();ctx.ellipse(470,tableY,175,8+s
+26: function drawRope(){const anchor=150,y=270,boxX=470+s.x*18;line(anchor,y,boxX,y,s.x>0?'#334e68':'#bcccdc',5);box(boxX,232,86,76);handle(boxX+43,270,'拖物块','#2f80
+27: function drawSpring(){const wall=150,y=270,origin=505,end=origin+s.x*22;line(105,y,wall,y,'#334e68',5);springPath(wall,y,end);box(end,234,86,72);line(origin,198
+28: function drawKnob(){line(290,505,650,505,'#bcccdc',3);const x=290+(s.k-1)/9*360;handle(x,505,'k','#12b886');layout.k={x,y:505};text(`材料硬度 k=${s.k.toFixed(1)} N/
+29: function draw(){var _bg=ctx.createLinearGradient(0,0,0,560);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,940,5
+30: function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}canvas.a
+32: playBtn.addEventListener('click',()=>{running=!running;if(running){amp=Math.max(2,Math.abs(s.x)||4);ph=0;}playBtn.textContent=running?'⏸ 暂停':'▶ 释放回弹';});
+32D: playBtn.addEventListener('click',()=>{running=!running;if(running){amp=Math.max(2,Math.abs(s.x)||4);ph=0;}playBtn.textContent=running?'⏸ 暂停':'▶ 释放回弹';});
+33D: resetBtn.addEventListener('click',()=>{running=false;amp=4;ph=0;s.mode='support';s.x=4;s.k=6;Object.entries(btn).forEach(([k,b])=>b.classList.toggle('active',k==='support'));playBtn.textContent='▶ 释放回
+34D: canvas.addEventListener('pointerdown',()=>{if(running){running=false;playBtn.textContent='▶ 释放回弹';}});
+35: function loop(now){const dt=Math.min((now-last)/1000,.05);last=now;if(running){ph+=dt;const w=Math.sqrt(s.k)*1.0;s.x=Math.round(amp*(0.5-0.5*Math.cos(w*ph))*10)
+
+===== anim/bx1/equilibrium.html (310 lines, kept 54) =====
+36: <div class="stage"><canvas id="canvas" width="920" height="520" aria-label="共点力平衡交互实验台：绳结侧视装置、力三角形图像和数据记录"></canvas></div>
+38: <div class="card task"><b>观察任务：</b>拖动左右绳端改变角度，对照绳结侧视装置、力三角形图像和数据记录，看 T1、T2 和 ΣFx/ΣFy 是否同时闭合为零。</div>
+39: <div class="chips"><button id="playBtn">▶ 播放：α β 同步放平</button><button id="resetBtn">重置</button></div>
+41: <div class="title">快速情境</div>
+43: <button data-preset="sym45" class="active">对称 45°</button>
+44: <button data-preset="flat">绳更平</button>
+45: <button data-preset="leftFlat">左侧更平</button>
+46: <button data-preset="heavy">重物加重</button>
+50: <div class="title">实时读数</div>
+52: <div class="meter"><span>左绳 T1</span><b id="t1Text">14.1 N</b></div>
+53: <div class="meter"><span>右绳 T2</span><b id="t2Text">14.1 N</b></div>
+54: <div class="meter"><span>水平合力 ΣFx</span><b id="fxText">0.0 N</b></div>
+55: <div class="meter"><span>竖直合力 ΣFy</span><b id="fyText">0.0 N</b></div>
+59: <div><span>平衡条件</span><b>ΣF=0</b></div>
+63: <div class="card small"><b>可直接操作：</b>抓两个蓝色绳端改变 α、β；抓红色重物上下拖动改变 G。右侧三力首尾相接后回到起点，表示共点力平衡。</div>
+64: <div class="status" id="status">左右对称：T1=T2，水平分量相互抵消。</div>
+72: const state={alpha:45,beta:45,G:20,drag:null,playing:false,playDir:-1};
+81: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+98: const a=Math.atan2(y2-y1,x2-x1);
+104: ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));
+105: ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));
+121: const a=state.alpha*Math.PI/180,b=state.beta*Math.PI/180;
+122: const L={x:O.x-len*Math.cos(a),y:O.y-len*Math.sin(a)};
+123: const R={x:O.x+len*Math.cos(b),y:O.y-len*Math.sin(b)};
+124: const weightY=326+(state.G-5)/(60-5)*86;
+128: const a=state.alpha*Math.PI/180,b=state.beta*Math.PI/180;
+129: const denom=Math.sin(a+b);
+130: const T1=state.G*Math.cos(b)/denom;
+131: const T2=state.G*Math.cos(a)/denom;
+132: const fx=-T1*Math.cos(a)+T2*Math.cos(b);
+133: const fy=T1*Math.sin(a)+T2*Math.sin(b)-state.G;
+163: ctx.fillStyle='#0f172a';ctx.beginPath();ctx.arc(g.O.x,g.O.y,7,0,Math.PI*2);ctx.fill();
+171: const scale=Math.min(5.2,138/Math.max(v.T1,v.T2,state.G));
+172: arrow(g.O.x,g.O.y,g.O.x-v.T1*Math.cos(g.a)*scale,g.O.y-v.T1*Math.sin(g.a)*scale,colors.blue,4);
+173: arrow(g.O.x,g.O.y,g.O.x+v.T2*Math.cos(g.b)*scale,g.O.y-v.T2*Math.sin(g.b)*scale,colors.blue,4);
+182: const s=Math.min(4.8,120/Math.max(v.T1,v.T2,state.G));
+184: const a=state.alpha*Math.PI/180,b=state.beta*Math.PI/180;
+185: const p1={x:p0.x-v.T1*Math.cos(a)*s,y:p0.y-v.T1*Math.sin(a)*s};
+186: const p2={x:p1.x+v.T2*Math.cos(b)*s,y:p1.y-v.T2*Math.sin(b)*s};
+202: const fx=Math.abs(v.fx),fy=Math.abs(v.fy);
+213D: els.t1.textContent=`${fmt(v.T1)} N`;
+214D: els.t2.textContent=`${fmt(v.T2)} N`;
+215D: els.fx.textContent=`${fmt(v.fx,2)} N`;
+216D: els.fy.textContent=`${fmt(v.fy,2)} N`;
+226D: els.status.textContent='左右对称：T1=T2；若两边一起变平，T 会明显变大。';
+235: const g=geom(),v=values();
+248: function near(a,b,rad=24){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+250D: if(state.playing){state.playing=false;document.getElementById('playBtn').textContent='▶ 播放：α β 同步放平'}
+262: state.alpha=clamp(Math.atan2(g.O.y-p.y,g.O.x-p.x)*180/Math.PI,15,80);
+264: state.beta=clamp(Math.atan2(g.O.y-p.y,p.x-g.O.x)*180/Math.PI,15,80);
+266: state.G=clamp(5+((p.y-35)-326)/86*(60-5),5,60);
+293: state.alpha+=state.playDir*0.4;state.beta+=state.playDir*0.4;
+301D: playBtn.textContent=state.playing?'⏸ 暂停':'▶ 播放：α β 同步放平';
+304D: document.getElementById('resetBtn').addEventListener('click',()=>{state.playing=false;state.alpha=45;state.beta=45;state.G=20;playBtn.textContent='▶ 播放：α β 同步放平';draw();});
+
+===== anim/bx1/force-composition.html (37 lines, kept 16) =====
+13: <div class="stage"><canvas id="canvas" width="940" height="560" aria-label="力的合成交互实验台：共点力俯视装置、平行四边形图像和数据记录"></canvas><div class="hint">可直接拖 F1、F2 端点；红色对角线是两个力的等
+15: <div class="box task"><b>观察任务：</b>拖两个蓝色端点，对照共点力俯视装置、平行四边形图像和数据记录，看夹角从 0°、90° 到 180° 时合力怎样变化。</div>
+16: <div class="box"><b>快捷角度</b><div class="buttons" style="margin-top:7px"><button id="mSame" class="active">同向</button><button id="mRight">垂直</button><button id="
+17: <div class="box"><div class="buttons"><button id="play">▶ 旋转 F2</button><button id="resetBtn">重置</button></div></div>
+18: <div class="readout" id="readout"></div>
+18D: <div class="readout" id="readout"></div>
+19: <div class="box formula"><b>公式绑定</b><br>F合²=F1²+F2²+2F1F2cosθ。<br>同向最大：F1+F2。<br>反向最小：|F1-F2|。</div>
+19D: <div class="box formula"><b>公式绑定</b><br>F合²=F1²+F2²+2F1F2cosθ。<br>同向最大：F1+F2。<br>反向最小：|F1-F2|。</div>
+20: <div class="box warn" id="status"></div>
+24: (()=>{const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'),readout=document.getElementById('readout'),status=document.getElementById('stat
+25: function draw(){var _bg=ctx.createLinearGradient(0,0,0,560);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,940,5
+26: function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}canvas.a
+28D: playBtn.addEventListener('click',()=>{running=!running;playBtn.textContent=running?'⏸ 暂停':'▶ 旋转 F2';});
+29D: resetBtn.addEventListener('click',()=>{running=false;s={f1:{x:7,y:0},f2:{x:5,y:0},mode:'same'};Object.entries(btn).forEach(([k,b])=>b.classList.toggle('active',k==='same'));playBtn.textContent='▶ 旋转 F
+30D: canvas.addEventListener('pointerdown',()=>{if(running){running=false;playBtn.textContent='▶ 旋转 F2';}});
+31: function loop(now){const dt=Math.min((now-last)/1000,.05);last=now;if(running){const m2=mag(s.f2)||5;const ang=Math.atan2(s.f2.y,s.f2.x)+dt*0.9;s.f2={x:Math.rou
+
+===== anim/bx1/force-decomposition.html (304 lines, kept 57) =====
+36: <div class="stage"><canvas id="canvas" width="920" height="520" aria-label="力的分解交互实验台：斜面侧视装置、分力图像和数据记录"></canvas></div>
+38: <div class="card task"><b>观察任务：</b>拖动斜面顶端手柄改变 θ，对照斜面侧视装置、分力图像和数据记录，看红色重力始终竖直向下，分力如何合成回红色箭头。</div>
+39: <div class="chips"><button id="playBtn">▶ 播放：θ 自动扫描</button><button id="resetBtn">重置</button></div>
+41: <div class="title">快速角度</div>
+43: <button data-theta="0">0° 平面</button>
+44: <button data-theta="30" class="active">30° 典型</button>
+45: <button data-theta="45">45° 对比</button>
+46: <button data-theta="60">60° 陡坡</button>
+50: <div class="title">实时读数</div>
+52: <div class="meter"><span>斜面角 θ</span><b id="thetaText">30°</b></div>
+53: <div class="meter"><span>重力 G=mg</span><b id="gForceText">20.0 N</b></div>
+54: <div class="meter"><span>沿斜面 G∥</span><b id="parallelText">10.0 N</b></div>
+55: <div class="meter"><span>垂直斜面 G⊥</span><b id="perpText">17.3 N</b></div>
+59: <div><span>红色原力</span><b>G=mg</b></div>
+63: <div class="card small"><b>可直接操作：</b>抓斜面顶端圆点改角度；抓底部两个仪表改质量 m 和 g。虚线平行四边形闭合，说明分力只是等效替代，不是新增的力。</div>
+64: <div class="status" id="status">分解后列方程时，G 与 G∥、G⊥ 不要重复计入。</div>
+72: const state={theta:30,m:2,g:10,drag:null,playing:false,playDir:1};
+81: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+98: const a=Math.atan2(y2-y1,x2-x1);
+104: ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));
+105: ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));
+119: const a=state.theta*Math.PI/180;
+122: const end={x:base.x+len*Math.cos(a),y:base.y-len*Math.sin(a)};
+123: const alongUp={x:Math.cos(a),y:-Math.sin(a)};
+124: const alongDown={x:-Math.cos(a),y:Math.sin(a)};
+125: const normalOut={x:-Math.sin(a),y:-Math.cos(a)};
+126: const normalIn={x:Math.sin(a),y:Math.cos(a)};
+127: const foot={x:base.x+315*alongUp.x,y:base.y+315*alongUp.y};
+128: const block={x:foot.x+34*normalOut.x,y:foot.y+34*normalOut.y};
+129: const massKnob={x:170+(state.m-0.5)/(8-0.5)*210,y:470};
+130: const gKnob={x:515+(state.g-1.6)/(12-1.6)*210,y:470};
+134: const G=state.m*state.g;
+135: const a=state.theta*Math.PI/180;
+136: return{G,parallel:G*Math.sin(a),perp:G*Math.cos(a)};
+159: const t=i/10,x=x1+(x2-x1)*t,y=y1+(y2-y1)*t;
+183: const scale=Math.min(6.2,200/Math.max(v.G,1));
+184: const GEnd={x:p.x,y:p.y+v.G*scale};
+185: const paraEnd={x:p.x+g.alongDown.x*v.parallel*scale,y:p.y+g.alongDown.y*v.parallel*scale};
+186: const perpEnd={x:p.x+g.normalIn.x*v.perp*scale,y:p.y+g.normalIn.y*v.perp*scale};
+208D: els.theta.textContent=`${fmt(state.theta,0)}°`;
+209D: els.gForce.textContent=`${fmt(v.G)} N`;
+210D: els.parallel.textContent=`${fmt(v.parallel)} N`;
+211D: els.perp.textContent=`${fmt(v.perp)} N`;
+213: buttons.forEach(btn=>btn.classList.toggle('active',Math.abs(+btn.dataset.theta-state.theta)<.5));
+215D: els.status.textContent='θ=0° 时，G∥=0：重力只把物体压向水平面，没有沿面下滑分力。';
+217D: els.status.textContent='斜面越陡，G∥ 越接近 G，G⊥ 变小；支持力和摩擦相关量也会变小。';
+219D: els.status.textContent='分解后列方程时，G 与 G∥、G⊥ 不要重复计入。';
+221D: if(state.playing)els.status.textContent+='（播放中：θ 自动变化）';
+224: const g=geom(),v=values();
+244: function near(a,b,rad=22){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+246D: if(state.playing){state.playing=false;document.getElementById('playBtn').textContent='▶ 播放：θ 自动扫描'}
+258: const a=Math.atan2(g.base.y-p.y,p.x-g.base.x)*180/Math.PI;
+261: state.m=clamp(0.5+(p.x-170)/210*(8-0.5),0.5,8);
+263: state.g=clamp(1.6+(p.x-515)/210*(12-1.6),1.6,12);
+287: state.theta+=state.playDir*0.5;
+295D: playBtn.textContent=state.playing?'⏸ 暂停':'▶ 播放：θ 自动扫描';
+298D: document.getElementById('resetBtn').addEventListener('click',()=>{state.playing=false;state.theta=30;playBtn.textContent='▶ 播放：θ 自动扫描';draw();});
+
+===== anim/bx1/free-fall.html (58 lines, kept 26) =====
+19: <div class="stage"><canvas id="canvas" width="940" height="560" aria-label="自由落体交互实验台：落体侧视装置、v-t图像和数据记录"></canvas><div class="hint">可拖动高度线 H、v-t 斜率点 g、橙色时间游标和质量
+21: <div class="box task"><b>观察任务：</b>拖质量旋钮，对照落体侧视装置、v-t 图像和数据记录，看它只改变球大小，不会改变同一高度的落地时间。</div>
+22: <div class="box"><b>环境</b><div class="buttons" style="margin-top:7px"><button id="mEarth" class="active">地球</button><button id="mMoon">月球</button><button id="mJ
+23: <div class="box"><div class="buttons"><button id="play">▶ 播放下落</button><button id="resetBtn">重置</button></div></div>
+24: <div class="readout" id="readout"></div>
+24D: <div class="readout" id="readout"></div>
+25: <div class="box formula"><b>公式绑定</b><br>v=gt：v-t 纵坐标。<br>h=1/2gt²：v-t 面积。<br>v²=2gH：落地速度。<br>公式里没有 m。</div>
+25D: <div class="box formula"><b>公式绑定</b><br>v=gt：v-t 纵坐标。<br>h=1/2gt²：v-t 面积。<br>v²=2gH：落地速度。<br>公式里没有 m。</div>
+26: <div class="box warn" id="status"></div>
+31D: const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'),readout=document.getElementById('readout'),status=document.getElementById('status');
+33: const s={H:45,g:9.8,t:2,m:4,mode:'earth'}; const scene={x:70,top:52,bot:454,w:310}; const gv={ox:470,oy:430,w:330,h:300,tMax:5,vMax:55}; let drag=null,layout={}
+34: function clamp(v,a,b){return Math.max(a,Math.min(b,v));} function tLand(){return Math.sqrt(2*s.H/s.g)} function vLand(){return Math.sqrt(2*s.g*s.H)} function tE
+37: function arrow(x1,y1,x2,y2,c,w=3){line(x1,y1,x2,y2,c,w);const a=Math.atan2(y2-y1,x2-x1),l=10;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-l*Math.cos(a-.55),y
+39: function setMode(m){s.mode=m;if(m==='earth')s.g=9.8;if(m==='moon')s.g=1.6;if(m==='jupiter')s.g=24;if(m==='low')s.g=4;Object.entries(buttons).forEach(([k,b])=>b.
+40: function drawScene(){card(50,36,365,462);line(scene.x,scene.bot,scene.x+scene.w,scene.bot,'#334e68',3);const hY=yOfH(s.H);line(scene.x,hY,scene.x+scene.w,hY,'#f
+41: const y=yOfH(heightLeft(tEff())), r1=9, r2=clamp(5+s.m*1.3,8,22); for(let tt=0;tt<=tEff()+1e-6;tt+=0.25){const yy=yOfH(heightLeft(tt));ctx.fillStyle='rgba(240,1
+42: ctx.fillStyle='#2f80ed';ctx.beginPath();ctx.arc(scene.x+120,y,r1,0,Math.PI*2);ctx.fill();ctx.fillStyle='#e03131';ctx.beginPath();ctx.arc(scene.x+205,y,r2,0,Math
+43: line(scene.x+40,488,scene.x+260,488,'#bcccdc',3);const mx=scene.x+40+(s.m-.1)/(10-.1)*220;handle(mx,488,'m','#e03131');layout.m={x:mx,y:488};text(`质量 m=${s.m.to
+45: const tl=tLand(), te=tEff(), vl=vLand();ctx.fillStyle='rgba(240,140,0,.23)';ctx.beginPath();ctx.moveTo(gv.ox,gv.oy);ctx.lineTo(gx(te),gv.oy);ctx.lineTo(gx(te),g
+46: function draw(){var _bg=ctx.createLinearGradient(0,0,0,560);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,940,5
+47: function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}} canvas.
+48: canvas.addEventListener('pointermove',e=>{const p=pointer(e);if(drag==='H')s.H=Math.round(hFromY(p.y));if(drag==='m')s.m=Math.round(clamp(.1+(p.x-(scene.x+40))/
+50D: playBtn.addEventListener('click',()=>{if(s.t>=tLand())s.t=0;running=!running;playBtn.textContent=running?'⏸ 暂停':'▶ 播放下落';});
+51: resetBtn.addEventListener('click',()=>{running=false;Object.assign(s,{H:45,g:9.8,t:2,m:4,mode:'earth'});Object.entries(buttons).forEach(([k,b])=>b.classList.tog
+52: function loop(now){const dt=Math.min((now-last)/1000,.05);last=now;if(running){s.t=Math.min(tLand(),s.t+dt);if(s.t>=tLand()){running=false;playBtn.textContent='
+52D: function loop(now){const dt=Math.min((now-last)/1000,.05);last=now;if(running){s.t=Math.min(tLand(),s.t+dt);if(s.t>=tLand()){running=false;playBtn.textContent='▶ 重新下落';}draw();}requestAnimationFrame(l
+
+===== anim/bx1/friction.html (36 lines, kept 17) =====
+13: <div class="stage"><canvas id="canvas" width="940" height="560" aria-label="摩擦力交互实验台：木箱侧视装置、f-F图像和数据记录"></canvas><div class="hint">拖蓝色 F 端点推箱子；拖 μ 和 m 旋钮改变最大静摩擦
+15: <div class="box task"><b>观察任务：</b>缓慢拖大 F，对照木箱侧视装置、f-F 图像和数据记录，看静摩擦红箭头如何自动跟随；越过临界线后是否还随 F 增大？</div>
+16: <div class="box"><b>快捷情境</b><div class="buttons" style="margin-top:7px"><button id="mStatic" class="active">静止</button><button id="mCritical">临界</button><button
+17: <div class="readout" id="readout"></div>
+17D: <div class="readout" id="readout"></div>
+18: <div class="box formula"><b>公式绑定</b><br>静止：f=F外，且 f≤fmax。<br>临界：fmax=μN=μmg。<br>滑动：f=μN，不再随 F 增大。</div>
+18D: <div class="box formula"><b>公式绑定</b><br>静止：f=F外，且 f≤fmax。<br>临界：fmax=μN=μmg。<br>滑动：f=μN，不再随 F 增大。</div>
+19: <div class="box warn" id="status"></div>
+23: (()=>{const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'),readout=document.getElementById('readout'),status=document.getElementById('stat
+24: function drawScene(){card(50,36,835,210);const ground=185,boxX=350+(moving()?Math.min(60,acc()*20):0);line(100,ground,820,ground,'#7b8794',4);for(let x=110;x<81
+25: function drawGraph(){card(50,265,560,225);line(graph.ox,graph.oy,graph.ox+graph.w+28,graph.oy,'#334e68',2);line(graph.ox,graph.oy,graph.ox,graph.oy-graph.h-18,'
+26: function drawKnobs(){line(675,320,850,320,'#bcccdc',3);const mx=675+s.mu/.6*175;handle(mx,320,'μ','#12b886');layout.mu={x:mx,y:320};text(`μ=${s.mu.toFixed(2)}`,
+27: function draw(){var _bg=ctx.createLinearGradient(0,0,0,560);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,940,5
+28D: function animate(){if(!playing)return;s.F=Math.min(60,s.F+0.35);draw();if(s.F>=60){playing=false;playBtn.textContent='▶ 播放：F 自动增大';return}requestAnimationFrame(animate)}
+29D: playBtn.addEventListener('click',()=>{playing=!playing;playBtn.textContent=playing?'⏸ 暂停':'▶ 播放：F 自动增大';if(playing)animate();else draw()});
+30D: document.getElementById('resetBtn').addEventListener('click',()=>{playing=false;playBtn.textContent='▶ 播放：F 自动增大';setMode('static')});
+31: function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}canvas.a
+
+===== anim/bx1/galileo-ideal-experiment.html (61 lines, kept 20) =====
+20: <div class="stage"><canvas id="canvas" width="900" height="600" aria-label="伽利略理想实验台：双斜面侧视、摩擦调节、轨迹图像和推理记录"></canvas></div>
+22: <div class="card task"><b>观察任务：</b>逐渐减小摩擦和右斜面角度；看小球为什么趋向滚到等高位置，并推出水平面上若无阻力将持续运动。</div>
+24: <div class="title">实验参数</div>
+25: <label class="param"><span>右斜面角度 <b id="angleLab">25°</b></span><input id="angle" type="range" min="0" max="45" step="1" value="25"></label>
+26: <label class="param"><span>摩擦强度 <b id="fricLab">20%</b></span><input id="fric" type="range" min="0" max="70" step="1" value="20"></label>
+27: <label class="param"><span>释放高度 <b id="hLab">120</b></span><input id="height" type="range" min="70" max="170" step="5" value="120"></label>
+28: <div class="buttons"><button id="play">释放</button><button id="reset">重置</button></div>
+30: <div class="readout" id="readout"></div>
+30D: <div class="readout" id="readout"></div>
+31: <div class="card formula"><div class="title">推理公式</div><div>能量近似：mgh ≈ 1/2mv² + W_f。</div><div>摩擦趋于 0 时，小球趋向回到同一高度；右斜面趋于水平时，距离趋向无限长。</div></div>
+32: <div class="status" id="status"></div>
+41: const state={running:false,t:0,drag:null,trail:[]};
+43: function vals(){const a=+el.angle.value*Math.PI/180,F=+el.fric.value/100,H=+el.height.value;const reach=H*(1-F);const dist=a<.02?620:Math.min(620,reach/Math.sin
+47: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(
+48: function pathPoint(v){const baseY=390,cx=410,leftTop={x:160,y:baseY-v.H},leftBase={x:cx,y:baseY};const rightEnd={x:cx+v.dist*Math.cos(v.a),y:baseY-v.dist*Math.s
+49: function drawApp(v){const baseY=390,cx=410;box(42,72,810,290,'#fff');text('双斜面理想实验侧视：控制摩擦，观察等高思想',447,100,colors.ink,'center',16,'900');const lt={x:160,y:baseY-
+50: function drawGraph(v){box(42,390,810,150,'#fff');text('推理图像：右斜面越平，达到同一高度所需路程越长',447,416,colors.ink,'center',15,'900');const gx=118,gy=510,gw=660,gh=72;line(gx,g
+51: function update(v){el.angleLab.textContent=Math.round(v.a*180/Math.PI)+'°';el.fricLab.textContent=Math.round(v.F*100)+'%';el.hLab.textContent=v.H;el.readout.inn
+53: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+54: canvas.addEventListener('pointerdown',e=>{state.drag='angle';canvas.setPointerCapture(e.pointerId);move(e);e.preventDefault()});canvas.addEventListener('pointer
+
+===== anim/bx1/gravity.html (37 lines, kept 15) =====
+13: <div class="stage"><canvas id="canvas" width="940" height="560" aria-label="重力交互实验台：斜面侧视装置、分力图像和数据记录"></canvas><div class="hint">可拖动斜面端点、质量旋钮和 g 旋钮；红色 G 始终竖直向下<
+15: <div class="box task"><b>观察任务：</b>拖斜面端点改变 θ，对照斜面侧视装置、分力图像和数据记录，看红色 G 是否跟着斜面转。</div>
+16: <div class="box"><b>地点</b><div class="buttons" style="margin-top:7px"><button id="mEarth" class="active">地球</button><button id="mMoon">月球</button><button id="mJ
+17: <div class="box"><div class="buttons"><button id="play">▶ 释放下滑</button><button id="resetBtn">重置</button></div></div>
+18: <div class="readout" id="readout"></div><div class="box formula"><b>公式绑定</b><br>G=mg：红色箭头大小。<br>方向：从重心竖直向下。<br>斜面分力：G∥=Gsinθ，G⊥=Gcosθ。</div><div class="box warn
+18D: <div class="readout" id="readout"></div><div class="box formula"><b>公式绑定</b><br>G=mg：红色箭头大小。<br>方向：从重心竖直向下。<br>斜面分力：G∥=Gsinθ，G⊥=Gcosθ。</div><div class="box warn" id="status"></div>
+22: (()=>{const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'),readout=document.getElementById('readout'),status=document.getElementById('stat
+23: function drawBlock(cx,cy,w,h,a){ctx.save();ctx.translate(cx,cy);ctx.rotate(-a);ctx.fillStyle='#d9e2ec';ctx.strokeStyle='#334e68';ctx.lineWidth=2;ctx.fillRect(-w
+24: function draw(){var _bg=ctx.createLinearGradient(0,0,0,560);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,940,5
+25: const mx=130+(s.m-.5)/(8-.5)*230;line(130,520,360,520,'#bcccdc',3);handle(mx,520,'m','#12b886');layout.m={x:mx,y:520};text(`质量 m=${s.m.toFixed(1)} kg`,245,500,'
+26: function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}canvas.a
+28D: playBtn.addEventListener('click',()=>{running=!running;if(running&&(window.__gslide||0)>295){window.__gslide=0;vel=0;}playBtn.textContent=running?'⏸ 暂停':'▶ 释放下滑';});
+29: resetBtn.addEventListener('click',()=>{running=false;vel=0;window.__gslide=0;Object.assign(s,{m:2,g:9.8,theta:25,mode:'earth'});Object.entries(btn).forEach(([k,
+30D: canvas.addEventListener('pointerdown',()=>{if(running){running=false;playBtn.textContent='▶ 释放下滑';}});
+31: function loop(now){const dt=Math.min((now-last)/1000,.05);last=now;if(running){vel+=s.g*Math.sin(rad())*dt*9;window.__gslide=(window.__gslide||0)+vel*dt;if(wind
+
+===== anim/bx1/hooke-law.html (39 lines, kept 17) =====
+13: <div class="stage"><canvas id="canvas" width="940" height="560" aria-label="胡克定律交互实验台：弹簧侧视装置、F-x图像和数据记录"></canvas><div class="hint">可拖弹簧端点或 F-x 红点改 x，拖斜率点改 k，拖限
+15: <div class="box task"><b>观察任务：</b>拖红点让 x 加倍，对照弹簧侧视装置、F-x 图像和数据记录，看 F 是否加倍；拖紫色斜率点改变 k。</div>
+16: <div class="box"><b>快捷情境</b><div class="buttons" style="margin-top:7px"><button id="mStretch" class="active">伸长</button><button id="mCompress">压缩</button><butto
+17: <div class="box"><div class="buttons"><button id="play">▶ 释放振动</button><button id="resetBtn">重置</button></div></div>
+18: <div class="readout" id="readout"></div>
+18D: <div class="readout" id="readout"></div>
+19: <div class="box formula"><b>公式绑定</b><br>大小：F=k|x|。<br>方向：总指向恢复原长。<br>F-x 图像斜率大小就是 k。<br>只在弹性限度内成立。</div>
+19D: <div class="box formula"><b>公式绑定</b><br>大小：F=k|x|。<br>方向：总指向恢复原长。<br>F-x 图像斜率大小就是 k。<br>只在弹性限度内成立。</div>
+20: <div class="box warn" id="status"></div>
+24: (()=>{const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'),readout=document.getElementById('readout'),status=document.getElementById('stat
+25: function drawSpring(){card(50,36,385,220);text('x 是相对原长的形变量，不是弹簧总长度',242,64,'#334e68',15,'center','800');const end=spring.origin+s.x*18;line(spring.wall-35,spri
+26: function drawGraph(){card(455,36,395,462);line(g.ox,sy(0),g.ox+g.w+25,sy(0),'#334e68',2);line(sx(0),g.oy,sx(0),g.oy-g.h-20,'#334e68',2);text('x/cm',g.ox+g.w+36,
+27: function draw(){var _bg=ctx.createLinearGradient(0,0,0,560);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,940,5
+28: function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}canvas.a
+30D: playBtn.addEventListener('click',()=>{running=!running;if(running){amp=s.x||4;ph=0;}playBtn.textContent=running?'⏸ 暂停':'▶ 释放振动';});
+32D: canvas.addEventListener('pointerdown',()=>{if(running){running=false;playBtn.textContent='▶ 释放振动';}});
+33: function loop(now){const dt=Math.min((now-last)/1000,.05);last=now;if(running){ph+=dt;const w=Math.sqrt(s.k)*1.1;s.x=Math.round(amp*Math.cos(w*ph)*10)/10;draw()
+
+===== anim/bx1/newton-first.html (293 lines, kept 61) =====
+37: <div class="stage"><canvas id="canvas" width="920" height="520" aria-label="牛顿第一定律交互实验台：小车侧视装置、v-t图像和数据记录"></canvas></div>
+39: <div class="card task"><b>观察任务：</b>拖动粗糙度尺把 μ 变小；对照小车侧视装置、v-t 图像和数据记录，看频闪点、停止距离怎样变化。</div>
+40: <div class="chips"><button id="playBtn">▶ 播放：小车随时间运动</button><button id="resetBtn">重置</button></div>
+42: <div class="title">快速情境</div>
+44: <button data-mu="0.45">粗糙毛毡</button>
+45: <button data-mu="0.20" class="active">普通木板</button>
+46: <button data-mu="0.04">近似光滑</button>
+47: <button data-mu="0">理想无阻</button>
+51: <div class="title">实时读数</div>
+53: <div class="meter"><span>初速度 v0</span><b id="v0Text">6.0 m/s</b></div>
+54: <div class="meter"><span>摩擦因数 μ</span><b id="muText">0.20</b></div>
+55: <div class="meter"><span>观察时刻 t</span><b id="timeText">2.0 s</b></div>
+56: <div class="meter"><span>当前速度 v</span><b id="vText">2.0 m/s</b></div>
+61: <div><span>有摩擦</span><b>a=-μg</b></div>
+64: <div class="card small"><b>可直接操作：</b>抓蓝色速度发射器改变 v0；抓粗糙度尺改变 μ；抓时间尺红点改变观察时刻。</div>
+65: <div class="status" id="status">有摩擦：合力不为 0，速度被改变，最后停止。</div>
+73: const state={v0:6,mu:.2,t:2,drag:null,playing:false};
+74: const g=10;
+83: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+100: const a=Math.atan2(y2-y1,x2-x1);
+106: ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.sin(a-.42));
+107: ctx.lineTo(x2-13*Math.cos(a+.42),y2-13*Math.sin(a+.42));
+121: const mu=state.mu<.005?0:state.mu;
+122: const a=mu*g;
+123: const stopT=mu===0?Infinity:state.v0/a;
+125: const x=state.v0*useT-.5*a*useT*useT;
+126: const v=Math.max(0,state.v0-a*t);
+127: const stopDist=mu===0?Infinity:state.v0*state.v0/(2*a);
+131: const vKnob={x:94+state.v0/12*210,y:74};
+132: const muKnob={x:112+state.mu/.6*250,y:438};
+133: const tKnob={x:488+state.t/8*250,y:438};
+148: const x=x1+(x2-x1)*i/10;
+155: const rough=Math.round(state.mu/.6*10);
+157: const x=trackX+i*32;
+169: const carX=Math.min(trackX+trackW-66,trackX+q.x*scale);
+176: text(`v=${fmt(q.v)}m/s`,carX+118,trackY-40,colors.blue,'center',13,'900');
+178: for(let t=0;t<=Math.min(8,Number.isFinite(q.stopT)?q.stopT:8);t+=.5){
+180: const x=Math.min(trackX+trackW-10,trackX+p.x*scale);
+192: for(let x=0;x<=8;x+=2)line(ox+x/tMax*w,oy-h,ox+x/tMax*w,oy,'#e2e8f0',1);
+193: for(let v=0;v<=12;v+=3)line(ox,oy-v/vMax*h,ox+w,oy-v/vMax*h,'#e2e8f0',1);
+201: const t=i/10,p=values(t);
+202: const x=ox+t/tMax*w,y=oy-p.v/vMax*h;
+206: const px=ox+state.t/tMax*w,py=oy-q.v/vMax*h;
+207: ctx.fillStyle=colors.red;ctx.beginPath();ctx.arc(px,py,6,0,Math.PI*2);ctx.fill();
+211: els.v0.textContent=`${fmt(state.v0)} m/s`;
+211D: els.v0.textContent=`${fmt(state.v0)} m/s`;
+212D: els.mu.textContent=fmt(state.mu,2);
+213D: els.time.textContent=`${fmt(state.t)} s`;
+214: els.v.textContent=`${fmt(q.v)} m/s`;
+214D: els.v.textContent=`${fmt(q.v)} m/s`;
+215: document.querySelectorAll('[data-mu]').forEach(btn=>btn.classList.toggle('active',Math.abs(+btn.dataset.mu-state.mu)<.005));
+217D: els.status.textContent=(q.mu===0?'理想无阻：合力为 0，小车保持原来的速度做匀速直线运动。':'有摩擦：合力不为 0，速度被改变，最后停止。')+(state.playing?'（播放中：t 自动前进）':'');
+220: const q=values(),g0=geom();
+240: function near(a,b,rad=24){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+242D: if(state.playing){state.playing=false;document.getElementById('playBtn').textContent='▶ 播放：小车随时间运动'}
+254: state.v0=clamp((p.x-94)/210*12,1,12);
+256: state.mu=clamp((p.x-112)/250*.6,0,.6);
+258: state.t=clamp((p.x-488)/250*8,0,8);
+279D: if(state.t>=8){state.playing=false;playBtn.textContent='▶ 播放：小车随时间运动';return}
+284D: playBtn.textContent=state.playing?'⏸ 暂停':'▶ 播放：小车随时间运动';
+287: document.getElementById('resetBtn').addEventListener('click',()=>{state.v0=6;state.mu=.2;state.t=2;state.drag=null;state.playing=false;document.querySelectorAll
+
+===== anim/bx1/newton-second.html (136 lines, kept 45) =====
+36: <div class="stage"><canvas id="canvas" width="920" height="520" aria-label="牛顿第二定律交互实验台：小车侧视装置、a-F图像和数据记录"></canvas></div>
+38: <div class="card task"><b>观察任务：</b>直接拖推力箭头，对照小车侧视装置、a-F 图像和数据记录，看 a-F 图红点；拖质量砝码看 a-1/m 图红点。</div>
+39: <div class="chips"><button id="playBtn">▶ 播放：按 a 匀加速滑动</button><button id="resetBtn">重置</button></div>
+41: <div class="title">快速情境</div>
+43: <button data-case="light">轻车</button>
+44: <button data-case="heavy">重车</button>
+45: <button data-case="rough">粗糙面</button>
+46: <button data-case="smooth">光滑面</button>
+50: <div class="title">实时读数</div>
+52: <div class="meter"><span>外力 F</span><b id="fText">12.0 N</b></div>
+53: <div class="meter"><span>质量 m</span><b id="mText">3.0 kg</b></div>
+54: <div class="meter"><span>合力 F合</span><b id="netText">9.0 N</b></div>
+55: <div class="meter"><span>加速度 a</span><b id="aText">3.00 m/s²</b></div>
+60: <div><span>第二定律</span><b>a=F合/m</b></div>
+63: <div class="card small"><b>可直接操作：</b>抓红色推力箭头端点改变 F；抓砝码尺改变 m；抓粗糙度尺改变 μ。</div>
+64: <div class="status" id="status">合力不为 0，小车加速；a 与 F合 同向。</div>
+72: const state={F:12,m:3,mu:.1,drag:null,playing:false,playT:0};
+73: const G=10;
+76: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+80: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(
+82: function values(){const f=state.mu*state.m*G;const net=Math.max(0,state.F-f);return{f,net,a:net/state.m,invM:1/state.m}}
+84: function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(
+85: function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-
+88: const off=state.playing?Math.min(70,0.5*v.a*state.playT*state.playT*18):0;
+89: const groundY=284,boxX=142+off,boxW=74+state.m*5,boxH=42;
+91: for(let i=0;i<12;i++){const x=80+i*34;line(x,groundY+9,x+20,groundY+9+state.mu*22,state.mu>.18?'#b45309':'#cbd5e1',state.mu>.18?3:2)}
+93: text(`m=${fmt(state.m)}kg`,boxX+boxW/2,groundY-boxH/2,'#0f172a','center',13,'900');
+101: text(`a=${fmt(v.a,2)}m/s²`,boxX+boxW/2+68,groundY+50,colors.purple,'center',12,'900');
+103: function graphBox(x,y,w,h,title,xLab,yLab){roundRect(x,y,w,h,8,'#f8fafc','#d7dee8');text(title,x+w/2,y+23,'#0f172a','center',14,'900');const ox=x+42,oy=y+h-30,g
+106: const f0=state.mu*state.m*G;
+108: for(let F=0;F<=40;F++){const a=Math.max(0,F-f0)/state.m;const x=g1.ox+F/40*g1.gw,y=g1.oy-clamp(a,0,12)/12*g1.gh;if(F===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ct
+109: ctx.fillStyle=colors.red;ctx.beginPath();ctx.arc(g1.ox+state.F/40*g1.gw,g1.oy-clamp(v.a,0,12)/12*g1.gh,6,0,Math.PI*2);ctx.fill();
+110: const g2=graphBox(560,236,300,158,'控制 F合，看 a-1/m','1/m','a');
+111: ctx.save();ctx.strokeStyle=colors.blue;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(g2.ox,g2.oy);ctx.lineTo(g2.ox+g2.gw,g2.oy-clamp(v.net*1,0,12)/12*g2.gh);ctx.st
+112: ctx.fillStyle=colors.red;ctx.beginPath();ctx.arc(g2.ox+v.invM/1*g2.gw,g2.oy-clamp(v.a,0,12)/12*g2.gh,6,0,Math.PI*2);ctx.fill();
+115: els.F.textContent=`${fmt(state.F)} N`;els.m.textContent=`${fmt(state.m)} kg`;els.net.textContent=`${fmt(v.net)} N`;els.a.textContent=`${fmt(v.a,2)} m/s²`;
+115D: els.F.textContent=`${fmt(state.F)} N`;els.m.textContent=`${fmt(state.m)} kg`;els.net.textContent=`${fmt(v.net)} N`;els.a.textContent=`${fmt(v.a,2)} m/s²`;
+117D: els.status.textContent=(v.net===0?'外力还没超过最大静摩擦，合力为 0，小车暂不加速。':'合力不为 0，小车加速；a 与 F合 同向。')+(state.playing?'（播放中：按 a 匀加速运动）':'');
+120: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+121: function near(a,b,rad=24){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+123: function move(e){if(!state.drag)return;const p=pos(e);if(state.drag==='F')state.F=clamp((p.x-180)/210*40,0,40);if(state.drag==='m')state.m=clamp(1+(p.x-122)/240
+126: document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='light')state.m=1.5;if(c==='heavy')state
+128D: function animate(){if(!state.playing)return;state.playT+=0.03;draw();if(state.playT>2.5){state.playing=false;playBtn.textContent='▶ 播放：按 a 匀加速滑动';draw();return}requestAnimationFrame(animate)}
+129D: playBtn.addEventListener('click',()=>{state.playing=!state.playing;playBtn.textContent=state.playing?'⏸ 暂停':'▶ 播放：按 a 匀加速滑动';if(state.playing){state.playT=0;animate()}else draw()});
+130D: document.getElementById('resetBtn').addEventListener('click',()=>{state.F=12;state.m=3;state.mu=.1;state.playing=false;state.playT=0;playBtn.textContent='▶ 播放：按 a 匀加速滑动';draw()});
+
+===== anim/bx1/newton-third.html (200 lines, kept 47) =====
+35: <div class="stage"><canvas id="canvas" width="920" height="520" aria-label="牛顿第三定律交互实验台：两车侧视装置、力与加速度图像和数据记录"></canvas></div>
+37: <div class="card task"><b>观察任务：</b>拖动中间红色压缩手柄，对照两车侧视装置、力与加速度图像和数据记录，看红蓝力箭头是否永远等长反向。</div>
+38: <div class="chips"><button id="playBtn">▶ 播放：两车分开加速</button><button id="resetBtn">重置</button></div>
+40: <div class="title">快速情境</div>
+42: <button data-case="same">同质量</button>
+43: <button data-case="leftLight">左轻右重</button>
+44: <button data-case="rightLight">左重右轻</button>
+45: <button data-case="strong">更大推力</button>
+49: <div class="title">实时读数</div>
+51: <div class="meter"><span>左对右 F12</span><b id="f12Text">12.0 N</b></div>
+52: <div class="meter"><span>右对左 F21</span><b id="f21Text">12.0 N</b></div>
+53: <div class="meter"><span>左车 a1</span><b id="a1Text">6.0 m/s²</b></div>
+54: <div class="meter"><span>右车 a2</span><b id="a2Text">3.0 m/s²</b></div>
+58: <div><span>相互作用力</span><b>F12=-F21</b></div>
+59: <div><span>运动效果</span><b>a=F/m</b></div>
+62: <div class="card small"><b>可直接操作：</b>抓接触处手柄改 F；抓底部蓝/红质量尺改 m1、m2。右侧对照图专门区分“相互作用力”和“平衡力”。</div>
+63: <div class="status" id="status">力一定等大反向；加速度是否相同，要看各自质量。</div>
+71: const state={m1:2,m2:4,F:12,drag:null,playing:false,playT:0};
+80: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+89: const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.s
+96: const forceHandle={x:250+state.F/30*210,y:118};
+97: const m1Handle={x:116+(state.m1-1)/7*250,y:448};
+98: const m2Handle={x:510+(state.m2-1)/7*250,y:448};
+102: ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.s
+105: line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-18,c,'center',12,'900');
+116: const off1=state.playing?Math.min(70,0.5*v.a1*state.playT*state.playT*14):0;
+117: const off2=state.playing?Math.min(70,0.5*v.a2*state.playT*state.playT*14):0;
+122: const midX=(left.x+left.w+right.x)/2;
+125: for(let i=0;i<=10;i++){const x=250+i/10*210;line(x,113,x,123,'#0f172a',1)}
+128: const forceLen=Math.min(115,state.F*4);
+135: text(`a1=${fmt(v.a1)}m/s²`,178,left.y-34,colors.purple,'left',12,'900');
+136: text(`a2=${fmt(v.a2)}m/s²`,454,right.y-48,colors.purple,'left',12,'900');
+168D: els.f12.textContent=`${fmt(state.F)} N`;
+169D: els.f21.textContent=`${fmt(state.F)} N`;
+170: els.a1.textContent=`${fmt(v.a1)} m/s²`;
+170D: els.a1.textContent=`${fmt(v.a1)} m/s²`;
+171: els.a2.textContent=`${fmt(v.a2)} m/s²`;
+171D: els.a2.textContent=`${fmt(v.a2)} m/s²`;
+172: els.status.textContent=(Math.abs(v.a1-v.a2)<.05?'同质量时加速度也相同；这不是因为力不同，而是质量相同。':'力相等但加速度不同，因为 a=F/m，质量不同。')+(state.playing?'（播放中：两车正按各自 a 分开）':'');
+172D: els.status.textContent=(Math.abs(v.a1-v.a2)<.05?'同质量时加速度也相同；这不是因为力不同，而是质量相同。':'力相等但加速度不同，因为 a=F/m，质量不同。')+(state.playing?'（播放中：两车正按各自 a 分开）':'');
+184: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+185: function near(a,b,rad=25){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+187: function move(e){if(!state.drag)return;const p=pos(e);if(state.drag==='F')state.F=clamp((p.x-250)/210*30,2,30);if(state.drag==='m1')state.m1=clamp(1+(p.x-116)/2
+190: document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.dataset.case;if(c==='same'){state.m1=3;state.m2=3}if(c==='le
+192D: function animate(){if(!state.playing)return;state.playT+=0.03;draw();if(state.playT>2.2){state.playing=false;playBtn.textContent='▶ 播放：两车分开加速';draw();return}requestAnimationFrame(animate)}
+193D: playBtn.addEventListener('click',()=>{state.playing=!state.playing;playBtn.textContent=state.playing?'⏸ 暂停':'▶ 播放：两车分开加速';if(state.playing){state.playT=0;animate()}else draw()});
+194D: document.getElementById('resetBtn').addEventListener('click',()=>{state.m1=2;state.m2=4;state.F=12;state.playing=false;state.playT=0;playBtn.textContent='▶ 播放：两车分开加速';draw()});
+
+===== anim/bx1/overweight.html (158 lines, kept 39) =====
+38: <div class="stage"><canvas id="canvas" width="920" height="520" aria-label="超重与失重交互实验台：电梯侧视装置、秤读数图像和数据记录"></canvas></div>
+40: <div class="card task"><b>观察任务：</b>拖动电梯旁的加速度手柄，对照电梯侧视装置、秤读数图像和数据记录：向上时看 N 变大，向下时变小。</div>
+42: <div class="title">快速情境</div>
+44: <button data-a="2">加速向上</button>
+45: <button data-a="0" class="active">匀速/静止</button>
+46: <button data-a="-2">加速向下</button>
+47: <button data-free="1">自由下落</button>
+52: <div class="title">实时读数</div>
+54: <div class="meter"><span>真实重力 mg</span><b id="gForceText">600 N</b></div>
+55: <div class="meter"><span>视重 N</span><b id="nText">600 N</b></div>
+56: <div class="meter"><span>加速度 a</span><b id="aText">0.0 m/s²</b></div>
+57: <div class="meter"><span>质量 m</span><b id="mText">60 kg</b></div>
+61: <div><span>取向上为正</span><b>N-mg=ma</b></div>
+62: <div><span>秤的读数</span><b>N=m(g+a)</b></div>
+63: <div><span>完全失重</span><b>N=0, mg 仍在</b></div>
+65: <div class="card small"><b>可直接操作：</b>抓紫色加速度手柄改 a；抓底部质量尺改 m，抓 g 尺改重力场强。</div>
+66: <div class="status" id="status">正常：N=mg，视重等于真实重力。</div>
+74: const state={m:60,a:0,g:10,drag:null,running:false,phase:0};
+77: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+81: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(
+83: function values(){const G=state.m*state.g;const rawN=state.m*(state.g+state.a);const N=Math.max(0,rawN);return{G,N,rawN,contact:rawN>0}}
+84: function geom(){return{acc:{x:456,y:250-state.a/10*110},mass:{x:118+(state.m-20)/80*250,y:448},grav:{x:512+(state.g-1.6)/(10-1.6)*250,y:448}}}
+85: function handle(x,y,label,active,c){ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#d97706':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(
+86: function ruler(x1,y,x2,label,c){line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-
+88: ctx.fillStyle=colors.blue;ctx.beginPath();ctx.arc(x,y,16,0,Math.PI*2);ctx.fill();
+98: const scale=Math.min(120,Math.max(v.G,v.N,1)/Math.max(v.G,v.N,1)*86);
+99: const nLen=v.N===0?0:Math.min(120,v.N/Math.max(v.G,v.N)*100);
+100: const gLen=Math.min(120,v.G/Math.max(v.G,v.N)*100);
+103: text(`N=${fmt(v.N,0)}N`,278,314-nLen/2,colors.red,'left',12,'900');
+104: text(`mg=${fmt(v.G,0)}N`,278,176+gLen/2,colors.red,'left',12,'900');
+125: els.G.textContent=`${fmt(v.G,0)} N`;els.N.textContent=`${fmt(v.N,0)} N`;els.a.textContent=`${fmt(state.a)} m/s²`;els.m.textContent=`${fmt(state.m,0)} kg`;
+125D: els.G.textContent=`${fmt(v.G,0)} N`;els.N.textContent=`${fmt(v.N,0)} N`;els.a.textContent=`${fmt(state.a)} m/s²`;els.m.textContent=`${fmt(state.m,0)} kg`;
+126: document.querySelectorAll('[data-a]').forEach(btn=>btn.classList.toggle('active',Math.abs(+btn.dataset.a-state.a)<.05));
+131D: els.status.className=cls;els.status.textContent=msg;
+134: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+135: function near(a,b,rad=26){return Math.hypot(a.x-b.x,a.y-b.y)<=rad}
+137: function move(e){if(!state.drag)return;const p=pos(e);if(state.drag==='a')state.a=clamp((250-p.y)/110*10,-10,10);if(state.drag==='m')state.m=clamp(20+(p.x-118)/
+142D: document.getElementById('playBtn').addEventListener('click',function(){state.running=!state.running;this.textContent=state.running?'暂停演示':'播放演示'});
+147: state.a=Math.max(-state.g,Math.sin(state.phase)*4.5);
+
+===== anim/bx1/particle.html (331 lines, kept 55) =====
+44: <canvas id="canvas" width="940" height="560" aria-label="质点模型交互实验台：道路俯视装置、比例图像和数据记录"></canvas>
+45: <div class="hint">可直接拖动橙色手柄：车身长度 l、研究范围 s</div>
+48: <div class="card task"><b>观察任务：</b>拖动车身右端和终点手柄，对照道路俯视装置、比例图像和数据记录，比较整车与蓝点。</div>
+50: <div class="title">实验条件</div>
+51: <label class="param"><span>车身长度 l <b id="lenText">4 m</b></span><input id="len" type="range" min="1" max="20" step="1" value="4"></label>
+52: <div class="stepper"><button data-step="len" data-dir="-1">缩短 l</button><button data-step="len" data-dir="1">加长 l</button></div>
+53: <label class="param"><span>研究范围 s <b id="distText">400 km</b></span><input id="dist" type="range" min="5" max="800" step="5" value="400"></label>
+54: <div class="stepper"><button data-step="dist" data-dir="-1">减小 s</button><button data-step="dist" data-dir="1">增大 s</button></div>
+56: <button id="modePath" class="active">行程</button><button id="modePass">过线</button>
+57: <button id="modeTurn">转动</button><button id="modePosture">姿态</button>
+59: <div class="transport"><button id="playBtn">播放</button><button id="resetBtn">重置</button></div>
+61: <div class="readout" id="readout"></div>
+61D: <div class="readout" id="readout"></div>
+63: <div class="title">判据绑定</div>
+68: <div class="status" id="status"></div>
+89: const ratio=d.l/(d.s*1000);
+95: value=Math.round(clamp(value,+el.min,+el.max)/(+el.step||1))*(+el.step||1);
+111: const a=Math.atan2(y2-y1,x2-x1);
+116: ctx.lineTo(x2-10*Math.cos(a-.45),y2-10*Math.sin(a-.45));
+117: ctx.lineTo(x2-10*Math.cos(a+.45),y2-10*Math.sin(a+.45));
+134: ctx.fillStyle='#243b53';ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+137: const a=spin+i*Math.PI/2;
+138: line(x,y,x+Math.cos(a)*r*.72,y+Math.sin(a)*r*.72,'#fff',2);
+142: const h=34;
+161: const px=x+w*i/4;
+178: const critical=gx+gw*(.01/.03);
+181: const p=gx+gw*Math.min(1,v.ratio/.03);
+193: const visualScale=Math.max(.33,Math.min(1.05,Math.log10(d.s+10)/Math.log10(810)));
+194: const roadW=trackW*visualScale;
+195: const left=trackX+(trackW-roadW)/2;
+197: const carW=Math.max(42,Math.min(164,31+d.l*5.6));
+199: const carX=left+13+travel*d.progress;
+200: const pointX=left+roadW*d.progress;
+202: const wheelSpin=d.progress*d.s*0.08;
+203: const tilt=d.mode==='posture'?Math.sin(d.progress*Math.PI*2)*0.23-0.12:0;
+213: text('整体位置 x='+(d.s*d.progress).toFixed(1)+' km',left+Math.max(88,roadW*d.progress),106,'#2c7be5','center',13,'700');
+218: text('l = '+d.l+' m',carX+carW/2,carY+78,'#7c5700','center',12,'700');
+237: ctx.strokeStyle='#f08c00';ctx.lineWidth=3;ctx.beginPath();ctx.arc(carX+carW*.78,173,25,-.5,Math.PI*1.35);ctx.stroke();
+253: text('判据：l/s = '+(v.ratio*100).toFixed(4)+'%，研究任务 = '+modes[d.mode],470,458,'#334e68','center',14,'700');
+258D: document.getElementById('lenText').textContent=d.l+' m';
+259D: document.getElementById('distText').textContent=d.s+' km';
+260: document.getElementById('readout').innerHTML='任务=<b>'+modes[d.mode]+'</b><br>l/s=<b>'+(v.ratio*100).toFixed(4)+'%</b><br>位置 x=<b>'+(d.s*d.progress).toFixed(1)+'
+260D: document.getElementById('readout').innerHTML='任务=<b>'+modes[d.mode]+'</b><br>l/s=<b>'+(v.ratio*100).toFixed(4)+'%</b><br>位置 x=<b>'+(d.s*d.progress).toFixed(1)+' km</b><br>结论=<b>'+(v.ok?'可质点化':'不可质点化')
+263D: st.textContent=v.ok?'通过：本题只关心整体位置，大小和形状对结论影响可忽略。':'打回：当前任务需要车长、转角、姿态或各部分差异，不能用一个点替代。';
+271: const dt=Math.min(.05,(now-last)/1000);
+274: progress+=dt*.16;
+287: const dl=Math.hypot(p.x-layout.lenHandle.x,p.y-layout.lenHandle.y);
+288: const ds=Math.hypot(p.x-layout.rangeHandle.x,p.y-layout.rangeHandle.y);
+300: const t=(roadW/610);
+301: const target=Math.pow(10,t*Math.log10(810))-10;
+307: const overLen=Math.hypot(p.x-layout.lenHandle.x,p.y-layout.lenHandle.y)<28;
+308: const overDist=Math.hypot(p.x-layout.rangeHandle.x,p.y-layout.rangeHandle.y)<28;
+316: el.value=Math.max(+el.min,Math.min(+el.max,+el.value+dir*step));
+319D: playBtn.onclick=()=>{running=!running;playBtn.textContent=running?'暂停':'播放';last=performance.now();draw();};
+320D: document.getElementById('resetBtn').onclick=()=>{progress=0;running=false;els.len.value=4;els.dist.value=400;setMode('path');playBtn.textContent='播放';draw();};
+
+===== anim/bx1/plank-block.html (326 lines, kept 99) =====
+39: <div class="stage"><canvas id="canvas" width="960" height="760" aria-label="板块模型交互实验台"></canvas></div>
+41: <div class="card task"><b>观察任务：</b>先拖红色箭头或 v0 箭头，看摩擦方向；再拖时间游标，看相对滑痕 Δx 是否达到板长 L。</div>
+42: <div class="chips"><button id="playBtn">播放过程</button><button id="resetBtn">重置时间</button></div>
+44: <div class="title">实验模式</div>
+46: <button id="pullMode" class="active">拉物块判临界</button>
+47: <button id="kickMode">初速度看滑痕</button>
+51: <div class="title">快速情境</div>
+53: <button data-case="safe">共动安全</button>
+54: <button data-case="critical">恰好临界</button>
+55: <button data-case="fall">滑下木板</button>
+56: <button data-case="rough">增大摩擦</button>
+60: <div class="title">实时读数</div>
+62: <div class="meter"><span id="meter1Label">临界外力 Fcrit</span><b id="meter1">5.3 N</b></div>
+63: <div class="meter"><span>摩擦 f / fmax</span><b id="meter2">3.0 / 4.0 N</b></div>
+64: <div class="meter"><span>am / aM</span><b id="meter3">1.0 / 1.0</b></div>
+65: <div class="meter"><span>Δx 与 L</span><b id="meter4">0.00 / 2.0 m</b></div>
+70: <div><span>滑动后分列</span><b>am=(F-μmg)/m, aM=μmg/M</b></div>
+71: <div><span>滑痕/热量</span><b>Δx=xm-xM, Q=fΔx</b></div>
+72: <div><span>初速度共速</span><b>v0-μgt=μmgt/M</b></div>
+74: <div class="card small"><b>三视图绑定：</b>左侧是侧视实物过程，红色刻痕尺相当于俯视滑痕记录；右侧 x相-t 和 v-t 图用同一时间游标取读数。</div>
+75: <div class="status" id="status">相对静止：所需静摩擦没有超过最大静摩擦。</div>
+83: const state={mode:'pull',F:4,v0:4,mu:.4,m:1,M:3,L:2,g:10,t:0,drag:null,playing:false};
+90: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+99: const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.s
+105: ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#b45309':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.s
+112: const fMax=state.mu*state.m*state.g;
+113: const Fcrit=fMax*(state.m+state.M)/state.M;
+115: const fNeed=state.M*state.F/(state.m+state.M);
+117: const aCommon=state.F/(state.m+state.M);
+118: const am=sliding?(state.F-fMax)/state.m:aCommon;
+119: const aM=sliding?fMax/state.M:aCommon;
+121: const fallT=relA>0?Math.sqrt(2*state.L/relA):Infinity;
+124: const relX=.5*relA*t*t;
+125: const xm=.5*am*t*t;
+126: const xM=.5*aM*t*t;
+129: const a1=-state.mu*state.g;
+130: const a2=state.mu*state.m*state.g/state.M;
+131: const A=state.mu*state.g*(1+state.m/state.M);
+132: const tCommon=state.v0/A;
+133: const relMax=state.v0*state.v0/(2*A);
+137: const disc=Math.max(0,state.v0*state.v0-2*A*state.L);
+138: fallT=(state.v0-Math.sqrt(disc))/A;
+141: const t=clamp(state.t,0,Math.min(3,endT));
+142: const relX=state.v0*t-.5*A*t*t;
+143: const xm=state.v0*t+.5*a1*t*t;
+144: const xM=.5*a2*t*t;
+145: const vm=Math.max(0,state.v0+ a1*t);
+146: const vM=a2*t;
+150: const pullX=202+state.F/30*180;
+151: const v0X=202+state.v0/8*180;
+165: const baseY=300, plankW=260+state.L*42, plankH=30, plankX=110+Math.min(85,v.xM*18);
+166: const relPx=Math.min(plankW-56,v.relX/state.L*(plankW-56));
+171: text(`木板 M=${fmt(state.M)} kg, L=${fmt(state.L)} m`,plankX+plankW/2,baseY-plankH/2,'#334155','center',12,'900');
+173: text(`m=${fmt(state.m)} kg`,blockX+blockW/2,baseY-plankH-blockH/2,'#fff','center',12,'900');
+174: const topY=baseY-plankH-blockH/2;
+182: handle(g.top.x,g.top.y,`v0=${fmt(state.v0)}m/s`,state.drag==='v0',colors.red);
+193: const tt=v.endT*i/8, r=sampleAt(tt);
+194: const px=plankX+28+Math.min(plankW-56,r.relX/state.L*(plankW-56));
+195: ctx.fillStyle=i/8<=v.t/Math.max(.1,v.endT)?'#dc2626':'#cbd5e1';
+207: const max=state.mode==='pull'?Math.max(v.fNeed,v.fMax,1):Math.max(v.fMax,state.mu*state.m*state.g,1);
+217: const gx=615,gy=354,gw=260,gh=88,end=Math.max(.2,v.endT);
+220: const tt=end*i/80,r=sampleAt(tt);
+221: const x=gx+gw*i/80,y=gy-Math.min(1.05,r.relX/state.L)*gh;
+226: const tx=gx+gw*v.t/end;line(tx,gy,tx,gy-gh-8,colors.purple,2,[4,4]);text(`t=${fmt(v.t,2)}s`,tx,gy+16,colors.purple,'center',12,'900');
+228: const vy=548,vh=108,maxV=Math.max(state.v0,Math.abs(v.am*v.endT),Math.abs(v.aM*v.endT),1);
+230: for(let i=0;i<=80;i++){const tt=end*i/80,r=sampleAt(tt);const vm=state.mode==='kick'?Math.max(0,state.v0-state.mu*state.g*tt):r.am*tt;const x=gx+gw*i/80,y=vy-vm
+233: for(let i=0;i<=80;i++){const tt=end*i/80,r=sampleAt(tt);const vM=Math.max(0,r.aM*tt);const x=gx+gw*i/80,y=vy-vM/maxV*vh;if(i===0)ctx.moveTo(x,y);else ctx.lineTo
+236: const tx2=gx+gw*v.t/end;line(tx2,vy,tx2,vy-vh-8,colors.purple,2,[4,4]);
+240: line(78,704,408,704,'#0f172a',2);for(let i=0;i<=10;i++)line(78+i*33,699,78+i*33,709,'#0f172a',1);
+246: ruler(710,662,840,'g',colors.purple,g.g,`g=${fmt(state.g)}m/s²`,state.drag==='g');
+249: line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=10;i++){const x=x1+(x2-x1)*i/10;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-18,c,'center',12,'900');handle(h
+252: el.meter1Label.textContent=state.mode==='pull'?'临界外力 Fcrit':'共速/滑下时刻';
+252D: el.meter1Label.textContent=state.mode==='pull'?'临界外力 Fcrit':'共速/滑下时刻';
+253D: el.meter1.textContent=state.mode==='pull'?`${fmt(v.Fcrit,1)} N`:(v.falls?`${fmt(v.fallT,2)} s 滑下`:`${fmt(v.tCommon,2)} s 共速`);
+254: el.meter2.textContent=state.mode==='pull'?`${fmt(v.fNeed||v.fMax,2)} / ${fmt(v.fMax,2)} N`:`${fmt(v.fMax,2)} N`;
+254D: el.meter2.textContent=state.mode==='pull'?`${fmt(v.fNeed||v.fMax,2)} / ${fmt(v.fMax,2)} N`:`${fmt(v.fMax,2)} N`;
+255: el.meter3.textContent=`${fmt(v.am,2)} / ${fmt(v.aM,2)} m/s²`;
+255D: el.meter3.textContent=`${fmt(v.am,2)} / ${fmt(v.aM,2)} m/s²`;
+256: el.meter4.textContent=`${fmt(v.relX,2)} / ${fmt(state.L,1)} m`;
+256D: el.meter4.textContent=`${fmt(v.relX,2)} / ${fmt(state.L,1)} m`;
+257: const bad=v.relX>=state.L-.001, warn=state.mode==='pull'?Math.abs(state.F-v.Fcrit)<.2:v.phase.includes('滑动');
+268: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+269: function near(p,h,rad=26){return Math.hypot(p.x-h.x,p.y-h.y)<=rad}
+270D: function setMode(mode){state.mode=mode;state.t=0;state.playing=false;playBtn.textContent='播放过程';pullMode.classList.toggle('active',mode==='pull');kickMode.classList.toggle('active',mode==='kick');draw
+272D: state.playing=false;playBtn.textContent='播放过程';
+286: if(state.drag==='F')state.F=clamp((p.x-202)/180*30,0,30);
+287: if(state.drag==='v0')state.v0=clamp((p.x-202)/180*8,0,8);
+288: if(state.drag==='time')state.t=clamp((p.x-78)/330*Math.max(.2,v.endT),0,v.endT);
+289: if(state.drag==='m')state.m=clamp(.5+(p.x-70)/130*2.5,.5,3);
+290: if(state.drag==='M')state.M=clamp(1+(p.x-230)/130*5,1,6);
+
+===== anim/bx1/pursuit.html (187 lines, kept 39) =====
+30: <canvas id="canvas" width="940" height="560" aria-label="追及相遇交互实验台"></canvas>
+31: <div class="hint">可拖动前车起点 d、v-t 图中的后车 v0/终点、前车速度线和橙色时间游标</div>
+34: <div class="box task"><b>观察任务：</b>拖时间游标，看距离 Δx 先增后减；在 v1=v2 的竖线处，判断这是最远距离还是最近距离，不要把“速度相等”误当“相遇”。</div>
+38: <button id="mStart" class="active">静止追匀速</button><button id="mInitial">有初速追赶</button>
+39: <button id="mSlow">加速度较小</button><button id="mEqual">临界共速</button>
+42: <div class="box"><div class="buttons"><button id="play">▶ 播放运动</button><button id="resetBtn">重置</button></div></div>
+43: <div class="readout" id="readout"></div>
+43D: <div class="readout" id="readout"></div>
+46: x1=v10t+1/2at²。<br>
+50: <div class="box warn" id="status"></div>
+57D: const readout=document.getElementById('readout');
+65: const state={v10:0,a:2,v2:8,d:40,t:4,mode:'start'};
+71: function x1(t){return state.v10*t+0.5*state.a*t*t;}
+77: const A=0.5*state.a,B=state.v10-state.v2,C=-state.d,eps=1e-8;
+78: if(Math.abs(A)<eps){if(Math.abs(B)<eps)return[];const t=-C/B;return t>=0?[t]:[];}
+79: const D=B*B-4*A*C;if(D<0)return[];
+80: const r1=(-B-Math.sqrt(D))/(2*A),r2=(-B+Math.sqrt(D))/(2*A);
+83: function domainX(){const roots=meetTimes();const tMax=Math.max(15,roots[0]?roots[0]*1.1:15);let m=80;for(let t=0;t<=Math.min(tMax,18);t+=1){m=Math.max(m,x1(t),x
+104: function arrow(x1,y1,x2,y2,color,width=3){line(x1,y1,x2,y2,color,width);const a=Math.atan2(y2-y1,x2-x1),l=10;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-l*M
+111: for(let s=0;s<=m;s+=Math.max(20,Math.ceil(m/8/10)*10)){const x=px(s);line(x,track.y-8,x,track.y+8,'#bcccdc');text(String(Math.round(s)),x,track.y+25,'#7b8794',1
+116: ctx.fillStyle='#243b53';for(const c of [r-15,r+15,f-15,f+15]){ctx.beginPath();ctx.arc(c,track.y-20,5,0,Math.PI*2);ctx.fill();}
+119: if(dx(state.t)>0){line(r+25,track.y-90,f-25,track.y-90,'#f08c00',2,[5,5]);text(`Δx=${dx(state.t).toFixed(1)} m`,(r+f)/2,track.y-102,'#f08c00',13,'center','800')
+121: text(`t=${state.t.toFixed(1)} s，v1=${v1(state.t).toFixed(1)} m/s，v2=${state.v2.toFixed(1)} m/s`,468,86,'#0b7285',14,'center','800');
+127: for(let t=0;t<=15;t+=5){const x=g.ox+t/g.tMax*g.w;line(x,g.oy-5,x,g.oy+5,'#9fb3c8');text(String(t),x,g.oy+19,'#627d98',11,'center','500');}
+134: ctx.beginPath();for(let i=0;i<=120;i++){const t=gd.tMax*i/120,sx=gdX(t),sy=gdY(dx(t));if(i===0)ctx.moveTo(sx,sy);else ctx.lineTo(sx,sy);}ctx.strokeStyle='#f08c0
+140: ctx.beginPath();for(let i=0;i<=80;i++){const t=gv.tMax*i/80,sx=gvX(t),sy=gvY(v1(t));if(i===0)ctx.moveTo(sx,sy);else ctx.lineTo(sx,sy);}ctx.strokeStyle='#2f80ed'
+161: readout.innerHTML=`v10=<b>${state.v10.toFixed(1)}</b> m/s<br>a=<b>${state.a.toFixed(2)}</b> m/s²<br>v2=<b>${state.v2.toFixed(1)}</b> m/s<br>d=<b>${state.d.toFix
+162D: if(dx(state.t)<=0) status.textContent='已经相遇或超过：相遇条件是位置相同，也就是 Δx=0。';
+163D: else if(te!==null&&Math.abs(state.t-te)<0.08) status.textContent='当前是速度相等时刻。此模型中它通常是最远距离，不是相遇时刻。';
+164D: else if(te!==null&&state.t<te) status.textContent='后车仍比前车慢，距离还在增大；到 v1=v2 时距离达到最远。';
+165D: else status.textContent='后车已比前车快，距离开始缩小；是否相遇要看 Δx-t 曲线何时到 0。';
+167: function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
+168: canvas.addEventListener('pointerdown',e=>{const p=pointer(e);for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30){drag=k;can
+172: if(drag==='time') state.t=Math.round(tFromG(p.x,gd)*20)/20;
+173: if(drag==='v10') state.v10=Math.round(vFromGv(p.y)*10)/10;
+174: if(drag==='a') state.a=Math.round(((vFromGv(p.y)-state.v10)/gv.tMax)*100)/100;
+175: if(drag==='v2') state.v2=Math.round(vFromGv(p.y)*10)/10;
+177: let hit=false;for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30)hit=true;}
+182: const playBtn=document.getElementById("play"),resetBtn=document.getElementById("resetBtn");let __run=false,__last=performance.now();playBtn.addEventListener("cl
+
+===== anim/bx1/reference-frame.html (258 lines, kept 44) =====
+38: <canvas id="canvas" width="940" height="560" aria-label="参考系与相对速度交互实验台：道路侧视装置、速度图像和数据记录"></canvas>
+39: <div class="tip">可拖动画面中的橙色速度端点，改变 vA、vB 或雨/人速度</div>
+42: <div class="card task"><b>观察任务：</b>拖速度箭头，再切换参考系；对照道路侧视装置、速度图像和数据记录，看绿色相对速度怎样改变。</div>
+43: <div class="buttons"><button id="playBtn">播放</button><button id="resetBtn">重置</button></div>
+45: <div class="title">实验类型</div>
+46: <div class="tabs"><button id="tabLine" class="active">两车一维</button><button id="tabRain">雨中人二维</button></div>
+48: <div class="card" id="controlCard"></div>
+49: <div class="readout" id="readout"></div>
+49D: <div class="readout" id="readout"></div>
+50: <div class="card formula" id="formula"></div>
+51: <div class="status" id="status"></div>
+77: const a=Math.atan2(y2-y1,x2-x1);
+80: if(Math.hypot(x2-x1,y2-y1)>6){
+82: ctx.lineTo(x2-11*Math.cos(a-.45),y2-11*Math.sin(a-.45));
+83: ctx.lineTo(x2-11*Math.cos(a+.45),y2-11*Math.sin(a+.45));
+121: layout.vA={x:ox+vA*scale,y:yA,ox,y:yA};
+122: layout.vB={x:ox+vB*scale,y:yB,ox,y:yB};
+125: for(let i=0;i<7;i++) line(560+i*50,roadY-6,560+i*50,roadY+6,'#829ab1',1.5);
+148D: text('公式绑定：v物/参 = v物/地 - v参/地。当前：vA/'+frameName()+' = '+vA+' - ('+vf+') = '+relA+' m/s',470,484,'#087f5b','center',14,'700');
+160: const mag=Math.hypot(vMan,vRain);
+161: const ang=Math.atan2(vMan,vRain)*180/Math.PI;
+170: layout.vMan={x:px+vMan*28,y:py-66,ox:px,y:py-66};
+172: for(let i=0;i<7;i++){const rx=96+i*46;line(rx,82,rx,82+vRain*18,'rgba(44,123,229,.45)',2);}
+175: layout.vRain={x:380,y:84+vRain*18,ox:380,y0:84};
+177: for(let i=0;i<5;i++) line(px-52+i*24+vMan*8,py-120,px-52+i*24,py-120+vRain*22,'#1a7a1a',2.2);
+189D: text('公式绑定：v雨/人 = v雨/地 - v人/地 = (0,-'+vRain+') - ('+vMan+',0) = (-'+vMan+',-'+vRain+')',470,326,'#9a6700','center',14,'700');
+203: document.getElementById('readout').innerHTML=rows.map(r=>r[0]+'=<b>'+r[1]+'</b>').join('<br>');
+203D: document.getElementById('readout').innerHTML=rows.map(r=>r[0]+'=<b>'+r[1]+'</b>').join('<br>');
+205: function setFormula(s){document.getElementById('formula').innerHTML='<div class="title">公式和画面绑定</div><div>'+s+'</div>';}
+205D: function setFormula(s){document.getElementById('formula').innerHTML='<div class="title">公式和画面绑定</div><div>'+s+'</div>';}
+206D: function setStatus(s){document.getElementById('status').textContent=s;}
+208D: function syncPlayButton(){document.getElementById('playBtn').textContent=running?'暂停':'播放';}
+212: el.innerHTML='<div class="title">参考系</div><div class="seg"><button id="fGround">地面</button><button id="fA">车A</button><button id="fB">车B</button></div>';
+212D: el.innerHTML='<div class="title">参考系</div><div class="seg"><button id="fGround">地面</button><button id="fA">车A</button><button id="fB">车B</button></div>';
+219: el.innerHTML='<div class="title">二维参数</div><label class="param"><span>雨速 v雨 <b id="rainText">'+vRain+' m/s</b></span><input id="rainSlider" type="range" min="1"
+225: function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
+229: const h=layout[k];
+230: if(Math.hypot(p.x-h.x,p.y-h.y)<28){drag=k;canvas.setPointerCapture(e.pointerId);break;}
+236: if(drag==='vA') vA=Math.round(clamp((p.x-layout.vA.ox)/scale,-20,30));
+237: if(drag==='vB') vB=Math.round(clamp((p.x-layout.vB.ox)/scale,-20,30));
+238: if(drag==='vMan') vMan=Math.round(clamp((p.x-layout.vMan.ox)/28,0,8)*2)/2;
+239: if(drag==='vRain') vRain=Math.round(clamp((p.y-layout.vRain.y0)/18,1,8)*2)/2;
+243: for(const k of Object.keys(layout)){const h=layout[k]; if(Math.hypot(p.x-h.x,p.y-h.y)<28) hit=true;}
+252: function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(running&&mode==='line'){t+=dt;draw();}requestAnimationFrame(loop);}
+
+===== anim/bx1/si-units.html (61 lines, kept 20) =====
+21: <div class="stage"><canvas id="canvas" width="900" height="600" aria-label="量纲检查实验台：单位积木侧视、公式天平、维度图像和检查记录"></canvas></div>
+23: <div class="card task"><b>观察任务：</b>切换公式或拖动右侧指数滑块；看左右单位积木是否平衡，用量纲先发现公式错误。</div>
+25: <div class="title">公式检查器</div>
+26: <div class="buttons"><button data-case="newton" class="active">F=ma</button><button data-case="power">P=W/t</button><button data-case="gravity">F=Gm1m2/r²</butt
+27: <label class="param"><span>右侧长度指数 L <b id="lLab">1</b></span><input id="lExp" type="range" min="-3" max="3" step="1" value="1"></label>
+28: <label class="param"><span>右侧时间指数 T <b id="tLab">-2</b></span><input id="tExp" type="range" min="-4" max="2" step="1" value="-2"></label>
+29: <label class="param"><span>右侧质量指数 M <b id="mLab">1</b></span><input id="mExp" type="range" min="-2" max="2" step="1" value="1"></label>
+30: <div class="buttons"><button id="play">播放</button><button id="reset">重置</button></div>
+32: <div class="readout" id="readout"></div>
+32D: <div class="readout" id="readout"></div>
+33: <div class="card formula"><div class="title">公式绑定</div><div>量纲写作 M^a L^b T^c。等式左右量纲必须一致。</div><div>N=kg·m/s²，J=N·m，W=J/s。</div></div>
+33D: <div class="card formula"><div class="title">公式绑定</div><div>量纲写作 M^a L^b T^c。等式左右量纲必须一致。</div><div>N=kg·m/s²，J=N·m，W=J/s。</div></div>
+34: <div class="status" id="status"></div>
+42: const cases={newton:{name:'F=ma',left:{M:1,L:1,T:-2},right:{M:1,L:1,T:-2},note:'牛顿 N = kg·m/s²'},power:{name:'P=W/t',left:{M:1,L:2,T:-3},right:{M:1,L:2,T:-3},no
+44: const state={key:'newton',playing:false,phase:0,drag:null};
+49: function arrow(x1,y1,x2,y2,c,w=3){const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(
+50: function vals(){const c=cases[state.key];return{left:c.left,right:{M:+el.m.value,L:+el.l.value,T:+el.t.value},name:c.name,note:c.note}}
+52: function draw(){const v=vals(),ok=eq(v.left,v.right);ctx.clearRect(0,0,900,600);const bg=ctx.createLinearGradient(0,0,0,600);bg.addColorStop(0,'#fbfdff');bg.add
+54: canvas.addEventListener('pointerdown',e=>{state.drag='right';canvas.setPointerCapture(e.pointerId);move(e)});canvas.addEventListener('pointermove',move);functio
+56: function loop(){if(state.playing){state.phase+=0.04;el.t.value=Math.round(-1+2*Math.sin(state.phase));}draw();requestAnimationFrame(loop)}draw();requestAnimatio
+
+===== anim/bx1/spring-instant.html (324 lines, kept 78) =====
+39: <div class="stage"><canvas id="canvas" width="960" height="760" aria-label="弹簧瞬时问题交互实验台"></canvas></div>
+41: <div class="card task"><b>观察任务：</b>先看 `t=0-` 是否平衡，再切换 `cut_target`。剪断瞬间只删除被剪断/撤去的约束，未剪断弹簧的 `x` 和 `F弹=kx` 保持原值。</div>
+42: <div class="chips"><button id="playBtn">播放 0+ 短过程</button><button id="resetBtn">重置</button></div>
+44: <div class="title">cut_target 瞬时事件</div>
+46: <button data-target="rope" class="active">剪断 A-B 绳</button>
+47: <button data-target="spring">剪断上弹簧</button>
+48: <button data-target="support">撤去下支撑</button>
+49: <button id="balanceBtn">令 x=平衡值</button>
+53: <div class="title">快速情境</div>
+55: <button data-case="equal">双物块基础</button>
+56: <button data-case="heavyB">下物块更重</button>
+57: <button data-case="soft">软弹簧大形变</button>
+58: <button data-case="support">撤支撑下落</button>
+62: <div class="title">实时读数</div>
+64: <div class="meter"><span>F弹=kx</span><b id="fText">30.0 N</b></div>
+65: <div class="meter"><span>ΣF(0-) / N支撑</span><b id="eqText">0.0 N</b></div>
+66: <div class="meter"><span>a1 / a2</span><b id="aText">5.0 / -10.0</b></div>
+67: <div class="meter"><span>事件</span><b id="targetText">剪下绳</b></div>
+72: <div><span>平衡前</span><b>ΣF=0</b></div>
+74: <div><span>重新受力</span><b>ΣF=ma</b></div>
+76: <div class="card small"><b>三视图：</b>左侧是 `t=0-` 侧视实物，右侧是 `t=0+` 瞬时受力图，右下是图像记录时间线。可拖 `m1`、`m2`、`k`、`x`、`g`。</div>
+77: <div class="status" id="status">默认是剪断 A-B 绳：A 保留弹簧力，B 只受重力。</div>
+85: const state={m1:2,m2:1,k:100,x:.30,g:10,target:'rope',drag:null,playing:false,playT:0};
+90: const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+99: if(Math.hypot(x2-x1,y2-y1)<2)return;
+100: const a=Math.atan2(y2-y1,x2-x1);line(x1,y1,x2,y2,c,w);ctx.save();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-13*Math.cos(a-.42),y2-13*Math.s
+109: const n=8,amp=13,seg=len/(n*2);
+110: for(let i=1;i<=n*2;i++)ctx.lineTo(cx+(i%2?amp:-amp),top+(flip?-i*seg:i*seg));
+114: const F=state.k*state.x, w1=state.m1*state.g, w2=state.m2*state.g, total=(state.m1+state.m2)*state.g;
+118: a1=(F-w1)/state.m1;
+127: a1=(F-total)/(state.m1+state.m2);
+132: const xEq=state.target==='support'?total/state.k:total/state.k;
+140: const q=values();
+141: state.x=clamp(q.xEq*.55,.05,.7);
+142: }else state.x=clamp((state.m1+state.m2)*state.g/state.k,.05,.7);
+150: const top=114,stretch=76+clamp(state.x*.78,0,160),baseAY=top+stretch,baseBY=baseAY+104;
+151: const tau=after?Math.min(state.playT,1.45):0;
+152: const aShift=clamp(-0.5*q.a1*tau*tau*12,-78,108);
+153: const bShift=clamp(-0.5*q.a2*tau*tau*12,-78,116);
+164: if(after&&state.target==='rope'){line(cx,aY+44,cx,bY,'#b0bcc9',4,[7,5]);text('T=0',cx+22,(aY+bY)/2,colors.muted,'left',12,'900')}
+173: text(Math.abs(q.eqForce)<.25?'t=0-：F弹=(m1+m2)g，系统平衡':`t=0-：ΣF=${fmt(q.eqForce)}N，先令 x=平衡值`,cx,528,Math.abs(q.eqForce)<.25?colors.green:colors.orange,'center',12
+177: text(`a1=${fmt(q.a1)}m/s²`,cx+140,aY+16,colors.purple,'right',11,'900');
+178: text(`a2=${fmt(q.a2)}m/s²`,cx+140,bY+18,colors.purple,'right',11,'900');
+179: text(state.target==='spring'?'t=0+：被剪弹簧力消失':'t=0+：T=0，A/B 立即按各自加速度分离',cx,528,colors.green,'center',12,'900');
+185: const floor=362,initialLen=64+clamp(state.x*.72,0,150),initialTop=floor-initialLen;
+186: const tau=after?Math.min(state.playT,1.45):0;
+187: const shift=after?clamp(-0.5*q.a1*tau*tau*12,-34,82):0;
+199: if(after){arrow(cx+108,bY,cx+108,bY-clamp(q.a1*10,-110,110),colors.purple,4);text(`a=${fmt(q.a1)}m/s²`,cx+140,bY-8,colors.purple,'right',11,'900')}
+207: ?[`F弹=kx=${fmt(q.F)}N`,`t=0-: N=(m1+m2)g-F弹=${fmt(q.supportN)}N`,`t=0+: N=0, ΣF=F弹-(m1+m2)g`,`a=ΣF/(m1+m2)=${fmt(q.a1)}m/s²`]
+209: ?[`F弹=kx=${fmt(q.F)}N`,Math.abs(q.eqForce)<.25?'t=0-: F弹=(m1+m2)g':`t=0-: ΣF=${fmt(q.eqForce)}N，非平衡`,`t=0+: 被剪弹簧 F弹'=0`,`A、B 瞬时均自由下落 a=-g`]
+210: :[`F弹=kx=${fmt(q.F)}N`,Math.abs(q.eqForce)<.25?'t=0-: F弹=m1g+T, T=m2g':`t=0-: ΣF=${fmt(q.eqForce)}N，非平衡`,`t=0+: T=0, A 保留 F弹`,`a1=(F弹-m1g)/m1=${fmt(q.a1)}m/s²`]
+214: line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=5;i++){const x=x1+(x2-x1)*i/5;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-18,c,'center',12,'900');
+215: ctx.save();ctx.fillStyle=active?'#fde68a':'#fff';ctx.strokeStyle=active?'#b45309':c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(hx,y,10,0,Math.PI*2);ctx.fill();ctx.
+231: ruler(394,660,534,'k',colors.green,g.k,`k=${fmt(state.k,0)}N/m`,state.drag==='k');
+233: ruler(730,660,870,'g',colors.orange,g.g,`g=${fmt(state.g)}m/s²`,state.drag==='g');
+245: const dotX=770+Math.min(1,state.playT/2.2)*120;
+246: ctx.fillStyle=colors.purple;ctx.beginPath();ctx.arc(dotX,162,7,0,Math.PI*2);ctx.fill();
+250D: els.f.textContent=`${fmt(q.F)} N`;
+251: els.eq.textContent=state.target==='support'?`${fmt(q.eqForce)} / ${fmt(q.supportN)}`:`${fmt(q.eqForce)} N`;
+251D: els.eq.textContent=state.target==='support'?`${fmt(q.eqForce)} / ${fmt(q.supportN)}`:`${fmt(q.eqForce)} N`;
+252: els.a.textContent=`${fmt(q.a1)} / ${fmt(q.a2)}`;
+252D: els.a.textContent=`${fmt(q.a1)} / ${fmt(q.a2)}`;
+253D: els.target.textContent=q.label;
+256: if(state.target==='support')els.status.textContent=invalidSupport?`当前 F弹=${fmt(q.F)}N 大于总重，支撑不能“向下拉”；请减小 x 或重置。`:`撤支撑前 N=${fmt(q.supportN)}N，撤去后 N=0，物块按 a=${fmt
+256D: if(state.target==='support')els.status.textContent=invalidSupport?`当前 F弹=${fmt(q.F)}N 大于总重，支撑不能“向下拉”；请减小 x 或重置。`:`撤支撑前 N=${fmt(q.supportN)}N，撤去后 N=0，物块按 a=${fmt(q.a1)}m/s² 运动。`;
+257D: else els.status.textContent=(warn?`当前 x 不是平衡形变量，ΣF=${fmt(q.eqForce)}N；可点“令 x=平衡值”。`:`平衡前 ΣF≈0。`)+` ${q.label} 后按 t=0+ 新受力图列 ΣF=ma，未剪断弹簧保持 F弹=${fmt(q.F)}N。`;
+260: const q=values(),g=geometry();
+268: function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+269: function near(p,h,rad=25){return Math.hypot(p.x-h.x,p.y-h.y)<=rad}
+271D: state.playing=false;animSeq++;playBtn.textContent='播放 0+ 短过程';
+279: if(state.drag==='m1')state.m1=clamp(.5+(p.x-58)/140*4.5,.5,5);
+280: if(state.drag==='m2')state.m2=clamp(.5+(p.x-226)/140*4.5,.5,5);
+281: if(state.drag==='k')state.k=clamp(50+(p.x-394)/140*230,50,280);
+282: if(state.drag==='x')state.x=clamp(.05+(p.x-562)/140*.65,.05,.7);
+283: if(state.drag==='g')state.g=clamp(2+(p.x-730)/140*10,2,12);
+302: const c=btn.dataset.case;
+314D: if(state.playT>=2.2){state.playing=false;playBtn.textContent='播放 0+ 短过程';draw();return}
+317D: playBtn.addEventListener('click',()=>{state.playing=!state.playing;playBtn.textContent=state.playing?'暂停':'播放 0+ 短过程';if(state.playing){state.playT=0;animate(++animSeq)}else{animSeq++;draw()}});
+
+===== anim/bx1/time-instant.html (207 lines, kept 49) =====
+37: <canvas id="canvas" width="940" height="560" aria-label="时刻与时间间隔交互实验台：时间轴侧视装置、位移图像和数据记录"></canvas>
+38: <div class="tip">可直接拖动红色 t1/t2 游标和橙色速度端点</div>
+41: <div class="card task"><b>观察任务：</b>拖 t1、t2 两个红点，对照时间轴侧视装置、位移图像和数据记录，看橙色时间段 Δt 和绿色位移怎样对应。</div>
+43: <div class="title">实验参数</div>
+44: <label class="param"><span>速度 v <b id="vText">4.0 m/s</b></span><input id="vSlider" type="range" min="1" max="9" step="0.5" value="4"></label>
+45: <label class="param"><span>起始时刻 t1 <b id="t1Text">2.0 s</b></span><input id="t1Slider" type="range" min="0" max="9.5" step="0.5" value="2"></label>
+46: <label class="param"><span>末时刻 t2 <b id="t2Text">5.0 s</b></span><input id="t2Slider" type="range" min="0.5" max="10" step="0.5" value="5"></label>
+47: <div class="controls"><button id="playBtn">播放</button><button id="resetBtn">重置</button></div>
+49: <div class="readout" id="readout"></div>
+49D: <div class="readout" id="readout"></div>
+51: <div class="title">公式绑定</div>
+53: <div>位移公式用 `Δt=t2-t1`，不是用秒表读数 `t2`。</div>
+53D: <div>位移公式用 `Δt=t2-t1`，不是用秒表读数 `t2`。</div>
+55: <div class="status" id="status"></div>
+81: const a=Math.atan2(y2-y1,x2-x1);
+84: if(Math.hypot(x2-x1,y2-y1)>7){
+86: ctx.lineTo(x2-10*Math.cos(a-.45),y2-10*Math.sin(a-.45));
+87: ctx.lineTo(x2-10*Math.cos(a+.45),y2-10*Math.sin(a+.45));
+104: ctx.fillStyle='#334e68';ctx.beginPath();ctx.arc(x-12,y+12,5,0,Math.PI*2);ctx.arc(x+12,y+12,5,0,Math.PI*2);ctx.fill();
+110: document.getElementById('vText').textContent=v.toFixed(1)+' m/s';
+110D: document.getElementById('vText').textContent=v.toFixed(1)+' m/s';
+111D: document.getElementById('t1Text').textContent=t1.toFixed(1)+' s';
+112D: document.getElementById('t2Text').textContent=t2.toFixed(1)+' s';
+116: const dt=t2-t1;
+117: const activeTime=clamp(Math.min(now,t2)-t1,0,dt);
+118: const xNow=v*activeTime;
+119: const xFinal=v*dt;
+120: const wrong=v*t2;
+121: const xScale=(road.x1-road.x0)/(9*10);
+134: text('Δt = '+dt.toFixed(1)+' s',(tx(t1)+tx(t2))/2,axis.y-50,'#9a6700','center',13,'700');
+141: ctx.fillStyle='#7b2cbf';ctx.beginPath();ctx.arc(tx(now),axis.y,6,0,Math.PI*2);ctx.fill();
+149: const carX=road.x0+xNow*xScale;
+151: ctx.fillStyle='rgba(26,122,26,.23)';ctx.fillRect(road.x0,road.y-12,xNow*xScale,24);
+154: const wrongX=road.x0+wrong*xScale;
+159: const finalX=road.x0+xFinal*xScale;
+163: arrow(carX+24,road.y-18,carX+24+v*16,road.y-18,'#f0a500','v='+v.toFixed(1)+'m/s',3);
+165: layout.v={x:carX+24+v*16,y:road.y-18,base:carX+24};
+173: document.getElementById('readout').innerHTML='当前时刻 t=<b>'+now.toFixed(1)+' s</b><br>t1=<b>'+t1.toFixed(1)+' s</b>，t2=<b>'+t2.toFixed(1)+' s</b><br>Δt=t2-t1=<b>'
+176D: st.textContent=now<t1?'当前播放头还没进入区间：有时刻读数，但这段过程位移还没开始累积。':now<t2?'正在区间内：位移随已经经历的时间间隔增长。':'到达 t2：正确位移是 vΔt；红色虚线显示错用 t2 会多算。';
+178: function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
+181: for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30){drag=k;canvas.setPointerCapture(e.pointerId);break;}}
+186: if(drag==='t1') t1=snap(Math.min(timeFromX(p.x),t2-0.5),0.5);
+187: if(drag==='t2') t2=snap(Math.max(timeFromX(p.x),t1+0.5),0.5);
+188: if(drag==='v') v=snap(clamp((p.x-layout.v.base)/16,1,9),0.5);
+191: let hit=false;for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30)hit=true;}
+198D: document.getElementById('playBtn').onclick=()=>{running=!running;if(now>=10)now=0;document.getElementById('playBtn').textContent=running?'暂停':'播放';};
+199D: document.getElementById('resetBtn').onclick=()=>{now=0;running=false;document.getElementById('playBtn').textContent='播放';draw();};
+201: function loop(ts){const d=Math.min(.05,(ts-last)/1000);last=ts;if(running){now+=d;if(now>=10){now=10;running=false;document.getElementById('playBtn').textConten
+201D: function loop(ts){const d=Math.min(.05,(ts-last)/1000);last=ts;if(running){now+=d;if(now>=10){now=10;running=false;document.getElementById('playBtn').textContent='播放';}draw();}requestAnimationFrame(lo
+
+===== anim/bx1/uniform-acceleration.html (201 lines, kept 38) =====
+30: <canvas id="canvas" width="940" height="560" aria-label="匀变速直线运动交互实验台：小车侧视装置、v-t图像和数据记录"></canvas>
+31: <div class="hint">可拖动 v0 点、6 s 端点和橙色 t 游标，直接改变三条运动学公式里的量</div>
+34: <div class="box task"><b>观察任务：</b>拖右端点改变加速度，对照小车侧视装置、v-t 图像和数据记录，看频闪间距差是否恒定；拖 t 游标看面积 x。</div>
+38: <button id="mAccel" class="active">匀加速</button><button id="mBrake">匀减速</button>
+39: <button id="mReverse">反向加速</button><button id="mZero">由静止开始</button>
+42: <div class="box"><div class="buttons"><button id="play">▶ 播放运动</button><button id="resetBtn">重置</button></div></div>
+43: <div class="readout" id="readout"></div>
+43D: <div class="readout" id="readout"></div>
+47: x=v0t+1/2at²：v-t 面积。<br>
+50: <div class="box warn" id="status"></div>
+57D: const readout=document.getElementById('readout');
+65: const state={v0:2,a:1.4,t:4,mode:'accel'};
+66: const g={ox:82,oy:412,w:520,h:300,tMax:6,vMin:-10,vMax:18};
+72: function xAt(t){return state.v0*t+0.5*state.a*t*t;}
+92: const a=Math.atan2(y2-y1,x2-x1),l=10;
+94: ctx.lineTo(x2-l*Math.cos(a-0.55),y2-l*Math.sin(a-0.55));
+95: ctx.lineTo(x2-l*Math.cos(a+0.55),y2-l*Math.sin(a+0.55));
+115: const T=0.5, count=Math.floor(state.t/T);
+118: const tt=i*T, px=pxOf(xAt(tt));
+119: if(px>=track.x&&px<=track.x+track.w){ctx.fillStyle='#2f80ed';ctx.beginPath();ctx.arc(px,track.y-8,4.6,0,Math.PI*2);ctx.fill();}
+128: ctx.fillStyle='#243b53';ctx.beginPath();ctx.arc(p-15,track.y-22,5,0,Math.PI*2);ctx.arc(p+15,track.y-22,5,0,Math.PI*2);ctx.fill();
+132: text(`x=${xAt(state.t).toFixed(1)} m，v=${v.toFixed(1)} m/s，Δs=aT²=${(state.a*T*T).toFixed(2)} m`,468,84,'#0b7285',14,'center','800');
+137: const t1=tCur*i/steps,t2=tCur*(i+1)/steps;
+147: for(let i=0;i<=120;i++){const tt=g.tMax*i/120,sx=gx(tt),sy=gy(vAt(tt));if(i===0)ctx.moveTo(sx,sy);else ctx.lineTo(sx,sy);}
+152: text(`斜率 a=${state.a.toFixed(2)} m/s²`,gx(2)+12,gy(vAt(2))-13,'#7b2cbf',13);
+153: text(`面积 x=${x.toFixed(1)} m`,gx(Math.max(0.5,t*0.48)),gy(Math.max(0,v*0.45))+18,'#f08c00',13);
+165: text(`x = v0t + 1/2at²`,x+16,y+112,'#dbeafe',13);
+174: const t=state.t,v=vAt(t),x=xAt(t),lhs=v*v-state.v0*state.v0,rhs=2*state.a*x;
+175: readout.innerHTML=`v0=<b>${state.v0.toFixed(1)}</b> m/s<br>a=<b>${state.a.toFixed(2)}</b> m/s²<br>t=<b>${t.toFixed(2)}</b> s<br>v=<b>${v.toFixed(2)}</b> m/s<br>
+176D: if(Math.abs(state.a)<0.03) status.textContent='a≈0：退化为匀速直线运动，v-t 近似水平，频闪间距相等。';
+177D: else if(state.v0>0&&state.a<0&&t>-state.v0/state.a) status.textContent='数学模型已经越过 v=0 后反向；真实刹车题要在 v=0 处停止，下一节专门处理。';
+180: function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
+183: for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30){drag=k;canvas.setPointerCapture(e.pointerId);break;}}
+187: if(drag==='v0') state.v0=Math.round(vFromY(p.y)*10)/10;
+188: if(drag==='end') state.a=Math.round(((vFromY(p.y)-state.v0)/g.tMax)*100)/100;
+189: if(drag==='time') state.t=Math.round(tFromX(p.x)*20)/20;
+191: let hit=false;for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30)hit=true;}
+196: const playBtn=document.getElementById("play"),resetBtn=document.getElementById("resetBtn");let __run=false,__last=performance.now();playBtn.addEventListener("cl
+
+===== anim/bx1/uniform-motion.html (224 lines, kept 42) =====
+30: <canvas id="canvas" width="940" height="560" aria-label="匀速直线运动交互实验台：小车侧视装置、x-t图像和数据记录"></canvas>
+31: <div class="hint">可拖动起点旗、小车和 x-t 图上的橙色时间游标</div>
+34: <div class="box task"><b>观察任务：</b>拖小车改变速度，对照小车侧视装置、x-t 图像和数据记录，看频闪点是否仍等间距；拖时间游标看匀速推进。</div>
+38: <button id="mForward" class="active">正向匀速</button><button id="mBackward">负向匀速</button>
+39: <button id="mStill">静止</button><button id="mCompare">对比匀加速</button>
+42: <div class="box"><div class="buttons"><button id="play">▶ 播放运动</button><button id="resetBtn">重置</button></div></div>
+43: <div class="readout" id="readout"></div>
+43D: <div class="readout" id="readout"></div>
+50: <div class="box warn" id="status"></div>
+57D: const readout=document.getElementById('readout');
+65: const state={x0:-8,v:4,t:4,compare:false,mode:'forward'};
+103: const a=Math.atan2(y2-y1,x2-x1),l=10;
+105: ctx.lineTo(x2-l*Math.cos(a-0.55),y2-l*Math.sin(a-0.55));
+106: ctx.lineTo(x2-l*Math.cos(a+0.55),y2-l*Math.sin(a+0.55));
+129: const strobeDt=0.5, n=Math.floor(state.t/strobeDt);
+131: const tt=i*strobeDt, px=pxOf(state.x0+state.v*tt);
+132: if(px>=track.x&&px<=track.x+track.w){ctx.fillStyle='#2f80ed';ctx.beginPath();ctx.arc(px,track.y-10,4.5,0,Math.PI*2);ctx.fill();}
+135: const dx=state.v*state.t, a=2*dx/(state.t*state.t);
+137: const tt=i*strobeDt, px=pxOf(state.x0+0.5*a*tt*tt);
+138: if(px>=track.x&&px<=track.x+track.w){ctx.fillStyle='#f08c00';ctx.beginPath();ctx.arc(px,track.y-31,4.5,0,Math.PI*2);ctx.fill();}
+145: ctx.fillStyle='#243b53';ctx.beginPath();ctx.arc(p-15,track.y-19,5,0,Math.PI*2);ctx.arc(p+15,track.y-19,5,0,Math.PI*2);ctx.fill();
+147: text(`x=${xNow().toFixed(1)} m，Δx=${(state.v*state.t).toFixed(1)} m，v=${state.v.toFixed(1)} m/s`,470,88,'#0b7285',14,'center','800');
+172: text(`x-t 斜率 v=${state.v.toFixed(1)} m/s`,gx.ox+92,gx.oy-gx.h-2,'#2f80ed',13,'center','800');
+174: const dx=state.v*state.t, a=2*dx/(state.t*state.t);
+176: for(let i=0;i<=80;i++){const tt=8*i/80, xx=state.x0+0.5*a*tt*tt, sx=gxX(tt), sy=gxY(xx); if(i===0)ctx.moveTo(sx,sy); else ctx.lineTo(sx,sy);}
+187: text(`面积=Δx=${(state.v*state.t).toFixed(1)} m`,gv.ox+120,gv.oy+48,'#f08c00',13,'center','800');
+192: const gap=state.v*0.5;
+193: readout.innerHTML=`模式=<b>${state.compare?'对比匀加速':state.mode}</b><br>x0=<b>${state.x0.toFixed(1)}</b> m<br>t=<b>${state.t.toFixed(2)}</b> s<br>x=<b>${xNow().toFi
+194D: if(Math.abs(state.v)<0.03) status.textContent='v=0：频闪点重合，x-t 图是水平线，这叫静止，不是“有速度的匀速”。';
+195D: else if(state.v<0) status.textContent='v<0：小车沿负方向匀速，频闪仍等间距；x-t 斜率和 v-t 高度都为负。';
+197D: else status.textContent='判断匀速看“相同时间内位移相同”：频闪等间距、x-t 直线、v-t 水平线三者一致。';
+199: function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
+202: for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30){drag=k;canvas.setPointerCapture(e.pointerId);break;}}
+206: if(drag==='x0'){state.x0=Math.round(xOfPx(p.x)*10)/10;}
+207: if(drag==='car'){state.v=Math.round(((xOfPx(p.x)-state.x0)/state.t)*10)/10;}
+208: if(drag==='time'){state.t=Math.round(tFromGx(p.x)*20)/20;}
+210: let hit=false;for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30)hit=true;}
+215D: playBtn.addEventListener('click',()=>{if(state.t>=8)state.t=0;running=!running;playBtn.textContent=running?'⏸ 暂停':'▶ 播放运动';});
+216D: resetBtn.addEventListener('click',()=>{running=false;playBtn.textContent='▶ 播放运动';setMode('forward');});
+217D: canvas.addEventListener('pointerdown',()=>{if(running){running=false;playBtn.textContent='▶ 播放运动';}});
+218: function loop(now){const dt=Math.min((now-last)/1000,.05);last=now;if(running){state.t=Math.min(8,state.t+dt);if(state.t>=8){running=false;playBtn.textContent='
+218D: function loop(now){const dt=Math.min((now-last)/1000,.05);last=now;if(running){state.t=Math.min(8,state.t+dt);if(state.t>=8){running=false;playBtn.textContent='▶ 重新播放';}draw();}requestAnimationFrame(l
+
+===== anim/bx1/velocity.html (206 lines, kept 44) =====
+37: <canvas id="canvas" width="940" height="560" aria-label="平均速度与瞬时速度交互实验台：轨迹侧视装置、割线切线图像和数据记录"></canvas>
+38: <div class="tip">可拖动 x-t 图上的 P、Q 两点；Q 越靠近 P，平均速度越接近瞬时速度</div>
+41: <div class="card task"><b>观察任务：</b>拖 Q 点靠近 P 点，对照轨迹侧视装置、割线切线图像和数据记录，看橙色割线逐渐贴近蓝色切线。</div>
+43: <div class="title">运动参数</div>
+44: <label class="param"><span>初速度 v0 <b id="v0Text">2.0 m/s</b></span><input id="v0Slider" type="range" min="0" max="10" step="0.2" value="2"></label>
+45: <label class="param"><span>加速度 a <b id="aText">1.5 m/s²</b></span><input id="aSlider" type="range" min="0" max="4" step="0.1" value="1.5"></label>
+46: <div class="controls"><button id="shrinkBtn">缩小 Δt</button><button id="uniformBtn">设为匀速</button></div>
+47: <div class="controls" style="margin-top:6px"><button id="playBtn">▶ 播放：Δt 自动逼近0</button><button id="resetBtn">重置播放</button></div>
+49: <div class="readout" id="readout"></div>
+49D: <div class="readout" id="readout"></div>
+51: <div class="title">公式绑定</div>
+53: <div>瞬时速度 `v=lim(Δt→0)Δx/Δt`：蓝色切线斜率。</div>
+55: <div class="status" id="status"></div>
+66: function xAt(tt){return v0*tt+0.5*a*tt*tt;}
+83: const ang=Math.atan2(y2-y1,x2-x1);
+86: if(Math.hypot(x2-x1,y2-y1)>8){
+88: ctx.lineTo(x2-11*Math.cos(ang-.45),y2-11*Math.sin(ang-.45));
+89: ctx.lineTo(x2-11*Math.cos(ang+.45),y2-11*Math.sin(ang+.45));
+110: for(let i=0;i<=4;i++){const val=xMax()*i/4;line(graph.ox-5,sy(val),graph.ox+5,sy(val),'#829ab1',1.5);text(val.toFixed(0),graph.ox-18,sy(val),'#486581','right',1
+114: for(let i=0;i<=100;i++){const tt=6*i/100,xx=xAt(tt),px=sx(tt),py=sy(xx);if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}
+120: const t1=t,t2=t+dt,x1=xAt(t1),x2=xAt(t2),vInst=vAt(t1),vAvg=(x2-x1)/(t2-t1),diff=Math.abs(vAvg-vInst);
+128: const ta=Math.max(0,t1-tangentDt),tb=Math.min(6,t1+tangentDt);
+129: const tangentY1=x1-vInst*(t1-ta), tangentY2=x1+vInst*(tb-t1);
+141: const carX=sceneX+25+Math.min(150,x1/xMax()*170);
+145: ctx.fillStyle='#334e68';ctx.beginPath();ctx.arc(carX-13,baseY+2,5,0,Math.PI*2);ctx.arc(carX+13,baseY+2,5,0,Math.PI*2);ctx.fill();
+149: const barX=650,barY=250,barW=190,scaleV=Math.max(vAt(6),vAvg,8)*1.12;
+151: ctx.fillStyle='rgba(240,165,0,.25)';ctx.fillRect(barX,barY,barW*vAvg/scaleV,24);ctx.strokeStyle='#f0a500';ctx.strokeRect(barX,barY,barW*vAvg/scaleV,24);text('v̄
+152: ctx.fillStyle='rgba(44,123,229,.25)';ctx.fillRect(barX,barY+46,barW*vInst/scaleV,24);ctx.strokeStyle='#2c7be5';ctx.strokeRect(barX,barY+46,barW*vInst/scaleV,24)
+156: text('v̄ = [x(t+Δt)-x(t)]/Δt = '+vAvg.toFixed(3)+' m/s；v = v0+at = '+vInst.toFixed(3)+' m/s',470,486,'#334e68','center',14,'700');
+161: document.getElementById('v0Text').textContent=v0.toFixed(1)+' m/s';
+161D: document.getElementById('v0Text').textContent=v0.toFixed(1)+' m/s';
+162: document.getElementById('aText').textContent=a.toFixed(1)+' m/s²';
+162D: document.getElementById('aText').textContent=a.toFixed(1)+' m/s²';
+163: document.getElementById('readout').innerHTML='t=<b>'+t.toFixed(2)+' s</b><br>Δt=<b>'+dt.toFixed(2)+' s</b><br>平均速度 v̄=<b>'+vAvg.toFixed(3)+' m/s</b><br>瞬时速度 v=<
+166D: st.textContent=diff<0.08?'极限思想可见：Δt 很小时，割线斜率几乎等于切线斜率。':'平均速度描述一段过程；瞬时速度描述 P 点这一刻。拖 Q 靠近 P 再观察。';
+168: function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
+171: for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30){drag=k;canvas.setPointerCapture(e.pointerId);break;}}
+176: if(drag==='P'){t=snap(Math.min(timeFromX(p.x),5.95),0.05);if(t+dt>6)dt=6-t;}
+177: if(drag==='Q'){const tq=snap(timeFromX(p.x),0.05);dt=Math.max(0.05,tq-t);if(t+dt>6)dt=6-t;}
+180: let hit=false;for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30)hit=true;}
+186: document.getElementById('shrinkBtn').onclick=()=>{dt=Math.max(0.05,dt/2);draw();};
+191D: if(dt<=0.06){dt=0.06;playing=false;document.getElementById('playBtn').textContent='▶ 播放：Δt 自动逼近0';draw();return;}
+197D: document.getElementById('playBtn').textContent=playing?'⏸ 暂停':'▶ 播放：Δt 自动逼近0';
+200D: document.getElementById('resetBtn').onclick=()=>{playing=false;dt=dt0>0.1?dt0:1.5;document.getElementById('playBtn').textContent='▶ 播放：Δt 自动逼近0';draw();};
+
+===== anim/bx1/vertical-throw.html (37 lines, kept 17) =====
+13: <div class="stage"><canvas id="canvas" width="940" height="560" aria-label="竖直上抛交互实验台：小球侧视装置、v-t图像和数据记录"></canvas><div class="hint">可拖动 v0 点、调 g 点和橙色时间游标；最高点处 v
+15: <div class="box task"><b>观察任务：</b>拖 t 到紫色最高点竖线，对照小球侧视装置、v-t 图像和数据记录，看速度为 0 时加速度箭头是否消失。</div>
+16: <div class="box"><b>环境</b><div class="buttons" style="margin-top:7px"><button id="mEarth" class="active">地球</button><button id="mMoon">月球</button><button id="mH
+17: <div class="box"><div class="buttons"><button id="play">▶ 播放上抛</button><button id="resetBtn">重置</button></div></div>
+18: <div class="readout" id="readout"></div><div class="box formula"><b>公式绑定</b><br>v=v0-gt。<br>h=v0t-1/2gt²。<br>t上=v0/g，Hmax=v0²/(2g)。<br>回抛点：t总=2t上，v=-v0。</div><d
+18D: <div class="readout" id="readout"></div><div class="box formula"><b>公式绑定</b><br>v=v0-gt。<br>h=v0t-1/2gt²。<br>t上=v0/g，Hmax=v0²/(2g)。<br>回抛点：t总=2t上，v=-v0。</div><div class="box warn" id="status"></div>
+22: (()=>{const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'),readout=document.getElementById('readout'),status=document.getElementById('stat
+23: function setMode(m){s.mode=m;if(m==='earth'){s.v0=20;s.g=9.8;s.t=2}if(m==='moon'){s.v0=20;s.g=1.6;s.t=4}if(m==='high'){s.v0=20;s.g=18;s.t=1.1}if(m==='fast'){s.v
+24: function drawScene(){card(50,36,365,462);line(sc.x,sc.y0,sc.x+sc.w,sc.y0,'#334e68',3);const top=yH(hMax());line(sc.x,top,sc.x+sc.w,top,'#7b2cbf',2,[6,5]);text(`
+25: function drawGraph(){card(438,36,410,462);line(gv.ox,gv.oy,gv.ox+gv.w+28,gv.oy,'#334e68',2);line(gv.ox,gv.oy+gv.h/2,gv.ox+gv.w,gv.oy+gv.h/2,'#7b8794',1.5);line(
+26: function draw(){var _bg=ctx.createLinearGradient(0,0,0,560);_bg.addColorStop(0,"#fbfdff");_bg.addColorStop(1,"#eaf0f7");ctx.fillStyle=_bg;ctx.fillRect(0,0,940,5
+27: function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}canvas.a
+29D: playBtn.addEventListener('click',()=>{if(s.t>=tTot())s.t=0;running=!running;playBtn.textContent=running?'⏸ 暂停':'▶ 播放上抛';});
+30: resetBtn.addEventListener('click',()=>{running=false;s.v0=20;s.g=9.8;s.t=2;s.mode='earth';Object.entries(btn).forEach(([k,b])=>b.classList.toggle('active',k==='
+30D: resetBtn.addEventListener('click',()=>{running=false;s.v0=20;s.g=9.8;s.t=2;s.mode='earth';Object.entries(btn).forEach(([k,b])=>b.classList.toggle('active',k==='earth'));playBtn.textContent='▶ 播放上抛';dr
+31: function loop(now){const dt=Math.min((now-last)/1000,.05);last=now;if(running){s.t=Math.min(tTot(),s.t+dt);if(s.t>=tTot()){running=false;playBtn.textContent='▶ 
+31D: function loop(now){const dt=Math.min((now-last)/1000,.05);last=now;if(running){s.t=Math.min(tTot(),s.t+dt);if(s.t>=tTot()){running=false;playBtn.textContent='▶ 重新上抛';}draw();}requestAnimationFrame(loo
+
+===== anim/bx1/vt-graph.html (218 lines, kept 37) =====
+30: <canvas id="canvas" width="940" height="560" aria-label="v-t 图像交互实验台：小车侧视装置、面积图像和数据记录"></canvas>
+31: <div class="hint">可拖动 v0 点、6 s 端点和时间游标，直接改变截距、斜率与面积</div>
+34: <div class="box task"><b>观察任务：</b>拖 v0 点看纵截距；对照小车侧视装置、面积图像和数据记录，拖橙色时间游标，看填充面积怎样对应位移。</div>
+38: <button id="mAccel" class="active">正向加速</button><button id="mBrake">刹车到反向</button>
+39: <button id="mUniform">匀速</button><button id="mReverse">负向运动</button>
+42: <div class="box"><div class="buttons"><button id="play">▶ 播放运动</button><button id="resetBtn">重置</button></div></div>
+43: <div class="readout" id="readout"></div>
+43D: <div class="readout" id="readout"></div>
+46: 纵截距：v0；斜率：a=Δv/Δt。<br>
+47: 面积：x=∫vdt=v0t+1/2 at²。<br>
+50: <div class="box warn" id="status"></div>
+57D: const readout = document.getElementById('readout');
+65: const state = { v0: 2, a: 1, t: 4, mode: 'accel' };
+66: const g = { ox: 86, oy: 392, w: 520, h: 300, tMax: 6, vMin: -12, vMax: 18 };
+76: function signedX(t){ return state.v0 * t + 0.5 * state.a * t * t; }
+79: const tc = -state.v0 / state.a;
+102: const ang=Math.atan2(y2-y1,x2-x1),len=10;
+104: ctx.lineTo(x2-len*Math.cos(ang-0.55),y2-len*Math.sin(ang-0.55));
+105: ctx.lineTo(x2-len*Math.cos(ang+0.55),y2-len*Math.sin(ang+0.55));
+134: const t1=tCur*i/steps, t2=tCur*(i+1)/steps;
+147: const t=g.tMax*i/120, x=xOf(t), y=yOf(vAt(t));
+156: text(`斜率 a=${state.a.toFixed(2)} m/s²`,xOf(2.05),yOf(vAt(2.0))-14,'#7b2cbf',13);
+157: text(`面积 x=${signedX(tCur).toFixed(1)} m`,xOf(Math.max(0.55,tCur*0.48)),yOf(Math.max(0, vCur*0.45))+18,'#f08c00',13);
+165: const trackX=120, trackY=103, px=clamp(trackX + x*9, 76, 820);
+168: const xx=trackX+m*9; if(xx>90&&xx<820){ line(ctx,xx,trackY+17,xx,trackY+31,'#bcccdc'); text(String(m),xx,trackY+45,'#7b8794',10,'center','500'); }
+171: ctx.fillStyle='#243b53'; ctx.beginPath(); ctx.arc(px-15,trackY+22,5,0,Math.PI*2); ctx.arc(px+15,trackY+22,5,0,Math.PI*2); ctx.fill();
+175: text(`x=${x.toFixed(1)} m，路程=${d.toFixed(1)} m，v=${v.toFixed(1)} m/s`,470,88,'#0b7285',14,'center','800');
+182: readout.innerHTML = `v0=<b>${state.v0.toFixed(1)}</b> m/s<br>v(6s)=<b>${vEnd.toFixed(1)}</b> m/s<br>a=<b>${state.a.toFixed(2)}</b> m/s²<br>t=<b>${t.toFixed(2)}<
+183D: if(Math.abs(state.a)<0.03) status.textContent='a≈0：v-t 图像近似水平线，面积是矩形，速度不变。';
+185D: else status.textContent='看斜率，不看线长：v-t 图线越陡，加速度大小越大；下方面积才是位移。';
+194: const h=layout[k];
+195: if(Math.hypot(p.x-h.x,p.y-h.y)<28){ drag=k; canvas.setPointerCapture(e.pointerId); break; }
+200: if(drag==='v0') state.v0 = Math.round(vOf(p.y)*10)/10;
+201: if(drag==='end') state.a = Math.round(((vOf(p.y)-state.v0)/g.tMax)*100)/100;
+202: if(drag==='t') state.t = Math.round(tOf(p.x)*20)/20;
+206: const h=layout[k]; if(Math.hypot(p.x-h.x,p.y-h.y)<28) hit=true;
+212: const playBtn=document.getElementById("play"),resetBtn=document.getElementById("resetBtn");let __run=false,__last=performance.now();playBtn.addEventListener("cl
+
+===== anim/bx1/xt-graph.html (175 lines, kept 32) =====
+33: <canvas id="canvas" width="940" height="560" aria-label="x-t 图像交互实验台"></canvas>
+34: <div class="tip">可拖动 x-t 图上的 P、Q 点；看图上点怎样对应直线轨道上的小车位置</div>
+37: <div class="card task"><b>观察任务：</b>拖 P 点读某时刻位置；拖 Q 点量割线斜率；再看上方真实小车只在水平轨道上运动，x-t 图线不是轨迹。</div>
+39: <div class="title">运动类型</div>
+41: <button id="mUniform" class="active">匀速</button><button id="mAccel">加速</button>
+44: <div class="mode" style="margin-top:6px"><button id="playBtn">▶ 播放：小车随时间运动</button><button id="resetBtn">重置播放</button></div>
+46: <div class="readout" id="readout"></div>
+46D: <div class="readout" id="readout"></div>
+48: <div class="title">公式绑定</div>
+53: <div class="status" id="status"></div>
+69: function xAt(tt){const p=params();return p.x0+p.v0*tt+0.5*p.a*tt*tt;}
+70: function vAt(tt){const p=params();return p.v0+p.a*tt;}
+73: for(let i=0;i<=60;i++){const x=xAt(6*i/60);min=Math.min(min,x);max=Math.max(max,x);}
+74: const pad=Math.max(4,(max-min)*.18);return{min:min-pad,max:max+pad};
+77: function sy(x){const b=bounds();return graph.oy-(x-b.min)/(b.max-b.min)*graph.h;}
+83: function handle(x,y,label,c){ctx.save();ctx.fillStyle=c;ctx.strokeStyle='#102a43';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,9,0,Math.PI*2);ctx.fill();ctx.stro
+91: for(let i=0;i<=4;i++){const val=b.min+(b.max-b.min)*i/4;line(graph.ox-5,sy(val),graph.ox+5,sy(val),'#829ab1',1.4);text(val.toFixed(0),graph.ox-18,sy(val),'#4865
+95: for(let i=0;i<=120;i++){const tt=6*i/120,px=sx(tt),py=sy(xAt(tt));if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}
+100: const t1=t,t2=t+dt,x1=xAt(t1),x2=xAt(t2),v=vAt(t1),vAvg=(x2-x1)/dt;
+108: const carX=roadX0+(x1-b.min)/(b.max-b.min)*(roadX1-roadX0);
+112: ctx.fillStyle='#334e68';ctx.beginPath();ctx.arc(carX-14,roadY,5,0,Math.PI*2);ctx.arc(carX+14,roadY,5,0,Math.PI*2);ctx.fill();
+114: if(Math.abs(v)>0.05){const dir=v>0?1:-1;line(carX,roadY-16,carX+dir*Math.min(120,Math.abs(v)*14),roadY-16,'#2c7be5',3);text('v',carX+dir*Math.min(120,Math.abs(v
+120: const tl=.8,ta=Math.max(0,t1-tl),tb=Math.min(6,t1+tl);
+134: document.getElementById('readout').innerHTML='运动类型=<b>'+params().name+'</b><br>t=<b>'+t.toFixed(2)+' s</b><br>x=<b>'+xAt(t).toFixed(2)+' m</b><br>割线斜率=<b>'+vAvg
+135D: document.getElementById('status').textContent='x-t 图的斜率表示速度；交点才表示同一时刻同一位置，图线形状不是空间路线。';
+142: function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
+144D: if(playing){playing=false;document.getElementById('playBtn').textContent='▶ 播放：小车随时间运动';}
+145: const p=pointer(e);for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30){drag=k;canvas.setPointerCapture(e.pointerId);break;}
+148: if(drag){if(drag==='P'){t=snap(timeFromX(p.x),.05);if(t+dt>6)dt=6-t;} if(drag==='Q'){dt=Math.max(.05,snap(timeFromX(p.x)-t,.05));if(t+dt>6)dt=6-t;} draw();retur
+149: let hit=false;for(const k of Object.keys(layout)){const h=layout[k];if(Math.hypot(p.x-h.x,p.y-h.y)<30)hit=true;}canvas.style.cursor=hit?'grab':'default';
+166D: document.getElementById('playBtn').textContent=playing?'⏸ 暂停':'▶ 播放：小车随时间运动';
+169D: document.getElementById('resetBtn').onclick=()=>{playing=false;playClock=0;t=3;dt=1.5;document.getElementById('playBtn').textContent='▶ 播放：小车随时间运动';draw();};

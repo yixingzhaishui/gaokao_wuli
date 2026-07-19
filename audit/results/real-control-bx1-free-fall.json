@@ -1,0 +1,193 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T18:02:48.463Z",
+  "commit": "77b88de2496355353cfe9b77cb1d5e989ac848d7",
+  "module": "bx1",
+  "modules": [
+    "bx1"
+  ],
+  "summary": {
+    "total": 1,
+    "score": 100,
+    "pass": 1,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/bx1/free-fall.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:月球",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:木星",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:低重力",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:地球",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#mEarth",
+          "text": "地球",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mMoon",
+          "text": "月球",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mJupiter",
+          "text": "木星",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mLow",
+          "text": "低重力",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "▶ 播放下落",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "▶ 播放下落"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "34faa999",
+          "readout_hash": "c638e1aa",
+          "physical_readout_hash": "c638e1aa",
+          "readout": [
+            "H=45.0 mg=9.80 m/s²m=4.0 kgt=2.00 s已下落=19.60 m当前 v=19.60 m/st落=3.03 sv落=29.70 m/s",
+            "自由落体只由 H 和 g 决定；质量只改变画面大小。"
+          ],
+          "physical_readout": [
+            "H=45.0 mg=9.80 m/s²m=4.0 kgt=2.00 s已下落=19.60 m当前 v=19.60 m/st落=3.03 sv落=29.70 m/s",
+            "自由落体只由 H 和 g 决定；质量只改变画面大小。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "663b24fd",
+          "readout_hash": "e3aa8f52",
+          "physical_readout_hash": "e3aa8f52",
+          "readout": [
+            "H=45.0 mg=9.80 m/s²m=4.0 kgt=2.36 s已下落=27.26 m当前 v=23.12 m/st落=3.03 sv落=29.70 m/s",
+            "自由落体只由 H 和 g 决定；质量只改变画面大小。"
+          ],
+          "physical_readout": [
+            "H=45.0 mg=9.80 m/s²m=4.0 kgt=2.36 s已下落=27.26 m当前 v=23.12 m/st落=3.03 sv落=29.70 m/s",
+            "自由落体只由 H 和 g 决定；质量只改变画面大小。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "a1480bd9",
+          "readout_hash": "ad6f5f7e",
+          "physical_readout_hash": "ad6f5f7e",
+          "readout": [
+            "H=45.0 mg=9.80 m/s²m=4.0 kgt=2.38 s已下落=27.84 m当前 v=23.36 m/st落=3.03 sv落=29.70 m/s",
+            "自由落体只由 H 和 g 决定；质量只改变画面大小。"
+          ],
+          "physical_readout": [
+            "H=45.0 mg=9.80 m/s²m=4.0 kgt=2.38 s已下落=27.84 m当前 v=23.36 m/st落=3.03 sv落=29.70 m/s",
+            "自由落体只由 H 和 g 决定；质量只改变画面大小。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "a1480bd9",
+          "readout_hash": "ad6f5f7e",
+          "physical_readout_hash": "ad6f5f7e",
+          "readout": [
+            "H=45.0 mg=9.80 m/s²m=4.0 kgt=2.38 s已下落=27.84 m当前 v=23.36 m/st落=3.03 sv落=29.70 m/s",
+            "自由落体只由 H 和 g 决定；质量只改变画面大小。"
+          ],
+          "physical_readout": [
+            "H=45.0 mg=9.80 m/s²m=4.0 kgt=2.38 s已下落=27.84 m当前 v=23.36 m/st落=3.03 sv落=29.70 m/s",
+            "自由落体只由 H 和 g 决定；质量只改变画面大小。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "H=# mg=# m/s²m=# kgt=# s已下落=# m当前 v=# m/st落=# sv落=# m/s|自由落体只由 H 和 g 决定；质量只改变画面大小。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "H=# mg=# m/s²m=# kgt=# s已下落=# m当前 v=# m/st落=# sv落=# m/s|自由落体只由 H 和 g 决定；质量只改变画面大小。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

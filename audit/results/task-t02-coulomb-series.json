@@ -1,0 +1,536 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T06:17:14.472Z",
+  "commit": "ca09b1df4443b473c161c0cc04afc21b9cc4f9a4",
+  "module": "bx3",
+  "modules": [
+    "bx3"
+  ],
+  "summary": {
+    "total": 2,
+    "score": 100,
+    "pass": 2,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/bx3/coulomb.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#q1",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#q2",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#r",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:距离翻倍",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:异号相吸",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play-btn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset-btn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:距离翻倍",
+          "text": "距离翻倍",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:异号相吸",
+          "text": "异号相吸",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.32
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "reset-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "5f07d4bb",
+          "readout_hash": "b42e386",
+          "physical_readout_hash": "b42e386",
+          "readout": [
+            "q₁ = +3.0 μC",
+            "q₂ = +2.0 μC",
+            "距离 r = 3.0 m",
+            "距离 r = 3.00 m",
+            "力 F = 6.00 N",
+            "k·q₁q₂ = 54.0 N·m²",
+            "斥力（同号）",
+            "q₂ 速度 v = 0.00 m/s",
+            "加速度 a = 0.75 m/s²",
+            "演示时间 t = 0.00 s"
+          ],
+          "physical_readout": [
+            "q₁ = +3.0 μC",
+            "q₂ = +2.0 μC",
+            "距离 r = 3.0 m",
+            "距离 r = 3.00 m",
+            "力 F = 6.00 N",
+            "k·q₁q₂ = 54.0 N·m²",
+            "斥力（同号）",
+            "q₂ 速度 v = 0.00 m/s",
+            "加速度 a = 0.75 m/s²",
+            "演示时间 t = 0.00 s"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "e026b41",
+          "readout_hash": "9fde9e32",
+          "physical_readout_hash": "9fde9e32",
+          "readout": [
+            "q₁ = +3.0 μC",
+            "q₂ = +2.0 μC",
+            "距离 r = 3.1 m",
+            "距离 r = 3.09 m",
+            "力 F = 5.67 N",
+            "k·q₁q₂ = 54.0 N·m²",
+            "斥力（同号）",
+            "q₂ 速度 v = 0.35 m/s",
+            "加速度 a = 0.71 m/s²",
+            "演示时间 t = 0.48 s"
+          ],
+          "physical_readout": [
+            "q₁ = +3.0 μC",
+            "q₂ = +2.0 μC",
+            "距离 r = 3.1 m",
+            "距离 r = 3.09 m",
+            "力 F = 5.67 N",
+            "k·q₁q₂ = 54.0 N·m²",
+            "斥力（同号）",
+            "q₂ 速度 v = 0.35 m/s",
+            "加速度 a = 0.71 m/s²",
+            "演示时间 t = 0.48 s"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "84a5c32e",
+          "readout_hash": "c70f0aa8",
+          "physical_readout_hash": "c70f0aa8",
+          "readout": [
+            "q₁ = +3.0 μC",
+            "q₂ = +2.0 μC",
+            "距离 r = 3.1 m",
+            "距离 r = 3.10 m",
+            "力 F = 5.62 N",
+            "k·q₁q₂ = 54.0 N·m²",
+            "斥力（同号）",
+            "q₂ 速度 v = 0.37 m/s",
+            "加速度 a = 0.70 m/s²",
+            "演示时间 t = 0.51 s"
+          ],
+          "physical_readout": [
+            "q₁ = +3.0 μC",
+            "q₂ = +2.0 μC",
+            "距离 r = 3.1 m",
+            "距离 r = 3.10 m",
+            "力 F = 5.62 N",
+            "k·q₁q₂ = 54.0 N·m²",
+            "斥力（同号）",
+            "q₂ 速度 v = 0.37 m/s",
+            "加速度 a = 0.70 m/s²",
+            "演示时间 t = 0.51 s"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "84a5c32e",
+          "readout_hash": "c70f0aa8",
+          "physical_readout_hash": "c70f0aa8",
+          "readout": [
+            "q₁ = +3.0 μC",
+            "q₂ = +2.0 μC",
+            "距离 r = 3.1 m",
+            "距离 r = 3.10 m",
+            "力 F = 5.62 N",
+            "k·q₁q₂ = 54.0 N·m²",
+            "斥力（同号）",
+            "q₂ 速度 v = 0.37 m/s",
+            "加速度 a = 0.70 m/s²",
+            "演示时间 t = 0.51 s"
+          ],
+          "physical_readout": [
+            "q₁ = +3.0 μC",
+            "q₂ = +2.0 μC",
+            "距离 r = 3.1 m",
+            "距离 r = 3.10 m",
+            "力 F = 5.62 N",
+            "k·q₁q₂ = 54.0 N·m²",
+            "斥力（同号）",
+            "q₂ 速度 v = 0.37 m/s",
+            "加速度 a = 0.70 m/s²",
+            "演示时间 t = 0.51 s"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "q₁ = # μC|q₂ = # μC|距离 r = # m|距离 r = # m|力 F = # N|k·q₁q₂ = # N·m²|斥力（同号）|q₂ 速度 v = # m/s|加速度 a = # m/s²|演示时间 t = # s",
+          "controls": [
+            {
+              "id": "q1",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "q2",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "r",
+              "value": "3",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "q₁ = # μC|q₂ = # μC|距离 r = # m|距离 r = # m|力 F = # N|k·q₁q₂ = # N·m²|斥力（同号）|q₂ 速度 v = # m/s|加速度 a = # m/s²|演示时间 t = # s",
+          "controls": [
+            {
+              "id": "q1",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "q2",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "r",
+              "value": "3",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx3/series-parallel.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#r1",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#r2",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#u",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:并联",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:串联",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play-btn",
+          "text": "⏸ 暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:串联",
+          "text": "串联",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:并联",
+          "text": "并联",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.5
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "⏸ 暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "920b403f",
+          "readout_hash": "5ef5864f",
+          "physical_readout_hash": "5ef5864f",
+          "readout": [
+            "R1（拖动后看蓝色支路/元件读数）3.0 Ω",
+            "R2（拖动后看紫色支路/元件读数）6.0 Ω",
+            "电源 U（拖动后看所有表的变化）12.0 V",
+            "电源 U = 12.0 V",
+            "R1 = 3.0 Ω，R2 = 6.0 Ω",
+            "等效电阻 R = 9.00 Ω",
+            "总电流 I = 1.33 A",
+            "支路/元件：U1=4.0V, U2=8.0V"
+          ],
+          "physical_readout": [
+            "R1（拖动后看蓝色支路/元件读数）3.0 Ω",
+            "R2（拖动后看紫色支路/元件读数）6.0 Ω",
+            "电源 U（拖动后看所有表的变化）12.0 V",
+            "电源 U = 12.0 V",
+            "R1 = 3.0 Ω，R2 = 6.0 Ω",
+            "等效电阻 R = 9.00 Ω",
+            "总电流 I = 1.33 A",
+            "支路/元件：U1=4.0V, U2=8.0V"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "9b08d0ee",
+          "readout_hash": "5ef5864f",
+          "physical_readout_hash": "5ef5864f",
+          "readout": [
+            "R1（拖动后看蓝色支路/元件读数）3.0 Ω",
+            "R2（拖动后看紫色支路/元件读数）6.0 Ω",
+            "电源 U（拖动后看所有表的变化）12.0 V",
+            "电源 U = 12.0 V",
+            "R1 = 3.0 Ω，R2 = 6.0 Ω",
+            "等效电阻 R = 9.00 Ω",
+            "总电流 I = 1.33 A",
+            "支路/元件：U1=4.0V, U2=8.0V"
+          ],
+          "physical_readout": [
+            "R1（拖动后看蓝色支路/元件读数）3.0 Ω",
+            "R2（拖动后看紫色支路/元件读数）6.0 Ω",
+            "电源 U（拖动后看所有表的变化）12.0 V",
+            "电源 U = 12.0 V",
+            "R1 = 3.0 Ω，R2 = 6.0 Ω",
+            "等效电阻 R = 9.00 Ω",
+            "总电流 I = 1.33 A",
+            "支路/元件：U1=4.0V, U2=8.0V"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "f19acb",
+          "readout_hash": "5ef5864f",
+          "physical_readout_hash": "5ef5864f",
+          "readout": [
+            "R1（拖动后看蓝色支路/元件读数）3.0 Ω",
+            "R2（拖动后看紫色支路/元件读数）6.0 Ω",
+            "电源 U（拖动后看所有表的变化）12.0 V",
+            "电源 U = 12.0 V",
+            "R1 = 3.0 Ω，R2 = 6.0 Ω",
+            "等效电阻 R = 9.00 Ω",
+            "总电流 I = 1.33 A",
+            "支路/元件：U1=4.0V, U2=8.0V"
+          ],
+          "physical_readout": [
+            "R1（拖动后看蓝色支路/元件读数）3.0 Ω",
+            "R2（拖动后看紫色支路/元件读数）6.0 Ω",
+            "电源 U（拖动后看所有表的变化）12.0 V",
+            "电源 U = 12.0 V",
+            "R1 = 3.0 Ω，R2 = 6.0 Ω",
+            "等效电阻 R = 9.00 Ω",
+            "总电流 I = 1.33 A",
+            "支路/元件：U1=4.0V, U2=8.0V"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "f19acb",
+          "readout_hash": "5ef5864f",
+          "physical_readout_hash": "5ef5864f",
+          "readout": [
+            "R1（拖动后看蓝色支路/元件读数）3.0 Ω",
+            "R2（拖动后看紫色支路/元件读数）6.0 Ω",
+            "电源 U（拖动后看所有表的变化）12.0 V",
+            "电源 U = 12.0 V",
+            "R1 = 3.0 Ω，R2 = 6.0 Ω",
+            "等效电阻 R = 9.00 Ω",
+            "总电流 I = 1.33 A",
+            "支路/元件：U1=4.0V, U2=8.0V"
+          ],
+          "physical_readout": [
+            "R1（拖动后看蓝色支路/元件读数）3.0 Ω",
+            "R2（拖动后看紫色支路/元件读数）6.0 Ω",
+            "电源 U（拖动后看所有表的变化）12.0 V",
+            "电源 U = 12.0 V",
+            "R1 = 3.0 Ω，R2 = 6.0 Ω",
+            "等效电阻 R = 9.00 Ω",
+            "总电流 I = 1.33 A",
+            "支路/元件：U1=4.0V, U2=8.0V"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "R#（拖动后看蓝色支路/元件读数）# Ω|R#（拖动后看紫色支路/元件读数）# Ω|电源 U（拖动后看所有表的变化）# V|电源 U = # V|R# = # Ω，R# = # Ω|等效电阻 R = # Ω|总电流 I = # A|支路/元件：U#=#V, U#=#V",
+          "controls": [
+            {
+              "id": "r1",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "r2",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "u",
+              "value": "12",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "R#（拖动后看蓝色支路/元件读数）# Ω|R#（拖动后看紫色支路/元件读数）# Ω|电源 U（拖动后看所有表的变化）# V|电源 U = # V|R# = # Ω，R# = # Ω|等效电阻 R = # Ω|总电流 I = # A|支路/元件：U#=#V, U#=#V",
+          "controls": [
+            {
+              "id": "r1",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "r2",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "u",
+              "value": "12",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

@@ -36,6 +36,7 @@ canvas{display:block;width:100%;max-width:700px;background:#fff;border:1px solid
     <span class="chip">有效值 U = <b id="uv">220</b> V</span>
     <span class="chip">瞬时值 u = <b id="instv">0</b> V</span>
     <span class="chip">半周期平均值 = <b id="avgv">198</b> V</span>
+    <span class="chip">完整周期有符号平均值 = <b>0</b> V</span>
     <span class="chip">功率 P = <b id="pv">4840</b> W</span>
     <span class="chip">状态：<b id="statev">自动扫相位</b></span>
   </div>
@@ -84,10 +85,11 @@ cv.addEventListener('pointerup',()=>drag=false);cv.addEventListener('pointercanc
 document.getElementById('umr').oninput=e=>{Um=parseFloat(e.target.value);draw()};
 document.getElementById('rr').oninput=e=>{R=parseFloat(e.target.value);draw()};
 document.getElementById('play-btn').onclick=()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';draw()};
-document.getElementById('reset-btn').onclick=()=>{phase=0;running=true;document.getElementById('play-btn').textContent='暂停';draw()};
+document.getElementById('reset-btn').onclick=()=>{phase=0;Um=311;R=10;running=true;document.getElementById('umr').value=Um;document.getElementById('rr').value=R;document.getElementById('play-btn').textContent='暂停';draw()};
 function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;if(running&&!drag){phase=(phase+dt*1.6)%(2*Math.PI)}draw();requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
 })();
 </script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

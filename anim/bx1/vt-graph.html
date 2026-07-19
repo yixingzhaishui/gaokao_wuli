@@ -210,6 +210,7 @@
   window.addEventListener('pointerup', () => { drag=null; canvas.style.cursor='default'; });
   draw();
 const playBtn=document.getElementById("play"),resetBtn=document.getElementById("resetBtn");let __run=false,__last=performance.now();playBtn.addEventListener("click",()=>{const cap=(8);if(state.t>=cap)state.t=0;__run=!__run;playBtn.textContent=__run?"⏸ 暂停":"▶ 播放运动";});resetBtn.addEventListener("click",()=>{__run=false;state.v0=2;state.a=1;state.t=4;state.mode='accel';Object.entries(buttons).forEach(([k,b])=>b.classList.toggle('active',k==='accel'));playBtn.textContent="▶ 播放运动";draw();});canvas.addEventListener("pointerdown",()=>{if(__run){__run=false;playBtn.textContent="▶ 播放运动";}});function __loop(now){const dt=Math.min((now-__last)/1000,.05);__last=now;const cap=(8);if(__run){state.t=Math.min(cap,state.t+dt);if(state.t>=cap){__run=false;playBtn.textContent="▶ 重新播放";}draw();}requestAnimationFrame(__loop);}
+requestAnimationFrame(__loop);
 })();
 </script>
 </body>

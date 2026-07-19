@@ -32,7 +32,7 @@ button:hover{background:#f0f4f8}
     <div class="stage"><canvas id="cv" width="720" height="450" aria-label="电场力做功路径无关实验台：等势线俯视装置、路径图像和数据记录"></canvas><div style="padding:6px 10px;display:flex;gap:12px;align-items:center;font-size:13px;border-top:1px solid #eef2f7"><button id="play-btn" style="font:inherit;border:1px solid #cbd5e1;background:#fff;border-radius:6px;padding:5px 12px;cursor:pointer">⏸ 暂停</button><span>状态：<b id="run-st">运行中</b></span></div></div>
     <section class="panel">
       <div class="tools">
-        <button id="play">沿橙路演示</button>
+        <button id="play" data-audit-play>沿橙路演示</button>
         <button id="reset">复位</button>
       </div>
       <div class="read">
@@ -146,5 +146,6 @@ render();requestAnimationFrame(loop);
 var _pb=document.getElementById("play-btn");if(_pb)_pb.onclick=function(){window.__paused=!window.__paused;this.textContent=window.__paused?"▶ 播放":"⏸ 暂停";var st=document.getElementById("run-st");if(st)st.textContent=window.__paused?"已暂停":"运行中";};
 })();
 </script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

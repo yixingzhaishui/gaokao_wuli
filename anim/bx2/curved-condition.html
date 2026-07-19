@@ -125,5 +125,28 @@
   draw();requestAnimationFrame(tick);
 })();
 </script>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script>
+<script>/* GKWL: unified full reset (2026-07-12 review remediation) */
+(function(){
+  var btns=[].slice.call(document.querySelectorAll('button'));
+  var resets=btns.filter(function(b){return /重置|复位/.test(b.textContent)});
+  if(!resets.length)return;
+  var scoped=/播放|时间|回放/;
+  var primary=resets[0];
+  if(scoped.test(primary.textContent)){
+    var nb=document.createElement('button');
+    nb.textContent='全部重置';
+    nb.className=primary.className;
+    nb.setAttribute('data-gkwl-full-reset','1');
+    nb.addEventListener('click',function(){location.reload()});
+    primary.parentNode.insertBefore(nb,primary.nextSibling);
+  }else{
+    resets.forEach(function(b){b.addEventListener('click',function(){setTimeout(function(){location.reload()},60)})});
+  }
+})();
+</script>
+<script>
+window.B2_GUIDE={id:'B2-01',question:'合力转到与速度垂直时，小球会怎样？',observe:'先看蓝色速度和红色合力的方向，不要先套公式。预测下一幅轨迹和速率变化。',options:[{value:'turn',label:'速率瞬时不变，但速度方向改变，轨迹弯曲'},{value:'faster',label:'只会越来越快，仍沿直线'},{value:'stop',label:'立即停止'}],correct:'turn',actions:[{selector:'[data-case="turn"]'}],result:'轨迹弯曲；该瞬时合力没有沿速度方向的分量。',evidence:'F∥=0，F⊥不为0，速度箭头转向而不是沿原直线延伸。',explanation:'垂直速度的加速度改变速度方向；沿速度的加速度才改变速率。',transfer:'轨迹判断题先画瞬时速度切线，再看合力是否有垂直速度的分量。'};
+</script><script src="guided-lesson.js"></script>
 </body>
 </html>

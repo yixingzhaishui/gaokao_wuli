@@ -1,0 +1,291 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T17:55:21.813Z",
+  "commit": "8c5819e80fdc74f6be0cedcb987dcee8f8d01e07",
+  "module": "bx2",
+  "modules": [
+    "bx2"
+  ],
+  "summary": {
+    "total": 1,
+    "score": 100,
+    "pass": 1,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/bx2/energy-conservation.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#m",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#h",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#mu",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#u",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:无摩擦",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:有摩擦",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:多生热",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:增高",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:无摩擦",
+          "text": "无摩擦",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:有摩擦",
+          "text": "有摩擦",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:多生热",
+          "text": "多生热",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:增高",
+          "text": "增高",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "46152f26",
+          "readout_hash": "b908e699",
+          "physical_readout_hash": "b908e699",
+          "readout": [
+            "质量 m 2.0 kg",
+            "初始高度 h 5.0 m",
+            "摩擦因数 μ 0.20",
+            "过程位置 65%",
+            "Ep=35.0 J Ek=44.2 J E内=20.8 J E机=79.2 J E总=100.0 J E0=100.0 J",
+            "有摩擦：机械能减少，但减少量进入内能，总能量守恒。"
+          ],
+          "physical_readout": [
+            "质量 m 2.0 kg",
+            "初始高度 h 5.0 m",
+            "摩擦因数 μ 0.20",
+            "过程位置 65%",
+            "Ep=35.0 J Ek=44.2 J E内=20.8 J E机=79.2 J E总=100.0 J E0=100.0 J",
+            "有摩擦：机械能减少，但减少量进入内能，总能量守恒。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "94986a56",
+          "readout_hash": "43deac26",
+          "physical_readout_hash": "43deac26",
+          "readout": [
+            "质量 m 2.0 kg",
+            "初始高度 h 5.0 m",
+            "摩擦因数 μ 0.20",
+            "过程位置 66%",
+            "Ep=34.0 J Ek=44.9 J E内=21.1 J E机=78.9 J E总=100.0 J E0=100.0 J",
+            "有摩擦：机械能减少，但减少量进入内能，总能量守恒。"
+          ],
+          "physical_readout": [
+            "质量 m 2.0 kg",
+            "初始高度 h 5.0 m",
+            "摩擦因数 μ 0.20",
+            "过程位置 66%",
+            "Ep=34.0 J Ek=44.9 J E内=21.1 J E机=78.9 J E总=100.0 J E0=100.0 J",
+            "有摩擦：机械能减少，但减少量进入内能，总能量守恒。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "94986a56",
+          "readout_hash": "43deac26",
+          "physical_readout_hash": "43deac26",
+          "readout": [
+            "质量 m 2.0 kg",
+            "初始高度 h 5.0 m",
+            "摩擦因数 μ 0.20",
+            "过程位置 66%",
+            "Ep=34.0 J Ek=44.9 J E内=21.1 J E机=78.9 J E总=100.0 J E0=100.0 J",
+            "有摩擦：机械能减少，但减少量进入内能，总能量守恒。"
+          ],
+          "physical_readout": [
+            "质量 m 2.0 kg",
+            "初始高度 h 5.0 m",
+            "摩擦因数 μ 0.20",
+            "过程位置 66%",
+            "Ep=34.0 J Ek=44.9 J E内=21.1 J E机=78.9 J E总=100.0 J E0=100.0 J",
+            "有摩擦：机械能减少，但减少量进入内能，总能量守恒。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "94986a56",
+          "readout_hash": "43deac26",
+          "physical_readout_hash": "43deac26",
+          "readout": [
+            "质量 m 2.0 kg",
+            "初始高度 h 5.0 m",
+            "摩擦因数 μ 0.20",
+            "过程位置 66%",
+            "Ep=34.0 J Ek=44.9 J E内=21.1 J E机=78.9 J E总=100.0 J E0=100.0 J",
+            "有摩擦：机械能减少，但减少量进入内能，总能量守恒。"
+          ],
+          "physical_readout": [
+            "质量 m 2.0 kg",
+            "初始高度 h 5.0 m",
+            "摩擦因数 μ 0.20",
+            "过程位置 66%",
+            "Ep=34.0 J Ek=44.9 J E内=21.1 J E机=78.9 J E总=100.0 J E0=100.0 J",
+            "有摩擦：机械能减少，但减少量进入内能，总能量守恒。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "质量 m # kg|初始高度 h # m|摩擦因数 μ #|过程位置 #%|Ep=# J Ek=# J E内=# J E机=# J E总=# J E#=# J|有摩擦：机械能减少，但减少量进入内能，总能量守恒。",
+          "controls": [
+            {
+              "id": "m",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "h",
+              "value": "5",
+              "checked": false
+            },
+            {
+              "id": "mu",
+              "value": "0.2",
+              "checked": false
+            },
+            {
+              "id": "u",
+              "value": "0.65",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "质量 m # kg|初始高度 h # m|摩擦因数 μ #|过程位置 #%|Ep=# J Ek=# J E内=# J E机=# J E总=# J E#=# J|有摩擦：机械能减少，但减少量进入内能，总能量守恒。",
+          "controls": [
+            {
+              "id": "m",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "h",
+              "value": "5",
+              "checked": false
+            },
+            {
+              "id": "mu",
+              "value": "0.2",
+              "checked": false
+            },
+            {
+              "id": "u",
+              "value": "0.65",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

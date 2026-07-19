@@ -120,5 +120,28 @@
   draw();requestAnimationFrame(tick);
 })();
 </script>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script>
+<script>/* GKWL: unified full reset (2026-07-12 review remediation) */
+(function(){
+  var btns=[].slice.call(document.querySelectorAll('button'));
+  var resets=btns.filter(function(b){return /重置|复位/.test(b.textContent)});
+  if(!resets.length)return;
+  var scoped=/播放|时间|回放/;
+  var primary=resets[0];
+  if(scoped.test(primary.textContent)){
+    var nb=document.createElement('button');
+    nb.textContent='全部重置';
+    nb.className=primary.className;
+    nb.setAttribute('data-gkwl-full-reset','1');
+    nb.addEventListener('click',function(){location.reload()});
+    primary.parentNode.insertBefore(nb,primary.nextSibling);
+  }else{
+    resets.forEach(function(b){b.addEventListener('click',function(){setTimeout(function(){location.reload()},60)})});
+  }
+})();
+</script>
+<script>
+window.B2_GUIDE={id:'B2-02',question:'船头始终垂直河岸，水流变快后，过河时间会变吗？',observe:'船相对水的速度大小和方向不变，只把沿河水速增大。先判断时间和下游偏移。',options:[{value:'same',label:'时间不变，下游偏移增大'},{value:'longer',label:'时间变长，下游偏移不变'},{value:'both',label:'时间和偏移都增大'}],correct:'same',actions:[{selector:'[data-case="fastWater"]'}],result:'过河时间不变，下游偏移增大。',evidence:'垂直河岸分速度仍为4 m/s，沿河分速度增大；时间读数不变而偏移增大。',explanation:'两个分运动同时进行；过河时间由垂直河岸分量决定，水流只改变沿河分量。',transfer:'小船过河先统一参考系，再分别找决定时间和决定偏移的速度分量。'};
+</script><script src="guided-lesson.js"></script>
 </body>
 </html>

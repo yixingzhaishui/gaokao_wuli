@@ -1,0 +1,553 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T17:20:32.229Z",
+  "commit": "d96e3a5392db06e30a38e2285ff44f23116e201c",
+  "module": "bx3",
+  "modules": [
+    "bx3"
+  ],
+  "summary": {
+    "total": 2,
+    "score": 100,
+    "pass": 2,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/bx3/charge-electrification.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#n",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:接触起电",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:静电感应",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:元电荷检查",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:玻璃棒失电子",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:橡胶棒得电子",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:接触平分",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:非整数尝试",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:摩擦起电",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "▶ 播放过程",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:摩擦起电",
+          "text": "摩擦起电",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:接触起电",
+          "text": "接触起电",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:静电感应",
+          "text": "静电感应",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:元电荷检查",
+          "text": "元电荷检查",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:玻璃棒失电子",
+          "text": "玻璃棒失电子",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:橡胶棒得电子",
+          "text": "橡胶棒得电子",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:接触平分",
+          "text": "接触平分",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:非整数尝试",
+          "text": "非整数尝试",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#inductionStep",
+          "text": "接地",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [
+        {
+          "kind": "静电感应分步流程",
+          "expected": "进入静电感应后依次完成“接地 → 移开带电体”，每步改变画面或物理读数",
+          "actual": [
+            {
+              "label": "接地",
+              "changed": true
+            },
+            {
+              "label": "移开带电体",
+              "changed": true
+            }
+          ],
+          "pass": true
+        }
+      ],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "▶ 播放过程"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "916171f4",
+          "readout_hash": "6c000f9",
+          "physical_readout_hash": "6c000f9",
+          "readout": [
+            "电子转移数 n +6 个",
+            "电子转移数 n +6 个",
+            "qA=+6e qB=-6eq总=0e n=6量子化检查：通过",
+            "摩擦起电不是创造电荷，而是电子从一个物体转移到另一个物体。"
+          ],
+          "physical_readout": [
+            "电子转移数 n +6 个",
+            "电子转移数 n +6 个",
+            "qA=+6e qB=-6eq总=0e n=6量子化检查：通过",
+            "摩擦起电不是创造电荷，而是电子从一个物体转移到另一个物体。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "5bb47e9f",
+          "readout_hash": "6c000f9",
+          "physical_readout_hash": "6c000f9",
+          "readout": [
+            "电子转移数 n +6 个",
+            "电子转移数 n +6 个",
+            "qA=+6e qB=-6eq总=0e n=6量子化检查：通过",
+            "摩擦起电不是创造电荷，而是电子从一个物体转移到另一个物体。"
+          ],
+          "physical_readout": [
+            "电子转移数 n +6 个",
+            "电子转移数 n +6 个",
+            "qA=+6e qB=-6eq总=0e n=6量子化检查：通过",
+            "摩擦起电不是创造电荷，而是电子从一个物体转移到另一个物体。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "916171f4",
+          "readout_hash": "6c000f9",
+          "physical_readout_hash": "6c000f9",
+          "readout": [
+            "电子转移数 n +6 个",
+            "电子转移数 n +6 个",
+            "qA=+6e qB=-6eq总=0e n=6量子化检查：通过",
+            "摩擦起电不是创造电荷，而是电子从一个物体转移到另一个物体。"
+          ],
+          "physical_readout": [
+            "电子转移数 n +6 个",
+            "电子转移数 n +6 个",
+            "qA=+6e qB=-6eq总=0e n=6量子化检查：通过",
+            "摩擦起电不是创造电荷，而是电子从一个物体转移到另一个物体。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "916171f4",
+          "readout_hash": "6c000f9",
+          "physical_readout_hash": "6c000f9",
+          "readout": [
+            "电子转移数 n +6 个",
+            "电子转移数 n +6 个",
+            "qA=+6e qB=-6eq总=0e n=6量子化检查：通过",
+            "摩擦起电不是创造电荷，而是电子从一个物体转移到另一个物体。"
+          ],
+          "physical_readout": [
+            "电子转移数 n +6 个",
+            "电子转移数 n +6 个",
+            "qA=+6e qB=-6eq总=0e n=6量子化检查：通过",
+            "摩擦起电不是创造电荷，而是电子从一个物体转移到另一个物体。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "电子转移数 n # 个|电子转移数 n # 个|qA=#e qB=#eq总=#e n=#量子化检查：通过|摩擦起电不是创造电荷，而是电子从一个物体转移到另一个物体。",
+          "controls": [
+            {
+              "id": "n",
+              "value": "6",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "电子转移数 n # 个|电子转移数 n # 个|qA=#e qB=#eq总=#e n=#量子化检查：通过|摩擦起电不是创造电荷，而是电子从一个物体转移到另一个物体。",
+          "controls": [
+            {
+              "id": "n",
+              "value": "6",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx3/series-parallel.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#r1",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#r2",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#u",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:并联",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:串联",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play-btn",
+          "text": "⏸ 暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:串联",
+          "text": "串联",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:并联",
+          "text": "并联",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.5
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "⏸ 暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "e0f6458e",
+          "readout_hash": "5ef5864f",
+          "physical_readout_hash": "5ef5864f",
+          "readout": [
+            "R1（拖动后看蓝色支路/元件读数）3.0 Ω",
+            "R2（拖动后看紫色支路/元件读数）6.0 Ω",
+            "电源 U（拖动后看所有表的变化）12.0 V",
+            "电源 U = 12.0 V",
+            "R1 = 3.0 Ω，R2 = 6.0 Ω",
+            "等效电阻 R = 9.00 Ω",
+            "总电流 I = 1.33 A",
+            "支路/元件：U1=4.0V, U2=8.0V"
+          ],
+          "physical_readout": [
+            "R1（拖动后看蓝色支路/元件读数）3.0 Ω",
+            "R2（拖动后看紫色支路/元件读数）6.0 Ω",
+            "电源 U（拖动后看所有表的变化）12.0 V",
+            "电源 U = 12.0 V",
+            "R1 = 3.0 Ω，R2 = 6.0 Ω",
+            "等效电阻 R = 9.00 Ω",
+            "总电流 I = 1.33 A",
+            "支路/元件：U1=4.0V, U2=8.0V"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "24a02a96",
+          "readout_hash": "5ef5864f",
+          "physical_readout_hash": "5ef5864f",
+          "readout": [
+            "R1（拖动后看蓝色支路/元件读数）3.0 Ω",
+            "R2（拖动后看紫色支路/元件读数）6.0 Ω",
+            "电源 U（拖动后看所有表的变化）12.0 V",
+            "电源 U = 12.0 V",
+            "R1 = 3.0 Ω，R2 = 6.0 Ω",
+            "等效电阻 R = 9.00 Ω",
+            "总电流 I = 1.33 A",
+            "支路/元件：U1=4.0V, U2=8.0V"
+          ],
+          "physical_readout": [
+            "R1（拖动后看蓝色支路/元件读数）3.0 Ω",
+            "R2（拖动后看紫色支路/元件读数）6.0 Ω",
+            "电源 U（拖动后看所有表的变化）12.0 V",
+            "电源 U = 12.0 V",
+            "R1 = 3.0 Ω，R2 = 6.0 Ω",
+            "等效电阻 R = 9.00 Ω",
+            "总电流 I = 1.33 A",
+            "支路/元件：U1=4.0V, U2=8.0V"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "1a0168e0",
+          "readout_hash": "5ef5864f",
+          "physical_readout_hash": "5ef5864f",
+          "readout": [
+            "R1（拖动后看蓝色支路/元件读数）3.0 Ω",
+            "R2（拖动后看紫色支路/元件读数）6.0 Ω",
+            "电源 U（拖动后看所有表的变化）12.0 V",
+            "电源 U = 12.0 V",
+            "R1 = 3.0 Ω，R2 = 6.0 Ω",
+            "等效电阻 R = 9.00 Ω",
+            "总电流 I = 1.33 A",
+            "支路/元件：U1=4.0V, U2=8.0V"
+          ],
+          "physical_readout": [
+            "R1（拖动后看蓝色支路/元件读数）3.0 Ω",
+            "R2（拖动后看紫色支路/元件读数）6.0 Ω",
+            "电源 U（拖动后看所有表的变化）12.0 V",
+            "电源 U = 12.0 V",
+            "R1 = 3.0 Ω，R2 = 6.0 Ω",
+            "等效电阻 R = 9.00 Ω",
+            "总电流 I = 1.33 A",
+            "支路/元件：U1=4.0V, U2=8.0V"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "1a0168e0",
+          "readout_hash": "5ef5864f",
+          "physical_readout_hash": "5ef5864f",
+          "readout": [
+            "R1（拖动后看蓝色支路/元件读数）3.0 Ω",
+            "R2（拖动后看紫色支路/元件读数）6.0 Ω",
+            "电源 U（拖动后看所有表的变化）12.0 V",
+            "电源 U = 12.0 V",
+            "R1 = 3.0 Ω，R2 = 6.0 Ω",
+            "等效电阻 R = 9.00 Ω",
+            "总电流 I = 1.33 A",
+            "支路/元件：U1=4.0V, U2=8.0V"
+          ],
+          "physical_readout": [
+            "R1（拖动后看蓝色支路/元件读数）3.0 Ω",
+            "R2（拖动后看紫色支路/元件读数）6.0 Ω",
+            "电源 U（拖动后看所有表的变化）12.0 V",
+            "电源 U = 12.0 V",
+            "R1 = 3.0 Ω，R2 = 6.0 Ω",
+            "等效电阻 R = 9.00 Ω",
+            "总电流 I = 1.33 A",
+            "支路/元件：U1=4.0V, U2=8.0V"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "R#（拖动后看蓝色支路/元件读数）# Ω|R#（拖动后看紫色支路/元件读数）# Ω|电源 U（拖动后看所有表的变化）# V|电源 U = # V|R# = # Ω，R# = # Ω|等效电阻 R = # Ω|总电流 I = # A|支路/元件：U#=#V, U#=#V",
+          "controls": [
+            {
+              "id": "r1",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "r2",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "u",
+              "value": "12",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "R#（拖动后看蓝色支路/元件读数）# Ω|R#（拖动后看紫色支路/元件读数）# Ω|电源 U（拖动后看所有表的变化）# V|电源 U = # V|R# = # Ω，R# = # Ω|等效电阻 R = # Ω|总电流 I = # A|支路/元件：U#=#V, U#=#V",
+          "controls": [
+            {
+              "id": "r1",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "r2",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "u",
+              "value": "12",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

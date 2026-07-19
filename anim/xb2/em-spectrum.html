@@ -13,6 +13,7 @@
 <div class="root">
 <div class="stage"><canvas id="canvas" width="900" height="600" aria-label="电磁波谱实验台装置：频谱俯视滑尺、波长侧视图、能量柱图像、应用防护数据记录"></canvas></div>
 <div class="panel">
+<div class="card"><button id="playBtn" type="button">暂停演示</button></div>
 <div class="card task"><b>观察任务：</b>拖动频谱滑尺探针，对照频谱俯视图、波长侧视图和能量柱图像，看频率升高时波长如何变短、光子能量如何增大，以及应用和防护要求如何改变。</div>
 <div class="card"><div class="title">调频谱探针</div><label class="param"><span>频率指数 log₁₀f <b id="logLabel">8.0</b></span><input id="logf" type="range" min="4" max="21" step="0.1" value="8"></label><button id="record">记录当前波段</button></div>
 <div class="readout" id="readout"></div>
@@ -25,7 +26,7 @@
 (function(){
 'use strict';
 const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'),els={logf:document.getElementById('logf'),logLabel:document.getElementById('logLabel'),readout:document.getElementById('readout'),rows:document.getElementById('rows'),status:document.getElementById('status'),record:document.getElementById('record')};
-const S={t:0,drag:false,records:[]},C={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',green:'#087f5b',gold:'#f0a500',purple:'#7c3aed'};
+const S={t:0,drag:false,records:[],running:true},C={ink:'#102a43',muted:'#486581',blue:'#2c7be5',red:'#e03131',green:'#087f5b',gold:'#f0a500',purple:'#7c3aed'};
 const bands=[['无线电',4,9,'通信、广播','一般防护'],['微波',9,12,'雷达、通信、加热','避免强照射'],['红外',12,14.3,'遥控、热成像','热防护'],['可见光',14.3,14.9,'照明、视觉','强光护眼'],['紫外',14.9,16.5,'杀菌、荧光','防晒护眼'],['X射线',16.5,19,'医疗、安检','铅屏蔽'],['γ射线',19,21,'核医学、天体','严格屏蔽']];
 function p(){const log=+els.logf.value,f=Math.pow(10,log),lambda=3e8/f,e=4.136e-15*f,band=bands.find(b=>log>=b[1]&&log<b[2])||bands[bands.length-1];return{log,f,lambda,e,band}}function fmtSci(n){const e=Math.floor(Math.log10(n)),m=n/Math.pow(10,e);return m.toFixed(2)+'×10^'+e}
 function line(x1,y1,x2,y2,c='#9fb3c8',w=2,d){ctx.save();ctx.strokeStyle=c;ctx.lineWidth=w;if(d)ctx.setLineDash(d);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore()}function box(x,y,w,h,f='#fff',s='#d9e2ec'){ctx.save();ctx.fillStyle=f;ctx.strokeStyle=s;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.restore()}function text(s,x,y,c=C.ink,a='center',z=13,w='700'){ctx.fillStyle=c;ctx.font=w+' '+z+'px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';ctx.textAlign=a;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
@@ -35,8 +36,29 @@ function drawWave(q){box(72,310,360,190,'#fff');text('波长侧视图',252,334,C
 function drawEnergy(q){box(472,310,360,190,'#fff');text('能量柱图像与应用防护',652,334,C.ink,'center',14,'800');const h=Math.min(130,Math.max(8,(q.log-4)/17*130));box(535,360,70,130,'#f8fafc','#d9e2ec');ctx.fillStyle=q.log>16.5?C.red:q.log>14.9?C.gold:C.green;ctx.fillRect(535,490-h,70,h);text('E=hf',570,346,C.purple,'center',12,'900');text(q.band[3],714,390,C.green,'center',13,'900');text(q.band[4],714,430,q.log>16.5?C.red:C.gold,'center',13,'900')}
 function update(){const q=p();els.logLabel.textContent=q.log.toFixed(1);els.readout.innerHTML='波段：<b>'+q.band[0]+'</b><br>频率 f：<b>'+fmtSci(q.f)+' Hz</b><br>波长 λ：<b>'+fmtSci(q.lambda)+' m</b><br>光子能量：<b>'+q.e.toExponential(2)+' eV</b>';els.status.textContent=q.band[0]+'：典型应用是'+q.band[3]+'；防护要点：'+q.band[4]+'。';els.rows.innerHTML=S.records.slice(-6).map(r=>'<tr><td>'+r.b+'</td><td>'+r.l+'</td><td>'+r.e+'</td></tr>').join('')||'<tr><td colspan="3">暂无记录</td></tr>'}
 function record(){const q=p();S.records.push({b:q.band[0],l:fmtSci(q.lambda),e:q.e.toExponential(1)});if(S.records.length>8)S.records.shift();update()}
-els.logf.addEventListener('input',draw);els.record.addEventListener('click',record);canvas.addEventListener('pointerdown',e=>{S.drag=true;canvas.setPointerCapture(e.pointerId)});canvas.addEventListener('pointermove',e=>{if(!S.drag)return;const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width;els.logf.value=Math.max(4,Math.min(21,4+(x-110)/680*17));draw()});canvas.addEventListener('pointerup',e=>{S.drag=false;record();try{canvas.releasePointerCapture(e.pointerId)}catch(_){}});function loop(){S.t+=.02;draw();requestAnimationFrame(loop)}record();loop();
+const playBtn=document.getElementById('playBtn');playBtn.addEventListener('click',()=>{S.running=!S.running;playBtn.textContent=S.running?'暂停演示':'播放演示';if(S.running)draw()});els.logf.addEventListener('input',draw);els.record.addEventListener('click',record);canvas.addEventListener('pointerdown',e=>{S.drag=true;canvas.setPointerCapture(e.pointerId)});canvas.addEventListener('pointermove',e=>{if(!S.drag)return;const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width;els.logf.value=Math.max(4,Math.min(21,4+(x-110)/680*17));draw()});canvas.addEventListener('pointerup',e=>{S.drag=false;record();try{canvas.releasePointerCapture(e.pointerId)}catch(_){}});function loop(){if(S.running){S.t+=.02;draw()}requestAnimationFrame(loop)}record();loop();
 })();
 </script>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script>
+<script>/* GKWL: unified full reset (2026-07-12 review remediation) */
+(function(){
+  var btns=[].slice.call(document.querySelectorAll('button'));
+  var resets=btns.filter(function(b){return /重置|复位/.test(b.textContent)});
+  if(!resets.length)return;
+  var scoped=/播放|时间|回放/;
+  var primary=resets[0];
+  if(scoped.test(primary.textContent)){
+    var nb=document.createElement('button');
+    nb.textContent='全部重置';
+    nb.className=primary.className;
+    nb.setAttribute('data-gkwl-full-reset','1');
+    nb.addEventListener('click',function(){location.reload()});
+    primary.parentNode.insertBefore(nb,primary.nextSibling);
+  }else{
+    resets.forEach(function(b){b.addEventListener('click',function(){setTimeout(function(){location.reload()},60)})});
+  }
+})();
+</script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

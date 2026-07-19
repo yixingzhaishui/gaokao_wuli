@@ -37,7 +37,7 @@
     <div class="card task"><b>观察任务：</b>拖两根蓝色速度箭头，对照速度箭头侧视装置、Δv 图像和数据记录，先看紫色 Δv；再拖 Δt 手柄。</div>
     <div class="card">
       <div class="title">典型场景</div>
-      <div class="controls"><button id="speedUpBtn">同向加速</button><button id="brakeBtn">刹车减速</button><button id="reverseBtn">反向加速</button><button id="zeroBtn">v=0,a≠0</button></div>
+      <div class="controls"><button id="speedUpBtn">同向加速</button><button id="brakeBtn">刹车减速</button><button id="reverseBtn">反向加速</button><button id="zeroBtn">上抛最高点</button></div>
     </div>
     <div class="card">
       <div class="controls"><button id="playBtn">▶ 播放：按 a 匀变速运动</button><button id="resetBtn">重置播放</button></div>
@@ -163,7 +163,7 @@
     document.getElementById('readout').innerHTML='v1=<b>'+v1.toFixed(1)+' m/s</b><br>v2=<b>'+v2.toFixed(1)+' m/s</b><br>Δv=v2-v1=<b>'+dv.toFixed(1)+' m/s</b><br>Δt=<b>'+dt.toFixed(1)+' s</b><br>a=Δv/Δt=<b>'+a.toFixed(2)+' m/s²</b><br>播放中瞬时速度 v=<b id="liveV">'+(playing?(v1+a*(playT%dt)).toFixed(1):'—')+'</b> m/s';
     const st=document.getElementById('status');
     let msg;
-    if(Math.abs(v2)<0.05&&Math.abs(a)>0.05) msg='关键易错点：这一刻 v=0，但 a 不为 0，速度正准备改变方向。';
+    if(Math.abs(v2)<0.05&&Math.abs(a)>0.05) msg='竖直上抛最高点：取向上为正，此刻 v=0，但重力仍使 a=-g，随后速度转为向下。';
     else if(v2*a>0) msg='当前时刻 a 与 v2 同向：速率正在增大，是加速。';
     else if(v2*a<0) msg='当前时刻 a 与 v2 反向：速率正在减小，是减速。';
     else msg='a=0 或 v=0 的临界状态：不要把速度大小和加速度混为一谈。';
@@ -189,8 +189,8 @@
   window.addEventListener('pointerup',()=>{drag=null;canvas.style.cursor='default';});
   document.getElementById('speedUpBtn').onclick=()=>{v1=3;v2=10;dt=3;draw();};
   document.getElementById('brakeBtn').onclick=()=>{v1=10;v2=2;dt=4;draw();};
-  document.getElementById('reverseBtn').onclick=()=>{v1=-8;v2=-2;dt=3;draw();};
-  document.getElementById('zeroBtn').onclick=()=>{v1=6;v2=0;dt=2;draw();};
+  document.getElementById('reverseBtn').onclick=()=>{v1=-2;v2=-8;dt=3;draw();};
+  document.getElementById('zeroBtn').onclick=()=>{v1=9.8;v2=0;dt=1;draw();};
   function animate(){
     if(!playing)return;
     playT+=0.03;
@@ -204,6 +204,26 @@
   };
   document.getElementById('resetBtn').onclick=()=>{playing=false;playT=0;document.getElementById('playBtn').textContent='▶ 播放：按 a 匀变速运动';draw();};
   draw();
+})();
+</script>
+
+<script>/* GKWL: unified full reset (2026-07-12 review remediation) */
+(function(){
+  var btns=[].slice.call(document.querySelectorAll('button'));
+  var resets=btns.filter(function(b){return /重置|复位/.test(b.textContent)});
+  if(!resets.length)return;
+  var scoped=/播放|时间|回放/;
+  var primary=resets[0];
+  if(scoped.test(primary.textContent)){
+    var nb=document.createElement('button');
+    nb.textContent='全部重置';
+    nb.className=primary.className;
+    nb.setAttribute('data-gkwl-full-reset','1');
+    nb.addEventListener('click',function(){location.reload()});
+    primary.parentNode.insertBefore(nb,primary.nextSibling);
+  }else{
+    resets.forEach(function(b){b.addEventListener('click',function(){setTimeout(function(){location.reload()},60)})});
+  }
 })();
 </script>
 </body>

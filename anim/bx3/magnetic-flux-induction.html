@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B3-27 磁通量与感应条件证据台</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#eef2f7;color:#102a43}.wrap{padding:12px}.layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(290px,.85fr);gap:12px;align-items:start}canvas{display:block;width:100%;max-width:760px;background:#0b1728;border-radius:12px}.panel{background:#fff;border:1px solid #d9e2ec;border-radius:10px;padding:10px;display:grid;gap:9px}.task{background:#fff7e6;border-left:4px solid #f0a500;padding:9px;border-radius:6px;font-size:13px;line-height:1.55}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:7px}button{font:inherit;min-height:38px;border:1px solid #cbd5e1;background:#fff;border-radius:8px;padding:7px;cursor:pointer}button.active{background:#2563eb;color:#fff;border-color:#2563eb}.param{display:grid;gap:5px;font-size:13px}.param input{width:100%}.readout{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:9px;font-size:13px;line-height:1.62}.readout b{color:#0f766e}.formula{background:#eef6ff;border-left:4px solid #2563eb;padding:9px;border-radius:6px;font-size:13px;line-height:1.55}.status{font-size:13px;line-height:1.55;color:#334e68}@media(max-width:760px){.layout{grid-template-columns:1fr}.wrap{padding:8px}.buttons{grid-template-columns:1fr}canvas{max-height:380px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="layout">
+    <canvas id="canvas" width="760" height="470" aria-label="磁通量与电磁感应实验，显示闭合线圈、磁场变化、感应电动势和电流"></canvas>
+    <section class="panel">
+      <div class="task"><b>观察任务：</b>判断分两步：先看磁通量是否变化，再看回路是否闭合。分别验证“Φ 大但不变”和“开路但 Φ 变化”。</div>
+      <label class="param">磁感应强度 B：<b id="bLabel">0.50 T</b><input id="field" type="range" min="0" max="1" step="0.05" value="0.5"></label>
+      <label class="param">B 与面积法线夹角 θ：<b id="thetaLabel">0°</b><input id="theta" type="range" min="0" max="90" step="5" value="0"></label>
+      <div class="buttons">
+        <button id="changeFlux" data-audit-play>▶ 改变磁通量</button>
+        <button id="constantFlux">建立大而恒定的 Φ</button>
+        <button id="openCircuit">开路并改变 Φ</button>
+        <button id="reset" data-audit-reset>重置</button>
+      </div>
+      <div class="readout" id="readout">
+        回路：<b id="circuitValue">闭合</b><br>
+        磁通量 Φ：<b id="fluxValue">0.050 Wb</b><br>
+        磁通量变化 ΔΦ：<b id="deltaValue">0.000 Wb</b><br>
+        感应电动势 ε：<b id="emfValue">0.000 V</b><br>
+        感应电流 I：<b id="currentValue">0.000 A</b>
+      </div>
+      <div class="formula">匀强场、平面线圈：Φ=BS cosθ。出现感应电动势要求 ΔΦ≠0；出现感应电流还要求回路闭合。</div>
+      <div class="status" id="status">初态：闭合回路中的磁通量保持不变，所以没有持续感应电流。</div>
+    </section>
+  </div>
+</div>
+<script>
+(function(){
+  const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+  const field=document.getElementById('field'),theta=document.getElementById('theta');
+  const bLabel=document.getElementById('bLabel'),thetaLabel=document.getElementById('thetaLabel');
+  const fluxValue=document.getElementById('fluxValue'),deltaValue=document.getElementById('deltaValue'),emfValue=document.getElementById('emfValue'),currentValue=document.getElementById('currentValue');
+  const circuitValue=document.getElementById('circuitValue'),status=document.getElementById('status');
+  const changeFlux=document.getElementById('changeFlux'),constantFlux=document.getElementById('constantFlux'),openCircuit=document.getElementById('openCircuit');
+  const area=.10,resistance=4;let closed=true,playing=false,startB=.2,targetB=.8,progress=0,last=performance.now(),delta=0,emf=0,current=0;
+
+  function phi(){return Number(field.value)*area*Math.cos(Number(theta.value)*Math.PI/180);}
+  function update(kind){const value=phi();bLabel.textContent=`${Number(field.value).toFixed(2)} T`;thetaLabel.textContent=`${theta.value}°`;fluxValue.textContent=`${value.toFixed(3)} Wb`;deltaValue.textContent=`${delta.toFixed(3)} Wb`;emfValue.textContent=`${emf.toFixed(3)} V`;currentValue.textContent=`${current.toFixed(3)} A`;circuitValue.textContent=closed?'闭合':'开路';constantFlux.classList.toggle('active',kind==='constant');openCircuit.classList.toggle('active',!closed);render();}
+  function render(){
+    const g=ctx.createLinearGradient(0,0,0,canvas.height);g.addColorStop(0,'#10233c');g.addColorStop(1,'#07111f');ctx.fillStyle=g;ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#dbeafe';ctx.font='bold 17px system-ui';ctx.textAlign='left';ctx.fillText('磁通量变化与闭合条件：两个独立门槛',24,32);
+    const density=Math.max(2,Math.round(Number(field.value)*7));ctx.fillStyle='#38bdf8';ctx.font='18px system-ui';for(let row=0;row<density;row++)for(let col=0;col<8;col++){const x=65+col*78,y=80+row*(250/Math.max(1,density-1));ctx.fillText('×',x,y);}ctx.fillStyle='#7dd3fc';ctx.font='13px system-ui';ctx.fillText('B 垂直纸面向内（×）',60,365);
+    const angle=Number(theta.value)*Math.PI/180,cx=390,cy=225,rx=150,ry=Math.max(18,95*Math.cos(angle));ctx.strokeStyle=closed?'#fbbf24':'#94a3b8';ctx.lineWidth=8;ctx.beginPath();ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);ctx.stroke();if(!closed){ctx.fillStyle='#07111f';ctx.fillRect(cx+rx-12,cy-18,28,36);ctx.strokeStyle='#ef4444';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(cx+rx-14,cy-8);ctx.lineTo(cx+rx+16,cy-28);ctx.stroke();}
+    const meterX=620,meterY=225;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(meterX,meterY,54,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#64748b';ctx.lineWidth=3;ctx.stroke();ctx.save();ctx.translate(meterX,meterY);ctx.rotate(Math.max(-1,Math.min(1,current*20))*1.05);ctx.strokeStyle='#ef4444';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(0,12);ctx.lineTo(0,-38);ctx.stroke();ctx.restore();ctx.fillStyle='#334155';ctx.font='bold 14px system-ui';ctx.textAlign='center';ctx.fillText('检流计',meterX,meterY+76);
+    ctx.fillStyle=current!==0?'#86efac':'#cbd5e1';ctx.font='bold 15px system-ui';ctx.fillText(current!==0?'I≠0：闭合且 ΔΦ≠0':(!closed&&emf!==0?'ε≠0，但开路 I=0':'I=0'),390,420);
+  }
+  function stop(){playing=false;changeFlux.textContent='▶ 改变磁通量';}
+  function setStatic(){stop();closed=true;field.value='0.8';theta.value='0';delta=0;emf=0;current=0;status.textContent='磁通量很大但保持不变：ΔΦ=0，因此没有持续感应电动势和电流。';update('constant');}
+  function setOpen(){stop();closed=false;field.value='0.8';theta.value='0';delta=.04;emf=.20;current=0;status.textContent='开路时磁通量发生变化，可出现感应电动势；但没有闭合通路，所以 I=0。';update('open');}
+  function beginChange(){if(playing){stop();status.textContent='演示已暂停，当前磁通量和读数冻结。';return;}closed=true;startB=Number(field.value)>.5?.2:.8;targetB=startB>.5?.2:.8;field.value=String(startB);progress=0;delta=0;emf=0;current=0;playing=true;last=performance.now();changeFlux.textContent='⏸ 暂停变化';constantFlux.classList.remove('active');openCircuit.classList.remove('active');status.textContent='正在改变 B：磁通量变化，闭合回路中出现感应电流。';update('change');}
+  field.addEventListener('input',()=>{stop();delta=0;emf=0;current=0;status.textContent='手动设定后保持不变：当前磁通量不再变化，持续感应电流为零。';update('manual');});
+  theta.addEventListener('input',()=>{stop();delta=0;emf=0;current=0;status.textContent='改变夹角可改变磁通量；停止转动后磁通量恒定，持续感应电流回到零。';update('manual');});
+  changeFlux.addEventListener('click',beginChange);constantFlux.addEventListener('click',setStatic);openCircuit.addEventListener('click',setOpen);
+  document.getElementById('reset').addEventListener('click',()=>{stop();closed=true;field.value='0.5';theta.value='0';delta=0;emf=0;current=0;status.textContent='初态：闭合回路中的磁通量保持不变，所以没有持续感应电流。';update('reset');});
+  function loop(now){if(playing){const dt=Math.min((now-last)/1000,.05);last=now;const step=(targetB-startB)*dt/1.4;progress=Math.min(1,progress+dt/1.4);field.value=String(startB+(targetB-startB)*progress);delta=step*area*Math.cos(Number(theta.value)*Math.PI/180);emf=-delta/Math.max(dt,.001);current=closed?emf/resistance:0;update('change');if(progress>=1){stop();delta=0;emf=0;current=0;status.textContent='变化结束后 Φ 再次恒定，感应电动势和电流回到零。';update('settled');}}requestAnimationFrame(loop);}update('reset');requestAnimationFrame(loop);
+})();
+</script>
+<script src="guided-lesson.js"></script>
+</body>
+</html>

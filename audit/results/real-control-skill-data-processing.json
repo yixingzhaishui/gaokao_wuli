@@ -1,0 +1,296 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T18:29:20.182Z",
+  "commit": "2c478ed208651e04ca3e1934cfce72f6f0296959",
+  "module": "skill",
+  "modules": [
+    "skill"
+  ],
+  "summary": {
+    "total": 1,
+    "score": 100,
+    "pass": 1,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/skill/experiment-data-processing.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#k",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#b",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#noise",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#outlier",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:剔除异常点",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#toggle",
+          "text": "剔除异常点",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.5,
+          "py": 0.5
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "5576853c",
+          "readout_hash": "45ed538d",
+          "physical_readout_hash": "45ed538d",
+          "readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6相对误差：6.8%",
+            "1.03.04记录2.05.44记录3.08.08记录4.010.46记录5.015.06异常点6.015.47记录",
+            "判定：误差偏大，先查异常点、零点、读数和坐标轴选取。"
+          ],
+          "physical_readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6相对误差：6.8%",
+            "1.03.04记录2.05.44记录3.08.08记录4.010.46记录5.015.06异常点6.015.47记录",
+            "判定：误差偏大，先查异常点、零点、读数和坐标轴选取。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "a1b12d1b",
+          "readout_hash": "45ed538d",
+          "physical_readout_hash": "45ed538d",
+          "readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6相对误差：6.8%",
+            "1.03.04记录2.05.44记录3.08.08记录4.010.46记录5.015.06异常点6.015.47记录",
+            "判定：误差偏大，先查异常点、零点、读数和坐标轴选取。"
+          ],
+          "physical_readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6相对误差：6.8%",
+            "1.03.04记录2.05.44记录3.08.08记录4.010.46记录5.015.06异常点6.015.47记录",
+            "判定：误差偏大，先查异常点、零点、读数和坐标轴选取。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "4a0de200",
+          "readout_hash": "45ed538d",
+          "physical_readout_hash": "45ed538d",
+          "readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6相对误差：6.8%",
+            "1.03.04记录2.05.44记录3.08.08记录4.010.46记录5.015.06异常点6.015.47记录",
+            "判定：误差偏大，先查异常点、零点、读数和坐标轴选取。"
+          ],
+          "physical_readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6相对误差：6.8%",
+            "1.03.04记录2.05.44记录3.08.08记录4.010.46记录5.015.06异常点6.015.47记录",
+            "判定：误差偏大，先查异常点、零点、读数和坐标轴选取。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "4a0de200",
+          "readout_hash": "45ed538d",
+          "physical_readout_hash": "45ed538d",
+          "readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6相对误差：6.8%",
+            "1.03.04记录2.05.44记录3.08.08记录4.010.46记录5.015.06异常点6.015.47记录",
+            "判定：误差偏大，先查异常点、零点、读数和坐标轴选取。"
+          ],
+          "physical_readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6相对误差：6.8%",
+            "1.03.04记录2.05.44记录3.08.08记录4.010.46记录5.015.06异常点6.015.47记录",
+            "判定：误差偏大，先查异常点、零点、读数和坐标轴选取。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "真实斜率 k #|#|截距 b #|#|随机误差 #|#|异常点偏差 #|#|拟合斜率 k：#截距 b：#参与点数：#相对误差：#%|判定：误差偏大，先查异常点、零点、读数和坐标轴选取。",
+          "controls": [
+            {
+              "id": "k",
+              "value": "2.5",
+              "checked": false
+            },
+            {
+              "id": "b",
+              "value": "0.5",
+              "checked": false
+            },
+            {
+              "id": "noise",
+              "value": "0.35",
+              "checked": false
+            },
+            {
+              "id": "outlier",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "真实斜率 k #|#|截距 b #|#|随机误差 #|#|异常点偏差 #|#|拟合斜率 k：#截距 b：#参与点数：#相对误差：#%|判定：误差偏大，先查异常点、零点、读数和坐标轴选取。",
+          "controls": [
+            {
+              "id": "k",
+              "value": "2.5",
+              "checked": false
+            },
+            {
+              "id": "b",
+              "value": "0.5",
+              "checked": false
+            },
+            {
+              "id": "noise",
+              "value": "0.35",
+              "checked": false
+            },
+            {
+              "id": "outlier",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

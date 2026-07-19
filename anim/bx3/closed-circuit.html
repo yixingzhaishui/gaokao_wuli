@@ -39,6 +39,8 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
     <span class="r">路端电压 U = <b id="u-val">5.0</b> V</span>
     <span class="r">内压降 Ir = <b id="ir-val">1.0</b> V</span>
     <span class="r">电源功率 = <b id="p-val">3.0</b> W</span>
+    <span class="r">通过截面的电荷 Q = <b id="q-flow-val">0.00</b> C</span>
+    <span class="r">演示时间 = <b id="t-val">0.00</b> s</span>
   </div>
   <div class="hint">
     <p><b>观察任务</b>：拖动 R 滑块，或直接<b>拖动右侧 U-I 图像上的红色工作点</b>，对照电路俯视装置、U-I 图像和数据记录，看路端电压 U 和电流 I 如何反向变化。</p>
@@ -62,6 +64,8 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
     document.getElementById('u-val').textContent=U.toFixed(2);
     document.getElementById('ir-val').textContent=(ri*I).toFixed(2);
     document.getElementById('p-val').textContent=(emf*I).toFixed(1);
+    document.getElementById('q-flow-val').textContent=(I*t).toFixed(2);
+    document.getElementById('t-val').textContent=t.toFixed(2);
   }
 
   function drawCircuit(){
@@ -115,6 +119,18 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
     const U=calcU();
     ctx.fillStyle='#e03131';ctx.font='11px sans-serif';
     ctx.fillText('U='+U.toFixed(2)+'V',rx+20,cy+18);
+    // 正在流动的载流子：播放时沿闭合回路移动，位置和累计电荷 Q=It 同步。
+    if(running){
+      const phase=t*I*0.55;
+      for(let n=0;n<8;n++){
+        const u=(phase+n/8)%1;let x,y;
+        if(u<.25){x=cx-60+u/.25*120;y=cy-80;}
+        else if(u<.5){x=cx+60;y=cy-80+(u-.25)/.25*160;}
+        else if(u<.75){x=cx+60-(u-.5)/.25*120;y=cy+80;}
+        else{x=cx-60;y=cy+80-(u-.75)/.25*160;}
+        ctx.fillStyle='#ffd166';ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();
+      }
+    }
   }
 
   function drawGraph(){
@@ -180,7 +196,7 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
     ctx.fillText('U = ε - Ir = '+emf+' - '+I.toFixed(2)+'×'+ri+' = '+U.toFixed(2)+' V',15,H-10);
   }
 
-  function step(dt){if(!running)return;t+=dt;draw();}
+  function step(dt){if(!running)return;t+=dt;updateReadouts();draw();}
 
   function eventPos(ev){const rc=canvas.getBoundingClientRect();return{x:(ev.clientX-rc.left)*canvas.width/rc.width,y:(ev.clientY-rc.top)*canvas.height/rc.height};}
   canvas.addEventListener('pointerdown',ev=>{const p=eventPos(ev);if(Math.hypot(p.x-pointHot.x,p.y-pointHot.y)<16)dragPoint=true;});
@@ -196,12 +212,26 @@ canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid
   document.getElementById('emf').addEventListener('input',e=>{emf=parseFloat(e.target.value);document.getElementById('emf-display').textContent=emf.toFixed(1);updateReadouts();draw();});
   document.getElementById('ri').addEventListener('input',e=>{ri=parseFloat(e.target.value);document.getElementById('ri-display').textContent=ri.toFixed(1);updateReadouts();draw();});
   document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
-  document.getElementById('reset-btn').addEventListener('click',()=>{running=false;t=0;document.getElementById('play-btn').textContent='播放';draw();});
+  document.getElementById('reset-btn').addEventListener('click',()=>{
+    // A reset must restore the experiment, not merely stop its clock.  Keeping
+    // altered R, ε or r here made the button contradict the displayed initial
+    // state and prevented students from repeating the same comparison.
+    R=10;emf=6;ri=2;running=false;t=0;
+    document.getElementById('r').value=R;
+    document.getElementById('emf').value=emf;
+    document.getElementById('ri').value=ri;
+    document.getElementById('r-display').textContent=R.toFixed(1);
+    document.getElementById('emf-display').textContent=emf.toFixed(1);
+    document.getElementById('ri-display').textContent=ri.toFixed(1);
+    document.getElementById('play-btn').textContent='播放';
+    updateReadouts();draw();
+  });
 
   let lastTime=performance.now();
   function loop(now){const dt=Math.min((now-lastTime)/1000,0.05);lastTime=now;step(dt);requestAnimationFrame(loop);}
   updateReadouts();draw();requestAnimationFrame(loop);
 })();
 </script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

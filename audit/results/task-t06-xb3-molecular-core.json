@@ -1,0 +1,1096 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T06:45:49.177Z",
+  "commit": "50a9057b23840035111cf545c619b87b8c6c6313",
+  "module": "xb3",
+  "modules": [
+    "xb3"
+  ],
+  "summary": {
+    "total": 5,
+    "score": 100,
+    "pass": 5,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/xb3/diffusion-brownian.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#temp",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#radius",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#conc",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录状态",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录状态",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "d06cb59e",
+          "readout_hash": "ecd84e52",
+          "physical_readout_hash": "ecd84e52",
+          "readout": [
+            "温度 T 300 K",
+            "300 K",
+            "花粉半径 r 3.0 μm",
+            "3.0 μm",
+            "染料浓度差 80%",
+            "80%",
+            "扩散快慢：0.27布朗抖动：0.58花粉轨迹点：21微观原因：无规则碰撞",
+            "3003.00.270.58",
+            "低温时分子热运动较弱，扩散和布朗运动都较缓。"
+          ],
+          "physical_readout": [
+            "温度 T 300 K",
+            "300 K",
+            "花粉半径 r 3.0 μm",
+            "3.0 μm",
+            "染料浓度差 80%",
+            "80%",
+            "扩散快慢：0.27布朗抖动：0.58花粉轨迹点：21微观原因：无规则碰撞",
+            "3003.00.270.58",
+            "低温时分子热运动较弱，扩散和布朗运动都较缓。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "ac443f06",
+          "readout_hash": "a758d440",
+          "physical_readout_hash": "a758d440",
+          "readout": [
+            "温度 T 300 K",
+            "300 K",
+            "花粉半径 r 3.0 μm",
+            "3.0 μm",
+            "染料浓度差 80%",
+            "80%",
+            "扩散快慢：0.27布朗抖动：0.58花粉轨迹点：63微观原因：无规则碰撞",
+            "3003.00.270.58",
+            "低温时分子热运动较弱，扩散和布朗运动都较缓。"
+          ],
+          "physical_readout": [
+            "温度 T 300 K",
+            "300 K",
+            "花粉半径 r 3.0 μm",
+            "3.0 μm",
+            "染料浓度差 80%",
+            "80%",
+            "扩散快慢：0.27布朗抖动：0.58花粉轨迹点：63微观原因：无规则碰撞",
+            "3003.00.270.58",
+            "低温时分子热运动较弱，扩散和布朗运动都较缓。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "6454aaee",
+          "readout_hash": "ef04aba3",
+          "physical_readout_hash": "ef04aba3",
+          "readout": [
+            "温度 T 300 K",
+            "300 K",
+            "花粉半径 r 3.0 μm",
+            "3.0 μm",
+            "染料浓度差 80%",
+            "80%",
+            "扩散快慢：0.27布朗抖动：0.58花粉轨迹点：66微观原因：无规则碰撞",
+            "3003.00.270.58",
+            "低温时分子热运动较弱，扩散和布朗运动都较缓。"
+          ],
+          "physical_readout": [
+            "温度 T 300 K",
+            "300 K",
+            "花粉半径 r 3.0 μm",
+            "3.0 μm",
+            "染料浓度差 80%",
+            "80%",
+            "扩散快慢：0.27布朗抖动：0.58花粉轨迹点：66微观原因：无规则碰撞",
+            "3003.00.270.58",
+            "低温时分子热运动较弱，扩散和布朗运动都较缓。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "6454aaee",
+          "readout_hash": "ef04aba3",
+          "physical_readout_hash": "ef04aba3",
+          "readout": [
+            "温度 T 300 K",
+            "300 K",
+            "花粉半径 r 3.0 μm",
+            "3.0 μm",
+            "染料浓度差 80%",
+            "80%",
+            "扩散快慢：0.27布朗抖动：0.58花粉轨迹点：66微观原因：无规则碰撞",
+            "3003.00.270.58",
+            "低温时分子热运动较弱，扩散和布朗运动都较缓。"
+          ],
+          "physical_readout": [
+            "温度 T 300 K",
+            "300 K",
+            "花粉半径 r 3.0 μm",
+            "3.0 μm",
+            "染料浓度差 80%",
+            "80%",
+            "扩散快慢：0.27布朗抖动：0.58花粉轨迹点：66微观原因：无规则碰撞",
+            "3003.00.270.58",
+            "低温时分子热运动较弱，扩散和布朗运动都较缓。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "温度 T # K|# K|花粉半径 r # μm|# μm|染料浓度差 #%|#%|扩散快慢：#布朗抖动：#花粉轨迹点：#微观原因：无规则碰撞|低温时分子热运动较弱，扩散和布朗运动都较缓。",
+          "controls": [
+            {
+              "id": "temp",
+              "value": "300",
+              "checked": false
+            },
+            {
+              "id": "radius",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "conc",
+              "value": "80",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "温度 T # K|# K|花粉半径 r # μm|# μm|染料浓度差 #%|#%|扩散快慢：#布朗抖动：#花粉轨迹点：#微观原因：无规则碰撞|低温时分子热运动较弱，扩散和布朗运动都较缓。",
+          "controls": [
+            {
+              "id": "temp",
+              "value": "300",
+              "checked": false
+            },
+            {
+              "id": "radius",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "conc",
+              "value": "80",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb3/gas-state-parameters.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#vol",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#temp",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#amount",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#recordBtn",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "35a18044",
+          "readout_hash": "adf816d8",
+          "physical_readout_hash": "adf816d8",
+          "readout": [
+            "体积 V/m³：1.00",
+            "温度 T/K：300",
+            "物质的量 n/mol：1.00",
+            "p=nRT/V≈2493 PapV/T≈8.31 Pa·m³/K，nR≈8.31状态表：V=1.00 m³，T=300 K，n=1.00 mol分子点数=46；温度升高时平均速率比例∝√T",
+            "封闭定量气体 n 不变时，pV/T 保持 nR；若充气或漏气，n 改变，pV/T 也随之改变。"
+          ],
+          "physical_readout": [
+            "体积 V/m³：1.00",
+            "温度 T/K：300",
+            "物质的量 n/mol：1.00",
+            "p=nRT/V≈2493 PapV/T≈8.31 Pa·m³/K，nR≈8.31状态表：V=1.00 m³，T=300 K，n=1.00 mol分子点数=46；温度升高时平均速率比例∝√T",
+            "封闭定量气体 n 不变时，pV/T 保持 nR；若充气或漏气，n 改变，pV/T 也随之改变。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "603de03a",
+          "readout_hash": "4837eaad",
+          "physical_readout_hash": "4837eaad",
+          "readout": [
+            "体积 V/m³：1.40",
+            "温度 T/K：300",
+            "物质的量 n/mol：1.00",
+            "p=nRT/V≈1781 PapV/T≈8.31 Pa·m³/K，nR≈8.31状态表：V=1.40 m³，T=300 K，n=1.00 mol分子点数=46；温度升高时平均速率比例∝√T",
+            "封闭定量气体 n 不变时，pV/T 保持 nR；若充气或漏气，n 改变，pV/T 也随之改变。"
+          ],
+          "physical_readout": [
+            "体积 V/m³：1.40",
+            "温度 T/K：300",
+            "物质的量 n/mol：1.00",
+            "p=nRT/V≈1781 PapV/T≈8.31 Pa·m³/K，nR≈8.31状态表：V=1.40 m³，T=300 K，n=1.00 mol分子点数=46；温度升高时平均速率比例∝√T",
+            "封闭定量气体 n 不变时，pV/T 保持 nR；若充气或漏气，n 改变，pV/T 也随之改变。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "165ac371",
+          "readout_hash": "4837eaad",
+          "physical_readout_hash": "4837eaad",
+          "readout": [
+            "体积 V/m³：1.40",
+            "温度 T/K：300",
+            "物质的量 n/mol：1.00",
+            "p=nRT/V≈1781 PapV/T≈8.31 Pa·m³/K，nR≈8.31状态表：V=1.40 m³，T=300 K，n=1.00 mol分子点数=46；温度升高时平均速率比例∝√T",
+            "封闭定量气体 n 不变时，pV/T 保持 nR；若充气或漏气，n 改变，pV/T 也随之改变。"
+          ],
+          "physical_readout": [
+            "体积 V/m³：1.40",
+            "温度 T/K：300",
+            "物质的量 n/mol：1.00",
+            "p=nRT/V≈1781 PapV/T≈8.31 Pa·m³/K，nR≈8.31状态表：V=1.40 m³，T=300 K，n=1.00 mol分子点数=46；温度升高时平均速率比例∝√T",
+            "封闭定量气体 n 不变时，pV/T 保持 nR；若充气或漏气，n 改变，pV/T 也随之改变。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "510e758e",
+          "readout_hash": "4837eaad",
+          "physical_readout_hash": "4837eaad",
+          "readout": [
+            "体积 V/m³：1.40",
+            "温度 T/K：300",
+            "物质的量 n/mol：1.00",
+            "p=nRT/V≈1781 PapV/T≈8.31 Pa·m³/K，nR≈8.31状态表：V=1.40 m³，T=300 K，n=1.00 mol分子点数=46；温度升高时平均速率比例∝√T",
+            "封闭定量气体 n 不变时，pV/T 保持 nR；若充气或漏气，n 改变，pV/T 也随之改变。"
+          ],
+          "physical_readout": [
+            "体积 V/m³：1.40",
+            "温度 T/K：300",
+            "物质的量 n/mol：1.00",
+            "p=nRT/V≈1781 PapV/T≈8.31 Pa·m³/K，nR≈8.31状态表：V=1.40 m³，T=300 K，n=1.00 mol分子点数=46；温度升高时平均速率比例∝√T",
+            "封闭定量气体 n 不变时，pV/T 保持 nR；若充气或漏气，n 改变，pV/T 也随之改变。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "体积 V/m³：#|温度 T/K：#|物质的量 n/mol：#|p=nRT/V≈# PapV/T≈# Pa·m³/K，nR≈#状态表：V=# m³，T=# K，n=# mol分子点数=#；温度升高时平均速率比例∝√T|封闭定量气体 n 不变时，pV/T 保持 nR；若充气或漏气，n 改变，pV/T 也随之改变。",
+          "controls": [
+            {
+              "id": "vol",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "temp",
+              "value": "300",
+              "checked": false
+            },
+            {
+              "id": "amount",
+              "value": "1",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "体积 V/m³：#|温度 T/K：#|物质的量 n/mol：#|p=nRT/V≈# PapV/T≈# Pa·m³/K，nR≈#状态表：V=# m³，T=# K，n=# mol分子点数=#；温度升高时平均速率比例∝√T|封闭定量气体 n 不变时，pV/T 保持 nR；若充气或漏气，n 改变，pV/T 也随之改变。",
+          "controls": [
+            {
+              "id": "vol",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "temp",
+              "value": "300",
+              "checked": false
+            },
+            {
+              "id": "amount",
+              "value": "1",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb3/molecular-force.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#dist",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#temp",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#recordBtn",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "1c1b708c",
+          "readout_hash": "77a60176",
+          "physical_readout_hash": "77a60176",
+          "readout": [
+            "分子间距 r/r0：1.00",
+            "热扰动强度：30",
+            "r=1.00r0，合力 F≈0.000状态：合力≈0分子势能 Ep≈-0.556，r=r0 附近最小判断口诀：近斥、平衡零、稍远引、很远近似无力",
+            "平衡位置：引力和斥力大小相等，合力为零，分子势能最低。"
+          ],
+          "physical_readout": [
+            "分子间距 r/r0：1.00",
+            "热扰动强度：30",
+            "r=1.00r0，合力 F≈0.000状态：合力≈0分子势能 Ep≈-0.556，r=r0 附近最小判断口诀：近斥、平衡零、稍远引、很远近似无力",
+            "平衡位置：引力和斥力大小相等，合力为零，分子势能最低。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "664077a1",
+          "readout_hash": "572c49da",
+          "physical_readout_hash": "572c49da",
+          "readout": [
+            "分子间距 r/r0：1.14",
+            "热扰动强度：30",
+            "r=1.14r0，合力 F≈-0.250状态：引力主导分子势能 Ep≈-0.455，r=r0 附近最小判断口诀：近斥、平衡零、稍远引、很远近似无力",
+            "距离大于 r0：先表现为引力，距离很大时分子力趋近 0。"
+          ],
+          "physical_readout": [
+            "分子间距 r/r0：1.14",
+            "热扰动强度：30",
+            "r=1.14r0，合力 F≈-0.250状态：引力主导分子势能 Ep≈-0.455，r=r0 附近最小判断口诀：近斥、平衡零、稍远引、很远近似无力",
+            "距离大于 r0：先表现为引力，距离很大时分子力趋近 0。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "47cd0c1e",
+          "readout_hash": "b4623e01",
+          "physical_readout_hash": "b4623e01",
+          "readout": [
+            "分子间距 r/r0：1.15",
+            "热扰动强度：30",
+            "r=1.15r0，合力 F≈-0.250状态：引力主导分子势能 Ep≈-0.445，r=r0 附近最小判断口诀：近斥、平衡零、稍远引、很远近似无力",
+            "距离大于 r0：先表现为引力，距离很大时分子力趋近 0。"
+          ],
+          "physical_readout": [
+            "分子间距 r/r0：1.15",
+            "热扰动强度：30",
+            "r=1.15r0，合力 F≈-0.250状态：引力主导分子势能 Ep≈-0.445，r=r0 附近最小判断口诀：近斥、平衡零、稍远引、很远近似无力",
+            "距离大于 r0：先表现为引力，距离很大时分子力趋近 0。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "47cd0c1e",
+          "readout_hash": "b4623e01",
+          "physical_readout_hash": "b4623e01",
+          "readout": [
+            "分子间距 r/r0：1.15",
+            "热扰动强度：30",
+            "r=1.15r0，合力 F≈-0.250状态：引力主导分子势能 Ep≈-0.445，r=r0 附近最小判断口诀：近斥、平衡零、稍远引、很远近似无力",
+            "距离大于 r0：先表现为引力，距离很大时分子力趋近 0。"
+          ],
+          "physical_readout": [
+            "分子间距 r/r0：1.15",
+            "热扰动强度：30",
+            "r=1.15r0，合力 F≈-0.250状态：引力主导分子势能 Ep≈-0.445，r=r0 附近最小判断口诀：近斥、平衡零、稍远引、很远近似无力",
+            "距离大于 r0：先表现为引力，距离很大时分子力趋近 0。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "分子间距 r/r#：#|热扰动强度：#|r=#r#，合力 F≈#状态：合力≈#分子势能 Ep≈#，r=r# 附近最小判断口诀：近斥、平衡零、稍远引、很远近似无力|平衡位置：引力和斥力大小相等，合力为零，分子势能最低。",
+          "controls": [
+            {
+              "id": "dist",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "temp",
+              "value": "30",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "分子间距 r/r#：#|热扰动强度：#|r=#r#，合力 F≈#状态：合力≈#分子势能 Ep≈#，r=r# 附近最小判断口诀：近斥、平衡零、稍远引、很远近似无力|平衡位置：引力和斥力大小相等，合力为零，分子势能最低。",
+          "controls": [
+            {
+              "id": "dist",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "temp",
+              "value": "30",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb3/molecular-motion.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#temp",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#size",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#recordBtn",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "19d8d553",
+          "readout_hash": "4c663f1f",
+          "physical_readout_hash": "4c663f1f",
+          "readout": [
+            "温度 T/K：300",
+            "颗粒大小：10",
+            "温度 T=300 K，平均速率比例≈1.00平均动能比例∝T≈1.00布朗运动强度≈1.20；颗粒越小越明显注意：布朗运动是颗粒运动，间接反映分子热运动",
+            "中温：颗粒轨迹呈明显无规则折线。"
+          ],
+          "physical_readout": [
+            "温度 T/K：300",
+            "颗粒大小：10",
+            "温度 T=300 K，平均速率比例≈1.00平均动能比例∝T≈1.00布朗运动强度≈1.20；颗粒越小越明显注意：布朗运动是颗粒运动，间接反映分子热运动",
+            "中温：颗粒轨迹呈明显无规则折线。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "e359c2e7",
+          "readout_hash": "4c663f1f",
+          "physical_readout_hash": "4c663f1f",
+          "readout": [
+            "温度 T/K：300",
+            "颗粒大小：10",
+            "温度 T=300 K，平均速率比例≈1.00平均动能比例∝T≈1.00布朗运动强度≈1.20；颗粒越小越明显注意：布朗运动是颗粒运动，间接反映分子热运动",
+            "中温：颗粒轨迹呈明显无规则折线。"
+          ],
+          "physical_readout": [
+            "温度 T/K：300",
+            "颗粒大小：10",
+            "温度 T=300 K，平均速率比例≈1.00平均动能比例∝T≈1.00布朗运动强度≈1.20；颗粒越小越明显注意：布朗运动是颗粒运动，间接反映分子热运动",
+            "中温：颗粒轨迹呈明显无规则折线。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "31b1acea",
+          "readout_hash": "4c663f1f",
+          "physical_readout_hash": "4c663f1f",
+          "readout": [
+            "温度 T/K：300",
+            "颗粒大小：10",
+            "温度 T=300 K，平均速率比例≈1.00平均动能比例∝T≈1.00布朗运动强度≈1.20；颗粒越小越明显注意：布朗运动是颗粒运动，间接反映分子热运动",
+            "中温：颗粒轨迹呈明显无规则折线。"
+          ],
+          "physical_readout": [
+            "温度 T/K：300",
+            "颗粒大小：10",
+            "温度 T=300 K，平均速率比例≈1.00平均动能比例∝T≈1.00布朗运动强度≈1.20；颗粒越小越明显注意：布朗运动是颗粒运动，间接反映分子热运动",
+            "中温：颗粒轨迹呈明显无规则折线。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "31b1acea",
+          "readout_hash": "4c663f1f",
+          "physical_readout_hash": "4c663f1f",
+          "readout": [
+            "温度 T/K：300",
+            "颗粒大小：10",
+            "温度 T=300 K，平均速率比例≈1.00平均动能比例∝T≈1.00布朗运动强度≈1.20；颗粒越小越明显注意：布朗运动是颗粒运动，间接反映分子热运动",
+            "中温：颗粒轨迹呈明显无规则折线。"
+          ],
+          "physical_readout": [
+            "温度 T/K：300",
+            "颗粒大小：10",
+            "温度 T=300 K，平均速率比例≈1.00平均动能比例∝T≈1.00布朗运动强度≈1.20；颗粒越小越明显注意：布朗运动是颗粒运动，间接反映分子热运动",
+            "中温：颗粒轨迹呈明显无规则折线。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "温度 T/K：#|颗粒大小：#|温度 T=# K，平均速率比例≈#平均动能比例∝T≈#布朗运动强度≈#；颗粒越小越明显注意：布朗运动是颗粒运动，间接反映分子热运动|中温：颗粒轨迹呈明显无规则折线。",
+          "controls": [
+            {
+              "id": "temp",
+              "value": "300",
+              "checked": false
+            },
+            {
+              "id": "size",
+              "value": "10",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "温度 T/K：#|颗粒大小：#|温度 T=# K，平均速率比例≈#平均动能比例∝T≈#布朗运动强度≈#；颗粒越小越明显注意：布朗运动是颗粒运动，间接反映分子热运动|中温：颗粒轨迹呈明显无规则折线。",
+          "controls": [
+            {
+              "id": "temp",
+              "value": "300",
+              "checked": false
+            },
+            {
+              "id": "size",
+              "value": "10",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb3/molecular-speed-distribution.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#temp",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#mass",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#count",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录当前曲线",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "暂停分子运动",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录当前曲线",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停分子运动"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "3f8cf4e9",
+          "readout_hash": "16471f04",
+          "physical_readout_hash": "16471f04",
+          "readout": [
+            "温度 T 300 K",
+            "300 K",
+            "分子质量 m 28 u",
+            "28 u",
+            "样本数 N 160",
+            "160",
+            "最概然速率 vp：213平均速率 v̄：240宽度参数 a：151曲线面积（数值）：1.000样本中 v＞v̄：42.5%",
+            "3002132401.000",
+            "基准状态：用它和低温、高温虚线曲线比较，不把每个分子都当成同一速率。"
+          ],
+          "physical_readout": [
+            "温度 T 300 K",
+            "300 K",
+            "分子质量 m 28 u",
+            "28 u",
+            "样本数 N 160",
+            "160",
+            "最概然速率 vp：213平均速率 v̄：240宽度参数 a：151曲线面积（数值）：1.000样本中 v＞v̄：42.5%",
+            "3002132401.000",
+            "基准状态：用它和低温、高温虚线曲线比较，不把每个分子都当成同一速率。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "364c1351",
+          "readout_hash": "16471f04",
+          "physical_readout_hash": "16471f04",
+          "readout": [
+            "温度 T 300 K",
+            "300 K",
+            "分子质量 m 28 u",
+            "28 u",
+            "样本数 N 160",
+            "160",
+            "最概然速率 vp：213平均速率 v̄：240宽度参数 a：151曲线面积（数值）：1.000样本中 v＞v̄：42.5%",
+            "3002132401.000",
+            "基准状态：用它和低温、高温虚线曲线比较，不把每个分子都当成同一速率。"
+          ],
+          "physical_readout": [
+            "温度 T 300 K",
+            "300 K",
+            "分子质量 m 28 u",
+            "28 u",
+            "样本数 N 160",
+            "160",
+            "最概然速率 vp：213平均速率 v̄：240宽度参数 a：151曲线面积（数值）：1.000样本中 v＞v̄：42.5%",
+            "3002132401.000",
+            "基准状态：用它和低温、高温虚线曲线比较，不把每个分子都当成同一速率。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "76e2a8e1",
+          "readout_hash": "16471f04",
+          "physical_readout_hash": "16471f04",
+          "readout": [
+            "温度 T 300 K",
+            "300 K",
+            "分子质量 m 28 u",
+            "28 u",
+            "样本数 N 160",
+            "160",
+            "最概然速率 vp：213平均速率 v̄：240宽度参数 a：151曲线面积（数值）：1.000样本中 v＞v̄：42.5%",
+            "3002132401.000",
+            "基准状态：用它和低温、高温虚线曲线比较，不把每个分子都当成同一速率。"
+          ],
+          "physical_readout": [
+            "温度 T 300 K",
+            "300 K",
+            "分子质量 m 28 u",
+            "28 u",
+            "样本数 N 160",
+            "160",
+            "最概然速率 vp：213平均速率 v̄：240宽度参数 a：151曲线面积（数值）：1.000样本中 v＞v̄：42.5%",
+            "3002132401.000",
+            "基准状态：用它和低温、高温虚线曲线比较，不把每个分子都当成同一速率。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "76e2a8e1",
+          "readout_hash": "16471f04",
+          "physical_readout_hash": "16471f04",
+          "readout": [
+            "温度 T 300 K",
+            "300 K",
+            "分子质量 m 28 u",
+            "28 u",
+            "样本数 N 160",
+            "160",
+            "最概然速率 vp：213平均速率 v̄：240宽度参数 a：151曲线面积（数值）：1.000样本中 v＞v̄：42.5%",
+            "3002132401.000",
+            "基准状态：用它和低温、高温虚线曲线比较，不把每个分子都当成同一速率。"
+          ],
+          "physical_readout": [
+            "温度 T 300 K",
+            "300 K",
+            "分子质量 m 28 u",
+            "28 u",
+            "样本数 N 160",
+            "160",
+            "最概然速率 vp：213平均速率 v̄：240宽度参数 a：151曲线面积（数值）：1.000样本中 v＞v̄：42.5%",
+            "3002132401.000",
+            "基准状态：用它和低温、高温虚线曲线比较，不把每个分子都当成同一速率。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "温度 T # K|# K|分子质量 m # u|# u|样本数 N #|#|最概然速率 vp：#平均速率 v̄：#宽度参数 a：#曲线面积（数值）：#样本中 v＞v̄：#%|基准状态：用它和低温、高温虚线曲线比较，不把每个分子都当成同一速率。",
+          "controls": [
+            {
+              "id": "temp",
+              "value": "300",
+              "checked": false
+            },
+            {
+              "id": "mass",
+              "value": "28",
+              "checked": false
+            },
+            {
+              "id": "count",
+              "value": "160",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "温度 T # K|# K|分子质量 m # u|# u|样本数 N #|#|最概然速率 vp：#平均速率 v̄：#宽度参数 a：#曲线面积（数值）：#样本中 v＞v̄：#%|基准状态：用它和低温、高温虚线曲线比较，不把每个分子都当成同一速率。",
+          "controls": [
+            {
+              "id": "temp",
+              "value": "300",
+              "checked": false
+            },
+            {
+              "id": "mass",
+              "value": "28",
+              "checked": false
+            },
+            {
+              "id": "count",
+              "value": "160",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

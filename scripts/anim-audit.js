@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// 动画静态预筛选 V3：只检查 anim/**/*.html 的静态代理特征。
+// 动画静态预筛选 V4：只检查 anim/**/*.html 的静态代理特征。
 // 本分数不能证明动画能运行、控件有效或物理规律正确；最终结论以
 // Playwright 行为证据和人工物理复核为准（见 ../内容审核评分系统V3.md）。
 // 用法: node scripts/anim-audit.js [章节前缀，如 bx3]
@@ -40,7 +40,7 @@ for (const f of files) {
   const srcLen = src.replace(/\s+/g, ' ').trim().length; // 压缩空白后的脚本字符数（不受 minify 影响）
   const parses = jsOk(src);
   const hasCanvas = /<canvas/.test(html) && /getContext/.test(src);
-  // V2 metrics: “有部件”不等于“看得懂”，所以同时检查场景、仪器、多视角和过程痕迹。
+  // V4 metrics: 区分画布拖拽、预测驱动的引导演示和分步证据链，避免把“控制台化”误当成高质量。
   const drag = count(/pointerdown|pointermove|mousedown|touchstart/g, src);
   const raf = count(/requestAnimationFrame/g, src);
   const play = count(/play-btn|playBtn|['"]播放['"]|▶|release|释放/g, html);
@@ -52,10 +52,14 @@ for (const f of files) {
   const formula = /[≈√∝²³ΔλμΩθΦφ]|arcsin|sin[ ]?θ|=\s*[a-zA-Zρμ√(]|公式|定律|U=|E=|F=|Q=|I=|p=|v=|a=|ε=|e=|Φ=|N=/.test(strLits) || /公式/.test(html);
   const scene = has(/实验|装置|线圈|磁体|磁铁|导轨|导体棒|电表|电压表|电流表|灵敏电流计|灯泡|电源|变压器|传感器|屏|轨道|探针|磁场|电场|电路|apparatus|lab|coil|magnet|meter|bulb|rail|rod|sensor/i, inspectable);
   const direct = drag >= 2 && has(/drag|拖动|handle|grab|cursor|hit|knob|thumb|probe|magnet|coil|rod|slider/i, src + inspectable);
-  const causality = raf > 0 && has(/time|dt|speed|velocity|omega|phase|flux|dPhi|emf|current|force|accel|history|trail|trace|t\s*[+\-*/]?=|v\s*[+\-*/]?=/i, src);
+  const phased = has(/data-phase|setPhase|phase\s*===|phase\s*=|predict|prediction|evidence|预测|证据/i, src + inspectable);
+  const timed = raf > 0 || has(/setTimeout|setInterval/i, src);
+  const guided = play > 0 && phased && has(/predict|prediction|evidence|预测|证据/i, src + inspectable);
+  const causality = (timed || phased) && has(/time|dt|speed|velocity|omega|phase|flux|dPhi|emf|current|force|accel|history|trail|trace|合力|摩擦|距离|加速度|t\s*[+\-*/]?=|v\s*[+\-*/]?=/i, src + inspectable);
   const spatialView = has(/3D|三维|透视|俯视|侧视|正视|剖面|截面|投影|空间|坐标|x轴|y轴|z轴|isometric|perspective|projection|三视图|多视角/i, inspectable);
-  const pairedPanel = has(/实物|装置|实验台|场景/i, inspectable) && has(/图像|图线|表盘|电表|数据|记录|轨迹|俯视|侧视|剖面|3D|三维/i, inspectable);
+  const pairedPanel = has(/实物|装置|实验|场景|小车|箱子|物块/i, inspectable) && has(/图像|图线|表盘|电表|数据|记录|轨迹|坐标|a-F|f-F|Δx-t|v-t|俯视|侧视|剖面|3D|三维/i, inspectable);
   const multiView = spatialView && pairedPanel;
+  const multiRepresentation = multiView || pairedPanel;
   const instrument = readouts >= 3 && has(/电表|电压表|电流表|灵敏电流计|表盘|灯泡|亮度|刻度|尺|读数|图像|图线|坐标|斜率|面积|轨迹|频闪|数据|记录|meter|gauge|scope|chart|graph|plot|bulb|brightness/i, inspectable);
   const state = has(/观察任务|怎么玩|静止|滑动|超重|失重|临界|全反射|共振|守恒|加强|减弱|明显|不明显|状态|反馈|判定|status/i, html);
   const realism = count(/createRadialGradient|createLinearGradient|shadowBlur|arrow|field|line|gradient|label|fillText|strokeText/g, src);
@@ -70,16 +74,16 @@ for (const f of files) {
   score += (scene ? 10 : 0) + Math.min(6, Math.round(srcLen / 900));
   if (!scene) notes.push('缺实验场景/对象');
   // ② 画面内直接操作 14
-  score += direct ? 14 : (drag >= 2 ? 10 : (sliders >= 1 ? 5 : 0));
-  if (!direct) notes.push(sliders ? '主要靠滑块' : '缺画面内拖动');
+  score += direct ? 14 : (guided ? 12 : (drag >= 2 ? 10 : (sliders >= 1 ? 5 : 0)));
+  if (!direct && !guided) notes.push(sliders ? '主要靠滑块' : '缺有效引导或画面操作');
   // ③ 动态因果过程 14
-  score += (raf > 0 ? 6 : 0) + (play > 0 ? 4 : 0) + (causality ? 4 : 0);
-  if (raf === 0) notes.push('无rAF(不随时间动)');
+  score += (timed || phased ? 6 : 0) + (play > 0 ? 4 : 0) + (causality ? 4 : 0);
+  if (!timed && !phased) notes.push('无时间或教学阶段推进');
   if (play === 0) notes.push('无播放/重置');
   if (!causality) notes.push('因果过程弱');
   // ④ 多视角/空间表达 14
-  score += multiView ? 14 : 0;
-  if (!multiView) notes.push('缺多视角/空间表达');
+  score += multiView ? 14 : (multiRepresentation ? 12 : 0);
+  if (!multiRepresentation) notes.push('缺多表征/空间表达');
   // ⑤ 仪器读数与过程痕迹 14
   score += instrument ? 14 : (readouts >= 3 ? 7 : (readouts >= 1 ? 4 : 0));
   if (!instrument) notes.push('缺仪器/轨迹/数据记录');
@@ -93,9 +97,9 @@ for (const f of files) {
   score += Math.min(8, realism >= 5 ? 8 : (realism >= 2 ? 5 : (lines > 150 ? 3 : 1)));
 
   // Hard caps: prevent abstract slider demos from getting high scores.
-  if (!direct) score = capScore(score, 80, notes, '无画面内直接操作');
+  if (!direct && !guided) score = capScore(score, 80, notes, '无有效引导或画面内直接操作');
   if (!instrument) score = capScore(score, 84, notes, '无仪器/轨迹/数据记录');
-  if (!multiView) score = capScore(score, 86, notes, '无多视角/空间表达');
+  if (!multiRepresentation) score = capScore(score, 86, notes, '无多表征/空间表达');
   if (isElectromagCore && !spatialView) score = capScore(score, 82, notes, 'XB2电磁需空间方向/3D/多视角');
   if (isElectromagCore && spatialView && !multiView) score = capScore(score, 90, notes, 'XB2空间表达未与装置/图像成组');
   if (!state) score = capScore(score, 88, notes, '无观察任务/反馈');
@@ -110,9 +114,9 @@ for (const f of files) {
   else verdict = '静态草稿/玩具';
   const dims = {
     d1: (scene ? 10 : 0) + Math.min(6, Math.round(srcLen / 900)),
-    d2: direct ? 14 : (drag >= 2 ? 10 : (sliders >= 1 ? 5 : 0)),
-    d3: (raf > 0 ? 6 : 0) + (play > 0 ? 4 : 0) + (causality ? 4 : 0),
-    d4: multiView ? 14 : 0,
+    d2: direct ? 14 : (guided ? 12 : (drag >= 2 ? 10 : (sliders >= 1 ? 5 : 0))),
+    d3: (timed || phased ? 6 : 0) + (play > 0 ? 4 : 0) + (causality ? 4 : 0),
+    d4: multiView ? 14 : (multiRepresentation ? 12 : 0),
     d5: instrument ? 14 : (readouts >= 3 ? 7 : (readouts >= 1 ? 4 : 0)),
     d6: formula ? 12 : 0,
     d7: state ? 8 : 0,

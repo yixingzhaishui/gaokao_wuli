@@ -213,7 +213,7 @@ function drawLab(q) {
 }
 function drawGraph(q) {
   box(540, 82, 210, 304, '#f7f9fc', '#d9e2ec');
-  text('图像记录：sin r - sin i', 645, 106, '#102a43', 14, '700');
+  text('图像记录：纵 sin i - 横 sin r', 645, 106, '#102a43', 14, '700');
   const x = 574, y = 142, w = 140, h = 160;
   ctx.strokeStyle = '#e6edf5';
   ctx.lineWidth = 1;
@@ -226,13 +226,13 @@ function drawGraph(q) {
   ctx.beginPath(); ctx.moveTo(x, y + h); ctx.lineTo(x + w, y + h); ctx.moveTo(x, y + h); ctx.lineTo(x, y); ctx.stroke();
   ctx.strokeStyle = '#38b2ac';
   ctx.lineWidth = 3;
-  ctx.beginPath(); ctx.moveTo(x, y + h); ctx.lineTo(x + w * 0.92, y + h - h * 0.92 / q.n); ctx.stroke();
-  const px = x + w * Math.sin(rad(q.imeas));
-  const py = y + h - h * Math.sin(rad(q.rmeas));
+  ctx.beginPath(); ctx.moveTo(x, y + h); ctx.lineTo(x + w * 0.92 / q.n, y + h - h * 0.92); ctx.stroke();
+  const px = x + w * Math.sin(rad(q.rmeas));
+  const py = y + h - h * Math.sin(rad(q.imeas));
   ctx.fillStyle = q.ok ? '#0f9f6e' : '#d64545';
   ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI * 2); ctx.fill();
-  text('sin i', x + w - 12, y + h + 16, '#486581', 11);
-  text('sin r', x + 20, y - 10, '#486581', 11);
+  text('sin r', x + w - 12, y + h + 16, '#486581', 11);
+  text('sin i', x + 20, y - 10, '#486581', 11);
   text(`斜率 n≈${q.nmeas.toFixed(3)}`, 645, 326, q.ok ? '#087f5b' : '#b30000', 14, '700');
   ctx.strokeStyle = '#2c7be5';
   ctx.lineWidth = 4;
@@ -271,6 +271,7 @@ function draw() {
     `真实 n≈<b>${q.n.toFixed(3)}</b>，相对误差≈<b>${q.rel.toFixed(1)}%</b>`,
     q.ok ? '判定=<b>能用</b>' : '判定=<b>需重做</b>'
   ].join('<br>');
+  window.__EXP_TEST_STATE__={...q,graph:{x:'sin r',y:'sin i',slope:'n'}};
 }
 function loop(now) {
   if (!state.last) state.last = now;
@@ -332,7 +333,9 @@ els.playBtn.addEventListener('click', () => {
 els.resetBtn.addEventListener('click', () => {
   state.running = false;
   state.time = 2.4;
+  state.records = [];
   setValues({ i: 45, n: 1.5, err: 1, pin: 6 });
+  renderRecords();
   draw();
 });
 els.recordBtn.addEventListener('click', () => {
@@ -350,5 +353,6 @@ for (const id of ['incident', 'ntrue', 'error', 'pin']) els[id].addEventListener
 renderRecords();
 requestAnimationFrame(loop);
 </script>
+<script src="guided-experiment.js"></script>
 </body>
 </html>

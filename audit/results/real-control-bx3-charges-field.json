@@ -1,0 +1,269 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T17:21:16.636Z",
+  "commit": "8976bfdb85b5d7fe3d7884dfbe073c82beae3137",
+  "module": "bx3",
+  "modules": [
+    "bx3"
+  ],
+  "summary": {
+    "total": 1,
+    "score": 100,
+    "pass": 1,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/bx3/charges-field.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:加正电荷 +",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:加负电荷 −",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:清空",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:试探 −q",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:试探 2q",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:电场线",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:试探 +q",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:场矢量",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#addP",
+          "text": "加正电荷 +",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#addN",
+          "text": "加负电荷 −",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#clear",
+          "text": "清空",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:试探 +q",
+          "text": "试探 +q",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:试探 −q",
+          "text": "试探 −q",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:试探 2q",
+          "text": "试探 2q",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:场矢量",
+          "text": "场矢量",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:电场线",
+          "text": "电场线",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#playBtn",
+          "text": "▶ 播放：试探电荷自动巡游",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "▶ 播放：试探电荷自动巡游"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "1653c27f",
+          "readout_hash": "9d4aa0cb",
+          "physical_readout_hash": "9d4aa0cb",
+          "readout": [
+            "测试点场强 E = 0.40 （相对）",
+            "试探电荷 q = +q",
+            "受力 F = qE = 0.40，方向 沿 E 方向",
+            "电荷数 2",
+            "场强状态：增强中"
+          ],
+          "physical_readout": [
+            "测试点场强 E = 0.40 （相对）",
+            "试探电荷 q = +q",
+            "受力 F = qE = 0.40，方向 沿 E 方向",
+            "电荷数 2",
+            "场强状态：增强中"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "8fc213",
+          "readout_hash": "aef5be48",
+          "physical_readout_hash": "aef5be48",
+          "readout": [
+            "测试点场强 E = 0.53 （相对）",
+            "试探电荷 q = +q",
+            "受力 F = qE = 0.53，方向 沿 E 方向",
+            "电荷数 2",
+            "场强状态：巡游中，持续变化"
+          ],
+          "physical_readout": [
+            "测试点场强 E = 0.53 （相对）",
+            "试探电荷 q = +q",
+            "受力 F = qE = 0.53，方向 沿 E 方向",
+            "电荷数 2",
+            "场强状态：巡游中，持续变化"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "32ba0317",
+          "readout_hash": "5e81bd07",
+          "physical_readout_hash": "5e81bd07",
+          "readout": [
+            "测试点场强 E = 0.49 （相对）",
+            "试探电荷 q = +q",
+            "受力 F = qE = 0.49，方向 沿 E 方向",
+            "电荷数 2",
+            "场强状态：静止"
+          ],
+          "physical_readout": [
+            "测试点场强 E = 0.49 （相对）",
+            "试探电荷 q = +q",
+            "受力 F = qE = 0.49，方向 沿 E 方向",
+            "电荷数 2",
+            "场强状态：静止"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "32ba0317",
+          "readout_hash": "5e81bd07",
+          "physical_readout_hash": "5e81bd07",
+          "readout": [
+            "测试点场强 E = 0.49 （相对）",
+            "试探电荷 q = +q",
+            "受力 F = qE = 0.49，方向 沿 E 方向",
+            "电荷数 2",
+            "场强状态：静止"
+          ],
+          "physical_readout": [
+            "测试点场强 E = 0.49 （相对）",
+            "试探电荷 q = +q",
+            "受力 F = qE = 0.49，方向 沿 E 方向",
+            "电荷数 2",
+            "场强状态：静止"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "测试点场强 E = # （相对）|试探电荷 q = +q|受力 F = qE = #，方向 沿 E 方向|电荷数 #|场强状态：增强中",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "测试点场强 E = # （相对）|试探电荷 q = +q|受力 F = qE = #，方向 沿 E 方向|电荷数 #|场强状态：增强中",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

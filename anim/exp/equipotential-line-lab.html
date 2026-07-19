@@ -338,7 +338,8 @@ function draw() {
     `<div id="r2">目标电势 φ0=${v.target.toFixed(2)} V，差值≈${v.diff.toFixed(2)} V</div>`,
     `<div id="r3">等势线位置 x=d(1-φ0/U)≈${v.targetX.toFixed(1)} cm</div>`,
     `<div id="r4">场强估计 E≈U/d=${v.E.toFixed(0)} V/m</div>`,
-    `<div id="r5">沿等势线移动：UAB=0，W=qUAB=0</div>`
+    `<div id="r5">沿等势线移动：UAB=0，W=qUAB=0</div>`,
+    `<div id="r6">演示时间 t=${state.time.toFixed(2)} s</div>`
   ].join('');
   els.status.className = match ? 'status' : 'status bad';
   els.status.textContent = match
@@ -415,5 +416,6 @@ c.addEventListener('pointerleave', () => { state.drag = null; });
 renderMarks();
 requestAnimationFrame(loop);
 </script>
+<script src="guided-experiment.js"></script>
 </body>
 </html>

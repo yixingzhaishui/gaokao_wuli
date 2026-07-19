@@ -1,0 +1,459 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-11T07:05:12.990Z",
+  "commit": "fe51f581d55f3c1252210ce3727baf499567610c",
+  "module": "bx3",
+  "modules": [
+    "bx3"
+  ],
+  "summary": {
+    "total": 2,
+    "score": 100,
+    "pass": 2,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/bx3/capacitor-lab.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#E",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#R",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#C",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:断开",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#charge",
+          "text": "▶ 充电并播放",
+          "role": "other",
+          "checked": null,
+          "worked": null
+        },
+        {
+          "selector": "#discharge",
+          "text": "▶ 放电并播放",
+          "role": "other",
+          "checked": null,
+          "worked": null
+        },
+        {
+          "selector": "#open",
+          "text": "断开",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#playBtn",
+          "text": "播放演示",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放演示"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "98f5794b",
+          "readout_hash": "c6ee1b70",
+          "physical_readout_hash": "c15c6c30",
+          "readout": [
+            "电容器电压 U_C = 0.00 V",
+            "电荷量 Q = CU = 0 μC",
+            "充电电流 i = 0.60 mA",
+            "储能 ½CU² = 0 μJ",
+            "充放电状态：充电已暂停",
+            "拖动曲线探针读数：t=— s，U=— V",
+            "电源 E = 6 V",
+            "电阻 R = 10 kΩ",
+            "电容 C = 100 μF"
+          ],
+          "physical_readout": [
+            "电容器电压 U_C = 0.00 V",
+            "电荷量 Q = CU = 0 μC",
+            "充电电流 i = 0.60 mA",
+            "储能 ½CU² = 0 μJ",
+            "充放电状态：充电",
+            "拖动曲线探针读数：t=— s，U=— V",
+            "电源 E = 6 V",
+            "电阻 R = 10 kΩ",
+            "电容 C = 100 μF"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "fa7a15f2",
+          "readout_hash": "64d64bdb",
+          "physical_readout_hash": "64d64bdb",
+          "readout": [
+            "电容器电压 U_C = 1.81 V",
+            "电荷量 Q = CU = 181 μC",
+            "充电电流 i = 0.42 mA",
+            "储能 ½CU² = 163 μJ",
+            "充放电状态：正在充电",
+            "拖动曲线探针读数：t=— s，U=— V",
+            "电源 E = 6 V",
+            "电阻 R = 10 kΩ",
+            "电容 C = 100 μF"
+          ],
+          "physical_readout": [
+            "电容器电压 U_C = 1.81 V",
+            "电荷量 Q = CU = 181 μC",
+            "充电电流 i = 0.42 mA",
+            "储能 ½CU² = 163 μJ",
+            "充放电状态：正在充电",
+            "拖动曲线探针读数：t=— s，U=— V",
+            "电源 E = 6 V",
+            "电阻 R = 10 kΩ",
+            "电容 C = 100 μF"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "8c28d65e",
+          "readout_hash": "1282fdc9",
+          "physical_readout_hash": "935625d3",
+          "readout": [
+            "电容器电压 U_C = 1.91 V",
+            "电荷量 Q = CU = 191 μC",
+            "充电电流 i = 0.41 mA",
+            "储能 ½CU² = 183 μJ",
+            "充放电状态：充电已暂停",
+            "拖动曲线探针读数：t=— s，U=— V",
+            "电源 E = 6 V",
+            "电阻 R = 10 kΩ",
+            "电容 C = 100 μF"
+          ],
+          "physical_readout": [
+            "电容器电压 U_C = 1.91 V",
+            "电荷量 Q = CU = 191 μC",
+            "充电电流 i = 0.41 mA",
+            "储能 ½CU² = 183 μJ",
+            "充放电状态：充电",
+            "拖动曲线探针读数：t=— s，U=— V",
+            "电源 E = 6 V",
+            "电阻 R = 10 kΩ",
+            "电容 C = 100 μF"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "8c28d65e",
+          "readout_hash": "1282fdc9",
+          "physical_readout_hash": "935625d3",
+          "readout": [
+            "电容器电压 U_C = 1.91 V",
+            "电荷量 Q = CU = 191 μC",
+            "充电电流 i = 0.41 mA",
+            "储能 ½CU² = 183 μJ",
+            "充放电状态：充电已暂停",
+            "拖动曲线探针读数：t=— s，U=— V",
+            "电源 E = 6 V",
+            "电阻 R = 10 kΩ",
+            "电容 C = 100 μF"
+          ],
+          "physical_readout": [
+            "电容器电压 U_C = 1.91 V",
+            "电荷量 Q = CU = 191 μC",
+            "充电电流 i = 0.41 mA",
+            "储能 ½CU² = 183 μJ",
+            "充放电状态：充电",
+            "拖动曲线探针读数：t=— s，U=— V",
+            "电源 E = 6 V",
+            "电阻 R = 10 kΩ",
+            "电容 C = 100 μF"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "电容器电压 U_C = # V|电荷量 Q = CU = # μC|充电电流 i = # mA|储能 ½CU² = # μJ|充放电状态：充电已暂停|拖动曲线探针读数：t=— s，U=— V|电源 E = # V|电阻 R = # kΩ|电容 C = # μF",
+          "controls": [
+            {
+              "id": "E",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "R",
+              "value": "10",
+              "checked": false
+            },
+            {
+              "id": "C",
+              "value": "100",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "电容器电压 U_C = # V|电荷量 Q = CU = # μC|充电电流 i = # mA|储能 ½CU² = # μJ|充放电状态：充电已暂停|拖动曲线探针读数：t=— s，U=— V|电源 E = # V|电阻 R = # kΩ|电容 C = # μF",
+          "controls": [
+            {
+              "id": "E",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "R",
+              "value": "10",
+              "checked": false
+            },
+            {
+              "id": "C",
+              "value": "100",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx3/capacitor.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:断电源 Q不变",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:接电源 U不变",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "▶ 播放：自动拉开/靠近极板",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:接电源 U不变",
+          "text": "接电源 U不变",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:断电源 Q不变",
+          "text": "断电源 Q不变",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#reset",
+          "text": "复位",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.5,
+          "py": 0.5
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "▶ 播放：自动拉开/靠近极板"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "复位"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "20984082",
+          "readout_hash": "cb4edaab",
+          "physical_readout_hash": "cb4edaab",
+          "readout": [
+            "电容 C = 44.3 pF",
+            "电压 U = 12.0 V",
+            "电量 Q = 531 pC",
+            "场强 E≈U/d = 6.00 V/mm",
+            "板距 d = 2.0 mm，面积 S = 100 cm²",
+            "电容状态：静止"
+          ],
+          "physical_readout": [
+            "电容 C = 44.3 pF",
+            "电压 U = 12.0 V",
+            "电量 Q = 531 pC",
+            "场强 E≈U/d = 6.00 V/mm",
+            "板距 d = 2.0 mm，面积 S = 100 cm²",
+            "电容状态：静止"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "d817db3f",
+          "readout_hash": "257046d4",
+          "physical_readout_hash": "3960ade9",
+          "readout": [
+            "电容 C = 17.7 pF",
+            "电压 U = 12.0 V",
+            "电量 Q = 213 pC",
+            "场强 E≈U/d = 2.40 V/mm",
+            "板距 d = 5.0 mm，面积 S = 100 cm²",
+            "电容状态：播放中：U不变，Q、E随d变化"
+          ],
+          "physical_readout": [
+            "电容 C = 17.7 pF",
+            "电压 U = 12.0 V",
+            "电量 Q = 213 pC",
+            "场强 E≈U/d = 2.40 V/mm",
+            "板距 d = 5.0 mm，面积 S = 100 cm²",
+            "电容：U不变，Q、E随d变化"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "2a278dd6",
+          "readout_hash": "5d44141",
+          "physical_readout_hash": "5d44141",
+          "readout": [
+            "电容 C = 17.4 pF",
+            "电压 U = 12.0 V",
+            "电量 Q = 209 pC",
+            "场强 E≈U/d = 2.36 V/mm",
+            "板距 d = 5.1 mm，面积 S = 100 cm²",
+            "电容状态：静止"
+          ],
+          "physical_readout": [
+            "电容 C = 17.4 pF",
+            "电压 U = 12.0 V",
+            "电量 Q = 209 pC",
+            "场强 E≈U/d = 2.36 V/mm",
+            "板距 d = 5.1 mm，面积 S = 100 cm²",
+            "电容状态：静止"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "2a278dd6",
+          "readout_hash": "5d44141",
+          "physical_readout_hash": "5d44141",
+          "readout": [
+            "电容 C = 17.4 pF",
+            "电压 U = 12.0 V",
+            "电量 Q = 209 pC",
+            "场强 E≈U/d = 2.36 V/mm",
+            "板距 d = 5.1 mm，面积 S = 100 cm²",
+            "电容状态：静止"
+          ],
+          "physical_readout": [
+            "电容 C = 17.4 pF",
+            "电压 U = 12.0 V",
+            "电量 Q = 209 pC",
+            "场强 E≈U/d = 2.36 V/mm",
+            "板距 d = 5.1 mm，面积 S = 100 cm²",
+            "电容状态：静止"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "电容 C = # pF|电压 U = # V|电量 Q = # pC|场强 E≈U/d = # V/mm|板距 d = # mm，面积 S = # cm²|电容状态：静止",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "电容 C = # pF|电压 U = # V|电量 Q = # pC|场强 E≈U/d = # V/mm|板距 d = # mm，面积 S = # cm²|电容状态：静止",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

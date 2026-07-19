@@ -110,5 +110,28 @@
   draw();requestAnimationFrame(tick);
 })();
 </script>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script>
+<script>/* GKWL: unified full reset (2026-07-12 review remediation) */
+(function(){
+  var btns=[].slice.call(document.querySelectorAll('button'));
+  var resets=btns.filter(function(b){return /重置|复位/.test(b.textContent)});
+  if(!resets.length)return;
+  var scoped=/播放|时间|回放/;
+  var primary=resets[0];
+  if(scoped.test(primary.textContent)){
+    var nb=document.createElement('button');
+    nb.textContent='全部重置';
+    nb.className=primary.className;
+    nb.setAttribute('data-gkwl-full-reset','1');
+    nb.addEventListener('click',function(){location.reload()});
+    primary.parentNode.insertBefore(nb,primary.nextSibling);
+  }else{
+    resets.forEach(function(b){b.addEventListener('click',function(){setTimeout(function(){location.reload()},60)})});
+  }
+})();
+</script>
+<script>
+window.B2_GUIDE={id:'B2-05',question:'同一转盘转动周期不变，外圈点的线速度怎样变化？',observe:'把点从半径2 m移到4 m，转盘周期保持4 s。先比较角速度和线速度。',options:[{value:'double',label:'角速度不变，线速度变为2倍'},{value:'same',label:'角速度和线速度都不变'},{value:'half',label:'角速度不变，线速度变为一半'}],correct:'double',actions:[{selector:'[data-case="outer"]'}],result:'角速度不变，线速度变为2倍。',evidence:'周期读数不变，半径加倍，切线速度箭头和v读数加倍。',explanation:'同一转盘各点每秒转过相同角度；外圈在相同时间走过更长弧长。',transfer:'传动和转盘题先区分同轴共角速度与接触处共线速度。'};
+</script><script src="guided-lesson.js"></script>
 </body>
 </html>

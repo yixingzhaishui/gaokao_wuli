@@ -1,0 +1,1039 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T06:46:35.695Z",
+  "commit": "50a9057b23840035111cf545c619b87b8c6c6313",
+  "module": "xb3",
+  "modules": [
+    "xb3"
+  ],
+  "summary": {
+    "total": 5,
+    "score": 100,
+    "pass": 5,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/xb3/boyle-law.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#vol",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#temp",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#recordBtn",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "93d6de1",
+          "readout_hash": "cb35640",
+          "physical_readout_hash": "cb35640",
+          "readout": [
+            "体积 V/L：1.00",
+            "等温温度 T/K：300",
+            "p=C/V≈300.0pV≈300.0，C=nRT≈300.0当前 V=1.00 L，T=300 K玻意耳定律：一定量、等温时 p1V1=p2V2",
+            "同一条等温线上 pV 保持常量；改变 T 会换到另一条等温线。"
+          ],
+          "physical_readout": [
+            "体积 V/L：1.00",
+            "等温温度 T/K：300",
+            "p=C/V≈300.0pV≈300.0，C=nRT≈300.0当前 V=1.00 L，T=300 K玻意耳定律：一定量、等温时 p1V1=p2V2",
+            "同一条等温线上 pV 保持常量；改变 T 会换到另一条等温线。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "51ec85d6",
+          "readout_hash": "4025af6f",
+          "physical_readout_hash": "4025af6f",
+          "readout": [
+            "体积 V/L：1.40",
+            "等温温度 T/K：300",
+            "p=C/V≈214.3pV≈300.0，C=nRT≈300.0当前 V=1.40 L，T=300 K玻意耳定律：一定量、等温时 p1V1=p2V2",
+            "同一条等温线上 pV 保持常量；改变 T 会换到另一条等温线。"
+          ],
+          "physical_readout": [
+            "体积 V/L：1.40",
+            "等温温度 T/K：300",
+            "p=C/V≈214.3pV≈300.0，C=nRT≈300.0当前 V=1.40 L，T=300 K玻意耳定律：一定量、等温时 p1V1=p2V2",
+            "同一条等温线上 pV 保持常量；改变 T 会换到另一条等温线。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "88b37e",
+          "readout_hash": "7e403baa",
+          "physical_readout_hash": "7e403baa",
+          "readout": [
+            "体积 V/L：1.45",
+            "等温温度 T/K：300",
+            "p=C/V≈206.9pV≈300.0，C=nRT≈300.0当前 V=1.45 L，T=300 K玻意耳定律：一定量、等温时 p1V1=p2V2",
+            "同一条等温线上 pV 保持常量；改变 T 会换到另一条等温线。"
+          ],
+          "physical_readout": [
+            "体积 V/L：1.45",
+            "等温温度 T/K：300",
+            "p=C/V≈206.9pV≈300.0，C=nRT≈300.0当前 V=1.45 L，T=300 K玻意耳定律：一定量、等温时 p1V1=p2V2",
+            "同一条等温线上 pV 保持常量；改变 T 会换到另一条等温线。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "a7049e16",
+          "readout_hash": "7e403baa",
+          "physical_readout_hash": "7e403baa",
+          "readout": [
+            "体积 V/L：1.45",
+            "等温温度 T/K：300",
+            "p=C/V≈206.9pV≈300.0，C=nRT≈300.0当前 V=1.45 L，T=300 K玻意耳定律：一定量、等温时 p1V1=p2V2",
+            "同一条等温线上 pV 保持常量；改变 T 会换到另一条等温线。"
+          ],
+          "physical_readout": [
+            "体积 V/L：1.45",
+            "等温温度 T/K：300",
+            "p=C/V≈206.9pV≈300.0，C=nRT≈300.0当前 V=1.45 L，T=300 K玻意耳定律：一定量、等温时 p1V1=p2V2",
+            "同一条等温线上 pV 保持常量；改变 T 会换到另一条等温线。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "体积 V/L：#|等温温度 T/K：#|p=C/V≈#pV≈#，C=nRT≈#当前 V=# L，T=# K玻意耳定律：一定量、等温时 p#V#=p#V#|同一条等温线上 pV 保持常量；改变 T 会换到另一条等温线。",
+          "controls": [
+            {
+              "id": "vol",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "temp",
+              "value": "300",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "体积 V/L：#|等温温度 T/K：#|p=C/V≈#pV≈#，C=nRT≈#当前 V=# L，T=# K玻意耳定律：一定量、等温时 p#V#=p#V#|同一条等温线上 pV 保持常量；改变 T 会换到另一条等温线。",
+          "controls": [
+            {
+              "id": "vol",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "temp",
+              "value": "300",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb3/charles-law.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#temp",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#amount",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#recordBtn",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "30d87292",
+          "readout_hash": "c1987c84",
+          "physical_readout_hash": "c1987c84",
+          "readout": [
+            "热力学温度 T/K：300",
+            "物质的量 n/mol：1.00",
+            "p=nRT/V≈300.0p/T≈1.00，nR/V≈1.00T=300 K，摄氏温度 t≈26.9 ℃查理定律：一定量、等容时 p1/T1=p2/T2",
+            "正比例关系是 p 与热力学温度 T(K)，不是 p 与摄氏温度 t(℃)。"
+          ],
+          "physical_readout": [
+            "热力学温度 T/K：300",
+            "物质的量 n/mol：1.00",
+            "p=nRT/V≈300.0p/T≈1.00，nR/V≈1.00T=300 K，摄氏温度 t≈26.9 ℃查理定律：一定量、等容时 p1/T1=p2/T2",
+            "正比例关系是 p 与热力学温度 T(K)，不是 p 与摄氏温度 t(℃)。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "87d8f4f5",
+          "readout_hash": "21f0c26",
+          "physical_readout_hash": "21f0c26",
+          "readout": [
+            "热力学温度 T/K：520",
+            "物质的量 n/mol：1.00",
+            "p=nRT/V≈520.0p/T≈1.00，nR/V≈1.00T=520 K，摄氏温度 t≈246.9 ℃查理定律：一定量、等容时 p1/T1=p2/T2",
+            "正比例关系是 p 与热力学温度 T(K)，不是 p 与摄氏温度 t(℃)。"
+          ],
+          "physical_readout": [
+            "热力学温度 T/K：520",
+            "物质的量 n/mol：1.00",
+            "p=nRT/V≈520.0p/T≈1.00，nR/V≈1.00T=520 K，摄氏温度 t≈246.9 ℃查理定律：一定量、等容时 p1/T1=p2/T2",
+            "正比例关系是 p 与热力学温度 T(K)，不是 p 与摄氏温度 t(℃)。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "42615b06",
+          "readout_hash": "21f0c26",
+          "physical_readout_hash": "21f0c26",
+          "readout": [
+            "热力学温度 T/K：520",
+            "物质的量 n/mol：1.00",
+            "p=nRT/V≈520.0p/T≈1.00，nR/V≈1.00T=520 K，摄氏温度 t≈246.9 ℃查理定律：一定量、等容时 p1/T1=p2/T2",
+            "正比例关系是 p 与热力学温度 T(K)，不是 p 与摄氏温度 t(℃)。"
+          ],
+          "physical_readout": [
+            "热力学温度 T/K：520",
+            "物质的量 n/mol：1.00",
+            "p=nRT/V≈520.0p/T≈1.00，nR/V≈1.00T=520 K，摄氏温度 t≈246.9 ℃查理定律：一定量、等容时 p1/T1=p2/T2",
+            "正比例关系是 p 与热力学温度 T(K)，不是 p 与摄氏温度 t(℃)。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "5e2d820c",
+          "readout_hash": "21f0c26",
+          "physical_readout_hash": "21f0c26",
+          "readout": [
+            "热力学温度 T/K：520",
+            "物质的量 n/mol：1.00",
+            "p=nRT/V≈520.0p/T≈1.00，nR/V≈1.00T=520 K，摄氏温度 t≈246.9 ℃查理定律：一定量、等容时 p1/T1=p2/T2",
+            "正比例关系是 p 与热力学温度 T(K)，不是 p 与摄氏温度 t(℃)。"
+          ],
+          "physical_readout": [
+            "热力学温度 T/K：520",
+            "物质的量 n/mol：1.00",
+            "p=nRT/V≈520.0p/T≈1.00，nR/V≈1.00T=520 K，摄氏温度 t≈246.9 ℃查理定律：一定量、等容时 p1/T1=p2/T2",
+            "正比例关系是 p 与热力学温度 T(K)，不是 p 与摄氏温度 t(℃)。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "热力学温度 T/K：#|物质的量 n/mol：#|p=nRT/V≈#p/T≈#，nR/V≈#T=# K，摄氏温度 t≈# ℃查理定律：一定量、等容时 p#/T#=p#/T#|正比例关系是 p 与热力学温度 T(K)，不是 p 与摄氏温度 t(℃)。",
+          "controls": [
+            {
+              "id": "temp",
+              "value": "300",
+              "checked": false
+            },
+            {
+              "id": "amount",
+              "value": "1",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "热力学温度 T/K：#|物质的量 n/mol：#|p=nRT/V≈#p/T≈#，nR/V≈#T=# K，摄氏温度 t≈# ℃查理定律：一定量、等容时 p#/T#=p#/T#|正比例关系是 p 与热力学温度 T(K)，不是 p 与摄氏温度 t(℃)。",
+          "controls": [
+            {
+              "id": "temp",
+              "value": "300",
+              "checked": false
+            },
+            {
+              "id": "amount",
+              "value": "1",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb3/first-law.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#heat",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#work",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#volume",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#recordBtn",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.82
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "19751ab4",
+          "readout_hash": "7d3080f5",
+          "physical_readout_hash": "7d3080f5",
+          "readout": [
+            "热量 Q/J：500 J",
+            "外界对系统做功 W/J：200 J",
+            "活塞位置 V/L：2.4",
+            "Q=500 J（系统吸热为正）W=200 J（外界对系统做功为正）ΔU=Q+W=700 Jp-V 面积表示气体对外做功，本页 W 与其符号相反",
+            "判定：内能增加，系统获得的能量代数和为正。",
+            "点击“记录”保存一次能量账本"
+          ],
+          "physical_readout": [
+            "热量 Q/J：500 J",
+            "外界对系统做功 W/J：200 J",
+            "活塞位置 V/L：2.4",
+            "Q=500 J（系统吸热为正）W=200 J（外界对系统做功为正）ΔU=Q+W=700 Jp-V 面积表示气体对外做功，本页 W 与其符号相反",
+            "判定：内能增加，系统获得的能量代数和为正。",
+            "点击“记录”保存一次能量账本"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "fbd8cb60",
+          "readout_hash": "7d3080f5",
+          "physical_readout_hash": "7d3080f5",
+          "readout": [
+            "热量 Q/J：500 J",
+            "外界对系统做功 W/J：200 J",
+            "活塞位置 V/L：2.4",
+            "Q=500 J（系统吸热为正）W=200 J（外界对系统做功为正）ΔU=Q+W=700 Jp-V 面积表示气体对外做功，本页 W 与其符号相反",
+            "判定：内能增加，系统获得的能量代数和为正。",
+            "点击“记录”保存一次能量账本"
+          ],
+          "physical_readout": [
+            "热量 Q/J：500 J",
+            "外界对系统做功 W/J：200 J",
+            "活塞位置 V/L：2.4",
+            "Q=500 J（系统吸热为正）W=200 J（外界对系统做功为正）ΔU=Q+W=700 Jp-V 面积表示气体对外做功，本页 W 与其符号相反",
+            "判定：内能增加，系统获得的能量代数和为正。",
+            "点击“记录”保存一次能量账本"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "176269bf",
+          "readout_hash": "7d3080f5",
+          "physical_readout_hash": "7d3080f5",
+          "readout": [
+            "热量 Q/J：500 J",
+            "外界对系统做功 W/J：200 J",
+            "活塞位置 V/L：2.4",
+            "Q=500 J（系统吸热为正）W=200 J（外界对系统做功为正）ΔU=Q+W=700 Jp-V 面积表示气体对外做功，本页 W 与其符号相反",
+            "判定：内能增加，系统获得的能量代数和为正。",
+            "点击“记录”保存一次能量账本"
+          ],
+          "physical_readout": [
+            "热量 Q/J：500 J",
+            "外界对系统做功 W/J：200 J",
+            "活塞位置 V/L：2.4",
+            "Q=500 J（系统吸热为正）W=200 J（外界对系统做功为正）ΔU=Q+W=700 Jp-V 面积表示气体对外做功，本页 W 与其符号相反",
+            "判定：内能增加，系统获得的能量代数和为正。",
+            "点击“记录”保存一次能量账本"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "176269bf",
+          "readout_hash": "7d3080f5",
+          "physical_readout_hash": "7d3080f5",
+          "readout": [
+            "热量 Q/J：500 J",
+            "外界对系统做功 W/J：200 J",
+            "活塞位置 V/L：2.4",
+            "Q=500 J（系统吸热为正）W=200 J（外界对系统做功为正）ΔU=Q+W=700 Jp-V 面积表示气体对外做功，本页 W 与其符号相反",
+            "判定：内能增加，系统获得的能量代数和为正。",
+            "点击“记录”保存一次能量账本"
+          ],
+          "physical_readout": [
+            "热量 Q/J：500 J",
+            "外界对系统做功 W/J：200 J",
+            "活塞位置 V/L：2.4",
+            "Q=500 J（系统吸热为正）W=200 J（外界对系统做功为正）ΔU=Q+W=700 Jp-V 面积表示气体对外做功，本页 W 与其符号相反",
+            "判定：内能增加，系统获得的能量代数和为正。",
+            "点击“记录”保存一次能量账本"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "热量 Q/J：# J|外界对系统做功 W/J：# J|活塞位置 V/L：#|Q=# J（系统吸热为正）W=# J（外界对系统做功为正）ΔU=Q+W=# Jp-V 面积表示气体对外做功，本页 W 与其符号相反|判定：内能增加，系统获得的能量代数和为正。",
+          "controls": [
+            {
+              "id": "heat",
+              "value": "500",
+              "checked": false
+            },
+            {
+              "id": "work",
+              "value": "200",
+              "checked": false
+            },
+            {
+              "id": "volume",
+              "value": "2.4",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "热量 Q/J：# J|外界对系统做功 W/J：# J|活塞位置 V/L：#|Q=# J（系统吸热为正）W=# J（外界对系统做功为正）ΔU=Q+W=# Jp-V 面积表示气体对外做功，本页 W 与其符号相反|判定：内能增加，系统获得的能量代数和为正。",
+          "controls": [
+            {
+              "id": "heat",
+              "value": "500",
+              "checked": false
+            },
+            {
+              "id": "work",
+              "value": "200",
+              "checked": false
+            },
+            {
+              "id": "volume",
+              "value": "2.4",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb3/gas-law.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#v",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#t",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play-btn",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset-btn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "reset-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "192a623",
+          "readout_hash": "386fc582",
+          "physical_readout_hash": "386fc582",
+          "readout": [
+            "体积 V = 1.00",
+            "温度 T = 300 K",
+            "压强 p = nRT/V = 300.00",
+            "pV/T = 1.0000（守恒）",
+            "体积 V = 1.0",
+            "1.0",
+            "温度 T = 300 K",
+            "300"
+          ],
+          "physical_readout": [
+            "体积 V = 1.00",
+            "温度 T = 300 K",
+            "压强 p = nRT/V = 300.00",
+            "pV/T = 1.0000（守恒）",
+            "体积 V = 1.0",
+            "1.0",
+            "温度 T = 300 K",
+            "300"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "47f9069c",
+          "readout_hash": "386fc582",
+          "physical_readout_hash": "386fc582",
+          "readout": [
+            "体积 V = 1.00",
+            "温度 T = 300 K",
+            "压强 p = nRT/V = 300.00",
+            "pV/T = 1.0000（守恒）",
+            "体积 V = 1.0",
+            "1.0",
+            "温度 T = 300 K",
+            "300"
+          ],
+          "physical_readout": [
+            "体积 V = 1.00",
+            "温度 T = 300 K",
+            "压强 p = nRT/V = 300.00",
+            "pV/T = 1.0000（守恒）",
+            "体积 V = 1.0",
+            "1.0",
+            "温度 T = 300 K",
+            "300"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "aa69f42a",
+          "readout_hash": "386fc582",
+          "physical_readout_hash": "386fc582",
+          "readout": [
+            "体积 V = 1.00",
+            "温度 T = 300 K",
+            "压强 p = nRT/V = 300.00",
+            "pV/T = 1.0000（守恒）",
+            "体积 V = 1.0",
+            "1.0",
+            "温度 T = 300 K",
+            "300"
+          ],
+          "physical_readout": [
+            "体积 V = 1.00",
+            "温度 T = 300 K",
+            "压强 p = nRT/V = 300.00",
+            "pV/T = 1.0000（守恒）",
+            "体积 V = 1.0",
+            "1.0",
+            "温度 T = 300 K",
+            "300"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "aa69f42a",
+          "readout_hash": "386fc582",
+          "physical_readout_hash": "386fc582",
+          "readout": [
+            "体积 V = 1.00",
+            "温度 T = 300 K",
+            "压强 p = nRT/V = 300.00",
+            "pV/T = 1.0000（守恒）",
+            "体积 V = 1.0",
+            "1.0",
+            "温度 T = 300 K",
+            "300"
+          ],
+          "physical_readout": [
+            "体积 V = 1.00",
+            "温度 T = 300 K",
+            "压强 p = nRT/V = 300.00",
+            "pV/T = 1.0000（守恒）",
+            "体积 V = 1.0",
+            "1.0",
+            "温度 T = 300 K",
+            "300"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "体积 V = #|温度 T = # K|压强 p = nRT/V = #|pV/T = #（守恒）|体积 V = #|#|温度 T = # K|#",
+          "controls": [
+            {
+              "id": "v",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "t",
+              "value": "300",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "体积 V = #|温度 T = # K|压强 p = nRT/V = #|pV/T = #（守恒）|体积 V = #|#|温度 T = # K|#",
+          "controls": [
+            {
+              "id": "v",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "t",
+              "value": "300",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb3/internal-energy.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#temp",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#amount",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#dist",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#recordBtn",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "afaa05fa",
+          "readout_hash": "c31a7868",
+          "physical_readout_hash": "c31a7868",
+          "readout": [
+            "温度 T/K：300",
+            "物质的量 n/mol：1.0",
+            "分子间距 r/r0：1.00",
+            "总动能示意 ∝nT：1.00分子势能示意：0.00内能 U=动能+势能≈1.00分子数显示=40 个点，速率比例≈1.00",
+            "r≈r0：势能最低；理想气体常忽略分子势能。"
+          ],
+          "physical_readout": [
+            "温度 T/K：300",
+            "物质的量 n/mol：1.0",
+            "分子间距 r/r0：1.00",
+            "总动能示意 ∝nT：1.00分子势能示意：0.00内能 U=动能+势能≈1.00分子数显示=40 个点，速率比例≈1.00",
+            "r≈r0：势能最低；理想气体常忽略分子势能。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "794e078",
+          "readout_hash": "c31a7868",
+          "physical_readout_hash": "c31a7868",
+          "readout": [
+            "温度 T/K：300",
+            "物质的量 n/mol：1.0",
+            "分子间距 r/r0：1.00",
+            "总动能示意 ∝nT：1.00分子势能示意：0.00内能 U=动能+势能≈1.00分子数显示=40 个点，速率比例≈1.00",
+            "r≈r0：势能最低；理想气体常忽略分子势能。"
+          ],
+          "physical_readout": [
+            "温度 T/K：300",
+            "物质的量 n/mol：1.0",
+            "分子间距 r/r0：1.00",
+            "总动能示意 ∝nT：1.00分子势能示意：0.00内能 U=动能+势能≈1.00分子数显示=40 个点，速率比例≈1.00",
+            "r≈r0：势能最低；理想气体常忽略分子势能。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "e314c3f4",
+          "readout_hash": "c31a7868",
+          "physical_readout_hash": "c31a7868",
+          "readout": [
+            "温度 T/K：300",
+            "物质的量 n/mol：1.0",
+            "分子间距 r/r0：1.00",
+            "总动能示意 ∝nT：1.00分子势能示意：0.00内能 U=动能+势能≈1.00分子数显示=40 个点，速率比例≈1.00",
+            "r≈r0：势能最低；理想气体常忽略分子势能。"
+          ],
+          "physical_readout": [
+            "温度 T/K：300",
+            "物质的量 n/mol：1.0",
+            "分子间距 r/r0：1.00",
+            "总动能示意 ∝nT：1.00分子势能示意：0.00内能 U=动能+势能≈1.00分子数显示=40 个点，速率比例≈1.00",
+            "r≈r0：势能最低；理想气体常忽略分子势能。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "e314c3f4",
+          "readout_hash": "c31a7868",
+          "physical_readout_hash": "c31a7868",
+          "readout": [
+            "温度 T/K：300",
+            "物质的量 n/mol：1.0",
+            "分子间距 r/r0：1.00",
+            "总动能示意 ∝nT：1.00分子势能示意：0.00内能 U=动能+势能≈1.00分子数显示=40 个点，速率比例≈1.00",
+            "r≈r0：势能最低；理想气体常忽略分子势能。"
+          ],
+          "physical_readout": [
+            "温度 T/K：300",
+            "物质的量 n/mol：1.0",
+            "分子间距 r/r0：1.00",
+            "总动能示意 ∝nT：1.00分子势能示意：0.00内能 U=动能+势能≈1.00分子数显示=40 个点，速率比例≈1.00",
+            "r≈r0：势能最低；理想气体常忽略分子势能。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "温度 T/K：#|物质的量 n/mol：#|分子间距 r/r#：#|总动能示意 ∝nT：#分子势能示意：#内能 U=动能+势能≈#分子数显示=# 个点，速率比例≈#|r≈r#：势能最低；理想气体常忽略分子势能。",
+          "controls": [
+            {
+              "id": "temp",
+              "value": "300",
+              "checked": false
+            },
+            {
+              "id": "amount",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "dist",
+              "value": "1",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "温度 T/K：#|物质的量 n/mol：#|分子间距 r/r#：#|总动能示意 ∝nT：#分子势能示意：#内能 U=动能+势能≈#分子数显示=# 个点，速率比例≈#|r≈r#：势能最低；理想气体常忽略分子势能。",
+          "controls": [
+            {
+              "id": "temp",
+              "value": "300",
+              "checked": false
+            },
+            {
+              "id": "amount",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "dist",
+              "value": "1",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

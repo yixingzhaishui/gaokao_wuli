@@ -68,7 +68,7 @@ const els = {
   records: document.getElementById('records')
 };
 const state={running:false,time:0,last:0,drag:null,records:[]};
-function drawGraph(x0, y0, w, h, mode, m, r, omega, err) {
+function drawGraph(x0, y0, w, h, mode) {
   const labels = ['m', 'r', 'ω²'];
   ctx.strokeStyle = '#334e68';
   ctx.lineWidth = 3;
@@ -83,26 +83,21 @@ function drawGraph(x0, y0, w, h, mode, m, r, omega, err) {
   ctx.textAlign = 'left';
   ctx.fillText(labels[mode], x0 + w + 6, y0 + 4);
   ctx.fillText('F', x0 - 16, y0 - h - 4);
-  ctx.strokeStyle = '#829ab1';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(x0, y0);
-  ctx.lineTo(x0 + w, y0 - h);
-  ctx.stroke();
+  const points=state.records.filter(q=>q.mode===mode);
+  const xMax=mode===0?.32:mode===1?.55:100;
+  const toX=q=>mode===0?q.m:mode===1?q.r:q.omega*q.omega;
+  const slope=points.length>=3?points.reduce((s,q)=>s+toX(q)*q.F,0)/points.reduce((s,q)=>s+toX(q)*toX(q),0):null;
+  if(slope!==null){ctx.strokeStyle='#829ab1';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x0+w,y0-Math.min(1,slope*xMax/8)*h);ctx.stroke();}
   ctx.fillStyle = '#e03131';
-  for (let i = 1; i <= 8; i++) {
-    let mm = m, rr = r, ww = omega;
-    if (mode === 0) mm = 0.04 + i * 0.035;
-    if (mode === 1) rr = 0.06 + i * 0.055;
-    if (mode === 2) ww = 1.5 + i * 1.0;
-    const F = mm * ww * ww * rr * (1 - err / 100);
-    const xVal = mode === 0 ? mm / 0.32 : mode === 1 ? rr / 0.55 : (ww * ww) / 100;
-    const px = x0 + Math.min(1, xVal) * w;
-    const py = y0 - Math.min(1, F / 8) * h;
+  for (const q of points) {
+    const px = x0 + Math.min(1, toX(q)/xMax) * w;
+    const py = y0 - Math.min(1, q.F / 8) * h;
     ctx.beginPath();
     ctx.arc(px, py, 4, 0, Math.PI * 2);
     ctx.fill();
   }
+  ctx.fillStyle='#486581';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText(points.length<3?`请记录至少3组（已有${points.length}组）`:`由${points.length}组实测点拟合，斜率≈${slope.toFixed(3)}`,x0+w/2,y0-h-18);
+  return {count:points.length,slope};
 }
 function draw() {
   const mode = Number(els.mode.value);
@@ -187,7 +182,7 @@ function draw() {
   ctx.fillStyle = '#0f9f6e'; ctx.beginPath(); ctx.arc(bx, by, 12, 0, Math.PI*2); ctx.fill(); ctx.fillStyle='#fff'; ctx.font='700 10px system-ui'; ctx.fillText('r', bx, by+3);
   ctx.fillStyle = '#e03131'; ctx.beginPath(); ctx.arc(96 + omega*20, 350, 11, 0, Math.PI*2); ctx.fill(); ctx.fillStyle='#fff'; ctx.fillText('ω', 96+omega*20, 353);
   ctx.fillStyle = '#7b2cbf'; ctx.beginPath(); ctx.arc(96 + m*700, 322, 11, 0, Math.PI*2); ctx.fill(); ctx.fillStyle='#fff'; ctx.fillText('m', 96+m*700, 325);
-  drawGraph(452, 375, 180, 230, mode, m, r, omega, err);
+  const graph=drawGraph(452, 375, 180, 230, mode);
   ctx.fillStyle = '#486581';
   ctx.font = '13px system-ui';
   ctx.fillText('切线速度只改变方向；指向圆心的合力改变速度方向。', 350, 452);
@@ -200,9 +195,12 @@ function draw() {
     `<div id="r5">控制变量：${modes[mode]}</div>`
   ].join('');
   els.status.className = Fread <= 8 ? 'status' : 'status bad';
-  els.status.textContent = Fread <= 8
-    ? '通过：测力计读数与 m、r、ω² 的乘积同步增大。'
-    : '不通过：读数超过量程，应减小质量、半径或角速度。';
+  els.status.textContent = Fread > 8
+    ? '量程不合格：应减小质量、半径或角速度后再记录。'
+    : graph.count < 3
+      ? `尚不能下结论：固定另两个量，改变${['m','r','ω²'][mode]}并记录至少3组。`
+      : '数据已具备拟合条件：用实测点斜率检验正比关系，并核对控制变量是否保持不变。';
+  window.__EXP_TEST_STATE__={mode,F,Fread,recordCount:graph.count,slope:graph.slope};
   els.playBtn.textContent = state.running ? '暂停' : '播放';
 }
 Object.values(els).forEach(el => {
@@ -213,10 +211,11 @@ c.addEventListener('pointerdown',e=>{const p=pos(e),m=Number(els.mass.value),r=N
 c.addEventListener('pointermove',e=>{const p=pos(e);if(!state.drag){c.style.cursor='grab';return;}if(state.drag==='r'){const d=Math.hypot(p.x-230,p.y-235);els.radius.value=Math.max(.1,Math.min(.5,d/360)).toFixed(2);}if(state.drag==='omega'){els.omega.value=Math.max(2,Math.min(10,(p.x-96)/20)).toFixed(1);}if(state.drag==='m'){els.mass.value=Math.max(.05,Math.min(.3,(p.x-96)/700)).toFixed(2);}draw();});
 c.addEventListener('pointerup',e=>{state.drag=null;try{c.releasePointerCapture(e.pointerId)}catch(err){}});c.addEventListener('pointercancel',()=>{state.drag=null;});
 els.playBtn.addEventListener('click',()=>{state.running=!state.running;state.last=0;draw();});
-els.resetBtn.addEventListener('click',()=>{state.running=false;state.time=0;els.mode.value=2;els.mass.value=.1;els.radius.value=.3;els.omega.value=5;els.error.value=2;draw();});
-els.recordBtn.addEventListener('click',()=>{const m=Number(els.mass.value),r=Number(els.radius.value),omega=Number(els.omega.value),err=Number(els.error.value),F=m*omega*omega*r*(1-err/100);state.records.unshift({m,r,F});state.records=state.records.slice(0,4);els.records.innerHTML=state.records.map((q,i)=>`<tr><td style="text-align:left;border-bottom:1px solid #d9e2ec">${i+1}</td><td style="border-bottom:1px solid #d9e2ec">${q.m.toFixed(2)}</td><td style="border-bottom:1px solid #d9e2ec">${q.r.toFixed(2)}</td><td style="border-bottom:1px solid #d9e2ec">${q.F.toFixed(2)}</td></tr>`).join('');});
+els.resetBtn.addEventListener('click',()=>{state.running=false;state.time=0;state.records=[];els.mode.value=2;els.mass.value=.1;els.radius.value=.3;els.omega.value=5;els.error.value=2;els.records.innerHTML='';draw();});
+els.recordBtn.addEventListener('click',()=>{const mode=Number(els.mode.value),m=Number(els.mass.value),r=Number(els.radius.value),omega=Number(els.omega.value),err=Number(els.error.value),F=m*omega*omega*r*(1-err/100);if(F>8){draw();return;}state.records.unshift({mode,m,r,omega,F});state.records=state.records.slice(0,12);els.records.innerHTML=state.records.map((q,i)=>`<tr><td style="text-align:left;border-bottom:1px solid #d9e2ec">${i+1}</td><td style="border-bottom:1px solid #d9e2ec">${q.m.toFixed(2)}</td><td style="border-bottom:1px solid #d9e2ec">${q.r.toFixed(2)}</td><td style="border-bottom:1px solid #d9e2ec">${q.F.toFixed(2)}</td></tr>`).join('');draw();});
 function loop(now){if(!state.last)state.last=now;const dt=Math.min(.04,(now-state.last)/1000);state.last=now;if(state.running)state.time+=dt;draw();requestAnimationFrame(loop);}
 requestAnimationFrame(loop);
 </script>
+<script src="guided-experiment.js"></script>
 </body>
 </html>

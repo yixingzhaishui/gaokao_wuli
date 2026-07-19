@@ -1,0 +1,1351 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-11T15:54:24.526Z",
+  "commit": "5e886319bb33ef4205afab66abc9f88c34a66208",
+  "module": "exp",
+  "modules": [
+    "exp"
+  ],
+  "summary": {
+    "total": 5,
+    "score": 100,
+    "pass": 5,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/exp/double-slit-wavelength-lab.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#lambda",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#slit",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#screenDistance",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#count",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#error",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#recordBtn",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "9376b11c",
+          "readout_hash": "47f404f5",
+          "physical_readout_hash": "47f404f5",
+          "readout": [
+            "真实波长 λ/nm：550",
+            "双缝间距 d/mm：0.25",
+            "屏距 L/m：1.0",
+            "测量条纹数 N：5",
+            "读数误差：1%",
+            "理论 Δx=Lλ/d≈2.200mm测得 NΔx≈11.110mm，Δx≈2.222mmλ测=dΔx/L≈556nm真实 λ=550nm，相对误差≈1.0%d 变大条纹变窄；L 变大条纹变宽",
+            "通过：由条纹间距反算的波长在误差范围内合理。"
+          ],
+          "physical_readout": [
+            "真实波长 λ/nm：550",
+            "双缝间距 d/mm：0.25",
+            "屏距 L/m：1.0",
+            "测量条纹数 N：5",
+            "读数误差：1%",
+            "理论 Δx=Lλ/d≈2.200mm测得 NΔx≈11.110mm，Δx≈2.222mmλ测=dΔx/L≈556nm真实 λ=550nm，相对误差≈1.0%d 变大条纹变窄；L 变大条纹变宽",
+            "通过：由条纹间距反算的波长在误差范围内合理。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "d56a8e6d",
+          "readout_hash": "47f404f5",
+          "physical_readout_hash": "47f404f5",
+          "readout": [
+            "真实波长 λ/nm：550",
+            "双缝间距 d/mm：0.25",
+            "屏距 L/m：1.0",
+            "测量条纹数 N：5",
+            "读数误差：1%",
+            "理论 Δx=Lλ/d≈2.200mm测得 NΔx≈11.110mm，Δx≈2.222mmλ测=dΔx/L≈556nm真实 λ=550nm，相对误差≈1.0%d 变大条纹变窄；L 变大条纹变宽",
+            "通过：由条纹间距反算的波长在误差范围内合理。"
+          ],
+          "physical_readout": [
+            "真实波长 λ/nm：550",
+            "双缝间距 d/mm：0.25",
+            "屏距 L/m：1.0",
+            "测量条纹数 N：5",
+            "读数误差：1%",
+            "理论 Δx=Lλ/d≈2.200mm测得 NΔx≈11.110mm，Δx≈2.222mmλ测=dΔx/L≈556nm真实 λ=550nm，相对误差≈1.0%d 变大条纹变窄；L 变大条纹变宽",
+            "通过：由条纹间距反算的波长在误差范围内合理。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "9376b11c",
+          "readout_hash": "47f404f5",
+          "physical_readout_hash": "47f404f5",
+          "readout": [
+            "真实波长 λ/nm：550",
+            "双缝间距 d/mm：0.25",
+            "屏距 L/m：1.0",
+            "测量条纹数 N：5",
+            "读数误差：1%",
+            "理论 Δx=Lλ/d≈2.200mm测得 NΔx≈11.110mm，Δx≈2.222mmλ测=dΔx/L≈556nm真实 λ=550nm，相对误差≈1.0%d 变大条纹变窄；L 变大条纹变宽",
+            "通过：由条纹间距反算的波长在误差范围内合理。"
+          ],
+          "physical_readout": [
+            "真实波长 λ/nm：550",
+            "双缝间距 d/mm：0.25",
+            "屏距 L/m：1.0",
+            "测量条纹数 N：5",
+            "读数误差：1%",
+            "理论 Δx=Lλ/d≈2.200mm测得 NΔx≈11.110mm，Δx≈2.222mmλ测=dΔx/L≈556nm真实 λ=550nm，相对误差≈1.0%d 变大条纹变窄；L 变大条纹变宽",
+            "通过：由条纹间距反算的波长在误差范围内合理。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "9376b11c",
+          "readout_hash": "47f404f5",
+          "physical_readout_hash": "47f404f5",
+          "readout": [
+            "真实波长 λ/nm：550",
+            "双缝间距 d/mm：0.25",
+            "屏距 L/m：1.0",
+            "测量条纹数 N：5",
+            "读数误差：1%",
+            "理论 Δx=Lλ/d≈2.200mm测得 NΔx≈11.110mm，Δx≈2.222mmλ测=dΔx/L≈556nm真实 λ=550nm，相对误差≈1.0%d 变大条纹变窄；L 变大条纹变宽",
+            "通过：由条纹间距反算的波长在误差范围内合理。"
+          ],
+          "physical_readout": [
+            "真实波长 λ/nm：550",
+            "双缝间距 d/mm：0.25",
+            "屏距 L/m：1.0",
+            "测量条纹数 N：5",
+            "读数误差：1%",
+            "理论 Δx=Lλ/d≈2.200mm测得 NΔx≈11.110mm，Δx≈2.222mmλ测=dΔx/L≈556nm真实 λ=550nm，相对误差≈1.0%d 变大条纹变窄；L 变大条纹变宽",
+            "通过：由条纹间距反算的波长在误差范围内合理。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "真实波长 λ/nm：#|双缝间距 d/mm：#|屏距 L/m：#|测量条纹数 N：#|读数误差：#%|理论 Δx=Lλ/d≈#mm测得 NΔx≈#mm，Δx≈#mmλ测=dΔx/L≈#nm真实 λ=#nm，相对误差≈#%d 变大条纹变窄；L 变大条纹变宽|通过：由条纹间距反算的波长在误差范围内合理。",
+          "controls": [
+            {
+              "id": "lambda",
+              "value": "550",
+              "checked": false
+            },
+            {
+              "id": "slit",
+              "value": "0.25",
+              "checked": false
+            },
+            {
+              "id": "screenDistance",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "count",
+              "value": "5",
+              "checked": false
+            },
+            {
+              "id": "error",
+              "value": "1",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "真实波长 λ/nm：#|双缝间距 d/mm：#|屏距 L/m：#|测量条纹数 N：#|读数误差：#%|理论 Δx=Lλ/d≈#mm测得 NΔx≈#mm，Δx≈#mmλ测=dΔx/L≈#nm真实 λ=#nm，相对误差≈#%d 变大条纹变窄；L 变大条纹变宽|通过：由条纹间距反算的波长在误差范围内合理。",
+          "controls": [
+            {
+              "id": "lambda",
+              "value": "550",
+              "checked": false
+            },
+            {
+              "id": "slit",
+              "value": "0.25",
+              "checked": false
+            },
+            {
+              "id": "screenDistance",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "count",
+              "value": "5",
+              "checked": false
+            },
+            {
+              "id": "error",
+              "value": "1",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/exp/induced-current-direction-lab.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#turns",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#speed",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:S 极朝线圈",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:反向运动",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:预测左偏",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:预测右偏",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:反向验证",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:回到零位",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:N 极朝线圈",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "button:N 极朝线圈",
+          "text": "N 极朝线圈",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:S 极朝线圈",
+          "text": "S 极朝线圈",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#flip",
+          "text": "反向运动",
+          "role": "other",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "暂停演示",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#left",
+          "text": "预测左偏",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#right",
+          "text": "预测右偏",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#record",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#flip2",
+          "text": "反向验证",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#zero",
+          "text": "回到零位",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.32
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停演示"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "daac54c1",
+          "readout_hash": "618a80d5",
+          "physical_readout_hash": "618a80d5",
+          "readout": [
+            "线圈匝数 N 60",
+            "60",
+            "拖动速度 1.0",
+            "1.0",
+            "动作：插入磁极：N 极朝线圈ΔΦ：0.000e=-NΔΦ/Δt：0.00电流计：零位",
+            "暂无记录",
+            "先预测再拖动验证：感应电流总要阻碍磁通量变化。"
+          ],
+          "physical_readout": [
+            "线圈匝数 N 60",
+            "60",
+            "拖动速度 1.0",
+            "1.0",
+            "动作：插入磁极：N 极朝线圈ΔΦ：0.000e=-NΔΦ/Δt：0.00电流计：零位",
+            "暂无记录",
+            "先预测再拖动验证：感应电流总要阻碍磁通量变化。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "eb893e0f",
+          "readout_hash": "618a80d5",
+          "physical_readout_hash": "618a80d5",
+          "readout": [
+            "线圈匝数 N 60",
+            "60",
+            "拖动速度 1.0",
+            "1.0",
+            "动作：插入磁极：N 极朝线圈ΔΦ：0.000e=-NΔΦ/Δt：0.00电流计：零位",
+            "暂无记录",
+            "先预测再拖动验证：感应电流总要阻碍磁通量变化。"
+          ],
+          "physical_readout": [
+            "线圈匝数 N 60",
+            "60",
+            "拖动速度 1.0",
+            "1.0",
+            "动作：插入磁极：N 极朝线圈ΔΦ：0.000e=-NΔΦ/Δt：0.00电流计：零位",
+            "暂无记录",
+            "先预测再拖动验证：感应电流总要阻碍磁通量变化。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "2a12adb2",
+          "readout_hash": "618a80d5",
+          "physical_readout_hash": "618a80d5",
+          "readout": [
+            "线圈匝数 N 60",
+            "60",
+            "拖动速度 1.0",
+            "1.0",
+            "动作：插入磁极：N 极朝线圈ΔΦ：0.000e=-NΔΦ/Δt：0.00电流计：零位",
+            "暂无记录",
+            "先预测再拖动验证：感应电流总要阻碍磁通量变化。"
+          ],
+          "physical_readout": [
+            "线圈匝数 N 60",
+            "60",
+            "拖动速度 1.0",
+            "1.0",
+            "动作：插入磁极：N 极朝线圈ΔΦ：0.000e=-NΔΦ/Δt：0.00电流计：零位",
+            "暂无记录",
+            "先预测再拖动验证：感应电流总要阻碍磁通量变化。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "2a12adb2",
+          "readout_hash": "618a80d5",
+          "physical_readout_hash": "618a80d5",
+          "readout": [
+            "线圈匝数 N 60",
+            "60",
+            "拖动速度 1.0",
+            "1.0",
+            "动作：插入磁极：N 极朝线圈ΔΦ：0.000e=-NΔΦ/Δt：0.00电流计：零位",
+            "暂无记录",
+            "先预测再拖动验证：感应电流总要阻碍磁通量变化。"
+          ],
+          "physical_readout": [
+            "线圈匝数 N 60",
+            "60",
+            "拖动速度 1.0",
+            "1.0",
+            "动作：插入磁极：N 极朝线圈ΔΦ：0.000e=-NΔΦ/Δt：0.00电流计：零位",
+            "暂无记录",
+            "先预测再拖动验证：感应电流总要阻碍磁通量变化。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "线圈匝数 N #|#|拖动速度 #|#|动作：插入磁极：N 极朝线圈ΔΦ：#e=-NΔΦ/Δt：#电流计：零位|先预测再拖动验证：感应电流总要阻碍磁通量变化。",
+          "controls": [
+            {
+              "id": "turns",
+              "value": "60",
+              "checked": false
+            },
+            {
+              "id": "speed",
+              "value": "1",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "线圈匝数 N #|#|拖动速度 #|#|动作：插入磁极：N 极朝线圈ΔΦ：#e=-NΔΦ/Δt：#电流计：零位|先预测再拖动验证：感应电流总要阻碍磁通量变化。",
+          "controls": [
+            {
+              "id": "turns",
+              "value": "60",
+              "checked": false
+            },
+            {
+              "id": "speed",
+              "value": "1",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/exp/isothermal-gas-law-lab.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#vol",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#temp",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#err",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#reset",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "c7581a46",
+          "readout_hash": "86ef765a",
+          "physical_readout_hash": "86ef765a",
+          "readout": [
+            "体积 V 40.0 mL",
+            "40.0 mL",
+            "温度 T 300 K",
+            "300 K",
+            "摩擦/漏气误差 0%",
+            "0%",
+            "体积 V：40.0 mL压强 P：100.00 kPa1/V：0.0250 mL^-1PV：4000.0 kPa·mL温度：300 K",
+            "暂无记录",
+            "等温验证：若误差小，PV 应近似恒定；当前记录的 PV 平均值约 4000 kPa·mL。"
+          ],
+          "physical_readout": [
+            "体积 V 40.0 mL",
+            "40.0 mL",
+            "温度 T 300 K",
+            "300 K",
+            "摩擦/漏气误差 0%",
+            "0%",
+            "体积 V：40.0 mL压强 P：100.00 kPa1/V：0.0250 mL^-1PV：4000.0 kPa·mL温度：300 K",
+            "暂无记录",
+            "等温验证：若误差小，PV 应近似恒定；当前记录的 PV 平均值约 4000 kPa·mL。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "7f1ec58e",
+          "readout_hash": "4851c3c1",
+          "physical_readout_hash": "4851c3c1",
+          "readout": [
+            "体积 V 75.0 mL",
+            "75.0 mL",
+            "温度 T 300 K",
+            "300 K",
+            "摩擦/漏气误差 0%",
+            "0%",
+            "体积 V：75.0 mL压强 P：53.33 kPa1/V：0.0133 mL^-1PV：4000.0 kPa·mL温度：300 K",
+            "暂无记录",
+            "等温验证：若误差小，PV 应近似恒定；当前记录的 PV 平均值约 4000 kPa·mL。"
+          ],
+          "physical_readout": [
+            "体积 V 75.0 mL",
+            "75.0 mL",
+            "温度 T 300 K",
+            "300 K",
+            "摩擦/漏气误差 0%",
+            "0%",
+            "体积 V：75.0 mL压强 P：53.33 kPa1/V：0.0133 mL^-1PV：4000.0 kPa·mL温度：300 K",
+            "暂无记录",
+            "等温验证：若误差小，PV 应近似恒定；当前记录的 PV 平均值约 4000 kPa·mL。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "7f1ec58e",
+          "readout_hash": "4851c3c1",
+          "physical_readout_hash": "4851c3c1",
+          "readout": [
+            "体积 V 75.0 mL",
+            "75.0 mL",
+            "温度 T 300 K",
+            "300 K",
+            "摩擦/漏气误差 0%",
+            "0%",
+            "体积 V：75.0 mL压强 P：53.33 kPa1/V：0.0133 mL^-1PV：4000.0 kPa·mL温度：300 K",
+            "暂无记录",
+            "等温验证：若误差小，PV 应近似恒定；当前记录的 PV 平均值约 4000 kPa·mL。"
+          ],
+          "physical_readout": [
+            "体积 V 75.0 mL",
+            "75.0 mL",
+            "温度 T 300 K",
+            "300 K",
+            "摩擦/漏气误差 0%",
+            "0%",
+            "体积 V：75.0 mL压强 P：53.33 kPa1/V：0.0133 mL^-1PV：4000.0 kPa·mL温度：300 K",
+            "暂无记录",
+            "等温验证：若误差小，PV 应近似恒定；当前记录的 PV 平均值约 4000 kPa·mL。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "7f1ec58e",
+          "readout_hash": "4851c3c1",
+          "physical_readout_hash": "4851c3c1",
+          "readout": [
+            "体积 V 75.0 mL",
+            "75.0 mL",
+            "温度 T 300 K",
+            "300 K",
+            "摩擦/漏气误差 0%",
+            "0%",
+            "体积 V：75.0 mL压强 P：53.33 kPa1/V：0.0133 mL^-1PV：4000.0 kPa·mL温度：300 K",
+            "暂无记录",
+            "等温验证：若误差小，PV 应近似恒定；当前记录的 PV 平均值约 4000 kPa·mL。"
+          ],
+          "physical_readout": [
+            "体积 V 75.0 mL",
+            "75.0 mL",
+            "温度 T 300 K",
+            "300 K",
+            "摩擦/漏气误差 0%",
+            "0%",
+            "体积 V：75.0 mL压强 P：53.33 kPa1/V：0.0133 mL^-1PV：4000.0 kPa·mL温度：300 K",
+            "暂无记录",
+            "等温验证：若误差小，PV 应近似恒定；当前记录的 PV 平均值约 4000 kPa·mL。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "体积 V # mL|# mL|温度 T # K|# K|摩擦/漏气误差 #%|#%|体积 V：# mL压强 P：# kPa#/V：# mL^#PV：# kPa·mL温度：# K|等温验证：若误差小，PV 应近似恒定；当前记录的 PV 平均值约 # kPa·mL。",
+          "controls": [
+            {
+              "id": "vol",
+              "value": "40",
+              "checked": false
+            },
+            {
+              "id": "temp",
+              "value": "300",
+              "checked": false
+            },
+            {
+              "id": "err",
+              "value": "0",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "体积 V # mL|# mL|温度 T # K|# K|摩擦/漏气误差 #%|#%|体积 V：# mL压强 P：# kPa#/V：# mL^#PV：# kPa·mL温度：# K|等温验证：若误差小，PV 应近似恒定；当前记录的 PV 平均值约 # kPa·mL。",
+          "controls": [
+            {
+              "id": "vol",
+              "value": "40",
+              "checked": false
+            },
+            {
+              "id": "temp",
+              "value": "300",
+              "checked": false
+            },
+            {
+              "id": "err",
+              "value": "0",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/exp/resistivity-lab.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#length",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#diameter",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#voltage",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#rho",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#heat",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#recordBtn",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "de489716",
+          "readout_hash": "7819ccdf",
+          "physical_readout_hash": "7819ccdf",
+          "readout": [
+            "接入长度 L/cm：60",
+            "直径读数 d/mm：0.40",
+            "电压 U/V：1.2",
+            "真实电阻率 ρ/(10^-6 Ω·m)：0.50",
+            "温升误差/%：3",
+            "R=U/I≈2.46ΩS=πd²/4≈0.1257mm²ρ=RS/L≈0.515×10^-6Ω·m电流 I≈0.488A，误差≈3.0%累积焦耳热 W=I²Rt≈0.000J判定=能用"
+          ],
+          "physical_readout": [
+            "接入长度 L/cm：60",
+            "直径读数 d/mm：0.40",
+            "电压 U/V：1.2",
+            "真实电阻率 ρ/(10^-6 Ω·m)：0.50",
+            "温升误差/%：3",
+            "R=U/I≈2.46ΩS=πd²/4≈0.1257mm²ρ=RS/L≈0.515×10^-6Ω·m电流 I≈0.488A，误差≈3.0%累积焦耳热 W=I²Rt≈0.000J判定=能用"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "de489716",
+          "readout_hash": "b9d7c46e",
+          "physical_readout_hash": "b9d7c46e",
+          "readout": [
+            "接入长度 L/cm：60",
+            "直径读数 d/mm：0.40",
+            "电压 U/V：1.2",
+            "真实电阻率 ρ/(10^-6 Ω·m)：0.50",
+            "温升误差/%：3",
+            "R=U/I≈2.46ΩS=πd²/4≈0.1257mm²ρ=RS/L≈0.515×10^-6Ω·m电流 I≈0.488A，误差≈3.0%累积焦耳热 W=I²Rt≈0.205J判定=能用"
+          ],
+          "physical_readout": [
+            "接入长度 L/cm：60",
+            "直径读数 d/mm：0.40",
+            "电压 U/V：1.2",
+            "真实电阻率 ρ/(10^-6 Ω·m)：0.50",
+            "温升误差/%：3",
+            "R=U/I≈2.46ΩS=πd²/4≈0.1257mm²ρ=RS/L≈0.515×10^-6Ω·m电流 I≈0.488A，误差≈3.0%累积焦耳热 W=I²Rt≈0.205J判定=能用"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": false,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "de489716",
+          "readout_hash": "4160f59f",
+          "physical_readout_hash": "4160f59f",
+          "readout": [
+            "接入长度 L/cm：60",
+            "直径读数 d/mm：0.40",
+            "电压 U/V：1.2",
+            "真实电阻率 ρ/(10^-6 Ω·m)：0.50",
+            "温升误差/%：3",
+            "R=U/I≈2.46ΩS=πd²/4≈0.1257mm²ρ=RS/L≈0.515×10^-6Ω·m电流 I≈0.488A，误差≈3.0%累积焦耳热 W=I²Rt≈0.215J判定=能用"
+          ],
+          "physical_readout": [
+            "接入长度 L/cm：60",
+            "直径读数 d/mm：0.40",
+            "电压 U/V：1.2",
+            "真实电阻率 ρ/(10^-6 Ω·m)：0.50",
+            "温升误差/%：3",
+            "R=U/I≈2.46ΩS=πd²/4≈0.1257mm²ρ=RS/L≈0.515×10^-6Ω·m电流 I≈0.488A，误差≈3.0%累积焦耳热 W=I²Rt≈0.215J判定=能用"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "de489716",
+          "readout_hash": "4160f59f",
+          "physical_readout_hash": "4160f59f",
+          "readout": [
+            "接入长度 L/cm：60",
+            "直径读数 d/mm：0.40",
+            "电压 U/V：1.2",
+            "真实电阻率 ρ/(10^-6 Ω·m)：0.50",
+            "温升误差/%：3",
+            "R=U/I≈2.46ΩS=πd²/4≈0.1257mm²ρ=RS/L≈0.515×10^-6Ω·m电流 I≈0.488A，误差≈3.0%累积焦耳热 W=I²Rt≈0.215J判定=能用"
+          ],
+          "physical_readout": [
+            "接入长度 L/cm：60",
+            "直径读数 d/mm：0.40",
+            "电压 U/V：1.2",
+            "真实电阻率 ρ/(10^-6 Ω·m)：0.50",
+            "温升误差/%：3",
+            "R=U/I≈2.46ΩS=πd²/4≈0.1257mm²ρ=RS/L≈0.515×10^-6Ω·m电流 I≈0.488A，误差≈3.0%累积焦耳热 W=I²Rt≈0.215J判定=能用"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "接入长度 L/cm：#|直径读数 d/mm：#|电压 U/V：#|真实电阻率 ρ/(#^# Ω·m)：#|温升误差/%：#|R=U/I≈#ΩS=πd²/#≈#mm²ρ=RS/L≈#×#^#Ω·m电流 I≈#A，误差≈#%累积焦耳热 W=I²Rt≈#J判定=能用",
+          "controls": [
+            {
+              "id": "length",
+              "value": "60",
+              "checked": false
+            },
+            {
+              "id": "diameter",
+              "value": "0.4",
+              "checked": false
+            },
+            {
+              "id": "voltage",
+              "value": "1.2",
+              "checked": false
+            },
+            {
+              "id": "rho",
+              "value": "0.5",
+              "checked": false
+            },
+            {
+              "id": "heat",
+              "value": "3",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "接入长度 L/cm：#|直径读数 d/mm：#|电压 U/V：#|真实电阻率 ρ/(#^# Ω·m)：#|温升误差/%：#|R=U/I≈#ΩS=πd²/#≈#mm²ρ=RS/L≈#×#^#Ω·m电流 I≈#A，误差≈#%累积焦耳热 W=I²Rt≈#J判定=能用",
+          "controls": [
+            {
+              "id": "length",
+              "value": "60",
+              "checked": false
+            },
+            {
+              "id": "diameter",
+              "value": "0.4",
+              "checked": false
+            },
+            {
+              "id": "voltage",
+              "value": "1.2",
+              "checked": false
+            },
+            {
+              "id": "rho",
+              "value": "0.5",
+              "checked": false
+            },
+            {
+              "id": "heat",
+              "value": "3",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/exp/transformer-turns-voltage-lab.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#n1",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#n2",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#u1",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#load",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#reset",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.68,
+          "py": 0.5
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "8ee990ef",
+          "readout_hash": "a1bcabd1",
+          "physical_readout_hash": "a1bcabd1",
+          "readout": [
+            "原线圈匝数 n1 800",
+            "800",
+            "副线圈匝数 n2 200",
+            "200",
+            "原边电压 U1 12.0 V",
+            "12.0 V",
+            "负载电阻 R 24 Ω",
+            "24 Ω",
+            "类型：降压变压器U2=U1·n2/n1：3.00 VU2/U1：0.250n2/n1：0.250副边电流：0.13 A",
+            "暂无记录",
+            "验证：U2/U1 与 n2/n1 的差约为 0.000。保持 U1、n1 不变时，U2-n2 图像应近似过原点直线。"
+          ],
+          "physical_readout": [
+            "原线圈匝数 n1 800",
+            "800",
+            "副线圈匝数 n2 200",
+            "200",
+            "原边电压 U1 12.0 V",
+            "12.0 V",
+            "负载电阻 R 24 Ω",
+            "24 Ω",
+            "类型：降压变压器U2=U1·n2/n1：3.00 VU2/U1：0.250n2/n1：0.250副边电流：0.13 A",
+            "暂无记录",
+            "验证：U2/U1 与 n2/n1 的差约为 0.000。保持 U1、n1 不变时，U2-n2 图像应近似过原点直线。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "92903077",
+          "readout_hash": "a1bcabd1",
+          "physical_readout_hash": "a1bcabd1",
+          "readout": [
+            "原线圈匝数 n1 800",
+            "800",
+            "副线圈匝数 n2 200",
+            "200",
+            "原边电压 U1 12.0 V",
+            "12.0 V",
+            "负载电阻 R 24 Ω",
+            "24 Ω",
+            "类型：降压变压器U2=U1·n2/n1：3.00 VU2/U1：0.250n2/n1：0.250副边电流：0.13 A",
+            "暂无记录",
+            "验证：U2/U1 与 n2/n1 的差约为 0.000。保持 U1、n1 不变时，U2-n2 图像应近似过原点直线。"
+          ],
+          "physical_readout": [
+            "原线圈匝数 n1 800",
+            "800",
+            "副线圈匝数 n2 200",
+            "200",
+            "原边电压 U1 12.0 V",
+            "12.0 V",
+            "负载电阻 R 24 Ω",
+            "24 Ω",
+            "类型：降压变压器U2=U1·n2/n1：3.00 VU2/U1：0.250n2/n1：0.250副边电流：0.13 A",
+            "暂无记录",
+            "验证：U2/U1 与 n2/n1 的差约为 0.000。保持 U1、n1 不变时，U2-n2 图像应近似过原点直线。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "316af8af",
+          "readout_hash": "a1bcabd1",
+          "physical_readout_hash": "a1bcabd1",
+          "readout": [
+            "原线圈匝数 n1 800",
+            "800",
+            "副线圈匝数 n2 200",
+            "200",
+            "原边电压 U1 12.0 V",
+            "12.0 V",
+            "负载电阻 R 24 Ω",
+            "24 Ω",
+            "类型：降压变压器U2=U1·n2/n1：3.00 VU2/U1：0.250n2/n1：0.250副边电流：0.13 A",
+            "暂无记录",
+            "验证：U2/U1 与 n2/n1 的差约为 0.000。保持 U1、n1 不变时，U2-n2 图像应近似过原点直线。"
+          ],
+          "physical_readout": [
+            "原线圈匝数 n1 800",
+            "800",
+            "副线圈匝数 n2 200",
+            "200",
+            "原边电压 U1 12.0 V",
+            "12.0 V",
+            "负载电阻 R 24 Ω",
+            "24 Ω",
+            "类型：降压变压器U2=U1·n2/n1：3.00 VU2/U1：0.250n2/n1：0.250副边电流：0.13 A",
+            "暂无记录",
+            "验证：U2/U1 与 n2/n1 的差约为 0.000。保持 U1、n1 不变时，U2-n2 图像应近似过原点直线。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "316af8af",
+          "readout_hash": "a1bcabd1",
+          "physical_readout_hash": "a1bcabd1",
+          "readout": [
+            "原线圈匝数 n1 800",
+            "800",
+            "副线圈匝数 n2 200",
+            "200",
+            "原边电压 U1 12.0 V",
+            "12.0 V",
+            "负载电阻 R 24 Ω",
+            "24 Ω",
+            "类型：降压变压器U2=U1·n2/n1：3.00 VU2/U1：0.250n2/n1：0.250副边电流：0.13 A",
+            "暂无记录",
+            "验证：U2/U1 与 n2/n1 的差约为 0.000。保持 U1、n1 不变时，U2-n2 图像应近似过原点直线。"
+          ],
+          "physical_readout": [
+            "原线圈匝数 n1 800",
+            "800",
+            "副线圈匝数 n2 200",
+            "200",
+            "原边电压 U1 12.0 V",
+            "12.0 V",
+            "负载电阻 R 24 Ω",
+            "24 Ω",
+            "类型：降压变压器U2=U1·n2/n1：3.00 VU2/U1：0.250n2/n1：0.250副边电流：0.13 A",
+            "暂无记录",
+            "验证：U2/U1 与 n2/n1 的差约为 0.000。保持 U1、n1 不变时，U2-n2 图像应近似过原点直线。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "原线圈匝数 n# #|#|副线圈匝数 n# #|#|原边电压 U# # V|# V|负载电阻 R # Ω|# Ω|类型：降压变压器U#=U#·n#/n#：# VU#/U#：#n#/n#：#副边电流：# A|验证：U#/U# 与 n#/n# 的差约为 #。保持 U#、n# 不变时，U#-n# 图像应近似过原点直线。",
+          "controls": [
+            {
+              "id": "n1",
+              "value": "800",
+              "checked": false
+            },
+            {
+              "id": "n2",
+              "value": "200",
+              "checked": false
+            },
+            {
+              "id": "u1",
+              "value": "12",
+              "checked": false
+            },
+            {
+              "id": "load",
+              "value": "24",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "原线圈匝数 n# #|#|副线圈匝数 n# #|#|原边电压 U# # V|# V|负载电阻 R # Ω|# Ω|类型：降压变压器U#=U#·n#/n#：# VU#/U#：#n#/n#：#副边电流：# A|验证：U#/U# 与 n#/n# 的差约为 #。保持 U#、n# 不变时，U#-n# 图像应近似过原点直线。",
+          "controls": [
+            {
+              "id": "n1",
+              "value": "800",
+              "checked": false
+            },
+            {
+              "id": "n2",
+              "value": "200",
+              "checked": false
+            },
+            {
+              "id": "u1",
+              "value": "12",
+              "checked": false
+            },
+            {
+              "id": "load",
+              "value": "24",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

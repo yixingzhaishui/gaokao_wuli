@@ -229,5 +229,28 @@
   draw();requestAnimationFrame(tick);
 })();
 </script>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script>
+<script>/* GKWL: unified full reset (2026-07-12 review remediation) */
+(function(){
+  var btns=[].slice.call(document.querySelectorAll('button'));
+  var resets=btns.filter(function(b){return /重置|复位/.test(b.textContent)});
+  if(!resets.length)return;
+  var scoped=/播放|时间|回放/;
+  var primary=resets[0];
+  if(scoped.test(primary.textContent)){
+    var nb=document.createElement('button');
+    nb.textContent='全部重置';
+    nb.className=primary.className;
+    nb.setAttribute('data-gkwl-full-reset','1');
+    nb.addEventListener('click',function(){location.reload()});
+    primary.parentNode.insertBefore(nb,primary.nextSibling);
+  }else{
+    resets.forEach(function(b){b.addEventListener('click',function(){setTimeout(function(){location.reload()},60)})});
+  }
+})();
+</script>
+<script>
+window.B2_GUIDE={id:'B2-15',question:'恒力与位移垂直时，这个力做多少功？',observe:'保持力和位移都不为零，只把二者夹角改为90°。',options:[{value:'zero',label:'功为0'},{value:'positive',label:'做正功'},{value:'negative',label:'做负功'}],correct:'zero',actions:[{selector:'[data-case="zero"]'}],result:'这个力做功为0。',evidence:'力在位移方向的投影F∥变为0，功读数变为0。',explanation:'功只由力沿位移方向的分量贡献；有力、有位移也可能不做功。',transfer:'W=Fs cosα只适用于恒力和该段位移；变力问题不能直接套总位移。'};
+</script><script src="guided-lesson.js"></script>
 </body>
 </html>

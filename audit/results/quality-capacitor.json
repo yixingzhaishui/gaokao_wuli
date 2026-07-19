@@ -1,0 +1,203 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-11T07:04:18.991Z",
+  "commit": "fe51f581d55f3c1252210ce3727baf499567610c",
+  "module": "bx3",
+  "modules": [
+    "bx3"
+  ],
+  "summary": {
+    "total": 1,
+    "score": 100,
+    "pass": 1,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/bx3/capacitor.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:断电源 Q不变",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:接电源 U不变",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "▶ 播放：自动拉开/靠近极板",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:接电源 U不变",
+          "text": "接电源 U不变",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:断电源 Q不变",
+          "text": "断电源 Q不变",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#reset",
+          "text": "复位",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.5,
+          "py": 0.5
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "▶ 播放：自动拉开/靠近极板"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "复位"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "20984082",
+          "readout_hash": "cb4edaab",
+          "physical_readout_hash": "cb4edaab",
+          "readout": [
+            "电容 C = 44.3 pF",
+            "电压 U = 12.0 V",
+            "电量 Q = 531 pC",
+            "场强 E≈U/d = 6.00 V/mm",
+            "板距 d = 2.0 mm，面积 S = 100 cm²",
+            "电容状态：静止"
+          ],
+          "physical_readout": [
+            "电容 C = 44.3 pF",
+            "电压 U = 12.0 V",
+            "电量 Q = 531 pC",
+            "场强 E≈U/d = 6.00 V/mm",
+            "板距 d = 2.0 mm，面积 S = 100 cm²",
+            "电容状态：静止"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "c963dfb8",
+          "readout_hash": "81b69efc",
+          "physical_readout_hash": "410126d1",
+          "readout": [
+            "电容 C = 17.6 pF",
+            "电压 U = 12.0 V",
+            "电量 Q = 212 pC",
+            "场强 E≈U/d = 2.39 V/mm",
+            "板距 d = 5.0 mm，面积 S = 100 cm²",
+            "电容状态：播放中：U不变，Q、E随d变化"
+          ],
+          "physical_readout": [
+            "电容 C = 17.6 pF",
+            "电压 U = 12.0 V",
+            "电量 Q = 212 pC",
+            "场强 E≈U/d = 2.39 V/mm",
+            "板距 d = 5.0 mm，面积 S = 100 cm²",
+            "电容：U不变，Q、E随d变化"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "6ecebc60",
+          "readout_hash": "b1562a86",
+          "physical_readout_hash": "b1562a86",
+          "readout": [
+            "电容 C = 17.3 pF",
+            "电压 U = 12.0 V",
+            "电量 Q = 208 pC",
+            "场强 E≈U/d = 2.35 V/mm",
+            "板距 d = 5.1 mm，面积 S = 100 cm²",
+            "电容状态：静止"
+          ],
+          "physical_readout": [
+            "电容 C = 17.3 pF",
+            "电压 U = 12.0 V",
+            "电量 Q = 208 pC",
+            "场强 E≈U/d = 2.35 V/mm",
+            "板距 d = 5.1 mm，面积 S = 100 cm²",
+            "电容状态：静止"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "6ecebc60",
+          "readout_hash": "b1562a86",
+          "physical_readout_hash": "b1562a86",
+          "readout": [
+            "电容 C = 17.3 pF",
+            "电压 U = 12.0 V",
+            "电量 Q = 208 pC",
+            "场强 E≈U/d = 2.35 V/mm",
+            "板距 d = 5.1 mm，面积 S = 100 cm²",
+            "电容状态：静止"
+          ],
+          "physical_readout": [
+            "电容 C = 17.3 pF",
+            "电压 U = 12.0 V",
+            "电量 Q = 208 pC",
+            "场强 E≈U/d = 2.35 V/mm",
+            "板距 d = 5.1 mm，面积 S = 100 cm²",
+            "电容状态：静止"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "电容 C = # pF|电压 U = # V|电量 Q = # pC|场强 E≈U/d = # V/mm|板距 d = # mm，面积 S = # cm²|电容状态：静止",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "电容 C = # pF|电压 U = # V|电量 Q = # pC|场强 E≈U/d = # V/mm|板距 d = # mm，面积 S = # cm²|电容状态：静止",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

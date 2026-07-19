@@ -51,7 +51,7 @@ function state(){
   if(Math.abs(R-L)<0.25)return '临界：恰好到右边界';
   return R>L?'能穿出':'不能穿出，返回左侧';
 }
-function thetaDeg(){return R>=L?Math.asin(Math.min(1,L/R))*180/Math.PI:90}
+function thetaDeg(){return R>=L?Math.asin(Math.min(1,L/R))*180/Math.PI:180}
 function draw(){
   ctx.clearRect(0,0,W,H);
   const r=pxR(),w=pxL(),cx=x0,cy=y0-r;
@@ -66,7 +66,9 @@ function draw(){
   ctx.strokeStyle='#486581';ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(x0,y0);ctx.stroke();ctx.setLineDash([]);ctx.fillText('R',cx-16,(cy+y0)/2);
   let endX,endY,color;
   if(R>=L){const dy=Math.sqrt(Math.max(0,r*r-w*w));endX=x0+w;endY=cy+dy;color=Math.abs(R-L)<0.25?'#f08c00':'#2b8a3e';}
-  else{endX=x0+r;endY=cy;color='#c92a2a';}
+  // R<L: the right boundary is never reached.  The trajectory is the complete
+  // right semicircle and returns to the original (left) boundary above entry.
+  else{endX=x0;endY=cy-r;color='#c92a2a';}
   const endAng=Math.atan2(endY-cy,endX-cx);
   ctx.strokeStyle=color;ctx.lineWidth=4;ctx.beginPath();ctx.arc(cx,cy,r,Math.PI/2,endAng,true);ctx.stroke();
   ctx.fillStyle=color;ctx.beginPath();ctx.arc(endX,endY,8,0,7);ctx.fill();
@@ -81,6 +83,9 @@ function draw(){
   ctx.fillStyle='#243b53';ctx.font='13px system-ui';ctx.fillText('临界条件：R=L；若 R≥L 可穿出，若 R<L 从原边界返回',24,H-18);
   document.getElementById('rv').textContent=R.toFixed(1);document.getElementById('lv').textContent=L.toFixed(1);
   document.getElementById('angv').textContent=thetaDeg().toFixed(0);document.getElementById('statev').textContent=state();
+  cv.dataset.pathOutcome=R<L?'return-left-boundary':Math.abs(R-L)<.25?'critical-touch':'exit-right-boundary';
+  cv.dataset.sweepAngleDeg=thetaDeg().toFixed(0);
+  window.__ANIM_TEST_STATE__={R,L,thetaDeg:thetaDeg(),pathOutcome:cv.dataset.pathOutcome,endX,endY};
 }
 function pos(e){const r=cv.getBoundingClientRect(),s=cv.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s}}
 cv.addEventListener('pointerdown',e=>{const p=pos(e);if(Math.abs(p.x-(x0+pxL()))<18){drag='L';cv.setPointerCapture(e.pointerId)}else if(Math.abs(Math.hypot(p.x-x0,p.y-(y0-pxR()))-pxR())<24){drag='R';cv.setPointerCapture(e.pointerId)}});
@@ -89,11 +94,12 @@ cv.addEventListener('pointerup',()=>drag='');cv.addEventListener('pointercancel'
 document.getElementById('rr').addEventListener('input',e=>{R=parseFloat(e.target.value);sync();draw()});
 document.getElementById('lr').addEventListener('input',e=>{L=parseFloat(e.target.value);sync();draw()});
 document.getElementById('play').onclick=function(){running=!running;this.textContent=running?'⏸ 暂停':'▶ 播放';};
-document.getElementById('reset').onclick=()=>{R=9;L=9;t=0;sync();draw()};
+document.getElementById('reset').onclick=()=>{R=9;L=9;t=0;running=true;document.getElementById('play').textContent='⏸ 暂停';sync();draw()};
 let last=performance.now();
 function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;if(running)t+=dt;draw();requestAnimationFrame(loop);}
 sync();requestAnimationFrame(loop);
 })();
 </script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

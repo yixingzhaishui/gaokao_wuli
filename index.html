@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>四川高考物理</title>
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4.13.1/lib/themes/vue.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <style>
     :root {
@@ -20,16 +20,26 @@
       font-family: -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
       color: var(--text-main);
       background: #fff;
-      max-width: 100%;
     }
-    html {
+    body.ready {
       overflow-x: hidden;
     }
-    body,
-    body.ready {
-      overflow: visible !important;
-    }
     .app-nav { font-size: 14px; }
+    .review-banner {
+      position: fixed;
+      top: 0;
+      left: var(--sidebar-width);
+      right: 0;
+      z-index: 30;
+      padding: 9px 16px;
+      border-bottom: 1px solid #f0b429;
+      background: #fff3bf;
+      color: #7c4a03;
+      font-size: 14px;
+      line-height: 1.45;
+      text-align: center;
+    }
+    .content { padding-top: 42px; }
 
     /* 强制目录在左侧。Docsify 默认在窄屏会把目录折叠/挤到页面流里，
        本站是学习路径型网页，目录必须始终作为左侧导航存在。 */
@@ -50,6 +60,10 @@
     .sidebar-toggle {
       display: none !important;
     }
+    .mobile-nav-toggle,
+    .mobile-nav-scrim {
+      display: none;
+    }
     .sidebar .app-name {
       margin: 0 18px 14px !important;
       padding-bottom: 12px;
@@ -68,19 +82,23 @@
       margin: 2px 0 !important;
       line-height: 1.45;
     }
-    .sidebar-nav a {
+    .sidebar-nav a,
+    .sidebar .mobile-route-button {
       border-radius: 6px;
-      color: var(--text-main);
+      color: var(--text-muted);
       display: block;
       padding: 4px 8px;
       white-space: normal;
+      width: 100%;
+      border: 0;
+      background: transparent;
+      text-align: left;
+      font: inherit;
+      cursor: pointer;
     }
-    .sidebar-nav li > strong {
-      color: var(--text-main);
-      display: block;
-      padding: 4px 8px;
-    }
+    .sidebar .mobile-route-form { margin: 0; }
     .sidebar-nav a:hover,
+    .sidebar .mobile-route-button:hover,
     .sidebar-nav .active > a {
       background: #e8f1ff;
       color: var(--accent);
@@ -92,7 +110,6 @@
       margin-left: var(--sidebar-width) !important;
       width: calc(100vw - var(--sidebar-width)) !important;
       max-width: calc(100vw - var(--sidebar-width)) !important;
-      min-width: 0;
       padding-top: 0 !important;
       box-sizing: border-box;
     }
@@ -101,20 +118,8 @@
       padding: 30px 36px 80px !important;
     }
     .markdown-section iframe {
-      display: block;
       background: #fff;
-      width: 100%;
       max-width: 100%;
-      min-height: 560px;
-      border: 1px solid #d9e2ec;
-      border-radius: 8px;
-      pointer-events: auto;
-    }
-
-    @media (max-width: 760px) {
-      .markdown-section iframe {
-        height: 1100px;
-      }
     }
     .anchor span {
       color: var(--text-main);
@@ -300,61 +305,68 @@
       color: var(--accent);
       font-weight: 600;
     }
-    #mobile-sidebar-toggle,
-    #mobile-sidebar-backdrop {
-      display: none;
+    .verified-bank-link {
+      border: 1px solid #93c5fd;
+      border-radius: 8px;
+      background: #eff6ff;
+      color: #1e3a5f;
+      padding: 14px 16px;
+      line-height: 1.65;
+      margin: 16px 0;
+    }
+    .verified-bank-link a { font-weight: 700; }
+    .status.review {
+      background: #fff3cd;
+      color: #7c4a03;
     }
     @media (max-width: 760px) {
-      :root { --sidebar-width: min(84vw, 320px); }
+      :root { --sidebar-width: 270px; }
+      .review-banner {
+        left: 0;
+        padding: 7px 10px;
+        font-size: 12px;
+      }
+      .content { padding-top: 54px; }
       .sidebar {
         transform: translateX(-100%) !important;
-        box-shadow: 8px 0 24px rgba(16, 42, 67, .16);
-        transition: transform .2s ease;
+        transition: transform .2s ease !important;
+        box-shadow: none;
       }
-      .sidebar-nav a,
-      .sidebar-nav li > strong {
-        color: #102a43 !important;
+      body.mobile-nav-open .sidebar {
+        transform: translateX(0) !important;
+        box-shadow: 8px 0 24px rgba(16,42,67,.22);
       }
-      .sidebar-nav .active > a {
-        color: #1554b3 !important;
-      }
-      body.sidebar-open .sidebar { transform: translateX(0) !important; }
       .content {
         margin-left: 0 !important;
-        width: 100% !important;
-        max-width: none !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
       }
-      .markdown-section {
-        box-sizing: border-box;
-        width: 100% !important;
-        max-width: none !important;
-        padding: 24px 18px 70px !important;
-      }
-      #mobile-sidebar-toggle {
+      .mobile-nav-toggle {
         display: inline-flex;
-        position: fixed;
-        top: 12px;
-        left: 12px;
-        z-index: 30;
         align-items: center;
         justify-content: center;
-        width: 42px;
-        height: 42px;
-        border: 1px solid #bcccdc;
-        border-radius: 8px;
-        background: #fff;
-        color: var(--text-main);
-        box-shadow: 0 4px 12px rgba(16, 42, 67, .12);
-        font-size: 22px;
-        cursor: pointer;
-      }
-      body.sidebar-open #mobile-sidebar-backdrop {
-        display: block;
         position: fixed;
-        inset: 0;
-        z-index: 19;
-        background: rgba(16, 42, 67, .2);
+        left: 12px;
+        bottom: 14px;
+        z-index: 31;
+        min-width: 52px;
+        min-height: 44px;
+        padding: 8px 12px;
+        border: 1px solid #1e5fa8;
+        border-radius: 999px;
+        background: #2c7be5;
+        color: #fff;
+        box-shadow: 0 6px 16px rgba(16,42,67,.25);
+        font: 700 14px -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
       }
+      .mobile-nav-scrim {
+        position: fixed;
+        inset: 0 0 0 var(--sidebar-width);
+        z-index: 19;
+        background: rgba(16,42,67,.35);
+      }
+      body.mobile-nav-open .mobile-nav-scrim { display: block; }
+      .markdown-section { padding: 24px 18px 70px !important; }
       .graph-shell { grid-template-columns: 1fr; }
       .graph-panel { border-left: 0; border-top: 1px solid #d9e2ec; }
       .bank-toolbar,
@@ -363,13 +375,13 @@
   </style>
 </head>
 <body>
+  <div class="review-banner" role="status">
+    非四川省教育考试院官方项目 · 当前为内容审校测试版 · 交互通过不代表物理内容、答案与来源均已审定
+  </div>
   <div id="app"></div>
-  <button id="mobile-sidebar-toggle" type="button" aria-label="打开目录" aria-expanded="false">☰</button>
-  <div id="mobile-sidebar-backdrop" aria-hidden="true"></div>
   <script>
     window.$docsify = {
       name: '四川高考物理',
-      nameLink: '#/',
       loadSidebar: true,
       // 使用 _sidebar.md 作为唯一学习路径。不能让 Docsify 自动把每个
       // “9. 公式绑定 / 10. 适用条件”抽成目录，否则学生会跳到没上下文的位置。
@@ -388,16 +400,11 @@
       },
       plugins: [
         function(hook, vm) {
-          hook.beforeEach(function(content) {
-            return content.replace(/<iframe\b(?![^>]*\bloading=)[^>]*>/gi, function(tag) {
-              return tag.replace('<iframe', '<iframe loading="lazy"');
-            });
-          });
           hook.doneEach(function() {
-            setupMobileSidebar();
-            window.setTimeout(setupMobileSidebar, 250);
-            setupResponsiveIframes();
-            window.setTimeout(setupResponsiveIframes, 250);
+            setTimeout(hideUnverifiedExercises, 0);
+            setTimeout(syncRouteAnchor, 0);
+            initMobileNavigation();
+            watchMobileSidebarRoutes();
             if (location.hash.indexOf('/graph') !== -1) {
               renderKnowledgeGraph();
             }
@@ -412,71 +419,92 @@
       ]
     };
 
-    function closeMobileSidebar() {
-      document.body.classList.remove('sidebar-open');
-      const button = document.getElementById('mobile-sidebar-toggle');
-      if (button) {
-        button.setAttribute('aria-expanded', 'false');
-        button.setAttribute('aria-label', '打开目录');
-      }
+    function routeAnchorId() {
+      const match = location.hash.match(/[?&]id=([^&]+)/);
+      return match ? decodeURIComponent(match[1]) : '';
     }
 
-    function setupMobileSidebar() {
-      const button = document.getElementById('mobile-sidebar-toggle');
-      const backdrop = document.getElementById('mobile-sidebar-backdrop');
-      const main = document.querySelector('main');
-      if (!button) return;
-      if (main && backdrop && backdrop.parentElement !== main) {
-        main.appendChild(backdrop);
-      }
-      if (button.dataset.bound !== '1') {
-        button.dataset.bound = '1';
-        button.addEventListener('click', function() {
-          const open = document.body.classList.toggle('sidebar-open');
-          button.setAttribute('aria-expanded', String(open));
-          button.setAttribute('aria-label', open ? '关闭目录' : '打开目录');
+    function syncRouteAnchor() {
+      const id = routeAnchorId();
+      if (!id) return;
+      const target = document.getElementById(id);
+      if (!target) return;
+      requestAnimationFrame(function() {
+        target.scrollIntoView({ block: 'start', behavior: 'auto' });
+      });
+    }
+
+    function initMobileNavigation() {
+      if (document.getElementById('mobile-nav-toggle')) return;
+      const toggle = document.createElement('button');
+      const scrim = document.createElement('div');
+      toggle.id = 'mobile-nav-toggle';
+      toggle.className = 'mobile-nav-toggle';
+      toggle.type = 'button';
+      toggle.setAttribute('aria-label', '打开学习目录');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.textContent = '目录';
+      scrim.className = 'mobile-nav-scrim';
+      document.body.append(scrim, toggle);
+      const close = function() {
+        document.body.classList.remove('mobile-nav-open');
+        toggle.setAttribute('aria-expanded', 'false');
+      };
+      toggle.addEventListener('click', function() {
+        const open = !document.body.classList.contains('mobile-nav-open');
+        document.body.classList.toggle('mobile-nav-open', open);
+        toggle.setAttribute('aria-expanded', String(open));
+      });
+      scrim.addEventListener('click', close);
+      document.addEventListener('click', function(event) {
+        if (event.target.closest('.sidebar a')) close();
+      });
+      window.addEventListener('hashchange', function() {
+        close();
+        setTimeout(syncRouteAnchor, 0);
+      });
+    }
+
+    function bindMobileSidebarRoutes() {
+      if (!window.matchMedia('(max-width: 760px)').matches) return;
+      document.querySelectorAll('.sidebar a[href^="#/"]').forEach(function(link) {
+        const route = link.getAttribute('href');
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'mobile-route-button';
+        button.dataset.mobileRouteBound = 'true';
+        button.dataset.mobileRoute = route;
+        button.textContent = link.textContent;
+        if (link.title) button.title = link.title;
+        button.addEventListener('click', function(event) {
+          event.preventDefault();
+          document.body.classList.remove('mobile-nav-open');
+          const toggle = document.getElementById('mobile-nav-toggle');
+          if (toggle) toggle.setAttribute('aria-expanded', 'false');
+          // Route directly through Docsify's hash router.  Native form submit
+          // is inconsistent in mobile webviews and could leave the pressed
+          // directory item on screen without actually changing the lesson.
+          if (location.hash === route) syncRouteAnchor();
+          else location.hash = route;
         });
-      }
-      if (backdrop && backdrop.dataset.bound !== '1') {
-        backdrop.dataset.bound = '1';
-        backdrop.addEventListener('click', closeMobileSidebar);
-      }
-      if (button.dataset.hashBound !== '1') {
-        button.dataset.hashBound = '1';
-        window.addEventListener('hashchange', closeMobileSidebar);
-      }
+        link.replaceWith(button);
+      });
     }
 
-    function resizeAnimationFrame(frame) {
-      if (!frame) return;
-      if (window.innerWidth > 760) {
-        frame.style.height = '';
+    function watchMobileSidebarRoutes() {
+      if (document.documentElement.dataset.mobileRouteWatcher === 'true') {
+        bindMobileSidebarRoutes();
         return;
       }
-      try {
-        var doc = frame.contentDocument;
-        if (!doc) return;
-        var htmlHeight = doc.documentElement ? doc.documentElement.scrollHeight : 0;
-        var bodyHeight = doc.body ? doc.body.scrollHeight : 0;
-        var declaredHeight = Number(frame.getAttribute('height')) || 560;
-        var contentHeight = Math.max(declaredHeight, htmlHeight, bodyHeight, 560);
-        frame.style.height = Math.ceil(contentHeight) + 'px';
-      } catch (error) {
-        // Cross-origin or not-yet-loaded frames keep their declared height.
-      }
-    }
-
-    function setupResponsiveIframes() {
-      document.querySelectorAll('.markdown-section iframe').forEach(function(frame) {
-        if (frame.dataset.resizeBound !== '1') {
-          frame.dataset.resizeBound = '1';
-          frame.addEventListener('load', function() {
-            resizeAnimationFrame(frame);
-            window.setTimeout(function() { resizeAnimationFrame(frame); }, 250);
-          });
-        }
-        resizeAnimationFrame(frame);
-      });
+      document.documentElement.dataset.mobileRouteWatcher = 'true';
+      let attempts = 0;
+      const bindWhenSidebarIsReady = function() {
+        bindMobileSidebarRoutes();
+        if (document.querySelector('.sidebar .mobile-route-button') || attempts >= 20) return;
+        attempts += 1;
+        setTimeout(bindWhenSidebarIsReady, 50);
+      };
+      bindWhenSidebarIsReady();
     }
 
     function escapeHtml(value) {
@@ -491,8 +519,94 @@
       return Array.from(new Set(values.filter(Boolean))).sort((a, b) => String(a).localeCompare(String(b), 'zh-CN'));
     }
 
+    async function hideUnverifiedExercises() {
+      const section = document.querySelector('.markdown-section');
+      if (!section) return;
+      const headers = Array.from(section.querySelectorAll('h3, h4, h5, h6'));
+      // 在任何网络请求之前先隐藏自由文本旧题，避免请求挂起时短暂暴露。
+      for (const heading of headers) {
+        const title = (heading.textContent || '').replace(/\s+/g, '');
+        if (!/(例题|训练题)/.test(title)) continue;
+        heading.hidden = true;
+        let node = heading.nextElementSibling;
+        while (node && !/^H[2-4]$/.test(node.tagName)) {
+          node.hidden = true;
+          node = node.nextElementSibling;
+        }
+      }
+      let verified = [];
+      let idMap = {};
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);
+      try {
+        const [rawProblems, rawDiagnostic, rawIdMap] = await Promise.all([
+          fetch('data/verified-problems.json', { signal: controller.signal }).then(r => { if (!r.ok) throw new Error('题库请求失败'); return r.json(); }),
+          fetch('data/verified-diagnostic-2024cee.json', { signal: controller.signal }).then(r => { if (!r.ok) throw new Error('诊断题请求失败'); return r.json(); }),
+          fetch('data/id-map.json', { signal: controller.signal }).then(r => { if (!r.ok) throw new Error('目录请求失败'); return r.json(); })
+        ]);
+        idMap = rawIdMap || {};
+        verified = problemList(rawProblems).concat(problemList(rawDiagnostic)).filter(isPublishableProblem);
+      } catch (err) {
+        // 保持旧题隐藏；后续以明确的不可用提示替换。
+      } finally {
+        clearTimeout(timeout);
+      }
+      for (const heading of headers) {
+        if (heading.dataset.verifiedReplacement === '1') continue;
+        const title = (heading.textContent || '').replace(/\s+/g, '');
+        if (!/(例题|训练题)/.test(title)) continue;
+        let knowledgeId = '';
+        let cursor = heading.previousElementSibling;
+        while (cursor) {
+          if (/^H[3-4]$/.test(cursor.tagName) && cursor.id) {
+            knowledgeId = Object.keys(idMap).find(id => idMap[id].slug === cursor.id) || '';
+            if (knowledgeId) break;
+          }
+          cursor = cursor.previousElementSibling;
+        }
+        const related = knowledgeId
+          ? verified.filter(p => (p.knowledge_ids || []).includes(knowledgeId) || (p.model_ids || []).includes(knowledgeId)).slice(0, 3)
+          : [];
+        heading.dataset.verifiedReplacement = '1';
+        const replacement = document.createElement('aside');
+        replacement.className = 'verified-bank-link';
+        if (related.length) {
+          replacement.innerHTML = '<b>来源复核记录中的例题</b>（与本知识点直接关联；最终发布等级仍按政策 2.0 复核）' + related.map(p => renderProblemCard(p, idMap)).join('') + '<p>更多题目可到<a href="#/papers">来源复核中的题库</a>按知识点筛选。</p>';
+        } else {
+          replacement.innerHTML = '<b>本知识点的旧例题已下架</b>：题库数据暂不可用，或题目尚未达到来源发布门槛。请到<a href="#/papers">来源复核中的题库</a>查看当前状态。';
+        }
+        heading.replaceWith(replacement);
+        let node = replacement.nextElementSibling;
+        while (node && !/^H[2-4]$/.test(node.tagName)) {
+          const next = node.nextElementSibling;
+          node.hidden = true;
+          node = next;
+        }
+      }
+    }
+
     function problemList(data) {
       return Array.isArray(data) ? data : (data.problems || []);
+    }
+
+    function isPublishableProblem(p) {
+      if (!['official_exam', 'regional_exam', 'published_simulation', 'diagnostic_exam'].includes(p.source_kind)) return false;
+      if (p.source_policy_version !== '2.0' || p.verification_status !== 'double_checked') return false;
+      const independentB = Array.isArray(p.independent_secondary_sources) && p.independent_secondary_sources.filter(s => s && s.tier === 'B').length >= 2;
+      if (!(p.primary_source_tier === 'A' || (independentB && p.no_primary_source_reason))) return false;
+      if (!p.scan_page || !p.file_sha256 || !p.stem_checked_by || !p.answer_checked_by || !p.solution_recalculated_by) return false;
+      if (p.source_verified !== true || !p.source_detail || !p.exam || !p.question_no || !Array.isArray(p.source_urls) || !p.source_urls.length || !p.verified_at) return false;
+      if (!p.source || !p.stem || !p.answer || !p.solution || !p.method) return false;
+      if (!(p.knowledge_ids || []).length && !(p.model_ids || []).length) return false;
+      if (['单选', '多选'].includes(p.type) && (!Array.isArray(p.options) || p.options.length < 3)) return false;
+      // 符号推导题可以不含数字；用显式字段保留严格的发布过滤，同时避免静默误杀。
+      if (p.type === '计算' && p.symbolic !== true && !/[0-9０-９]/.test(p.stem || '')) return false;
+      if ((p.solution || '').replace(/\s/g, '').length < 35) return false;
+      if ((p.method || '').replace(/\s/g, '').length < 8) return false;
+      const needsFigure = /(如图|下图|图示|所示|图中|右图|左图)/.test(p.stem || '');
+      if ((needsFigure || p.diagram_required) && !(p.diagram || p.image || p.img || p.figure || p.svg)) return false;
+      if ((needsFigure || p.diagram_required) && !p.figure_fidelity_checked_by) return false;
+      return true;
     }
 
     function idLabel(id, idMap) {
@@ -500,96 +614,41 @@
       return meta ? id + ' ' + meta.title : id;
     }
 
-    function safeSvgNode(svgText) {
-      if (!svgText) return null;
-      const documentNode = new DOMParser().parseFromString(String(svgText), 'image/svg+xml');
-      if (documentNode.querySelector('parsererror') || documentNode.documentElement.nodeName.toLowerCase() !== 'svg') return null;
-      documentNode.querySelectorAll('script, foreignObject').forEach(node => node.remove());
-      documentNode.querySelectorAll('*').forEach(node => {
-        Array.from(node.attributes).forEach(attribute => {
-          const name = attribute.name.toLowerCase();
-          const value = attribute.value.trim().toLowerCase();
-          if (name.startsWith('on') || ((name === 'href' || name === 'xlink:href' || name === 'src') && value.startsWith('javascript:'))) {
-            node.removeAttribute(attribute.name);
-          }
-        });
-      });
-      return document.importNode(documentNode.documentElement, true);
-    }
-
-    function appendText(parent, tag, value, className) {
-      const element = document.createElement(tag);
-      if (className) element.className = className;
-      element.textContent = value == null ? '' : String(value);
-      parent.appendChild(element);
-      return element;
+    function sourceKindLabel(kind) {
+      return ({ official_exam: '高考真题', regional_exam: '适应性/联考原卷', published_simulation: '正式出版模拟卷', diagnostic_exam: '诊断考试原卷' })[kind] || '来源待审核';
     }
 
     function renderProblemCard(p, idMap) {
-      const article = document.createElement('article');
-      article.className = 'problem-item';
-      const meta = document.createElement('div');
-      meta.className = 'problem-meta';
-      const source = p.source_verified === false ? `${p.source || ''}（未核验原卷图号）` : p.source;
-      [p.id, source, p.year, p.type, p.difficulty]
-        .concat((p.knowledge_ids || []).map(id => idLabel(id, idMap)))
-        .concat((p.model_ids || []).map(id => idLabel(id, idMap)))
-        .forEach(value => appendText(meta, 'span', value, 'problem-pill'));
-      article.appendChild(meta);
-      appendText(article, 'div', p.stem, 'problem-stem');
-
-      if (p.diagram && p.diagram.svg) {
-        const diagram = document.createElement('div');
-        diagram.className = 'problem-diagram';
-        diagram.setAttribute('aria-label', p.diagram.title || '题图');
-        const svg = safeSvgNode(p.diagram.svg);
-        if (svg) diagram.appendChild(svg);
-        else appendText(diagram, 'p', '题图数据无法安全加载。');
-        article.appendChild(diagram);
-      }
-
-      if ((p.options || []).length) {
-        const options = document.createElement('ul');
-        options.className = 'problem-options';
-        p.options.forEach(option => appendText(options, 'li', option));
-        article.appendChild(options);
-      }
-
-      const details = document.createElement('details');
-      const summary = appendText(details, 'summary', '点击查看答案与解析');
-      summary.setAttribute('role', 'button');
-      appendText(details, 'p', `答案：${p.answer || ''}`);
-      appendText(details, 'p', `解析：${p.solution || ''}`);
-      appendText(details, 'p', `方法提炼：${p.method || ''}`);
-      if ((p.traps || []).length) appendText(details, 'p', `易错点：${p.traps.join('；')}`);
-      article.appendChild(details);
-      return article;
-    }
-
-    function renderTrapRow(row, idMap) {
-      const article = document.createElement('article');
-      article.className = 'trap-item';
-      const meta = document.createElement('div');
-      meta.className = 'trap-meta';
-      appendText(meta, 'span', `${row.items.length} 题`, 'trap-pill');
-      row.items.slice(0, 5).flatMap(p => p.knowledge_ids || []).slice(0, 4)
-        .forEach(id => appendText(meta, 'span', idLabel(id, idMap), 'trap-pill'));
-      article.appendChild(meta);
-      appendText(article, 'h3', row.trap);
-      const details = document.createElement('details');
-      appendText(details, 'summary', '查看关联题与纠正方法');
-      row.items.slice(0, 5).forEach(problem => {
-        const paragraph = document.createElement('p');
-        appendText(paragraph, 'b', problem.id);
-        paragraph.appendChild(document.createTextNode(` ${problem.stem || ''}`));
-        paragraph.appendChild(document.createElement('br'));
-        appendText(paragraph, 'b', '纠正：');
-        paragraph.appendChild(document.createTextNode(problem.method || problem.solution || ''));
-        details.appendChild(paragraph);
-      });
-      if (row.items.length > 5) appendText(details, 'p', `还有 ${row.items.length - 5} 道相关题，可在题库按关键词筛选。`);
-      article.appendChild(details);
-      return article;
+      const knowledge = (p.knowledge_ids || []).map(id => '<span class="problem-pill">' + escapeHtml(idLabel(id, idMap)) + '</span>').join('');
+      const models = (p.model_ids || []).map(id => '<span class="problem-pill">' + escapeHtml(idLabel(id, idMap)) + '</span>').join('');
+      const options = (p.options || []).length ? '<ul class="problem-options">' + p.options.map(o => '<li>' + escapeHtml(o) + '</li>').join('') + '</ul>' : '';
+      const diagram = p.diagram && p.diagram.svg ? '<div class="problem-diagram" aria-label="' + escapeHtml(p.diagram.title || '题图') + '">' + p.diagram.svg + '</div>' : '';
+      const source = p.source;
+      const sourceLinks = (p.source_urls || []).map((url, index) => '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener">来源' + (index + 1) + '</a>').join(' · ');
+      return [
+        '<article class="problem-item">',
+        '  <div class="problem-meta">',
+        '    <span class="problem-pill">' + escapeHtml(p.id) + '</span>',
+        '    <span class="problem-pill">' + escapeHtml(source || '') + '</span>',
+        '    <span class="problem-pill">' + escapeHtml(sourceKindLabel(p.source_kind)) + '</span>',
+        '    <span class="problem-pill">' + escapeHtml(p.year || '') + '</span>',
+        '    <span class="problem-pill">' + escapeHtml(p.type || '') + '</span>',
+        '    <span class="problem-pill">' + escapeHtml(p.difficulty || '') + '</span>',
+             knowledge,
+             models,
+        '  </div>',
+        '  <div class="problem-stem">' + escapeHtml(p.stem || '') + '</div>',
+           diagram,
+           options,
+        '  <p class="bank-summary"><b>可追溯来源：</b>' + escapeHtml(p.exam || '') + ' 第' + escapeHtml(p.question_no || '') + '题；' + sourceLinks + '<br><b>核验记录：</b>' + escapeHtml(p.verification || '') + '</p>',
+        '  <details><summary>点击查看答案与解析</summary>',
+        '    <p><b>答案：</b>' + escapeHtml(p.answer || '') + '</p>',
+        '    <p><b>解析：</b>' + escapeHtml(p.solution || '') + '</p>',
+        '    <p><b>方法提炼：</b>' + escapeHtml(p.method || '') + '</p>',
+        (p.traps || []).length ? '    <p><b>易错点：</b>' + p.traps.map(escapeHtml).join('；') + '</p>' : '',
+        '  </details>',
+        '</article>'
+      ].join('');
     }
 
     async function renderProblemBank() {
@@ -598,15 +657,13 @@
       mount.dataset.rendered = '1';
       mount.innerHTML = '<div class="graph-loading">正在加载题库...</div>';
       try {
-        const [rawProblems, rawPageExamples, rawSpecExamples, idMap] = await Promise.all([
-          fetch('data/problems.json').then(r => r.json()),
-          fetch('data/page-examples.json').then(r => r.json()),
-          fetch('data/spec-supplement-examples.json').then(r => r.json()),
+        const [rawProblems, rawDiagnostic, idMap] = await Promise.all([
+          fetch('data/verified-problems.json').then(r => r.json()),
+          fetch('data/verified-diagnostic-2024cee.json').then(r => r.json()),
           fetch('data/id-map.json').then(r => r.json())
         ]);
-        const problems = problemList(rawProblems)
-          .concat(rawPageExamples.examples || [])
-          .concat(rawSpecExamples.examples || []);
+        const allProblems = problemList(rawProblems).concat(problemList(rawDiagnostic));
+        const problems = allProblems.filter(isPublishableProblem);
         const knowledgeIds = unique(problems.flatMap(p => p.knowledge_ids || []));
         const modelIds = unique(problems.flatMap(p => p.model_ids || []));
         const difficulties = unique(problems.map(p => p.difficulty));
@@ -614,6 +671,7 @@
         const sources = unique(problems.map(p => p.source));
 
         mount.innerHTML = [
+          '<p class="bank-summary">仅展示已核验原卷题：每题都附卷名、题号、来源链接与核验记录。收录高考真题，以及有原卷和答案可复核的正式联考、诊断卷；改编题和未核验题均不展示。</p>',
           '<div class="bank-toolbar">',
           '  <input id="bank-q" type="search" placeholder="搜索题干 / 编号 / 方法">',
           '  <select id="bank-knowledge"><option value="">全部知识点</option>' + knowledgeIds.map(id => '<option value="' + escapeHtml(id) + '">' + escapeHtml(idLabel(id, idMap)) + '</option>').join('') + '</select>',
@@ -647,14 +705,12 @@
               && (!s || p.source === s);
           });
           summaryEl.textContent = '当前显示 ' + filtered.length + ' / ' + problems.length + ' 题';
-          listEl.replaceChildren(...(filtered.length
-            ? filtered.map(p => renderProblemCard(p, idMap))
-            : [appendText(document.createDocumentFragment(), 'p', '没有符合条件的题。')]));
+          listEl.innerHTML = filtered.map(p => renderProblemCard(p, idMap)).join('') || '<p>没有符合条件的题。</p>';
         }
         controls.forEach(el => el.addEventListener('input', apply));
         apply();
       } catch (err) {
-        mount.innerHTML = '<div class="graph-error">题库加载失败：' + escapeHtml(err.message) + '</div>';
+        mount.innerHTML = '<div class="graph-error">题库加载失败：' + err.message + '</div>';
       }
     }
 
@@ -664,15 +720,12 @@
       mount.dataset.rendered = '1';
       mount.innerHTML = '<div class="graph-loading">正在加载易错点...</div>';
       try {
-        const [rawProblems, rawPageExamples, rawSpecExamples, idMap] = await Promise.all([
-          fetch('data/problems.json').then(r => r.json()),
-          fetch('data/page-examples.json').then(r => r.json()),
-          fetch('data/spec-supplement-examples.json').then(r => r.json()),
+        const [rawProblems, rawDiagnostic, idMap] = await Promise.all([
+          fetch('data/verified-problems.json').then(r => r.json()),
+          fetch('data/verified-diagnostic-2024cee.json').then(r => r.json()),
           fetch('data/id-map.json').then(r => r.json())
         ]);
-        const problems = problemList(rawProblems)
-          .concat(rawPageExamples.examples || [])
-          .concat(rawSpecExamples.examples || []);
+        const problems = problemList(rawProblems).concat(problemList(rawDiagnostic)).filter(isPublishableProblem);
         const traps = new Map();
         for (const p of problems) {
           for (const trap of p.traps || []) {
@@ -714,14 +767,24 @@
             })
           })).filter(row => row.items.length);
           summaryEl.textContent = '当前显示 ' + filtered.length + ' 类易错点，共关联 ' + filtered.reduce((n, r) => n + r.items.length, 0) + ' 道题';
-          listEl.replaceChildren(...(filtered.length
-            ? filtered.map(row => renderTrapRow(row, idMap))
-            : [appendText(document.createDocumentFragment(), 'p', '没有符合条件的易错点。')]));
+          listEl.innerHTML = filtered.map(row => {
+            const sample = row.items.slice(0, 5);
+            return [
+              '<article class="trap-item">',
+              '  <div class="trap-meta"><span class="trap-pill">' + escapeHtml(row.items.length) + ' 题</span>' + sample.flatMap(p => p.knowledge_ids || []).slice(0, 4).map(id => '<span class="trap-pill">' + escapeHtml(idLabel(id, idMap)) + '</span>').join('') + '</div>',
+              '  <h3>' + escapeHtml(row.trap) + '</h3>',
+              '  <details><summary>查看关联题与纠正方法</summary>',
+              sample.map(p => '<p><b>' + escapeHtml(p.id) + '</b> ' + escapeHtml(p.stem) + '<br><b>纠正：</b>' + escapeHtml(p.method || p.solution || '') + '</p>').join(''),
+              row.items.length > sample.length ? '<p>还有 ' + (row.items.length - sample.length) + ' 道相关题，可在题库按关键词筛选。</p>' : '',
+              '  </details>',
+              '</article>'
+            ].join('');
+          }).join('') || '<p>没有符合条件的易错点。</p>';
         }
         [qEl, moduleEl, typeEl].forEach(el => el.addEventListener('input', apply));
         apply();
       } catch (err) {
-        mount.innerHTML = '<div class="graph-error">易错点加载失败：' + escapeHtml(err.message) + '</div>';
+        mount.innerHTML = '<div class="graph-error">易错点加载失败：' + err.message + '</div>';
       }
     }
 
@@ -755,9 +818,9 @@
           '  <div class="graph-stage"><svg role="img" aria-label="四川高考物理知识图谱"></svg></div>',
           '  <aside class="graph-panel">',
           '    <h3>知识图谱</h3>',
-          '    <p>点击节点跳到对应知识点；悬停查看模块、完成状态和前后关系。</p>',
-          '    <div class="graph-chip"><span class="graph-dot" style="background:#2c7be5"></span>done</div>',
-          '    <div class="graph-chip"><span class="graph-dot" style="background:#f0a500"></span>partial</div>',
+          '    <p>点击节点跳到对应知识点；悬停查看模块、完成状态和前后关系。图谱排版完成后会自动静止，只有拖动节点时才会短暂重新排列。</p>',
+          '    <div class="graph-chip"><span class="graph-dot" style="background:#2c7be5"></span>interaction passed · content pending</div>',
+          '    <div class="graph-chip"><span class="graph-dot" style="background:#f0a500"></span>interaction partial · content pending</div>',
           '    <div class="graph-chip"><span class="graph-dot" style="background:#9fb3c8"></span>pending</div>',
           '    <div class="legend">',
           '      <div><b>prerequisite</b>：前置知识</div>',
@@ -808,6 +871,11 @@
           .force('x', d3.forceX(d => moduleX(d.module)).strength(0.42))
           .force('y', d3.forceY(height / 2).strength(0.06))
           .force('collide', d3.forceCollide(34));
+        // A knowledge map is a reference diagram, not a decorative animation.
+        // Cap each force-layout pass so it settles quickly and then stays still.
+        let layoutTicks = 0;
+        const maxLayoutTicks = 90;
+        let draggingNode = false;
 
         const link = svg.append('g')
           .attr('stroke-linecap', 'round')
@@ -825,10 +893,8 @@
           .attr('class', 'graph-node')
           .on('mouseenter', function(event, d) {
             const tip = document.getElementById('graph-tooltip');
-            tip.replaceChildren();
-            appendText(tip, 'b', d.id + ' ' + d.title);
-            tip.appendChild(document.createElement('br'));
-            tip.appendChild(document.createTextNode(d.module + ' · ' + d.level + '档 · ' + d.status));
+            const statusText = d.status === 'done' ? 'interaction passed · content pending' : d.status === 'partial' ? 'interaction partial · content pending' : d.status;
+            tip.innerHTML = '<b>' + d.id + ' ' + d.title + '</b><br>' + d.module + ' · ' + d.level + '档 · ' + statusText;
             tip.style.left = (event.clientX + 12) + 'px';
             tip.style.top = (event.clientY + 12) + 'px';
             tip.style.display = 'block';
@@ -852,18 +918,15 @@
             node.classed('dim', n => !related.has(n.id)).classed('selected', n => n.id === d.id);
             link.classed('dim', e => !related.has(e.source.id) || !related.has(e.target.id));
             const selection = document.getElementById('graph-selection');
-            selection.replaceChildren();
-            selection.appendChild(document.createTextNode('当前：'));
-            appendText(selection, 'b', d.id + ' ' + d.title);
-            selection.appendChild(document.createElement('br'));
-            const anchor = document.createElement('a');
-            anchor.href = '#/' + encodeURIComponent(d.file) + '?id=' + encodeURIComponent(d.slug);
-            anchor.textContent = '跳到知识点';
-            selection.appendChild(anchor);
+            selection.innerHTML = '当前：<b>' + d.id + ' ' + d.title + '</b><br><a href="#/' + d.file + '?id=' + d.slug + '">跳到知识点</a>';
           })
           .call(d3.drag()
             .on('start', (event, d) => {
-              if (!event.active) simulation.alphaTarget(0.25).restart();
+              if (!event.active) {
+                layoutTicks = 0;
+                simulation.alpha(0.32).alphaTarget(0.18).restart();
+              }
+              draggingNode = true;
               d.fx = d.x;
               d.fy = d.y;
             })
@@ -873,6 +936,7 @@
             })
             .on('end', (event, d) => {
               if (!event.active) simulation.alphaTarget(0);
+              draggingNode = false;
               d.fx = null;
               d.fy = null;
             }));
@@ -912,18 +976,20 @@
           });
           node.attr('transform', d => 'translate(' + d.x + ',' + d.y + ')');
           moduleLabels.attr('x', d => moduleX(d));
+          layoutTicks += 1;
+          if (!draggingNode && layoutTicks >= maxLayoutTicks) simulation.stop();
         });
       } catch (err) {
-        mount.innerHTML = '<div class="graph-error">知识图谱加载失败：' + escapeHtml(err.message) + '</div>';
+        mount.innerHTML = '<div class="graph-error">知识图谱加载失败：' + err.message + '</div>';
       }
     }
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/docsify@4.13.1/lib/docsify.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/docsify@4.13.1/lib/plugins/search.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/docsify-pagination@2.10.1/dist/docsify-pagination.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/docsify@4.13.1/lib/plugins/zoom-image.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/zoom-image.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/docsify-katex@2.0.2/dist/docsify-katex.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@4/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-katex@latest/dist/docsify-katex.js"></script>
 </body>
 </html>

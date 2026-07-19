@@ -3,172 +3,80 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>洛伦兹力</title>
-<link rel="stylesheet" href="../common/controls.css">
+<title>洛伦兹力三维实验台</title>
 <style>
-body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#f7f9fc;color:#1f2933}
-.container{padding:12px}
-canvas{display:block;width:100%;max-width:600px;background:#fff;border:1px solid #d9e2ec;border-radius:8px;touch-action:none;cursor:grab}
-.readouts{display:flex;flex-wrap:wrap;gap:12px;margin:10px 0;font-size:14px}
-.readouts .r{background:#102a43;color:#d9e2ec;padding:6px 12px;border-radius:6px}
-.readouts .r b{color:#f0a500}
-.controls{display:flex;flex-wrap:wrap;gap:16px;margin:10px 0;align-items:center}
-.controls label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:#334e68}
-.controls input[type=range]{width:140px;accent-color:#2c7be5}
-.controls button{font:inherit;padding:6px 16px;border:1px solid #b0bcc9;background:#fff;border-radius:6px;cursor:pointer}
-.controls button:hover{background:#eef2f7}
-.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:8px 12px;border-radius:4px;font-size:13px;color:#486581;margin-top:10px}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#f7f9fc;color:#102a43}.container{padding:12px;max-width:980px;margin:auto}h2{font-size:17px;margin:0 0 8px}canvas{display:block;width:100%;max-width:760px;background:#fff;border:1px solid #d9e2ec;border-radius:9px;touch-action:none;cursor:grab}.controls,.readouts{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0;align-items:center}.controls label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:#334e68}.controls input{width:138px;accent-color:#2c7be5}button{font:inherit;padding:7px 11px;border:1px solid #b0bcc9;background:#fff;border-radius:7px;cursor:pointer}button.on{background:#2c7be5;color:#fff;border-color:#2c7be5}.r{background:#102a43;color:#e6eef7;padding:7px 10px;border-radius:7px;font-size:13px}.r b{color:#ffd166}.hint{background:#fff7e6;border-left:3px solid #f0a500;padding:9px 12px;border-radius:6px;font-size:13px;color:#486581;line-height:1.55}@media(max-width:620px){.container{padding:7px}canvas{min-height:500px}.controls label{width:calc(50% - 8px)}.controls input{width:100%}}
 </style>
 </head>
 <body>
 <div class="container">
-  <h2>洛伦兹力：F = qvB sinθ</h2>
+  <h2>洛伦兹力：三维速度分解与螺旋轨迹</h2>
   <div class="controls">
-    <label>速度 v = <span id="v-display">2.0</span>×10⁶ m/s
-      <input type="range" id="v" min="0.5" max="5" step="0.1" value="2"></label>
-    <label>磁感应强度 B = <span id="b-display">1.0</span> T
-      <input type="range" id="bf" min="0.1" max="3" step="0.1" value="1"></label>
-    <label>电荷 q = <span id="q-display">+1</span> e
-      <input type="range" id="q" min="-2" max="2" step="1" value="1"></label>
-    <label>夹角 θ = <span id="th-display">90</span>°
-      <input type="range" id="th" min="0" max="90" step="5" value="90"></label>
-    <button id="play-btn">播放</button>
-    <button id="reset-btn">重置</button>
-    <span style="font-size:13px;color:#486581">或拖蓝色速度箭头</span>
+    <label>速度 v = <span id="v-display">2.0</span>×10⁶ m/s<input type="range" id="v" min="0.5" max="5" step="0.1" value="2"></label>
+    <label>磁感应强度 B = <span id="b-display">1.0</span> T<input type="range" id="bf" min="0.1" max="3" step="0.1" value="1"></label>
+    <label>电荷 q = <span id="q-display">+1</span> e<input type="range" id="q" min="-2" max="2" step="1" value="1"></label>
+    <label>夹角 θ(v,B) = <span id="th-display">60</span>°<input type="range" id="th" min="0" max="90" step="5" value="60"></label>
+    <button id="play-btn">播放三维轨迹</button><button id="reset-btn">重置</button><button data-sign="1" class="on">正电荷</button><button data-sign="-1">负电荷</button>
   </div>
-  <canvas id="canvas" width="600" height="360" aria-label="洛伦兹力实验台：三维磁场方向装置、速度投影图像和数据记录"></canvas>
+  <canvas id="canvas" width="760" height="440" aria-label="洛伦兹力三维实验台：磁场方向、速度分解、螺旋轨迹和力矢量"></canvas>
   <div class="readouts">
-    <span class="r">力 F = <b id="f-val">3.2</b>×10⁻¹³ N</span>
-    <span class="r">速度 v = <b id="v-val">2.0</b>×10⁶ m/s</span>
-    <span class="r">磁感应强度 B = <b id="b-val">1.0</b> T</span>
-    <span class="r" id="dir-val">方向：垂直纸面向里</span>
+    <span class="r">v∥ = <b id="vp-val">1.00</b>×10⁶ m/s</span><span class="r">v⊥ = <b id="vt-val">1.73</b>×10⁶ m/s</span><span class="r">F = <b id="f-val">2.77</b>×10⁻¹³ N</span><span class="r">状态：<b id="state-val">速度分解完成</b></span>
   </div>
-  <div class="hint">
-    <p><b>观察任务</b>：直接拖<b>蓝色速度箭头</b>改变 v 和 θ，对照三维磁场方向装置、速度投影图像和数据记录，看 F 如何随 vBsinθ 变化；θ=90° 时最大，θ=0° 时 F=0。</p>
-  </div>
+  <div class="hint"><b>观察任务：</b>不要把 θ 当作纸面内转角。这里紫色箭头是 B 方向；蓝色 <b>v∥</b> 沿 B，不受磁场偏转；青色 <b>v⊥</b> 垂直 B，才产生红色 F。拖画面中的蓝色手柄（右为 v 大、上为 θ 大）后播放：正、负电荷绕 B 轴的旋向相反，但 F 始终垂直速度，所以速率不变。</div>
 </div>
 <script>
 (function(){
-  const canvas=document.getElementById('canvas');
-  const ctx=canvas.getContext('2d');
-  const W=canvas.width,H=canvas.height;
-  let v=2,B=1,q=1,th=90;
-  let running=false,t=0,dragV=false;
-  const e=1.6; // e = 1.6×10⁻¹⁹ C；v 的读数单位是 ×10⁶ m/s
-
-  function calcF(){
-    return Math.abs(q)*e*v*B*Math.sin(th*Math.PI/180); // ×10⁻¹³ N
+  const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height;
+  let v=2,B=1,q=1,theta=60,running=false,time=0,drag=false,trail=[];
+  let hot={x:0,y:0}; const e=1.6;
+  const id=s=>document.getElementById(s),clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+  function calc(){const rad=theta*Math.PI/180,par=v*Math.cos(rad),perp=v*Math.sin(rad),force=Math.abs(q)*e*v*B*Math.sin(rad);return{par,perp,force,rad};}
+  function arrow(x1,y1,x2,y2,c,w=2.6){const a=Math.atan2(y2-y1,x2-x1);ctx.save();ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=w;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-9*Math.cos(a-.45),y2-9*Math.sin(a-.45));ctx.lineTo(x2-9*Math.cos(a+.45),y2-9*Math.sin(a+.45));ctx.closePath();ctx.fill();ctx.restore();}
+  function box(x,y,w,h,title){ctx.fillStyle='#f8fbff';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1.2;ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();ctx.fillStyle='#334e68';ctx.font='700 12px system-ui';ctx.textAlign='left';ctx.fillText(title,x+10,y+18);}
+  function project(x,y,z,cx,cy){return{x:cx+x*.78+y*.42,y:cy-z-y*.22};}
+  function model(c,phase){const radius=20+c.perp*17,turn=q===0?0:(q>0?1:-1),p=.65+turn*phase;return{x:c.par*phase*24,y:radius*(Math.cos(p)-Math.cos(.65)),z:radius*(Math.sin(p)-Math.sin(.65)),p,radius,turn};}
+  function drawField(c){
+    const x=18,y=44,w=455,h=330,cx=142,cy=240;box(x,y,w,h,'三维视图：B 为螺旋的轴，F 指向轴心');
+    const xEnd=405;arrow(cx,cy,cx+220,cy,'#7c3aed',3.5);ctx.fillStyle='#7c3aed';ctx.font='700 13px system-ui';ctx.textAlign='center';ctx.fillText('B 方向',cx+224,cy-15);
+    ctx.strokeStyle='rgba(124,58,237,.22)';ctx.lineWidth=1.4;for(let k=-2;k<=2;k++){ctx.beginPath();ctx.moveTo(cx,cy+k*22);ctx.lineTo(cx+225,cy+k*22);ctx.stroke();}
+    const phase=running?time*1.35:0,point=model(c,phase),p=project(point.x,point.y,point.z,cx,cy);
+    // A faint full helix is the prediction; bright dots are its actual trace.
+    ctx.strokeStyle='rgba(44,123,229,.34)';ctx.lineWidth=1.5;ctx.beginPath();for(let i=0;i<=140;i++){const pp=model(c,i/28),sp=project(pp.x,pp.y,pp.z,cx,cy);if(i)ctx.lineTo(sp.x,sp.y);else ctx.moveTo(sp.x,sp.y)}ctx.stroke();
+    trail.forEach(t=>{const pp=model(c,t),sp=project(pp.x,pp.y,pp.z,cx,cy);ctx.fillStyle='rgba(44,123,229,.42)';ctx.beginPath();ctx.arc(sp.x,sp.y,2.4,0,7);ctx.fill();});
+    const charge=q>0?'#e03131':q<0?'#2c7be5':'#94a3b8';ctx.save();ctx.shadowColor=charge;ctx.shadowBlur=13;ctx.fillStyle=charge;ctx.beginPath();ctx.arc(p.x,p.y,12,0,7);ctx.fill();ctx.restore();ctx.fillStyle='#fff';ctx.font='900 14px system-ui';ctx.textAlign='center';ctx.fillText(q>0?'+':q<0?'−':'0',p.x,p.y+5);
+    const rate=1.35,dy=-point.radius*Math.sin(point.p)*rate*point.turn,dz=point.radius*Math.cos(point.p)*rate*point.turn;
+    const vel=project(point.x+c.par*25,point.y+dy,point.z+dz,cx,cy);arrow(p.x,p.y,p.x+(vel.x-p.x)*.42,p.y+(vel.y-p.y)*.42,'#2563eb',3);ctx.fillStyle='#2563eb';ctx.font='700 12px system-ui';ctx.textAlign='left';ctx.fillText('v（速率不变）',p.x+12,p.y-16);
+    if(c.force>.001){const norm=Math.hypot(point.y,point.z)||1,fp=project(point.x,point.y-point.y/norm*34,point.z-point.z/norm*34,cx,cy);arrow(p.x,p.y,fp.x,fp.y,'#dc2626',3);ctx.fillStyle='#dc2626';ctx.fillText('F洛',fp.x+6,fp.y-8);}
+    ctx.fillStyle='#0f766e';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText(c.par.toFixed(2)+'×10⁶ m/s 沿 B 推进',300,350);
+    // Direct two-dimensional handle: x controls v, y controls theta.
+    const hx=64+(v-.5)/4.5*118,hy=413-theta/90*86;ctx.strokeStyle='#cbd5e1';ctx.lineWidth=1.2;ctx.strokeRect(52,324,142,98);ctx.fillStyle='#486581';ctx.font='11px system-ui';ctx.textAlign='left';ctx.fillText('直接拖：v→，θ↑',61,342);ctx.fillStyle='#2563eb';ctx.beginPath();ctx.arc(hx,hy,10,0,7);ctx.fill();ctx.fillStyle='#fff';ctx.font='900 10px system-ui';ctx.textAlign='center';ctx.fillText('vθ',hx,hy+3);hot={x:hx,y:hy};
+    ctx.fillStyle='#102a43';ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillText('v = v∥ + v⊥：θ='+theta+'°，v⊥='+c.perp.toFixed(2)+'×10⁶ m/s',218,405);
   }
-
-  function updateReadouts(){
-    document.getElementById('f-val').textContent=calcF().toFixed(2);
-    document.getElementById('v-val').textContent=v.toFixed(1);
-    document.getElementById('b-val').textContent=B.toFixed(1);
-    const dir=document.getElementById('dir-val');
-    if(q>0)dir.textContent='F 方向：左手定则判定';
-    else if(q<0)dir.textContent='F 方向：反向（负电荷）';
-    else dir.textContent='q=0，无力';
+  function drawDecomposition(c){
+    const x=490,y=44,w=252,h=330;box(x,y,w,h,'速度分解：只有 v⊥ 产生 F');
+    const ox=x+42,oy=y+254;arrow(ox,oy,ox+154,oy,'#7c3aed',3);ctx.fillStyle='#7c3aed';ctx.font='700 12px system-ui';ctx.textAlign='center';ctx.fillText('B / v∥',ox+154,oy+18);
+    const len=56+c.perp*19,ang=-Math.PI/2;arrow(ox+95,oy,ox+95+Math.cos(ang)*len,oy+Math.sin(ang)*len,'#14b8a6',3);ctx.fillStyle='#0f766e';ctx.fillText('v⊥',ox+108,oy-len-10);
+    ctx.strokeStyle='#94a3b8';ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(ox+95,oy);ctx.arc(ox+95,oy,34,Math.PI,Math.PI+theta*Math.PI/180,true);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#334e68';ctx.font='12px system-ui';ctx.fillText('θ='+theta+'°',ox+52,oy-18);
+    const forceNote=c.force<.001?'θ=0°：v∥B，F=0，直线前进':`F=|q|vBsinθ=${c.force.toFixed(2)}×10⁻¹³ N`;
+    ctx.fillStyle=c.force<.001?'#b45309':'#dc2626';ctx.font='700 13px system-ui';ctx.textAlign='center';ctx.fillText(forceNote,x+w/2,y+55);
+    ctx.fillStyle='#486581';ctx.font='12px system-ui';ctx.textAlign='left';ctx.fillText('红色 F 始终垂直于瞬时 v',x+16,y+92);ctx.fillText('→ F·v=0，磁场不改变速率',x+16,y+115);
+    const gx=x+25,gy=y+160,gw=w-50,gh=110;ctx.strokeStyle='#d7e2ec';ctx.strokeRect(gx,gy,gw,gh);ctx.fillStyle='#334e68';ctx.font='11px system-ui';ctx.textAlign='left';ctx.fillText('F-θ 曲线（v、B 固定）',gx,gy-8);ctx.strokeStyle='#dc2626';ctx.lineWidth=2.5;ctx.beginPath();for(let i=0;i<=90;i++){const px=gx+i/90*gw,py=gy+gh-Math.sin(i*Math.PI/180)*gh*.8-10;if(i)ctx.lineTo(px,py);else ctx.moveTo(px,py)}ctx.stroke();const px=gx+theta/90*gw,py=gy+gh-Math.sin(theta*Math.PI/180)*gh*.8-10;ctx.fillStyle='#f0a500';ctx.beginPath();ctx.arc(px,py,5,0,7);ctx.fill();ctx.fillStyle='#486581';ctx.fillText('0°',gx,gy+gh+15);ctx.fillText('90°',gx+gw-18,gy+gh+15);
   }
-
-  function draw(){
-    ctx.clearRect(0,0,W,H);
-    const cx=W/2,cy=H/2;
-    // magnetic field (into page = × symbols)
-    ctx.strokeStyle='#2c7be5';ctx.fillStyle='#2c7be5';
-    ctx.font='14px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
-    for(let x=40;x<W-40;x+=50){
-      for(let y=40;y<H-40;y+=50){
-        if(Math.abs(x-cx)<60&&Math.abs(y-cy)<60)continue;
-        ctx.fillText('×',x,y);
-      }
-    }
-    ctx.fillStyle='#2c7be5';ctx.font='11px sans-serif';
-    ctx.fillText('B（垂直纸面向里）',W-100,20);
-    // velocity vector
-    const vLen=v*30;
-    const ang=th*Math.PI/180;
-    const vx=Math.cos(ang)*vLen;
-    const vy=-Math.sin(ang)*vLen;
-    ctx.strokeStyle='#2c7be5';ctx.fillStyle='#2c7be5';ctx.lineWidth=3;
-    ctx.beginPath();
-    ctx.moveTo(cx,cy);
-    ctx.lineTo(cx+vx,cy+vy);
-    ctx.stroke();
-    // arrowhead
-    const a=Math.atan2(vy,vx);
-    ctx.beginPath();
-    ctx.moveTo(cx+vx,cy+vy);
-    ctx.lineTo(cx+vx-10*Math.cos(a-0.4),cy+vy-10*Math.sin(a-0.4));
-    ctx.lineTo(cx+vx-10*Math.cos(a+0.4),cy+vy-10*Math.sin(a+0.4));
-    ctx.closePath();ctx.fill();
-    ctx.fillText('v',cx+vx+12,cy+vy-5);
-    if(running){
-      const phase=(t*1.4)%1;
-      ctx.fillStyle='#74c0fc';ctx.beginPath();ctx.arc(cx+vx*phase,cy+vy*phase,4,0,Math.PI*2);ctx.fill();
-    }
-    // charge（带辉光真实感）
-    const qcolor=q>0?'#e03131':(q<0?'#2c7be5':'#aab8c2');
-    const glow=ctx.createRadialGradient(cx,cy,3,cx,cy,32);glow.addColorStop(0,q>0?'rgba(224,49,49,0.5)':'rgba(44,123,229,0.5)');glow.addColorStop(1,'rgba(255,255,255,0)');
-    ctx.fillStyle=glow;ctx.beginPath();ctx.arc(cx,cy,32,0,7);ctx.fill();
-    ctx.fillStyle=qcolor;
-    ctx.beginPath();ctx.arc(cx,cy,14,0,Math.PI*2);ctx.fill();
-    ctx.strokeStyle='#334e68';ctx.lineWidth=2;ctx.stroke();
-    ctx.fillStyle='#fff';ctx.font='bold 13px sans-serif';
-    ctx.fillText(q>0?'+':(q<0?'−':'0'),cx,cy);
-    // Lorentz force (perpendicular to v, into page plane)
-    const f=calcF();
-    const fLen=Math.min(100,f*20+10);
-    // F perpendicular to v, for +q with B into page: F = qv×B
-    // v in plane, B into page → F perpendicular to v in plane
-    // For v at angle θ from horizontal, F is perpendicular (rotated -90° for +q)
-    const fAng=a-(q>0?Math.PI/2:(q<0?-Math.PI/2:0));
-    const fx=Math.cos(fAng)*fLen;
-    const fy=Math.sin(fAng)*fLen;
-    if(q!==0&&th>0){
-      ctx.strokeStyle='#e03131';ctx.fillStyle='#e03131';ctx.lineWidth=3;
-      ctx.beginPath();
-      ctx.moveTo(cx,cy);
-      ctx.lineTo(cx+fx,cy+fy);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(cx+fx,cy+fy);
-      ctx.lineTo(cx+fx-10*Math.cos(fAng-0.4),cy+fy-10*Math.sin(fAng-0.4));
-      ctx.lineTo(cx+fx-10*Math.cos(fAng+0.4),cy+fy-10*Math.sin(fAng+0.4));
-      ctx.closePath();ctx.fill();
-      ctx.font='12px sans-serif';
-      ctx.fillText('F',cx+fx+12,cy+fy);
-    }
-    // formula
-    ctx.fillStyle='#243b53';ctx.font='13px sans-serif';ctx.textAlign='left';
-    ctx.fillText('F = |q|vB sinθ = '+Math.abs(q)+'e×'+v.toFixed(1)+'×10⁶×'+B.toFixed(1)+'×sin'+th+'° = '+f.toFixed(2)+'×10⁻¹³ N',15,H-10);
-    ctx.font='bold 12px sans-serif';ctx.fillStyle='#e03131';ctx.textAlign='left';
-    ctx.fillText('状态：'+(th>=85?'θ≈90°，F 最大（v⊥B）':(th<=5?'θ≈0°，F=0（v∥B 不受力）':'θ 增大 → F 加强，θ 减小 → F 减弱')),15,20);
-  }
-
-  function step(dt){if(!running)return;t+=dt;draw();}
-
-  function sync(){
-    document.getElementById('v').value=v;document.getElementById('bf').value=B;document.getElementById('q').value=q;document.getElementById('th').value=th;
-    document.getElementById('v-display').textContent=v.toFixed(1);document.getElementById('b-display').textContent=B.toFixed(1);
-    document.getElementById('q-display').textContent=(q>=0?'+':'')+q;document.getElementById('th-display').textContent=th.toFixed(0);
-    updateReadouts();
-  }
-  function pos(e){const r=canvas.getBoundingClientRect(),s=canvas.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s};}
-  canvas.addEventListener('pointerdown',e=>{const p=pos(e);const cx=W/2,cy=H/2,ang=th*Math.PI/180,vx=Math.cos(ang)*v*30,vy=-Math.sin(ang)*v*30;if(Math.hypot(p.x-(cx+vx),p.y-(cy+vy))<24){dragV=true;canvas.setPointerCapture(e.pointerId);}});
-  canvas.addEventListener('pointermove',e=>{if(!dragV)return;const p=pos(e),cx=W/2,cy=H/2;const dx=p.x-cx,dy=p.y-cy;v=Math.max(0.5,Math.min(5,Math.round(Math.hypot(dx,dy)/30*10)/10));th=Math.max(0,Math.min(90,Math.round(Math.atan2(Math.max(0,-dy),Math.max(0.001,dx))*180/Math.PI/5)*5));sync();draw();});
-  canvas.addEventListener('pointerup',()=>{dragV=false;});
-  canvas.addEventListener('pointercancel',()=>{dragV=false;});
-  document.getElementById('v').addEventListener('input',e=>{v=parseFloat(e.target.value);sync();draw();});
-  document.getElementById('bf').addEventListener('input',e=>{B=parseFloat(e.target.value);sync();draw();});
-  document.getElementById('q').addEventListener('input',e=>{q=parseFloat(e.target.value);sync();draw();});
-  document.getElementById('th').addEventListener('input',e=>{th=parseFloat(e.target.value);sync();draw();});
-  document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
-  document.getElementById('reset-btn').addEventListener('click',()=>{running=false;t=0;v=2;B=1;q=1;th=90;document.getElementById('play-btn').textContent='播放';sync();draw();});
-
-  let lastTime=performance.now();
-  function loop(now){const dt=Math.min((now-lastTime)/1000,0.05);lastTime=now;step(dt);requestAnimationFrame(loop);}
-  sync();draw();requestAnimationFrame(loop);
+  function update(c){id('v-display').textContent=v.toFixed(1);id('b-display').textContent=B.toFixed(1);id('q-display').textContent=(q>=0?'+':'')+q;id('th-display').textContent=theta;id('vp-val').textContent=c.par.toFixed(2);id('vt-val').textContent=c.perp.toFixed(2);id('f-val').textContent=c.force.toFixed(2);id('state-val').textContent=running?(c.force<.001?'沿 B 匀速直线':'沿 B 轴螺旋，速率不变'):(c.force<.001?'v∥B：F=0':'已显示 v∥ 与 v⊥');['v','bf','q','th'].forEach(k=>id(k).value=({v,bf:B,q,th:theta})[k]);document.querySelectorAll('[data-sign]').forEach(b=>b.classList.toggle('on',Number(b.dataset.sign)===(q>=0?1:-1)));}
+  function draw(){const c=calc();ctx.clearRect(0,0,W,H);const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#fbfdff');bg.addColorStop(1,'#edf3f8');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);ctx.fillStyle='#102a43';ctx.font='900 18px system-ui';ctx.textAlign='center';ctx.fillText('洛伦兹力：v⊥ 转弯，v∥ 沿磁场推进',W/2,22);drawField(c);drawDecomposition(c);ctx.fillStyle='#243b53';ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillText('F=|q|vBsinθ = '+Math.abs(q)+'e×'+v.toFixed(1)+'×10⁶×'+B.toFixed(1)+'×sin'+theta+'° = '+c.force.toFixed(2)+'×10⁻¹³ N',20,H-14);update(c);window.__ANIM_TEST_STATE__={running,v,B,q,theta,vParallel:c.par,vPerpendicular:c.perp,force:c.force,trail:trail.length};}
+  function pos(e){const r=canvas.getBoundingClientRect(),s=W/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s};}
+  canvas.addEventListener('pointerdown',e=>{const p=pos(e);if(Math.hypot(p.x-hot.x,p.y-hot.y)<28){drag=true;canvas.setPointerCapture(e.pointerId);}});
+  canvas.addEventListener('pointermove',e=>{if(!drag)return;const p=pos(e);v=clamp(.5+(p.x-64)/118*4.5,.5,5);theta=Math.round(clamp((413-p.y)/86*90,0,90)/5)*5;trail=[];draw();});
+  canvas.addEventListener('pointerup',()=>{drag=false;});canvas.addEventListener('pointercancel',()=>{drag=false;});
+  id('v').oninput=e=>{v=+e.target.value;trail=[];draw()};id('bf').oninput=e=>{B=+e.target.value;trail=[];draw()};id('q').oninput=e=>{q=+e.target.value;trail=[];draw()};id('th').oninput=e=>{theta=+e.target.value;trail=[];draw()};
+  id('play-btn').onclick=()=>{running=!running;id('play-btn').textContent=running?'暂停三维轨迹':'播放三维轨迹';if(running){time=0;trail=[];}draw()};
+  id('reset-btn').onclick=()=>{v=2;B=1;q=1;theta=60;running=false;time=0;trail=[];id('play-btn').textContent='播放三维轨迹';draw()};
+  document.querySelectorAll('[data-sign]').forEach(b=>b.onclick=()=>{q=Math.abs(q||1)*Number(b.dataset.sign);trail=[];draw()});
+  let last=performance.now();function loop(now){const dt=Math.min((now-last)/1000,.05);last=now;if(running){time+=dt;trail.push(time*1.35);if(trail.length>120)trail.shift();draw();}requestAnimationFrame(loop)}
+  draw();requestAnimationFrame(loop);
 })();
 </script>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector('[data-audit-reset]');if(b)b.addEventListener('click',function(){location.reload()});})();</script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

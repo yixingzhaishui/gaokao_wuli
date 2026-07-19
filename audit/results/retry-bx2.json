@@ -1,0 +1,1651 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-11T06:23:52.979Z",
+  "commit": "eb30b19cf78dbb62af23d0567912504d02fe166f",
+  "module": "bx2",
+  "modules": [
+    "bx2"
+  ],
+  "summary": {
+    "total": 9,
+    "score": 100,
+    "pass": 9,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/bx2/centripetal.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:基础",
+          "kind": "initial_condition_retry",
+          "changed": false,
+          "affected_result": false
+        },
+        {
+          "selector": "button:速度加倍",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:半径变大",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:质量变大",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:基础",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:基础",
+          "text": "基础",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:速度加倍",
+          "text": "速度加倍",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:半径变大",
+          "text": "半径变大",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:质量变大",
+          "text": "质量变大",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "ab4320a",
+          "readout_hash": "a76d12ef",
+          "physical_readout_hash": "a76d12ef",
+          "readout": [
+            "向心加速度 a10.0 m/s² 向心力 F向5.0 N 角速度 ω5.0 rad/s 周期 T1.26 s",
+            "向心力是指向圆心的合力效果；它改变速度方向，不改变速率。"
+          ],
+          "physical_readout": [
+            "向心加速度 a10.0 m/s² 向心力 F向5.0 N 角速度 ω5.0 rad/s 周期 T1.26 s",
+            "向心力是指向圆心的合力效果；它改变速度方向，不改变速率。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "d0816d89",
+          "readout_hash": "a76d12ef",
+          "physical_readout_hash": "a76d12ef",
+          "readout": [
+            "向心加速度 a10.0 m/s² 向心力 F向5.0 N 角速度 ω5.0 rad/s 周期 T1.26 s",
+            "向心力是指向圆心的合力效果；它改变速度方向，不改变速率。"
+          ],
+          "physical_readout": [
+            "向心加速度 a10.0 m/s² 向心力 F向5.0 N 角速度 ω5.0 rad/s 周期 T1.26 s",
+            "向心力是指向圆心的合力效果；它改变速度方向，不改变速率。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "208be493",
+          "readout_hash": "a76d12ef",
+          "physical_readout_hash": "a76d12ef",
+          "readout": [
+            "向心加速度 a10.0 m/s² 向心力 F向5.0 N 角速度 ω5.0 rad/s 周期 T1.26 s",
+            "向心力是指向圆心的合力效果；它改变速度方向，不改变速率。"
+          ],
+          "physical_readout": [
+            "向心加速度 a10.0 m/s² 向心力 F向5.0 N 角速度 ω5.0 rad/s 周期 T1.26 s",
+            "向心力是指向圆心的合力效果；它改变速度方向，不改变速率。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "208be493",
+          "readout_hash": "a76d12ef",
+          "physical_readout_hash": "a76d12ef",
+          "readout": [
+            "向心加速度 a10.0 m/s² 向心力 F向5.0 N 角速度 ω5.0 rad/s 周期 T1.26 s",
+            "向心力是指向圆心的合力效果；它改变速度方向，不改变速率。"
+          ],
+          "physical_readout": [
+            "向心加速度 a10.0 m/s² 向心力 F向5.0 N 角速度 ω5.0 rad/s 周期 T1.26 s",
+            "向心力是指向圆心的合力效果；它改变速度方向，不改变速率。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "向心加速度 a# m/s² 向心力 F向# N 角速度 ω# rad/s 周期 T# s|向心力是指向圆心的合力效果；它改变速度方向，不改变速率。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "向心加速度 a# m/s² 向心力 F向# N 角速度 ω# rad/s 周期 T# s|向心力是指向圆心的合力效果；它改变速度方向，不改变速率。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx2/circular-basics.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:基础",
+          "kind": "initial_condition_retry",
+          "changed": false,
+          "affected_result": false
+        },
+        {
+          "selector": "button:外圈点",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:转得快",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:半圈",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:基础",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:基础",
+          "text": "基础",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:外圈点",
+          "text": "外圈点",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:转得快",
+          "text": "转得快",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:半圈",
+          "text": "半圈",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "1928ee26",
+          "readout_hash": "da05c011",
+          "physical_readout_hash": "da05c011",
+          "readout": [
+            "频率 f0.25 Hz 角速度 ω1.57 rad/s 线速度 v3.14 m/s 弧长 s4.19 m",
+            "同一转盘上 ω 相同；r 越大，v=ωr 越大。弧长由 s=rθ 决定。"
+          ],
+          "physical_readout": [
+            "频率 f0.25 Hz 角速度 ω1.57 rad/s 线速度 v3.14 m/s 弧长 s4.19 m",
+            "同一转盘上 ω 相同；r 越大，v=ωr 越大。弧长由 s=rθ 决定。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "7c89ab08",
+          "readout_hash": "da05c011",
+          "physical_readout_hash": "da05c011",
+          "readout": [
+            "频率 f0.25 Hz 角速度 ω1.57 rad/s 线速度 v3.14 m/s 弧长 s4.19 m",
+            "同一转盘上 ω 相同；r 越大，v=ωr 越大。弧长由 s=rθ 决定。"
+          ],
+          "physical_readout": [
+            "频率 f0.25 Hz 角速度 ω1.57 rad/s 线速度 v3.14 m/s 弧长 s4.19 m",
+            "同一转盘上 ω 相同；r 越大，v=ωr 越大。弧长由 s=rθ 决定。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "1928ee26",
+          "readout_hash": "da05c011",
+          "physical_readout_hash": "da05c011",
+          "readout": [
+            "频率 f0.25 Hz 角速度 ω1.57 rad/s 线速度 v3.14 m/s 弧长 s4.19 m",
+            "同一转盘上 ω 相同；r 越大，v=ωr 越大。弧长由 s=rθ 决定。"
+          ],
+          "physical_readout": [
+            "频率 f0.25 Hz 角速度 ω1.57 rad/s 线速度 v3.14 m/s 弧长 s4.19 m",
+            "同一转盘上 ω 相同；r 越大，v=ωr 越大。弧长由 s=rθ 决定。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "1928ee26",
+          "readout_hash": "da05c011",
+          "physical_readout_hash": "da05c011",
+          "readout": [
+            "频率 f0.25 Hz 角速度 ω1.57 rad/s 线速度 v3.14 m/s 弧长 s4.19 m",
+            "同一转盘上 ω 相同；r 越大，v=ωr 越大。弧长由 s=rθ 决定。"
+          ],
+          "physical_readout": [
+            "频率 f0.25 Hz 角速度 ω1.57 rad/s 线速度 v3.14 m/s 弧长 s4.19 m",
+            "同一转盘上 ω 相同；r 越大，v=ωr 越大。弧长由 s=rθ 决定。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "频率 f# Hz 角速度 ω# rad/s 线速度 v# m/s 弧长 s# m|同一转盘上 ω 相同；r 越大，v=ωr 越大。弧长由 s=rθ 决定。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "频率 f# Hz 角速度 ω# rad/s 线速度 v# m/s 弧长 s# m|同一转盘上 ω 相同；r 越大，v=ωr 越大。弧长由 s=rθ 决定。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx2/conical-pendulum.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:基础",
+          "kind": "initial_condition_retry",
+          "changed": false,
+          "affected_result": false
+        },
+        {
+          "selector": "button:大摆角",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:长绳",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:大质量",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:基础",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:基础",
+          "text": "基础",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:大摆角",
+          "text": "大摆角",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:长绳",
+          "text": "长绳",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:大质量",
+          "text": "大质量",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "fbf89bb",
+          "readout_hash": "7079329e",
+          "physical_readout_hash": "7079329e",
+          "readout": [
+            "半径 r0.57 m 速度 v1.98 m/s 绳拉力 T6.0 N 周期1.82 s",
+            "竖直方向平衡，水平方向的合力提供向心力。"
+          ],
+          "physical_readout": [
+            "半径 r0.57 m 速度 v1.98 m/s 绳拉力 T6.0 N 周期1.82 s",
+            "竖直方向平衡，水平方向的合力提供向心力。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "5202ba3a",
+          "readout_hash": "7079329e",
+          "physical_readout_hash": "7079329e",
+          "readout": [
+            "半径 r0.57 m 速度 v1.98 m/s 绳拉力 T6.0 N 周期1.82 s",
+            "竖直方向平衡，水平方向的合力提供向心力。"
+          ],
+          "physical_readout": [
+            "半径 r0.57 m 速度 v1.98 m/s 绳拉力 T6.0 N 周期1.82 s",
+            "竖直方向平衡，水平方向的合力提供向心力。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "22601072",
+          "readout_hash": "7079329e",
+          "physical_readout_hash": "7079329e",
+          "readout": [
+            "半径 r0.57 m 速度 v1.98 m/s 绳拉力 T6.0 N 周期1.82 s",
+            "竖直方向平衡，水平方向的合力提供向心力。"
+          ],
+          "physical_readout": [
+            "半径 r0.57 m 速度 v1.98 m/s 绳拉力 T6.0 N 周期1.82 s",
+            "竖直方向平衡，水平方向的合力提供向心力。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "22601072",
+          "readout_hash": "7079329e",
+          "physical_readout_hash": "7079329e",
+          "readout": [
+            "半径 r0.57 m 速度 v1.98 m/s 绳拉力 T6.0 N 周期1.82 s",
+            "竖直方向平衡，水平方向的合力提供向心力。"
+          ],
+          "physical_readout": [
+            "半径 r0.57 m 速度 v1.98 m/s 绳拉力 T6.0 N 周期1.82 s",
+            "竖直方向平衡，水平方向的合力提供向心力。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "半径 r# m 速度 v# m/s 绳拉力 T# N 周期# s|竖直方向平衡，水平方向的合力提供向心力。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "半径 r# m 速度 v# m/s 绳拉力 T# N 周期# s|竖直方向平衡，水平方向的合力提供向心力。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx2/geostationary.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:静止卫星",
+          "kind": "initial_condition_retry",
+          "changed": false,
+          "affected_result": false
+        },
+        {
+          "selector": "button:低轨快跑",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:倾斜同步",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:反向同步",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:静止卫星",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:静止卫星",
+          "text": "静止卫星",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:低轨快跑",
+          "text": "低轨快跑",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:倾斜同步",
+          "text": "倾斜同步",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:反向同步",
+          "text": "反向同步",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "356b8957",
+          "readout_hash": "4a343adc",
+          "physical_readout_hash": "4a343adc",
+          "readout": [
+            "周期 T24.0 h 离地高度 h35793 km 线速度 v3.07 km/s 经度漂移0°/日",
+            "同步、赤道、同向同时满足：卫星固定在同一经度上空。"
+          ],
+          "physical_readout": [
+            "周期 T24.0 h 离地高度 h35793 km 线速度 v3.07 km/s 经度漂移0°/日",
+            "同步、赤道、同向同时满足：卫星固定在同一经度上空。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "93007dc8",
+          "readout_hash": "4a343adc",
+          "physical_readout_hash": "4a343adc",
+          "readout": [
+            "周期 T24.0 h 离地高度 h35793 km 线速度 v3.07 km/s 经度漂移0°/日",
+            "同步、赤道、同向同时满足：卫星固定在同一经度上空。"
+          ],
+          "physical_readout": [
+            "周期 T24.0 h 离地高度 h35793 km 线速度 v3.07 km/s 经度漂移0°/日",
+            "同步、赤道、同向同时满足：卫星固定在同一经度上空。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "61db650b",
+          "readout_hash": "4a343adc",
+          "physical_readout_hash": "4a343adc",
+          "readout": [
+            "周期 T24.0 h 离地高度 h35793 km 线速度 v3.07 km/s 经度漂移0°/日",
+            "同步、赤道、同向同时满足：卫星固定在同一经度上空。"
+          ],
+          "physical_readout": [
+            "周期 T24.0 h 离地高度 h35793 km 线速度 v3.07 km/s 经度漂移0°/日",
+            "同步、赤道、同向同时满足：卫星固定在同一经度上空。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "61db650b",
+          "readout_hash": "4a343adc",
+          "physical_readout_hash": "4a343adc",
+          "readout": [
+            "周期 T24.0 h 离地高度 h35793 km 线速度 v3.07 km/s 经度漂移0°/日",
+            "同步、赤道、同向同时满足：卫星固定在同一经度上空。"
+          ],
+          "physical_readout": [
+            "周期 T24.0 h 离地高度 h35793 km 线速度 v3.07 km/s 经度漂移0°/日",
+            "同步、赤道、同向同时满足：卫星固定在同一经度上空。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "周期 T# h 离地高度 h# km 线速度 v# km/s 经度漂移#°/日|同步、赤道、同向同时满足：卫星固定在同一经度上空。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "周期 T# h 离地高度 h# km 线速度 v# km/s 经度漂移#°/日|同步、赤道、同向同时满足：卫星固定在同一经度上空。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx2/gravitation.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:地月量级",
+          "kind": "initial_condition_retry",
+          "changed": false,
+          "affected_result": false
+        },
+        {
+          "selector": "button:距离翻倍",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:质量翻倍",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:距离更近",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:地月量级",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "button:地月量级",
+          "text": "地月量级",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:距离翻倍",
+          "text": "距离翻倍",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:质量翻倍",
+          "text": "质量翻倍",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:距离更近",
+          "text": "距离更近",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#playBtn",
+          "text": "暂停演示",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.5,
+          "py": 0.5
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停演示"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "5a89c34d",
+          "readout_hash": "be05209f",
+          "physical_readout_hash": "be05209f",
+          "readout": [
+            "当前引力 F7.13e21 N 2r 时引力1.78e21 N 质心距离 r6.40e7 m 比例判断1/4",
+            "两物体受到的引力大小相等、方向相反，沿质心连线。"
+          ],
+          "physical_readout": [
+            "当前引力 F7.13e21 N 2r 时引力1.78e21 N 质心距离 r6.40e7 m 比例判断1/4",
+            "两物体受到的引力大小相等、方向相反，沿质心连线。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "3b7f4ca3",
+          "readout_hash": "be05209f",
+          "physical_readout_hash": "be05209f",
+          "readout": [
+            "当前引力 F7.13e21 N 2r 时引力1.78e21 N 质心距离 r6.40e7 m 比例判断1/4",
+            "两物体受到的引力大小相等、方向相反，沿质心连线。"
+          ],
+          "physical_readout": [
+            "当前引力 F7.13e21 N 2r 时引力1.78e21 N 质心距离 r6.40e7 m 比例判断1/4",
+            "两物体受到的引力大小相等、方向相反，沿质心连线。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "3ed1a0bc",
+          "readout_hash": "be05209f",
+          "physical_readout_hash": "be05209f",
+          "readout": [
+            "当前引力 F7.13e21 N 2r 时引力1.78e21 N 质心距离 r6.40e7 m 比例判断1/4",
+            "两物体受到的引力大小相等、方向相反，沿质心连线。"
+          ],
+          "physical_readout": [
+            "当前引力 F7.13e21 N 2r 时引力1.78e21 N 质心距离 r6.40e7 m 比例判断1/4",
+            "两物体受到的引力大小相等、方向相反，沿质心连线。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "3ed1a0bc",
+          "readout_hash": "be05209f",
+          "physical_readout_hash": "be05209f",
+          "readout": [
+            "当前引力 F7.13e21 N 2r 时引力1.78e21 N 质心距离 r6.40e7 m 比例判断1/4",
+            "两物体受到的引力大小相等、方向相反，沿质心连线。"
+          ],
+          "physical_readout": [
+            "当前引力 F7.13e21 N 2r 时引力1.78e21 N 质心距离 r6.40e7 m 比例判断1/4",
+            "两物体受到的引力大小相等、方向相反，沿质心连线。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "当前引力 F#e# N #r 时引力#e# N 质心距离 r#e# m 比例判断#/#|两物体受到的引力大小相等、方向相反，沿质心连线。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "当前引力 F#e# N #r 时引力#e# N 质心距离 r#e# m 比例判断#/#|两物体受到的引力大小相等、方向相反，沿质心连线。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx2/gravitational-potential.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:下降",
+          "kind": "initial_condition_retry",
+          "changed": false,
+          "affected_result": false
+        },
+        {
+          "selector": "button:上升",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:等高",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:换参考面",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:下降",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:下降",
+          "text": "下降",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:上升",
+          "text": "上升",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:等高",
+          "text": "等高",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:换参考面",
+          "text": "换参考面",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "26d0d2be",
+          "readout_hash": "91e9a546",
+          "physical_readout_hash": "91e9a546",
+          "readout": [
+            "初势能 Ep1140.0 J 末势能 Ep240.0 J 势能变化 ΔEp-100.0 J 重力做功 WG100.0 J 高度差 h1-h25.0 m 参考面 h00.0 m",
+            "物体下降：重力做正功，重力势能减少。"
+          ],
+          "physical_readout": [
+            "初势能 Ep1140.0 J 末势能 Ep240.0 J 势能变化 ΔEp-100.0 J 重力做功 WG100.0 J 高度差 h1-h25.0 m 参考面 h00.0 m",
+            "物体下降：重力做正功，重力势能减少。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "c695b0d9",
+          "readout_hash": "91e9a546",
+          "physical_readout_hash": "91e9a546",
+          "readout": [
+            "初势能 Ep1140.0 J 末势能 Ep240.0 J 势能变化 ΔEp-100.0 J 重力做功 WG100.0 J 高度差 h1-h25.0 m 参考面 h00.0 m",
+            "物体下降：重力做正功，重力势能减少。"
+          ],
+          "physical_readout": [
+            "初势能 Ep1140.0 J 末势能 Ep240.0 J 势能变化 ΔEp-100.0 J 重力做功 WG100.0 J 高度差 h1-h25.0 m 参考面 h00.0 m",
+            "物体下降：重力做正功，重力势能减少。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "941c94f1",
+          "readout_hash": "91e9a546",
+          "physical_readout_hash": "91e9a546",
+          "readout": [
+            "初势能 Ep1140.0 J 末势能 Ep240.0 J 势能变化 ΔEp-100.0 J 重力做功 WG100.0 J 高度差 h1-h25.0 m 参考面 h00.0 m",
+            "物体下降：重力做正功，重力势能减少。"
+          ],
+          "physical_readout": [
+            "初势能 Ep1140.0 J 末势能 Ep240.0 J 势能变化 ΔEp-100.0 J 重力做功 WG100.0 J 高度差 h1-h25.0 m 参考面 h00.0 m",
+            "物体下降：重力做正功，重力势能减少。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "941c94f1",
+          "readout_hash": "91e9a546",
+          "physical_readout_hash": "91e9a546",
+          "readout": [
+            "初势能 Ep1140.0 J 末势能 Ep240.0 J 势能变化 ΔEp-100.0 J 重力做功 WG100.0 J 高度差 h1-h25.0 m 参考面 h00.0 m",
+            "物体下降：重力做正功，重力势能减少。"
+          ],
+          "physical_readout": [
+            "初势能 Ep1140.0 J 末势能 Ep240.0 J 势能变化 ΔEp-100.0 J 重力做功 WG100.0 J 高度差 h1-h25.0 m 参考面 h00.0 m",
+            "物体下降：重力做正功，重力势能减少。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "初势能 Ep# J 末势能 Ep# J 势能变化 ΔEp# J 重力做功 WG# J 高度差 h#-h# m 参考面 h# m|物体下降：重力做正功，重力势能减少。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "初势能 Ep# J 末势能 Ep# J 势能变化 ΔEp# J 重力做功 WG# J 高度差 h#-h# m 参考面 h# m|物体下降：重力做正功，重力势能减少。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx2/motion-composition.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:垂直划",
+          "kind": "initial_condition_retry",
+          "changed": false,
+          "affected_result": false
+        },
+        {
+          "selector": "button:正对到达",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:水更快",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:河更宽",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:垂直划",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:垂直划",
+          "text": "垂直划",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:正对到达",
+          "text": "正对到达",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:水更快",
+          "text": "水更快",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:河更宽",
+          "text": "河更宽",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "24889de2",
+          "readout_hash": "f3772886",
+          "physical_readout_hash": "f3772886",
+          "readout": [
+            "沿河分量 vx2.00 m/s 过河分量 vy4.00 m/s 过河时间 t20.0 s 下游偏移 x40.0 m",
+            "垂直河岸分量决定时间，沿河分量决定偏移。"
+          ],
+          "physical_readout": [
+            "沿河分量 vx2.00 m/s 过河分量 vy4.00 m/s 过河时间 t20.0 s 下游偏移 x40.0 m",
+            "垂直河岸分量决定时间，沿河分量决定偏移。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "4c993d7e",
+          "readout_hash": "f3772886",
+          "physical_readout_hash": "f3772886",
+          "readout": [
+            "沿河分量 vx2.00 m/s 过河分量 vy4.00 m/s 过河时间 t20.0 s 下游偏移 x40.0 m",
+            "垂直河岸分量决定时间，沿河分量决定偏移。"
+          ],
+          "physical_readout": [
+            "沿河分量 vx2.00 m/s 过河分量 vy4.00 m/s 过河时间 t20.0 s 下游偏移 x40.0 m",
+            "垂直河岸分量决定时间，沿河分量决定偏移。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "24889de2",
+          "readout_hash": "f3772886",
+          "physical_readout_hash": "f3772886",
+          "readout": [
+            "沿河分量 vx2.00 m/s 过河分量 vy4.00 m/s 过河时间 t20.0 s 下游偏移 x40.0 m",
+            "垂直河岸分量决定时间，沿河分量决定偏移。"
+          ],
+          "physical_readout": [
+            "沿河分量 vx2.00 m/s 过河分量 vy4.00 m/s 过河时间 t20.0 s 下游偏移 x40.0 m",
+            "垂直河岸分量决定时间，沿河分量决定偏移。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "24889de2",
+          "readout_hash": "f3772886",
+          "physical_readout_hash": "f3772886",
+          "readout": [
+            "沿河分量 vx2.00 m/s 过河分量 vy4.00 m/s 过河时间 t20.0 s 下游偏移 x40.0 m",
+            "垂直河岸分量决定时间，沿河分量决定偏移。"
+          ],
+          "physical_readout": [
+            "沿河分量 vx2.00 m/s 过河分量 vy4.00 m/s 过河时间 t20.0 s 下游偏移 x40.0 m",
+            "垂直河岸分量决定时间，沿河分量决定偏移。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "沿河分量 vx# m/s 过河分量 vy# m/s 过河时间 t# s 下游偏移 x# m|垂直河岸分量决定时间，沿河分量决定偏移。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "沿河分量 vx# m/s 过河分量 vy# m/s 过河时间 t# s 下游偏移 x# m|垂直河岸分量决定时间，沿河分量决定偏移。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx2/oblique-throw.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:45°",
+          "kind": "initial_condition_retry",
+          "changed": false,
+          "affected_result": false
+        },
+        {
+          "selector": "button:类平抛",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:大角度",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:有高度",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:45°",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:45°",
+          "text": "45°",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:类平抛",
+          "text": "类平抛",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:大角度",
+          "text": "大角度",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:有高度",
+          "text": "有高度",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "89265812",
+          "readout_hash": "24e07e3d",
+          "physical_readout_hash": "24e07e3d",
+          "readout": [
+            "水平分量 v0x14.1 m/s 竖直分量 v0y14.1 m/s 飞行时间 T2.83 s 射程 R40.0 m",
+            "最高点只表示 vy=0，水平速度 vx 仍然存在。"
+          ],
+          "physical_readout": [
+            "水平分量 v0x14.1 m/s 竖直分量 v0y14.1 m/s 飞行时间 T2.83 s 射程 R40.0 m",
+            "最高点只表示 vy=0，水平速度 vx 仍然存在。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "55bb7b1",
+          "readout_hash": "24e07e3d",
+          "physical_readout_hash": "24e07e3d",
+          "readout": [
+            "水平分量 v0x14.1 m/s 竖直分量 v0y14.1 m/s 飞行时间 T2.83 s 射程 R40.0 m",
+            "最高点只表示 vy=0，水平速度 vx 仍然存在。"
+          ],
+          "physical_readout": [
+            "水平分量 v0x14.1 m/s 竖直分量 v0y14.1 m/s 飞行时间 T2.83 s 射程 R40.0 m",
+            "最高点只表示 vy=0，水平速度 vx 仍然存在。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "d932a1",
+          "readout_hash": "24e07e3d",
+          "physical_readout_hash": "24e07e3d",
+          "readout": [
+            "水平分量 v0x14.1 m/s 竖直分量 v0y14.1 m/s 飞行时间 T2.83 s 射程 R40.0 m",
+            "最高点只表示 vy=0，水平速度 vx 仍然存在。"
+          ],
+          "physical_readout": [
+            "水平分量 v0x14.1 m/s 竖直分量 v0y14.1 m/s 飞行时间 T2.83 s 射程 R40.0 m",
+            "最高点只表示 vy=0，水平速度 vx 仍然存在。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "d932a1",
+          "readout_hash": "24e07e3d",
+          "physical_readout_hash": "24e07e3d",
+          "readout": [
+            "水平分量 v0x14.1 m/s 竖直分量 v0y14.1 m/s 飞行时间 T2.83 s 射程 R40.0 m",
+            "最高点只表示 vy=0，水平速度 vx 仍然存在。"
+          ],
+          "physical_readout": [
+            "水平分量 v0x14.1 m/s 竖直分量 v0y14.1 m/s 飞行时间 T2.83 s 射程 R40.0 m",
+            "最高点只表示 vy=0，水平速度 vx 仍然存在。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "水平分量 v#x# m/s 竖直分量 v#y# m/s 飞行时间 T# s 射程 R# m|最高点只表示 vy=#，水平速度 vx 仍然存在。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "水平分量 v#x# m/s 竖直分量 v#y# m/s 飞行时间 T# s 射程 R# m|最高点只表示 vy=#，水平速度 vx 仍然存在。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/bx2/work.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:正功",
+          "kind": "initial_condition_retry",
+          "changed": false,
+          "affected_result": false
+        },
+        {
+          "selector": "button:零功",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:负功",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:无位移",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:正功",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:正功",
+          "text": "正功",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:零功",
+          "text": "零功",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:负功",
+          "text": "负功",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:无位移",
+          "text": "无位移",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "c62fb909",
+          "readout_hash": "9b952ce",
+          "physical_readout_hash": "9b952ce",
+          "readout": [
+            "力 F20 N 位移 s5.0 m 夹角 α37° cosα0.80 投影 F∥16.0 N 功 W79.9 J",
+            "正功：F∥ 与位移同向，力在推动物体沿位移方向运动。"
+          ],
+          "physical_readout": [
+            "力 F20 N 位移 s5.0 m 夹角 α37° cosα0.80 投影 F∥16.0 N 功 W79.9 J",
+            "正功：F∥ 与位移同向，力在推动物体沿位移方向运动。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "41411d1d",
+          "readout_hash": "9b952ce",
+          "physical_readout_hash": "9b952ce",
+          "readout": [
+            "力 F20 N 位移 s5.0 m 夹角 α37° cosα0.80 投影 F∥16.0 N 功 W79.9 J",
+            "正功：F∥ 与位移同向，力在推动物体沿位移方向运动。"
+          ],
+          "physical_readout": [
+            "力 F20 N 位移 s5.0 m 夹角 α37° cosα0.80 投影 F∥16.0 N 功 W79.9 J",
+            "正功：F∥ 与位移同向，力在推动物体沿位移方向运动。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "c62fb909",
+          "readout_hash": "9b952ce",
+          "physical_readout_hash": "9b952ce",
+          "readout": [
+            "力 F20 N 位移 s5.0 m 夹角 α37° cosα0.80 投影 F∥16.0 N 功 W79.9 J",
+            "正功：F∥ 与位移同向，力在推动物体沿位移方向运动。"
+          ],
+          "physical_readout": [
+            "力 F20 N 位移 s5.0 m 夹角 α37° cosα0.80 投影 F∥16.0 N 功 W79.9 J",
+            "正功：F∥ 与位移同向，力在推动物体沿位移方向运动。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "c62fb909",
+          "readout_hash": "9b952ce",
+          "physical_readout_hash": "9b952ce",
+          "readout": [
+            "力 F20 N 位移 s5.0 m 夹角 α37° cosα0.80 投影 F∥16.0 N 功 W79.9 J",
+            "正功：F∥ 与位移同向，力在推动物体沿位移方向运动。"
+          ],
+          "physical_readout": [
+            "力 F20 N 位移 s5.0 m 夹角 α37° cosα0.80 投影 F∥16.0 N 功 W79.9 J",
+            "正功：F∥ 与位移同向，力在推动物体沿位移方向运动。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "力 F# N 位移 s# m 夹角 α#° cosα# 投影 F∥# N 功 W# J|正功：F∥ 与位移同向，力在推动物体沿位移方向运动。",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "力 F# N 位移 s# m 夹角 α#° cosα# 投影 F∥# N 功 W# J|正功：F∥ 与位移同向，力在推动物体沿位移方向运动。",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

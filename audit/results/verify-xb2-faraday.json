@@ -1,0 +1,5544 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-11T06:30:55.854Z",
+  "commit": "eb30b19cf78dbb62af23d0567912504d02fe166f",
+  "module": "xb2",
+  "modules": [
+    "xb2"
+  ],
+  "summary": {
+    "total": 22,
+    "score": 100,
+    "pass": 22,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/xb2/ac-generation.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#w",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play-btn",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset-btn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.32
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "reset-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "a8554c1b",
+          "readout_hash": "afc9f209",
+          "physical_readout_hash": "afc9f209",
+          "readout": [
+            "角速度 ω = 2.0 rad/s",
+            "2.0",
+            "角速度 ω = 2.0 rad/s",
+            "法线 n 与 B 夹角 θ = 21°",
+            "瞬时电动势 e = 0.72",
+            "峰值 E_m = 2.00"
+          ],
+          "physical_readout": [
+            "角速度 ω = 2.0 rad/s",
+            "2.0",
+            "角速度 ω = 2.0 rad/s",
+            "法线 n 与 B 夹角 θ = 21°",
+            "瞬时电动势 e = 0.72",
+            "峰值 E_m = 2.00"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "daed4abf",
+          "readout_hash": "9bb15ed1",
+          "physical_readout_hash": "9bb15ed1",
+          "readout": [
+            "角速度 ω = 2.0 rad/s",
+            "2.0",
+            "角速度 ω = 2.0 rad/s",
+            "法线 n 与 B 夹角 θ = 61°",
+            "瞬时电动势 e = 1.75",
+            "峰值 E_m = 2.00"
+          ],
+          "physical_readout": [
+            "角速度 ω = 2.0 rad/s",
+            "2.0",
+            "角速度 ω = 2.0 rad/s",
+            "法线 n 与 B 夹角 θ = 61°",
+            "瞬时电动势 e = 1.75",
+            "峰值 E_m = 2.00"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "1f725270",
+          "readout_hash": "fb696dee",
+          "physical_readout_hash": "fb696dee",
+          "readout": [
+            "角速度 ω = 2.0 rad/s",
+            "2.0",
+            "角速度 ω = 2.0 rad/s",
+            "法线 n 与 B 夹角 θ = 64°",
+            "瞬时电动势 e = 1.80",
+            "峰值 E_m = 2.00"
+          ],
+          "physical_readout": [
+            "角速度 ω = 2.0 rad/s",
+            "2.0",
+            "角速度 ω = 2.0 rad/s",
+            "法线 n 与 B 夹角 θ = 64°",
+            "瞬时电动势 e = 1.80",
+            "峰值 E_m = 2.00"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "1f725270",
+          "readout_hash": "fb696dee",
+          "physical_readout_hash": "fb696dee",
+          "readout": [
+            "角速度 ω = 2.0 rad/s",
+            "2.0",
+            "角速度 ω = 2.0 rad/s",
+            "法线 n 与 B 夹角 θ = 64°",
+            "瞬时电动势 e = 1.80",
+            "峰值 E_m = 2.00"
+          ],
+          "physical_readout": [
+            "角速度 ω = 2.0 rad/s",
+            "2.0",
+            "角速度 ω = 2.0 rad/s",
+            "法线 n 与 B 夹角 θ = 64°",
+            "瞬时电动势 e = 1.80",
+            "峰值 E_m = 2.00"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "角速度 ω = # rad/s|#|角速度 ω = # rad/s|法线 n 与 B 夹角 θ = #°|瞬时电动势 e = #|峰值 E_m = #",
+          "controls": [
+            {
+              "id": "w",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "角速度 ω = # rad/s|#|角速度 ω = # rad/s|法线 n 与 B 夹角 θ = #°|瞬时电动势 e = #|峰值 E_m = #",
+          "controls": [
+            {
+              "id": "w",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb2/ac-values.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#umr",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#rr",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play-btn",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset-btn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "reset-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "5fae860d",
+          "readout_hash": "13f07c2d",
+          "physical_readout_hash": "79a748ce",
+          "readout": [
+            "峰值 Uₘ = 311 V",
+            "电阻 R = 10 Ω",
+            "峰值 Uₘ = 311 V",
+            "有效值 U = 220 V",
+            "瞬时值 u = 80 V",
+            "半周期平均值 = 198 V",
+            "功率 P = 4836 W",
+            "状态：暂停：拖红点读数"
+          ],
+          "physical_readout": [
+            "峰值 Uₘ = 311 V",
+            "电阻 R = 10 Ω",
+            "峰值 Uₘ = 311 V",
+            "有效值 U = 220 V",
+            "瞬时值 u = 80 V",
+            "半周期平均值 = 198 V",
+            "功率 P = 4836 W",
+            "：拖红点读数"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "619ea7cd",
+          "readout_hash": "d59b49d9",
+          "physical_readout_hash": "d59b49d9",
+          "readout": [
+            "峰值 Uₘ = 311 V",
+            "电阻 R = 10 Ω",
+            "峰值 Uₘ = 311 V",
+            "有效值 U = 220 V",
+            "瞬时值 u = 228 V",
+            "半周期平均值 = 198 V",
+            "功率 P = 4836 W",
+            "状态：自动扫相位"
+          ],
+          "physical_readout": [
+            "峰值 Uₘ = 311 V",
+            "电阻 R = 10 Ω",
+            "峰值 Uₘ = 311 V",
+            "有效值 U = 220 V",
+            "瞬时值 u = 228 V",
+            "半周期平均值 = 198 V",
+            "功率 P = 4836 W",
+            "状态：自动扫相位"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "1f9e481a",
+          "readout_hash": "ac53f07a",
+          "physical_readout_hash": "a6f469f7",
+          "readout": [
+            "峰值 Uₘ = 311 V",
+            "电阻 R = 10 Ω",
+            "峰值 Uₘ = 311 V",
+            "有效值 U = 220 V",
+            "瞬时值 u = 236 V",
+            "半周期平均值 = 198 V",
+            "功率 P = 4836 W",
+            "状态：暂停：拖红点读数"
+          ],
+          "physical_readout": [
+            "峰值 Uₘ = 311 V",
+            "电阻 R = 10 Ω",
+            "峰值 Uₘ = 311 V",
+            "有效值 U = 220 V",
+            "瞬时值 u = 236 V",
+            "半周期平均值 = 198 V",
+            "功率 P = 4836 W",
+            "：拖红点读数"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "1f9e481a",
+          "readout_hash": "ac53f07a",
+          "physical_readout_hash": "a6f469f7",
+          "readout": [
+            "峰值 Uₘ = 311 V",
+            "电阻 R = 10 Ω",
+            "峰值 Uₘ = 311 V",
+            "有效值 U = 220 V",
+            "瞬时值 u = 236 V",
+            "半周期平均值 = 198 V",
+            "功率 P = 4836 W",
+            "状态：暂停：拖红点读数"
+          ],
+          "physical_readout": [
+            "峰值 Uₘ = 311 V",
+            "电阻 R = 10 Ω",
+            "峰值 Uₘ = 311 V",
+            "有效值 U = 220 V",
+            "瞬时值 u = 236 V",
+            "半周期平均值 = 198 V",
+            "功率 P = 4836 W",
+            "：拖红点读数"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "峰值 Uₘ = # V|电阻 R = # Ω|峰值 Uₘ = # V|有效值 U = # V|瞬时值 u = # V|半周期平均值 = # V|功率 P = # W|状态：暂停：拖红点读数",
+          "controls": [
+            {
+              "id": "umr",
+              "value": "311",
+              "checked": false
+            },
+            {
+              "id": "rr",
+              "value": "10",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "峰值 Uₘ = # V|电阻 R = # Ω|峰值 Uₘ = # V|有效值 U = # V|瞬时值 u = # V|半周期平均值 = # V|功率 P = # W|状态：暂停：拖红点读数",
+          "controls": [
+            {
+              "id": "umr",
+              "value": "311",
+              "checked": false
+            },
+            {
+              "id": "rr",
+              "value": "10",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb2/ampere-force.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#b",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#i",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#l",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#th",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play-btn",
+          "text": "暂停电流",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset-btn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.5
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停电流"
+      },
+      "reset_button": {
+        "id": "reset-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "15bded4d",
+          "readout_hash": "adbd569f",
+          "physical_readout_hash": "78d85d85",
+          "readout": [
+            "B 强度 = 0.50 T",
+            "0.50",
+            "电流 I = 4.0 A",
+            "4.0",
+            "导线长 L = 0.5 m",
+            "0.5",
+            "夹角 θ = 90°",
+            "90",
+            "B = 0.50 T",
+            "I = 4.0 A",
+            "L = 0.5 m",
+            "θ = 90°",
+            "测力计 F = 1.000 N",
+            "方向：指向纸内 ⊗",
+            "通过截面的电荷 Q = 0.63 C",
+            "演示时间：0.16 s"
+          ],
+          "physical_readout": [
+            "B 强度 = 0.50 T",
+            "0.50",
+            "电流 I = 4.0 A",
+            "4.0",
+            "导线长 L = 0.5 m",
+            "0.5",
+            "夹角 θ = 90°",
+            "90",
+            "B = 0.50 T",
+            "I = 4.0 A",
+            "L = 0.5 m",
+            "θ = 90°",
+            "测力计 F = 1.000 N",
+            "方向：指向纸内 ⊗",
+            "通过截面的电荷 Q = 0.63 C"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "15bded4d",
+          "readout_hash": "90aa5f8e",
+          "physical_readout_hash": "96196591",
+          "readout": [
+            "B 强度 = 0.50 T",
+            "0.50",
+            "电流 I = 4.0 A",
+            "4.0",
+            "导线长 L = 0.5 m",
+            "0.5",
+            "夹角 θ = 90°",
+            "90",
+            "B = 0.50 T",
+            "I = 4.0 A",
+            "L = 0.5 m",
+            "θ = 90°",
+            "测力计 F = 1.000 N",
+            "方向：指向纸内 ⊗",
+            "通过截面的电荷 Q = 2.03 C",
+            "演示时间：0.51 s"
+          ],
+          "physical_readout": [
+            "B 强度 = 0.50 T",
+            "0.50",
+            "电流 I = 4.0 A",
+            "4.0",
+            "导线长 L = 0.5 m",
+            "0.5",
+            "夹角 θ = 90°",
+            "90",
+            "B = 0.50 T",
+            "I = 4.0 A",
+            "L = 0.5 m",
+            "θ = 90°",
+            "测力计 F = 1.000 N",
+            "方向：指向纸内 ⊗",
+            "通过截面的电荷 Q = 2.03 C"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": false,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "15bded4d",
+          "readout_hash": "879c283",
+          "physical_readout_hash": "df77a9c1",
+          "readout": [
+            "B 强度 = 0.50 T",
+            "0.50",
+            "电流 I = 4.0 A",
+            "4.0",
+            "导线长 L = 0.5 m",
+            "0.5",
+            "夹角 θ = 90°",
+            "90",
+            "B = 0.50 T",
+            "I = 4.0 A",
+            "L = 0.5 m",
+            "θ = 90°",
+            "测力计 F = 1.000 N",
+            "方向：指向纸内 ⊗",
+            "通过截面的电荷 Q = 2.10 C",
+            "演示时间：0.52 s"
+          ],
+          "physical_readout": [
+            "B 强度 = 0.50 T",
+            "0.50",
+            "电流 I = 4.0 A",
+            "4.0",
+            "导线长 L = 0.5 m",
+            "0.5",
+            "夹角 θ = 90°",
+            "90",
+            "B = 0.50 T",
+            "I = 4.0 A",
+            "L = 0.5 m",
+            "θ = 90°",
+            "测力计 F = 1.000 N",
+            "方向：指向纸内 ⊗",
+            "通过截面的电荷 Q = 2.10 C"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "15bded4d",
+          "readout_hash": "879c283",
+          "physical_readout_hash": "df77a9c1",
+          "readout": [
+            "B 强度 = 0.50 T",
+            "0.50",
+            "电流 I = 4.0 A",
+            "4.0",
+            "导线长 L = 0.5 m",
+            "0.5",
+            "夹角 θ = 90°",
+            "90",
+            "B = 0.50 T",
+            "I = 4.0 A",
+            "L = 0.5 m",
+            "θ = 90°",
+            "测力计 F = 1.000 N",
+            "方向：指向纸内 ⊗",
+            "通过截面的电荷 Q = 2.10 C",
+            "演示时间：0.52 s"
+          ],
+          "physical_readout": [
+            "B 强度 = 0.50 T",
+            "0.50",
+            "电流 I = 4.0 A",
+            "4.0",
+            "导线长 L = 0.5 m",
+            "0.5",
+            "夹角 θ = 90°",
+            "90",
+            "B = 0.50 T",
+            "I = 4.0 A",
+            "L = 0.5 m",
+            "θ = 90°",
+            "测力计 F = 1.000 N",
+            "方向：指向纸内 ⊗",
+            "通过截面的电荷 Q = 2.10 C"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "B 强度 = # T|#|电流 I = # A|#|导线长 L = # m|#|夹角 θ = #°|#|B = # T|I = # A|L = # m|θ = #°|测力计 F = # N|方向：指向纸内 ⊗|通过截面的电荷 Q = # C|演示时间：# s",
+          "controls": [
+            {
+              "id": "b",
+              "value": "0.5",
+              "checked": false
+            },
+            {
+              "id": "i",
+              "value": "4",
+              "checked": false
+            },
+            {
+              "id": "l",
+              "value": "0.5",
+              "checked": false
+            },
+            {
+              "id": "th",
+              "value": "90",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "B 强度 = # T|#|电流 I = # A|#|导线长 L = # m|#|夹角 θ = #°|#|B = # T|I = # A|L = # m|θ = #°|测力计 F = # N|方向：指向纸内 ⊗|通过截面的电荷 Q = # C|演示时间：# s",
+          "controls": [
+            {
+              "id": "b",
+              "value": "0.5",
+              "checked": false
+            },
+            {
+              "id": "i",
+              "value": "4",
+              "checked": false
+            },
+            {
+              "id": "l",
+              "value": "0.5",
+              "checked": false
+            },
+            {
+              "id": "th",
+              "value": "90",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb2/eddy-current.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#b",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#v",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#rho",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#slot",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:金属盘",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:电磁驱动",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录读数",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:铜管阻尼",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "暂停演示",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:铜管阻尼",
+          "text": "铜管阻尼",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:金属盘",
+          "text": "金属盘",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:电磁驱动",
+          "text": "电磁驱动",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#record",
+          "text": "记录读数",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停演示"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "33d7bbff",
+          "readout_hash": "a0fdd34a",
+          "physical_readout_hash": "a0fdd34a",
+          "readout": [
+            "磁场 B 0.80 T",
+            "0.80 T",
+            "速度 v 1.6 m/s",
+            "1.6 m/s",
+            "电阻率 ρ 低",
+            "低",
+            "开槽程度 0%",
+            "0%",
+            "涡流强度：1.28阻尼系数：37%热效应：79%方向判断：阻碍磁通量变化",
+            "铜管1.337%79%",
+            "闭合金属内部形成环形涡流，安培力按楞次定律阻碍相对运动。"
+          ],
+          "physical_readout": [
+            "磁场 B 0.80 T",
+            "0.80 T",
+            "速度 v 1.6 m/s",
+            "1.6 m/s",
+            "电阻率 ρ 低",
+            "低",
+            "开槽程度 0%",
+            "0%",
+            "涡流强度：1.28阻尼系数：37%热效应：79%方向判断：阻碍磁通量变化",
+            "铜管1.337%79%",
+            "闭合金属内部形成环形涡流，安培力按楞次定律阻碍相对运动。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "b991ebd5",
+          "readout_hash": "a0fdd34a",
+          "physical_readout_hash": "a0fdd34a",
+          "readout": [
+            "磁场 B 0.80 T",
+            "0.80 T",
+            "速度 v 1.6 m/s",
+            "1.6 m/s",
+            "电阻率 ρ 低",
+            "低",
+            "开槽程度 0%",
+            "0%",
+            "涡流强度：1.28阻尼系数：37%热效应：79%方向判断：阻碍磁通量变化",
+            "铜管1.337%79%",
+            "闭合金属内部形成环形涡流，安培力按楞次定律阻碍相对运动。"
+          ],
+          "physical_readout": [
+            "磁场 B 0.80 T",
+            "0.80 T",
+            "速度 v 1.6 m/s",
+            "1.6 m/s",
+            "电阻率 ρ 低",
+            "低",
+            "开槽程度 0%",
+            "0%",
+            "涡流强度：1.28阻尼系数：37%热效应：79%方向判断：阻碍磁通量变化",
+            "铜管1.337%79%",
+            "闭合金属内部形成环形涡流，安培力按楞次定律阻碍相对运动。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "b8ef4980",
+          "readout_hash": "a0fdd34a",
+          "physical_readout_hash": "a0fdd34a",
+          "readout": [
+            "磁场 B 0.80 T",
+            "0.80 T",
+            "速度 v 1.6 m/s",
+            "1.6 m/s",
+            "电阻率 ρ 低",
+            "低",
+            "开槽程度 0%",
+            "0%",
+            "涡流强度：1.28阻尼系数：37%热效应：79%方向判断：阻碍磁通量变化",
+            "铜管1.337%79%",
+            "闭合金属内部形成环形涡流，安培力按楞次定律阻碍相对运动。"
+          ],
+          "physical_readout": [
+            "磁场 B 0.80 T",
+            "0.80 T",
+            "速度 v 1.6 m/s",
+            "1.6 m/s",
+            "电阻率 ρ 低",
+            "低",
+            "开槽程度 0%",
+            "0%",
+            "涡流强度：1.28阻尼系数：37%热效应：79%方向判断：阻碍磁通量变化",
+            "铜管1.337%79%",
+            "闭合金属内部形成环形涡流，安培力按楞次定律阻碍相对运动。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "b8ef4980",
+          "readout_hash": "a0fdd34a",
+          "physical_readout_hash": "a0fdd34a",
+          "readout": [
+            "磁场 B 0.80 T",
+            "0.80 T",
+            "速度 v 1.6 m/s",
+            "1.6 m/s",
+            "电阻率 ρ 低",
+            "低",
+            "开槽程度 0%",
+            "0%",
+            "涡流强度：1.28阻尼系数：37%热效应：79%方向判断：阻碍磁通量变化",
+            "铜管1.337%79%",
+            "闭合金属内部形成环形涡流，安培力按楞次定律阻碍相对运动。"
+          ],
+          "physical_readout": [
+            "磁场 B 0.80 T",
+            "0.80 T",
+            "速度 v 1.6 m/s",
+            "1.6 m/s",
+            "电阻率 ρ 低",
+            "低",
+            "开槽程度 0%",
+            "0%",
+            "涡流强度：1.28阻尼系数：37%热效应：79%方向判断：阻碍磁通量变化",
+            "铜管1.337%79%",
+            "闭合金属内部形成环形涡流，安培力按楞次定律阻碍相对运动。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "磁场 B # T|# T|速度 v # m/s|# m/s|电阻率 ρ 低|低|开槽程度 #%|#%|涡流强度：#阻尼系数：#%热效应：#%方向判断：阻碍磁通量变化|闭合金属内部形成环形涡流，安培力按楞次定律阻碍相对运动。",
+          "controls": [
+            {
+              "id": "b",
+              "value": "0.8",
+              "checked": false
+            },
+            {
+              "id": "v",
+              "value": "1.6",
+              "checked": false
+            },
+            {
+              "id": "rho",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "slot",
+              "value": "0",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "磁场 B # T|# T|速度 v # m/s|# m/s|电阻率 ρ 低|低|开槽程度 #%|#%|涡流强度：#阻尼系数：#%热效应：#%方向判断：阻碍磁通量变化|闭合金属内部形成环形涡流，安培力按楞次定律阻碍相对运动。",
+          "controls": [
+            {
+              "id": "b",
+              "value": "0.8",
+              "checked": false
+            },
+            {
+              "id": "v",
+              "value": "1.6",
+              "checked": false
+            },
+            {
+              "id": "rho",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "slot",
+              "value": "0",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb2/em-spectrum.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#logf",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录当前波段",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "暂停演示",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录当前波段",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停演示"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "957c15b2",
+          "readout_hash": "af356d1f",
+          "physical_readout_hash": "af356d1f",
+          "readout": [
+            "频率指数 log₁₀f 8.0",
+            "8.0",
+            "波段：无线电频率 f：1.00×10^8 Hz波长 λ：3.00×10^0 m光子能量：4.14e-7 eV",
+            "无线电3.00×10^04.1e-7",
+            "无线电：典型应用是通信、广播；防护要点：一般防护。"
+          ],
+          "physical_readout": [
+            "频率指数 log₁₀f 8.0",
+            "8.0",
+            "波段：无线电频率 f：1.00×10^8 Hz波长 λ：3.00×10^0 m光子能量：4.14e-7 eV",
+            "无线电3.00×10^04.1e-7",
+            "无线电：典型应用是通信、广播；防护要点：一般防护。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "736a5cd3",
+          "readout_hash": "af356d1f",
+          "physical_readout_hash": "af356d1f",
+          "readout": [
+            "频率指数 log₁₀f 8.0",
+            "8.0",
+            "波段：无线电频率 f：1.00×10^8 Hz波长 λ：3.00×10^0 m光子能量：4.14e-7 eV",
+            "无线电3.00×10^04.1e-7",
+            "无线电：典型应用是通信、广播；防护要点：一般防护。"
+          ],
+          "physical_readout": [
+            "频率指数 log₁₀f 8.0",
+            "8.0",
+            "波段：无线电频率 f：1.00×10^8 Hz波长 λ：3.00×10^0 m光子能量：4.14e-7 eV",
+            "无线电3.00×10^04.1e-7",
+            "无线电：典型应用是通信、广播；防护要点：一般防护。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "92b7c85a",
+          "readout_hash": "af356d1f",
+          "physical_readout_hash": "af356d1f",
+          "readout": [
+            "频率指数 log₁₀f 8.0",
+            "8.0",
+            "波段：无线电频率 f：1.00×10^8 Hz波长 λ：3.00×10^0 m光子能量：4.14e-7 eV",
+            "无线电3.00×10^04.1e-7",
+            "无线电：典型应用是通信、广播；防护要点：一般防护。"
+          ],
+          "physical_readout": [
+            "频率指数 log₁₀f 8.0",
+            "8.0",
+            "波段：无线电频率 f：1.00×10^8 Hz波长 λ：3.00×10^0 m光子能量：4.14e-7 eV",
+            "无线电3.00×10^04.1e-7",
+            "无线电：典型应用是通信、广播；防护要点：一般防护。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "92b7c85a",
+          "readout_hash": "af356d1f",
+          "physical_readout_hash": "af356d1f",
+          "readout": [
+            "频率指数 log₁₀f 8.0",
+            "8.0",
+            "波段：无线电频率 f：1.00×10^8 Hz波长 λ：3.00×10^0 m光子能量：4.14e-7 eV",
+            "无线电3.00×10^04.1e-7",
+            "无线电：典型应用是通信、广播；防护要点：一般防护。"
+          ],
+          "physical_readout": [
+            "频率指数 log₁₀f 8.0",
+            "8.0",
+            "波段：无线电频率 f：1.00×10^8 Hz波长 λ：3.00×10^0 m光子能量：4.14e-7 eV",
+            "无线电3.00×10^04.1e-7",
+            "无线电：典型应用是通信、广播；防护要点：一般防护。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "频率指数 log₁₀f #|#|波段：无线电频率 f：#×#^# Hz波长 λ：#×#^# m光子能量：#e# eV|无线电：典型应用是通信、广播；防护要点：一般防护。",
+          "controls": [
+            {
+              "id": "logf",
+              "value": "8",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "频率指数 log₁₀f #|#|波段：无线电频率 f：#×#^# Hz波长 λ：#×#^# m光子能量：#e# eV|无线电：典型应用是通信、广播；防护要点：一般防护。",
+          "controls": [
+            {
+              "id": "logf",
+              "value": "8",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb2/em-wave-transmission.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#carrier",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#tune",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#mod",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#dist",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录状态",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录状态",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "a490ad21",
+          "readout_hash": "82bde1fe",
+          "physical_readout_hash": "82bde1fe",
+          "readout": [
+            "载波频率 f₀ 100 MHz",
+            "100 MHz",
+            "调谐频率 fᵣ 98 MHz",
+            "98 MHz",
+            "调制深度 60%",
+            "60%",
+            "距离 d 20 km",
+            "20 km",
+            "波长 λ：3.00 m传播延迟：0.067 ms频差 |f₀-fᵣ|：2 MHz接收强度：69%",
+            "1009869%成功",
+            "调谐接近载波频率，接收强，解调输出清晰。"
+          ],
+          "physical_readout": [
+            "载波频率 f₀ 100 MHz",
+            "100 MHz",
+            "调谐频率 fᵣ 98 MHz",
+            "98 MHz",
+            "调制深度 60%",
+            "60%",
+            "距离 d 20 km",
+            "20 km",
+            "波长 λ：3.00 m传播延迟：0.067 ms频差 |f₀-fᵣ|：2 MHz接收强度：69%",
+            "1009869%成功",
+            "调谐接近载波频率，接收强，解调输出清晰。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "160828fa",
+          "readout_hash": "82bde1fe",
+          "physical_readout_hash": "82bde1fe",
+          "readout": [
+            "载波频率 f₀ 100 MHz",
+            "100 MHz",
+            "调谐频率 fᵣ 98 MHz",
+            "98 MHz",
+            "调制深度 60%",
+            "60%",
+            "距离 d 20 km",
+            "20 km",
+            "波长 λ：3.00 m传播延迟：0.067 ms频差 |f₀-fᵣ|：2 MHz接收强度：69%",
+            "1009869%成功",
+            "调谐接近载波频率，接收强，解调输出清晰。"
+          ],
+          "physical_readout": [
+            "载波频率 f₀ 100 MHz",
+            "100 MHz",
+            "调谐频率 fᵣ 98 MHz",
+            "98 MHz",
+            "调制深度 60%",
+            "60%",
+            "距离 d 20 km",
+            "20 km",
+            "波长 λ：3.00 m传播延迟：0.067 ms频差 |f₀-fᵣ|：2 MHz接收强度：69%",
+            "1009869%成功",
+            "调谐接近载波频率，接收强，解调输出清晰。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "9aed3181",
+          "readout_hash": "82bde1fe",
+          "physical_readout_hash": "82bde1fe",
+          "readout": [
+            "载波频率 f₀ 100 MHz",
+            "100 MHz",
+            "调谐频率 fᵣ 98 MHz",
+            "98 MHz",
+            "调制深度 60%",
+            "60%",
+            "距离 d 20 km",
+            "20 km",
+            "波长 λ：3.00 m传播延迟：0.067 ms频差 |f₀-fᵣ|：2 MHz接收强度：69%",
+            "1009869%成功",
+            "调谐接近载波频率，接收强，解调输出清晰。"
+          ],
+          "physical_readout": [
+            "载波频率 f₀ 100 MHz",
+            "100 MHz",
+            "调谐频率 fᵣ 98 MHz",
+            "98 MHz",
+            "调制深度 60%",
+            "60%",
+            "距离 d 20 km",
+            "20 km",
+            "波长 λ：3.00 m传播延迟：0.067 ms频差 |f₀-fᵣ|：2 MHz接收强度：69%",
+            "1009869%成功",
+            "调谐接近载波频率，接收强，解调输出清晰。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "9aed3181",
+          "readout_hash": "82bde1fe",
+          "physical_readout_hash": "82bde1fe",
+          "readout": [
+            "载波频率 f₀ 100 MHz",
+            "100 MHz",
+            "调谐频率 fᵣ 98 MHz",
+            "98 MHz",
+            "调制深度 60%",
+            "60%",
+            "距离 d 20 km",
+            "20 km",
+            "波长 λ：3.00 m传播延迟：0.067 ms频差 |f₀-fᵣ|：2 MHz接收强度：69%",
+            "1009869%成功",
+            "调谐接近载波频率，接收强，解调输出清晰。"
+          ],
+          "physical_readout": [
+            "载波频率 f₀ 100 MHz",
+            "100 MHz",
+            "调谐频率 fᵣ 98 MHz",
+            "98 MHz",
+            "调制深度 60%",
+            "60%",
+            "距离 d 20 km",
+            "20 km",
+            "波长 λ：3.00 m传播延迟：0.067 ms频差 |f₀-fᵣ|：2 MHz接收强度：69%",
+            "1009869%成功",
+            "调谐接近载波频率，接收强，解调输出清晰。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "载波频率 f₀ # MHz|# MHz|调谐频率 fᵣ # MHz|# MHz|调制深度 #%|#%|距离 d # km|# km|波长 λ：# m传播延迟：# ms频差 |f₀-fᵣ|：# MHz接收强度：#%|调谐接近载波频率，接收强，解调输出清晰。",
+          "controls": [
+            {
+              "id": "carrier",
+              "value": "100",
+              "checked": false
+            },
+            {
+              "id": "tune",
+              "value": "98",
+              "checked": false
+            },
+            {
+              "id": "mod",
+              "value": "60",
+              "checked": false
+            },
+            {
+              "id": "dist",
+              "value": "20",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "载波频率 f₀ # MHz|# MHz|调谐频率 fᵣ # MHz|# MHz|调制深度 #%|#%|距离 d # km|# km|波长 λ：# m传播延迟：# ms频差 |f₀-fᵣ|：# MHz接收强度：#%|调谐接近载波频率，接收强，解调输出清晰。",
+          "controls": [
+            {
+              "id": "carrier",
+              "value": "100",
+              "checked": false
+            },
+            {
+              "id": "tune",
+              "value": "98",
+              "checked": false
+            },
+            {
+              "id": "mod",
+              "value": "60",
+              "checked": false
+            },
+            {
+              "id": "dist",
+              "value": "20",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb2/faraday-law.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#b",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#angle",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#area",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#turns",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#speed",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:停住看 E=0",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play-b",
+          "text": "▶ 自动改变 B",
+          "role": "other",
+          "checked": null,
+          "worked": null
+        },
+        {
+          "selector": "#play-angle",
+          "text": "▶ 自动转动线圈",
+          "role": "other",
+          "checked": null,
+          "worked": null
+        },
+        {
+          "selector": "#freeze",
+          "text": "停住看 E=0",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#playBtn",
+          "text": "暂停演示",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": true,
+        "auditReset": false,
+        "text": "暂停演示"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "55a5893e",
+          "readout_hash": "133e8d7",
+          "physical_readout_hash": "133e8d7",
+          "readout": [
+            "磁场 B = 0.55 T",
+            "0.55",
+            "法线夹角 θ = 35°",
+            "35",
+            "面积 A = 0.70 m²",
+            "0.70",
+            "匝数 n = 3",
+            "3",
+            "变化速度 = 3",
+            "3",
+            "Φ = 0.32 Wb",
+            "|ΔΦ/Δt| = 0.000",
+            "E = n|ΔΦ/Δt| = 0.00 V",
+            "n = 3 匝",
+            "状态：已冻结：Φ 不变，E=0"
+          ],
+          "physical_readout": [
+            "磁场 B = 0.55 T",
+            "0.55",
+            "法线夹角 θ = 35°",
+            "35",
+            "面积 A = 0.70 m²",
+            "0.70",
+            "匝数 n = 3",
+            "3",
+            "变化速度 = 3",
+            "3",
+            "Φ = 0.32 Wb",
+            "|ΔΦ/Δt| = 0.000",
+            "E = n|ΔΦ/Δt| = 0.00 V",
+            "n = 3 匝",
+            "状态：已冻结：Φ 不变，E=0"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "2cfb8cd2",
+          "readout_hash": "133e8d7",
+          "physical_readout_hash": "133e8d7",
+          "readout": [
+            "磁场 B = 0.55 T",
+            "0.55",
+            "法线夹角 θ = 35°",
+            "35",
+            "面积 A = 0.70 m²",
+            "0.70",
+            "匝数 n = 3",
+            "3",
+            "变化速度 = 3",
+            "3",
+            "Φ = 0.32 Wb",
+            "|ΔΦ/Δt| = 0.000",
+            "E = n|ΔΦ/Δt| = 0.00 V",
+            "n = 3 匝",
+            "状态：已冻结：Φ 不变，E=0"
+          ],
+          "physical_readout": [
+            "磁场 B = 0.55 T",
+            "0.55",
+            "法线夹角 θ = 35°",
+            "35",
+            "面积 A = 0.70 m²",
+            "0.70",
+            "匝数 n = 3",
+            "3",
+            "变化速度 = 3",
+            "3",
+            "Φ = 0.32 Wb",
+            "|ΔΦ/Δt| = 0.000",
+            "E = n|ΔΦ/Δt| = 0.00 V",
+            "n = 3 匝",
+            "状态：已冻结：Φ 不变，E=0"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "2cfb8cd2",
+          "readout_hash": "133e8d7",
+          "physical_readout_hash": "133e8d7",
+          "readout": [
+            "磁场 B = 0.55 T",
+            "0.55",
+            "法线夹角 θ = 35°",
+            "35",
+            "面积 A = 0.70 m²",
+            "0.70",
+            "匝数 n = 3",
+            "3",
+            "变化速度 = 3",
+            "3",
+            "Φ = 0.32 Wb",
+            "|ΔΦ/Δt| = 0.000",
+            "E = n|ΔΦ/Δt| = 0.00 V",
+            "n = 3 匝",
+            "状态：已冻结：Φ 不变，E=0"
+          ],
+          "physical_readout": [
+            "磁场 B = 0.55 T",
+            "0.55",
+            "法线夹角 θ = 35°",
+            "35",
+            "面积 A = 0.70 m²",
+            "0.70",
+            "匝数 n = 3",
+            "3",
+            "变化速度 = 3",
+            "3",
+            "Φ = 0.32 Wb",
+            "|ΔΦ/Δt| = 0.000",
+            "E = n|ΔΦ/Δt| = 0.00 V",
+            "n = 3 匝",
+            "状态：已冻结：Φ 不变，E=0"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "2cfb8cd2",
+          "readout_hash": "133e8d7",
+          "physical_readout_hash": "133e8d7",
+          "readout": [
+            "磁场 B = 0.55 T",
+            "0.55",
+            "法线夹角 θ = 35°",
+            "35",
+            "面积 A = 0.70 m²",
+            "0.70",
+            "匝数 n = 3",
+            "3",
+            "变化速度 = 3",
+            "3",
+            "Φ = 0.32 Wb",
+            "|ΔΦ/Δt| = 0.000",
+            "E = n|ΔΦ/Δt| = 0.00 V",
+            "n = 3 匝",
+            "状态：已冻结：Φ 不变，E=0"
+          ],
+          "physical_readout": [
+            "磁场 B = 0.55 T",
+            "0.55",
+            "法线夹角 θ = 35°",
+            "35",
+            "面积 A = 0.70 m²",
+            "0.70",
+            "匝数 n = 3",
+            "3",
+            "变化速度 = 3",
+            "3",
+            "Φ = 0.32 Wb",
+            "|ΔΦ/Δt| = 0.000",
+            "E = n|ΔΦ/Δt| = 0.00 V",
+            "n = 3 匝",
+            "状态：已冻结：Φ 不变，E=0"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "磁场 B = # T|#|法线夹角 θ = #°|#|面积 A = # m²|#|匝数 n = #|#|变化速度 = #|#|Φ = # Wb||ΔΦ/Δt| = #|E = n|ΔΦ/Δt| = # V|n = # 匝|状态：已冻结：Φ 不变，E=#",
+          "controls": [
+            {
+              "id": "b",
+              "value": "55",
+              "checked": false
+            },
+            {
+              "id": "angle",
+              "value": "35",
+              "checked": false
+            },
+            {
+              "id": "area",
+              "value": "70",
+              "checked": false
+            },
+            {
+              "id": "turns",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "speed",
+              "value": "3",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "磁场 B = # T|#|法线夹角 θ = #°|#|面积 A = # m²|#|匝数 n = #|#|变化速度 = #|#|Φ = # Wb||ΔΦ/Δt| = #|E = n|ΔΦ/Δt| = # V|n = # 匝|状态：已冻结：Φ 不变，E=#",
+          "controls": [
+            {
+              "id": "b",
+              "value": "55",
+              "checked": false
+            },
+            {
+              "id": "angle",
+              "value": "35",
+              "checked": false
+            },
+            {
+              "id": "area",
+              "value": "70",
+              "checked": false
+            },
+            {
+              "id": "turns",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "speed",
+              "value": "3",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb2/generator-motor.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#b",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#w",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#i",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#load",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:电动机",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录状态",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:发电机",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#gen",
+          "text": "发电机",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#mot",
+          "text": "电动机",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录状态",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "4fade650",
+          "readout_hash": "503b4c3b",
+          "physical_readout_hash": "503b4c3b",
+          "readout": [
+            "磁感应强度 B 0.60 T",
+            "0.60 T",
+            "角速度 ω 2.0 rad/s",
+            "2.0 rad/s",
+            "线圈电流 I 4.0 A",
+            "4.0 A",
+            "负载/阻力 45%",
+            "45%",
+            "峰值电动势 Eₘ：2.88 V瞬时电动势 e：0.00 V相位 θ：0.00 rad当前线圈电流 I：4.0 A（切换电动机观察安培力）负载后输出：0.00判据：ω、B 越大，Eₘ 越大",
+            "发电0.602.00.0",
+            "发电机把外力做功输入的机械能，经电磁感应转化为电能。"
+          ],
+          "physical_readout": [
+            "磁感应强度 B 0.60 T",
+            "0.60 T",
+            "角速度 ω 2.0 rad/s",
+            "2.0 rad/s",
+            "线圈电流 I 4.0 A",
+            "4.0 A",
+            "负载/阻力 45%",
+            "45%",
+            "峰值电动势 Eₘ：2.88 V瞬时电动势 e：0.00 V相位 θ：0.00 rad当前线圈电流 I：4.0 A（切换电动机观察安培力）负载后输出：0.00判据：ω、B 越大，Eₘ 越大",
+            "发电0.602.00.0",
+            "发电机把外力做功输入的机械能，经电磁感应转化为电能。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "76b9b7c1",
+          "readout_hash": "b8fb0b2",
+          "physical_readout_hash": "b8fb0b2",
+          "readout": [
+            "磁感应强度 B 0.60 T",
+            "0.60 T",
+            "角速度 ω 2.0 rad/s",
+            "2.0 rad/s",
+            "线圈电流 I 4.0 A",
+            "4.0 A",
+            "负载/阻力 45%",
+            "45%",
+            "峰值电动势 Eₘ：2.88 V瞬时电动势 e：1.86 V相位 θ：0.70 rad当前线圈电流 I：4.0 A（切换电动机观察安培力）负载后输出：1.48判据：ω、B 越大，Eₘ 越大",
+            "发电0.602.00.0",
+            "发电机把外力做功输入的机械能，经电磁感应转化为电能。"
+          ],
+          "physical_readout": [
+            "磁感应强度 B 0.60 T",
+            "0.60 T",
+            "角速度 ω 2.0 rad/s",
+            "2.0 rad/s",
+            "线圈电流 I 4.0 A",
+            "4.0 A",
+            "负载/阻力 45%",
+            "45%",
+            "峰值电动势 Eₘ：2.88 V瞬时电动势 e：1.86 V相位 θ：0.70 rad当前线圈电流 I：4.0 A（切换电动机观察安培力）负载后输出：1.48判据：ω、B 越大，Eₘ 越大",
+            "发电0.602.00.0",
+            "发电机把外力做功输入的机械能，经电磁感应转化为电能。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "713f9dfa",
+          "readout_hash": "4e185e1a",
+          "physical_readout_hash": "4e185e1a",
+          "readout": [
+            "磁感应强度 B 0.60 T",
+            "0.60 T",
+            "角速度 ω 2.0 rad/s",
+            "2.0 rad/s",
+            "线圈电流 I 4.0 A",
+            "4.0 A",
+            "负载/阻力 45%",
+            "45%",
+            "峰值电动势 Eₘ：2.88 V瞬时电动势 e：1.96 V相位 θ：0.75 rad当前线圈电流 I：4.0 A（切换电动机观察安培力）负载后输出：1.57判据：ω、B 越大，Eₘ 越大",
+            "发电0.602.00.0",
+            "发电机把外力做功输入的机械能，经电磁感应转化为电能。"
+          ],
+          "physical_readout": [
+            "磁感应强度 B 0.60 T",
+            "0.60 T",
+            "角速度 ω 2.0 rad/s",
+            "2.0 rad/s",
+            "线圈电流 I 4.0 A",
+            "4.0 A",
+            "负载/阻力 45%",
+            "45%",
+            "峰值电动势 Eₘ：2.88 V瞬时电动势 e：1.96 V相位 θ：0.75 rad当前线圈电流 I：4.0 A（切换电动机观察安培力）负载后输出：1.57判据：ω、B 越大，Eₘ 越大",
+            "发电0.602.00.0",
+            "发电机把外力做功输入的机械能，经电磁感应转化为电能。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "713f9dfa",
+          "readout_hash": "4e185e1a",
+          "physical_readout_hash": "4e185e1a",
+          "readout": [
+            "磁感应强度 B 0.60 T",
+            "0.60 T",
+            "角速度 ω 2.0 rad/s",
+            "2.0 rad/s",
+            "线圈电流 I 4.0 A",
+            "4.0 A",
+            "负载/阻力 45%",
+            "45%",
+            "峰值电动势 Eₘ：2.88 V瞬时电动势 e：1.96 V相位 θ：0.75 rad当前线圈电流 I：4.0 A（切换电动机观察安培力）负载后输出：1.57判据：ω、B 越大，Eₘ 越大",
+            "发电0.602.00.0",
+            "发电机把外力做功输入的机械能，经电磁感应转化为电能。"
+          ],
+          "physical_readout": [
+            "磁感应强度 B 0.60 T",
+            "0.60 T",
+            "角速度 ω 2.0 rad/s",
+            "2.0 rad/s",
+            "线圈电流 I 4.0 A",
+            "4.0 A",
+            "负载/阻力 45%",
+            "45%",
+            "峰值电动势 Eₘ：2.88 V瞬时电动势 e：1.96 V相位 θ：0.75 rad当前线圈电流 I：4.0 A（切换电动机观察安培力）负载后输出：1.57判据：ω、B 越大，Eₘ 越大",
+            "发电0.602.00.0",
+            "发电机把外力做功输入的机械能，经电磁感应转化为电能。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "磁感应强度 B # T|# T|角速度 ω # rad/s|# rad/s|线圈电流 I # A|# A|负载/阻力 #%|#%|峰值电动势 Eₘ：# V瞬时电动势 e：# V相位 θ：# rad当前线圈电流 I：# A（切换电动机观察安培力）负载后输出：#判据：ω、B 越大，Eₘ 越大|发电机把外力做功输入的机械能，经电磁感应转化为电能。",
+          "controls": [
+            {
+              "id": "b",
+              "value": "0.6",
+              "checked": false
+            },
+            {
+              "id": "w",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "i",
+              "value": "4",
+              "checked": false
+            },
+            {
+              "id": "load",
+              "value": "45",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "磁感应强度 B # T|# T|角速度 ω # rad/s|# rad/s|线圈电流 I # A|# A|负载/阻力 #%|#%|峰值电动势 Eₘ：# V瞬时电动势 e：# V相位 θ：# rad当前线圈电流 I：# A（切换电动机观察安培力）负载后输出：#判据：ω、B 越大，Eₘ 越大|发电机把外力做功输入的机械能，经电磁感应转化为电能。",
+          "controls": [
+            {
+              "id": "b",
+              "value": "0.6",
+              "checked": false
+            },
+            {
+              "id": "w",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "i",
+              "value": "4",
+              "checked": false
+            },
+            {
+              "id": "load",
+              "value": "45",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb2/lc-oscillation.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#l",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#c",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#u",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录状态",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录状态",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "24812912",
+          "readout_hash": "d3f196df",
+          "physical_readout_hash": "d3f196df",
+          "readout": [
+            "电感 L 20 mH",
+            "20 mH",
+            "电容 C 50 μF",
+            "50 μF",
+            "初始电压 U₀ 6.0 V",
+            "6.0 V",
+            "周期 T：6.3 ms电荷 q：-272.2 μC电流 i：126.1 mA总能量：0.90 mJ",
+            "0.00π300.00.00.90",
+            "电容电荷接近最大，电场能最大，电流接近 0。"
+          ],
+          "physical_readout": [
+            "电感 L 20 mH",
+            "20 mH",
+            "电容 C 50 μF",
+            "50 μF",
+            "初始电压 U₀ 6.0 V",
+            "6.0 V",
+            "周期 T：6.3 ms电荷 q：-272.2 μC电流 i：126.1 mA总能量：0.90 mJ",
+            "0.00π300.00.00.90",
+            "电容电荷接近最大，电场能最大，电流接近 0。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "9ae37af8",
+          "readout_hash": "e1673fa4",
+          "physical_readout_hash": "e1673fa4",
+          "readout": [
+            "电感 L 20 mH",
+            "20 mH",
+            "电容 C 50 μF",
+            "50 μF",
+            "初始电压 U₀ 6.0 V",
+            "6.0 V",
+            "周期 T：6.3 ms电荷 q：273.3 μC电流 i：-123.7 mA总能量：0.90 mJ",
+            "0.00π300.00.00.90",
+            "电容电荷接近最大，电场能最大，电流接近 0。"
+          ],
+          "physical_readout": [
+            "电感 L 20 mH",
+            "20 mH",
+            "电容 C 50 μF",
+            "50 μF",
+            "初始电压 U₀ 6.0 V",
+            "6.0 V",
+            "周期 T：6.3 ms电荷 q：273.3 μC电流 i：-123.7 mA总能量：0.90 mJ",
+            "0.00π300.00.00.90",
+            "电容电荷接近最大，电场能最大，电流接近 0。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "32b37be2",
+          "readout_hash": "eb402c6b",
+          "physical_readout_hash": "eb402c6b",
+          "readout": [
+            "电感 L 20 mH",
+            "20 mH",
+            "电容 C 50 μF",
+            "50 μF",
+            "初始电压 U₀ 6.0 V",
+            "6.0 V",
+            "周期 T：6.3 ms电荷 q：159.8 μC电流 i：-253.9 mA总能量：0.90 mJ",
+            "0.00π300.00.00.90",
+            "电场能和磁场能正在相互转化。"
+          ],
+          "physical_readout": [
+            "电感 L 20 mH",
+            "20 mH",
+            "电容 C 50 μF",
+            "50 μF",
+            "初始电压 U₀ 6.0 V",
+            "6.0 V",
+            "周期 T：6.3 ms电荷 q：159.8 μC电流 i：-253.9 mA总能量：0.90 mJ",
+            "0.00π300.00.00.90",
+            "电场能和磁场能正在相互转化。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "32b37be2",
+          "readout_hash": "eb402c6b",
+          "physical_readout_hash": "eb402c6b",
+          "readout": [
+            "电感 L 20 mH",
+            "20 mH",
+            "电容 C 50 μF",
+            "50 μF",
+            "初始电压 U₀ 6.0 V",
+            "6.0 V",
+            "周期 T：6.3 ms电荷 q：159.8 μC电流 i：-253.9 mA总能量：0.90 mJ",
+            "0.00π300.00.00.90",
+            "电场能和磁场能正在相互转化。"
+          ],
+          "physical_readout": [
+            "电感 L 20 mH",
+            "20 mH",
+            "电容 C 50 μF",
+            "50 μF",
+            "初始电压 U₀ 6.0 V",
+            "6.0 V",
+            "周期 T：6.3 ms电荷 q：159.8 μC电流 i：-253.9 mA总能量：0.90 mJ",
+            "0.00π300.00.00.90",
+            "电场能和磁场能正在相互转化。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "电感 L # mH|# mH|电容 C # μF|# μF|初始电压 U₀ # V|# V|周期 T：# ms电荷 q：# μC电流 i：# mA总能量：# mJ|电容电荷接近最大，电场能最大，电流接近 #。",
+          "controls": [
+            {
+              "id": "l",
+              "value": "20",
+              "checked": false
+            },
+            {
+              "id": "c",
+              "value": "50",
+              "checked": false
+            },
+            {
+              "id": "u",
+              "value": "6",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "电感 L # mH|# mH|电容 C # μF|# μF|初始电压 U₀ # V|# V|周期 T：# ms电荷 q：# μC电流 i：# mA总能量：# mJ|电容电荷接近最大，电场能最大，电流接近 #。",
+          "controls": [
+            {
+              "id": "l",
+              "value": "20",
+              "checked": false
+            },
+            {
+              "id": "c",
+              "value": "50",
+              "checked": false
+            },
+            {
+              "id": "u",
+              "value": "6",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb2/lenz-law.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#speed",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:S 极朝线圈",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:N 极朝线圈",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play-btn",
+          "text": "自动靠近/远离",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#n-btn",
+          "text": "N 极朝线圈",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#s-btn",
+          "text": "S 极朝线圈",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#reset-btn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.32
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "自动靠近/远离"
+      },
+      "reset_button": {
+        "id": "reset-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "989d0ec1",
+          "readout_hash": "b00726ae",
+          "physical_readout_hash": "b00726ae",
+          "readout": [
+            "自动速度 = 2",
+            "2",
+            "磁通量 Φ = 0.18",
+            "ΔΦ/Δt = 0.000",
+            "感应电流 = 无",
+            "线圈近端 = —",
+            "作用 = —"
+          ],
+          "physical_readout": [
+            "自动速度 = 2",
+            "2",
+            "磁通量 Φ = 0.18",
+            "ΔΦ/Δt = 0.000",
+            "感应电流 = 无",
+            "线圈近端 = —",
+            "作用 = —"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "a27ac29d",
+          "readout_hash": "4dac50af",
+          "physical_readout_hash": "4dac50af",
+          "readout": [
+            "自动速度 = 2",
+            "2",
+            "磁通量 Φ = 0.25",
+            "ΔΦ/Δt = 0.002",
+            "感应电流 = 逆时针",
+            "线圈近端 = N",
+            "作用 = 排斥"
+          ],
+          "physical_readout": [
+            "自动速度 = 2",
+            "2",
+            "磁通量 Φ = 0.25",
+            "ΔΦ/Δt = 0.002",
+            "感应电流 = 逆时针",
+            "线圈近端 = N",
+            "作用 = 排斥"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "422dce0f",
+          "readout_hash": "23dcf162",
+          "physical_readout_hash": "23dcf162",
+          "readout": [
+            "自动速度 = 2",
+            "2",
+            "磁通量 Φ = 0.25",
+            "ΔΦ/Δt = 0.000",
+            "感应电流 = 无",
+            "线圈近端 = —",
+            "作用 = —"
+          ],
+          "physical_readout": [
+            "自动速度 = 2",
+            "2",
+            "磁通量 Φ = 0.25",
+            "ΔΦ/Δt = 0.000",
+            "感应电流 = 无",
+            "线圈近端 = —",
+            "作用 = —"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "422dce0f",
+          "readout_hash": "23dcf162",
+          "physical_readout_hash": "23dcf162",
+          "readout": [
+            "自动速度 = 2",
+            "2",
+            "磁通量 Φ = 0.25",
+            "ΔΦ/Δt = 0.000",
+            "感应电流 = 无",
+            "线圈近端 = —",
+            "作用 = —"
+          ],
+          "physical_readout": [
+            "自动速度 = 2",
+            "2",
+            "磁通量 Φ = 0.25",
+            "ΔΦ/Δt = 0.000",
+            "感应电流 = 无",
+            "线圈近端 = —",
+            "作用 = —"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "自动速度 = #|#|磁通量 Φ = #|ΔΦ/Δt = #|感应电流 = 无|线圈近端 = —|作用 = —",
+          "controls": [
+            {
+              "id": "speed",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "自动速度 = #|#|磁通量 Φ = #|ΔΦ/Δt = #|感应电流 = 无|线圈近端 = —|作用 = —",
+          "controls": [
+            {
+              "id": "speed",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb2/lorentz-force.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#v",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#bf",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#q",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#th",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play-btn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset-btn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "reset-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "db6957b6",
+          "readout_hash": "f22b2d91",
+          "physical_readout_hash": "f22b2d91",
+          "readout": [
+            "速度 v = 2.0×10⁶ m/s",
+            "磁感应强度 B = 1.0 T",
+            "电荷 q = +1 e",
+            "夹角 θ = 90°",
+            "力 F = 3.20×10⁻¹³ N",
+            "速度 v = 2.0×10⁶ m/s",
+            "磁感应强度 B = 1.0 T",
+            "F 方向：左手定则判定"
+          ],
+          "physical_readout": [
+            "速度 v = 2.0×10⁶ m/s",
+            "磁感应强度 B = 1.0 T",
+            "电荷 q = +1 e",
+            "夹角 θ = 90°",
+            "力 F = 3.20×10⁻¹³ N",
+            "速度 v = 2.0×10⁶ m/s",
+            "磁感应强度 B = 1.0 T",
+            "F 方向：左手定则判定"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "8fd6ff3",
+          "readout_hash": "f22b2d91",
+          "physical_readout_hash": "f22b2d91",
+          "readout": [
+            "速度 v = 2.0×10⁶ m/s",
+            "磁感应强度 B = 1.0 T",
+            "电荷 q = +1 e",
+            "夹角 θ = 90°",
+            "力 F = 3.20×10⁻¹³ N",
+            "速度 v = 2.0×10⁶ m/s",
+            "磁感应强度 B = 1.0 T",
+            "F 方向：左手定则判定"
+          ],
+          "physical_readout": [
+            "速度 v = 2.0×10⁶ m/s",
+            "磁感应强度 B = 1.0 T",
+            "电荷 q = +1 e",
+            "夹角 θ = 90°",
+            "力 F = 3.20×10⁻¹³ N",
+            "速度 v = 2.0×10⁶ m/s",
+            "磁感应强度 B = 1.0 T",
+            "F 方向：左手定则判定"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "ff818938",
+          "readout_hash": "f22b2d91",
+          "physical_readout_hash": "f22b2d91",
+          "readout": [
+            "速度 v = 2.0×10⁶ m/s",
+            "磁感应强度 B = 1.0 T",
+            "电荷 q = +1 e",
+            "夹角 θ = 90°",
+            "力 F = 3.20×10⁻¹³ N",
+            "速度 v = 2.0×10⁶ m/s",
+            "磁感应强度 B = 1.0 T",
+            "F 方向：左手定则判定"
+          ],
+          "physical_readout": [
+            "速度 v = 2.0×10⁶ m/s",
+            "磁感应强度 B = 1.0 T",
+            "电荷 q = +1 e",
+            "夹角 θ = 90°",
+            "力 F = 3.20×10⁻¹³ N",
+            "速度 v = 2.0×10⁶ m/s",
+            "磁感应强度 B = 1.0 T",
+            "F 方向：左手定则判定"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "ff818938",
+          "readout_hash": "f22b2d91",
+          "physical_readout_hash": "f22b2d91",
+          "readout": [
+            "速度 v = 2.0×10⁶ m/s",
+            "磁感应强度 B = 1.0 T",
+            "电荷 q = +1 e",
+            "夹角 θ = 90°",
+            "力 F = 3.20×10⁻¹³ N",
+            "速度 v = 2.0×10⁶ m/s",
+            "磁感应强度 B = 1.0 T",
+            "F 方向：左手定则判定"
+          ],
+          "physical_readout": [
+            "速度 v = 2.0×10⁶ m/s",
+            "磁感应强度 B = 1.0 T",
+            "电荷 q = +1 e",
+            "夹角 θ = 90°",
+            "力 F = 3.20×10⁻¹³ N",
+            "速度 v = 2.0×10⁶ m/s",
+            "磁感应强度 B = 1.0 T",
+            "F 方向：左手定则判定"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "速度 v = #×#⁶ m/s|磁感应强度 B = # T|电荷 q = # e|夹角 θ = #°|力 F = #×#⁻¹³ N|速度 v = #×#⁶ m/s|磁感应强度 B = # T|F 方向：左手定则判定",
+          "controls": [
+            {
+              "id": "v",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "bf",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "q",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "th",
+              "value": "90",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "速度 v = #×#⁶ m/s|磁感应强度 B = # T|电荷 q = # e|夹角 θ = #°|力 F = #×#⁻¹³ N|速度 v = #×#⁶ m/s|磁感应强度 B = # T|F 方向：左手定则判定",
+          "controls": [
+            {
+              "id": "v",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "bf",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "q",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "th",
+              "value": "90",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb2/magnetic-circle.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#vInput",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#bInput",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#aInput",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#mInput",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:单步",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:垂直入射：圆周",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:斜射入场：螺旋",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:增大速度：R 变大",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:增强磁场：R 变小",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:负电荷 q<0",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:正电荷 q>0",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#stepBtn",
+          "text": "单步",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:垂直入射：圆周",
+          "text": "垂直入射：圆周",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:斜射入场：螺旋",
+          "text": "斜射入场：螺旋",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:增大速度：R 变大",
+          "text": "增大速度：R 变大",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:增强磁场：R 变小",
+          "text": "增强磁场：R 变小",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:正电荷 q>0",
+          "text": "正电荷 q>0",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:负电荷 q<0",
+          "text": "负电荷 q<0",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.32,
+          "py": 0.32
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "a5600f58",
+          "readout_hash": "ee9d6345",
+          "physical_readout_hash": "ee9d6345",
+          "readout": [
+            "轨道半径 R4.2 cm 周期 T0.131 μs 洛伦兹力 |F|1.60e-13 N 螺距 p∥0.0 cm",
+            "速度 v2.0×10⁶",
+            "磁场 B0.50 T",
+            "入射角 α90°",
+            "质量 m1.0mₚ",
+            "垂直入射：v∥≈0，洛伦兹力提供向心力，轨迹是匀速圆周。"
+          ],
+          "physical_readout": [
+            "轨道半径 R4.2 cm 周期 T0.131 μs 洛伦兹力 |F|1.60e-13 N 螺距 p∥0.0 cm",
+            "速度 v2.0×10⁶",
+            "磁场 B0.50 T",
+            "入射角 α90°",
+            "质量 m1.0mₚ",
+            "垂直入射：v∥≈0，洛伦兹力提供向心力，轨迹是匀速圆周。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "861805f9",
+          "readout_hash": "ee9d6345",
+          "physical_readout_hash": "ee9d6345",
+          "readout": [
+            "轨道半径 R4.2 cm 周期 T0.131 μs 洛伦兹力 |F|1.60e-13 N 螺距 p∥0.0 cm",
+            "速度 v2.0×10⁶",
+            "磁场 B0.50 T",
+            "入射角 α90°",
+            "质量 m1.0mₚ",
+            "垂直入射：v∥≈0，洛伦兹力提供向心力，轨迹是匀速圆周。"
+          ],
+          "physical_readout": [
+            "轨道半径 R4.2 cm 周期 T0.131 μs 洛伦兹力 |F|1.60e-13 N 螺距 p∥0.0 cm",
+            "速度 v2.0×10⁶",
+            "磁场 B0.50 T",
+            "入射角 α90°",
+            "质量 m1.0mₚ",
+            "垂直入射：v∥≈0，洛伦兹力提供向心力，轨迹是匀速圆周。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "80c5abf7",
+          "readout_hash": "ee9d6345",
+          "physical_readout_hash": "ee9d6345",
+          "readout": [
+            "轨道半径 R4.2 cm 周期 T0.131 μs 洛伦兹力 |F|1.60e-13 N 螺距 p∥0.0 cm",
+            "速度 v2.0×10⁶",
+            "磁场 B0.50 T",
+            "入射角 α90°",
+            "质量 m1.0mₚ",
+            "垂直入射：v∥≈0，洛伦兹力提供向心力，轨迹是匀速圆周。"
+          ],
+          "physical_readout": [
+            "轨道半径 R4.2 cm 周期 T0.131 μs 洛伦兹力 |F|1.60e-13 N 螺距 p∥0.0 cm",
+            "速度 v2.0×10⁶",
+            "磁场 B0.50 T",
+            "入射角 α90°",
+            "质量 m1.0mₚ",
+            "垂直入射：v∥≈0，洛伦兹力提供向心力，轨迹是匀速圆周。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "80c5abf7",
+          "readout_hash": "ee9d6345",
+          "physical_readout_hash": "ee9d6345",
+          "readout": [
+            "轨道半径 R4.2 cm 周期 T0.131 μs 洛伦兹力 |F|1.60e-13 N 螺距 p∥0.0 cm",
+            "速度 v2.0×10⁶",
+            "磁场 B0.50 T",
+            "入射角 α90°",
+            "质量 m1.0mₚ",
+            "垂直入射：v∥≈0，洛伦兹力提供向心力，轨迹是匀速圆周。"
+          ],
+          "physical_readout": [
+            "轨道半径 R4.2 cm 周期 T0.131 μs 洛伦兹力 |F|1.60e-13 N 螺距 p∥0.0 cm",
+            "速度 v2.0×10⁶",
+            "磁场 B0.50 T",
+            "入射角 α90°",
+            "质量 m1.0mₚ",
+            "垂直入射：v∥≈0，洛伦兹力提供向心力，轨迹是匀速圆周。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "轨道半径 R# cm 周期 T# μs 洛伦兹力 |F|#e# N 螺距 p∥# cm|速度 v#×#⁶|磁场 B# T|入射角 α#°|质量 m#mₚ|垂直入射：v∥≈#，洛伦兹力提供向心力，轨迹是匀速圆周。",
+          "controls": [
+            {
+              "id": "vInput",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "bInput",
+              "value": "0.5",
+              "checked": false
+            },
+            {
+              "id": "aInput",
+              "value": "90",
+              "checked": false
+            },
+            {
+              "id": "mInput",
+              "value": "1",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "轨道半径 R# cm 周期 T# μs 洛伦兹力 |F|#e# N 螺距 p∥# cm|速度 v#×#⁶|磁场 B# T|入射角 α#°|质量 m#mₚ|垂直入射：v∥≈#，洛伦兹力提供向心力，轨迹是匀速圆周。",
+          "controls": [
+            {
+              "id": "vInput",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "bInput",
+              "value": "0.5",
+              "checked": false
+            },
+            {
+              "id": "aInput",
+              "value": "90",
+              "checked": false
+            },
+            {
+              "id": "mInput",
+              "value": "1",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb2/magnetic-critical.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#rr",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#lr",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "⏸ 暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.68
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "⏸ 暂停"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "8bc66826",
+          "readout_hash": "3c03fbd",
+          "physical_readout_hash": "3c03fbd",
+          "readout": [
+            "半径 R（由 v/B 决定）= 9.0 cm",
+            "磁场宽度 L = 9.0 cm",
+            "轨道半径 R = 9.0 cm",
+            "磁场宽度 L = 9.0 cm",
+            "圆心角 θ = 90°",
+            "状态：临界：恰好到右边界"
+          ],
+          "physical_readout": [
+            "半径 R（由 v/B 决定）= 9.0 cm",
+            "磁场宽度 L = 9.0 cm",
+            "轨道半径 R = 9.0 cm",
+            "磁场宽度 L = 9.0 cm",
+            "圆心角 θ = 90°",
+            "状态：临界：恰好到右边界"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "7d092104",
+          "readout_hash": "3c03fbd",
+          "physical_readout_hash": "3c03fbd",
+          "readout": [
+            "半径 R（由 v/B 决定）= 9.0 cm",
+            "磁场宽度 L = 9.0 cm",
+            "轨道半径 R = 9.0 cm",
+            "磁场宽度 L = 9.0 cm",
+            "圆心角 θ = 90°",
+            "状态：临界：恰好到右边界"
+          ],
+          "physical_readout": [
+            "半径 R（由 v/B 决定）= 9.0 cm",
+            "磁场宽度 L = 9.0 cm",
+            "轨道半径 R = 9.0 cm",
+            "磁场宽度 L = 9.0 cm",
+            "圆心角 θ = 90°",
+            "状态：临界：恰好到右边界"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "1301c54c",
+          "readout_hash": "3c03fbd",
+          "physical_readout_hash": "3c03fbd",
+          "readout": [
+            "半径 R（由 v/B 决定）= 9.0 cm",
+            "磁场宽度 L = 9.0 cm",
+            "轨道半径 R = 9.0 cm",
+            "磁场宽度 L = 9.0 cm",
+            "圆心角 θ = 90°",
+            "状态：临界：恰好到右边界"
+          ],
+          "physical_readout": [
+            "半径 R（由 v/B 决定）= 9.0 cm",
+            "磁场宽度 L = 9.0 cm",
+            "轨道半径 R = 9.0 cm",
+            "磁场宽度 L = 9.0 cm",
+            "圆心角 θ = 90°",
+            "状态：临界：恰好到右边界"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "1301c54c",
+          "readout_hash": "3c03fbd",
+          "physical_readout_hash": "3c03fbd",
+          "readout": [
+            "半径 R（由 v/B 决定）= 9.0 cm",
+            "磁场宽度 L = 9.0 cm",
+            "轨道半径 R = 9.0 cm",
+            "磁场宽度 L = 9.0 cm",
+            "圆心角 θ = 90°",
+            "状态：临界：恰好到右边界"
+          ],
+          "physical_readout": [
+            "半径 R（由 v/B 决定）= 9.0 cm",
+            "磁场宽度 L = 9.0 cm",
+            "轨道半径 R = 9.0 cm",
+            "磁场宽度 L = 9.0 cm",
+            "圆心角 θ = 90°",
+            "状态：临界：恰好到右边界"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "半径 R（由 v/B 决定）= # cm|磁场宽度 L = # cm|轨道半径 R = # cm|磁场宽度 L = # cm|圆心角 θ = #°|状态：临界：恰好到右边界",
+          "controls": [
+            {
+              "id": "rr",
+              "value": "9",
+              "checked": false
+            },
+            {
+              "id": "lr",
+              "value": "9",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "半径 R（由 v/B 决定）= # cm|磁场宽度 L = # cm|轨道半径 R = # cm|磁场宽度 L = # cm|圆心角 θ = #°|状态：临界：恰好到右边界",
+          "controls": [
+            {
+              "id": "rr",
+              "value": "9",
+              "checked": false
+            },
+            {
+              "id": "lr",
+              "value": "9",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb2/magnetic-field.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#strength",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:通电直导线",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:切换 N-S / 电流方向",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:条形磁体",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#magnet-btn",
+          "text": "条形磁体",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#wire-btn",
+          "text": "通电直导线",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#dir-btn",
+          "text": "切换 N-S / 电流方向",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play-btn",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset-btn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.68
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "reset-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "dbbc47a3",
+          "readout_hash": "6f89bb9c",
+          "physical_readout_hash": "6f89bb9c",
+          "readout": [
+            "场源强度 / 电流 I = 6",
+            "6",
+            "场源：条形磁体",
+            "强度 = 6",
+            "探针 |B| = 45.83",
+            "方向角 = 0°",
+            "判定：强场区"
+          ],
+          "physical_readout": [
+            "场源强度 / 电流 I = 6",
+            "6",
+            "场源：条形磁体",
+            "强度 = 6",
+            "探针 |B| = 45.83",
+            "方向角 = 0°",
+            "判定：强场区"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "9cd1cb29",
+          "readout_hash": "6f89bb9c",
+          "physical_readout_hash": "6f89bb9c",
+          "readout": [
+            "场源强度 / 电流 I = 6",
+            "6",
+            "场源：条形磁体",
+            "强度 = 6",
+            "探针 |B| = 45.83",
+            "方向角 = 0°",
+            "判定：强场区"
+          ],
+          "physical_readout": [
+            "场源强度 / 电流 I = 6",
+            "6",
+            "场源：条形磁体",
+            "强度 = 6",
+            "探针 |B| = 45.83",
+            "方向角 = 0°",
+            "判定：强场区"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "9cd1cb29",
+          "readout_hash": "6f89bb9c",
+          "physical_readout_hash": "6f89bb9c",
+          "readout": [
+            "场源强度 / 电流 I = 6",
+            "6",
+            "场源：条形磁体",
+            "强度 = 6",
+            "探针 |B| = 45.83",
+            "方向角 = 0°",
+            "判定：强场区"
+          ],
+          "physical_readout": [
+            "场源强度 / 电流 I = 6",
+            "6",
+            "场源：条形磁体",
+            "强度 = 6",
+            "探针 |B| = 45.83",
+            "方向角 = 0°",
+            "判定：强场区"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "9cd1cb29",
+          "readout_hash": "6f89bb9c",
+          "physical_readout_hash": "6f89bb9c",
+          "readout": [
+            "场源强度 / 电流 I = 6",
+            "6",
+            "场源：条形磁体",
+            "强度 = 6",
+            "探针 |B| = 45.83",
+            "方向角 = 0°",
+            "判定：强场区"
+          ],
+          "physical_readout": [
+            "场源强度 / 电流 I = 6",
+            "6",
+            "场源：条形磁体",
+            "强度 = 6",
+            "探针 |B| = 45.83",
+            "方向角 = 0°",
+            "判定：强场区"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "场源强度 / 电流 I = #|#|场源：条形磁体|强度 = #|探针 |B| = #|方向角 = #°|判定：强场区",
+          "controls": [
+            {
+              "id": "strength",
+              "value": "6",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "场源强度 / 电流 I = #|#|场源：条形磁体|强度 = #|探针 |B| = #|方向角 = #°|判定：强场区",
+          "controls": [
+            {
+              "id": "strength",
+              "value": "6",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb2/magnetic-flux.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#br",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#sr",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#tr",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "▶ 自动转动",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.5,
+          "py": 0.82
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "▶ 自动转动"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "b580fd62",
+          "readout_hash": "227d95e4",
+          "physical_readout_hash": "227d95e4",
+          "readout": [
+            "B = 0.50 T",
+            "S = 0.020 m²",
+            "θ = 0°",
+            "B = 0.50 T",
+            "S = 0.020 m²",
+            "θ = 0°",
+            "Φ = 0.0100 Wb"
+          ],
+          "physical_readout": [
+            "B = 0.50 T",
+            "S = 0.020 m²",
+            "θ = 0°",
+            "B = 0.50 T",
+            "S = 0.020 m²",
+            "θ = 0°",
+            "Φ = 0.0100 Wb"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "a3164431",
+          "readout_hash": "47eb3dae",
+          "physical_readout_hash": "47eb3dae",
+          "readout": [
+            "B = 0.50 T",
+            "S = 0.020 m²",
+            "θ = 1°",
+            "B = 0.50 T",
+            "S = 0.020 m²",
+            "θ = 1°",
+            "Φ = 0.0100 Wb"
+          ],
+          "physical_readout": [
+            "B = 0.50 T",
+            "S = 0.020 m²",
+            "θ = 1°",
+            "B = 0.50 T",
+            "S = 0.020 m²",
+            "θ = 1°",
+            "Φ = 0.0100 Wb"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "a3164431",
+          "readout_hash": "47eb3dae",
+          "physical_readout_hash": "47eb3dae",
+          "readout": [
+            "B = 0.50 T",
+            "S = 0.020 m²",
+            "θ = 1°",
+            "B = 0.50 T",
+            "S = 0.020 m²",
+            "θ = 1°",
+            "Φ = 0.0100 Wb"
+          ],
+          "physical_readout": [
+            "B = 0.50 T",
+            "S = 0.020 m²",
+            "θ = 1°",
+            "B = 0.50 T",
+            "S = 0.020 m²",
+            "θ = 1°",
+            "Φ = 0.0100 Wb"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "a3164431",
+          "readout_hash": "47eb3dae",
+          "physical_readout_hash": "47eb3dae",
+          "readout": [
+            "B = 0.50 T",
+            "S = 0.020 m²",
+            "θ = 1°",
+            "B = 0.50 T",
+            "S = 0.020 m²",
+            "θ = 1°",
+            "Φ = 0.0100 Wb"
+          ],
+          "physical_readout": [
+            "B = 0.50 T",
+            "S = 0.020 m²",
+            "θ = 1°",
+            "B = 0.50 T",
+            "S = 0.020 m²",
+            "θ = 1°",
+            "Φ = 0.0100 Wb"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "B = # T|S = # m²|θ = #°|B = # T|S = # m²|θ = #°|Φ = # Wb",
+          "controls": [
+            {
+              "id": "br",
+              "value": "0.5",
+              "checked": false
+            },
+            {
+              "id": "sr",
+              "value": "0.02",
+              "checked": false
+            },
+            {
+              "id": "tr",
+              "value": "0",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "B = # T|S = # m²|θ = #°|B = # T|S = # m²|θ = #°|Φ = # Wb",
+          "controls": [
+            {
+              "id": "br",
+              "value": "0.5",
+              "checked": false
+            },
+            {
+              "id": "sr",
+              "value": "0.02",
+              "checked": false
+            },
+            {
+              "id": "tr",
+              "value": "0",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb2/maxwell-em-theory.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#f",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#e",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#x",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录状态",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录状态",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "860f737d",
+          "readout_hash": "37db7ee5",
+          "physical_readout_hash": "37db7ee5",
+          "readout": [
+            "振荡频率 f 2.0 Hz",
+            "2.0 Hz",
+            "电场幅度 E₀ 70%",
+            "70%",
+            "相位探针 x 45%",
+            "45%",
+            "探针处 E：0.66探针处 B：0.66关系：E、B 同相且垂直波速：c=λf",
+            "45%0.220.22x",
+            "电磁波不需要介质：变化电场和变化磁场互相激发，能脱离振荡电路向外传播。"
+          ],
+          "physical_readout": [
+            "振荡频率 f 2.0 Hz",
+            "2.0 Hz",
+            "电场幅度 E₀ 70%",
+            "70%",
+            "相位探针 x 45%",
+            "45%",
+            "探针处 E：0.66探针处 B：0.66关系：E、B 同相且垂直波速：c=λf",
+            "45%0.220.22x",
+            "电磁波不需要介质：变化电场和变化磁场互相激发，能脱离振荡电路向外传播。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "9481d231",
+          "readout_hash": "51299b0d",
+          "physical_readout_hash": "51299b0d",
+          "readout": [
+            "振荡频率 f 2.0 Hz",
+            "2.0 Hz",
+            "电场幅度 E₀ 70%",
+            "70%",
+            "相位探针 x 45%",
+            "45%",
+            "探针处 E：0.03探针处 B：0.03关系：E、B 同相且垂直波速：c=λf",
+            "45%0.220.22x",
+            "电磁波不需要介质：变化电场和变化磁场互相激发，能脱离振荡电路向外传播。"
+          ],
+          "physical_readout": [
+            "振荡频率 f 2.0 Hz",
+            "2.0 Hz",
+            "电场幅度 E₀ 70%",
+            "70%",
+            "相位探针 x 45%",
+            "45%",
+            "探针处 E：0.03探针处 B：0.03关系：E、B 同相且垂直波速：c=λf",
+            "45%0.220.22x",
+            "电磁波不需要介质：变化电场和变化磁场互相激发，能脱离振荡电路向外传播。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "eed93d13",
+          "readout_hash": "e6f6c38d",
+          "physical_readout_hash": "e6f6c38d",
+          "readout": [
+            "振荡频率 f 2.0 Hz",
+            "2.0 Hz",
+            "电场幅度 E₀ 70%",
+            "70%",
+            "相位探针 x 45%",
+            "45%",
+            "探针处 E：-0.10探针处 B：-0.10关系：E、B 同相且垂直波速：c=λf",
+            "45%0.220.22x",
+            "电磁波不需要介质：变化电场和变化磁场互相激发，能脱离振荡电路向外传播。"
+          ],
+          "physical_readout": [
+            "振荡频率 f 2.0 Hz",
+            "2.0 Hz",
+            "电场幅度 E₀ 70%",
+            "70%",
+            "相位探针 x 45%",
+            "45%",
+            "探针处 E：-0.10探针处 B：-0.10关系：E、B 同相且垂直波速：c=λf",
+            "45%0.220.22x",
+            "电磁波不需要介质：变化电场和变化磁场互相激发，能脱离振荡电路向外传播。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "eed93d13",
+          "readout_hash": "e6f6c38d",
+          "physical_readout_hash": "e6f6c38d",
+          "readout": [
+            "振荡频率 f 2.0 Hz",
+            "2.0 Hz",
+            "电场幅度 E₀ 70%",
+            "70%",
+            "相位探针 x 45%",
+            "45%",
+            "探针处 E：-0.10探针处 B：-0.10关系：E、B 同相且垂直波速：c=λf",
+            "45%0.220.22x",
+            "电磁波不需要介质：变化电场和变化磁场互相激发，能脱离振荡电路向外传播。"
+          ],
+          "physical_readout": [
+            "振荡频率 f 2.0 Hz",
+            "2.0 Hz",
+            "电场幅度 E₀ 70%",
+            "70%",
+            "相位探针 x 45%",
+            "45%",
+            "探针处 E：-0.10探针处 B：-0.10关系：E、B 同相且垂直波速：c=λf",
+            "45%0.220.22x",
+            "电磁波不需要介质：变化电场和变化磁场互相激发，能脱离振荡电路向外传播。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "振荡频率 f # Hz|# Hz|电场幅度 E₀ #%|#%|相位探针 x #%|#%|探针处 E：#探针处 B：#关系：E、B 同相且垂直波速：c=λf|电磁波不需要介质：变化电场和变化磁场互相激发，能脱离振荡电路向外传播。",
+          "controls": [
+            {
+              "id": "f",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "e",
+              "value": "70",
+              "checked": false
+            },
+            {
+              "id": "x",
+              "value": "45",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "振荡频率 f # Hz|# Hz|电场幅度 E₀ #%|#%|相位探针 x #%|#%|探针处 E：#探针处 B：#关系：E、B 同相且垂直波速：c=λf|电磁波不需要介质：变化电场和变化磁场互相激发，能脱离振荡电路向外传播。",
+          "controls": [
+            {
+              "id": "f",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "e",
+              "value": "70",
+              "checked": false
+            },
+            {
+              "id": "x",
+              "value": "45",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb2/mutual-induction.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#freqInput",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:单步",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:直流：稳定",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:通断瞬间",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:交流：持续变化",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#stepBtn",
+          "text": "单步",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#acBtn",
+          "text": "交流：持续变化",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#dcBtn",
+          "text": "直流：稳定",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#pulseBtn",
+          "text": "通断瞬间",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.68,
+          "py": 0.32
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "d8349f34",
+          "readout_hash": "d67cc89d",
+          "physical_readout_hash": "d67cc89d",
+          "readout": [
+            "原线圈 I₁0.86 A dI₁/dt3.24 A/s 副线圈 Φ₂0.51 副线圈 E₂-0.73 V",
+            "交流频率 f1.0 Hz",
+            "I₁ 正在变化 → B 正在变化 → Φ₂ 正在变化 → E₂=-0.73 V，副线圈电流计偏转。"
+          ],
+          "physical_readout": [
+            "原线圈 I₁0.86 A dI₁/dt3.24 A/s 副线圈 Φ₂0.51 副线圈 E₂-0.73 V",
+            "交流频率 f1.0 Hz",
+            "I₁ 正在变化 → B 正在变化 → Φ₂ 正在变化 → E₂=-0.73 V，副线圈电流计偏转。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "264f4add",
+          "readout_hash": "3f6de6c",
+          "physical_readout_hash": "3f6de6c",
+          "readout": [
+            "原线圈 I₁-0.14 A dI₁/dt-6.22 A/s 副线圈 Φ₂-0.08 副线圈 E₂1.41 V",
+            "交流频率 f1.0 Hz",
+            "I₁ 正在变化 → B 正在变化 → Φ₂ 正在变化 → E₂=1.41 V，副线圈电流计偏转。"
+          ],
+          "physical_readout": [
+            "原线圈 I₁-0.14 A dI₁/dt-6.22 A/s 副线圈 Φ₂-0.08 副线圈 E₂1.41 V",
+            "交流频率 f1.0 Hz",
+            "I₁ 正在变化 → B 正在变化 → Φ₂ 正在变化 → E₂=1.41 V，副线圈电流计偏转。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "259618aa",
+          "readout_hash": "1c86391f",
+          "physical_readout_hash": "1c86391f",
+          "readout": [
+            "原线圈 I₁-0.25 A dI₁/dt-6.09 A/s 副线圈 Φ₂-0.15 副线圈 E₂1.38 V",
+            "交流频率 f1.0 Hz",
+            "I₁ 正在变化 → B 正在变化 → Φ₂ 正在变化 → E₂=1.38 V，副线圈电流计偏转。"
+          ],
+          "physical_readout": [
+            "原线圈 I₁-0.25 A dI₁/dt-6.09 A/s 副线圈 Φ₂-0.15 副线圈 E₂1.38 V",
+            "交流频率 f1.0 Hz",
+            "I₁ 正在变化 → B 正在变化 → Φ₂ 正在变化 → E₂=1.38 V，副线圈电流计偏转。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "259618aa",
+          "readout_hash": "1c86391f",
+          "physical_readout_hash": "1c86391f",
+          "readout": [
+            "原线圈 I₁-0.25 A dI₁/dt-6.09 A/s 副线圈 Φ₂-0.15 副线圈 E₂1.38 V",
+            "交流频率 f1.0 Hz",
+            "I₁ 正在变化 → B 正在变化 → Φ₂ 正在变化 → E₂=1.38 V，副线圈电流计偏转。"
+          ],
+          "physical_readout": [
+            "原线圈 I₁-0.25 A dI₁/dt-6.09 A/s 副线圈 Φ₂-0.15 副线圈 E₂1.38 V",
+            "交流频率 f1.0 Hz",
+            "I₁ 正在变化 → B 正在变化 → Φ₂ 正在变化 → E₂=1.38 V，副线圈电流计偏转。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "原线圈 I₁# A dI₁/dt# A/s 副线圈 Φ₂# 副线圈 E₂# V|交流频率 f# Hz|I₁ 正在变化 → B 正在变化 → Φ₂ 正在变化 → E₂=# V，副线圈电流计偏转。",
+          "controls": [
+            {
+              "id": "freqInput",
+              "value": "1",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "原线圈 I₁# A dI₁/dt# A/s 副线圈 Φ₂# 副线圈 E₂# V|交流频率 f# Hz|I₁ 正在变化 → B 正在变化 → Φ₂ 正在变化 → E₂=# V，副线圈电流计偏转。",
+          "controls": [
+            {
+              "id": "freqInput",
+              "value": "1",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb2/power-transmission.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#pr",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#ur",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#rr",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play-btn",
+          "text": "暂停演示",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset-btn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停演示"
+      },
+      "reset_button": {
+        "id": "reset-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "69e0fb54",
+          "readout_hash": "3a1ab914",
+          "physical_readout_hash": "2f7885c9",
+          "readout": [
+            "输送功率 P = 100 kW",
+            "输送电压 U = 14.2 kV",
+            "线路总电阻 r = 10 Ω",
+            "输送功率 P = 100 kW",
+            "输送电压 U = 14.2 kV",
+            "线路电流 I = 7.0 A",
+            "线路损耗 P损 = 0.5 kW",
+            "电压损失 ΔU = 0.07 kV",
+            "用户功率 = 99.5 kW",
+            "效率 = 99.5%",
+            "状态：暂停观察读数"
+          ],
+          "physical_readout": [
+            "输送功率 P = 100 kW",
+            "输送电压 U = 14.2 kV",
+            "线路总电阻 r = 10 Ω",
+            "输送功率 P = 100 kW",
+            "输送电压 U = 14.2 kV",
+            "线路电流 I = 7.0 A",
+            "线路损耗 P损 = 0.5 kW",
+            "电压损失 ΔU = 0.07 kV",
+            "用户功率 = 99.5 kW",
+            "效率 = 99.5%",
+            "观察读数"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "b808f148",
+          "readout_hash": "12d3db66",
+          "physical_readout_hash": "12d3db66",
+          "readout": [
+            "输送功率 P = 100 kW",
+            "输送电压 U = 16.9 kV",
+            "线路总电阻 r = 10 Ω",
+            "输送功率 P = 100 kW",
+            "输送电压 U = 16.9 kV",
+            "线路电流 I = 5.9 A",
+            "线路损耗 P损 = 0.4 kW",
+            "电压损失 ΔU = 0.06 kV",
+            "用户功率 = 99.6 kW",
+            "效率 = 99.6%",
+            "状态：自动演示高压降损"
+          ],
+          "physical_readout": [
+            "输送功率 P = 100 kW",
+            "输送电压 U = 16.9 kV",
+            "线路总电阻 r = 10 Ω",
+            "输送功率 P = 100 kW",
+            "输送电压 U = 16.9 kV",
+            "线路电流 I = 5.9 A",
+            "线路损耗 P损 = 0.4 kW",
+            "电压损失 ΔU = 0.06 kV",
+            "用户功率 = 99.6 kW",
+            "效率 = 99.6%",
+            "状态：自动演示高压降损"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "b4f7328d",
+          "readout_hash": "4530ae48",
+          "physical_readout_hash": "ec9b6265",
+          "readout": [
+            "输送功率 P = 100 kW",
+            "输送电压 U = 17.1 kV",
+            "线路总电阻 r = 10 Ω",
+            "输送功率 P = 100 kW",
+            "输送电压 U = 17.1 kV",
+            "线路电流 I = 5.9 A",
+            "线路损耗 P损 = 0.3 kW",
+            "电压损失 ΔU = 0.06 kV",
+            "用户功率 = 99.7 kW",
+            "效率 = 99.7%",
+            "状态：暂停观察读数"
+          ],
+          "physical_readout": [
+            "输送功率 P = 100 kW",
+            "输送电压 U = 17.1 kV",
+            "线路总电阻 r = 10 Ω",
+            "输送功率 P = 100 kW",
+            "输送电压 U = 17.1 kV",
+            "线路电流 I = 5.9 A",
+            "线路损耗 P损 = 0.3 kW",
+            "电压损失 ΔU = 0.06 kV",
+            "用户功率 = 99.7 kW",
+            "效率 = 99.7%",
+            "观察读数"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "b4f7328d",
+          "readout_hash": "4530ae48",
+          "physical_readout_hash": "ec9b6265",
+          "readout": [
+            "输送功率 P = 100 kW",
+            "输送电压 U = 17.1 kV",
+            "线路总电阻 r = 10 Ω",
+            "输送功率 P = 100 kW",
+            "输送电压 U = 17.1 kV",
+            "线路电流 I = 5.9 A",
+            "线路损耗 P损 = 0.3 kW",
+            "电压损失 ΔU = 0.06 kV",
+            "用户功率 = 99.7 kW",
+            "效率 = 99.7%",
+            "状态：暂停观察读数"
+          ],
+          "physical_readout": [
+            "输送功率 P = 100 kW",
+            "输送电压 U = 17.1 kV",
+            "线路总电阻 r = 10 Ω",
+            "输送功率 P = 100 kW",
+            "输送电压 U = 17.1 kV",
+            "线路电流 I = 5.9 A",
+            "线路损耗 P损 = 0.3 kW",
+            "电压损失 ΔU = 0.06 kV",
+            "用户功率 = 99.7 kW",
+            "效率 = 99.7%",
+            "观察读数"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "输送功率 P = # kW|输送电压 U = # kV|线路总电阻 r = # Ω|输送功率 P = # kW|输送电压 U = # kV|线路电流 I = # A|线路损耗 P损 = # kW|电压损失 ΔU = # kV|用户功率 = # kW|效率 = #%|状态：暂停观察读数",
+          "controls": [
+            {
+              "id": "pr",
+              "value": "100",
+              "checked": false
+            },
+            {
+              "id": "ur",
+              "value": "14",
+              "checked": false
+            },
+            {
+              "id": "rr",
+              "value": "10",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "输送功率 P = # kW|输送电压 U = # kV|线路总电阻 r = # Ω|输送功率 P = # kW|输送电压 U = # kV|线路电流 I = # A|线路损耗 P损 = # kW|电压损失 ΔU = # kV|用户功率 = # kW|效率 = #%|状态：暂停观察读数",
+          "controls": [
+            {
+              "id": "pr",
+              "value": "100",
+              "checked": false
+            },
+            {
+              "id": "ur",
+              "value": "14",
+              "checked": false
+            },
+            {
+              "id": "rr",
+              "value": "10",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb2/rail-rod.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#v",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#b",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#l",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#r",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#cam",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:磁场反向",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:速度反向",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play-btn",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reverse-b",
+          "text": "磁场反向",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#reverse-v",
+          "text": "速度反向",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#reset-btn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.32
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "reset-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "b0e32b18",
+          "readout_hash": "9339fee8",
+          "physical_readout_hash": "9339fee8",
+          "readout": [
+            "速度 v = 5.0 m/s",
+            "5.0",
+            "磁场 B = 0.60 T",
+            "0.60",
+            "导轨宽度 L = 0.58 m",
+            "0.58",
+            "电阻 R = 2.0 Ω",
+            "2.0",
+            "3D观察角 = 18°",
+            "18",
+            "E = BLv = 1.74 V",
+            "I = E/R = 0.87 A",
+            "F安 = BIL = 0.30 N",
+            "P = I²R = 1.51 W",
+            "状态：安培力阻碍运动"
+          ],
+          "physical_readout": [
+            "速度 v = 5.0 m/s",
+            "5.0",
+            "磁场 B = 0.60 T",
+            "0.60",
+            "导轨宽度 L = 0.58 m",
+            "0.58",
+            "电阻 R = 2.0 Ω",
+            "2.0",
+            "3D观察角 = 18°",
+            "18",
+            "E = BLv = 1.74 V",
+            "I = E/R = 0.87 A",
+            "F安 = BIL = 0.30 N",
+            "P = I²R = 1.51 W",
+            "状态：安培力阻碍运动"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "4c58d10b",
+          "readout_hash": "9339fee8",
+          "physical_readout_hash": "9339fee8",
+          "readout": [
+            "速度 v = 5.0 m/s",
+            "5.0",
+            "磁场 B = 0.60 T",
+            "0.60",
+            "导轨宽度 L = 0.58 m",
+            "0.58",
+            "电阻 R = 2.0 Ω",
+            "2.0",
+            "3D观察角 = 18°",
+            "18",
+            "E = BLv = 1.74 V",
+            "I = E/R = 0.87 A",
+            "F安 = BIL = 0.30 N",
+            "P = I²R = 1.51 W",
+            "状态：安培力阻碍运动"
+          ],
+          "physical_readout": [
+            "速度 v = 5.0 m/s",
+            "5.0",
+            "磁场 B = 0.60 T",
+            "0.60",
+            "导轨宽度 L = 0.58 m",
+            "0.58",
+            "电阻 R = 2.0 Ω",
+            "2.0",
+            "3D观察角 = 18°",
+            "18",
+            "E = BLv = 1.74 V",
+            "I = E/R = 0.87 A",
+            "F安 = BIL = 0.30 N",
+            "P = I²R = 1.51 W",
+            "状态：安培力阻碍运动"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "475994a8",
+          "readout_hash": "9339fee8",
+          "physical_readout_hash": "9339fee8",
+          "readout": [
+            "速度 v = 5.0 m/s",
+            "5.0",
+            "磁场 B = 0.60 T",
+            "0.60",
+            "导轨宽度 L = 0.58 m",
+            "0.58",
+            "电阻 R = 2.0 Ω",
+            "2.0",
+            "3D观察角 = 18°",
+            "18",
+            "E = BLv = 1.74 V",
+            "I = E/R = 0.87 A",
+            "F安 = BIL = 0.30 N",
+            "P = I²R = 1.51 W",
+            "状态：安培力阻碍运动"
+          ],
+          "physical_readout": [
+            "速度 v = 5.0 m/s",
+            "5.0",
+            "磁场 B = 0.60 T",
+            "0.60",
+            "导轨宽度 L = 0.58 m",
+            "0.58",
+            "电阻 R = 2.0 Ω",
+            "2.0",
+            "3D观察角 = 18°",
+            "18",
+            "E = BLv = 1.74 V",
+            "I = E/R = 0.87 A",
+            "F安 = BIL = 0.30 N",
+            "P = I²R = 1.51 W",
+            "状态：安培力阻碍运动"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "3ecec76b",
+          "readout_hash": "9339fee8",
+          "physical_readout_hash": "9339fee8",
+          "readout": [
+            "速度 v = 5.0 m/s",
+            "5.0",
+            "磁场 B = 0.60 T",
+            "0.60",
+            "导轨宽度 L = 0.58 m",
+            "0.58",
+            "电阻 R = 2.0 Ω",
+            "2.0",
+            "3D观察角 = 18°",
+            "18",
+            "E = BLv = 1.74 V",
+            "I = E/R = 0.87 A",
+            "F安 = BIL = 0.30 N",
+            "P = I²R = 1.51 W",
+            "状态：安培力阻碍运动"
+          ],
+          "physical_readout": [
+            "速度 v = 5.0 m/s",
+            "5.0",
+            "磁场 B = 0.60 T",
+            "0.60",
+            "导轨宽度 L = 0.58 m",
+            "0.58",
+            "电阻 R = 2.0 Ω",
+            "2.0",
+            "3D观察角 = 18°",
+            "18",
+            "E = BLv = 1.74 V",
+            "I = E/R = 0.87 A",
+            "F安 = BIL = 0.30 N",
+            "P = I²R = 1.51 W",
+            "状态：安培力阻碍运动"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "速度 v = # m/s|#|磁场 B = # T|#|导轨宽度 L = # m|#|电阻 R = # Ω|#|#D观察角 = #°|#|E = BLv = # V|I = E/R = # A|F安 = BIL = # N|P = I²R = # W|状态：安培力阻碍运动",
+          "controls": [
+            {
+              "id": "v",
+              "value": "50",
+              "checked": false
+            },
+            {
+              "id": "b",
+              "value": "60",
+              "checked": false
+            },
+            {
+              "id": "l",
+              "value": "58",
+              "checked": false
+            },
+            {
+              "id": "r",
+              "value": "20",
+              "checked": false
+            },
+            {
+              "id": "cam",
+              "value": "18",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "速度 v = # m/s|#|磁场 B = # T|#|导轨宽度 L = # m|#|电阻 R = # Ω|#|#D观察角 = #°|#|E = BLv = # V|I = E/R = # A|F安 = BIL = # N|P = I²R = # W|状态：安培力阻碍运动",
+          "controls": [
+            {
+              "id": "v",
+              "value": "50",
+              "checked": false
+            },
+            {
+              "id": "b",
+              "value": "60",
+              "checked": false
+            },
+            {
+              "id": "l",
+              "value": "58",
+              "checked": false
+            },
+            {
+              "id": "r",
+              "value": "20",
+              "checked": false
+            },
+            {
+              "id": "cam",
+              "value": "18",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb2/self-induction.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#lr",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#rr",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:闭合开关",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#toggle",
+          "text": "闭合开关",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play-btn",
+          "text": "暂停自动通断",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset-btn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停自动通断"
+      },
+      "reset_button": {
+        "id": "reset-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "84b7e3f8",
+          "readout_hash": "f358b637",
+          "physical_readout_hash": "f358b637",
+          "readout": [
+            "L = 2.0 H",
+            "R = 2.0 Ω",
+            "自感系数 L = 2.0 H",
+            "时间常数 τ=L/R = 1.00 s",
+            "电流 I = 0.00 A",
+            "状态：断电：维持减小"
+          ],
+          "physical_readout": [
+            "L = 2.0 H",
+            "R = 2.0 Ω",
+            "自感系数 L = 2.0 H",
+            "时间常数 τ=L/R = 1.00 s",
+            "电流 I = 0.00 A",
+            "状态：断电：维持减小"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "6282343b",
+          "readout_hash": "f358b637",
+          "physical_readout_hash": "f358b637",
+          "readout": [
+            "L = 2.0 H",
+            "R = 2.0 Ω",
+            "自感系数 L = 2.0 H",
+            "时间常数 τ=L/R = 1.00 s",
+            "电流 I = 0.00 A",
+            "状态：断电：维持减小"
+          ],
+          "physical_readout": [
+            "L = 2.0 H",
+            "R = 2.0 Ω",
+            "自感系数 L = 2.0 H",
+            "时间常数 τ=L/R = 1.00 s",
+            "电流 I = 0.00 A",
+            "状态：断电：维持减小"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "917ad3b9",
+          "readout_hash": "f358b637",
+          "physical_readout_hash": "f358b637",
+          "readout": [
+            "L = 2.0 H",
+            "R = 2.0 Ω",
+            "自感系数 L = 2.0 H",
+            "时间常数 τ=L/R = 1.00 s",
+            "电流 I = 0.00 A",
+            "状态：断电：维持减小"
+          ],
+          "physical_readout": [
+            "L = 2.0 H",
+            "R = 2.0 Ω",
+            "自感系数 L = 2.0 H",
+            "时间常数 τ=L/R = 1.00 s",
+            "电流 I = 0.00 A",
+            "状态：断电：维持减小"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "6022b21f",
+          "readout_hash": "f358b637",
+          "physical_readout_hash": "f358b637",
+          "readout": [
+            "L = 2.0 H",
+            "R = 2.0 Ω",
+            "自感系数 L = 2.0 H",
+            "时间常数 τ=L/R = 1.00 s",
+            "电流 I = 0.00 A",
+            "状态：断电：维持减小"
+          ],
+          "physical_readout": [
+            "L = 2.0 H",
+            "R = 2.0 Ω",
+            "自感系数 L = 2.0 H",
+            "时间常数 τ=L/R = 1.00 s",
+            "电流 I = 0.00 A",
+            "状态：断电：维持减小"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "L = # H|R = # Ω|自感系数 L = # H|时间常数 τ=L/R = # s|电流 I = # A|状态：断电：维持减小",
+          "controls": [
+            {
+              "id": "lr",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "rr",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "L = # H|R = # Ω|自感系数 L = # H|时间常数 τ=L/R = # s|电流 I = # A|状态：断电：维持减小",
+          "controls": [
+            {
+              "id": "lr",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "rr",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb2/sensor.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#inputr",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#thr",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:热敏",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:力敏",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:光敏",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "button:光敏",
+          "text": "光敏",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:热敏",
+          "text": "热敏",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:力敏",
+          "text": "力敏",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play-btn",
+          "text": "播放扫描",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset-btn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放扫描"
+      },
+      "reset_button": {
+        "id": "reset-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "211559e",
+          "readout_hash": "29734dbf",
+          "physical_readout_hash": "fcd0b38c",
+          "readout": [
+            "光照 = 0%",
+            "光照",
+            "触发阈值 = 2.50 V",
+            "类型 = 光敏电阻",
+            "光照 = 0%",
+            "敏感电阻 Rₛ = 20000 Ω",
+            "输出电压 Uout = 4.00 V",
+            "阈值 = 2.50 V",
+            "执行器 = 触发",
+            "状态：暂停：已超过阈值",
+            "暂停：已超过阈值"
+          ],
+          "physical_readout": [
+            "光照 = 0%",
+            "光照",
+            "触发阈值 = 2.50 V",
+            "类型 = 光敏电阻",
+            "光照 = 0%",
+            "敏感电阻 Rₛ = 20000 Ω",
+            "输出电压 Uout = 4.00 V",
+            "阈值 = 2.50 V",
+            "执行器 = 触发",
+            "：已超过阈值",
+            "：已超过阈值"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "50e96dca",
+          "readout_hash": "fdd852bd",
+          "physical_readout_hash": "fdd852bd",
+          "readout": [
+            "光照 = 65%",
+            "光照",
+            "触发阈值 = 2.50 V",
+            "类型 = 光敏电阻",
+            "光照 = 65%",
+            "敏感电阻 Rₛ = 1419 Ω",
+            "输出电压 Uout = 1.11 V",
+            "阈值 = 2.50 V",
+            "执行器 = 未触发",
+            "状态：自动扫描输入量",
+            "自动扫描输入量"
+          ],
+          "physical_readout": [
+            "光照 = 65%",
+            "光照",
+            "触发阈值 = 2.50 V",
+            "类型 = 光敏电阻",
+            "光照 = 65%",
+            "敏感电阻 Rₛ = 1419 Ω",
+            "输出电压 Uout = 1.11 V",
+            "阈值 = 2.50 V",
+            "执行器 = 未触发",
+            "状态：自动扫描输入量",
+            "自动扫描输入量"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "cdf02048",
+          "readout_hash": "f918165d",
+          "physical_readout_hash": "6b579c26",
+          "readout": [
+            "光照 = 67%",
+            "光照",
+            "触发阈值 = 2.50 V",
+            "类型 = 光敏电阻",
+            "光照 = 67%",
+            "敏感电阻 Rₛ = 1397 Ω",
+            "输出电压 Uout = 1.09 V",
+            "阈值 = 2.50 V",
+            "执行器 = 未触发",
+            "状态：暂停：未达阈值",
+            "暂停：未达阈值"
+          ],
+          "physical_readout": [
+            "光照 = 67%",
+            "光照",
+            "触发阈值 = 2.50 V",
+            "类型 = 光敏电阻",
+            "光照 = 67%",
+            "敏感电阻 Rₛ = 1397 Ω",
+            "输出电压 Uout = 1.09 V",
+            "阈值 = 2.50 V",
+            "执行器 = 未触发",
+            "：未达阈值",
+            "：未达阈值"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "e4b5ccf4",
+          "readout_hash": "f918165d",
+          "physical_readout_hash": "6b579c26",
+          "readout": [
+            "光照 = 67%",
+            "光照",
+            "触发阈值 = 2.50 V",
+            "类型 = 光敏电阻",
+            "光照 = 67%",
+            "敏感电阻 Rₛ = 1397 Ω",
+            "输出电压 Uout = 1.09 V",
+            "阈值 = 2.50 V",
+            "执行器 = 未触发",
+            "状态：暂停：未达阈值",
+            "暂停：未达阈值"
+          ],
+          "physical_readout": [
+            "光照 = 67%",
+            "光照",
+            "触发阈值 = 2.50 V",
+            "类型 = 光敏电阻",
+            "光照 = 67%",
+            "敏感电阻 Rₛ = 1397 Ω",
+            "输出电压 Uout = 1.09 V",
+            "阈值 = 2.50 V",
+            "执行器 = 未触发",
+            "：未达阈值",
+            "：未达阈值"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "光照 = #%|光照|触发阈值 = # V|类型 = 光敏电阻|光照 = #%|敏感电阻 Rₛ = # Ω|输出电压 Uout = # V|阈值 = # V|执行器 = 触发|状态：暂停：已超过阈值|暂停：已超过阈值",
+          "controls": [
+            {
+              "id": "inputr",
+              "value": "0",
+              "checked": false
+            },
+            {
+              "id": "thr",
+              "value": "2.5",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "光照 = #%|光照|触发阈值 = # V|类型 = 光敏电阻|光照 = #%|敏感电阻 Rₛ = # Ω|输出电压 Uout = # V|阈值 = # V|执行器 = 触发|状态：暂停：已超过阈值|暂停：已超过阈值",
+          "controls": [
+            {
+              "id": "inputr",
+              "value": "0",
+              "checked": false
+            },
+            {
+              "id": "thr",
+              "value": "2.5",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb2/transformer.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#n1",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#n2",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#u1",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#load-r",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play-btn",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset-btn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.32,
+          "py": 0.32
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "reset-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "a97e50a5",
+          "readout_hash": "868ffaf6",
+          "physical_readout_hash": "868ffaf6",
+          "readout": [
+            "初级匝数 n₁ = 1000",
+            "次级匝数 n₂ = 100",
+            "输入有效值 U₁ = 220 V",
+            "负载电阻 R = 11 Ω",
+            "U₁ = 220 V",
+            "U₂ = 22.0 V",
+            "I₁ = 0.20 A",
+            "I₂ = 2.00 A",
+            "P₁≈P₂ = 44 W",
+            "n₁:n₂ = 1000:100",
+            "降压变压器"
+          ],
+          "physical_readout": [
+            "初级匝数 n₁ = 1000",
+            "次级匝数 n₂ = 100",
+            "输入有效值 U₁ = 220 V",
+            "负载电阻 R = 11 Ω",
+            "U₁ = 220 V",
+            "U₂ = 22.0 V",
+            "I₁ = 0.20 A",
+            "I₂ = 2.00 A",
+            "P₁≈P₂ = 44 W",
+            "n₁:n₂ = 1000:100",
+            "降压变压器"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "52a033c1",
+          "readout_hash": "868ffaf6",
+          "physical_readout_hash": "868ffaf6",
+          "readout": [
+            "初级匝数 n₁ = 1000",
+            "次级匝数 n₂ = 100",
+            "输入有效值 U₁ = 220 V",
+            "负载电阻 R = 11 Ω",
+            "U₁ = 220 V",
+            "U₂ = 22.0 V",
+            "I₁ = 0.20 A",
+            "I₂ = 2.00 A",
+            "P₁≈P₂ = 44 W",
+            "n₁:n₂ = 1000:100",
+            "降压变压器"
+          ],
+          "physical_readout": [
+            "初级匝数 n₁ = 1000",
+            "次级匝数 n₂ = 100",
+            "输入有效值 U₁ = 220 V",
+            "负载电阻 R = 11 Ω",
+            "U₁ = 220 V",
+            "U₂ = 22.0 V",
+            "I₁ = 0.20 A",
+            "I₂ = 2.00 A",
+            "P₁≈P₂ = 44 W",
+            "n₁:n₂ = 1000:100",
+            "降压变压器"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "b09a4ac0",
+          "readout_hash": "868ffaf6",
+          "physical_readout_hash": "868ffaf6",
+          "readout": [
+            "初级匝数 n₁ = 1000",
+            "次级匝数 n₂ = 100",
+            "输入有效值 U₁ = 220 V",
+            "负载电阻 R = 11 Ω",
+            "U₁ = 220 V",
+            "U₂ = 22.0 V",
+            "I₁ = 0.20 A",
+            "I₂ = 2.00 A",
+            "P₁≈P₂ = 44 W",
+            "n₁:n₂ = 1000:100",
+            "降压变压器"
+          ],
+          "physical_readout": [
+            "初级匝数 n₁ = 1000",
+            "次级匝数 n₂ = 100",
+            "输入有效值 U₁ = 220 V",
+            "负载电阻 R = 11 Ω",
+            "U₁ = 220 V",
+            "U₂ = 22.0 V",
+            "I₁ = 0.20 A",
+            "I₂ = 2.00 A",
+            "P₁≈P₂ = 44 W",
+            "n₁:n₂ = 1000:100",
+            "降压变压器"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "b09a4ac0",
+          "readout_hash": "868ffaf6",
+          "physical_readout_hash": "868ffaf6",
+          "readout": [
+            "初级匝数 n₁ = 1000",
+            "次级匝数 n₂ = 100",
+            "输入有效值 U₁ = 220 V",
+            "负载电阻 R = 11 Ω",
+            "U₁ = 220 V",
+            "U₂ = 22.0 V",
+            "I₁ = 0.20 A",
+            "I₂ = 2.00 A",
+            "P₁≈P₂ = 44 W",
+            "n₁:n₂ = 1000:100",
+            "降压变压器"
+          ],
+          "physical_readout": [
+            "初级匝数 n₁ = 1000",
+            "次级匝数 n₂ = 100",
+            "输入有效值 U₁ = 220 V",
+            "负载电阻 R = 11 Ω",
+            "U₁ = 220 V",
+            "U₂ = 22.0 V",
+            "I₁ = 0.20 A",
+            "I₂ = 2.00 A",
+            "P₁≈P₂ = 44 W",
+            "n₁:n₂ = 1000:100",
+            "降压变压器"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "初级匝数 n₁ = #|次级匝数 n₂ = #|输入有效值 U₁ = # V|负载电阻 R = # Ω|U₁ = # V|U₂ = # V|I₁ = # A|I₂ = # A|P₁≈P₂ = # W|n₁:n₂ = #:#|降压变压器",
+          "controls": [
+            {
+              "id": "n1",
+              "value": "1000",
+              "checked": false
+            },
+            {
+              "id": "n2",
+              "value": "100",
+              "checked": false
+            },
+            {
+              "id": "u1",
+              "value": "220",
+              "checked": false
+            },
+            {
+              "id": "load-r",
+              "value": "11",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "初级匝数 n₁ = #|次级匝数 n₂ = #|输入有效值 U₁ = # V|负载电阻 R = # Ω|U₁ = # V|U₂ = # V|I₁ = # A|I₂ = # A|P₁≈P₂ = # W|n₁:n₂ = #:#|降压变压器",
+          "controls": [
+            {
+              "id": "n1",
+              "value": "1000",
+              "checked": false
+            },
+            {
+              "id": "n2",
+              "value": "100",
+              "checked": false
+            },
+            {
+              "id": "u1",
+              "value": "220",
+              "checked": false
+            },
+            {
+              "id": "load-r",
+              "value": "11",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

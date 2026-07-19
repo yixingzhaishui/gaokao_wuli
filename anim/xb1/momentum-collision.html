@@ -29,7 +29,7 @@ canvas{display:block;width:100%;max-width:640px;background:#fff;border:1px solid
 <body>
 <div class="container">
   <h2>碰撞与动量守恒：m₁v₁ + m₂v₂ = m₁v₁′ + m₂v₂′</h2>
-  <canvas id="canvas" width="640" height="360" aria-label="碰撞动量守恒实验台：小车侧视装置、动量条形图像和数据记录"></canvas>
+  <canvas id="canvas" width="640" height="360" data-collision-parameter-guard="requires-v1-greater-than-v2-for-left-car-to-catch-right-car" aria-label="碰撞动量守恒实验台：小车侧视装置、碰撞条件、动量条形图像和数据记录"></canvas>
   <div class="readouts">
     <span class="r">碰前总动量 p = <b id="p-before">—</b> kg·m/s</span>
     <span class="r ok">碰后总动量 p′ = <b id="p-after">—</b> kg·m/s</span>
@@ -37,6 +37,7 @@ canvas{display:block;width:100%;max-width:640px;background:#fff;border:1px solid
     <span class="r">碰后动能 = <b id="ek-after">—</b> J</span>
     <span class="r">碰后 v₁′ = <b id="u1">—</b> m/s</span>
     <span class="r">碰后 v₂′ = <b id="u2">—</b> m/s</span>
+    <span class="r" id="modeReadout">碰撞模式：弹性</span>
   </div>
   <div class="controls">
     <label>m₁ = <span id="m1-d">1.0</span> kg
@@ -156,13 +157,15 @@ canvas{display:block;width:100%;max-width:640px;background:#fff;border:1px solid
     drawBox(x2,m2,cur2,'#e8590c','m₂');
     // status text
     ctx.fillStyle='#243b53';ctx.font='13px sans-serif';ctx.textAlign='left';
-    ctx.fillText(collided?(elastic?'已碰撞（弹性：动能守恒）':'已碰撞（完全非弹性：粘连同速）'):'碰撞前',15,28);
+    const canCollide=v1>v2;
+    ctx.fillText(collided?(elastic?'已碰撞（弹性：动能守恒）':'已碰撞（完全非弹性：粘连同速）'):(canCollide?'碰撞前':'参数无效：左车追不上右车，本次不会碰撞'),15,28);
     const pB=(m1*v1+m2*v2), pA=(m1*cur1+m2*cur2);
     bar(150,278,'总p前',pB,'#2c7be5');
     bar(150,314,'总p后',pA,'#0b7285');
     ctx.fillStyle=Math.abs(pB-pA)<0.02?'#0b7285':'#e8590c';ctx.font='bold 13px sans-serif';ctx.textAlign='left';
     ctx.fillText(Math.abs(pB-pA)<0.02?'守恒检查通过':'还未到碰撞结算',440,297);
     updateReadouts();
+    canvas.dataset.collisionScenario=canCollide?'will-collide':'rejected-no-collision';
   }
 
   function updateReadouts(){
@@ -174,6 +177,7 @@ canvas{display:block;width:100%;max-width:640px;background:#fff;border:1px solid
     document.getElementById('ek-after').textContent=ekA.toFixed(2);
     document.getElementById('u1').textContent=cur1.toFixed(2);
     document.getElementById('u2').textContent=cur2.toFixed(2);
+    document.getElementById('modeReadout').textContent=elastic?'弹性碰撞：碰后动能守恒':'完全非弹性：碰后两车粘连同速，动能有损失';
   }
 
   function syncControls(){
@@ -190,7 +194,7 @@ canvas{display:block;width:100%;max-width:640px;background:#fff;border:1px solid
     document.querySelectorAll('#mode button').forEach(x=>x.classList.remove('active'));
     b.classList.add('active');elastic=parseInt(b.dataset.e);reset();
   }));
-  document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
+  document.getElementById('play-btn').addEventListener('click',()=>{if(v1<=v2){running=false;document.getElementById('play-btn').textContent='无法碰撞：v₁≤v₂';draw();return;}running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
   document.getElementById('reset-btn').addEventListener('click',reset);
   function pointerPos(e){const r=canvas.getBoundingClientRect(),s=canvas.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s};}
   function hitCar(p,x,m,v,which){
@@ -219,5 +223,6 @@ canvas{display:block;width:100%;max-width:640px;background:#fff;border:1px solid
   syncControls();reset();requestAnimationFrame(loop);
 })();
 </script>
+<script src="guided-lesson.js"></script><script src="../model/guided-lesson.js"></script>
 </body>
 </html>

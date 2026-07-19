@@ -149,7 +149,7 @@
     document.querySelectorAll('[data-type]').forEach(btn=>btn.classList.toggle('active',btn.dataset.type===state.type));
     const warn=state.type==='geo'&&Math.abs(v.T-1440)>50;
     els.status.className='status'+(warn?' warn':'');
-    els.status.textContent=warn?'同步卫星不是任意高度：T 必须等于 24h，且还要赤道同向。':'高轨低速长周期；卫星质量 m 在圆轨方程中约掉。';
+    els.status.textContent=warn?'同步卫星不是任意高度：T 必须等于地球自转恒星日（约23h56min，高中常近似24h），且还要赤道同向。':'高轨低速长周期；卫星质量 m 在圆轨方程中约掉。';
     els.play.textContent=state.running?'暂停':'播放';
   }
   function draw(){const v=calc(),g=geometry(v);ctx.clearRect(0,0,960,760);const bg=ctx.createLinearGradient(0,0,0,760);bg.addColorStop(0,'#fbfdff');bg.addColorStop(1,'#eaf0f7');ctx.fillStyle=bg;ctx.fillRect(0,0,960,760);text('天体运动模型实验台：万有引力提供向心力，轨道半径决定快慢',480,28,'#0f172a','center',20,'900');drawOrbit(v);drawGraphs(v);drawControls(v,g);update(v)}
@@ -166,5 +166,8 @@
   draw();requestAnimationFrame(tick);
 })();
 </script>
+<script>
+window.B2_GUIDE={id:'B2-11',question:'同一中心天体的圆轨道升高后，速度和周期怎样变化？',observe:'把轨道半径r增大；r是地心距离，等于地球半径R加高度h。',options:[{value:'slower',label:'速度变小，周期变长'},{value:'faster',label:'速度变大，周期变短'},{value:'same',label:'速度和周期都不变'}],correct:'slower',actions:[{selector:'[data-type="high"]'}],result:'高轨速度更小，周期更长。',evidence:'速度读数下降、周期读数上升，轨道半径从地心量起。',explanation:'圆轨道由万有引力提供向心力；半径增大时轨道速度降低，而轨道周长和周期增长。',transfer:'只有近似圆轨道才能直接使用本页v、T与r的圆轨比较关系。'};
+</script><script src="guided-lesson.js"></script><script src="../model/guided-lesson.js"></script>
 </body>
 </html>

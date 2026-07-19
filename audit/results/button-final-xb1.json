@@ -1,0 +1,4471 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-11T06:20:46.172Z",
+  "commit": "eb30b19cf78dbb62af23d0567912504d02fe166f",
+  "module": "xb1",
+  "modules": [
+    "xb1"
+  ],
+  "summary": {
+    "total": 21,
+    "score": 100,
+    "pass": 21,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/xb1/damped-vibration.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset",
+          "text": "复位",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "复位"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "b6cbc5c5",
+          "readout_hash": "da51acf8",
+          "physical_readout_hash": "da51acf8",
+          "readout": [
+            "初始振幅 A₀ = 8.0 cm",
+            "阻尼比 ζ = 0.15",
+            "当前振幅包络 = 7.8 cm",
+            "机械能比例 = 94%",
+            "状态：欠阻尼：振荡衰减"
+          ],
+          "physical_readout": [
+            "初始振幅 A₀ = 8.0 cm",
+            "阻尼比 ζ = 0.15",
+            "当前振幅包络 = 7.8 cm",
+            "机械能比例 = 94%",
+            "状态：欠阻尼：振荡衰减"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "1aee2973",
+          "readout_hash": "5e990e2e",
+          "physical_readout_hash": "5e990e2e",
+          "readout": [
+            "初始振幅 A₀ = 8.0 cm",
+            "阻尼比 ζ = 0.15",
+            "当前振幅包络 = 7.4 cm",
+            "机械能比例 = 85%",
+            "状态：欠阻尼：振荡衰减"
+          ],
+          "physical_readout": [
+            "初始振幅 A₀ = 8.0 cm",
+            "阻尼比 ζ = 0.15",
+            "当前振幅包络 = 7.4 cm",
+            "机械能比例 = 85%",
+            "状态：欠阻尼：振荡衰减"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "3fa6f6af",
+          "readout_hash": "7d095c20",
+          "physical_readout_hash": "7d095c20",
+          "readout": [
+            "初始振幅 A₀ = 8.0 cm",
+            "阻尼比 ζ = 0.15",
+            "当前振幅包络 = 7.3 cm",
+            "机械能比例 = 84%",
+            "状态：欠阻尼：振荡衰减"
+          ],
+          "physical_readout": [
+            "初始振幅 A₀ = 8.0 cm",
+            "阻尼比 ζ = 0.15",
+            "当前振幅包络 = 7.3 cm",
+            "机械能比例 = 84%",
+            "状态：欠阻尼：振荡衰减"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "3fa6f6af",
+          "readout_hash": "7d095c20",
+          "physical_readout_hash": "7d095c20",
+          "readout": [
+            "初始振幅 A₀ = 8.0 cm",
+            "阻尼比 ζ = 0.15",
+            "当前振幅包络 = 7.3 cm",
+            "机械能比例 = 84%",
+            "状态：欠阻尼：振荡衰减"
+          ],
+          "physical_readout": [
+            "初始振幅 A₀ = 8.0 cm",
+            "阻尼比 ζ = 0.15",
+            "当前振幅包络 = 7.3 cm",
+            "机械能比例 = 84%",
+            "状态：欠阻尼：振荡衰减"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "初始振幅 A₀ = # cm|阻尼比 ζ = #|当前振幅包络 = # cm|机械能比例 = #%|状态：欠阻尼：振荡衰减",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "初始振幅 A₀ = # cm|阻尼比 ζ = #|当前振幅包络 = # cm|机械能比例 = #%|状态：欠阻尼：振荡衰减",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb1/doppler.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#vs",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play-btn",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset-btn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "reset-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "95519079",
+          "readout_hash": "8c43ec90",
+          "physical_readout_hash": "8c43ec90",
+          "readout": [
+            "波速 v = 120",
+            "波源速度 vs = 40",
+            "前方接收 f前 = 1.50 f₀",
+            "后方接收 f后 = 0.75 f₀",
+            "波源速度 vs = 40",
+            "40"
+          ],
+          "physical_readout": [
+            "波速 v = 120",
+            "波源速度 vs = 40",
+            "前方接收 f前 = 1.50 f₀",
+            "后方接收 f后 = 0.75 f₀",
+            "波源速度 vs = 40",
+            "40"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "71d6a5ef",
+          "readout_hash": "8c43ec90",
+          "physical_readout_hash": "8c43ec90",
+          "readout": [
+            "波速 v = 120",
+            "波源速度 vs = 40",
+            "前方接收 f前 = 1.50 f₀",
+            "后方接收 f后 = 0.75 f₀",
+            "波源速度 vs = 40",
+            "40"
+          ],
+          "physical_readout": [
+            "波速 v = 120",
+            "波源速度 vs = 40",
+            "前方接收 f前 = 1.50 f₀",
+            "后方接收 f后 = 0.75 f₀",
+            "波源速度 vs = 40",
+            "40"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "4e4542a9",
+          "readout_hash": "8c43ec90",
+          "physical_readout_hash": "8c43ec90",
+          "readout": [
+            "波速 v = 120",
+            "波源速度 vs = 40",
+            "前方接收 f前 = 1.50 f₀",
+            "后方接收 f后 = 0.75 f₀",
+            "波源速度 vs = 40",
+            "40"
+          ],
+          "physical_readout": [
+            "波速 v = 120",
+            "波源速度 vs = 40",
+            "前方接收 f前 = 1.50 f₀",
+            "后方接收 f后 = 0.75 f₀",
+            "波源速度 vs = 40",
+            "40"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "4e4542a9",
+          "readout_hash": "8c43ec90",
+          "physical_readout_hash": "8c43ec90",
+          "readout": [
+            "波速 v = 120",
+            "波源速度 vs = 40",
+            "前方接收 f前 = 1.50 f₀",
+            "后方接收 f后 = 0.75 f₀",
+            "波源速度 vs = 40",
+            "40"
+          ],
+          "physical_readout": [
+            "波速 v = 120",
+            "波源速度 vs = 40",
+            "前方接收 f前 = 1.50 f₀",
+            "后方接收 f后 = 0.75 f₀",
+            "波源速度 vs = 40",
+            "40"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "波速 v = #|波源速度 vs = #|前方接收 f前 = # f₀|后方接收 f后 = # f₀|波源速度 vs = #|#",
+          "controls": [
+            {
+              "id": "vs",
+              "value": "40",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "波速 v = #|波源速度 vs = #|前方接收 f前 = # f₀|后方接收 f后 = # f₀|波源速度 vs = #|#",
+          "controls": [
+            {
+              "id": "vs",
+              "value": "40",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb1/double-slit.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#lamr",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#dr",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#Lr",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "⏸ 暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "⏸ 暂停"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "ac94f014",
+          "readout_hash": "3250c551",
+          "physical_readout_hash": "3250c551",
+          "readout": [
+            "波长 λ = 550 nm",
+            "双缝间距 d = 0.20 mm",
+            "缝到屏 L = 1.0 m",
+            "波长 λ = 550 nm",
+            "双缝间距 d = 0.20 mm",
+            "缝到屏 L = 1.0 m",
+            "条纹间距 Δx = 2.75 mm"
+          ],
+          "physical_readout": [
+            "波长 λ = 550 nm",
+            "双缝间距 d = 0.20 mm",
+            "缝到屏 L = 1.0 m",
+            "波长 λ = 550 nm",
+            "双缝间距 d = 0.20 mm",
+            "缝到屏 L = 1.0 m",
+            "条纹间距 Δx = 2.75 mm"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "3464714c",
+          "readout_hash": "3250c551",
+          "physical_readout_hash": "3250c551",
+          "readout": [
+            "波长 λ = 550 nm",
+            "双缝间距 d = 0.20 mm",
+            "缝到屏 L = 1.0 m",
+            "波长 λ = 550 nm",
+            "双缝间距 d = 0.20 mm",
+            "缝到屏 L = 1.0 m",
+            "条纹间距 Δx = 2.75 mm"
+          ],
+          "physical_readout": [
+            "波长 λ = 550 nm",
+            "双缝间距 d = 0.20 mm",
+            "缝到屏 L = 1.0 m",
+            "波长 λ = 550 nm",
+            "双缝间距 d = 0.20 mm",
+            "缝到屏 L = 1.0 m",
+            "条纹间距 Δx = 2.75 mm"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "884e43f4",
+          "readout_hash": "3250c551",
+          "physical_readout_hash": "3250c551",
+          "readout": [
+            "波长 λ = 550 nm",
+            "双缝间距 d = 0.20 mm",
+            "缝到屏 L = 1.0 m",
+            "波长 λ = 550 nm",
+            "双缝间距 d = 0.20 mm",
+            "缝到屏 L = 1.0 m",
+            "条纹间距 Δx = 2.75 mm"
+          ],
+          "physical_readout": [
+            "波长 λ = 550 nm",
+            "双缝间距 d = 0.20 mm",
+            "缝到屏 L = 1.0 m",
+            "波长 λ = 550 nm",
+            "双缝间距 d = 0.20 mm",
+            "缝到屏 L = 1.0 m",
+            "条纹间距 Δx = 2.75 mm"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "884e43f4",
+          "readout_hash": "3250c551",
+          "physical_readout_hash": "3250c551",
+          "readout": [
+            "波长 λ = 550 nm",
+            "双缝间距 d = 0.20 mm",
+            "缝到屏 L = 1.0 m",
+            "波长 λ = 550 nm",
+            "双缝间距 d = 0.20 mm",
+            "缝到屏 L = 1.0 m",
+            "条纹间距 Δx = 2.75 mm"
+          ],
+          "physical_readout": [
+            "波长 λ = 550 nm",
+            "双缝间距 d = 0.20 mm",
+            "缝到屏 L = 1.0 m",
+            "波长 λ = 550 nm",
+            "双缝间距 d = 0.20 mm",
+            "缝到屏 L = 1.0 m",
+            "条纹间距 Δx = 2.75 mm"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "波长 λ = # nm|双缝间距 d = # mm|缝到屏 L = # m|波长 λ = # nm|双缝间距 d = # mm|缝到屏 L = # m|条纹间距 Δx = # mm",
+          "controls": [
+            {
+              "id": "lamr",
+              "value": "550",
+              "checked": false
+            },
+            {
+              "id": "dr",
+              "value": "0.2",
+              "checked": false
+            },
+            {
+              "id": "Lr",
+              "value": "1",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "波长 λ = # nm|双缝间距 d = # mm|缝到屏 L = # m|波长 λ = # nm|双缝间距 d = # mm|缝到屏 L = # m|条纹间距 Δx = # mm",
+          "controls": [
+            {
+              "id": "lamr",
+              "value": "550",
+              "checked": false
+            },
+            {
+              "id": "dr",
+              "value": "0.2",
+              "checked": false
+            },
+            {
+              "id": "Lr",
+              "value": "1",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb1/fiber-optic.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#n1",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#n2",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#angle",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#bend",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录读数",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录读数",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "407b6613",
+          "readout_hash": "e61315ba",
+          "physical_readout_hash": "e61315ba",
+          "readout": [
+            "芯层折射率 n₁ 1.50",
+            "1.50",
+            "包层折射率 n₂ 1.46",
+            "1.46",
+            "入射角 i 78°",
+            "78°",
+            "弯曲程度 20%",
+            "20%",
+            "临界角 C：76.7°入射角 i：78°全反射条件：n₁>n₂ 且 i≥C估计损耗：5%",
+            "78°76.7°全反射5%",
+            "满足全反射：光脉冲被限制在芯层内，多次反射后仍可向前传播。"
+          ],
+          "physical_readout": [
+            "芯层折射率 n₁ 1.50",
+            "1.50",
+            "包层折射率 n₂ 1.46",
+            "1.46",
+            "入射角 i 78°",
+            "78°",
+            "弯曲程度 20%",
+            "20%",
+            "临界角 C：76.7°入射角 i：78°全反射条件：n₁>n₂ 且 i≥C估计损耗：5%",
+            "78°76.7°全反射5%",
+            "满足全反射：光脉冲被限制在芯层内，多次反射后仍可向前传播。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "aed6d586",
+          "readout_hash": "e61315ba",
+          "physical_readout_hash": "e61315ba",
+          "readout": [
+            "芯层折射率 n₁ 1.50",
+            "1.50",
+            "包层折射率 n₂ 1.46",
+            "1.46",
+            "入射角 i 78°",
+            "78°",
+            "弯曲程度 20%",
+            "20%",
+            "临界角 C：76.7°入射角 i：78°全反射条件：n₁>n₂ 且 i≥C估计损耗：5%",
+            "78°76.7°全反射5%",
+            "满足全反射：光脉冲被限制在芯层内，多次反射后仍可向前传播。"
+          ],
+          "physical_readout": [
+            "芯层折射率 n₁ 1.50",
+            "1.50",
+            "包层折射率 n₂ 1.46",
+            "1.46",
+            "入射角 i 78°",
+            "78°",
+            "弯曲程度 20%",
+            "20%",
+            "临界角 C：76.7°入射角 i：78°全反射条件：n₁>n₂ 且 i≥C估计损耗：5%",
+            "78°76.7°全反射5%",
+            "满足全反射：光脉冲被限制在芯层内，多次反射后仍可向前传播。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "aed6d586",
+          "readout_hash": "e61315ba",
+          "physical_readout_hash": "e61315ba",
+          "readout": [
+            "芯层折射率 n₁ 1.50",
+            "1.50",
+            "包层折射率 n₂ 1.46",
+            "1.46",
+            "入射角 i 78°",
+            "78°",
+            "弯曲程度 20%",
+            "20%",
+            "临界角 C：76.7°入射角 i：78°全反射条件：n₁>n₂ 且 i≥C估计损耗：5%",
+            "78°76.7°全反射5%",
+            "满足全反射：光脉冲被限制在芯层内，多次反射后仍可向前传播。"
+          ],
+          "physical_readout": [
+            "芯层折射率 n₁ 1.50",
+            "1.50",
+            "包层折射率 n₂ 1.46",
+            "1.46",
+            "入射角 i 78°",
+            "78°",
+            "弯曲程度 20%",
+            "20%",
+            "临界角 C：76.7°入射角 i：78°全反射条件：n₁>n₂ 且 i≥C估计损耗：5%",
+            "78°76.7°全反射5%",
+            "满足全反射：光脉冲被限制在芯层内，多次反射后仍可向前传播。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "aed6d586",
+          "readout_hash": "e61315ba",
+          "physical_readout_hash": "e61315ba",
+          "readout": [
+            "芯层折射率 n₁ 1.50",
+            "1.50",
+            "包层折射率 n₂ 1.46",
+            "1.46",
+            "入射角 i 78°",
+            "78°",
+            "弯曲程度 20%",
+            "20%",
+            "临界角 C：76.7°入射角 i：78°全反射条件：n₁>n₂ 且 i≥C估计损耗：5%",
+            "78°76.7°全反射5%",
+            "满足全反射：光脉冲被限制在芯层内，多次反射后仍可向前传播。"
+          ],
+          "physical_readout": [
+            "芯层折射率 n₁ 1.50",
+            "1.50",
+            "包层折射率 n₂ 1.46",
+            "1.46",
+            "入射角 i 78°",
+            "78°",
+            "弯曲程度 20%",
+            "20%",
+            "临界角 C：76.7°入射角 i：78°全反射条件：n₁>n₂ 且 i≥C估计损耗：5%",
+            "78°76.7°全反射5%",
+            "满足全反射：光脉冲被限制在芯层内，多次反射后仍可向前传播。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "芯层折射率 n₁ #|#|包层折射率 n₂ #|#|入射角 i #°|#°|弯曲程度 #%|#%|临界角 C：#°入射角 i：#°全反射条件：n₁>n₂ 且 i≥C估计损耗：#%|满足全反射：光脉冲被限制在芯层内，多次反射后仍可向前传播。",
+          "controls": [
+            {
+              "id": "n1",
+              "value": "1.5",
+              "checked": false
+            },
+            {
+              "id": "n2",
+              "value": "1.46",
+              "checked": false
+            },
+            {
+              "id": "angle",
+              "value": "78",
+              "checked": false
+            },
+            {
+              "id": "bend",
+              "value": "20",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "芯层折射率 n₁ #|#|包层折射率 n₂ #|#|入射角 i #°|#°|弯曲程度 #%|#%|临界角 C：#°入射角 i：#°全反射条件：n₁>n₂ 且 i≥C估计损耗：#%|满足全反射：光脉冲被限制在芯层内，多次反射后仍可向前传播。",
+          "controls": [
+            {
+              "id": "n1",
+              "value": "1.5",
+              "checked": false
+            },
+            {
+              "id": "n2",
+              "value": "1.46",
+              "checked": false
+            },
+            {
+              "id": "angle",
+              "value": "78",
+              "checked": false
+            },
+            {
+              "id": "bend",
+              "value": "20",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb1/forced-resonance.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "⏸ 暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset",
+          "text": "复位",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.32,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "⏸ 暂停"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "复位"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "62023822",
+          "readout_hash": "567dfe02",
+          "physical_readout_hash": "567dfe02",
+          "readout": [
+            "固有频率 f固 = 2.0 Hz",
+            "驱动频率 f驱 = 2.0 Hz",
+            "稳定后频率 = 2.0 Hz",
+            "稳态振幅 = 5.0 倍",
+            "状态：共振附近：振幅最大"
+          ],
+          "physical_readout": [
+            "固有频率 f固 = 2.0 Hz",
+            "驱动频率 f驱 = 2.0 Hz",
+            "稳定后频率 = 2.0 Hz",
+            "稳态振幅 = 5.0 倍",
+            "状态：共振附近：振幅最大"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "9f5ff62a",
+          "readout_hash": "567dfe02",
+          "physical_readout_hash": "567dfe02",
+          "readout": [
+            "固有频率 f固 = 2.0 Hz",
+            "驱动频率 f驱 = 2.0 Hz",
+            "稳定后频率 = 2.0 Hz",
+            "稳态振幅 = 5.0 倍",
+            "状态：共振附近：振幅最大"
+          ],
+          "physical_readout": [
+            "固有频率 f固 = 2.0 Hz",
+            "驱动频率 f驱 = 2.0 Hz",
+            "稳定后频率 = 2.0 Hz",
+            "稳态振幅 = 5.0 倍",
+            "状态：共振附近：振幅最大"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "5afc8f81",
+          "readout_hash": "567dfe02",
+          "physical_readout_hash": "567dfe02",
+          "readout": [
+            "固有频率 f固 = 2.0 Hz",
+            "驱动频率 f驱 = 2.0 Hz",
+            "稳定后频率 = 2.0 Hz",
+            "稳态振幅 = 5.0 倍",
+            "状态：共振附近：振幅最大"
+          ],
+          "physical_readout": [
+            "固有频率 f固 = 2.0 Hz",
+            "驱动频率 f驱 = 2.0 Hz",
+            "稳定后频率 = 2.0 Hz",
+            "稳态振幅 = 5.0 倍",
+            "状态：共振附近：振幅最大"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "5afc8f81",
+          "readout_hash": "567dfe02",
+          "physical_readout_hash": "567dfe02",
+          "readout": [
+            "固有频率 f固 = 2.0 Hz",
+            "驱动频率 f驱 = 2.0 Hz",
+            "稳定后频率 = 2.0 Hz",
+            "稳态振幅 = 5.0 倍",
+            "状态：共振附近：振幅最大"
+          ],
+          "physical_readout": [
+            "固有频率 f固 = 2.0 Hz",
+            "驱动频率 f驱 = 2.0 Hz",
+            "稳定后频率 = 2.0 Hz",
+            "稳态振幅 = 5.0 倍",
+            "状态：共振附近：振幅最大"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "固有频率 f固 = # Hz|驱动频率 f驱 = # Hz|稳定后频率 = # Hz|稳态振幅 = # 倍|状态：共振附近：振幅最大",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "固有频率 f固 = # Hz|驱动频率 f驱 = # Hz|稳定后频率 = # Hz|稳态振幅 = # 倍|状态：共振附近：振幅最大",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb1/impulse.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "button:缓冲目标",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#mode",
+          "text": "缓冲目标",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset",
+          "text": "复位",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.32,
+          "py": 0.32
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "复位"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "130e7272",
+          "readout_hash": "85a39879",
+          "physical_readout_hash": "85a39879",
+          "readout": [
+            "质量 m = 1.0 kg",
+            "力 F = 4.0 N",
+            "作用时间 t = 2.0 s",
+            "冲量 I = F·t = 8.0 N·s",
+            "动量变化 Δp = 8.0 kg·m/s",
+            "末速度 v′ = 9.0 m/s",
+            "状态：状态：正向冲量，Δp 为正"
+          ],
+          "physical_readout": [
+            "质量 m = 1.0 kg",
+            "力 F = 4.0 N",
+            "作用时间 t = 2.0 s",
+            "冲量 I = F·t = 8.0 N·s",
+            "动量变化 Δp = 8.0 kg·m/s",
+            "末速度 v′ = 9.0 m/s",
+            "状态：状态：正向冲量，Δp 为正"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "4e98420",
+          "readout_hash": "4af8c0dd",
+          "physical_readout_hash": "4af8c0dd",
+          "readout": [
+            "质量 m = 1.0 kg",
+            "力 F = 4.0 N",
+            "作用时间 t = 2.0 s",
+            "冲量 I = F·t = 8.0 N·s",
+            "动量变化 Δp = 8.0 kg·m/s",
+            "末速度 v′ = 9.0 m/s",
+            "状态：运动中：冲量正在累积"
+          ],
+          "physical_readout": [
+            "质量 m = 1.0 kg",
+            "力 F = 4.0 N",
+            "作用时间 t = 2.0 s",
+            "冲量 I = F·t = 8.0 N·s",
+            "动量变化 Δp = 8.0 kg·m/s",
+            "末速度 v′ = 9.0 m/s",
+            "状态：运动中：冲量正在累积"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "d57c2153",
+          "readout_hash": "85a39879",
+          "physical_readout_hash": "85a39879",
+          "readout": [
+            "质量 m = 1.0 kg",
+            "力 F = 4.0 N",
+            "作用时间 t = 2.0 s",
+            "冲量 I = F·t = 8.0 N·s",
+            "动量变化 Δp = 8.0 kg·m/s",
+            "末速度 v′ = 9.0 m/s",
+            "状态：状态：正向冲量，Δp 为正"
+          ],
+          "physical_readout": [
+            "质量 m = 1.0 kg",
+            "力 F = 4.0 N",
+            "作用时间 t = 2.0 s",
+            "冲量 I = F·t = 8.0 N·s",
+            "动量变化 Δp = 8.0 kg·m/s",
+            "末速度 v′ = 9.0 m/s",
+            "状态：状态：正向冲量，Δp 为正"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "d57c2153",
+          "readout_hash": "85a39879",
+          "physical_readout_hash": "85a39879",
+          "readout": [
+            "质量 m = 1.0 kg",
+            "力 F = 4.0 N",
+            "作用时间 t = 2.0 s",
+            "冲量 I = F·t = 8.0 N·s",
+            "动量变化 Δp = 8.0 kg·m/s",
+            "末速度 v′ = 9.0 m/s",
+            "状态：状态：正向冲量，Δp 为正"
+          ],
+          "physical_readout": [
+            "质量 m = 1.0 kg",
+            "力 F = 4.0 N",
+            "作用时间 t = 2.0 s",
+            "冲量 I = F·t = 8.0 N·s",
+            "动量变化 Δp = 8.0 kg·m/s",
+            "末速度 v′ = 9.0 m/s",
+            "状态：状态：正向冲量，Δp 为正"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "质量 m = # kg|力 F = # N|作用时间 t = # s|冲量 I = F·t = # N·s|动量变化 Δp = # kg·m/s|末速度 v′ = # m/s|状态：状态：正向冲量，Δp 为正",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "质量 m = # kg|力 F = # N|作用时间 t = # s|冲量 I = F·t = # N·s|动量变化 Δp = # kg·m/s|末速度 v′ = # m/s|状态：状态：正向冲量，Δp 为正",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb1/laser.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#divergence",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#coherence",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#power",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#lambda",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录读数",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录读数",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "23c20c94",
+          "readout_hash": "a242b388",
+          "physical_readout_hash": "a242b388",
+          "readout": [
+            "发散角 θ 2.0 mrad",
+            "2.0 mrad",
+            "相干性 85%",
+            "85%",
+            "功率 P 5.0 mW",
+            "5.0 mW",
+            "波长 λ 650 nm",
+            "650 nm",
+            "远处 L=1000 m激光光斑半径 r≈Lθ：2.00 m光子能量 E=hc/λ：1.91 eV相干性：85%",
+            "测距/通信2.00 m1.91",
+            "发散角小：方向性强，远处光斑仍小，适合测距和准直。"
+          ],
+          "physical_readout": [
+            "发散角 θ 2.0 mrad",
+            "2.0 mrad",
+            "相干性 85%",
+            "85%",
+            "功率 P 5.0 mW",
+            "5.0 mW",
+            "波长 λ 650 nm",
+            "650 nm",
+            "远处 L=1000 m激光光斑半径 r≈Lθ：2.00 m光子能量 E=hc/λ：1.91 eV相干性：85%",
+            "测距/通信2.00 m1.91",
+            "发散角小：方向性强，远处光斑仍小，适合测距和准直。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "5479cfc3",
+          "readout_hash": "a242b388",
+          "physical_readout_hash": "a242b388",
+          "readout": [
+            "发散角 θ 2.0 mrad",
+            "2.0 mrad",
+            "相干性 85%",
+            "85%",
+            "功率 P 5.0 mW",
+            "5.0 mW",
+            "波长 λ 650 nm",
+            "650 nm",
+            "远处 L=1000 m激光光斑半径 r≈Lθ：2.00 m光子能量 E=hc/λ：1.91 eV相干性：85%",
+            "测距/通信2.00 m1.91",
+            "发散角小：方向性强，远处光斑仍小，适合测距和准直。"
+          ],
+          "physical_readout": [
+            "发散角 θ 2.0 mrad",
+            "2.0 mrad",
+            "相干性 85%",
+            "85%",
+            "功率 P 5.0 mW",
+            "5.0 mW",
+            "波长 λ 650 nm",
+            "650 nm",
+            "远处 L=1000 m激光光斑半径 r≈Lθ：2.00 m光子能量 E=hc/λ：1.91 eV相干性：85%",
+            "测距/通信2.00 m1.91",
+            "发散角小：方向性强，远处光斑仍小，适合测距和准直。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "2861d291",
+          "readout_hash": "a242b388",
+          "physical_readout_hash": "a242b388",
+          "readout": [
+            "发散角 θ 2.0 mrad",
+            "2.0 mrad",
+            "相干性 85%",
+            "85%",
+            "功率 P 5.0 mW",
+            "5.0 mW",
+            "波长 λ 650 nm",
+            "650 nm",
+            "远处 L=1000 m激光光斑半径 r≈Lθ：2.00 m光子能量 E=hc/λ：1.91 eV相干性：85%",
+            "测距/通信2.00 m1.91",
+            "发散角小：方向性强，远处光斑仍小，适合测距和准直。"
+          ],
+          "physical_readout": [
+            "发散角 θ 2.0 mrad",
+            "2.0 mrad",
+            "相干性 85%",
+            "85%",
+            "功率 P 5.0 mW",
+            "5.0 mW",
+            "波长 λ 650 nm",
+            "650 nm",
+            "远处 L=1000 m激光光斑半径 r≈Lθ：2.00 m光子能量 E=hc/λ：1.91 eV相干性：85%",
+            "测距/通信2.00 m1.91",
+            "发散角小：方向性强，远处光斑仍小，适合测距和准直。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "2861d291",
+          "readout_hash": "a242b388",
+          "physical_readout_hash": "a242b388",
+          "readout": [
+            "发散角 θ 2.0 mrad",
+            "2.0 mrad",
+            "相干性 85%",
+            "85%",
+            "功率 P 5.0 mW",
+            "5.0 mW",
+            "波长 λ 650 nm",
+            "650 nm",
+            "远处 L=1000 m激光光斑半径 r≈Lθ：2.00 m光子能量 E=hc/λ：1.91 eV相干性：85%",
+            "测距/通信2.00 m1.91",
+            "发散角小：方向性强，远处光斑仍小，适合测距和准直。"
+          ],
+          "physical_readout": [
+            "发散角 θ 2.0 mrad",
+            "2.0 mrad",
+            "相干性 85%",
+            "85%",
+            "功率 P 5.0 mW",
+            "5.0 mW",
+            "波长 λ 650 nm",
+            "650 nm",
+            "远处 L=1000 m激光光斑半径 r≈Lθ：2.00 m光子能量 E=hc/λ：1.91 eV相干性：85%",
+            "测距/通信2.00 m1.91",
+            "发散角小：方向性强，远处光斑仍小，适合测距和准直。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "发散角 θ # mrad|# mrad|相干性 #%|#%|功率 P # mW|# mW|波长 λ # nm|# nm|远处 L=# m激光光斑半径 r≈Lθ：# m光子能量 E=hc/λ：# eV相干性：#%|发散角小：方向性强，远处光斑仍小，适合测距和准直。",
+          "controls": [
+            {
+              "id": "divergence",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "coherence",
+              "value": "85",
+              "checked": false
+            },
+            {
+              "id": "power",
+              "value": "5",
+              "checked": false
+            },
+            {
+              "id": "lambda",
+              "value": "650",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "发散角 θ # mrad|# mrad|相干性 #%|#%|功率 P # mW|# mW|波长 λ # nm|# nm|远处 L=# m激光光斑半径 r≈Lθ：# m光子能量 E=hc/λ：# eV相干性：#%|发散角小：方向性强，远处光斑仍小，适合测距和准直。",
+          "controls": [
+            {
+              "id": "divergence",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "coherence",
+              "value": "85",
+              "checked": false
+            },
+            {
+              "id": "power",
+              "value": "5",
+              "checked": false
+            },
+            {
+              "id": "lambda",
+              "value": "650",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb1/light-diffraction.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#lamr",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#ar",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "⏸ 暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "⏸ 暂停"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "a367a5d5",
+          "readout_hash": "2639217d",
+          "physical_readout_hash": "2639217d",
+          "readout": [
+            "波长 λ = 550 nm",
+            "缝宽 a = 0.10 mm",
+            "波长 λ = 550 nm",
+            "缝宽 a = 0.10 mm",
+            "a/λ = 182",
+            "中央亮纹半角 ≈ 0.32°"
+          ],
+          "physical_readout": [
+            "波长 λ = 550 nm",
+            "缝宽 a = 0.10 mm",
+            "波长 λ = 550 nm",
+            "缝宽 a = 0.10 mm",
+            "a/λ = 182",
+            "中央亮纹半角 ≈ 0.32°"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "d540765a",
+          "readout_hash": "2639217d",
+          "physical_readout_hash": "2639217d",
+          "readout": [
+            "波长 λ = 550 nm",
+            "缝宽 a = 0.10 mm",
+            "波长 λ = 550 nm",
+            "缝宽 a = 0.10 mm",
+            "a/λ = 182",
+            "中央亮纹半角 ≈ 0.32°"
+          ],
+          "physical_readout": [
+            "波长 λ = 550 nm",
+            "缝宽 a = 0.10 mm",
+            "波长 λ = 550 nm",
+            "缝宽 a = 0.10 mm",
+            "a/λ = 182",
+            "中央亮纹半角 ≈ 0.32°"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "86c99885",
+          "readout_hash": "2639217d",
+          "physical_readout_hash": "2639217d",
+          "readout": [
+            "波长 λ = 550 nm",
+            "缝宽 a = 0.10 mm",
+            "波长 λ = 550 nm",
+            "缝宽 a = 0.10 mm",
+            "a/λ = 182",
+            "中央亮纹半角 ≈ 0.32°"
+          ],
+          "physical_readout": [
+            "波长 λ = 550 nm",
+            "缝宽 a = 0.10 mm",
+            "波长 λ = 550 nm",
+            "缝宽 a = 0.10 mm",
+            "a/λ = 182",
+            "中央亮纹半角 ≈ 0.32°"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "86c99885",
+          "readout_hash": "2639217d",
+          "physical_readout_hash": "2639217d",
+          "readout": [
+            "波长 λ = 550 nm",
+            "缝宽 a = 0.10 mm",
+            "波长 λ = 550 nm",
+            "缝宽 a = 0.10 mm",
+            "a/λ = 182",
+            "中央亮纹半角 ≈ 0.32°"
+          ],
+          "physical_readout": [
+            "波长 λ = 550 nm",
+            "缝宽 a = 0.10 mm",
+            "波长 λ = 550 nm",
+            "缝宽 a = 0.10 mm",
+            "a/λ = 182",
+            "中央亮纹半角 ≈ 0.32°"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "波长 λ = # nm|缝宽 a = # mm|波长 λ = # nm|缝宽 a = # mm|a/λ = #|中央亮纹半角 ≈ #°",
+          "controls": [
+            {
+              "id": "lamr",
+              "value": "550",
+              "checked": false
+            },
+            {
+              "id": "ar",
+              "value": "0.1",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "波长 λ = # nm|缝宽 a = # mm|波长 λ = # nm|缝宽 a = # mm|a/λ = #|中央亮纹半角 ≈ #°",
+          "controls": [
+            {
+              "id": "lamr",
+              "value": "550",
+              "checked": false
+            },
+            {
+              "id": "ar",
+              "value": "0.1",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb1/momentum-collision.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#m1",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#v1",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#m2",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#v2",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:完全非弹性",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:弹性碰撞",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "button:弹性碰撞",
+          "text": "弹性碰撞",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:完全非弹性",
+          "text": "完全非弹性",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play-btn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset-btn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "reset-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "e314fb93",
+          "readout_hash": "7086f162",
+          "physical_readout_hash": "7086f162",
+          "readout": [
+            "碰前总动量 p = 3.00 kg·m/s",
+            "碰后总动量 p′ = 3.00 kg·m/s",
+            "碰前动能 = 4.50 J",
+            "碰后动能 = 4.50 J",
+            "碰后 v₁′ = 3.00 m/s",
+            "碰后 v₂′ = 0.00 m/s",
+            "弹性碰撞：碰后动能守恒",
+            "m₁ = 1.0 kg",
+            "1.0",
+            "v₁ = 3.0 m/s",
+            "3.0",
+            "m₂ = 2.0 kg",
+            "2.0",
+            "v₂ = 0.0 m/s",
+            "0.0"
+          ],
+          "physical_readout": [
+            "碰前总动量 p = 3.00 kg·m/s",
+            "碰后总动量 p′ = 3.00 kg·m/s",
+            "碰前动能 = 4.50 J",
+            "碰后动能 = 4.50 J",
+            "碰后 v₁′ = 3.00 m/s",
+            "碰后 v₂′ = 0.00 m/s",
+            "弹性碰撞：碰后动能守恒",
+            "m₁ = 1.0 kg",
+            "1.0",
+            "v₁ = 3.0 m/s",
+            "3.0",
+            "m₂ = 2.0 kg",
+            "2.0",
+            "v₂ = 0.0 m/s",
+            "0.0"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "3ccb943c",
+          "readout_hash": "7086f162",
+          "physical_readout_hash": "7086f162",
+          "readout": [
+            "碰前总动量 p = 3.00 kg·m/s",
+            "碰后总动量 p′ = 3.00 kg·m/s",
+            "碰前动能 = 4.50 J",
+            "碰后动能 = 4.50 J",
+            "碰后 v₁′ = 3.00 m/s",
+            "碰后 v₂′ = 0.00 m/s",
+            "弹性碰撞：碰后动能守恒",
+            "m₁ = 1.0 kg",
+            "1.0",
+            "v₁ = 3.0 m/s",
+            "3.0",
+            "m₂ = 2.0 kg",
+            "2.0",
+            "v₂ = 0.0 m/s",
+            "0.0"
+          ],
+          "physical_readout": [
+            "碰前总动量 p = 3.00 kg·m/s",
+            "碰后总动量 p′ = 3.00 kg·m/s",
+            "碰前动能 = 4.50 J",
+            "碰后动能 = 4.50 J",
+            "碰后 v₁′ = 3.00 m/s",
+            "碰后 v₂′ = 0.00 m/s",
+            "弹性碰撞：碰后动能守恒",
+            "m₁ = 1.0 kg",
+            "1.0",
+            "v₁ = 3.0 m/s",
+            "3.0",
+            "m₂ = 2.0 kg",
+            "2.0",
+            "v₂ = 0.0 m/s",
+            "0.0"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "c1612d2f",
+          "readout_hash": "7086f162",
+          "physical_readout_hash": "7086f162",
+          "readout": [
+            "碰前总动量 p = 3.00 kg·m/s",
+            "碰后总动量 p′ = 3.00 kg·m/s",
+            "碰前动能 = 4.50 J",
+            "碰后动能 = 4.50 J",
+            "碰后 v₁′ = 3.00 m/s",
+            "碰后 v₂′ = 0.00 m/s",
+            "弹性碰撞：碰后动能守恒",
+            "m₁ = 1.0 kg",
+            "1.0",
+            "v₁ = 3.0 m/s",
+            "3.0",
+            "m₂ = 2.0 kg",
+            "2.0",
+            "v₂ = 0.0 m/s",
+            "0.0"
+          ],
+          "physical_readout": [
+            "碰前总动量 p = 3.00 kg·m/s",
+            "碰后总动量 p′ = 3.00 kg·m/s",
+            "碰前动能 = 4.50 J",
+            "碰后动能 = 4.50 J",
+            "碰后 v₁′ = 3.00 m/s",
+            "碰后 v₂′ = 0.00 m/s",
+            "弹性碰撞：碰后动能守恒",
+            "m₁ = 1.0 kg",
+            "1.0",
+            "v₁ = 3.0 m/s",
+            "3.0",
+            "m₂ = 2.0 kg",
+            "2.0",
+            "v₂ = 0.0 m/s",
+            "0.0"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "c1612d2f",
+          "readout_hash": "7086f162",
+          "physical_readout_hash": "7086f162",
+          "readout": [
+            "碰前总动量 p = 3.00 kg·m/s",
+            "碰后总动量 p′ = 3.00 kg·m/s",
+            "碰前动能 = 4.50 J",
+            "碰后动能 = 4.50 J",
+            "碰后 v₁′ = 3.00 m/s",
+            "碰后 v₂′ = 0.00 m/s",
+            "弹性碰撞：碰后动能守恒",
+            "m₁ = 1.0 kg",
+            "1.0",
+            "v₁ = 3.0 m/s",
+            "3.0",
+            "m₂ = 2.0 kg",
+            "2.0",
+            "v₂ = 0.0 m/s",
+            "0.0"
+          ],
+          "physical_readout": [
+            "碰前总动量 p = 3.00 kg·m/s",
+            "碰后总动量 p′ = 3.00 kg·m/s",
+            "碰前动能 = 4.50 J",
+            "碰后动能 = 4.50 J",
+            "碰后 v₁′ = 3.00 m/s",
+            "碰后 v₂′ = 0.00 m/s",
+            "弹性碰撞：碰后动能守恒",
+            "m₁ = 1.0 kg",
+            "1.0",
+            "v₁ = 3.0 m/s",
+            "3.0",
+            "m₂ = 2.0 kg",
+            "2.0",
+            "v₂ = 0.0 m/s",
+            "0.0"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "碰前总动量 p = # kg·m/s|碰后总动量 p′ = # kg·m/s|碰前动能 = # J|碰后动能 = # J|碰后 v₁′ = # m/s|碰后 v₂′ = # m/s|弹性碰撞：碰后动能守恒|m₁ = # kg|#|v₁ = # m/s|#|m₂ = # kg|#|v₂ = # m/s|#",
+          "controls": [
+            {
+              "id": "m1",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "v1",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "m2",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "v2",
+              "value": "0",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "碰前总动量 p = # kg·m/s|碰后总动量 p′ = # kg·m/s|碰前动能 = # J|碰后动能 = # J|碰后 v₁′ = # m/s|碰后 v₂′ = # m/s|弹性碰撞：碰后动能守恒|m₁ = # kg|#|v₁ = # m/s|#|m₂ = # kg|#|v₂ = # m/s|#",
+          "controls": [
+            {
+              "id": "m1",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "v1",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "m2",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "v2",
+              "value": "0",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb1/momentum.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "⏸ 暂停运动",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset",
+          "text": "复位",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.32,
+          "py": 0.32
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "⏸ 暂停运动"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "复位"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "524d83c2",
+          "readout_hash": "67d7c978",
+          "physical_readout_hash": "4efd7647",
+          "readout": [
+            "质量 m = 2.0 kg",
+            "速度 v = 3.0 m/s",
+            "动量 p = mv = 6.0 kg·m/s",
+            "动能 Ek = 1/2 mv² = 9.0 J",
+            "运动状态：已暂停",
+            "取向右为正：p 为正，方向向右"
+          ],
+          "physical_readout": [
+            "质量 m = 2.0 kg",
+            "速度 v = 3.0 m/s",
+            "动量 p = mv = 6.0 kg·m/s",
+            "动能 Ek = 1/2 mv² = 9.0 J",
+            "运动",
+            "取向右为正：p 为正，方向向右"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "2432677",
+          "readout_hash": "2e15bd1",
+          "physical_readout_hash": "2e15bd1",
+          "readout": [
+            "质量 m = 2.0 kg",
+            "速度 v = 3.0 m/s",
+            "动量 p = mv = 6.0 kg·m/s",
+            "动能 Ek = 1/2 mv² = 9.0 J",
+            "运动状态：向右匀速运动",
+            "取向右为正：p 为正，方向向右"
+          ],
+          "physical_readout": [
+            "质量 m = 2.0 kg",
+            "速度 v = 3.0 m/s",
+            "动量 p = mv = 6.0 kg·m/s",
+            "动能 Ek = 1/2 mv² = 9.0 J",
+            "运动状态：向右匀速运动",
+            "取向右为正：p 为正，方向向右"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "947cff93",
+          "readout_hash": "67d7c978",
+          "physical_readout_hash": "4efd7647",
+          "readout": [
+            "质量 m = 2.0 kg",
+            "速度 v = 3.0 m/s",
+            "动量 p = mv = 6.0 kg·m/s",
+            "动能 Ek = 1/2 mv² = 9.0 J",
+            "运动状态：已暂停",
+            "取向右为正：p 为正，方向向右"
+          ],
+          "physical_readout": [
+            "质量 m = 2.0 kg",
+            "速度 v = 3.0 m/s",
+            "动量 p = mv = 6.0 kg·m/s",
+            "动能 Ek = 1/2 mv² = 9.0 J",
+            "运动",
+            "取向右为正：p 为正，方向向右"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "44a369e0",
+          "readout_hash": "67d7c978",
+          "physical_readout_hash": "4efd7647",
+          "readout": [
+            "质量 m = 2.0 kg",
+            "速度 v = 3.0 m/s",
+            "动量 p = mv = 6.0 kg·m/s",
+            "动能 Ek = 1/2 mv² = 9.0 J",
+            "运动状态：已暂停",
+            "取向右为正：p 为正，方向向右"
+          ],
+          "physical_readout": [
+            "质量 m = 2.0 kg",
+            "速度 v = 3.0 m/s",
+            "动量 p = mv = 6.0 kg·m/s",
+            "动能 Ek = 1/2 mv² = 9.0 J",
+            "运动",
+            "取向右为正：p 为正，方向向右"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "质量 m = # kg|速度 v = # m/s|动量 p = mv = # kg·m/s|动能 Ek = #/# mv² = # J|运动状态：已暂停|取向右为正：p 为正，方向向右",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "质量 m = # kg|速度 v = # m/s|动量 p = mv = # kg·m/s|动能 Ek = #/# mv² = # J|运动状态：已暂停|取向右为正：p 为正，方向向右",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb1/pendulum.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#l",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#th",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#g",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play-btn",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset-btn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "reset-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "e5d2a60e",
+          "readout_hash": "998b4ca",
+          "physical_readout_hash": "998b4ca",
+          "readout": [
+            "摆长 L = 1.0 m",
+            "周期 T = 2.01 s",
+            "摆角 θ = 9°",
+            "状态：小角度等时性成立（与振幅、质量无关）",
+            "摆长 L = 1.0 m",
+            "1.0",
+            "初始摆角 θ₀ = 10°",
+            "10",
+            "重力 g = 9.8",
+            "9.8"
+          ],
+          "physical_readout": [
+            "摆长 L = 1.0 m",
+            "周期 T = 2.01 s",
+            "摆角 θ = 9°",
+            "状态：小角度等时性成立（与振幅、质量无关）",
+            "摆长 L = 1.0 m",
+            "1.0",
+            "初始摆角 θ₀ = 10°",
+            "10",
+            "重力 g = 9.8",
+            "9.8"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "a81f121f",
+          "readout_hash": "4ea2f93f",
+          "physical_readout_hash": "4ea2f93f",
+          "readout": [
+            "摆长 L = 1.0 m",
+            "周期 T = 2.01 s",
+            "摆角 θ = -1°",
+            "状态：小角度等时性成立（与振幅、质量无关）",
+            "摆长 L = 1.0 m",
+            "1.0",
+            "初始摆角 θ₀ = 10°",
+            "10",
+            "重力 g = 9.8",
+            "9.8"
+          ],
+          "physical_readout": [
+            "摆长 L = 1.0 m",
+            "周期 T = 2.01 s",
+            "摆角 θ = -1°",
+            "状态：小角度等时性成立（与振幅、质量无关）",
+            "摆长 L = 1.0 m",
+            "1.0",
+            "初始摆角 θ₀ = 10°",
+            "10",
+            "重力 g = 9.8",
+            "9.8"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "6babe94",
+          "readout_hash": "4ea2f93f",
+          "physical_readout_hash": "4ea2f93f",
+          "readout": [
+            "摆长 L = 1.0 m",
+            "周期 T = 2.01 s",
+            "摆角 θ = -1°",
+            "状态：小角度等时性成立（与振幅、质量无关）",
+            "摆长 L = 1.0 m",
+            "1.0",
+            "初始摆角 θ₀ = 10°",
+            "10",
+            "重力 g = 9.8",
+            "9.8"
+          ],
+          "physical_readout": [
+            "摆长 L = 1.0 m",
+            "周期 T = 2.01 s",
+            "摆角 θ = -1°",
+            "状态：小角度等时性成立（与振幅、质量无关）",
+            "摆长 L = 1.0 m",
+            "1.0",
+            "初始摆角 θ₀ = 10°",
+            "10",
+            "重力 g = 9.8",
+            "9.8"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "6babe94",
+          "readout_hash": "4ea2f93f",
+          "physical_readout_hash": "4ea2f93f",
+          "readout": [
+            "摆长 L = 1.0 m",
+            "周期 T = 2.01 s",
+            "摆角 θ = -1°",
+            "状态：小角度等时性成立（与振幅、质量无关）",
+            "摆长 L = 1.0 m",
+            "1.0",
+            "初始摆角 θ₀ = 10°",
+            "10",
+            "重力 g = 9.8",
+            "9.8"
+          ],
+          "physical_readout": [
+            "摆长 L = 1.0 m",
+            "周期 T = 2.01 s",
+            "摆角 θ = -1°",
+            "状态：小角度等时性成立（与振幅、质量无关）",
+            "摆长 L = 1.0 m",
+            "1.0",
+            "初始摆角 θ₀ = 10°",
+            "10",
+            "重力 g = 9.8",
+            "9.8"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "摆长 L = # m|周期 T = # s|摆角 θ = #°|状态：小角度等时性成立（与振幅、质量无关）|摆长 L = # m|#|初始摆角 θ₀ = #°|#|重力 g = #|#",
+          "controls": [
+            {
+              "id": "l",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "th",
+              "value": "10",
+              "checked": false
+            },
+            {
+              "id": "g",
+              "value": "9.8",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "摆长 L = # m|周期 T = # s|摆角 θ = #°|状态：小角度等时性成立（与振幅、质量无关）|摆长 L = # m|#|初始摆角 θ₀ = #°|#|重力 g = #|#",
+          "controls": [
+            {
+              "id": "l",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "th",
+              "value": "10",
+              "checked": false
+            },
+            {
+              "id": "g",
+              "value": "9.8",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb1/photoelectric.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#nu",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#w",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#int",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play-btn",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset-btn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "reset-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "2a96df48",
+          "readout_hash": "b8e37316",
+          "physical_readout_hash": "b8e37316",
+          "readout": [
+            "频率 ν = 7.0 ×10¹⁴ Hz",
+            "逸出功 W₀ = 2.3 eV",
+            "截止频率 ν₀ = 5.56 ×10¹⁴ Hz",
+            "最大初动能 Eₖ = 0.60 eV",
+            "状态：发射电子",
+            "光频率 ν = 7.0 ×10¹⁴ Hz",
+            "7.0",
+            "逸出功 W₀ = 2.3 eV",
+            "2.3",
+            "光强 = 中",
+            "中"
+          ],
+          "physical_readout": [
+            "频率 ν = 7.0 ×10¹⁴ Hz",
+            "逸出功 W₀ = 2.3 eV",
+            "截止频率 ν₀ = 5.56 ×10¹⁴ Hz",
+            "最大初动能 Eₖ = 0.60 eV",
+            "状态：发射电子",
+            "光频率 ν = 7.0 ×10¹⁴ Hz",
+            "7.0",
+            "逸出功 W₀ = 2.3 eV",
+            "2.3",
+            "光强 = 中",
+            "中"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "9f8022f9",
+          "readout_hash": "b8e37316",
+          "physical_readout_hash": "b8e37316",
+          "readout": [
+            "频率 ν = 7.0 ×10¹⁴ Hz",
+            "逸出功 W₀ = 2.3 eV",
+            "截止频率 ν₀ = 5.56 ×10¹⁴ Hz",
+            "最大初动能 Eₖ = 0.60 eV",
+            "状态：发射电子",
+            "光频率 ν = 7.0 ×10¹⁴ Hz",
+            "7.0",
+            "逸出功 W₀ = 2.3 eV",
+            "2.3",
+            "光强 = 中",
+            "中"
+          ],
+          "physical_readout": [
+            "频率 ν = 7.0 ×10¹⁴ Hz",
+            "逸出功 W₀ = 2.3 eV",
+            "截止频率 ν₀ = 5.56 ×10¹⁴ Hz",
+            "最大初动能 Eₖ = 0.60 eV",
+            "状态：发射电子",
+            "光频率 ν = 7.0 ×10¹⁴ Hz",
+            "7.0",
+            "逸出功 W₀ = 2.3 eV",
+            "2.3",
+            "光强 = 中",
+            "中"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "828c5255",
+          "readout_hash": "b8e37316",
+          "physical_readout_hash": "b8e37316",
+          "readout": [
+            "频率 ν = 7.0 ×10¹⁴ Hz",
+            "逸出功 W₀ = 2.3 eV",
+            "截止频率 ν₀ = 5.56 ×10¹⁴ Hz",
+            "最大初动能 Eₖ = 0.60 eV",
+            "状态：发射电子",
+            "光频率 ν = 7.0 ×10¹⁴ Hz",
+            "7.0",
+            "逸出功 W₀ = 2.3 eV",
+            "2.3",
+            "光强 = 中",
+            "中"
+          ],
+          "physical_readout": [
+            "频率 ν = 7.0 ×10¹⁴ Hz",
+            "逸出功 W₀ = 2.3 eV",
+            "截止频率 ν₀ = 5.56 ×10¹⁴ Hz",
+            "最大初动能 Eₖ = 0.60 eV",
+            "状态：发射电子",
+            "光频率 ν = 7.0 ×10¹⁴ Hz",
+            "7.0",
+            "逸出功 W₀ = 2.3 eV",
+            "2.3",
+            "光强 = 中",
+            "中"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "828c5255",
+          "readout_hash": "b8e37316",
+          "physical_readout_hash": "b8e37316",
+          "readout": [
+            "频率 ν = 7.0 ×10¹⁴ Hz",
+            "逸出功 W₀ = 2.3 eV",
+            "截止频率 ν₀ = 5.56 ×10¹⁴ Hz",
+            "最大初动能 Eₖ = 0.60 eV",
+            "状态：发射电子",
+            "光频率 ν = 7.0 ×10¹⁴ Hz",
+            "7.0",
+            "逸出功 W₀ = 2.3 eV",
+            "2.3",
+            "光强 = 中",
+            "中"
+          ],
+          "physical_readout": [
+            "频率 ν = 7.0 ×10¹⁴ Hz",
+            "逸出功 W₀ = 2.3 eV",
+            "截止频率 ν₀ = 5.56 ×10¹⁴ Hz",
+            "最大初动能 Eₖ = 0.60 eV",
+            "状态：发射电子",
+            "光频率 ν = 7.0 ×10¹⁴ Hz",
+            "7.0",
+            "逸出功 W₀ = 2.3 eV",
+            "2.3",
+            "光强 = 中",
+            "中"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "频率 ν = # ×#¹⁴ Hz|逸出功 W₀ = # eV|截止频率 ν₀ = # ×#¹⁴ Hz|最大初动能 Eₖ = # eV|状态：发射电子|光频率 ν = # ×#¹⁴ Hz|#|逸出功 W₀ = # eV|#|光强 = 中|中",
+          "controls": [
+            {
+              "id": "nu",
+              "value": "7",
+              "checked": false
+            },
+            {
+              "id": "w",
+              "value": "2.3",
+              "checked": false
+            },
+            {
+              "id": "int",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "频率 ν = # ×#¹⁴ Hz|逸出功 W₀ = # eV|截止频率 ν₀ = # ×#¹⁴ Hz|最大初动能 Eₖ = # eV|状态：发射电子|光频率 ν = # ×#¹⁴ Hz|#|逸出功 W₀ = # eV|#|光强 = 中|中",
+          "controls": [
+            {
+              "id": "nu",
+              "value": "7",
+              "checked": false
+            },
+            {
+              "id": "w",
+              "value": "2.3",
+              "checked": false
+            },
+            {
+              "id": "int",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb1/polarization.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#th",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play-btn",
+          "text": "⏸ 暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset-btn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.5,
+          "py": 0.32
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "⏸ 暂停"
+      },
+      "reset_button": {
+        "id": "reset-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "7e4f540e",
+          "readout_hash": "4f913b62",
+          "physical_readout_hash": "4f913b62",
+          "readout": [
+            "两偏振片夹角 θ = 30°",
+            "cos²θ = 0.750",
+            "出射光强 I = 0.750 I₀",
+            "状态：部分透过",
+            "检偏器角度 θ = 30°",
+            "30"
+          ],
+          "physical_readout": [
+            "两偏振片夹角 θ = 30°",
+            "cos²θ = 0.750",
+            "出射光强 I = 0.750 I₀",
+            "状态：部分透过",
+            "检偏器角度 θ = 30°",
+            "30"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "66e9f23c",
+          "readout_hash": "4f913b62",
+          "physical_readout_hash": "4f913b62",
+          "readout": [
+            "两偏振片夹角 θ = 30°",
+            "cos²θ = 0.750",
+            "出射光强 I = 0.750 I₀",
+            "状态：部分透过",
+            "检偏器角度 θ = 30°",
+            "30"
+          ],
+          "physical_readout": [
+            "两偏振片夹角 θ = 30°",
+            "cos²θ = 0.750",
+            "出射光强 I = 0.750 I₀",
+            "状态：部分透过",
+            "检偏器角度 θ = 30°",
+            "30"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "8267e26d",
+          "readout_hash": "4f913b62",
+          "physical_readout_hash": "4f913b62",
+          "readout": [
+            "两偏振片夹角 θ = 30°",
+            "cos²θ = 0.750",
+            "出射光强 I = 0.750 I₀",
+            "状态：部分透过",
+            "检偏器角度 θ = 30°",
+            "30"
+          ],
+          "physical_readout": [
+            "两偏振片夹角 θ = 30°",
+            "cos²θ = 0.750",
+            "出射光强 I = 0.750 I₀",
+            "状态：部分透过",
+            "检偏器角度 θ = 30°",
+            "30"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "8267e26d",
+          "readout_hash": "4f913b62",
+          "physical_readout_hash": "4f913b62",
+          "readout": [
+            "两偏振片夹角 θ = 30°",
+            "cos²θ = 0.750",
+            "出射光强 I = 0.750 I₀",
+            "状态：部分透过",
+            "检偏器角度 θ = 30°",
+            "30"
+          ],
+          "physical_readout": [
+            "两偏振片夹角 θ = 30°",
+            "cos²θ = 0.750",
+            "出射光强 I = 0.750 I₀",
+            "状态：部分透过",
+            "检偏器角度 θ = 30°",
+            "30"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "两偏振片夹角 θ = #°|cos²θ = #|出射光强 I = # I₀|状态：部分透过|检偏器角度 θ = #°|#",
+          "controls": [
+            {
+              "id": "th",
+              "value": "30",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "两偏振片夹角 θ = #°|cos²θ = #|出射光强 I = # I₀|状态：部分透过|检偏器角度 θ = #°|#",
+          "controls": [
+            {
+              "id": "th",
+              "value": "30",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb1/recoil.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [],
+      "button_checks": [
+        {
+          "selector": "#fire",
+          "text": "释放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset",
+          "text": "复位",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.68,
+          "py": 0.5
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "fire",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "释放"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "复位"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "c1b390d3",
+          "readout_hash": "92fe578",
+          "physical_readout_hash": "92fe578",
+          "readout": [
+            "主体质量 M = 50 kg",
+            "喷出质量 m = 2.0 kg",
+            "喷出速度 v = 10.0 m/s",
+            "主体速度 V = -0.40 m/s",
+            "喷出物动量 mv = 20.0",
+            "系统总动量 = 0.00"
+          ],
+          "physical_readout": [
+            "主体质量 M = 50 kg",
+            "喷出质量 m = 2.0 kg",
+            "喷出速度 v = 10.0 m/s",
+            "主体速度 V = -0.40 m/s",
+            "喷出物动量 mv = 20.0",
+            "系统总动量 = 0.00"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "7ae3d09b",
+          "readout_hash": "92fe578",
+          "physical_readout_hash": "92fe578",
+          "readout": [
+            "主体质量 M = 50 kg",
+            "喷出质量 m = 2.0 kg",
+            "喷出速度 v = 10.0 m/s",
+            "主体速度 V = -0.40 m/s",
+            "喷出物动量 mv = 20.0",
+            "系统总动量 = 0.00"
+          ],
+          "physical_readout": [
+            "主体质量 M = 50 kg",
+            "喷出质量 m = 2.0 kg",
+            "喷出速度 v = 10.0 m/s",
+            "主体速度 V = -0.40 m/s",
+            "喷出物动量 mv = 20.0",
+            "系统总动量 = 0.00"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "433d7674",
+          "readout_hash": "92fe578",
+          "physical_readout_hash": "92fe578",
+          "readout": [
+            "主体质量 M = 50 kg",
+            "喷出质量 m = 2.0 kg",
+            "喷出速度 v = 10.0 m/s",
+            "主体速度 V = -0.40 m/s",
+            "喷出物动量 mv = 20.0",
+            "系统总动量 = 0.00"
+          ],
+          "physical_readout": [
+            "主体质量 M = 50 kg",
+            "喷出质量 m = 2.0 kg",
+            "喷出速度 v = 10.0 m/s",
+            "主体速度 V = -0.40 m/s",
+            "喷出物动量 mv = 20.0",
+            "系统总动量 = 0.00"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "d29b4a10",
+          "readout_hash": "92fe578",
+          "physical_readout_hash": "92fe578",
+          "readout": [
+            "主体质量 M = 50 kg",
+            "喷出质量 m = 2.0 kg",
+            "喷出速度 v = 10.0 m/s",
+            "主体速度 V = -0.40 m/s",
+            "喷出物动量 mv = 20.0",
+            "系统总动量 = 0.00"
+          ],
+          "physical_readout": [
+            "主体质量 M = 50 kg",
+            "喷出质量 m = 2.0 kg",
+            "喷出速度 v = 10.0 m/s",
+            "主体速度 V = -0.40 m/s",
+            "喷出物动量 mv = 20.0",
+            "系统总动量 = 0.00"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "主体质量 M = # kg|喷出质量 m = # kg|喷出速度 v = # m/s|主体速度 V = # m/s|喷出物动量 mv = #|系统总动量 = #",
+          "controls": []
+        },
+        "canonicalReset": {
+          "stableReadout": "主体质量 M = # kg|喷出质量 m = # kg|喷出速度 v = # m/s|主体速度 V = # m/s|喷出物动量 mv = #|系统总动量 = #",
+          "controls": []
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb1/refraction.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#ir",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#nr",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "⏸ 暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "⏸ 暂停"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "69294a9",
+          "readout_hash": "f8968ce5",
+          "physical_readout_hash": "f8968ce5",
+          "readout": [
+            "入射角 θ₁ = 45°",
+            "玻璃折射率 n = 1.50",
+            "入射角 θ₁ = 45°",
+            "折射率 n = 1.50",
+            "折射角 θ₂ = 28.1°",
+            "玻璃中光速 v = 0.667·c",
+            "光脉冲位置 s/L = 0.22",
+            "演示时间 t = 0.16 s"
+          ],
+          "physical_readout": [
+            "入射角 θ₁ = 45°",
+            "玻璃折射率 n = 1.50",
+            "入射角 θ₁ = 45°",
+            "折射率 n = 1.50",
+            "折射角 θ₂ = 28.1°",
+            "玻璃中光速 v = 0.667·c",
+            "光脉冲位置 s/L = 0.22",
+            "演示时间 t = 0.16 s"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "69294a9",
+          "readout_hash": "3d061c38",
+          "physical_readout_hash": "3d061c38",
+          "readout": [
+            "入射角 θ₁ = 45°",
+            "玻璃折射率 n = 1.50",
+            "入射角 θ₁ = 45°",
+            "折射率 n = 1.50",
+            "折射角 θ₂ = 28.1°",
+            "玻璃中光速 v = 0.667·c",
+            "光脉冲位置 s/L = 0.26",
+            "演示时间 t = 0.51 s"
+          ],
+          "physical_readout": [
+            "入射角 θ₁ = 45°",
+            "玻璃折射率 n = 1.50",
+            "入射角 θ₁ = 45°",
+            "折射率 n = 1.50",
+            "折射角 θ₂ = 28.1°",
+            "玻璃中光速 v = 0.667·c",
+            "光脉冲位置 s/L = 0.26",
+            "演示时间 t = 0.51 s"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": false,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "69294a9",
+          "readout_hash": "731bbff5",
+          "physical_readout_hash": "731bbff5",
+          "readout": [
+            "入射角 θ₁ = 45°",
+            "玻璃折射率 n = 1.50",
+            "入射角 θ₁ = 45°",
+            "折射率 n = 1.50",
+            "折射角 θ₂ = 28.1°",
+            "玻璃中光速 v = 0.667·c",
+            "光脉冲位置 s/L = 0.30",
+            "演示时间 t = 0.53 s"
+          ],
+          "physical_readout": [
+            "入射角 θ₁ = 45°",
+            "玻璃折射率 n = 1.50",
+            "入射角 θ₁ = 45°",
+            "折射率 n = 1.50",
+            "折射角 θ₂ = 28.1°",
+            "玻璃中光速 v = 0.667·c",
+            "光脉冲位置 s/L = 0.30",
+            "演示时间 t = 0.53 s"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "69294a9",
+          "readout_hash": "731bbff5",
+          "physical_readout_hash": "731bbff5",
+          "readout": [
+            "入射角 θ₁ = 45°",
+            "玻璃折射率 n = 1.50",
+            "入射角 θ₁ = 45°",
+            "折射率 n = 1.50",
+            "折射角 θ₂ = 28.1°",
+            "玻璃中光速 v = 0.667·c",
+            "光脉冲位置 s/L = 0.30",
+            "演示时间 t = 0.53 s"
+          ],
+          "physical_readout": [
+            "入射角 θ₁ = 45°",
+            "玻璃折射率 n = 1.50",
+            "入射角 θ₁ = 45°",
+            "折射率 n = 1.50",
+            "折射角 θ₂ = 28.1°",
+            "玻璃中光速 v = 0.667·c",
+            "光脉冲位置 s/L = 0.30",
+            "演示时间 t = 0.53 s"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "入射角 θ₁ = #°|玻璃折射率 n = #|入射角 θ₁ = #°|折射率 n = #|折射角 θ₂ = #°|玻璃中光速 v = #·c|光脉冲位置 s/L = #|演示时间 t = # s",
+          "controls": [
+            {
+              "id": "ir",
+              "value": "45",
+              "checked": false
+            },
+            {
+              "id": "nr",
+              "value": "1.5",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "入射角 θ₁ = #°|玻璃折射率 n = #|入射角 θ₁ = #°|折射率 n = #|折射角 θ₂ = #°|玻璃中光速 v = #·c|光脉冲位置 s/L = #|演示时间 t = # s",
+          "controls": [
+            {
+              "id": "ir",
+              "value": "45",
+              "checked": false
+            },
+            {
+              "id": "nr",
+              "value": "1.5",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb1/shm.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#a",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#t",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play-btn",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset-btn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "reset-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "6fa516e1",
+          "readout_hash": "81b4e163",
+          "physical_readout_hash": "81b4e163",
+          "readout": [
+            "位移 x = 2.94 cm",
+            "速度 v = 16.44 cm/s",
+            "回复力 F = −kx -2.94，向左",
+            "周期 T = 2.0 s",
+            "振幅 A = 6 cm",
+            "6",
+            "周期 T = 2.0 s",
+            "2.0"
+          ],
+          "physical_readout": [
+            "位移 x = 2.94 cm",
+            "速度 v = 16.44 cm/s",
+            "回复力 F = −kx -2.94，向左",
+            "周期 T = 2.0 s",
+            "振幅 A = 6 cm",
+            "6",
+            "周期 T = 2.0 s",
+            "2.0"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "6ad10d6",
+          "readout_hash": "261431a",
+          "physical_readout_hash": "261431a",
+          "readout": [
+            "位移 x = 6.00 cm",
+            "速度 v = -0.76 cm/s",
+            "回复力 F = −kx -6.00，向左",
+            "周期 T = 2.0 s",
+            "振幅 A = 6 cm",
+            "6",
+            "周期 T = 2.0 s",
+            "2.0"
+          ],
+          "physical_readout": [
+            "位移 x = 6.00 cm",
+            "速度 v = -0.76 cm/s",
+            "回复力 F = −kx -6.00，向左",
+            "周期 T = 2.0 s",
+            "振幅 A = 6 cm",
+            "6",
+            "周期 T = 2.0 s",
+            "2.0"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "8b6f8ce7",
+          "readout_hash": "f940dfb6",
+          "physical_readout_hash": "f940dfb6",
+          "readout": [
+            "位移 x = 5.96 cm",
+            "速度 v = -2.23 cm/s",
+            "回复力 F = −kx -5.96，向左",
+            "周期 T = 2.0 s",
+            "振幅 A = 6 cm",
+            "6",
+            "周期 T = 2.0 s",
+            "2.0"
+          ],
+          "physical_readout": [
+            "位移 x = 5.96 cm",
+            "速度 v = -2.23 cm/s",
+            "回复力 F = −kx -5.96，向左",
+            "周期 T = 2.0 s",
+            "振幅 A = 6 cm",
+            "6",
+            "周期 T = 2.0 s",
+            "2.0"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "8b6f8ce7",
+          "readout_hash": "f940dfb6",
+          "physical_readout_hash": "f940dfb6",
+          "readout": [
+            "位移 x = 5.96 cm",
+            "速度 v = -2.23 cm/s",
+            "回复力 F = −kx -5.96，向左",
+            "周期 T = 2.0 s",
+            "振幅 A = 6 cm",
+            "6",
+            "周期 T = 2.0 s",
+            "2.0"
+          ],
+          "physical_readout": [
+            "位移 x = 5.96 cm",
+            "速度 v = -2.23 cm/s",
+            "回复力 F = −kx -5.96，向左",
+            "周期 T = 2.0 s",
+            "振幅 A = 6 cm",
+            "6",
+            "周期 T = 2.0 s",
+            "2.0"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "位移 x = # cm|速度 v = # cm/s|回复力 F = −kx #|周期 T = # s|振幅 A = # cm|#|周期 T = # s|#",
+          "controls": [
+            {
+              "id": "a",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "t",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "位移 x = # cm|速度 v = # cm/s|回复力 F = −kx #|周期 T = # s|振幅 A = # cm|#|周期 T = # s|#",
+          "controls": [
+            {
+              "id": "a",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "t",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb1/total-reflection.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#i",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#n",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play-btn",
+          "text": "⏸ 暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset-btn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.68
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "⏸ 暂停"
+      },
+      "reset_button": {
+        "id": "reset-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "b2e08781",
+          "readout_hash": "a02059a7",
+          "physical_readout_hash": "a02059a7",
+          "readout": [
+            "入射角 θ₁ = 30°",
+            "折射率 n = 1.50",
+            "临界角 C = 41.8°",
+            "折射角 θ₂ = 48.6°",
+            "状态：折射+部分反射",
+            "入射角 θ₁ = 30°",
+            "30",
+            "玻璃折射率 n = 1.50",
+            "1.50"
+          ],
+          "physical_readout": [
+            "入射角 θ₁ = 30°",
+            "折射率 n = 1.50",
+            "临界角 C = 41.8°",
+            "折射角 θ₂ = 48.6°",
+            "状态：折射+部分反射",
+            "入射角 θ₁ = 30°",
+            "30",
+            "玻璃折射率 n = 1.50",
+            "1.50"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "e9d05ba7",
+          "readout_hash": "a02059a7",
+          "physical_readout_hash": "a02059a7",
+          "readout": [
+            "入射角 θ₁ = 30°",
+            "折射率 n = 1.50",
+            "临界角 C = 41.8°",
+            "折射角 θ₂ = 48.6°",
+            "状态：折射+部分反射",
+            "入射角 θ₁ = 30°",
+            "30",
+            "玻璃折射率 n = 1.50",
+            "1.50"
+          ],
+          "physical_readout": [
+            "入射角 θ₁ = 30°",
+            "折射率 n = 1.50",
+            "临界角 C = 41.8°",
+            "折射角 θ₂ = 48.6°",
+            "状态：折射+部分反射",
+            "入射角 θ₁ = 30°",
+            "30",
+            "玻璃折射率 n = 1.50",
+            "1.50"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "b2e08781",
+          "readout_hash": "a02059a7",
+          "physical_readout_hash": "a02059a7",
+          "readout": [
+            "入射角 θ₁ = 30°",
+            "折射率 n = 1.50",
+            "临界角 C = 41.8°",
+            "折射角 θ₂ = 48.6°",
+            "状态：折射+部分反射",
+            "入射角 θ₁ = 30°",
+            "30",
+            "玻璃折射率 n = 1.50",
+            "1.50"
+          ],
+          "physical_readout": [
+            "入射角 θ₁ = 30°",
+            "折射率 n = 1.50",
+            "临界角 C = 41.8°",
+            "折射角 θ₂ = 48.6°",
+            "状态：折射+部分反射",
+            "入射角 θ₁ = 30°",
+            "30",
+            "玻璃折射率 n = 1.50",
+            "1.50"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "b2e08781",
+          "readout_hash": "a02059a7",
+          "physical_readout_hash": "a02059a7",
+          "readout": [
+            "入射角 θ₁ = 30°",
+            "折射率 n = 1.50",
+            "临界角 C = 41.8°",
+            "折射角 θ₂ = 48.6°",
+            "状态：折射+部分反射",
+            "入射角 θ₁ = 30°",
+            "30",
+            "玻璃折射率 n = 1.50",
+            "1.50"
+          ],
+          "physical_readout": [
+            "入射角 θ₁ = 30°",
+            "折射率 n = 1.50",
+            "临界角 C = 41.8°",
+            "折射角 θ₂ = 48.6°",
+            "状态：折射+部分反射",
+            "入射角 θ₁ = 30°",
+            "30",
+            "玻璃折射率 n = 1.50",
+            "1.50"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "入射角 θ₁ = #°|折射率 n = #|临界角 C = #°|折射角 θ₂ = #°|状态：折射+部分反射|入射角 θ₁ = #°|#|玻璃折射率 n = #|#",
+          "controls": [
+            {
+              "id": "i",
+              "value": "30",
+              "checked": false
+            },
+            {
+              "id": "n",
+              "value": "1.5",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "入射角 θ₁ = #°|折射率 n = #|临界角 C = #°|折射角 θ₂ = #°|状态：折射+部分反射|入射角 θ₁ = #°|#|玻璃折射率 n = #|#",
+          "controls": [
+            {
+              "id": "i",
+              "value": "30",
+              "checked": false
+            },
+            {
+              "id": "n",
+              "value": "1.5",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb1/wave-basics.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#lam",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#f",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:波形图 y-x",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": false
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "button:波形图 y-x",
+          "text": "波形图 y-x",
+          "role": "condition",
+          "checked": true,
+          "worked": "already_selected"
+        },
+        {
+          "selector": "button:振动图 y-t",
+          "text": "振动图 y-t",
+          "role": "other",
+          "checked": null,
+          "worked": null
+        },
+        {
+          "selector": "#play-btn",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset-btn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "reset-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "f83de891",
+          "readout_hash": "e60f4220",
+          "physical_readout_hash": "e60f4220",
+          "readout": [
+            "波长 λ = 120 px",
+            "频率 f = 1.0 Hz",
+            "周期 T = 1.00 s",
+            "波速 v = λf = 120 px/s",
+            "波长 λ = 120 px",
+            "120",
+            "频率 f = 1.0 Hz",
+            "1.0"
+          ],
+          "physical_readout": [
+            "波长 λ = 120 px",
+            "频率 f = 1.0 Hz",
+            "周期 T = 1.00 s",
+            "波速 v = λf = 120 px/s",
+            "波长 λ = 120 px",
+            "120",
+            "频率 f = 1.0 Hz",
+            "1.0"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "197e3622",
+          "readout_hash": "e60f4220",
+          "physical_readout_hash": "e60f4220",
+          "readout": [
+            "波长 λ = 120 px",
+            "频率 f = 1.0 Hz",
+            "周期 T = 1.00 s",
+            "波速 v = λf = 120 px/s",
+            "波长 λ = 120 px",
+            "120",
+            "频率 f = 1.0 Hz",
+            "1.0"
+          ],
+          "physical_readout": [
+            "波长 λ = 120 px",
+            "频率 f = 1.0 Hz",
+            "周期 T = 1.00 s",
+            "波速 v = λf = 120 px/s",
+            "波长 λ = 120 px",
+            "120",
+            "频率 f = 1.0 Hz",
+            "1.0"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "85fa58ea",
+          "readout_hash": "e60f4220",
+          "physical_readout_hash": "e60f4220",
+          "readout": [
+            "波长 λ = 120 px",
+            "频率 f = 1.0 Hz",
+            "周期 T = 1.00 s",
+            "波速 v = λf = 120 px/s",
+            "波长 λ = 120 px",
+            "120",
+            "频率 f = 1.0 Hz",
+            "1.0"
+          ],
+          "physical_readout": [
+            "波长 λ = 120 px",
+            "频率 f = 1.0 Hz",
+            "周期 T = 1.00 s",
+            "波速 v = λf = 120 px/s",
+            "波长 λ = 120 px",
+            "120",
+            "频率 f = 1.0 Hz",
+            "1.0"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "85fa58ea",
+          "readout_hash": "e60f4220",
+          "physical_readout_hash": "e60f4220",
+          "readout": [
+            "波长 λ = 120 px",
+            "频率 f = 1.0 Hz",
+            "周期 T = 1.00 s",
+            "波速 v = λf = 120 px/s",
+            "波长 λ = 120 px",
+            "120",
+            "频率 f = 1.0 Hz",
+            "1.0"
+          ],
+          "physical_readout": [
+            "波长 λ = 120 px",
+            "频率 f = 1.0 Hz",
+            "周期 T = 1.00 s",
+            "波速 v = λf = 120 px/s",
+            "波长 λ = 120 px",
+            "120",
+            "频率 f = 1.0 Hz",
+            "1.0"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "波长 λ = # px|频率 f = # Hz|周期 T = # s|波速 v = λf = # px/s|波长 λ = # px|#|频率 f = # Hz|#",
+          "controls": [
+            {
+              "id": "lam",
+              "value": "120",
+              "checked": false
+            },
+            {
+              "id": "f",
+              "value": "1",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "波长 λ = # px|频率 f = # Hz|周期 T = # s|波速 v = λf = # px/s|波长 λ = # px|#|频率 f = # Hz|#",
+          "controls": [
+            {
+              "id": "lam",
+              "value": "120",
+              "checked": false
+            },
+            {
+              "id": "f",
+              "value": "1",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb1/wave-diffraction.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#lam",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#a",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play-btn",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset-btn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.5,
+          "py": 0.32
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "reset-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "f182349b",
+          "readout_hash": "4875d665",
+          "physical_readout_hash": "4875d665",
+          "readout": [
+            "波长 λ = 40 px",
+            "缝宽 a = 80 px",
+            "a/λ = 2.0",
+            "衍射：比较明显（边缘弯折清楚）",
+            "波长 λ = 40 px",
+            "40",
+            "缝宽 a = 80 px",
+            "80"
+          ],
+          "physical_readout": [
+            "波长 λ = 40 px",
+            "缝宽 a = 80 px",
+            "a/λ = 2.0",
+            "衍射：比较明显（边缘弯折清楚）",
+            "波长 λ = 40 px",
+            "40",
+            "缝宽 a = 80 px",
+            "80"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "a7340be4",
+          "readout_hash": "4875d665",
+          "physical_readout_hash": "4875d665",
+          "readout": [
+            "波长 λ = 40 px",
+            "缝宽 a = 80 px",
+            "a/λ = 2.0",
+            "衍射：比较明显（边缘弯折清楚）",
+            "波长 λ = 40 px",
+            "40",
+            "缝宽 a = 80 px",
+            "80"
+          ],
+          "physical_readout": [
+            "波长 λ = 40 px",
+            "缝宽 a = 80 px",
+            "a/λ = 2.0",
+            "衍射：比较明显（边缘弯折清楚）",
+            "波长 λ = 40 px",
+            "40",
+            "缝宽 a = 80 px",
+            "80"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "2ed2ad31",
+          "readout_hash": "4875d665",
+          "physical_readout_hash": "4875d665",
+          "readout": [
+            "波长 λ = 40 px",
+            "缝宽 a = 80 px",
+            "a/λ = 2.0",
+            "衍射：比较明显（边缘弯折清楚）",
+            "波长 λ = 40 px",
+            "40",
+            "缝宽 a = 80 px",
+            "80"
+          ],
+          "physical_readout": [
+            "波长 λ = 40 px",
+            "缝宽 a = 80 px",
+            "a/λ = 2.0",
+            "衍射：比较明显（边缘弯折清楚）",
+            "波长 λ = 40 px",
+            "40",
+            "缝宽 a = 80 px",
+            "80"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "2ed2ad31",
+          "readout_hash": "4875d665",
+          "physical_readout_hash": "4875d665",
+          "readout": [
+            "波长 λ = 40 px",
+            "缝宽 a = 80 px",
+            "a/λ = 2.0",
+            "衍射：比较明显（边缘弯折清楚）",
+            "波长 λ = 40 px",
+            "40",
+            "缝宽 a = 80 px",
+            "80"
+          ],
+          "physical_readout": [
+            "波长 λ = 40 px",
+            "缝宽 a = 80 px",
+            "a/λ = 2.0",
+            "衍射：比较明显（边缘弯折清楚）",
+            "波长 λ = 40 px",
+            "40",
+            "缝宽 a = 80 px",
+            "80"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "波长 λ = # px|缝宽 a = # px|a/λ = #|衍射：比较明显（边缘弯折清楚）|波长 λ = # px|#|缝宽 a = # px|#",
+          "controls": [
+            {
+              "id": "lam",
+              "value": "40",
+              "checked": false
+            },
+            {
+              "id": "a",
+              "value": "80",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "波长 λ = # px|缝宽 a = # px|a/λ = #|衍射：比较明显（边缘弯折清楚）|波长 λ = # px|#|缝宽 a = # px|#",
+          "controls": [
+            {
+              "id": "lam",
+              "value": "40",
+              "checked": false
+            },
+            {
+              "id": "a",
+              "value": "80",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb1/wave-interference.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#lam",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#d",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play-btn",
+          "text": "暂停",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#reset-btn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.32,
+          "py": 0.5
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停"
+      },
+      "reset_button": {
+        "id": "reset-btn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "adee4336",
+          "readout_hash": "94edbf08",
+          "physical_readout_hash": "94edbf08",
+          "readout": [
+            "波长 λ = 40 px",
+            "双源间距 d = 120 px",
+            "测试点路程差 Δr = 72 (1.80λ) px",
+            "该点：中间态",
+            "波长 λ = 40 px",
+            "40",
+            "双源间距 d = 120 px",
+            "120"
+          ],
+          "physical_readout": [
+            "波长 λ = 40 px",
+            "双源间距 d = 120 px",
+            "测试点路程差 Δr = 72 (1.80λ) px",
+            "该点：中间态",
+            "波长 λ = 40 px",
+            "40",
+            "双源间距 d = 120 px",
+            "120"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "228223bd",
+          "readout_hash": "94edbf08",
+          "physical_readout_hash": "94edbf08",
+          "readout": [
+            "波长 λ = 40 px",
+            "双源间距 d = 120 px",
+            "测试点路程差 Δr = 72 (1.80λ) px",
+            "该点：中间态",
+            "波长 λ = 40 px",
+            "40",
+            "双源间距 d = 120 px",
+            "120"
+          ],
+          "physical_readout": [
+            "波长 λ = 40 px",
+            "双源间距 d = 120 px",
+            "测试点路程差 Δr = 72 (1.80λ) px",
+            "该点：中间态",
+            "波长 λ = 40 px",
+            "40",
+            "双源间距 d = 120 px",
+            "120"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "26c6ef41",
+          "readout_hash": "94edbf08",
+          "physical_readout_hash": "94edbf08",
+          "readout": [
+            "波长 λ = 40 px",
+            "双源间距 d = 120 px",
+            "测试点路程差 Δr = 72 (1.80λ) px",
+            "该点：中间态",
+            "波长 λ = 40 px",
+            "40",
+            "双源间距 d = 120 px",
+            "120"
+          ],
+          "physical_readout": [
+            "波长 λ = 40 px",
+            "双源间距 d = 120 px",
+            "测试点路程差 Δr = 72 (1.80λ) px",
+            "该点：中间态",
+            "波长 λ = 40 px",
+            "40",
+            "双源间距 d = 120 px",
+            "120"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "26c6ef41",
+          "readout_hash": "94edbf08",
+          "physical_readout_hash": "94edbf08",
+          "readout": [
+            "波长 λ = 40 px",
+            "双源间距 d = 120 px",
+            "测试点路程差 Δr = 72 (1.80λ) px",
+            "该点：中间态",
+            "波长 λ = 40 px",
+            "40",
+            "双源间距 d = 120 px",
+            "120"
+          ],
+          "physical_readout": [
+            "波长 λ = 40 px",
+            "双源间距 d = 120 px",
+            "测试点路程差 Δr = 72 (1.80λ) px",
+            "该点：中间态",
+            "波长 λ = 40 px",
+            "40",
+            "双源间距 d = 120 px",
+            "120"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "波长 λ = # px|双源间距 d = # px|测试点路程差 Δr = # (#λ) px|该点：中间态|波长 λ = # px|#|双源间距 d = # px|#",
+          "controls": [
+            {
+              "id": "lam",
+              "value": "40",
+              "checked": false
+            },
+            {
+              "id": "d",
+              "value": "120",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "波长 λ = # px|双源间距 d = # px|测试点路程差 Δr = # (#λ) px|该点：中间态|波长 λ = # px|#|双源间距 d = # px|#",
+          "controls": [
+            {
+              "id": "lam",
+              "value": "40",
+              "checked": false
+            },
+            {
+              "id": "d",
+              "value": "120",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/xb1/wave-reflection-refraction.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#angle",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#v1",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#v2",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#freq",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录一组读数",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#record",
+          "text": "记录一组读数",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#playBtn",
+          "text": "暂停演示",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "暂停演示"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "53a9fe0a",
+          "readout_hash": "bf872f38",
+          "physical_readout_hash": "bf872f38",
+          "readout": [
+            "入射角 θ₁ 35°",
+            "35°",
+            "介质1波速 v₁ 2.0 m/s",
+            "2.0 m/s",
+            "介质2波速 v₂ 1.2 m/s",
+            "1.2 m/s",
+            "频率 f 5.0 Hz",
+            "5.0 Hz",
+            "反射角：35°折射角：20.1°频率：5.0 Hz，两侧不变波长：λ₁=0.40 m，λ₂=0.24 m",
+            "35°35°20.1°0.24 m",
+            "进入较慢介质：折射角变小，波长变短，频率不变。"
+          ],
+          "physical_readout": [
+            "入射角 θ₁ 35°",
+            "35°",
+            "介质1波速 v₁ 2.0 m/s",
+            "2.0 m/s",
+            "介质2波速 v₂ 1.2 m/s",
+            "1.2 m/s",
+            "频率 f 5.0 Hz",
+            "5.0 Hz",
+            "反射角：35°折射角：20.1°频率：5.0 Hz，两侧不变波长：λ₁=0.40 m，λ₂=0.24 m",
+            "35°35°20.1°0.24 m",
+            "进入较慢介质：折射角变小，波长变短，频率不变。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "e0690723",
+          "readout_hash": "bf872f38",
+          "physical_readout_hash": "bf872f38",
+          "readout": [
+            "入射角 θ₁ 35°",
+            "35°",
+            "介质1波速 v₁ 2.0 m/s",
+            "2.0 m/s",
+            "介质2波速 v₂ 1.2 m/s",
+            "1.2 m/s",
+            "频率 f 5.0 Hz",
+            "5.0 Hz",
+            "反射角：35°折射角：20.1°频率：5.0 Hz，两侧不变波长：λ₁=0.40 m，λ₂=0.24 m",
+            "35°35°20.1°0.24 m",
+            "进入较慢介质：折射角变小，波长变短，频率不变。"
+          ],
+          "physical_readout": [
+            "入射角 θ₁ 35°",
+            "35°",
+            "介质1波速 v₁ 2.0 m/s",
+            "2.0 m/s",
+            "介质2波速 v₂ 1.2 m/s",
+            "1.2 m/s",
+            "频率 f 5.0 Hz",
+            "5.0 Hz",
+            "反射角：35°折射角：20.1°频率：5.0 Hz，两侧不变波长：λ₁=0.40 m，λ₂=0.24 m",
+            "35°35°20.1°0.24 m",
+            "进入较慢介质：折射角变小，波长变短，频率不变。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "8bd578c8",
+          "readout_hash": "bf872f38",
+          "physical_readout_hash": "bf872f38",
+          "readout": [
+            "入射角 θ₁ 35°",
+            "35°",
+            "介质1波速 v₁ 2.0 m/s",
+            "2.0 m/s",
+            "介质2波速 v₂ 1.2 m/s",
+            "1.2 m/s",
+            "频率 f 5.0 Hz",
+            "5.0 Hz",
+            "反射角：35°折射角：20.1°频率：5.0 Hz，两侧不变波长：λ₁=0.40 m，λ₂=0.24 m",
+            "35°35°20.1°0.24 m",
+            "进入较慢介质：折射角变小，波长变短，频率不变。"
+          ],
+          "physical_readout": [
+            "入射角 θ₁ 35°",
+            "35°",
+            "介质1波速 v₁ 2.0 m/s",
+            "2.0 m/s",
+            "介质2波速 v₂ 1.2 m/s",
+            "1.2 m/s",
+            "频率 f 5.0 Hz",
+            "5.0 Hz",
+            "反射角：35°折射角：20.1°频率：5.0 Hz，两侧不变波长：λ₁=0.40 m，λ₂=0.24 m",
+            "35°35°20.1°0.24 m",
+            "进入较慢介质：折射角变小，波长变短，频率不变。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "8bd578c8",
+          "readout_hash": "bf872f38",
+          "physical_readout_hash": "bf872f38",
+          "readout": [
+            "入射角 θ₁ 35°",
+            "35°",
+            "介质1波速 v₁ 2.0 m/s",
+            "2.0 m/s",
+            "介质2波速 v₂ 1.2 m/s",
+            "1.2 m/s",
+            "频率 f 5.0 Hz",
+            "5.0 Hz",
+            "反射角：35°折射角：20.1°频率：5.0 Hz，两侧不变波长：λ₁=0.40 m，λ₂=0.24 m",
+            "35°35°20.1°0.24 m",
+            "进入较慢介质：折射角变小，波长变短，频率不变。"
+          ],
+          "physical_readout": [
+            "入射角 θ₁ 35°",
+            "35°",
+            "介质1波速 v₁ 2.0 m/s",
+            "2.0 m/s",
+            "介质2波速 v₂ 1.2 m/s",
+            "1.2 m/s",
+            "频率 f 5.0 Hz",
+            "5.0 Hz",
+            "反射角：35°折射角：20.1°频率：5.0 Hz，两侧不变波长：λ₁=0.40 m，λ₂=0.24 m",
+            "35°35°20.1°0.24 m",
+            "进入较慢介质：折射角变小，波长变短，频率不变。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "入射角 θ₁ #°|#°|介质#波速 v₁ # m/s|# m/s|介质#波速 v₂ # m/s|# m/s|频率 f # Hz|# Hz|反射角：#°折射角：#°频率：# Hz，两侧不变波长：λ₁=# m，λ₂=# m|进入较慢介质：折射角变小，波长变短，频率不变。",
+          "controls": [
+            {
+              "id": "angle",
+              "value": "35",
+              "checked": false
+            },
+            {
+              "id": "v1",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "v2",
+              "value": "1.2",
+              "checked": false
+            },
+            {
+              "id": "freq",
+              "value": "5",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "入射角 θ₁ #°|#°|介质#波速 v₁ # m/s|# m/s|介质#波速 v₂ # m/s|# m/s|频率 f # Hz|# Hz|反射角：#°折射角：#°频率：# Hz，两侧不变波长：λ₁=# m，λ₂=# m|进入较慢介质：折射角变小，波长变短，频率不变。",
+          "controls": [
+            {
+              "id": "angle",
+              "value": "35",
+              "checked": false
+            },
+            {
+              "id": "v1",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "v2",
+              "value": "1.2",
+              "checked": false
+            },
+            {
+              "id": "freq",
+              "value": "5",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

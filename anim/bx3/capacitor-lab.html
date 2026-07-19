@@ -35,19 +35,20 @@ canvas{display:block;width:100%;max-width:720px;background:#0e1a2b;border-radius
     <span class="chip">拖动曲线探针读数：t=<b id="probeT">—</b> s，U=<b id="probeU">—</b> V</span>
   </div>
   <div class="ctrls">
-    <button class="btn on" id="charge">▶ 充电</button>
-    <button class="btn" id="discharge">▶ 放电</button>
+    <button class="btn on" id="charge">▶ 充电并播放</button>
+    <button class="btn" id="discharge">▶ 放电并播放</button>
     <button class="btn" id="open">断开</button>
+    <button class="btn" id="playBtn">播放演示</button>
     <label>电源 E = <span id="El">6</span> V<input type="range" id="E" min="2" max="10" step="1" value="6"></label>
     <label>电阻 R = <span id="Rl">10</span> kΩ<input type="range" id="R" min="2" max="30" step="1" value="10"></label>
     <label>电容 C = <span id="Cl">100</span> μF<input type="range" id="C" min="20" max="200" step="10" value="100"></label>
   </div>
-  <div class="hint"><b>怎么玩</b>：点<b>充电</b>，对照极板侧视装置、Uc-t 图像和数据记录，看电荷逐个<b>积累</b>到极板上，电压 U_C 沿曲线<b>上升</b>逼近电源电压 E。拖<b>R</b> 或 <b>C</b> 看时间常数 τ=RC 怎样改变。</div>
+  <div class="hint"><b>观察任务</b>：先点<b>充电</b>，对照极板侧视装置、Uc-t 图像和数据记录，看电荷逐个<b>积累</b>到极板上，电压 U_C 沿曲线<b>上升</b>逼近电源电压 E；再拖<b>R</b> 或 <b>C</b>，比较时间常数 τ=RC 怎样改变。</div>
 </div>
 <script>
 (function(){
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
-let E=6,R=10,C=100,mode='charge',Uc=0,t=0,hist=[],dragProbe=false,probeFrac=null;
+let E=6,R=10,C=100,mode='charge',Uc=0,t=0,hist=[],dragProbe=false,probeFrac=null,running=false;
 // geometry
 const capX=250,capTopY=120,capBotY=250,plateW=150; // plates
 const gx=470,gy=70,gw=220,gh=170; // graph
@@ -116,11 +117,17 @@ function draw(){
   document.getElementById('q').textContent=q.toFixed(0);
   document.getElementById('i').textContent=iMA.toFixed(2);
   document.getElementById('w').textContent=(0.5*C*Uc*Uc).toFixed(0);
-  document.getElementById('statev').textContent=mode==='charge'?'正在充电':(mode==='discharge'?'正在放电':'断开（临界：电荷保持不变）');
+  document.getElementById('statev').textContent=mode==='charge'?(running?'正在充电':'充电已暂停'):(mode==='discharge'?(running?'正在放电':'放电已暂停'):'断开（临界：电荷保持不变）');
   document.getElementById('probeT').textContent=probeVal?probeVal.t.toFixed(2):'—';
   document.getElementById('probeU').textContent=probeVal?probeVal.u.toFixed(2):'—';
 }
-function setMode(m,btn){mode=m;t=0;hist=[];document.querySelectorAll('.btn').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');}
+function setMode(m,btn){
+  mode=m;t=0;hist=[];
+  running=m!=='open';
+  document.getElementById('playBtn').textContent=running?'暂停演示':'播放演示';
+  document.querySelectorAll('.btn').forEach(b=>b.classList.remove('on'));
+  if(btn)btn.classList.add('on');
+}
 document.getElementById('charge').onclick=function(){setMode('charge',this);};
 document.getElementById('discharge').onclick=function(){setMode('discharge',this);};
 document.getElementById('open').onclick=function(){setMode('open',this);};
@@ -131,9 +138,11 @@ cv.addEventListener('pointerdown',e=>{const p=pos(e);if(p.x>=gx&&p.x<=gx+gw&&p.y
 cv.addEventListener('pointermove',e=>{if(!dragProbe)return;const p=pos(e);probeFrac=Math.max(0,Math.min(1,(p.x-gx)/gw));draw();});
 window.addEventListener('pointerup',()=>dragProbe=false);
 let last=performance.now();
-function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;step(dt);draw();requestAnimationFrame(loop);}
+document.getElementById('playBtn').onclick=function(){running=!running;this.textContent=running?'暂停演示':'播放演示';if(running)draw()};
+function loop(now){const dt=Math.min((now-last)/1000,0.05);last=now;if(running)step(dt);draw();requestAnimationFrame(loop);}
 draw();requestAnimationFrame(loop);
 })();
 </script>
+<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script><script src="guided-lesson.js"></script>
 </body>
 </html>

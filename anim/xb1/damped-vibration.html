@@ -15,6 +15,7 @@ h2{font-size:17px;margin:0 0 10px}
 canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab;background:#fff}
 .panel{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px}
 .buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.control{display:grid;gap:4px;font-size:12px;color:#486581;margin-bottom:10px}.control input{width:100%;accent-color:var(--gold)}
 button{font:inherit;border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 10px;cursor:pointer}
 .read{display:grid;gap:7px}
 .chip{background:#102a43;color:#eef4ff;border-radius:8px;padding:8px 10px;font-size:13px;line-height:1.45}
@@ -28,20 +29,21 @@ button{font:inherit;border:1px solid var(--line);background:#fff;border-radius:8
 <div class="wrap">
   <h2>阻尼振动：拖阻尼阀，看振幅包络和能量怎样衰减</h2>
   <div class="lab">
-    <div class="stage"><canvas id="cv" width="720" height="470" aria-label="阻尼振动交互实验台：振子侧视装置、振幅包络图像和数据记录"></canvas></div>
+    <div class="stage"><canvas id="cv" width="720" height="470" data-damping-boundaries="underdamped:zeta<1;critical:zeta=1;overdamped:zeta>1" aria-label="阻尼振动交互实验台：振子侧视装置、三种阻尼响应图像和数据记录"></canvas></div>
     <section class="panel">
       <div class="buttons"><button id="play">暂停</button><button id="reset">复位</button></div>
+      <label class="control">阻尼比 ζ = <span id="zlabel">0.15</span><input id="zeta" type="range" min="0.05" max="1.60" step="0.05" value="0.15"></label>
       <div class="read">
         <div class="chip">初始振幅 A₀ = <b id="Aout">8.0</b> cm</div>
         <div class="chip">阻尼比 ζ = <b id="zout">0.15</b></div>
-        <div class="chip ok">当前振幅包络 = <b id="envout">8.0</b> cm</div>
+        <div class="chip ok">当前响应量级 = <b id="envout">8.0</b> cm</div>
         <div class="chip">机械能比例 = <b id="Eout">100</b>%</div>
         <div class="chip warn">状态：<b id="stateout">欠阻尼：振荡衰减</b></div>
       </div>
       <div class="hint"><b>观察任务</b>：拖蓝色振子改变初始振幅，对照振子侧视装置、振幅包络图像和数据记录，拖右侧金色阻尼阀改变阻尼比。</div>
       <div class="formula">
         <b>画面绑定</b><br>
-        欠阻尼时 x(t)=A₀e<sup>-βt</sup>cos(ωt+φ)，虚线包络就是 A₀e<sup>-βt</sup>。能量条随振幅平方衰减，阻尼把机械能转化为内能。
+        欠阻尼 ζ&lt;1 时振荡衰减；临界阻尼只在 ζ=1，且无振荡、回到平衡最快；过阻尼 ζ&gt;1 时由两个衰减指数叠加。虚线只在欠阻尼时表示指数包络。
       </div>
     </section>
   </div>
@@ -56,18 +58,28 @@ function id(s){return document.getElementById(s)}
 function clamp(x,a,b){return Math.max(a,Math.min(b,x))}
 function omega(){return 2*Math.PI/2}
 function state(){
-  if(zeta<.75)return '欠阻尼：振荡衰减';
-  if(zeta<=1.15)return '临界附近：最快平复';
+  if(zeta<1)return '欠阻尼：振荡衰减';
+  if(Math.abs(zeta-1)<.005)return '临界阻尼：最快无振荡平复';
   return '过阻尼：不振荡但回得慢';
 }
 function model(tt){
+  const w0=omega();
   if(zeta<1){
-    const env=A0*Math.exp(-zeta*tt);
-    return {x:env*Math.cos(omega()*Math.sqrt(1-zeta*zeta)*tt),env};
+    const decay=Math.exp(-zeta*w0*tt),wd=w0*Math.sqrt(1-zeta*zeta);
+    const x=A0*decay*Math.cos(wd*tt);
+    const v=A0*decay*(-zeta*w0*Math.cos(wd*tt)-wd*Math.sin(wd*tt));
+    return {x,v,env:A0*decay,kind:'underdamped'};
   }
-  const rate=zeta<=1.15?1.15:.55;
-  const env=A0*Math.exp(-rate*tt);
-  return {x:env*(1+rate*tt),env:Math.min(A0,env*(1+rate*tt))};
+  if(Math.abs(zeta-1)<.005){
+    const x=A0*(1+w0*tt)*Math.exp(-w0*tt);
+    const v=-A0*w0*w0*tt*Math.exp(-w0*tt);
+    return {x,v,env:Math.abs(x),kind:'critical'};
+  }
+  const s=Math.sqrt(zeta*zeta-1),r1=-w0*(zeta-s),r2=-w0*(zeta+s);
+  const c1=-r2*A0/(r1-r2),c2=r1*A0/(r1-r2);
+  const x=c1*Math.exp(r1*tt)+c2*Math.exp(r2*tt);
+  const v=c1*r1*Math.exp(r1*tt)+c2*r2*Math.exp(r2*tt);
+  return {x,v,env:Math.abs(x),kind:'overdamped'};
 }
 function pos(e){const r=cv.getBoundingClientRect(),s=cv.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s}}
 function spring(x1,x2,y){
@@ -92,11 +104,13 @@ function drawGraph(){
   ctx.fillStyle='#fff';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect?ctx.roundRect(gx-20,gy-20,gw+42,gh+60,8):ctx.rect(gx-20,gy-20,gw+42,gh+60);ctx.fill();ctx.stroke();
   ctx.strokeStyle='#9fb3c8';ctx.beginPath();ctx.moveTo(gx,gy);ctx.lineTo(gx,gy+gh);ctx.lineTo(gx+gw,gy+gh);ctx.stroke();
   ctx.strokeStyle='#dbe4ee';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(gx,gc);ctx.lineTo(gx+gw,gc);ctx.stroke();ctx.setLineDash([]);
-  ctx.strokeStyle='#f0a500';ctx.setLineDash([5,4]);ctx.beginPath();
-  for(let i=0;i<=gw;i++){const tt=i/gw*8,env=model(tt).env,y=gc-env*7;if(i===0)ctx.moveTo(gx+i,y);else ctx.lineTo(gx+i,y)}
-  ctx.stroke();ctx.beginPath();
-  for(let i=0;i<=gw;i++){const tt=i/gw*8,env=model(tt).env,y=gc+env*7;if(i===0)ctx.moveTo(gx+i,y);else ctx.lineTo(gx+i,y)}
-  ctx.stroke();ctx.setLineDash([]);
+  if(zeta<1){
+    ctx.strokeStyle='#f0a500';ctx.setLineDash([5,4]);ctx.beginPath();
+    for(let i=0;i<=gw;i++){const tt=i/gw*8,env=model(tt).env,y=gc-env*7;if(i===0)ctx.moveTo(gx+i,y);else ctx.lineTo(gx+i,y)}
+    ctx.stroke();ctx.beginPath();
+    for(let i=0;i<=gw;i++){const tt=i/gw*8,env=model(tt).env,y=gc+env*7;if(i===0)ctx.moveTo(gx+i,y);else ctx.lineTo(gx+i,y)}
+    ctx.stroke();ctx.setLineDash([]);
+  }
   ctx.strokeStyle='#2c7be5';ctx.lineWidth=2;ctx.beginPath();
   for(let i=0;i<=gw;i++){const tt=i/gw*8,x=model(tt).x,y=gc-x*7;if(i===0)ctx.moveTo(gx+i,y);else ctx.lineTo(gx+i,y)}
   ctx.stroke();
@@ -117,10 +131,11 @@ function draw(){
   ctx.fillStyle='#f0a500';ctx.strokeStyle='#8a5a00';ctx.lineWidth=2;ctx.beginPath();ctx.arc(valveX,valveY,12,0,7);ctx.fill();ctx.stroke();
   ctx.fillStyle='#8a5a00';ctx.font='12px system-ui';ctx.fillText('阻尼阀 ζ',valveX,72);
   drawGraph();
-  const E=Math.min(100,Math.max(0,(m.env/A0)*(m.env/A0)*100));
+  const E=Math.min(100,Math.max(0,(m.x*m.x+(m.v/omega())*(m.v/omega()))/(A0*A0)*100));
   ctx.fillStyle='#eef4ff';ctx.fillRect(70,360,190,24);ctx.fillStyle='#159a6b';ctx.fillRect(70,360,190*E/100,24);ctx.strokeStyle='#334e68';ctx.strokeRect(70,360,190,24);
   ctx.fillStyle='#102a43';ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillText('机械能随振幅平方衰减',70,350);
-  ctx.fillStyle='#243b53';ctx.font='13px system-ui';ctx.fillText('公式：x(t)=A₀·e^(−βt)·cos(ωt)，包络=A₀e^(−βt)',70,455);
+  ctx.fillStyle='#243b53';ctx.font='13px system-ui';ctx.fillText(zeta<1?'欠阻尼：指数包络内振荡':'无振荡响应：按临界/过阻尼方程衰减',70,455);
+  cv.dataset.dampingClass=m.kind;cv.dataset.zeta=zeta.toFixed(2);
   update(m,E);
 }
 function update(m,E){els.A.textContent=A0.toFixed(1);els.z.textContent=zeta.toFixed(2);els.env.textContent=m.env.toFixed(1);els.E.textContent=E.toFixed(0);els.state.textContent=state()}
@@ -132,15 +147,17 @@ cv.addEventListener('pointerdown',e=>{
 cv.addEventListener('pointermove',e=>{
   if(!drag)return;const p=pos(e);
   if(drag==='A'){A0=clamp(Math.abs((p.x-eqX)/pxPerCm),2,12);t=0;}
-  if(drag==='z')zeta=clamp((p.y-95)/190*1.6,.02,1.6);
+  if(drag==='z'){zeta=clamp((p.y-95)/190*1.6,.05,1.6);id('zeta').value=zeta;id('zlabel').textContent=zeta.toFixed(2);}
   draw();
 });
 window.addEventListener('pointerup',()=>{drag=null;cv.style.cursor='grab'});
+id('zeta').addEventListener('input',()=>{zeta=Number(id('zeta').value);id('zlabel').textContent=zeta.toFixed(2);t=0;draw()});
 id('play').onclick=()=>{running=!running;id('play').textContent=running?'暂停':'播放'};
-id('reset').onclick=()=>{A0=8;zeta=.15;t=0;running=true;id('play').textContent='暂停';draw()};
+id('reset').onclick=()=>{A0=8;zeta=.15;t=0;running=true;id('zeta').value=zeta;id('zlabel').textContent=zeta.toFixed(2);id('play').textContent='暂停';draw()};
 function loop(now){const dt=Math.min((now-last)/1000,.05);last=now;if(running)t+=dt;draw();requestAnimationFrame(loop)}
 draw();requestAnimationFrame(loop);
 })();
 </script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

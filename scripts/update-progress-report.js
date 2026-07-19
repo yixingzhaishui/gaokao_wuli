@@ -13,7 +13,7 @@ const statusOrder = ['done', 'partial', 'pending', 'draft', 'review'];
 const moduleOrder = [
   ['bx1', '必修1'], ['bx2', '必修2'], ['bx3', '必修3'],
   ['xb1', '选择性必修1'], ['xb2', '选择性必修2'], ['xb3', '选择性必修3'],
-  ['gaokao-skills', '高考能力专题'], ['experiments', '官方必做实验专题'], ['models', '模型专题']
+  ['gaokao-skills', '高考能力专题'], ['experiments', '实验专题（21 项课标必做 + 配套）'], ['models', '模型专题']
 ];
 const start = '<!-- progress-report:start -->';
 const end = '<!-- progress-report:end -->';
@@ -46,7 +46,7 @@ function report() {
   const lines = [
     start,
     '<!-- 此区域由 scripts/update-progress-report.js 生成，请勿手工修改。 -->',
-    '| 模块 | 总条目 | done | partial | pending | draft | review | 完成率 |',
+    '| 模块 | 总条目 | interaction done | interaction partial | pending | draft | legacy review | 交互建设率 |',
     '|---|---:|---:|---:|---:|---:|---:|---:|',
     ...orderedRows.filter(row => row.total).map(row => tableRow([
       row.name,
@@ -60,7 +60,7 @@ function report() {
       rate(totals.done, total)
     ]),
     '',
-    `状态口径：${statusOrder.join('、')}；完成率只按 done ÷ 总条目计算。当前审核条目总数为 ${total}。`,
+    `状态口径：${statusOrder.join('、')}；完成率只表示页面结构与交互建设进度，不表示课标、物理内容、答案、来源或教学审定。当前目录条目总数为 ${total}。`,
     end
   ];
   return lines.join('\n');

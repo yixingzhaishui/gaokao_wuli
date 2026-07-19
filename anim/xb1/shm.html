@@ -131,7 +131,7 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
   bind('a',v=>{A=v;document.getElementById('a-d').textContent=v;});
   bind('t',v=>{T=v;document.getElementById('t-d').textContent=v.toFixed(1);});
   document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
-  document.getElementById('reset-btn').addEventListener('click',()=>{t=0;draw();});
+  document.getElementById('reset-btn').addEventListener('click',()=>{A=6;T=2;t=0;running=true;document.getElementById('a').value=A;document.getElementById('t').value=T;document.getElementById('a-d').textContent=A;document.getElementById('t-d').textContent=T.toFixed(1);document.getElementById('play-btn').textContent='暂停';draw();});
   function pointerPos(e){const r=canvas.getBoundingClientRect(),s=canvas.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s};}
   canvas.addEventListener('pointerdown',e=>{
     const p=pointerPos(e),x=xOf(t),bx=eqX+x*pxPerCm;
@@ -154,5 +154,6 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
   draw();requestAnimationFrame(loop);
 })();
 </script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

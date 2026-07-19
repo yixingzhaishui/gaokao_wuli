@@ -1,0 +1,268 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T18:16:58.166Z",
+  "commit": "a8ab8397e1eeeb49514470fddba10216ed560582",
+  "module": "exp",
+  "modules": [
+    "exp"
+  ],
+  "summary": {
+    "total": 1,
+    "score": 100,
+    "pass": 1,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/exp/resistivity-lab.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#length",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#diameter",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#voltage",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#rho",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#heat",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#recordBtn",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "de489716",
+          "readout_hash": "7819ccdf",
+          "physical_readout_hash": "7819ccdf",
+          "readout": [
+            "接入长度 L/cm：60",
+            "直径读数 d/mm：0.40",
+            "电压 U/V：1.2",
+            "真实电阻率 ρ/(10^-6 Ω·m)：0.50",
+            "温升误差/%：3",
+            "R=U/I≈2.46ΩS=πd²/4≈0.1257mm²ρ=RS/L≈0.515×10^-6Ω·m电流 I≈0.488A，误差≈3.0%累积焦耳热 W=I²Rt≈0.000J判定=能用"
+          ],
+          "physical_readout": [
+            "接入长度 L/cm：60",
+            "直径读数 d/mm：0.40",
+            "电压 U/V：1.2",
+            "真实电阻率 ρ/(10^-6 Ω·m)：0.50",
+            "温升误差/%：3",
+            "R=U/I≈2.46ΩS=πd²/4≈0.1257mm²ρ=RS/L≈0.515×10^-6Ω·m电流 I≈0.488A，误差≈3.0%累积焦耳热 W=I²Rt≈0.000J判定=能用"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "bb011751",
+          "readout_hash": "7ca8af67",
+          "physical_readout_hash": "7ca8af67",
+          "readout": [
+            "接入长度 L/cm：60",
+            "直径读数 d/mm：0.40",
+            "电压 U/V：1.2",
+            "真实电阻率 ρ/(10^-6 Ω·m)：0.50",
+            "温升误差/%：3",
+            "R=U/I≈2.46ΩS=πd²/4≈0.1257mm²ρ=RS/L≈0.515×10^-6Ω·m电流 I≈0.488A，误差≈3.0%累积焦耳热 W=I²Rt≈0.220J判定=能用"
+          ],
+          "physical_readout": [
+            "接入长度 L/cm：60",
+            "直径读数 d/mm：0.40",
+            "电压 U/V：1.2",
+            "真实电阻率 ρ/(10^-6 Ω·m)：0.50",
+            "温升误差/%：3",
+            "R=U/I≈2.46ΩS=πd²/4≈0.1257mm²ρ=RS/L≈0.515×10^-6Ω·m电流 I≈0.488A，误差≈3.0%累积焦耳热 W=I²Rt≈0.220J判定=能用"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "de489716",
+          "readout_hash": "45c43a68",
+          "physical_readout_hash": "45c43a68",
+          "readout": [
+            "接入长度 L/cm：60",
+            "直径读数 d/mm：0.40",
+            "电压 U/V：1.2",
+            "真实电阻率 ρ/(10^-6 Ω·m)：0.50",
+            "温升误差/%：3",
+            "R=U/I≈2.46ΩS=πd²/4≈0.1257mm²ρ=RS/L≈0.515×10^-6Ω·m电流 I≈0.488A，误差≈3.0%累积焦耳热 W=I²Rt≈0.229J判定=能用"
+          ],
+          "physical_readout": [
+            "接入长度 L/cm：60",
+            "直径读数 d/mm：0.40",
+            "电压 U/V：1.2",
+            "真实电阻率 ρ/(10^-6 Ω·m)：0.50",
+            "温升误差/%：3",
+            "R=U/I≈2.46ΩS=πd²/4≈0.1257mm²ρ=RS/L≈0.515×10^-6Ω·m电流 I≈0.488A，误差≈3.0%累积焦耳热 W=I²Rt≈0.229J判定=能用"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "de489716",
+          "readout_hash": "45c43a68",
+          "physical_readout_hash": "45c43a68",
+          "readout": [
+            "接入长度 L/cm：60",
+            "直径读数 d/mm：0.40",
+            "电压 U/V：1.2",
+            "真实电阻率 ρ/(10^-6 Ω·m)：0.50",
+            "温升误差/%：3",
+            "R=U/I≈2.46ΩS=πd²/4≈0.1257mm²ρ=RS/L≈0.515×10^-6Ω·m电流 I≈0.488A，误差≈3.0%累积焦耳热 W=I²Rt≈0.229J判定=能用"
+          ],
+          "physical_readout": [
+            "接入长度 L/cm：60",
+            "直径读数 d/mm：0.40",
+            "电压 U/V：1.2",
+            "真实电阻率 ρ/(10^-6 Ω·m)：0.50",
+            "温升误差/%：3",
+            "R=U/I≈2.46ΩS=πd²/4≈0.1257mm²ρ=RS/L≈0.515×10^-6Ω·m电流 I≈0.488A，误差≈3.0%累积焦耳热 W=I²Rt≈0.229J判定=能用"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "接入长度 L/cm：#|直径读数 d/mm：#|电压 U/V：#|真实电阻率 ρ/(#^# Ω·m)：#|温升误差/%：#|R=U/I≈#ΩS=πd²/#≈#mm²ρ=RS/L≈#×#^#Ω·m电流 I≈#A，误差≈#%累积焦耳热 W=I²Rt≈#J判定=能用",
+          "controls": [
+            {
+              "id": "length",
+              "value": "60",
+              "checked": false
+            },
+            {
+              "id": "diameter",
+              "value": "0.4",
+              "checked": false
+            },
+            {
+              "id": "voltage",
+              "value": "1.2",
+              "checked": false
+            },
+            {
+              "id": "rho",
+              "value": "0.5",
+              "checked": false
+            },
+            {
+              "id": "heat",
+              "value": "3",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "接入长度 L/cm：#|直径读数 d/mm：#|电压 U/V：#|真实电阻率 ρ/(#^# Ω·m)：#|温升误差/%：#|R=U/I≈#ΩS=πd²/#≈#mm²ρ=RS/L≈#×#^#Ω·m电流 I≈#A，误差≈#%累积焦耳热 W=I²Rt≈#J判定=能用",
+          "controls": [
+            {
+              "id": "length",
+              "value": "60",
+              "checked": false
+            },
+            {
+              "id": "diameter",
+              "value": "0.4",
+              "checked": false
+            },
+            {
+              "id": "voltage",
+              "value": "1.2",
+              "checked": false
+            },
+            {
+              "id": "rho",
+              "value": "0.5",
+              "checked": false
+            },
+            {
+              "id": "heat",
+              "value": "3",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

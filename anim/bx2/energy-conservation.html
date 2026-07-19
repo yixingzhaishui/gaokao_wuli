@@ -40,7 +40,7 @@
     <div class="hint">侧视轨道 + 能量图像 + 内能剖面 + 数据记录；可直接拖动滑块改变位置，拖动橙色高度手柄改变初始能量</div>
   </div>
   <div class="panel">
-    <div class="card task"><b>观察任务：</b>拖动滑块时盯住橙色总能量柱：机械能可以变少，但 `Ep+Ek+E内` 必须始终等于初始 `mgh`。</div>
+    <div class="card task"><b>观察任务：</b>本实验选择“滑块 + 固定斜面 + 地球”为近似封闭系统。拖动滑块时盯住橙色总能量柱：机械能可以变少，但 `Ep+Ek+E内` 必须始终等于初始 `mgh`。</div>
     <div class="card">
       <div class="title">实验控制</div>
       <label class="param"><span>质量 m <b id="mText">2.0 kg</b></span><input id="m" type="range" min="0.5" max="8" step="0.1" value="2"></label>
@@ -65,7 +65,7 @@
       <div class="title">公式对照</div>
       <div>E0 = mgh，对应橙色高度尺。</div>
       <div>E机 = Ep + Ek，对应紫/蓝/绿能量柱。</div>
-      <div>E内 = -Wf，对应摩擦生热红色柱。</div>
+      <div>E内 = Q = fk·s相对；本固定斜面特例才有 Q=-Wf(滑块)。</div>
       <div>E总 = Ep + Ek + E内 = E0。</div>
     </div>
     <div class="status" id="status">有摩擦：机械能减少，但减少量进入内能，总能量守恒。</div>
@@ -191,7 +191,7 @@
     else { ui.status.textContent='有摩擦：机械能减少，但减少量进入内能，总能量守恒。'; ui.status.style.background='#fff7e6'; ui.status.style.color='#9a6700'; ui.status.style.borderColor='#f0a500'; }
   }
 
-  function draw(){ const q=p(); const r=calc(q); ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle='#f7f9fc'; ctx.fillRect(0,0,canvas.width,canvas.height); drawScene(q,r); drawFlow(q,r); drawBars(q,r); updatePanel(q,r); }
+  function draw(){ const q=p(); const r=calc(q); canvas.dataset.systemBoundary='block-fixed-ramp-earth-approximately-closed'; canvas.dataset.heatRelation='Q=fk*s_relative'; canvas.dataset.qEqualsMinusWfOnlyHere='true'; ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle='#f7f9fc'; ctx.fillRect(0,0,canvas.width,canvas.height); drawScene(q,r); drawFlow(q,r); drawBars(q,r); updatePanel(q,r); }
   function eventPos(ev){ const src=ev.touches&&ev.touches.length?ev.touches[0]:(ev.changedTouches&&ev.changedTouches.length?ev.changedTouches[0]:ev); const rect=canvas.getBoundingClientRect(); return { x:(src.clientX-rect.left)*canvas.width/rect.width, y:(src.clientY-rect.top)*canvas.height/rect.height }; }
   function dist(a,x,y){ return Math.hypot(a.x-x,a.y-y); }
   function setProgressFromPoint(pos){ const geo=state.hot.block.geo; const vx=geo.bottom.x-geo.top.x, vy=geo.bottom.y-geo.top.y; const wx=pos.x-geo.top.x, wy=pos.y-geo.top.y; setValue('u',(wx*vx+wy*vy)/(vx*vx+vy*vy)); }

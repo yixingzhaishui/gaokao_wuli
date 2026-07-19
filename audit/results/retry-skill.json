@@ -1,0 +1,351 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-11T06:24:41.013Z",
+  "commit": "eb30b19cf78dbb62af23d0567912504d02fe166f",
+  "module": "skill",
+  "modules": [
+    "skill"
+  ],
+  "summary": {
+    "total": 1,
+    "score": 0,
+    "pass": 0,
+    "needs_review": 0,
+    "blocked": 1
+  },
+  "results": [
+    {
+      "file": "anim/skill/science-info-problem.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#a",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#b",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#eta",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:太阳能电池",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:单步",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:A. 4.0×10² m",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:B. 4.0×10⁵ m",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:C. 4.0×10⁶ m",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:D. 4.0×10⁸ m",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:提交答案",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:下一题",
+          "kind": "initial_condition_retry",
+          "changed": false,
+          "affected_result": false
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#orbit",
+          "text": "航天周期",
+          "role": "condition",
+          "checked": false,
+          "worked": "initially_active"
+        },
+        {
+          "selector": "#solar",
+          "text": "太阳能电池",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#step",
+          "text": "单步",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#reset",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:A. 4.0×10² m",
+          "text": "A. 4.0×10² m",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:B. 4.0×10⁵ m",
+          "text": "B. 4.0×10⁵ m",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:C. 4.0×10⁶ m",
+          "text": "C. 4.0×10⁶ m",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:D. 4.0×10⁸ m",
+          "text": "D. 4.0×10⁸ m",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#submitAnswer",
+          "text": "提交答案",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#nextQuestion",
+          "text": "下一题",
+          "role": "condition",
+          "checked": true,
+          "worked": false
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": null,
+      "reentry_passed": false,
+      "mobile_passed": false,
+      "hard_failures": [
+        {
+          "code": "H5",
+          "description": "审核脚本异常：locator.click: Test timeout of 90000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button').nth(10)\u001b[22m\n\u001b[2m    - locator resolved to <button disabled id=\"nextQuestion\">下一题</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    168 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m        - element is not enabled\u001b[22m\n\u001b[2m      - retrying click action\u001b[22m\n\u001b[2m        - waiting 500ms\u001b[22m\n"
+        }
+      ],
+      "result": "BLOCKED",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "46dc7fa7",
+          "readout_hash": "b162cdcf",
+          "physical_readout_hash": "51773329",
+          "readout": [
+            "轨道高度 h400 km",
+            "400 km",
+            "轨道速度 v7.7 km/s",
+            "7.7 km/s",
+            "附加比例 η20%",
+            "20%",
+            "动画时间 t0.00 s轨道半径 r6770 km周期 T92.1 min模型T=2πr/v",
+            "动画已暂停；当前题仍可作答，评分只在提交答案后改变。"
+          ],
+          "physical_readout": [
+            "轨道高度 h400 km",
+            "400 km",
+            "轨道速度 v7.7 km/s",
+            "7.7 km/s",
+            "附加比例 η20%",
+            "20%",
+            "动画时间 t0.00 s轨道半径 r6770 km周期 T92.1 min模型T=2πr/v",
+            "动画；当前题仍可作答，评分只在提交答案后改变。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "812eadb7",
+          "readout_hash": "64aa168d",
+          "physical_readout_hash": "1fa12255",
+          "readout": [
+            "轨道高度 h400 km",
+            "400 km",
+            "轨道速度 v7.7 km/s",
+            "7.7 km/s",
+            "附加比例 η20%",
+            "20%",
+            "动画时间 t0.39 s轨道半径 r6770 km周期 T92.1 min模型T=2πr/v",
+            "动画播放中；评分只在提交答案后改变。"
+          ],
+          "physical_readout": [
+            "轨道高度 h400 km",
+            "400 km",
+            "轨道速度 v7.7 km/s",
+            "7.7 km/s",
+            "附加比例 η20%",
+            "20%",
+            "动画时间 t0.39 s轨道半径 r6770 km周期 T92.1 min模型T=2πr/v",
+            "动画；评分只在提交答案后改变。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "efa6fd69",
+          "readout_hash": "f4c82a3d",
+          "physical_readout_hash": "92960293",
+          "readout": [
+            "轨道高度 h400 km",
+            "400 km",
+            "轨道速度 v7.7 km/s",
+            "7.7 km/s",
+            "附加比例 η20%",
+            "20%",
+            "动画时间 t0.42 s轨道半径 r6770 km周期 T92.1 min模型T=2πr/v",
+            "动画已暂停；当前题仍可作答，评分只在提交答案后改变。"
+          ],
+          "physical_readout": [
+            "轨道高度 h400 km",
+            "400 km",
+            "轨道速度 v7.7 km/s",
+            "7.7 km/s",
+            "附加比例 η20%",
+            "20%",
+            "动画时间 t0.42 s轨道半径 r6770 km周期 T92.1 min模型T=2πr/v",
+            "动画；当前题仍可作答，评分只在提交答案后改变。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "efa6fd69",
+          "readout_hash": "f4c82a3d",
+          "physical_readout_hash": "92960293",
+          "readout": [
+            "轨道高度 h400 km",
+            "400 km",
+            "轨道速度 v7.7 km/s",
+            "7.7 km/s",
+            "附加比例 η20%",
+            "20%",
+            "动画时间 t0.42 s轨道半径 r6770 km周期 T92.1 min模型T=2πr/v",
+            "动画已暂停；当前题仍可作答，评分只在提交答案后改变。"
+          ],
+          "physical_readout": [
+            "轨道高度 h400 km",
+            "400 km",
+            "轨道速度 v7.7 km/s",
+            "7.7 km/s",
+            "附加比例 η20%",
+            "20%",
+            "动画时间 t0.42 s轨道半径 r6770 km周期 T92.1 min模型T=2πr/v",
+            "动画；当前题仍可作答，评分只在提交答案后改变。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "轨道高度 h# km|# km|轨道速度 v# km/s|# km/s|附加比例 η#%|#%|动画时间 t# s轨道半径 r# km周期 T# min模型T=#πr/v|动画已暂停；当前题仍可作答，评分只在提交答案后改变。",
+          "controls": [
+            {
+              "id": "a",
+              "value": "400",
+              "checked": false
+            },
+            {
+              "id": "b",
+              "value": "7.7",
+              "checked": false
+            },
+            {
+              "id": "eta",
+              "value": "20",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "轨道高度 h# km|# km|轨道速度 v# km/s|# km/s|附加比例 η#%|#%|动画时间 t# s轨道半径 r# km周期 T# min模型T=#πr/v|动画已暂停；当前题仍可作答，评分只在提交答案后改变。",
+          "controls": [
+            {
+              "id": "a",
+              "value": "400",
+              "checked": false
+            },
+            {
+              "id": "b",
+              "value": "7.7",
+              "checked": false
+            },
+            {
+              "id": "eta",
+              "value": "20",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

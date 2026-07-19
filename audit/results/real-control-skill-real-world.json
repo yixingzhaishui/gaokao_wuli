@@ -1,0 +1,282 @@
+{
+  "score_version": "3.0",
+  "generated_at": "2026-07-12T18:27:37.144Z",
+  "commit": "2c478ed208651e04ca3e1934cfce72f6f0296959",
+  "module": "skill",
+  "modules": [
+    "skill"
+  ],
+  "summary": {
+    "total": 1,
+    "score": 100,
+    "pass": 1,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/skill/real-world-modeling.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#v",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#p1",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#p2",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:无人机投放",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:单步",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:汽车制动",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#brake",
+          "text": "汽车制动",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#drop",
+          "text": "无人机投放",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#step",
+          "text": "单步",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#reset",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "916bb03d",
+          "readout_hash": "fbeda366",
+          "physical_readout_hash": "fbeda366",
+          "readout": [
+            "初速度 v₀ 20.0 m/s",
+            "20.0 m/s",
+            "反应时间 tᵣ 1.0 s",
+            "1.0 s",
+            "路面摩擦因数 μ 0.70",
+            "0.70",
+            "当前过程反应段：匀速时间 t0.00 s当前速度 v20.00 m/s反应距离20.0 m制动距离29.2 m停车距离49.2 m",
+            "先把驾驶员反应时间单独建成匀速段：这一段没有制动加速度。"
+          ],
+          "physical_readout": [
+            "初速度 v₀ 20.0 m/s",
+            "20.0 m/s",
+            "反应时间 tᵣ 1.0 s",
+            "1.0 s",
+            "路面摩擦因数 μ 0.70",
+            "0.70",
+            "当前过程反应段：匀速时间 t0.00 s当前速度 v20.00 m/s反应距离20.0 m制动距离29.2 m停车距离49.2 m",
+            "先把驾驶员反应时间单独建成匀速段：这一段没有制动加速度。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "f4b91cc7",
+          "readout_hash": "7a100bd",
+          "physical_readout_hash": "7a100bd",
+          "readout": [
+            "初速度 v₀ 20.0 m/s",
+            "20.0 m/s",
+            "反应时间 tᵣ 1.0 s",
+            "1.0 s",
+            "路面摩擦因数 μ 0.70",
+            "0.70",
+            "当前过程反应段：匀速时间 t0.38 s当前速度 v20.00 m/s反应距离20.0 m制动距离29.2 m停车距离49.2 m",
+            "先把驾驶员反应时间单独建成匀速段：这一段没有制动加速度。"
+          ],
+          "physical_readout": [
+            "初速度 v₀ 20.0 m/s",
+            "20.0 m/s",
+            "反应时间 tᵣ 1.0 s",
+            "1.0 s",
+            "路面摩擦因数 μ 0.70",
+            "0.70",
+            "当前过程反应段：匀速时间 t0.38 s当前速度 v20.00 m/s反应距离20.0 m制动距离29.2 m停车距离49.2 m",
+            "先把驾驶员反应时间单独建成匀速段：这一段没有制动加速度。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "3b31899c",
+          "readout_hash": "53d9775a",
+          "physical_readout_hash": "53d9775a",
+          "readout": [
+            "初速度 v₀ 20.0 m/s",
+            "20.0 m/s",
+            "反应时间 tᵣ 1.0 s",
+            "1.0 s",
+            "路面摩擦因数 μ 0.70",
+            "0.70",
+            "当前过程反应段：匀速时间 t0.40 s当前速度 v20.00 m/s反应距离20.0 m制动距离29.2 m停车距离49.2 m",
+            "先把驾驶员反应时间单独建成匀速段：这一段没有制动加速度。"
+          ],
+          "physical_readout": [
+            "初速度 v₀ 20.0 m/s",
+            "20.0 m/s",
+            "反应时间 tᵣ 1.0 s",
+            "1.0 s",
+            "路面摩擦因数 μ 0.70",
+            "0.70",
+            "当前过程反应段：匀速时间 t0.40 s当前速度 v20.00 m/s反应距离20.0 m制动距离29.2 m停车距离49.2 m",
+            "先把驾驶员反应时间单独建成匀速段：这一段没有制动加速度。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "3b31899c",
+          "readout_hash": "53d9775a",
+          "physical_readout_hash": "53d9775a",
+          "readout": [
+            "初速度 v₀ 20.0 m/s",
+            "20.0 m/s",
+            "反应时间 tᵣ 1.0 s",
+            "1.0 s",
+            "路面摩擦因数 μ 0.70",
+            "0.70",
+            "当前过程反应段：匀速时间 t0.40 s当前速度 v20.00 m/s反应距离20.0 m制动距离29.2 m停车距离49.2 m",
+            "先把驾驶员反应时间单独建成匀速段：这一段没有制动加速度。"
+          ],
+          "physical_readout": [
+            "初速度 v₀ 20.0 m/s",
+            "20.0 m/s",
+            "反应时间 tᵣ 1.0 s",
+            "1.0 s",
+            "路面摩擦因数 μ 0.70",
+            "0.70",
+            "当前过程反应段：匀速时间 t0.40 s当前速度 v20.00 m/s反应距离20.0 m制动距离29.2 m停车距离49.2 m",
+            "先把驾驶员反应时间单独建成匀速段：这一段没有制动加速度。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "初速度 v₀ # m/s|# m/s|反应时间 tᵣ # s|# s|路面摩擦因数 μ #|#|当前过程反应段：匀速时间 t# s当前速度 v# m/s反应距离# m制动距离# m停车距离# m|先把驾驶员反应时间单独建成匀速段：这一段没有制动加速度。",
+          "controls": [
+            {
+              "id": "v",
+              "value": "20",
+              "checked": false
+            },
+            {
+              "id": "p1",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "p2",
+              "value": "0.7",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "初速度 v₀ # m/s|# m/s|反应时间 tᵣ # s|# s|路面摩擦因数 μ #|#|当前过程反应段：匀速时间 t# s当前速度 v# m/s反应距离# m制动距离# m停车距离# m|先把驾驶员反应时间单独建成匀速段：这一段没有制动加速度。",
+          "controls": [
+            {
+              "id": "v",
+              "value": "20",
+              "checked": false
+            },
+            {
+              "id": "p1",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "p2",
+              "value": "0.7",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

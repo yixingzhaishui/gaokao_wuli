@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B3-25 电流的磁效应证据台</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:#eef2f7;color:#102a43}.wrap{padding:12px}.layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(270px,.85fr);gap:12px;align-items:start}canvas{display:block;width:100%;max-width:760px;background:#0b1728;border-radius:12px;box-shadow:0 2px 10px rgba(16,42,67,.18)}.panel{background:#fff;border:1px solid #d9e2ec;border-radius:10px;padding:10px;display:grid;gap:9px}.task{background:#fff7e6;border-left:4px solid #f0a500;padding:9px;border-radius:6px;font-size:13px;line-height:1.55}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:7px}button{font:inherit;min-height:38px;border:1px solid #cbd5e1;background:#fff;border-radius:8px;padding:7px;cursor:pointer}button.active{background:#2563eb;color:#fff;border-color:#2563eb}.readout{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:9px;font-size:13px;line-height:1.6}.readout b{color:#0f766e}.formula{background:#eef6ff;border-left:4px solid #2563eb;padding:9px;border-radius:6px;font-size:13px;line-height:1.55}.status{font-size:13px;line-height:1.55;color:#334e68}.legend{font-size:12px;color:#64748b}@media(max-width:760px){.layout{grid-template-columns:1fr}.wrap{padding:8px}.buttons{grid-template-columns:1fr}canvas{max-height:380px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="layout">
+    <canvas id="canvas" width="760" height="470" aria-label="直导线电流与指南针偏转演示，显示地磁场、环形磁场和指南针方向"></canvas>
+    <section class="panel">
+      <div class="task"><b>观察任务：</b>比较通电前后指南针北极方向；再反向电流，检查偏转是否反向。</div>
+      <div class="buttons">
+        <button id="currentOn" data-audit-play>▶ 接通正向电流</button>
+        <button id="reverse">反向电流</button>
+        <button id="cutMagnet">截断条形磁体</button>
+        <button id="reset" data-audit-reset>重置</button>
+      </div>
+      <div class="readout" id="readout">
+        电流：<b id="currentValue">0.0 A</b><br>
+        指南针方向：<b id="compassValue">0°（地磁北）</b><br>
+        证据状态：<b id="evidenceValue">未通电</b>
+      </div>
+      <div class="formula">电流周围存在磁场；电流方向反向，环形磁场方向随之反向。指南针北极沿当地合磁场方向静止。</div>
+      <div class="status" id="status">初态：只有地磁场，指南针指向北方。点击通电后观察偏转。</div>
+      <div class="legend">红色 N、蓝色 S 同时保留：磁体截断后不会得到孤立磁极。</div>
+    </section>
+  </div>
+</div>
+<script>
+(function(){
+  const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+  const currentValue=document.getElementById('currentValue'),compassValue=document.getElementById('compassValue');
+  const evidenceValue=document.getElementById('evidenceValue'),status=document.getElementById('status');
+  const currentOn=document.getElementById('currentOn'),reverse=document.getElementById('reverse'),cutMagnet=document.getElementById('cutMagnet');
+  let current=0,cut=false,displayAngle=0,targetAngle=0,animationFrame=0,lastFrame=0;
+
+  function drawArrow(x1,y1,x2,y2,color,label){
+    const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-12*Math.cos(a-.45),y2-12*Math.sin(a-.45));ctx.lineTo(x2-12*Math.cos(a+.45),y2-12*Math.sin(a+.45));ctx.closePath();ctx.fill();ctx.font='bold 15px system-ui';ctx.fillText(label,x2+8,y2-8);
+  }
+  function drawCompass(cx,cy,angle){
+    ctx.save();ctx.translate(cx,cy);ctx.rotate(angle);ctx.fillStyle='#ef4444';ctx.beginPath();ctx.moveTo(0,-58);ctx.lineTo(-12,0);ctx.lineTo(12,0);ctx.closePath();ctx.fill();ctx.fillStyle='#3b82f6';ctx.beginPath();ctx.moveTo(0,58);ctx.lineTo(-12,0);ctx.lineTo(12,0);ctx.closePath();ctx.fill();ctx.fillStyle='#fff';ctx.font='bold 14px system-ui';ctx.textAlign='center';ctx.fillText('N',0,-26);ctx.fillText('S',0,36);ctx.restore();ctx.strokeStyle='#d9e2ec';ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx,cy,72,0,Math.PI*2);ctx.stroke();
+  }
+  function drawMagnet(x,y,w,h){
+    const gap=cut?8:0,half=(w-gap)/2;ctx.fillStyle='#ef4444';ctx.fillRect(x,y,half,h);ctx.fillStyle='#3b82f6';ctx.fillRect(x+half+gap,y,half,h);ctx.fillStyle='#fff';ctx.font='bold 18px system-ui';ctx.textAlign='center';ctx.fillText('N',x+half/2,y+h/2+6);ctx.fillText('S',x+half+gap+half/2,y+h/2+6);
+    if(cut){ctx.strokeStyle='#fff';ctx.setLineDash([4,3]);ctx.strokeRect(x+w/2-3,y-4,6,h+8);ctx.setLineDash([]);ctx.fillStyle='#cbd5e1';ctx.font='12px system-ui';ctx.fillText('每一段仍有 N、S 两极',x+w/2,y+h+22);}
+  }
+  function render(){
+    const g=ctx.createLinearGradient(0,0,0,canvas.height);g.addColorStop(0,'#10233c');g.addColorStop(1,'#07111f');ctx.fillStyle=g;ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle='#dbeafe';ctx.font='bold 17px system-ui';ctx.textAlign='left';ctx.fillText('奥斯特证据：通电导线使指南针偏转',24,32);
+    drawArrow(70,145,70,78,'#38bdf8','地磁场 B地');
+    const wireX=310,wireY=240;ctx.fillStyle='#fbbf24';ctx.beginPath();ctx.arc(wireX,wireY,28,0,Math.PI*2);ctx.fill();ctx.fillStyle='#0f172a';ctx.font='bold 24px system-ui';ctx.textAlign='center';ctx.fillText(current>=0?'•':'×',wireX,wireY+8);ctx.fillStyle='#cbd5e1';ctx.font='13px system-ui';ctx.fillText(current===0?'导线未通电':(current>0?'电流垂直纸面向外':'电流垂直纸面向内'),wireX,wireY+58);
+    if(current!==0){ctx.strokeStyle='rgba(251,191,36,.75)';ctx.lineWidth=3;for(const r of [60,95,130]){ctx.beginPath();ctx.arc(wireX,wireY,r,0,Math.PI*2);ctx.stroke();const a=current>0?-.35:.35;drawArrow(wireX+r*Math.cos(a),wireY+r*Math.sin(a),wireX+r*Math.cos(a+.22*Math.sign(current)),wireY+r*Math.sin(a+.22*Math.sign(current)),'#fbbf24','');}}
+    drawCompass(555,230,displayAngle*Math.PI/180);ctx.fillStyle='#e2e8f0';ctx.font='14px system-ui';ctx.textAlign='center';ctx.fillText('指南针',555,330);
+    drawMagnet(470,380,180,34);
+    currentValue.textContent=`${current.toFixed(1)} A`;compassValue.textContent=current===0?'0°（地磁北）':`${current>0?'+':'−'}55°（发生偏转）`;evidenceValue.textContent=current===0?'未通电':'电流产生磁场';
+  }
+  function animateCompass(now){const dt=Math.min((now-lastFrame)/1000,.05);lastFrame=now;const gap=targetAngle-displayAngle;const step=Math.sign(gap)*Math.min(Math.abs(gap),120*dt);displayAngle+=step;render();if(Math.abs(targetAngle-displayAngle)>.05)animationFrame=requestAnimationFrame(animateCompass);else{displayAngle=targetAngle;animationFrame=0;render();}}
+  function moveCompass(){if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){displayAngle=targetAngle;render();return;}if(!animationFrame){lastFrame=performance.now();animationFrame=requestAnimationFrame(animateCompass);}}
+  function setCurrent(value){current=value;targetAngle=value===0?0:(value>0?55:-55);currentOn.classList.toggle('active',value>0);reverse.classList.toggle('active',value<0);currentOn.textContent=value>0?'⏸ 断开电流':'▶ 接通正向电流';status.textContent=value===0?'断电后只剩地磁场，指南针回到南北方向。':value>0?'正向电流产生环形磁场，指南针偏转 +55°。':'电流方向反向，环形磁场和指南针偏转方向都反向。';moveCompass();}
+  currentOn.addEventListener('click',()=>setCurrent(current>0?0:2));
+  reverse.addEventListener('click',()=>setCurrent(current<0?2:-2));
+  cutMagnet.addEventListener('click',()=>{cut=!cut;cutMagnet.classList.toggle('active',cut);status.textContent=cut?'磁体截断后，每一段仍同时出现 N、S 两极，没有孤立磁极。':'完整磁体仍由 N、S 两极组成。';render();});
+  document.getElementById('reset').addEventListener('click',()=>{if(animationFrame)cancelAnimationFrame(animationFrame);animationFrame=0;current=0;cut=false;displayAngle=0;targetAngle=0;currentOn.classList.remove('active');reverse.classList.remove('active');cutMagnet.classList.remove('active');currentOn.textContent='▶ 接通正向电流';status.textContent='初态：只有地磁场，指南针指向北方。点击通电后观察偏转。';render();});
+  render();
+})();
+</script>
+<script src="guided-lesson.js"></script>
+</body>
+</html>
