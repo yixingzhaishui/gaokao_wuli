@@ -1,0 +1,3227 @@
+{
+  "score_version": "3.1",
+  "generated_at": "2026-07-19T04:12:00.470Z",
+  "commit": "db395ba8624f5352df7ac2e3907d0e9d31ccdde9",
+  "worktree_clean": true,
+  "git_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "tested_files_sha256": {
+    "anim/skill/circuit-experiment-design.html": "3b112c167c8ec916530e71d7ed5adad45bf141549f9439891768a4892c5f3cda",
+    "anim/skill/electromagnetic-induction-combo.html": "7c7cc3c9287facff266f353f7082508924547b566a5bdc514c61b18475d7e140",
+    "anim/skill/energy-momentum-combo.html": "691adf1dc8f9f3b8278fb3244231f0241f2dec6a33a2f365ddcfc0bf8810f2dd",
+    "anim/skill/error-analysis.html": "f84118ee801c3a110a0038e295edafdf093ce48e46318c0702f6f2ab899ec12f",
+    "anim/skill/experiment-data-processing.html": "849e08a7a68386f16fd59c19e48393d5a5ca5c428e9cbd8ca66eb35d8168b6cf",
+    "anim/skill/extreme-critical.html": "8de8159a530224d5fc61320847ce0807cd29de5bd3f5ff7edd6d4e13fa1c9c4c",
+    "anim/skill/graph-slope-area.html": "7f9281ba2088279c149c4066d4f1980ad35853ecfd0a58053c75a1d620f533af",
+    "anim/skill/instrument-reading.html": "ba5337693b3f3708a57f1978671017c9476bce47c0e48493312e8fa2456fc3a8",
+    "anim/skill/multi-process-motion.html": "0903447185dd287374e29a3f2365cf1a0e56501c15ef91853830bebcd946046e",
+    "anim/skill/real-world-modeling.html": "7e453ea1457515e7118181288958450ddebf67f4d4fc235316d27d8ca6e03a5b",
+    "anim/skill/science-info-problem.html": "633c7ae5261ce42abffbad29e598c3124e97a7b5af6d999de19b4b19e8760449"
+  },
+  "test_command": "AUDIT_MODULE=skill AUDIT_REPORT=g7-skill-remediated-db395ba.json playwright test tests/interaction-audit.spec.js --workers=1",
+  "module": "skill",
+  "modules": [
+    "skill"
+  ],
+  "summary": {
+    "total": 11,
+    "score": 100,
+    "pass": 11,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/skill/circuit-experiment-design.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#rx",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#pos",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#emf",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#aRange",
+          "kind": "select-one",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#vRange",
+          "kind": "select-one",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:内接法",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:外接法",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:限流式",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录方案",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:分压式",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#inner",
+          "text": "内接法",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#outer",
+          "text": "外接法",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#divider",
+          "text": "分压式",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#limiter",
+          "text": "限流式",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "播放调节",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录方案",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.32,
+          "py": 0.5
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放调节"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "f9a182a6",
+          "readout_hash": "42abba24",
+          "physical_readout_hash": "42abba24",
+          "readout": [
+            "待测电阻 Rx 20.0 Ω",
+            "20.0 Ω",
+            "滑片位置 0.50",
+            "0.50",
+            "电源电压 6.0 V",
+            "6.0 V",
+            "电流表量程0.6 A3 A",
+            "电压表量程3 V15 V",
+            "电压表：1.81 / 3.0 V电流表：0.091 / 0.6 A测得电阻：19.80 Ω（偏小 0.99%）滑变器功率：0.82 / 2.0 W",
+            "外接分压19.80",
+            "当前未过载；按 RA=0.5Ω、RV=2000Ω 比较误差，建议优先外接。临界 Rx≈√(RA·RV)=31.6Ω。"
+          ],
+          "physical_readout": [
+            "待测电阻 Rx 20.0 Ω",
+            "20.0 Ω",
+            "滑片位置 0.50",
+            "0.50",
+            "电源电压 6.0 V",
+            "6.0 V",
+            "电流表量程0.6 A3 A",
+            "电压表量程3 V15 V",
+            "电压表：1.81 / 3.0 V电流表：0.091 / 0.6 A测得电阻：19.80 Ω（偏小 0.99%）滑变器功率：0.82 / 2.0 W",
+            "外接分压19.80",
+            "当前未过载；按 RA=0.5Ω、RV=2000Ω 比较误差，建议优先外接。临界 Rx≈√(RA·RV)=31.6Ω。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "5d71d2ba",
+          "readout_hash": "dfc27017",
+          "physical_readout_hash": "dfc27017",
+          "readout": [
+            "待测电阻 Rx 20.0 Ω",
+            "20.0 Ω",
+            "滑片位置 0.59",
+            "0.59",
+            "电源电压 6.0 V",
+            "6.0 V",
+            "电流表量程0.6 A3 A",
+            "电压表量程3 V15 V",
+            "电压表：2.16 / 3.0 V电流表：0.109 / 0.6 A测得电阻：19.80 Ω（偏小 0.99%）滑变器功率：0.86 / 2.0 W",
+            "外接分压19.80",
+            "当前未过载；按 RA=0.5Ω、RV=2000Ω 比较误差，建议优先外接。临界 Rx≈√(RA·RV)=31.6Ω。"
+          ],
+          "physical_readout": [
+            "待测电阻 Rx 20.0 Ω",
+            "20.0 Ω",
+            "滑片位置 0.59",
+            "0.59",
+            "电源电压 6.0 V",
+            "6.0 V",
+            "电流表量程0.6 A3 A",
+            "电压表量程3 V15 V",
+            "电压表：2.16 / 3.0 V电流表：0.109 / 0.6 A测得电阻：19.80 Ω（偏小 0.99%）滑变器功率：0.86 / 2.0 W",
+            "外接分压19.80",
+            "当前未过载；按 RA=0.5Ω、RV=2000Ω 比较误差，建议优先外接。临界 Rx≈√(RA·RV)=31.6Ω。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "eafec9e3",
+          "readout_hash": "542fab97",
+          "physical_readout_hash": "542fab97",
+          "readout": [
+            "待测电阻 Rx 20.0 Ω",
+            "20.0 Ω",
+            "滑片位置 0.60",
+            "0.60",
+            "电源电压 6.0 V",
+            "6.0 V",
+            "电流表量程0.6 A3 A",
+            "电压表量程3 V15 V",
+            "电压表：2.21 / 3.0 V电流表：0.111 / 0.6 A测得电阻：19.80 Ω（偏小 0.99%）滑变器功率：0.87 / 2.0 W",
+            "外接分压19.80",
+            "当前未过载；按 RA=0.5Ω、RV=2000Ω 比较误差，建议优先外接。临界 Rx≈√(RA·RV)=31.6Ω。"
+          ],
+          "physical_readout": [
+            "待测电阻 Rx 20.0 Ω",
+            "20.0 Ω",
+            "滑片位置 0.60",
+            "0.60",
+            "电源电压 6.0 V",
+            "6.0 V",
+            "电流表量程0.6 A3 A",
+            "电压表量程3 V15 V",
+            "电压表：2.21 / 3.0 V电流表：0.111 / 0.6 A测得电阻：19.80 Ω（偏小 0.99%）滑变器功率：0.87 / 2.0 W",
+            "外接分压19.80",
+            "当前未过载；按 RA=0.5Ω、RV=2000Ω 比较误差，建议优先外接。临界 Rx≈√(RA·RV)=31.6Ω。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "eafec9e3",
+          "readout_hash": "542fab97",
+          "physical_readout_hash": "542fab97",
+          "readout": [
+            "待测电阻 Rx 20.0 Ω",
+            "20.0 Ω",
+            "滑片位置 0.60",
+            "0.60",
+            "电源电压 6.0 V",
+            "6.0 V",
+            "电流表量程0.6 A3 A",
+            "电压表量程3 V15 V",
+            "电压表：2.21 / 3.0 V电流表：0.111 / 0.6 A测得电阻：19.80 Ω（偏小 0.99%）滑变器功率：0.87 / 2.0 W",
+            "外接分压19.80",
+            "当前未过载；按 RA=0.5Ω、RV=2000Ω 比较误差，建议优先外接。临界 Rx≈√(RA·RV)=31.6Ω。"
+          ],
+          "physical_readout": [
+            "待测电阻 Rx 20.0 Ω",
+            "20.0 Ω",
+            "滑片位置 0.60",
+            "0.60",
+            "电源电压 6.0 V",
+            "6.0 V",
+            "电流表量程0.6 A3 A",
+            "电压表量程3 V15 V",
+            "电压表：2.21 / 3.0 V电流表：0.111 / 0.6 A测得电阻：19.80 Ω（偏小 0.99%）滑变器功率：0.87 / 2.0 W",
+            "外接分压19.80",
+            "当前未过载；按 RA=0.5Ω、RV=2000Ω 比较误差，建议优先外接。临界 Rx≈√(RA·RV)=31.6Ω。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "待测电阻 Rx # Ω|# Ω|滑片位置 #|#|电源电压 # V|# V|电流表量程# A# A|电压表量程# V# V|电压表：# / # V电流表：# / # A测得电阻：# Ω（偏小 #%）滑变器功率：# / # W|当前未过载；按 RA=#Ω、RV=#Ω 比较误差，建议优先外接。临界 Rx≈√(RA·RV)=#Ω。",
+          "controls": [
+            {
+              "id": "rx",
+              "value": "20",
+              "checked": false
+            },
+            {
+              "id": "pos",
+              "value": "0.5",
+              "checked": false
+            },
+            {
+              "id": "emf",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "aRange",
+              "value": "0.6",
+              "selectedIndex": 0
+            },
+            {
+              "id": "vRange",
+              "value": "3",
+              "selectedIndex": 0
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "待测电阻 Rx # Ω|# Ω|滑片位置 #|#|电源电压 # V|# V|电流表量程# A# A|电压表量程# V# V|电压表：# / # V电流表：# / # A测得电阻：# Ω（偏小 #%）滑变器功率：# / # W|当前未过载；按 RA=#Ω、RV=#Ω 比较误差，建议优先外接。临界 Rx≈√(RA·RV)=#Ω。",
+          "controls": [
+            {
+              "id": "rx",
+              "value": "20",
+              "checked": false
+            },
+            {
+              "id": "pos",
+              "value": "0.5",
+              "checked": false
+            },
+            {
+              "id": "emf",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "aRange",
+              "value": "0.6",
+              "selectedIndex": 0
+            },
+            {
+              "id": "vRange",
+              "value": "3",
+              "selectedIndex": 0
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/skill/electromagnetic-induction-combo.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#B",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#L",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#v",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#R",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:单步",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#step",
+          "text": "单步",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#reset",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.32,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "7fe2001e",
+          "readout_hash": "9079cb23",
+          "physical_readout_hash": "9079cb23",
+          "readout": [
+            "磁感应强度 B 0.60 T",
+            "0.60 T",
+            "导体棒长度 L 0.50 m",
+            "0.50 m",
+            "速度大小 |v| 3.0 m/s",
+            "3.0 m/s",
+            "电阻 R 2.0 Ω",
+            "2.0 Ω",
+            "当前速度 v3.00 m/s磁通量 Φ0.336 Wb感应电动势 ε0.90 V感应电流 I0.45 A电流方向逆时针安培力 F安0.13 N",
+            "链条正在发生：Φ 变化率=0.90 Wb/s → ε=0.90 V → I=0.45 A；安培力方向阻碍运动，P机械≈P热=0.40 W。"
+          ],
+          "physical_readout": [
+            "磁感应强度 B 0.60 T",
+            "0.60 T",
+            "导体棒长度 L 0.50 m",
+            "0.50 m",
+            "速度大小 |v| 3.0 m/s",
+            "3.0 m/s",
+            "电阻 R 2.0 Ω",
+            "2.0 Ω",
+            "当前速度 v3.00 m/s磁通量 Φ0.336 Wb感应电动势 ε0.90 V感应电流 I0.45 A电流方向逆时针安培力 F安0.13 N",
+            "链条正在发生：Φ 变化率=0.90 Wb/s → ε=0.90 V → I=0.45 A；安培力方向阻碍运动，P机械≈P热=0.40 W。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "57e150f2",
+          "readout_hash": "5bb3fbdd",
+          "physical_readout_hash": "5bb3fbdd",
+          "readout": [
+            "磁感应强度 B 0.60 T",
+            "0.60 T",
+            "导体棒长度 L 0.50 m",
+            "0.50 m",
+            "速度大小 |v| 3.0 m/s",
+            "3.0 m/s",
+            "电阻 R 2.0 Ω",
+            "2.0 Ω",
+            "当前速度 v3.00 m/s磁通量 Φ0.657 Wb感应电动势 ε0.90 V感应电流 I0.45 A电流方向逆时针安培力 F安0.13 N",
+            "链条正在发生：Φ 变化率=0.90 Wb/s → ε=0.90 V → I=0.45 A；安培力方向阻碍运动，P机械≈P热=0.40 W。"
+          ],
+          "physical_readout": [
+            "磁感应强度 B 0.60 T",
+            "0.60 T",
+            "导体棒长度 L 0.50 m",
+            "0.50 m",
+            "速度大小 |v| 3.0 m/s",
+            "3.0 m/s",
+            "电阻 R 2.0 Ω",
+            "2.0 Ω",
+            "当前速度 v3.00 m/s磁通量 Φ0.657 Wb感应电动势 ε0.90 V感应电流 I0.45 A电流方向逆时针安培力 F安0.13 N",
+            "链条正在发生：Φ 变化率=0.90 Wb/s → ε=0.90 V → I=0.45 A；安培力方向阻碍运动，P机械≈P热=0.40 W。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "49f41fe8",
+          "readout_hash": "e21612b7",
+          "physical_readout_hash": "e21612b7",
+          "readout": [
+            "磁感应强度 B 0.60 T",
+            "0.60 T",
+            "导体棒长度 L 0.50 m",
+            "0.50 m",
+            "速度大小 |v| 3.0 m/s",
+            "3.0 m/s",
+            "电阻 R 2.0 Ω",
+            "2.0 Ω",
+            "当前速度 v3.00 m/s磁通量 Φ0.673 Wb感应电动势 ε0.90 V感应电流 I0.45 A电流方向逆时针安培力 F安0.13 N",
+            "链条正在发生：Φ 变化率=0.90 Wb/s → ε=0.90 V → I=0.45 A；安培力方向阻碍运动，P机械≈P热=0.40 W。"
+          ],
+          "physical_readout": [
+            "磁感应强度 B 0.60 T",
+            "0.60 T",
+            "导体棒长度 L 0.50 m",
+            "0.50 m",
+            "速度大小 |v| 3.0 m/s",
+            "3.0 m/s",
+            "电阻 R 2.0 Ω",
+            "2.0 Ω",
+            "当前速度 v3.00 m/s磁通量 Φ0.673 Wb感应电动势 ε0.90 V感应电流 I0.45 A电流方向逆时针安培力 F安0.13 N",
+            "链条正在发生：Φ 变化率=0.90 Wb/s → ε=0.90 V → I=0.45 A；安培力方向阻碍运动，P机械≈P热=0.40 W。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "49f41fe8",
+          "readout_hash": "e21612b7",
+          "physical_readout_hash": "e21612b7",
+          "readout": [
+            "磁感应强度 B 0.60 T",
+            "0.60 T",
+            "导体棒长度 L 0.50 m",
+            "0.50 m",
+            "速度大小 |v| 3.0 m/s",
+            "3.0 m/s",
+            "电阻 R 2.0 Ω",
+            "2.0 Ω",
+            "当前速度 v3.00 m/s磁通量 Φ0.673 Wb感应电动势 ε0.90 V感应电流 I0.45 A电流方向逆时针安培力 F安0.13 N",
+            "链条正在发生：Φ 变化率=0.90 Wb/s → ε=0.90 V → I=0.45 A；安培力方向阻碍运动，P机械≈P热=0.40 W。"
+          ],
+          "physical_readout": [
+            "磁感应强度 B 0.60 T",
+            "0.60 T",
+            "导体棒长度 L 0.50 m",
+            "0.50 m",
+            "速度大小 |v| 3.0 m/s",
+            "3.0 m/s",
+            "电阻 R 2.0 Ω",
+            "2.0 Ω",
+            "当前速度 v3.00 m/s磁通量 Φ0.673 Wb感应电动势 ε0.90 V感应电流 I0.45 A电流方向逆时针安培力 F安0.13 N",
+            "链条正在发生：Φ 变化率=0.90 Wb/s → ε=0.90 V → I=0.45 A；安培力方向阻碍运动，P机械≈P热=0.40 W。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "磁感应强度 B # T|# T|导体棒长度 L # m|# m|速度大小 |v| # m/s|# m/s|电阻 R # Ω|# Ω|当前速度 v# m/s磁通量 Φ# Wb感应电动势 ε# V感应电流 I# A电流方向逆时针安培力 F安# N|链条正在发生：Φ 变化率=# Wb/s → ε=# V → I=# A；安培力方向阻碍运动，P机械≈P热=# W。",
+          "controls": [
+            {
+              "id": "B",
+              "value": "0.6",
+              "checked": false
+            },
+            {
+              "id": "L",
+              "value": "0.5",
+              "checked": false
+            },
+            {
+              "id": "v",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "R",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "磁感应强度 B # T|# T|导体棒长度 L # m|# m|速度大小 |v| # m/s|# m/s|电阻 R # Ω|# Ω|当前速度 v# m/s磁通量 Φ# Wb感应电动势 ε# V感应电流 I# A电流方向逆时针安培力 F安# N|链条正在发生：Φ 变化率=# Wb/s → ε=# V → I=# A；安培力方向阻碍运动，P机械≈P热=# W。",
+          "controls": [
+            {
+              "id": "B",
+              "value": "0.6",
+              "checked": false
+            },
+            {
+              "id": "L",
+              "value": "0.5",
+              "checked": false
+            },
+            {
+              "id": "v",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "R",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/skill/energy-momentum-combo.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#m1",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#m2",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#v0",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#k",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:单步",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#step",
+          "text": "单步",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#reset",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "22f8a3d0",
+          "readout_hash": "5cb5a6a2",
+          "physical_readout_hash": "5cb5a6a2",
+          "readout": [
+            "小车质量 m₁ 1.0 kg",
+            "1.0 kg",
+            "木块质量 m₂ 2.0 kg",
+            "2.0 kg",
+            "入射速度 v₀ 6.0 m/s",
+            "6.0 m/s",
+            "弹簧劲度系数 k 120 N/m",
+            "120 N/m",
+            "当前阶段碰撞前时间 t0.00 s当前动量 p6.00 kg·m/s当前动能 K18.00 J弹性势能 Ep0.00 J最大压缩 x0.32 m",
+            "蓝车正在接近木块：碰撞还未发生，先记录碰前动量 p₀=6.00 kg·m/s。"
+          ],
+          "physical_readout": [
+            "小车质量 m₁ 1.0 kg",
+            "1.0 kg",
+            "木块质量 m₂ 2.0 kg",
+            "2.0 kg",
+            "入射速度 v₀ 6.0 m/s",
+            "6.0 m/s",
+            "弹簧劲度系数 k 120 N/m",
+            "120 N/m",
+            "当前阶段碰撞前时间 t0.00 s当前动量 p6.00 kg·m/s当前动能 K18.00 J弹性势能 Ep0.00 J最大压缩 x0.32 m",
+            "蓝车正在接近木块：碰撞还未发生，先记录碰前动量 p₀=6.00 kg·m/s。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "3768d02b",
+          "readout_hash": "acf36f79",
+          "physical_readout_hash": "acf36f79",
+          "readout": [
+            "小车质量 m₁ 1.0 kg",
+            "1.0 kg",
+            "木块质量 m₂ 2.0 kg",
+            "2.0 kg",
+            "入射速度 v₀ 6.0 m/s",
+            "6.0 m/s",
+            "弹簧劲度系数 k 120 N/m",
+            "120 N/m",
+            "当前阶段碰撞前时间 t0.36 s当前动量 p6.00 kg·m/s当前动能 K18.00 J弹性势能 Ep0.00 J最大压缩 x0.32 m",
+            "蓝车正在接近木块：碰撞还未发生，先记录碰前动量 p₀=6.00 kg·m/s。"
+          ],
+          "physical_readout": [
+            "小车质量 m₁ 1.0 kg",
+            "1.0 kg",
+            "木块质量 m₂ 2.0 kg",
+            "2.0 kg",
+            "入射速度 v₀ 6.0 m/s",
+            "6.0 m/s",
+            "弹簧劲度系数 k 120 N/m",
+            "120 N/m",
+            "当前阶段碰撞前时间 t0.36 s当前动量 p6.00 kg·m/s当前动能 K18.00 J弹性势能 Ep0.00 J最大压缩 x0.32 m",
+            "蓝车正在接近木块：碰撞还未发生，先记录碰前动量 p₀=6.00 kg·m/s。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "26e61bf3",
+          "readout_hash": "72fc2a43",
+          "physical_readout_hash": "72fc2a43",
+          "readout": [
+            "小车质量 m₁ 1.0 kg",
+            "1.0 kg",
+            "木块质量 m₂ 2.0 kg",
+            "2.0 kg",
+            "入射速度 v₀ 6.0 m/s",
+            "6.0 m/s",
+            "弹簧劲度系数 k 120 N/m",
+            "120 N/m",
+            "当前阶段碰撞前时间 t0.38 s当前动量 p6.00 kg·m/s当前动能 K18.00 J弹性势能 Ep0.00 J最大压缩 x0.32 m",
+            "蓝车正在接近木块：碰撞还未发生，先记录碰前动量 p₀=6.00 kg·m/s。"
+          ],
+          "physical_readout": [
+            "小车质量 m₁ 1.0 kg",
+            "1.0 kg",
+            "木块质量 m₂ 2.0 kg",
+            "2.0 kg",
+            "入射速度 v₀ 6.0 m/s",
+            "6.0 m/s",
+            "弹簧劲度系数 k 120 N/m",
+            "120 N/m",
+            "当前阶段碰撞前时间 t0.38 s当前动量 p6.00 kg·m/s当前动能 K18.00 J弹性势能 Ep0.00 J最大压缩 x0.32 m",
+            "蓝车正在接近木块：碰撞还未发生，先记录碰前动量 p₀=6.00 kg·m/s。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "26e61bf3",
+          "readout_hash": "72fc2a43",
+          "physical_readout_hash": "72fc2a43",
+          "readout": [
+            "小车质量 m₁ 1.0 kg",
+            "1.0 kg",
+            "木块质量 m₂ 2.0 kg",
+            "2.0 kg",
+            "入射速度 v₀ 6.0 m/s",
+            "6.0 m/s",
+            "弹簧劲度系数 k 120 N/m",
+            "120 N/m",
+            "当前阶段碰撞前时间 t0.38 s当前动量 p6.00 kg·m/s当前动能 K18.00 J弹性势能 Ep0.00 J最大压缩 x0.32 m",
+            "蓝车正在接近木块：碰撞还未发生，先记录碰前动量 p₀=6.00 kg·m/s。"
+          ],
+          "physical_readout": [
+            "小车质量 m₁ 1.0 kg",
+            "1.0 kg",
+            "木块质量 m₂ 2.0 kg",
+            "2.0 kg",
+            "入射速度 v₀ 6.0 m/s",
+            "6.0 m/s",
+            "弹簧劲度系数 k 120 N/m",
+            "120 N/m",
+            "当前阶段碰撞前时间 t0.38 s当前动量 p6.00 kg·m/s当前动能 K18.00 J弹性势能 Ep0.00 J最大压缩 x0.32 m",
+            "蓝车正在接近木块：碰撞还未发生，先记录碰前动量 p₀=6.00 kg·m/s。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "小车质量 m₁ # kg|# kg|木块质量 m₂ # kg|# kg|入射速度 v₀ # m/s|# m/s|弹簧劲度系数 k # N/m|# N/m|当前阶段碰撞前时间 t# s当前动量 p# kg·m/s当前动能 K# J弹性势能 Ep# J最大压缩 x# m|蓝车正在接近木块：碰撞还未发生，先记录碰前动量 p₀=# kg·m/s。",
+          "controls": [
+            {
+              "id": "m1",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "m2",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "v0",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "k",
+              "value": "120",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "小车质量 m₁ # kg|# kg|木块质量 m₂ # kg|# kg|入射速度 v₀ # m/s|# m/s|弹簧劲度系数 k # N/m|# N/m|当前阶段碰撞前时间 t# s当前动量 p# kg·m/s当前动能 K# J弹性势能 Ep# J最大压缩 x# m|蓝车正在接近木块：碰撞还未发生，先记录碰前动量 p₀=# kg·m/s。",
+          "controls": [
+            {
+              "id": "m1",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "m2",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "v0",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "k",
+              "value": "120",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/skill/error-analysis.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#trueValue",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#sys",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#random",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#n",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:零误差修正",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "播放扰动",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#correct",
+          "text": "零误差修正",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放扰动"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "eceff6",
+          "readout_hash": "123b2971",
+          "physical_readout_hash": "123b2971",
+          "readout": [
+            "真实值 10.00",
+            "10.00",
+            "系统误差 0.60",
+            "0.60",
+            "偶然误差幅度 0.45",
+            "0.45",
+            "测量次数 5",
+            "5",
+            "平均值：10.621绝对误差 Δ：0.621相对误差 δ：6.2%当前处理：未修正固定零误差",
+            "110.290.29210.770.77310.670.67410.500.50510.880.88",
+            "当前 δ=6.2% 只描述本次仿真偏差；是否满足要求必须与题设允许误差或不确定度比较，不能套统一 2% 门槛。"
+          ],
+          "physical_readout": [
+            "真实值 10.00",
+            "10.00",
+            "系统误差 0.60",
+            "0.60",
+            "偶然误差幅度 0.45",
+            "0.45",
+            "测量次数 5",
+            "5",
+            "平均值：10.621绝对误差 Δ：0.621相对误差 δ：6.2%当前处理：未修正固定零误差",
+            "110.290.29210.770.77310.670.67410.500.50510.880.88",
+            "当前 δ=6.2% 只描述本次仿真偏差；是否满足要求必须与题设允许误差或不确定度比较，不能套统一 2% 门槛。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "6214083c",
+          "readout_hash": "26591a95",
+          "physical_readout_hash": "26591a95",
+          "readout": [
+            "真实值 10.00",
+            "10.00",
+            "系统误差 0.60",
+            "0.60",
+            "偶然误差幅度 0.45",
+            "0.45",
+            "测量次数 5",
+            "5",
+            "平均值：10.626绝对误差 Δ：0.626相对误差 δ：6.3%当前处理：未修正固定零误差",
+            "110.300.30210.810.81310.690.69410.490.49510.840.84",
+            "当前 δ=6.3% 只描述本次仿真偏差；是否满足要求必须与题设允许误差或不确定度比较，不能套统一 2% 门槛。"
+          ],
+          "physical_readout": [
+            "真实值 10.00",
+            "10.00",
+            "系统误差 0.60",
+            "0.60",
+            "偶然误差幅度 0.45",
+            "0.45",
+            "测量次数 5",
+            "5",
+            "平均值：10.626绝对误差 Δ：0.626相对误差 δ：6.3%当前处理：未修正固定零误差",
+            "110.300.30210.810.81310.690.69410.490.49510.840.84",
+            "当前 δ=6.3% 只描述本次仿真偏差；是否满足要求必须与题设允许误差或不确定度比较，不能套统一 2% 门槛。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "eceff6",
+          "readout_hash": "123b2971",
+          "physical_readout_hash": "123b2971",
+          "readout": [
+            "真实值 10.00",
+            "10.00",
+            "系统误差 0.60",
+            "0.60",
+            "偶然误差幅度 0.45",
+            "0.45",
+            "测量次数 5",
+            "5",
+            "平均值：10.621绝对误差 Δ：0.621相对误差 δ：6.2%当前处理：未修正固定零误差",
+            "110.290.29210.770.77310.670.67410.500.50510.880.88",
+            "当前 δ=6.2% 只描述本次仿真偏差；是否满足要求必须与题设允许误差或不确定度比较，不能套统一 2% 门槛。"
+          ],
+          "physical_readout": [
+            "真实值 10.00",
+            "10.00",
+            "系统误差 0.60",
+            "0.60",
+            "偶然误差幅度 0.45",
+            "0.45",
+            "测量次数 5",
+            "5",
+            "平均值：10.621绝对误差 Δ：0.621相对误差 δ：6.2%当前处理：未修正固定零误差",
+            "110.290.29210.770.77310.670.67410.500.50510.880.88",
+            "当前 δ=6.2% 只描述本次仿真偏差；是否满足要求必须与题设允许误差或不确定度比较，不能套统一 2% 门槛。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "eceff6",
+          "readout_hash": "123b2971",
+          "physical_readout_hash": "123b2971",
+          "readout": [
+            "真实值 10.00",
+            "10.00",
+            "系统误差 0.60",
+            "0.60",
+            "偶然误差幅度 0.45",
+            "0.45",
+            "测量次数 5",
+            "5",
+            "平均值：10.621绝对误差 Δ：0.621相对误差 δ：6.2%当前处理：未修正固定零误差",
+            "110.290.29210.770.77310.670.67410.500.50510.880.88",
+            "当前 δ=6.2% 只描述本次仿真偏差；是否满足要求必须与题设允许误差或不确定度比较，不能套统一 2% 门槛。"
+          ],
+          "physical_readout": [
+            "真实值 10.00",
+            "10.00",
+            "系统误差 0.60",
+            "0.60",
+            "偶然误差幅度 0.45",
+            "0.45",
+            "测量次数 5",
+            "5",
+            "平均值：10.621绝对误差 Δ：0.621相对误差 δ：6.2%当前处理：未修正固定零误差",
+            "110.290.29210.770.77310.670.67410.500.50510.880.88",
+            "当前 δ=6.2% 只描述本次仿真偏差；是否满足要求必须与题设允许误差或不确定度比较，不能套统一 2% 门槛。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "真实值 #|#|系统误差 #|#|偶然误差幅度 #|#|测量次数 #|#|平均值：#绝对误差 Δ：#相对误差 δ：#%当前处理：未修正固定零误差|当前 δ=#% 只描述本次仿真偏差；是否满足要求必须与题设允许误差或不确定度比较，不能套统一 #% 门槛。",
+          "controls": [
+            {
+              "id": "trueValue",
+              "value": "10",
+              "checked": false
+            },
+            {
+              "id": "sys",
+              "value": "0.6",
+              "checked": false
+            },
+            {
+              "id": "random",
+              "value": "0.45",
+              "checked": false
+            },
+            {
+              "id": "n",
+              "value": "5",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "真实值 #|#|系统误差 #|#|偶然误差幅度 #|#|测量次数 #|#|平均值：#绝对误差 Δ：#相对误差 δ：#%当前处理：未修正固定零误差|当前 δ=#% 只描述本次仿真偏差；是否满足要求必须与题设允许误差或不确定度比较，不能套统一 #% 门槛。",
+          "controls": [
+            {
+              "id": "trueValue",
+              "value": "10",
+              "checked": false
+            },
+            {
+              "id": "sys",
+              "value": "0.6",
+              "checked": false
+            },
+            {
+              "id": "random",
+              "value": "0.45",
+              "checked": false
+            },
+            {
+              "id": "n",
+              "value": "5",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/skill/experiment-data-processing.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#k",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#b",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#noise",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#outlier",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:复测第 5 点",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:证据不足，暂不剔除",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:清除复测证据",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "播放装置",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#inspect",
+          "text": "复测第 5 点",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#toggle",
+          "text": "证据不足，暂不剔除",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#resetEvidence",
+          "text": "清除复测证据",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.5,
+          "py": 0.5
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放装置"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "1e2f0afe",
+          "readout_hash": "9f66f186",
+          "physical_readout_hash": "9f66f186",
+          "readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6仿真斜率偏差：6.8%",
+            "1.03.04原始记录2.05.44原始记录3.08.08原始记录4.010.46原始记录5.015.06待复核6.015.47原始记录",
+            "处理决定未开放：先复测第 5 点并检查记录、装置或操作原因。"
+          ],
+          "physical_readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6仿真斜率偏差：6.8%",
+            "1.03.04原始记录2.05.44原始记录3.08.08原始记录4.010.46原始记录5.015.06待复核6.015.47原始记录",
+            "处理决定未开放：先复测第 5 点并检查记录、装置或操作原因。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "5de2f053",
+          "readout_hash": "9f66f186",
+          "physical_readout_hash": "9f66f186",
+          "readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6仿真斜率偏差：6.8%",
+            "1.03.04原始记录2.05.44原始记录3.08.08原始记录4.010.46原始记录5.015.06待复核6.015.47原始记录",
+            "处理决定未开放：先复测第 5 点并检查记录、装置或操作原因。"
+          ],
+          "physical_readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6仿真斜率偏差：6.8%",
+            "1.03.04原始记录2.05.44原始记录3.08.08原始记录4.010.46原始记录5.015.06待复核6.015.47原始记录",
+            "处理决定未开放：先复测第 5 点并检查记录、装置或操作原因。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "5c541a0c",
+          "readout_hash": "9f66f186",
+          "physical_readout_hash": "9f66f186",
+          "readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6仿真斜率偏差：6.8%",
+            "1.03.04原始记录2.05.44原始记录3.08.08原始记录4.010.46原始记录5.015.06待复核6.015.47原始记录",
+            "处理决定未开放：先复测第 5 点并检查记录、装置或操作原因。"
+          ],
+          "physical_readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6仿真斜率偏差：6.8%",
+            "1.03.04原始记录2.05.44原始记录3.08.08原始记录4.010.46原始记录5.015.06待复核6.015.47原始记录",
+            "处理决定未开放：先复测第 5 点并检查记录、装置或操作原因。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "5c541a0c",
+          "readout_hash": "9f66f186",
+          "physical_readout_hash": "9f66f186",
+          "readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6仿真斜率偏差：6.8%",
+            "1.03.04原始记录2.05.44原始记录3.08.08原始记录4.010.46原始记录5.015.06待复核6.015.47原始记录",
+            "处理决定未开放：先复测第 5 点并检查记录、装置或操作原因。"
+          ],
+          "physical_readout": [
+            "真实斜率 k 2.50",
+            "2.50",
+            "截距 b 0.50",
+            "0.50",
+            "随机误差 0.35",
+            "0.35",
+            "异常点偏差 2.00",
+            "2.00",
+            "拟合斜率 k：2.669截距 b：0.247参与点数：6仿真斜率偏差：6.8%",
+            "1.03.04原始记录2.05.44原始记录3.08.08原始记录4.010.46原始记录5.015.06待复核6.015.47原始记录",
+            "处理决定未开放：先复测第 5 点并检查记录、装置或操作原因。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "真实斜率 k #|#|截距 b #|#|随机误差 #|#|异常点偏差 #|#|拟合斜率 k：#截距 b：#参与点数：#仿真斜率偏差：#%|处理决定未开放：先复测第 # 点并检查记录、装置或操作原因。",
+          "controls": [
+            {
+              "id": "k",
+              "value": "2.5",
+              "checked": false
+            },
+            {
+              "id": "b",
+              "value": "0.5",
+              "checked": false
+            },
+            {
+              "id": "noise",
+              "value": "0.35",
+              "checked": false
+            },
+            {
+              "id": "outlier",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "真实斜率 k #|#|截距 b #|#|随机误差 #|#|异常点偏差 #|#|拟合斜率 k：#截距 b：#参与点数：#仿真斜率偏差：#%|处理决定未开放：先复测第 # 点并检查记录、装置或操作原因。",
+          "controls": [
+            {
+              "id": "k",
+              "value": "2.5",
+              "checked": false
+            },
+            {
+              "id": "b",
+              "value": "0.5",
+              "checked": false
+            },
+            {
+              "id": "noise",
+              "value": "0.35",
+              "checked": false
+            },
+            {
+              "id": "outlier",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/skill/extreme-critical.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#main",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#scale",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#grav",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:射程极值",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录临界",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:圆周临界",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#circle",
+          "text": "圆周临界",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#projectile",
+          "text": "射程极值",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "播放扫速",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录临界",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放扫速"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "a00a58af",
+          "readout_hash": "c85b0487",
+          "physical_readout_hash": "c85b0487",
+          "readout": [
+            "速度/角度 6.00 m/s",
+            "6.00 m/s",
+            "半径/初速 3.00 m",
+            "3.00 m",
+            "高度/重力 9.8",
+            "9.8",
+            "临界速度：5.42 m/s方程所需 N/m：2.20 N/kg实际约束力 N/m：2.20 N/kg状态：贴轨运动",
+            "圆周N=0贴轨运动",
+            "本页只研究内轨最高点：N 指向圆心且不能为负；方程若要求 N<0，物体已脱离。"
+          ],
+          "physical_readout": [
+            "速度/角度 6.00 m/s",
+            "6.00 m/s",
+            "半径/初速 3.00 m",
+            "3.00 m",
+            "高度/重力 9.8",
+            "9.8",
+            "临界速度：5.42 m/s方程所需 N/m：2.20 N/kg实际约束力 N/m：2.20 N/kg状态：贴轨运动",
+            "圆周N=0贴轨运动",
+            "本页只研究内轨最高点：N 指向圆心且不能为负；方程若要求 N<0，物体已脱离。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "2b267d41",
+          "readout_hash": "f90c5415",
+          "physical_readout_hash": "f90c5415",
+          "readout": [
+            "速度/角度 6.50 m/s",
+            "6.50 m/s",
+            "半径/初速 3.00 m",
+            "3.00 m",
+            "高度/重力 9.8",
+            "9.8",
+            "临界速度：5.42 m/s方程所需 N/m：4.28 N/kg实际约束力 N/m：4.28 N/kg状态：贴轨运动",
+            "圆周N=0贴轨运动",
+            "本页只研究内轨最高点：N 指向圆心且不能为负；方程若要求 N<0，物体已脱离。"
+          ],
+          "physical_readout": [
+            "速度/角度 6.50 m/s",
+            "6.50 m/s",
+            "半径/初速 3.00 m",
+            "3.00 m",
+            "高度/重力 9.8",
+            "9.8",
+            "临界速度：5.42 m/s方程所需 N/m：4.28 N/kg实际约束力 N/m：4.28 N/kg状态：贴轨运动",
+            "圆周N=0贴轨运动",
+            "本页只研究内轨最高点：N 指向圆心且不能为负；方程若要求 N<0，物体已脱离。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "2b267d41",
+          "readout_hash": "f90c5415",
+          "physical_readout_hash": "f90c5415",
+          "readout": [
+            "速度/角度 6.50 m/s",
+            "6.50 m/s",
+            "半径/初速 3.00 m",
+            "3.00 m",
+            "高度/重力 9.8",
+            "9.8",
+            "临界速度：5.42 m/s方程所需 N/m：4.28 N/kg实际约束力 N/m：4.28 N/kg状态：贴轨运动",
+            "圆周N=0贴轨运动",
+            "本页只研究内轨最高点：N 指向圆心且不能为负；方程若要求 N<0，物体已脱离。"
+          ],
+          "physical_readout": [
+            "速度/角度 6.50 m/s",
+            "6.50 m/s",
+            "半径/初速 3.00 m",
+            "3.00 m",
+            "高度/重力 9.8",
+            "9.8",
+            "临界速度：5.42 m/s方程所需 N/m：4.28 N/kg实际约束力 N/m：4.28 N/kg状态：贴轨运动",
+            "圆周N=0贴轨运动",
+            "本页只研究内轨最高点：N 指向圆心且不能为负；方程若要求 N<0，物体已脱离。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "2b267d41",
+          "readout_hash": "f90c5415",
+          "physical_readout_hash": "f90c5415",
+          "readout": [
+            "速度/角度 6.50 m/s",
+            "6.50 m/s",
+            "半径/初速 3.00 m",
+            "3.00 m",
+            "高度/重力 9.8",
+            "9.8",
+            "临界速度：5.42 m/s方程所需 N/m：4.28 N/kg实际约束力 N/m：4.28 N/kg状态：贴轨运动",
+            "圆周N=0贴轨运动",
+            "本页只研究内轨最高点：N 指向圆心且不能为负；方程若要求 N<0，物体已脱离。"
+          ],
+          "physical_readout": [
+            "速度/角度 6.50 m/s",
+            "6.50 m/s",
+            "半径/初速 3.00 m",
+            "3.00 m",
+            "高度/重力 9.8",
+            "9.8",
+            "临界速度：5.42 m/s方程所需 N/m：4.28 N/kg实际约束力 N/m：4.28 N/kg状态：贴轨运动",
+            "圆周N=0贴轨运动",
+            "本页只研究内轨最高点：N 指向圆心且不能为负；方程若要求 N<0，物体已脱离。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "速度/角度 # m/s|# m/s|半径/初速 # m|# m|高度/重力 #|#|临界速度：# m/s方程所需 N/m：# N/kg实际约束力 N/m：# N/kg状态：贴轨运动|本页只研究内轨最高点：N 指向圆心且不能为负；方程若要求 N<#，物体已脱离。",
+          "controls": [
+            {
+              "id": "main",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "scale",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "grav",
+              "value": "9.8",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "速度/角度 # m/s|# m/s|半径/初速 # m|# m|高度/重力 #|#|临界速度：# m/s方程所需 N/m：# N/kg实际约束力 N/m：# N/kg状态：贴轨运动|本页只研究内轨最高点：N 指向圆心且不能为负；方程若要求 N<#，物体已脱离。",
+          "controls": [
+            {
+              "id": "main",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "scale",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "grav",
+              "value": "9.8",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/skill/graph-slope-area.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#a",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#b",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#c",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:F-x",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:I-U",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录读数",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:v-t",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#vt",
+          "text": "v-t",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#fx",
+          "text": "F-x",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#iu",
+          "text": "I-U",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录读数",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.5
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "6e03d210",
+          "readout_hash": "8802e78f",
+          "physical_readout_hash": "8802e78f",
+          "readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.0",
+            "6.0",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：24.00截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ],
+          "physical_readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.0",
+            "6.0",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：24.00截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "51468af6",
+          "readout_hash": "f17634a9",
+          "physical_readout_hash": "f17634a9",
+          "readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.2",
+            "6.2",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：25.38截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ],
+          "physical_readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.2",
+            "6.2",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：25.38截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "51468af6",
+          "readout_hash": "f17634a9",
+          "physical_readout_hash": "f17634a9",
+          "readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.2",
+            "6.2",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：25.38截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ],
+          "physical_readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.2",
+            "6.2",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：25.38截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "51468af6",
+          "readout_hash": "f17634a9",
+          "physical_readout_hash": "f17634a9",
+          "readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.2",
+            "6.2",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：25.38截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ],
+          "physical_readout": [
+            "点 A 横坐标 1.0",
+            "1.0",
+            "点 B 横坐标 6.2",
+            "6.2",
+            "截距/初值 2.0",
+            "2.0",
+            "斜率 k：0.80面积 S：25.38截距：2.0坐标轴：v/(m/s) - t/s",
+            "vt0.8024.02.0",
+            "读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "点 A 横坐标 #|#|点 B 横坐标 #|#|截距/初值 #|#|斜率 k：#面积 S：#截距：#坐标轴：v/(m/s) - t/s|读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。",
+          "controls": [
+            {
+              "id": "a",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "b",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "c",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "点 A 横坐标 #|#|点 B 横坐标 #|#|截距/初值 #|#|斜率 k：#面积 S：#截距：#坐标轴：v/(m/s) - t/s|读图顺序：先读横纵轴和单位，再问斜率、面积、截距分别是什么物理量。",
+          "controls": [
+            {
+              "id": "a",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "b",
+              "value": "6",
+              "checked": false
+            },
+            {
+              "id": "c",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/skill/instrument-reading.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#value",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#zero",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:测微器",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:线性电表",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:欧姆表",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录读数",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:卡尺",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#caliper",
+          "text": "卡尺",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#micrometer",
+          "text": "测微器",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#meter",
+          "text": "线性电表",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#ohmmeter",
+          "text": "欧姆表",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#record",
+          "text": "记录读数",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:重置",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "",
+        "auditPlay": false,
+        "auditReset": true,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "cb6af8a9",
+          "readout_hash": "2c9b120d",
+          "physical_readout_hash": "2c9b120d",
+          "readout": [
+            "被测量/指针位置 23.40",
+            "23.40",
+            "零误差/零位偏差 0 格",
+            "0 格",
+            "量程 undefined mm0.6 A3 V15 V",
+            "undefined mm",
+            "仪器：游标卡尺示值/刻度：23.40 mm修正/换算后：23.40 mm读数依据：主尺+游标",
+            "卡尺23.4023.400 mm",
+            "量程、最小分度和零误差相互独立；先读示值，再按当前仪器规则修正并写单位。"
+          ],
+          "physical_readout": [
+            "被测量/指针位置 23.40",
+            "23.40",
+            "零误差/零位偏差 0 格",
+            "0 格",
+            "量程 undefined mm0.6 A3 V15 V",
+            "undefined mm",
+            "仪器：游标卡尺示值/刻度：23.40 mm修正/换算后：23.40 mm读数依据：主尺+游标",
+            "卡尺23.4023.400 mm",
+            "量程、最小分度和零误差相互独立；先读示值，再按当前仪器规则修正并写单位。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "a6815d13",
+          "readout_hash": "bed65dff",
+          "physical_readout_hash": "bed65dff",
+          "readout": [
+            "被测量/指针位置 29.85",
+            "29.85",
+            "零误差/零位偏差 0 格",
+            "0 格",
+            "量程 undefined mm0.6 A3 V15 V",
+            "undefined mm",
+            "仪器：游标卡尺示值/刻度：29.85 mm修正/换算后：29.85 mm读数依据：主尺+游标",
+            "卡尺23.4023.400 mm",
+            "量程、最小分度和零误差相互独立；先读示值，再按当前仪器规则修正并写单位。"
+          ],
+          "physical_readout": [
+            "被测量/指针位置 29.85",
+            "29.85",
+            "零误差/零位偏差 0 格",
+            "0 格",
+            "量程 undefined mm0.6 A3 V15 V",
+            "undefined mm",
+            "仪器：游标卡尺示值/刻度：29.85 mm修正/换算后：29.85 mm读数依据：主尺+游标",
+            "卡尺23.4023.400 mm",
+            "量程、最小分度和零误差相互独立；先读示值，再按当前仪器规则修正并写单位。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "fd261c8a",
+          "readout_hash": "7f4cea31",
+          "physical_readout_hash": "7f4cea31",
+          "readout": [
+            "被测量/指针位置 30.15",
+            "30.15",
+            "零误差/零位偏差 0 格",
+            "0 格",
+            "量程 undefined mm0.6 A3 V15 V",
+            "undefined mm",
+            "仪器：游标卡尺示值/刻度：30.15 mm修正/换算后：30.15 mm读数依据：主尺+游标",
+            "卡尺23.4023.400 mm",
+            "量程、最小分度和零误差相互独立；先读示值，再按当前仪器规则修正并写单位。"
+          ],
+          "physical_readout": [
+            "被测量/指针位置 30.15",
+            "30.15",
+            "零误差/零位偏差 0 格",
+            "0 格",
+            "量程 undefined mm0.6 A3 V15 V",
+            "undefined mm",
+            "仪器：游标卡尺示值/刻度：30.15 mm修正/换算后：30.15 mm读数依据：主尺+游标",
+            "卡尺23.4023.400 mm",
+            "量程、最小分度和零误差相互独立；先读示值，再按当前仪器规则修正并写单位。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "fd261c8a",
+          "readout_hash": "7f4cea31",
+          "physical_readout_hash": "7f4cea31",
+          "readout": [
+            "被测量/指针位置 30.15",
+            "30.15",
+            "零误差/零位偏差 0 格",
+            "0 格",
+            "量程 undefined mm0.6 A3 V15 V",
+            "undefined mm",
+            "仪器：游标卡尺示值/刻度：30.15 mm修正/换算后：30.15 mm读数依据：主尺+游标",
+            "卡尺23.4023.400 mm",
+            "量程、最小分度和零误差相互独立；先读示值，再按当前仪器规则修正并写单位。"
+          ],
+          "physical_readout": [
+            "被测量/指针位置 30.15",
+            "30.15",
+            "零误差/零位偏差 0 格",
+            "0 格",
+            "量程 undefined mm0.6 A3 V15 V",
+            "undefined mm",
+            "仪器：游标卡尺示值/刻度：30.15 mm修正/换算后：30.15 mm读数依据：主尺+游标",
+            "卡尺23.4023.400 mm",
+            "量程、最小分度和零误差相互独立；先读示值，再按当前仪器规则修正并写单位。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "被测量/指针位置 #|#|零误差/零位偏差 # 格|# 格|量程 undefined mm# A# V# V|undefined mm|仪器：游标卡尺示值/刻度：# mm修正/换算后：# mm读数依据：主尺+游标|量程、最小分度和零误差相互独立；先读示值，再按当前仪器规则修正并写单位。",
+          "controls": [
+            {
+              "id": "value",
+              "value": "46.8",
+              "checked": false
+            },
+            {
+              "id": "zero",
+              "value": "0",
+              "checked": false
+            },
+            {
+              "id": "range",
+              "value": "3V",
+              "selectedIndex": 1
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "被测量/指针位置 #|#|零误差/零位偏差 # 格|# 格|量程 undefined mm# A# V# V|undefined mm|仪器：游标卡尺示值/刻度：# mm修正/换算后：# mm读数依据：主尺+游标|量程、最小分度和零误差相互独立；先读示值，再按当前仪器规则修正并写单位。",
+          "controls": [
+            {
+              "id": "value",
+              "value": "46.8",
+              "checked": false
+            },
+            {
+              "id": "zero",
+              "value": "0",
+              "checked": false
+            },
+            {
+              "id": "range",
+              "value": "3V",
+              "selectedIndex": 1
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/skill/multi-process-motion.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#a1",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#t1",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#t2",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#a3",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:单步",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#play",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#step",
+          "text": "单步",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#reset",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.5
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "d846b024",
+          "readout_hash": "666dbf2c",
+          "physical_readout_hash": "666dbf2c",
+          "readout": [
+            "加速度 a₁ 2.0 m/s²",
+            "2.0 m/s²",
+            "加速时长 t₁ 3.0 s",
+            "3.0 s",
+            "匀速时长 t₂ 3.0 s",
+            "3.0 s",
+            "制动加速度大小 a₃ 3.0 m/s²",
+            "3.0 m/s²",
+            "当前阶段加速时间 t0.00 s位置 x0.00 m速度 v0.00 m/s加速度 a2.00 m/s²总位移33.00 m",
+            "加速阶段：速度箭头变长，v-t 图像斜率为 a₁。 阴影面积累计到 x。"
+          ],
+          "physical_readout": [
+            "加速度 a₁ 2.0 m/s²",
+            "2.0 m/s²",
+            "加速时长 t₁ 3.0 s",
+            "3.0 s",
+            "匀速时长 t₂ 3.0 s",
+            "3.0 s",
+            "制动加速度大小 a₃ 3.0 m/s²",
+            "3.0 m/s²",
+            "当前阶段加速时间 t0.00 s位置 x0.00 m速度 v0.00 m/s加速度 a2.00 m/s²总位移33.00 m",
+            "加速阶段：速度箭头变长，v-t 图像斜率为 a₁。 阴影面积累计到 x。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "29aac7d7",
+          "readout_hash": "84707864",
+          "physical_readout_hash": "84707864",
+          "readout": [
+            "加速度 a₁ 2.0 m/s²",
+            "2.0 m/s²",
+            "加速时长 t₁ 3.0 s",
+            "3.0 s",
+            "匀速时长 t₂ 3.0 s",
+            "3.0 s",
+            "制动加速度大小 a₃ 3.0 m/s²",
+            "3.0 m/s²",
+            "当前阶段加速时间 t0.36 s位置 x0.13 m速度 v0.72 m/s加速度 a2.00 m/s²总位移33.00 m",
+            "加速阶段：速度箭头变长，v-t 图像斜率为 a₁。 阴影面积累计到 x。"
+          ],
+          "physical_readout": [
+            "加速度 a₁ 2.0 m/s²",
+            "2.0 m/s²",
+            "加速时长 t₁ 3.0 s",
+            "3.0 s",
+            "匀速时长 t₂ 3.0 s",
+            "3.0 s",
+            "制动加速度大小 a₃ 3.0 m/s²",
+            "3.0 m/s²",
+            "当前阶段加速时间 t0.36 s位置 x0.13 m速度 v0.72 m/s加速度 a2.00 m/s²总位移33.00 m",
+            "加速阶段：速度箭头变长，v-t 图像斜率为 a₁。 阴影面积累计到 x。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "bd4400e3",
+          "readout_hash": "3e03f89a",
+          "physical_readout_hash": "3e03f89a",
+          "readout": [
+            "加速度 a₁ 2.0 m/s²",
+            "2.0 m/s²",
+            "加速时长 t₁ 3.0 s",
+            "3.0 s",
+            "匀速时长 t₂ 3.0 s",
+            "3.0 s",
+            "制动加速度大小 a₃ 3.0 m/s²",
+            "3.0 m/s²",
+            "当前阶段加速时间 t0.38 s位置 x0.14 m速度 v0.75 m/s加速度 a2.00 m/s²总位移33.00 m",
+            "加速阶段：速度箭头变长，v-t 图像斜率为 a₁。 阴影面积累计到 x。"
+          ],
+          "physical_readout": [
+            "加速度 a₁ 2.0 m/s²",
+            "2.0 m/s²",
+            "加速时长 t₁ 3.0 s",
+            "3.0 s",
+            "匀速时长 t₂ 3.0 s",
+            "3.0 s",
+            "制动加速度大小 a₃ 3.0 m/s²",
+            "3.0 m/s²",
+            "当前阶段加速时间 t0.38 s位置 x0.14 m速度 v0.75 m/s加速度 a2.00 m/s²总位移33.00 m",
+            "加速阶段：速度箭头变长，v-t 图像斜率为 a₁。 阴影面积累计到 x。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "bd4400e3",
+          "readout_hash": "3e03f89a",
+          "physical_readout_hash": "3e03f89a",
+          "readout": [
+            "加速度 a₁ 2.0 m/s²",
+            "2.0 m/s²",
+            "加速时长 t₁ 3.0 s",
+            "3.0 s",
+            "匀速时长 t₂ 3.0 s",
+            "3.0 s",
+            "制动加速度大小 a₃ 3.0 m/s²",
+            "3.0 m/s²",
+            "当前阶段加速时间 t0.38 s位置 x0.14 m速度 v0.75 m/s加速度 a2.00 m/s²总位移33.00 m",
+            "加速阶段：速度箭头变长，v-t 图像斜率为 a₁。 阴影面积累计到 x。"
+          ],
+          "physical_readout": [
+            "加速度 a₁ 2.0 m/s²",
+            "2.0 m/s²",
+            "加速时长 t₁ 3.0 s",
+            "3.0 s",
+            "匀速时长 t₂ 3.0 s",
+            "3.0 s",
+            "制动加速度大小 a₃ 3.0 m/s²",
+            "3.0 m/s²",
+            "当前阶段加速时间 t0.38 s位置 x0.14 m速度 v0.75 m/s加速度 a2.00 m/s²总位移33.00 m",
+            "加速阶段：速度箭头变长，v-t 图像斜率为 a₁。 阴影面积累计到 x。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "加速度 a₁ # m/s²|# m/s²|加速时长 t₁ # s|# s|匀速时长 t₂ # s|# s|制动加速度大小 a₃ # m/s²|# m/s²|当前阶段加速时间 t# s位置 x# m速度 v# m/s加速度 a# m/s²总位移# m|加速阶段：速度箭头变长，v-t 图像斜率为 a₁。 阴影面积累计到 x。",
+          "controls": [
+            {
+              "id": "a1",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "t1",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "t2",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "a3",
+              "value": "3",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "加速度 a₁ # m/s²|# m/s²|加速时长 t₁ # s|# s|匀速时长 t₂ # s|# s|制动加速度大小 a₃ # m/s²|# m/s²|当前阶段加速时间 t# s位置 x# m速度 v# m/s加速度 a# m/s²总位移# m|加速阶段：速度箭头变长，v-t 图像斜率为 a₁。 阴影面积累计到 x。",
+          "controls": [
+            {
+              "id": "a1",
+              "value": "2",
+              "checked": false
+            },
+            {
+              "id": "t1",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "t2",
+              "value": "3",
+              "checked": false
+            },
+            {
+              "id": "a3",
+              "value": "3",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/skill/real-world-modeling.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#v",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#p1",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#p2",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:无人机投放",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:单步",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:汽车制动",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#brake",
+          "text": "汽车制动",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#drop",
+          "text": "无人机投放",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#step",
+          "text": "单步",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#reset",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "916bb03d",
+          "readout_hash": "fbeda366",
+          "physical_readout_hash": "fbeda366",
+          "readout": [
+            "初速度 v₀ 20.0 m/s",
+            "20.0 m/s",
+            "反应时间 tᵣ 1.0 s",
+            "1.0 s",
+            "路面摩擦因数 μ 0.70",
+            "0.70",
+            "当前过程反应段：匀速时间 t0.00 s当前速度 v20.00 m/s反应距离20.0 m制动距离29.2 m停车距离49.2 m",
+            "先把驾驶员反应时间单独建成匀速段：这一段没有制动加速度。"
+          ],
+          "physical_readout": [
+            "初速度 v₀ 20.0 m/s",
+            "20.0 m/s",
+            "反应时间 tᵣ 1.0 s",
+            "1.0 s",
+            "路面摩擦因数 μ 0.70",
+            "0.70",
+            "当前过程反应段：匀速时间 t0.00 s当前速度 v20.00 m/s反应距离20.0 m制动距离29.2 m停车距离49.2 m",
+            "先把驾驶员反应时间单独建成匀速段：这一段没有制动加速度。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "5b8519e4",
+          "readout_hash": "72255dde",
+          "physical_readout_hash": "72255dde",
+          "readout": [
+            "初速度 v₀ 20.0 m/s",
+            "20.0 m/s",
+            "反应时间 tᵣ 1.0 s",
+            "1.0 s",
+            "路面摩擦因数 μ 0.70",
+            "0.70",
+            "当前过程反应段：匀速时间 t0.35 s当前速度 v20.00 m/s反应距离20.0 m制动距离29.2 m停车距离49.2 m",
+            "先把驾驶员反应时间单独建成匀速段：这一段没有制动加速度。"
+          ],
+          "physical_readout": [
+            "初速度 v₀ 20.0 m/s",
+            "20.0 m/s",
+            "反应时间 tᵣ 1.0 s",
+            "1.0 s",
+            "路面摩擦因数 μ 0.70",
+            "0.70",
+            "当前过程反应段：匀速时间 t0.35 s当前速度 v20.00 m/s反应距离20.0 m制动距离29.2 m停车距离49.2 m",
+            "先把驾驶员反应时间单独建成匀速段：这一段没有制动加速度。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "92fbf34f",
+          "readout_hash": "7a100bd",
+          "physical_readout_hash": "7a100bd",
+          "readout": [
+            "初速度 v₀ 20.0 m/s",
+            "20.0 m/s",
+            "反应时间 tᵣ 1.0 s",
+            "1.0 s",
+            "路面摩擦因数 μ 0.70",
+            "0.70",
+            "当前过程反应段：匀速时间 t0.38 s当前速度 v20.00 m/s反应距离20.0 m制动距离29.2 m停车距离49.2 m",
+            "先把驾驶员反应时间单独建成匀速段：这一段没有制动加速度。"
+          ],
+          "physical_readout": [
+            "初速度 v₀ 20.0 m/s",
+            "20.0 m/s",
+            "反应时间 tᵣ 1.0 s",
+            "1.0 s",
+            "路面摩擦因数 μ 0.70",
+            "0.70",
+            "当前过程反应段：匀速时间 t0.38 s当前速度 v20.00 m/s反应距离20.0 m制动距离29.2 m停车距离49.2 m",
+            "先把驾驶员反应时间单独建成匀速段：这一段没有制动加速度。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "92fbf34f",
+          "readout_hash": "7a100bd",
+          "physical_readout_hash": "7a100bd",
+          "readout": [
+            "初速度 v₀ 20.0 m/s",
+            "20.0 m/s",
+            "反应时间 tᵣ 1.0 s",
+            "1.0 s",
+            "路面摩擦因数 μ 0.70",
+            "0.70",
+            "当前过程反应段：匀速时间 t0.38 s当前速度 v20.00 m/s反应距离20.0 m制动距离29.2 m停车距离49.2 m",
+            "先把驾驶员反应时间单独建成匀速段：这一段没有制动加速度。"
+          ],
+          "physical_readout": [
+            "初速度 v₀ 20.0 m/s",
+            "20.0 m/s",
+            "反应时间 tᵣ 1.0 s",
+            "1.0 s",
+            "路面摩擦因数 μ 0.70",
+            "0.70",
+            "当前过程反应段：匀速时间 t0.38 s当前速度 v20.00 m/s反应距离20.0 m制动距离29.2 m停车距离49.2 m",
+            "先把驾驶员反应时间单独建成匀速段：这一段没有制动加速度。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "初速度 v₀ # m/s|# m/s|反应时间 tᵣ # s|# s|路面摩擦因数 μ #|#|当前过程反应段：匀速时间 t# s当前速度 v# m/s反应距离# m制动距离# m停车距离# m|先把驾驶员反应时间单独建成匀速段：这一段没有制动加速度。",
+          "controls": [
+            {
+              "id": "v",
+              "value": "20",
+              "checked": false
+            },
+            {
+              "id": "p1",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "p2",
+              "value": "0.7",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "初速度 v₀ # m/s|# m/s|反应时间 tᵣ # s|# s|路面摩擦因数 μ #|#|当前过程反应段：匀速时间 t# s当前速度 v# m/s反应距离# m制动距离# m停车距离# m|先把驾驶员反应时间单独建成匀速段：这一段没有制动加速度。",
+          "controls": [
+            {
+              "id": "v",
+              "value": "20",
+              "checked": false
+            },
+            {
+              "id": "p1",
+              "value": "1",
+              "checked": false
+            },
+            {
+              "id": "p2",
+              "value": "0.7",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    },
+    {
+      "file": "anim/skill/science-info-problem.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#a",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:太阳能电池",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:装置单步",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:A. 4.0×10² m",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:B. 4.0×10⁵ m",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:C. 4.0×10⁶ m",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:D. 4.0×10⁸ m",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:提交答案",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:下一题",
+          "kind": "initial_condition_retry",
+          "changed": false,
+          "affected_result": false
+        },
+        {
+          "selector": "button:航天周期",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#orbit",
+          "text": "航天周期",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#solar",
+          "text": "太阳能电池",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#play",
+          "text": "装置动画：播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#step",
+          "text": "装置单步",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#reset",
+          "text": "重置本轮",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "button:A. 4.0×10² m",
+          "text": "A. 4.0×10² m",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:B. 4.0×10⁵ m",
+          "text": "B. 4.0×10⁵ m",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:C. 4.0×10⁶ m",
+          "text": "C. 4.0×10⁶ m",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "button:D. 4.0×10⁸ m",
+          "text": "D. 4.0×10⁸ m",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#submitAnswer",
+          "text": "提交答案",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        },
+        {
+          "selector": "#nextQuestion",
+          "text": "下一题",
+          "role": "condition",
+          "checked": true,
+          "worked": false
+        }
+      ],
+      "semantic_checks": [
+        {
+          "kind": "答题流程",
+          "expected": "选择选项 → 提交答案 → 解锁下一题 → 题号变化",
+          "actual": {
+            "before": "第 1 / 3 题",
+            "after": "第 2 / 3 题",
+            "enabledAfterSubmit": true,
+            "feedbackShown": true
+          },
+          "pass": true
+        }
+      ],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": true,
+        "point": {
+          "px": 0.18,
+          "py": 0.18
+        },
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "play",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "装置动画：播放"
+      },
+      "reset_button": {
+        "id": "reset",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置本轮"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "43ee7798",
+          "readout_hash": "2ea9ed87",
+          "physical_readout_hash": "2ea9ed87",
+          "readout": [
+            "轨道高度 h400 km",
+            "400 km",
+            "圆轨道速度 v（由 h 派生）7.67 km/s",
+            "7.67 km/s",
+            "附加比例 η20%",
+            "20%",
+            "装置动画 t0.00 s轨道半径 r6770 km圆轨道速度 v7.67 km/s周期 T92.4 min模型v=√(GM/r)，T=2π√(r³/GM)",
+            "圆轨道速度由引力向心条件派生，不能与高度任意组合；动画不影响答题得分。"
+          ],
+          "physical_readout": [
+            "轨道高度 h400 km",
+            "400 km",
+            "圆轨道速度 v（由 h 派生）7.67 km/s",
+            "7.67 km/s",
+            "附加比例 η20%",
+            "20%",
+            "装置动画 t0.00 s轨道半径 r6770 km圆轨道速度 v7.67 km/s周期 T92.4 min模型v=√(GM/r)，T=2π√(r³/GM)",
+            "圆轨道速度由引力向心条件派生，不能与高度任意组合；动画不影响答题得分。"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "dc50eb3a",
+          "readout_hash": "68243ac4",
+          "physical_readout_hash": "68243ac4",
+          "readout": [
+            "轨道高度 h400 km",
+            "400 km",
+            "圆轨道速度 v（由 h 派生）7.67 km/s",
+            "7.67 km/s",
+            "附加比例 η20%",
+            "20%",
+            "装置动画 t0.36 s轨道半径 r6770 km圆轨道速度 v7.67 km/s周期 T92.4 min模型v=√(GM/r)，T=2π√(r³/GM)",
+            "圆轨道速度由引力向心条件派生，不能与高度任意组合；动画不影响答题得分。"
+          ],
+          "physical_readout": [
+            "轨道高度 h400 km",
+            "400 km",
+            "圆轨道速度 v（由 h 派生）7.67 km/s",
+            "7.67 km/s",
+            "附加比例 η20%",
+            "20%",
+            "装置动画 t0.36 s轨道半径 r6770 km圆轨道速度 v7.67 km/s周期 T92.4 min模型v=√(GM/r)，T=2π√(r³/GM)",
+            "圆轨道速度由引力向心条件派生，不能与高度任意组合；动画不影响答题得分。"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": true,
+        "raw_readout_changed": true
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "a76614be",
+          "readout_hash": "dcaca5c6",
+          "physical_readout_hash": "dcaca5c6",
+          "readout": [
+            "轨道高度 h400 km",
+            "400 km",
+            "圆轨道速度 v（由 h 派生）7.67 km/s",
+            "7.67 km/s",
+            "附加比例 η20%",
+            "20%",
+            "装置动画 t0.38 s轨道半径 r6770 km圆轨道速度 v7.67 km/s周期 T92.4 min模型v=√(GM/r)，T=2π√(r³/GM)",
+            "圆轨道速度由引力向心条件派生，不能与高度任意组合；动画不影响答题得分。"
+          ],
+          "physical_readout": [
+            "轨道高度 h400 km",
+            "400 km",
+            "圆轨道速度 v（由 h 派生）7.67 km/s",
+            "7.67 km/s",
+            "附加比例 η20%",
+            "20%",
+            "装置动画 t0.38 s轨道半径 r6770 km圆轨道速度 v7.67 km/s周期 T92.4 min模型v=√(GM/r)，T=2π√(r³/GM)",
+            "圆轨道速度由引力向心条件派生，不能与高度任意组合；动画不影响答题得分。"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "a76614be",
+          "readout_hash": "dcaca5c6",
+          "physical_readout_hash": "dcaca5c6",
+          "readout": [
+            "轨道高度 h400 km",
+            "400 km",
+            "圆轨道速度 v（由 h 派生）7.67 km/s",
+            "7.67 km/s",
+            "附加比例 η20%",
+            "20%",
+            "装置动画 t0.38 s轨道半径 r6770 km圆轨道速度 v7.67 km/s周期 T92.4 min模型v=√(GM/r)，T=2π√(r³/GM)",
+            "圆轨道速度由引力向心条件派生，不能与高度任意组合；动画不影响答题得分。"
+          ],
+          "physical_readout": [
+            "轨道高度 h400 km",
+            "400 km",
+            "圆轨道速度 v（由 h 派生）7.67 km/s",
+            "7.67 km/s",
+            "附加比例 η20%",
+            "20%",
+            "装置动画 t0.38 s轨道半径 r6770 km圆轨道速度 v7.67 km/s周期 T92.4 min模型v=√(GM/r)，T=2π√(r³/GM)",
+            "圆轨道速度由引力向心条件派生，不能与高度任意组合；动画不影响答题得分。"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "轨道高度 h# km|# km|圆轨道速度 v（由 h 派生）# km/s|# km/s|附加比例 η#%|#%|装置动画 t# s轨道半径 r# km圆轨道速度 v# km/s周期 T# min模型v=√(GM/r)，T=#π√(r³/GM)|圆轨道速度由引力向心条件派生，不能与高度任意组合；动画不影响答题得分。",
+          "controls": [
+            {
+              "id": "a",
+              "value": "400",
+              "checked": false
+            },
+            {
+              "id": "b",
+              "value": "7.7",
+              "checked": false
+            },
+            {
+              "id": "eta",
+              "value": "20",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "轨道高度 h# km|# km|圆轨道速度 v（由 h 派生）# km/s|# km/s|附加比例 η#%|#%|装置动画 t# s轨道半径 r# km圆轨道速度 v# km/s周期 T# min模型v=√(GM/r)，T=#π√(r³/GM)|圆轨道速度由引力向心条件派生，不能与高度任意组合；动画不影响答题得分。",
+          "controls": [
+            {
+              "id": "a",
+              "value": "400",
+              "checked": false
+            },
+            {
+              "id": "b",
+              "value": "7.7",
+              "checked": false
+            },
+            {
+              "id": "eta",
+              "value": "20",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}

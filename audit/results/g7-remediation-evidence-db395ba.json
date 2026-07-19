@@ -1,0 +1,118 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-07-18",
+  "chapter_mapping": "第七大章 = 高考能力专题 = G-01..G-12",
+  "baseline_head": "828d2a73a930cfc5451404874bfe3f6daa356cbd",
+  "remediation_head": "db395ba8624f5352df7ac2e3907d0e9d31ccdde9",
+  "automated_gates": {
+    "node scripts/gen-data.js --check": {
+      "result": "PASS",
+      "catalog_entries": 229,
+      "progress_entries": 229
+    },
+    "npm run check": {
+      "result": "PASS",
+      "static_pages": 206,
+      "chapters": 13,
+      "issues": 0,
+      "p0_p1": 0,
+      "formula_lint": 0
+    },
+    "npm run audit:pedagogy:g7": {
+      "result": "PASS",
+      "tests": 4,
+      "desktop_guides": "12/12",
+      "mobile_390x844_reduced_motion": "12/12"
+    },
+    "npm run audit:physics:g7": {
+      "result": "PASS",
+      "tests": 12,
+      "physics_nodes": "12/12"
+    },
+    "g7-skill-remediated-db395ba.json": {
+      "result": "PASS",
+      "commit": "db395ba8624f5352df7ac2e3907d0e9d31ccdde9",
+      "worktree_clean": true,
+      "score": 100,
+      "pass": 11,
+      "hard_failures": 0
+    },
+    "g7-model-g10-remediated-db395ba.json": {
+      "result": "PASS",
+      "commit": "db395ba8624f5352df7ac2e3907d0e9d31ccdde9",
+      "worktree_clean": true,
+      "score": 100,
+      "pass": 1,
+      "hard_failures": 0
+    }
+  },
+  "finding_closure": {
+    "G-SYS-01": {
+      "result": "PASS",
+      "evidence": "12/12 nodes now require prediction before revealing the canvas, readout, formula, explanation, boundary, transfer, and replay path."
+    },
+    "G-SYS-02": {
+      "result": "PASS",
+      "evidence": "12/12 nodes expose a static reduced-motion completion path and pass 390x844 overflow/runtime checks; initial motion is paused or starts stopped."
+    },
+    "G-01": {
+      "result": "PASS",
+      "evidence": "Non-origin I-U line reports slope 0.45 by delta-y/delta-x while y/x is demonstrably different and limited to origin-proportional lines."
+    },
+    "G-02": {
+      "result": "PASS",
+      "evidence": "The outlier action stays disabled until repeat evidence exists; the original six records remain visible after the five-point fit is selected."
+    },
+    "G-03": {
+      "result": "PASS",
+      "evidence": "Instrument, range/multiplier, and zero correction are independent; meter ranges and nonlinear ohmmeter scale/multipliers are separately modeled."
+    },
+    "G-04": {
+      "result": "PASS",
+      "evidence": "Every displayed row error is recomputed from the corrected reading, and credibility is bound to task tolerance rather than a universal 2 percent verdict."
+    },
+    "G-05": {
+      "result": "PASS",
+      "evidence": "Inner/outer topology, RA/RV loading, divider/limiter network, meter ranges, rheostat power, readings, and safety use one circuit solver."
+    },
+    "G-06": {
+      "result": "PASS",
+      "evidence": "The page is explicitly the inner-track top; contact force is inward and nonnegative, with detachment shown when the required force is negative."
+    },
+    "G-07": {
+      "result": "PASS",
+      "evidence": "The acceleration-to-uniform boundary preserves both velocity and position, with the next step continuing from the same state."
+    },
+    "G-08": {
+      "result": "PASS",
+      "evidence": "At half post-collision energy, the drawn compression ratio is sqrt(1/2); momentum and spring-energy stages use distinct, defined accounts."
+    },
+    "G-09": {
+      "result": "PASS",
+      "evidence": "One SI position drives flux, flux rate, emf, current, force, and power; abs(dPhi/dt)=abs(emf) and force opposes actual motion."
+    },
+    "G-10": {
+      "result": "PASS",
+      "evidence": "Only exact opposing force balance is labeled theoretical straight-through; any experimental bandwidth requires a separate resolution model."
+    },
+    "G-11": {
+      "result": "PASS",
+      "evidence": "Ground-frame no-drag drop uses constant release horizontal speed and hides the irrelevant control; braking is labeled a level-road limiting model."
+    },
+    "G-12": {
+      "result": "PASS",
+      "evidence": "Orbit height uniquely derives radius, circular speed, and period from Earth gravity; the independent speed and irrelevant ratio controls are disabled/hidden."
+    }
+  },
+  "publication_state": {
+    "implementation_release_gate": "PASS",
+    "physics_remediation_reaudit": "PASS",
+    "pedagogy_remediation_reaudit": "PASS",
+    "interaction_qa": "PASS",
+    "mobile_and_reduced_motion": "PASS",
+    "source_gate": "PENDING_ALL_STATIC_EXAMPLES_QUARANTINED",
+    "teacher_signoff": "PENDING",
+    "content_approval": "PENDING",
+    "student_status_labels": "PRESERVED_INTERACTION_PASSED_CONTENT_PENDING"
+  }
+}

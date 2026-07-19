@@ -224,3 +224,71 @@ development_flow: continue
 source_gate: all_static_examples_quarantined
 teacher_signoff: pending
 ```
+
+---
+
+## 整改复审附录：实现提交 `db395ba`
+
+```yaml
+remediation_head: db395ba8624f5352df7ac2e3907d0e9d31ccdde9
+baseline_head: 828d2a73a930cfc5451404874bfe3f6daa356cbd
+implementation_worktree_at_evidence_start: clean
+review_status: remediation_complete_reaudit_pass
+implementation_release_gate: pass
+physics_remediation_reaudit: pass_12_of_12
+pedagogy_remediation_reaudit: pass_12_of_12
+generic_interaction: pass_12_of_12_unique_pages
+mobile_390x844: pass_12_of_12
+reduced_motion: pass_12_of_12
+source_gate: pending_all_static_examples_quarantined
+teacher_signoff: pending
+content_approval: pending
+student_status_labels: interaction_passed_content_pending_preserved
+```
+
+本附录覆盖初审后的实现复审，证据绑定 `db395ba8624f5352df7ac2e3907d0e9d31ccdde9`。这里的 `implementation_release_gate: pass` 表示第七章整改代码可发布；它不把隔离中的例题认定为真题、不替代教师签署，也不把页面状态从 `interaction passed · content pending` 改为内容完成。
+
+### finding 关闭矩阵
+
+| finding | 复审 | 可观察关闭证据 |
+|---|---|---|
+| G-SYS-01 | PASS | G-01..G-12 均先预测，再开放真实状态、画面证据、解释、边界、迁移和重新预测；公式/读数在验证前隐藏 |
+| G-SYS-02 | PASS | 12/12 有 reduced-motion 静态证据路径，初态静止或由引导先暂停；390×844 全部可完成且无横向溢出 |
+| G-01 | PASS | 非零截距 I-U 线使用 `ΔI/ΔU=0.45`；专项断言同时证明 `I/U` 与斜率不同 |
+| G-02 | PASS | 复测前剔除按钮禁用；复测后才可剔除拟合副本，六条原始记录仍保留 |
+| G-03 | PASS | 仪器、量程/倍率、零位偏差分别控制；线性电表和非线性欧姆表分别通过专项读数断言 |
+| G-04 | PASS | 修正后每行误差等于“修正读数−真值”；可信度只与题设允许误差/不确定度比较 |
+| G-05 | PASS | 内外接和分压/限流真实改变拓扑；RA/RV、量程、滑变器功率、读数与安全门禁由同一求解器产生 |
+| G-06 | PASS | 固定内轨最高点，N 只指向圆心且实际值不小于零；需求 N<0 时显示脱离轨迹 |
+| G-07 | PASS | 加速段末速度/位置与匀速段初速度/位置逐值相等，下一单步从同一边界状态继续 |
+| G-08 | PASS | t=6 s、Ep/K碰后=1/2 时，画面压缩比为 `√(1/2)`；碰撞动量账和压簧能量账分开 |
+| G-09 | PASS | SI 位置 x 唯一驱动 Φ、dΦ/dt、ε、I、F、P；专项断言验证 `|dΦ/dt|=|ε|` 且 `Fv≤0` |
+| G-10 | PASS | 只有 `qE=qvB` 精确平衡才判理论直线通过；非平衡明确显示偏转，实验容差需另给分辨率模型 |
+| G-11 | PASS | 地面系无阻力投放使用 `x=v₀t`，隐藏无关控件；汽车模型明确限定为水平路面极限制动 |
+| G-12 | PASS | 高度唯一派生 r、圆轨道速度和周期，独立速度输入禁用；光伏模式才恢复其有效控件 |
+
+### 复审门禁
+
+| 命令 / 报告 | 结果 |
+|---|---|
+| `node scripts/gen-data.js --check` | PASS；目录 229、进度 229，未重建 id-map/progress |
+| `npm run check` | PASS；206 页、13 章、issues=0，P0/P1 与公式 lint 全部为 0 |
+| `npm run audit:pedagogy:g7` | 4/4 PASS；12 节桌面引导与 12 节 390×844 reduced-motion 路径通过 |
+| `npm run audit:physics:g7` | 12/12 PASS；每个 G 节点均有物理语义专项断言 |
+| `audit/results/g7-skill-remediated-db395ba.json` | 11/11 PASS，score=100，hard_failures=0，`worktree_clean=true` |
+| `audit/results/g7-model-g10-remediated-db395ba.json` | G-10 1/1 PASS，score=100，hard_failures=0，`worktree_clean=true` |
+| `audit/results/g7-remediation-evidence-db395ba.json` | 13 个初审 finding 全部关闭；发布边界和待办状态单独记录 |
+
+### 复审裁决
+
+```yaml
+engineering_interaction: pass
+physics_implementation: pass
+guided_pedagogy_implementation: pass
+mobile_and_reduced_motion: pass
+implementation_release_gate: pass
+development_flow: continue
+source_examples: pending_quarantined
+teacher_signoff: pending
+content_approval: pending
+```

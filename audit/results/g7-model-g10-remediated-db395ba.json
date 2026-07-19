@@ -1,0 +1,290 @@
+{
+  "score_version": "3.1",
+  "generated_at": "2026-07-19T04:12:15.232Z",
+  "commit": "db395ba8624f5352df7ac2e3907d0e9d31ccdde9",
+  "worktree_clean": true,
+  "git_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "tested_files_sha256": {
+    "anim/model/compound-field-particle.html": "1e78a103e0f9babd56c8d927ea879e946a2abcc152bcc657ffeee5f98bbe65ac"
+  },
+  "test_command": "AUDIT_MODULE=model AUDIT_REPORT=g7-model-g10-remediated-db395ba.json playwright test tests/interaction-audit.spec.js --workers=1",
+  "module": "model",
+  "modules": [
+    "model"
+  ],
+  "summary": {
+    "total": 1,
+    "score": 100,
+    "pass": 1,
+    "needs_review": 0,
+    "blocked": 0
+  },
+  "results": [
+    {
+      "file": "anim/model/compound-field-particle.html",
+      "loaded": true,
+      "console_errors": [],
+      "page_errors": [],
+      "play_button_found": true,
+      "state_changed_after_play": true,
+      "pause_worked": true,
+      "reset_button_found": true,
+      "reset_worked": true,
+      "controls": [
+        {
+          "selector": "#charge",
+          "kind": "select-one",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#electric",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#magnetic",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#speed",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "#mass",
+          "kind": "range",
+          "changed": true,
+          "affected_result": true
+        },
+        {
+          "selector": "button:记录",
+          "kind": "condition_button",
+          "changed": true,
+          "affected_result": true
+        }
+      ],
+      "button_checks": [
+        {
+          "selector": "#playBtn",
+          "text": "播放",
+          "role": "play",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#resetBtn",
+          "text": "重置",
+          "role": "reset",
+          "checked": true,
+          "worked": null
+        },
+        {
+          "selector": "#recordBtn",
+          "text": "记录",
+          "role": "condition",
+          "checked": true,
+          "worked": true
+        }
+      ],
+      "semantic_checks": [],
+      "direct_canvas_drag": {
+        "tested": true,
+        "affected_result": false,
+        "required": false
+      },
+      "reentry_passed": true,
+      "mobile_passed": true,
+      "hard_failures": [],
+      "result": "PASS",
+      "play_button": {
+        "id": "playBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "播放"
+      },
+      "reset_button": {
+        "id": "resetBtn",
+        "auditPlay": false,
+        "auditReset": false,
+        "text": "重置"
+      },
+      "play_debug": {
+        "initial": {
+          "visual_hash": "3126c42d",
+          "readout_hash": "29ff3901",
+          "physical_readout_hash": "29ff3901",
+          "readout": [
+            "电荷性质：正电荷",
+            "电场强度 E/(10^3 V/m)：4.0",
+            "磁感应强度 B/T：0.8",
+            "入射速度 v/(10^3 m/s)：5.0",
+            "质量 m/(10^-15 kg)：2.0",
+            "公式绑定：qE=4.00e-9 N，qvB=4.00e-9 N选择速度 v0=E/B=5.00 x 10^3 m/s当前 v=5.00 x 10^3 m/s，偏差=0.0%纯磁场半径 R=mv/(|q|B)=12.50 m时间演化：轨迹点、力表盘、半径尺、图像游标正在联动",
+            "判定：严格直线通过，qE 与 qvB 等大反向，合力为 0。",
+            "点击“记录”保存一次测量"
+          ],
+          "physical_readout": [
+            "电荷性质：正电荷",
+            "电场强度 E/(10^3 V/m)：4.0",
+            "磁感应强度 B/T：0.8",
+            "入射速度 v/(10^3 m/s)：5.0",
+            "质量 m/(10^-15 kg)：2.0",
+            "公式绑定：qE=4.00e-9 N，qvB=4.00e-9 N选择速度 v0=E/B=5.00 x 10^3 m/s当前 v=5.00 x 10^3 m/s，偏差=0.0%纯磁场半径 R=mv/(|q|B)=12.50 m时间演化：轨迹点、力表盘、半径尺、图像游标正在联动",
+            "判定：严格直线通过，qE 与 qvB 等大反向，合力为 0。",
+            "点击“记录”保存一次测量"
+          ]
+        },
+        "afterPlay": {
+          "visual_hash": "4cb8a4dd",
+          "readout_hash": "29ff3901",
+          "physical_readout_hash": "29ff3901",
+          "readout": [
+            "电荷性质：正电荷",
+            "电场强度 E/(10^3 V/m)：4.0",
+            "磁感应强度 B/T：0.8",
+            "入射速度 v/(10^3 m/s)：5.0",
+            "质量 m/(10^-15 kg)：2.0",
+            "公式绑定：qE=4.00e-9 N，qvB=4.00e-9 N选择速度 v0=E/B=5.00 x 10^3 m/s当前 v=5.00 x 10^3 m/s，偏差=0.0%纯磁场半径 R=mv/(|q|B)=12.50 m时间演化：轨迹点、力表盘、半径尺、图像游标正在联动",
+            "判定：严格直线通过，qE 与 qvB 等大反向，合力为 0。",
+            "点击“记录”保存一次测量"
+          ],
+          "physical_readout": [
+            "电荷性质：正电荷",
+            "电场强度 E/(10^3 V/m)：4.0",
+            "磁感应强度 B/T：0.8",
+            "入射速度 v/(10^3 m/s)：5.0",
+            "质量 m/(10^-15 kg)：2.0",
+            "公式绑定：qE=4.00e-9 N，qvB=4.00e-9 N选择速度 v0=E/B=5.00 x 10^3 m/s当前 v=5.00 x 10^3 m/s，偏差=0.0%纯磁场半径 R=mv/(|q|B)=12.50 m时间演化：轨迹点、力表盘、半径尺、图像游标正在联动",
+            "判定：严格直线通过，qE 与 qvB 等大反向，合力为 0。",
+            "点击“记录”保存一次测量"
+          ]
+        }
+      },
+      "motion_evidence": {
+        "canvas_or_svg_changed": true,
+        "physical_readout_changed": false,
+        "raw_readout_changed": false
+      },
+      "pause_debug": {
+        "pauseA": {
+          "visual_hash": "3126c42d",
+          "readout_hash": "29ff3901",
+          "physical_readout_hash": "29ff3901",
+          "readout": [
+            "电荷性质：正电荷",
+            "电场强度 E/(10^3 V/m)：4.0",
+            "磁感应强度 B/T：0.8",
+            "入射速度 v/(10^3 m/s)：5.0",
+            "质量 m/(10^-15 kg)：2.0",
+            "公式绑定：qE=4.00e-9 N，qvB=4.00e-9 N选择速度 v0=E/B=5.00 x 10^3 m/s当前 v=5.00 x 10^3 m/s，偏差=0.0%纯磁场半径 R=mv/(|q|B)=12.50 m时间演化：轨迹点、力表盘、半径尺、图像游标正在联动",
+            "判定：严格直线通过，qE 与 qvB 等大反向，合力为 0。",
+            "点击“记录”保存一次测量"
+          ],
+          "physical_readout": [
+            "电荷性质：正电荷",
+            "电场强度 E/(10^3 V/m)：4.0",
+            "磁感应强度 B/T：0.8",
+            "入射速度 v/(10^3 m/s)：5.0",
+            "质量 m/(10^-15 kg)：2.0",
+            "公式绑定：qE=4.00e-9 N，qvB=4.00e-9 N选择速度 v0=E/B=5.00 x 10^3 m/s当前 v=5.00 x 10^3 m/s，偏差=0.0%纯磁场半径 R=mv/(|q|B)=12.50 m时间演化：轨迹点、力表盘、半径尺、图像游标正在联动",
+            "判定：严格直线通过，qE 与 qvB 等大反向，合力为 0。",
+            "点击“记录”保存一次测量"
+          ]
+        },
+        "pauseB": {
+          "visual_hash": "3126c42d",
+          "readout_hash": "29ff3901",
+          "physical_readout_hash": "29ff3901",
+          "readout": [
+            "电荷性质：正电荷",
+            "电场强度 E/(10^3 V/m)：4.0",
+            "磁感应强度 B/T：0.8",
+            "入射速度 v/(10^3 m/s)：5.0",
+            "质量 m/(10^-15 kg)：2.0",
+            "公式绑定：qE=4.00e-9 N，qvB=4.00e-9 N选择速度 v0=E/B=5.00 x 10^3 m/s当前 v=5.00 x 10^3 m/s，偏差=0.0%纯磁场半径 R=mv/(|q|B)=12.50 m时间演化：轨迹点、力表盘、半径尺、图像游标正在联动",
+            "判定：严格直线通过，qE 与 qvB 等大反向，合力为 0。",
+            "点击“记录”保存一次测量"
+          ],
+          "physical_readout": [
+            "电荷性质：正电荷",
+            "电场强度 E/(10^3 V/m)：4.0",
+            "磁感应强度 B/T：0.8",
+            "入射速度 v/(10^3 m/s)：5.0",
+            "质量 m/(10^-15 kg)：2.0",
+            "公式绑定：qE=4.00e-9 N，qvB=4.00e-9 N选择速度 v0=E/B=5.00 x 10^3 m/s当前 v=5.00 x 10^3 m/s，偏差=0.0%纯磁场半径 R=mv/(|q|B)=12.50 m时间演化：轨迹点、力表盘、半径尺、图像游标正在联动",
+            "判定：严格直线通过，qE 与 qvB 等大反向，合力为 0。",
+            "点击“记录”保存一次测量"
+          ]
+        }
+      },
+      "reset_debug": {
+        "resetSnapshot": {
+          "stableReadout": "电荷性质：正电荷|电场强度 E/(#^# V/m)：#|磁感应强度 B/T：#|入射速度 v/(#^# m/s)：#|质量 m/(#^# kg)：#|公式绑定：qE=#e# N，qvB=#e# N选择速度 v#=E/B=# x #^# m/s当前 v=# x #^# m/s，偏差=#%纯磁场半径 R=mv/(|q|B)=# m时间演化：轨迹点、力表盘、半径尺、图像游标正在联动|判定：严格直线通过，qE 与 qvB 等大反向，合力为 #。",
+          "controls": [
+            {
+              "id": "charge",
+              "value": "1",
+              "selectedIndex": 0
+            },
+            {
+              "id": "electric",
+              "value": "4",
+              "checked": false
+            },
+            {
+              "id": "magnetic",
+              "value": "0.8",
+              "checked": false
+            },
+            {
+              "id": "speed",
+              "value": "5",
+              "checked": false
+            },
+            {
+              "id": "mass",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        },
+        "canonicalReset": {
+          "stableReadout": "电荷性质：正电荷|电场强度 E/(#^# V/m)：#|磁感应强度 B/T：#|入射速度 v/(#^# m/s)：#|质量 m/(#^# kg)：#|公式绑定：qE=#e# N，qvB=#e# N选择速度 v#=E/B=# x #^# m/s当前 v=# x #^# m/s，偏差=#%纯磁场半径 R=mv/(|q|B)=# m时间演化：轨迹点、力表盘、半径尺、图像游标正在联动|判定：严格直线通过，qE 与 qvB 等大反向，合力为 #。",
+          "controls": [
+            {
+              "id": "charge",
+              "value": "1",
+              "selectedIndex": 0
+            },
+            {
+              "id": "electric",
+              "value": "4",
+              "checked": false
+            },
+            {
+              "id": "magnetic",
+              "value": "0.8",
+              "checked": false
+            },
+            {
+              "id": "speed",
+              "value": "5",
+              "checked": false
+            },
+            {
+              "id": "mass",
+              "value": "2",
+              "checked": false
+            }
+          ]
+        }
+      },
+      "reset_visual_match": true
+    }
+  ]
+}
