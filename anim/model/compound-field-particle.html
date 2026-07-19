@@ -200,6 +200,7 @@ function drawSideView(p,progress){
   arrow(px,py,px+28*Math.cos(a+Math.PI/2),py+28*Math.sin(a+Math.PI/2),'#2c7be5',3);
   label('R=mv/(|q|B)',x+w/2,y+138,'#38b2ac',13);
 }
+function isExactBalance(p){return Math.abs(p.Fe-p.Fm)<=Math.max(p.Fe,p.Fm,1e-30)*1e-9;}
 function updateReadouts(p){
   setLabels(p);
   const absRel=Math.abs(p.rel)*100;
@@ -211,14 +212,16 @@ function updateReadouts(p){
     `<div>纯磁场半径 R=mv/(|q|B)=${p.radius.toFixed(2)} m</div>`,
     `<div>时间演化：轨迹点、力表盘、半径尺、图像游标正在联动</div>`
   ].join('');
-  const ok=absRel<4;
+  const ok=isExactBalance(p);
   els.status.className=ok?'status':'status bad';
-  els.status.textContent=ok?'判定：接近临界直线通过，qE 与 qvB 等大反向。':`判定：未通过，${direction}，粒子会向合力方向偏转。`;
+  els.status.textContent=ok?'判定：严格直线通过，qE 与 qvB 等大反向，合力为 0。':`判定：未严格直线通过，${direction}，合力不为 0，粒子向合力方向偏转。实验容差需另给狭缝或探测器分辨率。`;
 }
 function render(){
   const p=params();
   drawScene(p);
   updateReadouts(p);
+  canvas.dataset.selectorModel='exact-force-balance-no-undeclared-tolerance';
+  window.__ANIM_TEST_STATE__={playing,t,params:p,exact:isExactBalance(p)};
 }
 function animate(now){
   if(!last)last=now;
@@ -252,7 +255,7 @@ els.playBtn.addEventListener('click',()=>{playing=!playing;els.playBtn.textConte
 els.resetBtn.addEventListener('click',reset);
 els.recordBtn.addEventListener('click',()=>{
   const p=params();
-  records.unshift({v:p.v/1000,v0:p.v0/1000,rel:Math.abs(p.rel)*100,ok:Math.abs(p.rel)<0.04});
+  records.unshift({v:p.v/1000,v0:p.v0/1000,rel:Math.abs(p.rel)*100,ok:isExactBalance(p)});
   records=records.slice(0,5);
   els.recordBody.innerHTML=records.map((r,i)=>`<tr><td>${i+1} ${r.ok?'通过':'偏转'}</td><td>${r.v.toFixed(2)}</td><td>${r.v0.toFixed(2)}</td><td>${r.rel.toFixed(1)}%</td></tr>`).join('');
 });
@@ -260,5 +263,6 @@ els.recordBtn.addEventListener('click',()=>{
 render();
 requestAnimationFrame(animate);
 </script>
+<script src="../skill/guided-lesson.js"></script>
 </body>
 </html>

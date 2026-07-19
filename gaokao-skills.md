@@ -34,8 +34,11 @@
 - 能识别 `I-U` 图像斜率与电阻倒数的关系。
 - 会辨析“所有面积都有物理意义”的常见错解。
 
-**交互探究。**
-<iframe src="anim/skill/graph-slope-area.html" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+#### 本页主问题与引导演示
+
+先预测非零截距图线的斜率规则，再验证 `Δy/Δx` 与 `y/x` 的边界；完成预测后才开放公式和自由读图。
+
+<iframe src="anim/skill/graph-slope-area.html?lesson=G-01" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 #### 方法、条件与迁移
 
@@ -77,8 +80,11 @@
 - 会识别异常点、零点误差、坐标轴选择不当等常见失分点。
 - 会用相对误差评价实验结论是否可信。
 
-**交互探究。**
-<iframe src="anim/skill/experiment-data-processing.html" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+#### 本页主问题与引导演示
+
+先判断偏离多数点的数据能否直接删除，再用复测证据决定保留或剔除；原始记录始终保留可追溯。
+
+<iframe src="anim/skill/experiment-data-processing.html?lesson=G-02" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 #### 方法、条件与迁移
 
@@ -89,6 +95,8 @@
 第四步：斜率、截距要翻译成题目中的物理量
 第五步：异常点先找原因，再决定是否剔除
 ```
+
+异常点不能只因“偏离拟合线”就删除：应保留原始记录，完成复测或找到可核查的操作/仪器原因后，才可在拟合副本中剔除。相对误差只描述本次模拟值与参考值的差异；是否“可信”必须使用题目给出的允许误差、仪器等级或实验目的，不能套统一百分比阈值。
 
 #### 例题与训练（来源审核中）
 
@@ -104,8 +112,11 @@
 - 会识别“忘量程”“忘零误差”“有效数字乱写”的常见失分点。
 - 能把读数结果迁移到实验表格、图像斜率和误差分析。
 
-**交互探究。**
-<iframe src="anim/skill/instrument-reading.html" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+#### 本页主问题与引导演示
+
+先区分仪器、量程/倍率和零误差，再从实际刻度得到唯一读数；量程不能由零误差控件暗中改变。
+
+<iframe src="anim/skill/instrument-reading.html?lesson=G-03" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 #### 方法、条件与迁移
 
@@ -116,6 +127,8 @@
 电表：表盘刻度要乘以量程比例
 最终答案必须带单位和合理有效数字
 ```
+
+电表量程/欧姆倍率与零点修正是两个独立设置：量程决定换算比例，零点修正只校正起点，不能暗中切换量程。欧姆表还必须使用非线性刻度并在读数后乘倍率。
 
 **专项条件检查。**
 
@@ -139,8 +152,11 @@
 - 会计算绝对误差、相对误差，并评价实验结论可信度。
 - 会提出有效改进方案，而不是泛泛写“多测几次”。
 
-**交互探究。**
-<iframe src="anim/skill/error-analysis.html" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+#### 本页主问题与引导演示
+
+先预测多次平均能否消除固定零点偏差，再比较修正前后同一组数据；可信度必须依据题设要求而非统一百分比。
+
+<iframe src="anim/skill/error-analysis.html?lesson=G-04" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 #### 方法、条件与迁移
 
@@ -167,8 +183,11 @@
 - 会判断电压表分流、电流表分压导致的测量值偏大或偏小。
 - 会把电路图、实物连线、读数表格和 `U-I` 图像统一起来。
 
-**交互探究。**
-<iframe src="anim/skill/circuit-experiment-design.html" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+#### 本页主问题与引导演示
+
+先预测内外接误差方向，再让真实接线拓扑、仪表内阻、量程、滑变器功率和读数共同验证方案。
+
+<iframe src="anim/skill/circuit-experiment-design.html?lesson=G-05" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 #### 方法、条件与迁移
 
@@ -191,6 +210,7 @@
 - 电流表外接时，电流表读数包含电压表分流，测量结果偏小；其影响随 $R_x/R_V$ 增大而增大。
 - 比较两类误差可得到量级判据 $R_x\approx\sqrt{R_A R_V}$：$R_x$ 较大时常选内接，较小时常选外接；已知具体内阻时应直接比较误差，不能只背口诀。
 - 量程选择先保证任何调节状态下不过载并留有安全裕量，再尽量让正常读数达到满量程的较大比例，以兼顾读数精度。
+- 接线图、仪表内阻模型、量程判据和安全判据必须使用同一组电路状态；不能画一种接法、用另一种接法的理想读数。分压式还要检查滑动变阻器各段电流与额定功率，限流式要检查串联段功耗。
 
 #### 例题与训练（来源审核中）
 
@@ -206,8 +226,11 @@
 - 会区分数学极值和物理可行范围。
 - 会在综合题中先画临界状态，再列方程。
 
-**交互探究。**
-<iframe src="anim/skill/extreme-critical.html" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+#### 本页主问题与引导演示
+
+先明确本页研究内轨最高点，再预测约束力的允许方向和“支持力降为零”的边界；低于临界速度必须显示脱离。
+
+<iframe src="anim/skill/extreme-critical.html?lesson=G-06" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 #### 方法、条件与迁移
 
@@ -218,6 +241,8 @@
 图像题找顶点，方程题看判别式，函数题可配方
 最后检查物理范围，不能只看数学答案
 ```
+
+本页动画固定研究“物体在竖直圆形内轨最高点”。指向圆心的需求约束力为 $N_{\text{需}}=mv^2/R-mg$；接触力不能反向，故实际 $N=\max(0,N_{\text{需}})$。当需求值小于零时，结论是脱离轨道而不是出现负支持力。
 
 #### 例题与训练（来源审核中）
 
@@ -234,8 +259,11 @@
 - 会区分总时间、分段时间、总位移和每段位移。
 - 会识别多过程题中“一个公式套到底”的错解。
 
-**交互探究。**
-<iframe src="anim/skill/multi-process-motion.html" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+#### 本页主问题与引导演示
+
+先预测相邻过程如何接续，再用小车、阶段条、`v-t` 游标和面积核对前段末状态就是后段初状态。
+
+<iframe src="anim/skill/multi-process-motion.html?lesson=G-07" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 #### 方法、条件与迁移
 
@@ -269,8 +297,11 @@
 #### 情境与现象
 先看碰撞瞬间：蓝色小车和金色木块接触后，读数中的**碰前动量与碰后动量相等**，但动能已经减少；再看压缩弹簧阶段，动能柱下降、弹性势能柱上升，二者之和保持不变。拖动画面里的蓝色小车改变 `v₀`，观察动量、碰后速度和最大压缩量同步变化。
 
-**交互探究。**
-<iframe src="anim/skill/energy-momentum-combo.html" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+#### 本页主问题与引导演示
+
+先预测弹性势能比例与压缩比例是否线性，再把碰撞动量账和压簧能量账分阶段验证。
+
+<iframe src="anim/skill/energy-momentum-combo.html?lesson=G-08" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 #### 方法、条件与迁移
 
@@ -281,6 +312,8 @@
 机械能守恒看是否只有重力、弹力做功
 有摩擦或外力做功，用功能关系补账
 ```
+
+完全非弹性碰撞阶段使用 $m_1v_0=(m_1+m_2)v_c$；随后压簧阶段使用 $\tfrac12(m_1+m_2)v_c^2=\tfrac12(m_1+m_2)v^2+\tfrac12kx^2$。因此弹性势能占比为一半时，压缩量是最大压缩量的 $\sqrt{1/2}$，不是一半。
 
 #### 例题与训练（来源审核中）
 
@@ -295,18 +328,18 @@
 - 会用楞次定律判断感应电流方向。
 - 会计算导体棒切割磁感线的感应电动势、电流和安培力。
 - 会把机械功率、安培力功率和电热功率联系起来。
-
-
-
-> **公式首次使用卡**：适用边界——电磁感应综合题先判断磁通量变化和感应方向，再在指定匀强场、有效长度及电路模型下列 E、I、安培力和能量关系；几何改变时重新求有效量。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
-
-- 会在图像题中用 $\Phi -t$ 斜率判断感应电动势。
+- 会在磁通量—时间图像中用斜率判断感应电动势。
 
 #### 情境与现象
-先看一根导体棒在磁场中的闭合导轨上移动：回路面积 `S` 和磁通量 $\Phi =B\cdot S$ 改变，电流表才偏转；把导体棒拖向相反方向，电流方向和安培力方向都会反转。再看底部记录，确认 $\varepsilon =BLv$、$I=\varepsilon /R$ 和 $P_{\text{机械}}=P_{\text{热}}$ 是同一条链上的读数。
+先看一根导体棒在磁场中的闭合导轨上移动：回路面积和磁通量改变，电流表才偏转；把导体棒拖向相反方向，电流方向和安培力方向都会反转。再看底部记录，确认磁通变化、感应电动势、电流、安培力和功率是同一条链上的读数。
 
-**交互探究。**
-<iframe src="anim/skill/electromagnetic-induction-combo.html" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+#### 本页主问题与引导演示
+
+先预测导体棒反向时整条感应链怎样变，再让有单位的位置 `x` 同时驱动磁通量、斜率、电动势、电流、安培力和功率。
+
+<iframe src="anim/skill/electromagnetic-induction-combo.html?lesson=G-09" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
+> **公式首次使用卡**：适用边界——电磁感应综合题先判断磁通量变化和感应方向，再在指定匀强场、有效长度及电路模型下列 E、I、安培力和能量关系；几何改变时重新求有效量。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
 
 #### 方法、条件与迁移
 
@@ -317,6 +350,8 @@
 闭合回路再算 I=ε/R
 安培力 F=BIL，能量看机械功转电热
 ```
+
+本页把导体棒位置 $x$ 作为有单位的物理坐标，回路面积 $S=Lx$、磁通量 $\Phi=BLx$；播放和拖动都从同一 $dx/dt$ 得到速度，因此 $|d\Phi/dt|=BL|v|=|\varepsilon|$。安培力始终与实际运动方向相反，匀速外力做功率才等于电热功率。
 
 #### 例题与训练（来源审核中）
 
@@ -329,17 +364,17 @@
 #### 能力目标
 - 会画出电场力、洛伦兹力、重力的方向。
 - 会识别速度选择器、质谱仪、回旋运动、复合场平衡等模型。
-
-
-
-> **公式首次使用卡**：适用边界——复合场中必须分别写电场力和洛伦兹力方向；速度选择器要求两力反向且 qE=qvB；磁场圆周运动还要求速度垂直磁场且其他力可忽略。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
-
-- 会用 $qvB=qE$ 判断匀速直线通过条件。
-- 会用 $qvB=mv^{2}/r$ 求半径、周期和比荷。
+- 会用电场力与洛伦兹力等大反向判断匀速直线通过条件。
+- 会用洛伦兹力提供向心力求半径、周期和比荷。
 - 会把“先加速、再偏转、再匀速圆周”拆成多过程。
 
-**交互探究。**
-<iframe src="anim/model/compound-field-particle.html" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+#### 本页主问题与引导演示
+
+先预测严格直线通过条件，再用两力、轨迹和记录表核对精确平衡；实验容差必须另有狭缝或探测器分辨率模型。
+
+<iframe src="anim/model/compound-field-particle.html?lesson=G-10" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
+> **公式首次使用卡**：适用边界——复合场中必须分别写电场力和洛伦兹力方向；速度选择器要求两力反向且 qE=qvB；磁场圆周运动还要求速度垂直磁场且其他力可忽略。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
 
 #### 方法、条件与迁移
 
@@ -350,6 +385,8 @@
 圆周偏转：洛伦兹力提供向心力
 复杂装置按区域分段处理
 ```
+
+理论上的直线通过条件是精确等式 $qE=qvB$。若实际装置允许一定速度带宽，必须另给狭缝宽度、场区长度或探测器分辨率并由轨迹偏移推导；不能用未声明的百分比容差代替物理模型。
 
 #### 例题与训练（来源审核中）
 
@@ -368,8 +405,11 @@
 #### 情境与现象
 先切换真实场景：汽车制动不是一个公式，而是“反应阶段匀速 + 制动阶段匀减速”；无人机投放不是斜抛的黑箱，而是“水平匀速 + 竖直自由落体”。拖动画面中的汽车或无人机改变初速度，观察过程图像、模型假设和最终结果怎样一起变化。
 
-**交互探究。**
-<iframe src="anim/skill/real-world-modeling.html" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+#### 本页主问题与引导演示
+
+先声明参考系与忽略因素，再验证地面系释放速度、无空气阻力轨迹和汽车极限制动边界。
+
+<iframe src="anim/skill/real-world-modeling.html?lesson=G-11" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 #### 方法、条件与迁移
 
@@ -380,6 +420,8 @@
 列模型：受力图、图像、方程三选一或组合
 验答案：单位、数量级、方向、正负都要检查
 ```
+
+无人机投放采用地面参考系并忽略空气阻力：释放瞬间物体保留无人机的水平速度，故 $x=v_0t$，风速不属于这一模型。汽车页只演示水平路面、轮胎达到附着极限的制动边界 $a=-\mu g$；一般制动问题仍应由实际制动力或题设加速度建模。
 
 #### 例题与训练（来源审核中）
 
@@ -398,14 +440,15 @@
 
 #### 情境与现象
 
+信息题不是“看见科技名词就套公式”。先在航天或光伏材料中圈出数据、单位和效率，再把它们翻译成轨道半径、速度、周期或输入功率、效率、输出功率。动画播放/暂停只影响装置画面；每道题必须选择后点击“提交答案”，系统才计分并给出解析。
 
+#### 本页主问题与引导演示
+
+先提取圆轨道或光伏模型的有效条件，再统一单位、派生量和数量级；高度与圆轨道速度不能任意独立组合。
+
+<iframe src="anim/skill/science-info-problem.html?lesson=G-12" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 > **公式首次使用卡**：适用边界——科技信息题只使用材料明确给出的模型、数据和适用范围；先完成单位换算和数量级检查；类比关系必须说明对应量，不能把背景宣传语当作物理条件。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
-
-信息题不是“看见科技名词就套公式”。先在航天或光伏材料中圈出数据、单位和效率，再把它们翻译成 `r、v、T` 或 $P_{\text{入}}、\eta 、P_{\text{出}}$。动画播放/暂停只影响装置画面；每道题必须选择后点击“提交答案”，系统才计分并给出解析。
-
-**交互探究。**
-<iframe src="anim/skill/science-info-problem.html" width="100%" height="720" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 #### 方法、条件与迁移
 
@@ -416,6 +459,8 @@
 科技情境最后都要回到旧模型
 答案要做数量级和单位检查
 ```
+
+航天页只讨论忽略大气阻力、地球视为球对称天体的圆轨道：由高度先求 $r=R_\oplus+h$，再由 $v=\sqrt{GM/r}$ 和 $T=2\pi\sqrt{r^3/(GM)}$ 派生速度与周期；高度、圆轨道速度和周期不能作为互不相关的三个输入。
 
 #### 例题与训练（来源审核中）
 

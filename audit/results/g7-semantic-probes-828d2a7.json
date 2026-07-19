@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-07-18",
+  "baseline_head": "828d2a73a930cfc5451404874bfe3f6daa356cbd",
+  "chapter_mapping": "第七大章 = 高考能力专题 = G-01..G-12",
+  "method": "Playwright Chromium browser-level clicks, keyboard operations, select changes, step controls, record/reset controls, and 390x844 viewport inspection; static source assertions are listed separately in the chief-editor report.",
+  "probes": {
+    "G-01": {
+      "action": "pause; select I-U; move intercept control to 5.0",
+      "displayed_slope": 0.45,
+      "formula_card": "斜率：纵轴量/横轴量",
+      "y_over_x_at_A": 5.45,
+      "pass": false,
+      "finding": "The formula card states y/x while the same non-origin line correctly computes delta-y/delta-x; the two student-visible rules contradict each other."
+    },
+    "G-03": {
+      "action": "pause; select meter; operate the same zero-error/multiplier control with Home and End while keeping the pointer fixed",
+      "home_readout": "原读数 27.50 A; 修正/换算后 0.330 A",
+      "end_readout": "原读数 27.50 V; 修正/换算后 8.250 V",
+      "pass": false,
+      "finding": "A control labelled zero error/multiplier silently changes instrument type and range from 0.6 A to 15 V."
+    },
+    "G-08": {
+      "action": "press step 24 times to t=6.00 s in spring compression",
+      "K_J": 3.0,
+      "Ep_J": 3.0,
+      "post_collision_energy_J": 6.0,
+      "energy_fraction": 0.5,
+      "physical_compression_fraction": 0.7071067812,
+      "drawn_compression_fraction": 0.5,
+      "pass": false,
+      "finding": "The drawn compression is proportional to Ep, but Ep is proportional to x squared; at half energy the page draws half compression instead of sqrt(1/2) compression."
+    },
+    "G-09": {
+      "action": "press single-step once from the default state",
+      "step_dt_s": 0.25,
+      "flux_before_Wb": 0.084,
+      "flux_after_Wb": 0.14025,
+      "observed_flux_slope_Wb_per_s": 0.225,
+      "displayed_emf_V": 0.9,
+      "pass": false,
+      "finding": "The displayed emf is four times the slope of the page's own flux record for the same step."
+    },
+    "G-10": {
+      "action": "at 390x844, operate speed, charge, play, record, and reset controls",
+      "mobile_scroll_width": 390,
+      "mobile_client_width": 390,
+      "changed_record": "1 偏转; v=10.00; v0=5.00; deviation=100.0%",
+      "reset_state": "speed=5; charge=positive; play label=播放",
+      "generic_interaction_pass": true,
+      "physics_tolerance_review": "pending revision because abs(relative deviation) < 4% is called straight-through without a stated measurement-resolution model"
+    },
+    "G-11": {
+      "action": "select drone drop; pause; move wind-speed control from 0 to 5 m/s",
+      "stated_assumption": "忽略空气阻力",
+      "formula": "x=(v0+u)t",
+      "wind_0_range_m": 40.4061017821,
+      "wind_5_range_m": 50.5076272276,
+      "pass": false,
+      "finding": "Wind changes the projectile while the model simultaneously declares air resistance ignored."
+    },
+    "G-12": {
+      "action": "move orbit height to 2000 km and orbital speed to 1.0 km/s",
+      "displayed_period_min": 876.5,
+      "pass": false,
+      "finding": "The open exploration continues to label an independently chosen, non-viable speed-height pair as an orbit instead of distinguishing kinematic circumference/time from a gravitational circular orbit."
+    }
+  }
+}
