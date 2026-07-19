@@ -322,3 +322,18 @@ teacher_signoff: pending
 - `npm run check`：229 节点、206 页、13 章、0 issues，编辑覆盖、数学、答案隔离、静态回退与 P0/P1 门禁全部通过。
 
 保留边界：320 个题块继续隔离，26 节静态例题仍为“来源审核中”，`content pending` 与教师签署状态不变。
+
+## 发布前跨章兼容复审（2026-07-18）
+
+GitHub CI 在实现提交发布后发现：E-15 多用电表和 E-21 电容器充放电同时承担 B3-18、B3-23 的引导演示；E8 统一引导替换旧脚本后，B3 的预测—验证 DOM 契约不再存在。实现提交 `3532a65bd5cefe1c6a662a6501736085d0e2dbae` 已用单一控件锁和轻量兼容视图恢复跨章契约，避免两个引导脚本同时禁用同一组实验控件。
+
+兼容修复保持两条真实物理证据：B3-18 把被测电路切为带电后明确显示“不通过”；B3-23 把 `R` 从 20 kΩ 调到 40 kΩ 后显示 `τ=4.00 s`。E8 原有装置检查→预测→测量→分析链路没有被短路，公式和读数仍延迟到相应证据阶段。
+
+发布复验：
+
+- `npx playwright test tests/b3-guided-pedagogy.spec.js --reporter=line`：5/5 PASS，含 B3 27 节逐页物理状态、390×844 和减少动态检查。
+- `npx playwright test tests/e8-remediation.spec.js --reporter=line`：9/9 PASS，E8 26 页分阶段流程与节点语义保持通过。
+- `AUDIT_MODULE=exp AUDIT_REPORT=exp-remediated-3532a65.json ...`：26/26 PASS，score 100，mobile 26/26，hard failures 0；证据绑定 `3532a65`，生成时 `worktree_clean=true`。
+- `npm run check`：229 节点、206 页、13 章、0 issues，P0/P1 门禁通过。
+
+发布判定保持 `engineering_ready`；题源审核和教师签署边界不变。
