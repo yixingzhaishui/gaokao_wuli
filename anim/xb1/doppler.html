@@ -24,7 +24,7 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
 <body>
 <div class="container">
   <h2>多普勒效应：波源运动使波前一边挤密、一边拉疏</h2>
-  <canvas id="canvas" width="660" height="360" aria-label="多普勒效应实验台：波面俯视装置、频率图像和数据记录"></canvas>
+  <canvas id="canvas" width="660" height="360" data-source-motion="continuous-no-wrap" data-formula-scope="stationary-medium-stationary-observer-moving-subsonic-source" aria-label="多普勒效应实验台：连续运动波源、波面俯视装置、频率图像和数据记录"></canvas>
   <div class="readouts">
     <span class="r">波速 v = <b id="v-v">120</b></span>
     <span class="r">波源速度 vs = <b id="vs-v">40</b></span>
@@ -48,18 +48,12 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
   const W=canvas.width,H=canvas.height;
   const v=120;            // wave speed px/s
   const T=0.6;            // emit period s
-  let vs=40, t=0, running=true,dragVs=false;
+  let vs=40, t=0, running=true,dragVs=false,ended=false;
   const cy=H/2;
   let emits=[];          // {x0, t0}
   let lastEmit=-1;
-  function srcX(tt){ // source oscillates back to left when it exits, to keep on screen
-    let x=60 + vs*tt;
-    const span=W-120;
-    // bounce within [60, W-60]
-    const period=2*span/Math.max(vs,1e-3);
-    // simpler: wrap
-    x=60 + ((vs*tt)%span);
-    return x;
+  function srcX(tt){
+    return Math.min(W-60,60+vs*tt);
   }
 
   function draw(){
@@ -94,8 +88,9 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
     document.getElementById('vs-v').textContent=vs;
     document.getElementById('ff-v').textContent=(vs>=v?'≫1(激波)':ff.toFixed(2));
     document.getElementById('fb-v').textContent=fb.toFixed(2);
+    canvas.dataset.sourceX=sx.toFixed(2);canvas.dataset.motionEnded=ended?'true':'false';
     ctx.fillStyle='#243b53';ctx.font='13px sans-serif';ctx.textAlign='left';
-    ctx.fillText('f′ = v/(v∓vs)·f₀   前方用 v−vs（升高），后方用 v+vs（降低）',18,H-14);
+    ctx.fillText('均匀静止介质、观察者静止、vs<v：f′ = v/(v∓vs)·f₀',18,H-14);
     ctx.font='bold 13px sans-serif';ctx.fillStyle='#c92a2a';
     ctx.fillText('状态：波源接近前方 → 波前挤密、频率升高；远离后方 → 波前拉疏、频率降低',18,26);
   }
@@ -104,6 +99,7 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
     t+=dt;
     if(t-lastEmit>=T){lastEmit=t;emits.push({x0:srcX(t),t0:t});}
     emits=emits.filter(e=> (t-e.t0)*v < 800);
+    if(srcX(t)>=W-60){ended=true;running=false;document.getElementById('play-btn').textContent='重播';}
   }
   document.getElementById('vs').addEventListener('input',e=>{vs=parseFloat(e.target.value);document.getElementById('vs-d').textContent=vs;draw();});
   function pos(e){const r=canvas.getBoundingClientRect(),s=canvas.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s}}
@@ -117,12 +113,13 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
     document.getElementById('vs').value=vs;document.getElementById('vs-d').textContent=vs;draw();
   });
   window.addEventListener('pointerup',()=>{dragVs=false;canvas.style.cursor='grab';});
-  document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
-  document.getElementById('reset-btn').addEventListener('click',()=>{vs=40;t=0;lastEmit=-1;emits=[];running=true;document.getElementById('vs').value=vs;document.getElementById('vs-d').textContent=vs;document.getElementById('play-btn').textContent='暂停';draw();});
+  document.getElementById('play-btn').addEventListener('click',()=>{if(ended){t=0;lastEmit=-1;emits=[];ended=false;running=true;}else running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
+  document.getElementById('reset-btn').addEventListener('click',()=>{vs=40;t=0;lastEmit=-1;emits=[];ended=false;running=true;document.getElementById('vs').value=vs;document.getElementById('vs-d').textContent=vs;document.getElementById('play-btn').textContent='暂停';draw();});
   let last=performance.now();
   function loop(now){const dt=Math.min((now-last)/1000,0.03);last=now;if(running)step(dt);draw();requestAnimationFrame(loop);}
   draw();requestAnimationFrame(loop);
 })();
 </script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

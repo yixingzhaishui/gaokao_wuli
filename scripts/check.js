@@ -218,7 +218,8 @@ for (const md of walk(root, (fp, name) => name.endsWith('.md'))) {
   const ifRe = /<iframe[^>]+src="([^"]+)"/g;
   let m;
   while ((m = ifRe.exec(text)) !== null) {
-    const target = path.resolve(path.dirname(md), m[1]);
+    const fileTarget = m[1].split(/[?#]/, 1)[0];
+    const target = path.resolve(path.dirname(md), fileTarget);
     if (!fs.existsSync(target)) {
       errors.push(`iframe 动画不存在: ${path.basename(md)} -> ${m[1]}`);
     }

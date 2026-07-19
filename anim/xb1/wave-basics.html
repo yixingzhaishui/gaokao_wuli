@@ -28,17 +28,17 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
 </head>
 <body>
 <div class="container">
-  <h2>机械波：v = λf（一个周期传播一个波长）</h2>
-  <canvas id="canvas" width="660" height="360" aria-label="机械波基础实验台：绳波侧视装置、波形图像和数据记录"></canvas>
+  <h2>机械波：同一介质中 v 固定，λ = v/f</h2>
+  <canvas id="canvas" width="660" height="360" data-wave-control-model="medium-speed-fixed-frequency-changes-wavelength" aria-label="机械波基础实验台：绳波侧视装置、波形图像、介质波速和数据记录"></canvas>
   <div class="readouts">
     <span class="r">波长 λ = <b id="lam-v">120</b> px</span>
     <span class="r">频率 f = <b id="f-v">1.0</b> Hz</span>
     <span class="r">周期 T = <b id="t-v">1.00</b> s</span>
-    <span class="r">波速 v = λf = <b id="v-v">120</b> px/s</span>
+    <span class="r">介质波速 v = <b id="v-v">120</b> px/s</span>
   </div>
   <div class="controls">
-    <label>波长 λ = <span id="lam-d">120</span> px
-      <input type="range" id="lam" min="60" max="220" step="5" value="120"></label>
+    <label>介质波速 v = <span id="speed-d">120</span> px/s
+      <input type="range" id="medium-v" min="80" max="200" step="5" value="120"></label>
     <label>频率 f = <span id="f-d">1.0</span> Hz
       <input type="range" id="f" min="0.4" max="2.0" step="0.1" value="1"></label>
     <div class="seg" id="mode">
@@ -49,7 +49,7 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
     <button id="reset-btn">重置</button>
   </div>
   <div class="hint">
-    <p><b>观察任务</b>：红色质点只上下振动、并不随波前进。对照绳波侧视装置、波形图像和数据记录，拖动 <b>λ</b> 看波形疏密变化；拖动 <b>f</b> 看质点上下更快。</p>
+    <p><b>观察任务</b>：红色质点只上下振动、并不随波前进。固定介质波速时增大波源频率，观察波长自动减小；只有切换介质波速，v 才改变。</p>
   </div>
 </div>
 <script>
@@ -57,13 +57,14 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
   const canvas=document.getElementById('canvas');
   const ctx=canvas.getContext('2d');
   const W=canvas.width,H=canvas.height;
-  let lam=120,f=1,drag=null,lamAnchor=40,lamHandle=160;
+  let v=120,f=1,drag=null;
   let t=0,running=true,mode='wave';
   const A=44, midY=150;
   const x0=40, xW=580;           // wave medium region
   let markX=x0+200;              // tracked particle x-position (fixed point in space)
   // y(x,t) = A sin(2π(t/T - x/λ)) : wave moving +x
-  function yOf(x,tt){return A*Math.sin(2*Math.PI*(tt*f - (x-x0)/lam));}
+  function wavelength(){return v/f;}
+  function yOf(x,tt){return A*Math.sin(2*Math.PI*(tt*f - (x-x0)/wavelength()));}
 
   function drawAxes(){
     ctx.strokeStyle='#dbe4ee';ctx.setLineDash([4,3]);
@@ -89,6 +90,7 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
     ctx.stroke();
     // wavelength bracket (between two adjacent crests near left)
     // find a crest x where phase = π/2
+    const lam=wavelength();
     const crest1=x0+ ((0.25 - (t*f%1))*lam) ; // approximate first crest
     let cx=crest1; while(cx<x0+10)cx+=lam;
     if(cx+lam<x0+xW){
@@ -97,8 +99,6 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
       ctx.beginPath();ctx.moveTo(cx,midY-A-18);ctx.lineTo(cx,midY-A-10);ctx.moveTo(cx+lam,midY-A-18);ctx.lineTo(cx+lam,midY-A-10);ctx.stroke();
       ctx.fillStyle='#0b7285';ctx.font='12px sans-serif';ctx.textAlign='center';
       ctx.fillText('λ',cx+lam/2,midY-A-20);
-      lamAnchor=cx;lamHandle=cx+lam;
-      ctx.fillStyle='#f0a500';ctx.strokeStyle='#8a5a00';ctx.lineWidth=2;ctx.beginPath();ctx.arc(lamHandle,midY-A-14,8,0,Math.PI*2);ctx.fill();ctx.stroke();
     }
     // propagation direction arrow
     ctx.strokeStyle='#829ab1';ctx.fillStyle='#829ab1';ctx.lineWidth=2;
@@ -123,7 +123,7 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
       ctx.font='10px sans-serif';ctx.fillText('质点只上下动',markX+22,py);
     }
     ctx.fillStyle='#243b53';ctx.font='13px sans-serif';ctx.textAlign='left';
-    ctx.fillText('y(x,t) = A·sin[2π(t/T − x/λ)]，波形以 v=λf 向右平移',20,H-14);
+    ctx.fillText('y(x,t) = A·sin[2π(t/T − x/λ)]；当前介质 v='+v.toFixed(0)+' px/s，λ=v/f',20,H-14);
     ctx.font='bold 12px sans-serif';ctx.fillStyle='#c92a2a';
     ctx.fillText('状态：红色质点只上下振动、并不随波迁移，波传递的是振动形式与能量',20,24);
   }
@@ -140,12 +140,12 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
     ctx.strokeStyle='#c92a2a';ctx.lineWidth=2.5;ctx.beginPath();
     for(let px=0;px<=xW;px++){
       const tt=t-win+(px/xW)*win;
-      const yy=midY - A*Math.sin(2*Math.PI*(tt*f-(markX-x0)/lam));
+      const yy=midY - A*Math.sin(2*Math.PI*(tt*f-(markX-x0)/wavelength()));
       if(px===0)ctx.moveTo(x0+px,yy);else ctx.lineTo(x0+px,yy);
     }
     ctx.stroke();
     // current point
-    const cy=midY - A*Math.sin(2*Math.PI*(t*f-(markX-x0)/lam));
+    const cy=midY - A*Math.sin(2*Math.PI*(t*f-(markX-x0)/wavelength()));
     ctx.fillStyle='#c92a2a';ctx.beginPath();ctx.arc(x0+xW,cy,5,0,Math.PI*2);ctx.fill();
     // period bracket
     const Tpx=(1/f)/win*xW;
@@ -159,33 +159,30 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
 
   function draw(){
     if(mode==='wave')drawWave();else drawVib();
-    document.getElementById('lam-v').textContent=lam;
+    const lam=wavelength();
+    document.getElementById('lam-v').textContent=lam.toFixed(0);
     document.getElementById('f-v').textContent=f.toFixed(1);
     document.getElementById('t-v').textContent=(1/f).toFixed(2);
-    document.getElementById('v-v').textContent=Math.round(lam*f);
+    document.getElementById('v-v').textContent=v.toFixed(0);
+    canvas.dataset.mediumSpeed=v.toFixed(0);canvas.dataset.wavelength=lam.toFixed(1);canvas.dataset.frequency=f.toFixed(1);
   }
   function bind(id,cb){document.getElementById(id).addEventListener('input',e=>{cb(parseFloat(e.target.value));draw();});}
-  bind('lam',v=>{lam=v;document.getElementById('lam-d').textContent=v;});
+  bind('medium-v',value=>{v=value;document.getElementById('speed-d').textContent=value.toFixed(0);});
   bind('f',v=>{f=v;document.getElementById('f-d').textContent=v.toFixed(1);});
   document.querySelectorAll('#mode button').forEach(b=>b.addEventListener('click',()=>{
     mode=b.dataset.m;document.querySelectorAll('#mode button').forEach(x=>x.classList.remove('on'));b.classList.add('on');draw();
   }));
   document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
-  document.getElementById('reset-btn').addEventListener('click',()=>{lam=120;f=1;t=0;mode='wave';markX=x0+200;running=true;document.getElementById('lam').value=lam;document.getElementById('f').value=f;document.getElementById('lam-d').textContent=lam;document.getElementById('f-d').textContent=f.toFixed(1);document.querySelectorAll('#mode button').forEach(b=>b.classList.toggle('on',b.dataset.m==='wave'));document.getElementById('play-btn').textContent='暂停';draw();});
+  document.getElementById('reset-btn').addEventListener('click',()=>{v=120;f=1;t=0;mode='wave';markX=x0+200;running=true;document.getElementById('medium-v').value=v;document.getElementById('f').value=f;document.getElementById('speed-d').textContent=v.toFixed(0);document.getElementById('f-d').textContent=f.toFixed(1);document.querySelectorAll('#mode button').forEach(b=>b.classList.toggle('on',b.dataset.m==='wave'));document.getElementById('play-btn').textContent='暂停';draw();});
   function pointerPos(e){const r=canvas.getBoundingClientRect(),s=canvas.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s};}
   canvas.addEventListener('pointerdown',e=>{
     if(mode!=='wave')return;
     const p=pointerPos(e),py=midY-yOf(markX,t);
     if(Math.hypot(p.x-markX,p.y-py)<24||Math.abs(p.x-markX)<12&&p.y>midY-A-12&&p.y<midY+A+40){drag='probe';canvas.style.cursor='grabbing';return}
-    if(Math.hypot(p.x-lamHandle,p.y-(midY-A-14))<24){drag='lam';canvas.style.cursor='grabbing';return}
   });
   canvas.addEventListener('pointermove',e=>{
     if(!drag)return;const p=pointerPos(e);
     if(drag==='probe')markX=Math.max(x0+20,Math.min(x0+xW-20,p.x));
-    if(drag==='lam'){
-      lam=Math.round(Math.max(60,Math.min(220,p.x-lamAnchor))/5)*5;
-      document.getElementById('lam').value=lam;document.getElementById('lam-d').textContent=lam;
-    }
     draw();
   });
   window.addEventListener('pointerup',()=>{drag=null;canvas.style.cursor='grab';});
@@ -194,5 +191,6 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
   draw();requestAnimationFrame(loop);
 })();
 </script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

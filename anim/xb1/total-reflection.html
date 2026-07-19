@@ -23,8 +23,8 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
 </head>
 <body>
 <div class="container">
-  <h2>全反射：从光密到光疏，θ₁ ≥ C 时 sinC = 1/n</h2>
-  <canvas id="canvas" width="660" height="360" aria-label="全反射实验台：界面侧视装置、角度图像和数据记录"></canvas>
+  <h2>全反射：从光密到光疏，θ₁ &gt; C</h2>
+  <canvas id="canvas" width="660" height="360" data-total-reflection-boundary="i<C:refraction;i=C:critical;i>C:total" aria-label="全反射实验台：折射、临界和全反射三种状态、角度图像和数据记录"></canvas>
   <div class="readouts">
     <span class="r">入射角 θ₁ = <b id="i-v">30</b>°</span>
     <span class="r">折射率 n = <b id="n-v">1.50</b></span>
@@ -35,10 +35,11 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
   <div class="controls">
     <button id="play-btn">⏸ 暂停</button>
     <label>入射角 θ₁ = <span id="i-d">30</span>°
-      <input type="range" id="i" min="0" max="89" step="1" value="30"></label>
+      <input type="range" id="i" min="0" max="89" step="0.1" value="30"></label>
     <label>玻璃折射率 n = <span id="n-d">1.50</span>
       <input type="range" id="n" min="1.1" max="2.4" step="0.05" value="1.5"></label>
     <button id="reset-btn">重置</button>
+    <button id="critical-case">设为临界角</button>
     <span style="font-size:13px;color:#486581">或直接拖橙色入射光线</span>
   </div>
   <div class="hint">
@@ -73,8 +74,8 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
     ctx.strokeStyle='#e8590c';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(ix,iy);ctx.stroke();arrow(sx,sy,ix,iy,'#e8590c');
     // critical angle
     const C=Math.asin(1/n);
-    const nearCritical=Math.abs(ir-C)<0.8*D;
-    const total = ir>C+0.2*D;
+    const nearCritical=Math.abs(ir-C)<1e-7;
+    const total = ir>C+1e-7;
     const sinr=n*Math.sin(ir);
     const r2=Math.asin(Math.min(1,sinr));
     // reflected ray (always present; strong if total)
@@ -113,12 +114,14 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
     }
     // formula
     ctx.fillStyle='#243b53';ctx.font='13px sans-serif';ctx.textAlign='left';
-    ctx.fillText('sinC = 1/n = '+(1/n).toFixed(3)+'  → C = '+(C/D).toFixed(1)+'°；θ₁'+(total?'≥':'<')+'C',18,H-14);
+    const relation=total?'>':nearCritical?'=':'<';
+    ctx.fillText('sin C = 1/n = '+(1/n).toFixed(3)+'  → C = '+(C/D).toFixed(1)+'°；θ₁ '+relation+' C',18,H-14);
     document.getElementById('i-v').textContent=i;
     document.getElementById('n-v').textContent=n.toFixed(2);
     document.getElementById('c-v').textContent=(C/D).toFixed(1);
     document.getElementById('r-v').textContent=total?'无折射':(nearCritical?'90.0°':(r2/D).toFixed(1)+'°');
-    document.getElementById('st-v').textContent= total?'全反射':(nearCritical?'临界：折射光贴界面':'折射+部分反射');
+    document.getElementById('st-v').textContent= total?'全反射':(nearCritical?'临界：折射光沿界面':'折射+部分反射');
+    canvas.dataset.opticalState=total?'total-reflection':nearCritical?'critical':'refraction';
   }
   function sync(){document.getElementById('i').value=i;document.getElementById('n').value=n;document.getElementById('i-d').textContent=i;document.getElementById('n-d').textContent=n.toFixed(2);}
   function pos(e){const r=canvas.getBoundingClientRect(),s=canvas.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s};}
@@ -129,6 +132,7 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
   function bind(id,cb){document.getElementById(id).addEventListener('input',e=>{cb(parseFloat(e.target.value));draw();});}
   bind('i',v=>{i=v;document.getElementById('i-d').textContent=v;});
   bind('n',v=>{n=v;document.getElementById('n-d').textContent=v.toFixed(2);});
+  document.getElementById('critical-case').addEventListener('click',()=>{i=Math.asin(1/n)/D;sync();draw();});
   document.getElementById('play-btn').addEventListener('click',e=>{playing=!playing;e.currentTarget.textContent=playing?'⏸ 暂停':'▶ 播放';draw();});
   document.getElementById('reset-btn').addEventListener('click',()=>{i=30;n=1.5;t=0;playing=true;document.getElementById('play-btn').textContent='⏸ 暂停';sync();draw();});
   let last=performance.now();
@@ -136,5 +140,6 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
   sync();requestAnimationFrame(loop);
 })();
 </script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

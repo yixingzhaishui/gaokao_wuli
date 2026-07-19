@@ -23,13 +23,13 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
 </head>
 <body>
 <div class="container">
-  <h2>单摆：T = 2π√(L/g)</h2>
-  <canvas id="canvas" width="660" height="360" aria-label="单摆实验台：摆球侧视装置、T-L图像和数据记录"></canvas>
+  <h2>单摆：小角度下 T ≈ 2π√(L/g)</h2>
+  <canvas id="canvas" width="660" height="360" data-small-angle-limit="theta0<=10deg" data-reset-model="controls-display-internal-state-synchronized" aria-label="单摆实验台：摆球侧视装置、小角度参照和数据记录"></canvas>
   <div class="readouts">
     <span class="r">摆长 L = <b id="l-v">1.0</b> m</span>
-    <span class="r">周期 T = <b id="t-v">2.01</b> s</span>
+    <span class="r">当前模型周期 T = <b id="t-v">2.01</b> s</span>
     <span class="r">摆角 θ = <b id="th-v">0</b>°</span>
-    <span class="r" id="iso">等时性：与振幅、质量无关</span>
+    <span class="r" id="iso">状态：小角度近似</span>
   </div>
   <div class="controls">
     <label>摆长 L = <span id="l-d">1.0</span> m
@@ -42,7 +42,7 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
     <button id="reset-btn">重置</button>
   </div>
   <div class="hint">
-    <p><b>观察任务</b>：直接拖左侧摆球，对照摆球侧视装置、T-L 图像和数据记录，看周期 T 如何随 √L 变化；小角度内改变 θ₀，周期几乎不变。</p>
+    <p><b>观察任务</b>：比较当前摆与 5° 小角度参照摆。小角度内周期几乎不随振幅改变；超过本页约定的 10° 后，模型加入大角度修正，不能再宣称严格同步。</p>
   </div>
 </div>
 <script>
@@ -54,11 +54,16 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
   let t=0,running=true;
   const pivotX=200,pivotY=40, pxPerM=110;
 
-  function period(){return 2*Math.PI*Math.sqrt(L/g);}
-  function angle(tt){return th0*Math.cos(2*Math.PI*tt/period());}
+  function smallAnglePeriod(){return 2*Math.PI*Math.sqrt(L/g);}
+  function periodFor(amp){
+    const a=Math.abs(amp);
+    return smallAnglePeriod()*(1+a*a/16+11*Math.pow(a,4)/3072);
+  }
+  function period(){return periodFor(th0);}
+  function angle(tt){return th0*Math.cos(2*Math.PI*tt/periodFor(th0));}
 
   function drawPendulum(px,phase,color,amp){
-    const th=amp*Math.cos(2*Math.PI*t/period()+phase);
+    const th=amp*Math.cos(2*Math.PI*t/periodFor(amp)+phase);
     const len=L*pxPerM;
     const bx=px+len*Math.sin(th), by=pivotY+len*Math.cos(th);
     ctx.strokeStyle='#829ab1';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(px,pivotY);ctx.lineTo(bx,by);ctx.stroke();
@@ -77,11 +82,12 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
     ctx.strokeStyle='#dbe4ee';ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(pivotX,pivotY);ctx.lineTo(pivotX,pivotY+L*pxPerM+30);ctx.stroke();ctx.setLineDash([]);
     // main pendulum (amplitude th0)
     const p=drawPendulum(pivotX,0,'#2c7be5',th0);
-    // second pendulum, larger amplitude same length -> shows isochronism (synchronized)
-    const p2=drawPendulum(pivotX+230,0,'#e8590c',th0*1.4);
+    // Fixed 5° reference: both are nearly synchronous only while the current angle is small.
+    const referenceAmp=5*Math.PI/180;
+    drawPendulum(pivotX+230,0,'#e8590c',referenceAmp);
     ctx.fillStyle='#829ab1';ctx.font='11px sans-serif';ctx.textAlign='center';
-    ctx.fillText('小振幅',pivotX,pivotY+L*pxPerM+50);
-    ctx.fillText('大振幅（同步！）',pivotX+230,pivotY+L*pxPerM+50);
+    ctx.fillText('当前振幅 '+Math.abs(th0*180/Math.PI).toFixed(0)+'°',pivotX,pivotY+L*pxPerM+50);
+    ctx.fillText('5° 小角度参照',pivotX+230,pivotY+L*pxPerM+50);
     // angle arc + restoring component
     const th=p.th;
     ctx.strokeStyle='#c92a2a';ctx.lineWidth=1.5;
@@ -89,12 +95,15 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
     const tanDir=Math.cos(th); // rough
     // formula
     ctx.fillStyle='#243b53';ctx.font='13px sans-serif';ctx.textAlign='left';
-    ctx.fillText('T = 2π√(L/g) = 2π√('+L.toFixed(1)+'/'+g.toFixed(1)+') = '+period().toFixed(2)+' s',20,H-16);
+    const large=Math.abs(th0*180/Math.PI)>10;
+    ctx.fillText((large?'大角度修正：':'小角近似：')+'T₀ = 2π√(L/g) = '+smallAnglePeriod().toFixed(3)+' s，当前 T = '+period().toFixed(3)+' s',20,H-16);
     // readouts
     document.getElementById('l-v').textContent=L.toFixed(1);
     document.getElementById('t-v').textContent=period().toFixed(2);
     document.getElementById('th-v').textContent=(th*180/Math.PI).toFixed(0);
-    document.getElementById('iso').textContent=Math.abs(th0*180/Math.PI)<=10?'状态：小角度等时性成立（与振幅、质量无关）':'状态：角度偏大，周期公式只近似适用';
+    document.getElementById('iso').textContent=large?'状态：超过 10°，与 5° 参照不再严格同步':'状态：小角度内周期近似与振幅、摆球质量无关';
+    canvas.dataset.physicalAngleDeg=Math.abs(th0*180/Math.PI).toFixed(0);
+    canvas.dataset.periodModel=large?'large-angle-corrected':'small-angle-approximation';
   }
 
   function bind(id,cb){document.getElementById(id).addEventListener('input',e=>{cb(parseFloat(e.target.value));draw();});}
@@ -102,7 +111,7 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
   bind('th',v=>{th0=v*Math.PI/180;document.getElementById('th-d').textContent=v;});
   bind('g',v=>{g=v;document.getElementById('g-d').textContent=v.toFixed(1);});
   document.getElementById('play-btn').addEventListener('click',()=>{running=!running;document.getElementById('play-btn').textContent=running?'暂停':'播放';});
-  document.getElementById('reset-btn').addEventListener('click',()=>{L=1;theta=10;g=9.8;t=0;running=true;document.getElementById('l').value=L;document.getElementById('th').value=theta;document.getElementById('g').value=g;document.getElementById('l-d').textContent=L.toFixed(1);document.getElementById('th-d').textContent=theta;document.getElementById('g-d').textContent=g.toFixed(1);document.getElementById('play-btn').textContent='暂停';draw();});
+  document.getElementById('reset-btn').addEventListener('click',()=>{L=1;th0=10*Math.PI/180;g=9.8;t=0;running=true;document.getElementById('l').value=L;document.getElementById('th').value=10;document.getElementById('g').value=g;document.getElementById('l-d').textContent=L.toFixed(1);document.getElementById('th-d').textContent='10';document.getElementById('g-d').textContent=g.toFixed(1);document.getElementById('play-btn').textContent='暂停';draw();});
   function pointerPos(e){const r=canvas.getBoundingClientRect(),s=canvas.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s};}
   canvas.addEventListener('pointerdown',e=>{
     const p=pointerPos(e),th=angle(t),len=L*pxPerM,bx=pivotX+len*Math.sin(th),by=pivotY+len*Math.cos(th);
@@ -127,5 +136,6 @@ canvas{display:block;width:100%;max-width:660px;background:#fff;border:1px solid
   draw();requestAnimationFrame(loop);
 })();
 </script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

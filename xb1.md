@@ -5,7 +5,7 @@
 
 ## 4.1 动量 <h3 id="momentum-section"></h3>
 
-<h4 id="momentum">X1-01 动量 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="momentum">X1-01 动量 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -36,8 +36,9 @@
 
 图中：动量方向与速度方向相同（矢量），箭头越长表示动量越大。
 
+#### 本页主问题与引导演示
 **交互探究。**
-<iframe src="anim/xb1/momentum.html" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb1/momentum.html?lesson=X1-01" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 **证据任务。**
 - 拖动车身右侧金色把手改变质量 `m`，看同样速度下紫色动量箭头和 `p-v` 图像斜率如何变大。
@@ -77,7 +78,7 @@
 
 ---
 
-<h4 id="impulse">X1-02 冲量 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="impulse">X1-02 冲量 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -92,8 +93,9 @@
 #### 情境与现象
 同样想让静止的小车获得一定速度，可以用大力推一下，也可以用小力推很久。"力对时间的累积"决定了效果——这个累积量就是冲量。
 
+#### 本页主问题与引导演示
 **交互探究。**
-<iframe src="anim/xb1/impulse.html" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb1/impulse.html?lesson=X1-02" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 **证据任务。**
 
@@ -133,7 +135,7 @@
 
 ---
 
-<h4 id="momentum-theorem">X1-03 动量定理 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="momentum-theorem">X1-03 动量定理 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -146,26 +148,27 @@
 - 后续应用：X1-04 动量守恒定律
 
 #### 情境与现象
-鸡蛋落到水泥地会碎，落到海绵上不碎。两种情况动量变化相同（都从下落速度变到零），但海绵**延长了作用时间**，使冲力大大减小。这就是动量定理的威力。
+比较同一鸡蛋的两次下落时，只有在**入射速度相同、都最终停止且都不反弹**的条件下，两次动量变化才相同。海绵延长受力时间，使相同合外力冲量对应的平均合力减小；若发生反弹，末速度方向改变，动量变化也会改变。
 
+#### 本页主问题与引导演示
 **交互探究。**
-<iframe src="anim/xb1/impulse.html" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb1/impulse.html?lesson=X1-03" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 
 
 
 > **公式首次使用卡**：适用边界——动量定理作用于明确研究对象和时间段，合外力冲量等于该对象动量变化；变质量系统或参考系改变时不能直接套用固定质量形式。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
 
-（同一动画：$Ft = \Delta p$。固定末速度目标，拖动 t 增大，可见所需 F 减小。）
+（同一动画用矩形力—时间图表示平均合力：$\bar F_{\text{合}}\Delta t = \Delta p$。固定初、末动量后，拖动 $\Delta t$ 增大，可见所需平均合力减小。）
 
 **证据任务。**
 - 点击动画中的“缓冲目标”，保持动量变化 Δp 不变；再拖长作用时间 t，看所需的力 F 变小（缓冲原理）。
 - 冲量读数 I 始终等于动量变化读数 Δp。
 
 #### 规律、证据与核心概念
-由牛顿第二定律 $F = ma = m\cdot \Delta v/\Delta t$ 变形：$F\cdot \Delta t = m\cdot \Delta v = \Delta p$。即合外力的冲量等于物体动量的变化量：
+对恒质量物体，由牛顿第二定律的动量形式积分可得：合外力的冲量等于物体动量的变化量。恒力时可写 $F_{\text{合}}\Delta t=\Delta p$；变力时冲量是 $F-t$ 图像的代数面积，$\bar F_{\text{合}}\Delta t=\Delta p$ 中的 $\bar F$ 是平均合力。
 
-$F_{\text{合}}\cdot t = mv′ − mv = \Delta p$
+$I_{\text{合}}=\int_{t_1}^{t_2}F_{\text{合}}\,dt=mv′-mv=\Delta p$
 
 #### 公式、变量、单位与条件
 - $F_{\text{合}}\cdot t$ → 冲量（F-t 面积）
@@ -189,7 +192,7 @@ $F_{\text{合}}\cdot t = mv′ − mv = \Delta p$
 
 ---
 
-<h4 id="momentum-conservation">X1-04 动量守恒定律 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="momentum-conservation">X1-04 动量守恒定律 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -204,8 +207,9 @@ $F_{\text{合}}\cdot t = mv′ − mv = \Delta p$
 #### 情境与现象
 两辆碰碰车相撞，一个快车撞上一个慢车后，快的变慢、慢的变快，但**系统的总动量**在碰撞前后保持不变。只要没有外力干扰，动量这个"运动的量"在系统内部转移但不消失。
 
+#### 本页主问题与引导演示
 **交互探究。**
-<iframe src="anim/xb1/momentum-collision.html" width="100%" height="650" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb1/momentum-collision.html?lesson=X1-04" width="100%" height="650" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 **证据任务。**
 - 碰撞前后，两个"总动量"读数和下方条形始终相等（动量守恒）。
@@ -249,7 +253,7 @@ $m_{1}v_{1} + m_{2}v_{2} = m_{1}v_{1}′ + m_{2}v_{2}′$
 
 ---
 
-<h4 id="elastic-collision">X1-05 弹性碰撞 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="elastic-collision">X1-05 弹性碰撞 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -264,8 +268,9 @@ $m_{1}v_{1} + m_{2}v_{2} = m_{1}v_{1}′ + m_{2}v_{2}′$
 #### 情境与现象
 台球或钢珠相撞几乎不损失能量。特别地，等质量钢珠正碰，会发生"速度交换"——入射球停下，被撞球以原速度飞出（牛顿摆现象）。
 
+#### 本页主问题与引导演示
 **交互探究。**
-<iframe src="anim/xb1/momentum-collision.html" width="100%" height="650" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb1/momentum-collision.html?lesson=X1-05" width="100%" height="650" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 （保持"弹性碰撞"模式。）
 
@@ -286,7 +291,7 @@ $m_{1}v_{1} + m_{2}v_{2} = m_{1}v_{1}′ + m_{2}v_{2}′$
 $\tfrac{1}{2}m_{1}v_{1}^{2} + \tfrac{1}{2}m_{2}v_{2}^{2} = \tfrac{1}{2}m_{1}v_{1}′^{2} + \tfrac{1}{2}m_{2}v_{2}′^{2}$
 
 联立解得（v₂ = 0 时）：
-$v_{1}′ = (m_{1}−m_{2})/(m_{1}+m_{2})\cdot v_{1}$，$v_{2}′ = 2\ \mathrm{m}_{1}/(m_{1}+m_{2})\cdot v_{1}$
+$v_{1}′ = (m_{1}−m_{2})/(m_{1}+m_{2})\cdot v_{1}$，$v_{2}′ = 2m_{1}/(m_{1}+m_{2})\cdot v_{1}$
 
 #### 公式、变量、单位与条件
 - 等质量正碰（m₁=m₂）→ $v_{1}′=0, v_{2}′=v_{1}$，动画中碰后速度读数显示"速度交换"
@@ -310,7 +315,7 @@ $v_{1}′ = (m_{1}−m_{2})/(m_{1}+m_{2})\cdot v_{1}$，$v_{2}′ = 2\ \mathrm{m
 
 ---
 
-<h4 id="inelastic-collision">X1-06 非弹性碰撞 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="inelastic-collision">X1-06 非弹性碰撞 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -323,10 +328,11 @@ $v_{1}′ = (m_{1}−m_{2})/(m_{1}+m_{2})\cdot v_{1}$，$v_{2}′ = 2\ \mathrm{m
 - 后续应用：综合能量-动量问题
 
 #### 情境与现象
-橡皮泥砸在木块上会粘住，子弹打进木块后一起运动。这类碰撞动量守恒，但一部分动能转化为内能（发热、形变），动能减少。粘在一起、损失动能最多的极端情况叫"完全非弹性碰撞"。
+橡皮泥砸在木块上会粘住，子弹打进木块后一起运动。在碰撞短时间内系统合外力冲量可忽略时，系统动量守恒，但一部分动能转化为内能（发热、形变），动能减少。粘在一起、损失动能最多的极端情况叫"完全非弹性碰撞"。
 
+#### 本页主问题与引导演示
 **交互探究。**
-<iframe src="anim/xb1/momentum-collision.html" width="100%" height="650" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb1/momentum-collision.html?lesson=X1-06" width="100%" height="650" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 （切换到"完全非弹性"模式。）
 
@@ -341,7 +347,8 @@ $v_{1}′ = (m_{1}−m_{2})/(m_{1}+m_{2})\cdot v_{1}$，$v_{2}′ = 2\ \mathrm{m
 - 拖动车身金色把手改变质量比，看损失的动能不同（速度差越大、约化质量越大，损失越多）。
 
 #### 规律、证据与核心概念
-- **动量守恒**（所有碰撞都成立）：$m_{1}v_{1} + m_{2}v_{2} = (m_{1}+m_{2})v_{\text{共}}$
+- **动量守恒的条件**：只有研究系统在碰撞时间内的合外力冲量可忽略时，碰撞前后总动量才守恒。
+- **完全非弹性特例**：两物体粘在一起后才有 $m_{1}v_{1}+m_{2}v_{2}=(m_{1}+m_{2})v_{\text{共}}$；一般非弹性碰撞不要求碰后共同速度。
 - **动能不守恒**：损失量 $\Delta E_{k} = Ek_{\text{前}} − Ek_{\text{后}} > 0$，转化为内能。
 - 碰撞满足两条约束：动量守恒；碰后动能不大于碰前（不能凭空增加）。完全非弹性碰撞损失动能最多。
 
@@ -351,7 +358,7 @@ $v_{1}′ = (m_{1}−m_{2})/(m_{1}+m_{2})\cdot v_{1}$，$v_{2}′ = 2\ \mathrm{m
 - "粘在一起/嵌入" → 完全非弹性判据
 
 #### 边界检查与易错点
-- 误以为非弹性碰撞动量也不守恒（只要合外力为零，动量恒守恒）。
+- 误以为非弹性碰撞动量一定守恒（还必须先检查系统合外力冲量是否可忽略）。
 - 用动能守恒去解非弹性碰撞。
 - 忘记子弹打木块、人跳上小车等都属于完全非弹性模型。
 
@@ -367,7 +374,7 @@ $v_{1}′ = (m_{1}−m_{2})/(m_{1}+m_{2})\cdot v_{1}$，$v_{2}′ = 2\ \mathrm{m
 
 ---
 
-<h4 id="recoil">X1-07 反冲运动 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="recoil">X1-07 反冲运动 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -400,8 +407,9 @@ $v_{1}′ = (m_{1}−m_{2})/(m_{1}+m_{2})\cdot v_{1}$，$v_{2}′ = 2\ \mathrm{m
 
 图中：喷出物向右动量 `mv`，主体向左动量 `MV`，两者等大反向，系统总动量保持为零。
 
+#### 本页主问题与引导演示
 **交互探究。**
-<iframe src="anim/xb1/recoil.html" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb1/recoil.html?lesson=X1-07" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 **证据任务。**
 - 拖蓝色主体右侧金色把手改变 `M`，看主体越重反冲速度 `V` 越小。
@@ -443,7 +451,7 @@ $0 = MV + mv \to MV = −mv$（大小相等，方向相反）
 
 ## 4.2 机械振动 <h3 id="vibration-section"></h3>
 
-<h4 id="shm">X1-08 简谐运动 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="shm">X1-08 简谐运动 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -458,8 +466,9 @@ $0 = MV + mv \to MV = −mv$（大小相等，方向相反）
 #### 情境与现象
 弹簧振子在光滑水平面上被拉开后松手，会围绕平衡位置来回往复运动，越靠近平衡位置速度越快，到两端瞬间停下再返回。这种"回复力总指向平衡位置、大小与位移成正比"的运动就是简谐运动。
 
+#### 本页主问题与引导演示
 **交互探究。**
-<iframe src="anim/xb1/shm.html" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb1/shm.html?lesson=X1-08" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 **证据任务。**
 - 振子经过**平衡位置**时速度最大、回复力为零。
@@ -474,7 +483,7 @@ $0 = MV + mv \to MV = −mv$（大小相等，方向相反）
 
 - **回复力**：$F = −kx$，负号表示力总指向平衡位置，大小与位移成正比。这是简谐运动的动力学判据。
 - **位移方程**：$x = A\cdot \sin (2\pi t/T + \varphi )$，A 为振幅，T 为周期，φ 为初相。
-- **能量**：动能与势能相互转化，机械能守恒。平衡位置动能最大，两端势能最大。
+- **理想无阻尼模型的能量**：动能与势能相互转化，机械能守恒。平衡位置动能最大，两端势能最大；存在阻力时机械能不再守恒。
 
 #### 公式、变量、单位与条件
 - $x = A\cdot \sin (2\pi t/T)$ → 动画右侧正弦图
@@ -499,7 +508,7 @@ $0 = MV + mv \to MV = −mv$（大小相等，方向相反）
 
 ---
 
-<h4 id="pendulum">X1-09 单摆 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="pendulum">X1-09 单摆 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -514,8 +523,9 @@ $0 = MV + mv \to MV = −mv$（大小相等，方向相反）
 #### 情境与现象
 摆钟的摆、荡秋千都是单摆。伽利略发现：同一个摆，不管摆动幅度大一点还是小一点（小角度内），来回一次的时间几乎相同——这就是单摆的"等时性"，也是摆钟计时的基础。
 
+#### 本页主问题与引导演示
 **交互探究。**
-<iframe src="anim/xb1/pendulum.html" width="100%" height="640" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb1/pendulum.html?lesson=X1-09" width="100%" height="640" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 **证据任务。**
 
@@ -524,7 +534,7 @@ $0 = MV + mv \to MV = −mv$（大小相等，方向相反）
 > **公式首次使用卡**：适用边界——单摆周期 T=2π√(l/g) 只适用于小角度、细线轻且不可伸长、摆球可视为质点并忽略阻力；l 为悬点到摆球质心距离。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
 
 - 直接拖动左侧摆球改变摆长 `L`：周期 `T` 随 $\sqrt{L}$ 变化（L 变 4 倍，T 变 2 倍）。
-- 拖动摆球改变初始摆角（小角度内）：周期几乎不变——**等时性**（左侧两个不同振幅的摆始终同步）。
+- 拖动摆球改变初始摆角：与 5° 参照摆比较。小角度内周期几乎不变；超过 10° 后动画加入大角度修正，两摆不再被强制同步。
 - 把 g 拖到 1.6（月球）：周期明显变长。
 
 #### 规律、证据与核心概念
@@ -532,14 +542,14 @@ $0 = MV + mv \to MV = −mv$（大小相等，方向相反）
 
 $T = 2\pi \sqrt{L/g}$
 
-周期只与摆长 L 和重力加速度 g 有关，与振幅、摆球质量无关。
+在上述小角度及理想单摆条件下，周期近似只与摆长 L 和重力加速度 g 有关，与振幅、摆球质量无关；振幅较大时周期会随振幅增大而略增。
 
 #### 公式、变量、单位与条件
 - $T = 2\pi \sqrt{L/g}$ → 动画实时读数
 - `L` 和 $\theta _{0}$ → 直接拖摆球时由绳长和摆线夹角读出
 - T ∝ √L → L 增大周期变长
 - T ∝ 1/√g → g 减小（月球）周期变长
-- 与振幅、质量无关 → 等时性（两摆同步）
+- 小角度内与振幅、质量近似无关 → 与 5° 参照摆近似同步；大角度时不再使用该结论
 
 #### 边界检查与易错点
 - 认为摆球越重周期越长（周期与质量无关）。
@@ -558,7 +568,7 @@ $T = 2\pi \sqrt{L/g}$
 
 ---
 
-<h4 id="shm-graph">X1-10 简谐运动的图像 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="shm-graph">X1-10 简谐运动的图像 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -573,8 +583,9 @@ $T = 2\pi \sqrt{L/g}$
 #### 情境与现象
 把简谐运动的位移随时间记录下来，得到一条标准的正弦（余弦）曲线。从图像上能一眼读出振幅、周期，并判断任意时刻的位移、速度方向和加速度方向。
 
+#### 本页主问题与引导演示
 **交互探究。**
-<iframe src="anim/xb1/shm.html" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb1/shm.html?lesson=X1-10" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 （右侧即为实时生成的 x-t 图像，红点为当前状态。）
 
@@ -617,7 +628,7 @@ $T = 2\pi \sqrt{L/g}$
 
 ---
 
-<h4 id="damped-vibration">X1-11 阻尼振动 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="damped-vibration">X1-11 阻尼振动 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -642,26 +653,24 @@ $T = 2\pi \sqrt{L/g}$
 
 图中：振动曲线包络线逐渐收窄，能量被阻力耗散。
 
+#### 本页主问题与引导演示
 **交互探究。**
-<iframe src="anim/xb1/damped-vibration.html" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb1/damped-vibration.html?lesson=X1-11" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
+> **公式首次使用卡**：适用边界——阻尼振动振幅随时间衰减但周期是否近似不变取决于弱阻尼条件；机械能减少是阻力做负功的结果，不能套用无阻尼简谐运动的恒振幅关系。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
 
 **证据任务。**
 - 拖蓝色振子改变初始振幅，观察 x-t 图包络和能量条怎样随时间衰减。
-- 拖右侧金色阻尼阀改变阻尼比：小阻尼会来回振荡，临界附近最快平复，过阻尼不振荡但回得慢。
+- 拖右侧金色阻尼阀改变阻尼比：$\zeta<1$ 为欠阻尼、$\zeta=1$ 才是临界阻尼、$\zeta>1$ 为过阻尼；三种响应使用各自的方程，不能用“临界附近”替代分类边界。
 - 看能量条：阻尼不是改变平衡位置，而是把机械能逐渐转化为内能。
 
 #### 规律、证据与核心概念
 - **本质**：振动系统因克服阻力做功，机械能不断转化为内能，振幅逐渐减小。
 - **频率**：阻尼振动的周期近似等于系统固有周期（弱阻尼时），但振幅衰减。
-- **分类**：欠阻尼（振荡衰减）、临界阻尼（最快回到平衡不振荡，如汽车减震器）、过阻尼（缓慢回到平衡）。
+- **分类**：$\zeta<1$ 欠阻尼（振荡衰减）、$\zeta=1$ 临界阻尼（最快回到平衡且不振荡）、$\zeta>1$ 过阻尼（不振荡但回得更慢）。汽车减振器的工程目标通常是接近临界阻尼，而不是把一段区间都定义为临界阻尼。
 
 #### 公式、变量、单位与条件
-
-
-
-> **公式首次使用卡**：适用边界——阻尼振动振幅随时间衰减但周期是否近似不变取决于弱阻尼条件；机械能减少是阻力做负功的结果，不能套用无阻尼简谐运动的恒振幅关系。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
-
-- $A(t)=A_{0}e^{-\beta t}$ → 动画 x-t 图的金色包络线
+- 欠阻尼时指数因子 $e^{-\beta t}$ → 动画 x-t 图的金色包络；临界与过阻尼响应不再显示为振荡包络
 - 振幅衰减 → 绿色机械能条随振幅平方变小
 - 阻尼比 `ζ` → 金色阻尼阀位置，决定欠阻尼/临界/过阻尼状态
 
@@ -679,7 +688,7 @@ $T = 2\pi \sqrt{L/g}$
 
 ---
 
-<h4 id="forced-resonance">X1-12 受迫振动与共振 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="forced-resonance">X1-12 受迫振动与共振 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -692,7 +701,7 @@ $T = 2\pi \sqrt{L/g}$
 - 后续应用：桥梁、机械设计
 
 #### 情境与现象
-荡秋千时，只有按秋千固有节奏推，才能越荡越高；洗衣机甩干到某转速会突然剧烈抖动；士兵齐步过桥可能引发桥梁危险振动。当驱动频率等于系统固有频率时，振幅达到最大——这就是共振。
+荡秋千时，按接近秋千固有节奏推，能持续高效输入能量；洗衣机甩干到某转速会突然剧烈抖动；士兵齐步过桥可能引发桥梁危险振动。弱阻尼时位移振幅峰出现在固有频率附近；阻尼不可忽略时，峰值位置、峰高和峰宽都要由响应曲线判断。
 
 **静态表征。**
 <svg viewBox="0 0 360 150" width="100%" style="max-width:520px">
@@ -700,16 +709,17 @@ $T = 2\pi \sqrt{L/g}$
   <line x1="40" y1="20" x2="40" y2="120" stroke="#b0bcc9"/>
   <path d="M40 110 Q120 100 180 40 Q210 20 240 40 Q300 100 340 112" fill="none" stroke="#2c7be5" stroke-width="2.5"/>
   <line x1="200" y1="20" x2="200" y2="120" stroke="#c92a2a" stroke-dasharray="4 3"/>
-  <text x="200" y="138" font-size="10" fill="#c92a2a" text-anchor="middle">f驱 = f固</text>
+  <text x="200" y="138" font-size="10" fill="#c92a2a" text-anchor="middle">弱阻尼：f峰 ≈ f固</text>
   <text x="205" y="34" font-size="10" fill="#c92a2a">共振峰</text>
   <text x="20" y="20" font-size="10" fill="#829ab1">振幅</text>
   <text x="330" y="135" font-size="10" fill="#829ab1">f驱</text>
 </svg>
 
-图中：振幅-驱动频率曲线在固有频率处出现尖峰（共振峰）。
+图中：弱阻尼近似下，振幅—驱动频率曲线的峰值靠近固有频率；阻尼增大时峰值降低、展宽并向较低频率移动。
 
+#### 本页主问题与引导演示
 **交互探究。**
-<iframe src="anim/xb1/forced-resonance.html" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb1/forced-resonance.html?lesson=X1-12" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 **证据任务。**
 
@@ -717,19 +727,19 @@ $T = 2\pi \sqrt{L/g}$
 
 > **公式首次使用卡**：适用边界——稳定受迫振动频率等于驱动力频率；共振峰位置和宽度取决于固有频率与阻尼；只有弱阻尼附近才能把最大振幅简单对应驱动频率等于固有频率。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
 
-- 拖红色驱动频率探针扫过曲线，观察红点接近 $f_{\text{固}}$ 时振幅最大。
-- 拖金色阻尼阀，观察共振峰变矮变宽，理解加阻尼可以减小共振危害。
+- 拖红色驱动频率探针扫过曲线，直接用曲线最高点和幅值读数确定 $f_{\text{峰}}$，不要先把它强制等同于 $f_{\text{固}}$。
+- 增大阻尼，观察位移振幅峰变矮、变宽并向较低频率移动，理解加阻尼可以减小共振危害。
 - 注意右侧读数：受迫振动稳定后频率等于 $f_{\text{驱}}$，不是一定等于 $f_{\text{固}}$。
 
 #### 规律、证据与核心概念
 - **受迫振动**：物体在周期性外力（驱动力）作用下的振动，稳定后振动频率**等于驱动力频率**，与固有频率无关。
-- **共振**：当驱动力频率 = 系统固有频率时，振幅最大，能量输入效率最高。
-- **应用与防范**：共振可利用（收音机调谐、共振筛、微波炉），也需防范（桥梁、建筑抗震，改变固有频率或加阻尼）。
+- **共振与位移振幅峰**：弱阻尼时可近似认为 $f_{\text{峰}}\approx f_{\text{固}}$；本页阻尼振子模型中 $f_{\text{峰}}=f_{\text{固}}\sqrt{1-2\zeta^2}$（$\zeta<1/\sqrt2$）。稳定受迫振动频率始终等于驱动频率。
+- **应用与防范**：机械共振可利用（共振筛、乐器共鸣），也需防范（桥梁、建筑与转动机械，改变固有频率或加阻尼）。微波炉加热不作为机械共振例子。
 
 #### 公式、变量、单位与条件
 - 受迫振动频率 = 驱动频率 $f = f_{\text{驱}}$ → 右侧稳定后频率读数
-- 共振条件 $f_{\text{驱}} = f_{\text{固}}$ → 动画曲线峰值和红点最高处
-- 加阻尼 → 金色阻尼阀上移后，共振峰变矮变宽（抗震设计）
+- 位移振幅峰频率 $f_{\text{峰}}$ → 动画绿色虚线和实时读数；只有弱阻尼时近似等于 $f_{\text{固}}$
+- 加阻尼 → 共振峰变矮、变宽并向较低频率移动（抗震设计）
 
 #### 边界检查与易错点
 - 认为受迫振动频率等于固有频率（其实等于驱动频率）。
@@ -747,7 +757,7 @@ $T = 2\pi \sqrt{L/g}$
 
 ## 4.3 机械波 <h3 id="wave-section"></h3>
 
-<h4 id="wave-formation">X1-13 机械波的形成 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="wave-formation">X1-13 机械波的形成 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 #### 课标定位与学习目标
@@ -761,8 +771,9 @@ $T = 2\pi \sqrt{L/g}$
 #### 情境与现象
 把一根长绳一端上下抖动，"凸起"会沿绳子一节一节传出去；但绳上任何一个点其实只是在原地上下动，并没有跟着跑向远处。抖水面、抖弹簧、声音在空气里传播都是同一回事——**振动的形式和能量在传，介质本身不迁移**。
 
+#### 本页主问题与引导演示
 **交互探究。**
-<iframe src="anim/xb1/wave-basics.html" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb1/wave-basics.html?lesson=X1-13" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 **证据任务。**
 - 拖动<b>红色质点探针</b>选择绳上任意一点并盯住它：它只上下振动，从不向右移动——先建立"介质不迁移"的画面。
@@ -789,7 +800,7 @@ $T = 2\pi \sqrt{L/g}$
 
 ---
 
-<h4 id="wave-parameters">X1-14 波长、频率、波速 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="wave-parameters">X1-14 波长、频率、波速 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 #### 课标定位与学习目标
@@ -803,13 +814,14 @@ $T = 2\pi \sqrt{L/g}$
 #### 情境与现象
 同样一列波，抖得快（频率大）时波形挤得密（波长短）；换到"传得快"的介质里，同样的频率能拉出更长的波。三个量 λ、f、v 之间不是各自独立的，而是被一条铁律 v=λf 锁在一起。
 
+#### 本页主问题与引导演示
 **交互探究。**
-<iframe src="anim/xb1/wave-basics.html" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb1/wave-basics.html?lesson=X1-14" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 **证据任务。**
-- 拖动波形上的 <b>λ 标尺金色端点</b>：读数 v=λf 同步变化，波形变疏或变密。
-- 拖动 <b>f</b>：红点上下振动更快、周期 T=1/f 变短，波速 v 变大。
-- 记住动画顶部那行读数：v 永远等于 λ×f。
+- 保持“介质波速”不变，把 <b>f</b> 从 1.0 Hz 增大到 2.0 Hz：红点振动更快、周期减半，波长也减半，但波速保持不变。
+- 只改变“介质波速”：频率由波源保持，波速增大时波长按 $\lambda=v/f$ 增大。
+- 对照顶部三个读数确认：$v=\lambda f$ 是约束关系，不表示在同一介质中调频率会改变波速。
 
 #### 规律、证据与核心概念
 - **波长 λ**：一个周期内波传播的距离，也是波形上两个相邻同相点（相邻波峰之间）的距离。
@@ -818,9 +830,9 @@ $T = 2\pi \sqrt{L/g}$
 - **基本关系**：v=λf=λ/T。一个周期传播一个波长。
 
 #### 公式、变量、单位与条件
-- v=λf → 动画顶部读数行，拖 λ 标尺或 f 时 v 实时改变。
-- T=1/f → 拖 f 时周期读数反比变化。
-- λ = 动画中标注的相邻波峰间距（青色 λ 括号和金色端点）。
+- $v=\lambda f$ → 动画顶部读数行；同一介质调 $f$ 时 $v$ 保持、$\lambda$ 联动，切换介质时才改变 $v$。
+- $T=1/f$ → 调 $f$ 时周期读数反比变化。
+- $\lambda$ = 动画中标注的相邻波峰间距（青色括号），由当前 $v/f$ 计算。
 
 #### 边界检查与易错点
 - 认为波速由频率或波源决定（错，波速由介质决定）。
@@ -835,7 +847,7 @@ $T = 2\pi \sqrt{L/g}$
 
 ---
 
-<h4 id="wave-graph">X1-15 波的图像 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="wave-graph">X1-15 波的图像 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 #### 课标定位与学习目标
@@ -849,8 +861,9 @@ $T = 2\pi \sqrt{L/g}$
 #### 情境与现象
 考试里最容易混的两张图：一张横轴是<b>位置 x</b>（波形图，是"某一时刻整条介质的空间照片"），一张横轴是<b>时间 t</b>（振动图，是"某一个质点随时间的位移记录"）。两张图长得都像正弦曲线，含义却完全不同。
 
+#### 本页主问题与引导演示
 **交互探究。**
-<iframe src="anim/xb1/wave-basics.html" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb1/wave-basics.html?lesson=X1-15" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 **证据任务。**
 - 默认<b>波形图 y-x</b>：横轴是空间，读<b>波长 λ</b>（相邻波峰间距）。
@@ -880,7 +893,7 @@ $T = 2\pi \sqrt{L/g}$
 
 ---
 
-<h4 id="interference">X1-16 波的干涉 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="interference">X1-16 波的干涉 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 #### 课标定位与学习目标
@@ -894,8 +907,9 @@ $T = 2\pi \sqrt{L/g}$
 #### 情境与现象
 两块石头同时丢进平静水面，两组圆形水波相遇，会看到一些位置水面剧烈起伏、另一些位置几乎不动，形成稳定的"网格状"图样。这就是干涉：两列<b>相干波</b>叠加，某些点始终加强、某些点始终减弱。
 
+#### 本页主问题与引导演示
 **交互探究。**
-<iframe src="anim/xb1/wave-interference.html" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb1/wave-interference.html?lesson=X1-16" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 **证据任务。**
 - 拖动<b>白色测试点</b>，读它到两个波源的<b>路程差 Δr</b>。
@@ -905,10 +919,10 @@ $T = 2\pi \sqrt{L/g}$
 
 #### 规律、证据与核心概念
 - **相干条件**：两波源<b>频率相同、相位差恒定</b>（通常同相），才能形成稳定干涉图样。
-- **叠加原理**：相遇处质点位移 = 两列波单独引起位移的矢量和。
+- **叠加原理**：相遇处质点位移 = 两列波单独引起位移的代数和。只有频率相同、相位差恒定的相干波才形成稳定加强/减弱图样。
 - **加强/减弱判据**（两同相相干源）：
   - 振动加强：Δr = kλ（k=0,1,2…）
-  - 振动减弱：Δr = (k+½)λ（k=0,1,2…）
+  - 振动减弱：Δr = (k+½)λ（k=0,1,2…）；只有两列波在该点振幅相等时才能完全相消，振幅不等时仍有剩余振幅
   - 其中 Δr=|r₁−r₂| 是该点到两波源的路程差。
 
 #### 公式、变量、单位与条件
@@ -928,7 +942,7 @@ $T = 2\pi \sqrt{L/g}$
 
 ---
 
-<h4 id="diffraction">X1-17 波的衍射 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="diffraction">X1-17 波的衍射 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 #### 课标定位与学习目标
@@ -942,8 +956,9 @@ $T = 2\pi \sqrt{L/g}$
 #### 情境与现象
 隔着一堵墙也能听见墙那边有人说话——声波能"绕过"障碍和缝隙传到后面。水波穿过防波堤的缺口后，会在堤后展开成扇形。波能绕过障碍物或穿过狭缝后偏离直线传播，叫衍射。
 
+#### 本页主问题与引导演示
 **交互探究。**
-<iframe src="anim/xb1/wave-diffraction.html" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb1/wave-diffraction.html?lesson=X1-17" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 **证据任务。**
 - 直接拖缝旁红色 <b>a 标尺</b> 变小，看穿过缝的波在挡板后展开得越来越"圆"。
@@ -970,7 +985,7 @@ $T = 2\pi \sqrt{L/g}$
 
 ---
 
-<h4 id="doppler">X1-18 多普勒效应 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="doppler">X1-18 多普勒效应 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 #### 课标定位与学习目标
@@ -984,8 +999,9 @@ $T = 2\pi \sqrt{L/g}$
 #### 情境与现象
 救护车鸣笛驶近时音调听起来更"尖"（高），驶过后远去时音调突然变"闷"（低）。波源和观察者有相对运动时，观察者接收到的频率不等于波源发出的频率——这就是多普勒效应。
 
+#### 本页主问题与引导演示
 **交互探究。**
-<iframe src="anim/xb1/doppler.html" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb1/doppler.html?lesson=X1-18" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 **证据任务。**
 - 看运动波源<b>前方</b>的波圈被挤<b>密</b>（波长短）→ 前方观察者接收频率<b>升高</b>（音调高）。
@@ -993,19 +1009,19 @@ $T = 2\pi \sqrt{L/g}$
 - 拖波源红色速度箭头端点增大 <b>vs</b>：前后差别更明显；vs 接近波速 v 时前方波圈几乎叠成一条（激波前兆）。
 
 #### 规律、证据与核心概念
-- **多普勒效应**：波源与观察者有相对运动时，观察者接收到的频率发生变化。
+- **多普勒效应**：波源或观察者相对传播介质运动时，观察者接收到的频率发生变化；只说二者“相对运动”不足以确定介质波中的定量公式。
 - **本质**：波速 v 由介质决定<b>不变</b>；波源运动使前方波长被压缩、后方被拉长，从而改变单位时间到达观察者的波数（频率）。
 - **定性规律**：相互<b>靠近</b>→接收频率升高；相互<b>远离</b>→接收频率降低。（波源发出的频率 f₀ 始终不变。）
-- **波源运动、观察者不动**时：f前=v/(v−vs)·f₀，f后=v/(v+vs)·f₀。
+- **本页公式的适用情形**：均匀静止介质中观察者相对介质静止、波源以 $v_s<v$ 沿连线运动时，$f_{\text{前}}=\dfrac{v}{v-v_s}f_0$，$f_{\text{后}}=\dfrac{v}{v+v_s}f_0$。观察者运动需另计观察者相对介质的速度；$v_s\ge v$ 时进入激波问题。
 
 #### 公式、变量、单位与条件
-- f′=v/(v∓vs)·f₀ → 动画读数：前方用 v−vs（分母变小，f 升高），后方用 v+vs（f 降低）。
+- $f'=v/(v\mp v_s)\cdot f_0$ → 只对应本页“介质静止、观察者静止、亚声速运动波源”的动画：前方用 $v-v_s$，后方用 $v+v_s$。
 - 波圈的疏密 = 接收波长的长短 = 频率高低的直观体现。
 
 #### 边界检查与易错点
 - 认为多普勒效应改变了波源发出的频率（错，f₀ 不变，改变的是<b>接收</b>频率）。
 - 认为波速也变了（错，波速由介质决定不变）。
-- 把"靠近变高、远离变低"记反；或忘了它对声波、光波（红移/蓝移）都适用。
+- 把"靠近变高、远离变低"记反；或把介质中声波的速度叠加公式直接用于光的红移/蓝移。光学多普勒需使用相对论模型，本页只作定性迁移。
 
 #### 例题与训练（来源审核中）
 
@@ -1015,7 +1031,7 @@ $T = 2\pi \sqrt{L/g}$
 
 ## 4.4 光 <h3 id="light-section"></h3>
 
-<h4 id="refraction">X1-19 光的折射 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="refraction">X1-19 光的折射 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 #### 课标定位与学习目标
@@ -1029,8 +1045,9 @@ $T = 2\pi \sqrt{L/g}$
 #### 情境与现象
 把筷子斜插进水里，水下部分看起来"折断"并向上翘；游泳池看起来比实际浅。光从一种介质进入另一种介质，传播方向会在界面处偏折——这就是折射，根源是光在不同介质里速度不同。
 
+#### 本页主问题与引导演示
 **交互探究。**
-<iframe src="anim/xb1/refraction.html" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb1/refraction.html?lesson=X1-19" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 **证据任务。**
 - 直接拖<b>橙色入射光线</b>或 θ₁ 滑杆：光从空气进玻璃，折射线始终<b>偏向法线</b>（θ₂&lt;θ₁）。
@@ -1038,6 +1055,9 @@ $T = 2\pi \sqrt{L/g}$
 - 读底部公式：sinθ₁/sinθ₂ 恒等于 n；玻璃中光速 v=c/n 变慢。
 
 #### 规律、证据与核心概念
+
+> **公式首次使用卡**：适用边界——折射定律适用于各向同性介质的几何光学模型，角度均相对法线；跨界面频率由光源保持，传播速度和波长改变。$n=c/v$ 中 $c$ 为真空光速，$v$ 为该介质中的相速度。
+
 - **折射定律（斯涅尔）**：n₁sinθ₁ = n₂sinθ₂。角度都从<b>法线</b>量起。
 - **折射率 n**：n = c/v（真空光速 / 介质中光速），n>1。介质对光越"密"，n 越大，光速越慢。
 - **相对折射率**：从介质1到介质2，n₁₂ = sinθ₁/sinθ₂ = v₁/v₂ = n₂/n₁。
@@ -1062,7 +1082,7 @@ $T = 2\pi \sqrt{L/g}$
 
 ---
 
-<h4 id="total-reflection">X1-20 全反射 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="total-reflection">X1-20 全反射 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -1077,8 +1097,9 @@ $T = 2\pi \sqrt{L/g}$
 #### 情境与现象
 潜水时抬头看水面，正上方能看到天空，但斜着看水面却像一面<b>镜子</b>，把水下的景物反射回来。光从光密介质射向光疏介质、入射角足够大时，会<b>完全</b>被反射回去、没有折射光——全反射。光纤能"关住"光走几十公里，靠的正是全反射。
 
+#### 本页主问题与引导演示
 **交互探究。**
-<iframe src="anim/xb1/total-reflection.html" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb1/total-reflection.html?lesson=X1-20" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 **证据任务。**
 - 直接拖<b>橙色入射光线</b>或 θ₁ 滑杆从小到大：折射角 θ₂ 增长更快，率先冲到 90°。
@@ -1093,17 +1114,17 @@ $T = 2\pi \sqrt{L/g}$
 
 - **全反射条件**（两个缺一不可）：① 光从<b>光密</b>介质射向<b>光疏</b>介质（n₁>n₂）；② 入射角 <b>θ₁ > 临界角 C</b>。$θ_1=C$ 时折射角为 $90^\circ$，折射光沿界面掠出，是临界状态；只有超过临界角后折射光才消失。
 - **临界角公式**：折射角=90° 时的入射角即临界角。由 n₁sinC=n₂sin90°=n₂ 得 <b>sinC = n₂/n₁</b>；若射向空气（n₂=1），sinC=1/n₁。
-- **边界说明**：按教材和考试判定使用 $θ_1\ge C$；理解图像时要知道 $θ_1=C$ 对应折射角 $90^\circ$ 的临界状态，$θ_1>C$ 时才没有传播到光疏介质中的折射光。
+- **边界说明**：$θ_1<C$ 时有折射光，$θ_1=C$ 是折射光沿界面传播的临界状态，只有 $θ_1>C$ 时才发生全反射。若题目把临界状态与“全反射起点”合并表述，作图和物理解释仍要单列 $θ_1=C$。
 
 #### 公式、变量、单位与条件
 - sinC=1/n → 动画读数"临界角 C"，拖 n 时 C 反向变化。
-- θ₁ 与 C 的比较（≥或&lt;）→ 状态文字"全反射 / 折射+部分反射"。
+- θ₁ 与 C 的比较（&lt;、=、&gt;）→ 三种独立状态“折射+反射 / 临界 / 全反射”。
 - 橙色入射线、蓝色折射线、θ₂ 读数和临界角虚线同步变化，直观显示是否越过临界。
 
 #### 边界检查与易错点
 - 只记"入射角大就全反射"，忘了必须<b>光密→光疏</b>（从空气进玻璃再大也不会全反射）。
 - 把 sinC=1/n 里的 n 用反（射向空气时 n 是光密介质折射率）。
-- 认为全反射会损失能量（相反，全反射是能量几乎无损的反射，光纤才能远传）。
+- 在理想无吸收界面模型中，全反射没有向光疏介质传播的折射能流；真实材料仍可能有吸收、散射和倏逝场耦合损耗，不能写成无条件“绝对无损”。
 
 #### 例题与训练（来源审核中）
 
@@ -1113,7 +1134,7 @@ $T = 2\pi \sqrt{L/g}$
 
 ---
 
-<h4 id="light-interference">X1-21 光的干涉 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="light-interference">X1-21 光的干涉 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 #### 课标定位与学习目标
@@ -1127,25 +1148,29 @@ $T = 2\pi \sqrt{L/g}$
 #### 情境与现象
 让一束单色光穿过两条靠得很近的平行狭缝，屏上不是两条亮线，而是一排<b>等间距的明暗条纹</b>。这是杨氏双缝实验——它证明光是波（能干涉），并且能用来测量光的波长。
 
+#### 本页主问题与引导演示
 **交互探究。**
-<iframe src="anim/xb1/double-slit.html" width="100%" height="640" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb1/double-slit.html?lesson=X1-21" width="100%" height="640" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 **证据任务。**
 - 拖<b>λ</b> 变大（偏红）→条纹间距 Δx <b>变宽</b>。
 - 直接拖<b>两条缝</b>改变双缝间距 d：d 变大→条纹<b>变窄</b>（挤密）。
 - 直接拖<b>右侧屏幕</b>改变缝到屏距离 L：屏越远，条纹越宽。
-- 三者始终满足 Δx=Lλ/d，读数实时对应屏上标尺 Δx。
+- 在相干、远场和小角近似成立时，三者满足 $\Delta x=L\lambda/d$，读数对应屏上标尺 $\Delta x$。
 
 #### 规律、证据与核心概念
 - **相干光**：两缝由同一束光分出，频率相同、相位差恒定 → 满足相干条件，形成稳定干涉。
 - **明暗条件**（屏上某点到两缝路程差 δ）：
   - 亮纹（加强）：δ = kλ（k=0,±1,±2…）
   - 暗纹（减弱）：δ = (k+½)λ
-- **条纹间距**：相邻亮纹（或相邻暗纹）间距 <b>Δx = Lλ/d</b>。其中 L 为缝到屏距离，d 为双缝间距。
+- **条纹间距**：在双缝间距远小于屏距、观察位置近轴的小角近似下，相邻亮纹（或相邻暗纹）间距 <b>$\Delta x=L\lambda/d$</b>。其中 L 为缝到屏距离，d 为双缝间距。
 - **测波长**：由 Δx=Lλ/d 反解 λ = dΔx/L（实验重点）。
 
 #### 公式、变量、单位与条件
-- Δx=Lλ/d → 动画读数与屏上 Δx 标尺同步。
+
+> **公式首次使用卡**：$\Delta x=L\lambda/d$ 要求两缝相干、$L\gg d$ 且采用近轴小角近似；超出该范围应从实际程差和角度关系计算，不能把近似式当无条件恒等式。
+
+- $\Delta x=L\lambda/d$ → 动画读数与屏上 $\Delta x$ 标尺同步。
 - 拖双缝时 d 标尺改变，拖屏幕时 L 标尺变长；λ↑→Δx↑，d↑→Δx↓，L↑→Δx↑，都能在条纹和读数里同时看到。
 
 #### 边界检查与易错点
@@ -1161,7 +1186,7 @@ $T = 2\pi \sqrt{L/g}$
 
 ---
 
-<h4 id="light-diffraction">X1-22 光的衍射 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="light-diffraction">X1-22 光的衍射 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 #### 课标定位与学习目标
@@ -1175,8 +1200,9 @@ $T = 2\pi \sqrt{L/g}$
 #### 情境与现象
 让左侧单色平面光<b>从左向右</b>通过一条单缝，在右侧观察屏上出现中央特别宽、特别亮，两侧逐渐变暗变窄的条纹——单缝衍射。缝越窄，中央亮纹反而越宽。这说明光能"绕"过缝的边缘，是波动性的直接证据。
 
+#### 本页主问题与引导演示
 **交互探究。**
-<iframe src="anim/xb1/light-diffraction.html" width="100%" height="640" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb1/light-diffraction.html?lesson=X1-22" width="100%" height="640" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 **证据任务。**
 - 直接拖<b>单缝上下边</b>让缝宽 a 变小→中央亮纹明显<b>变宽</b>（衍射更明显）。
@@ -1187,11 +1213,11 @@ $T = 2\pi \sqrt{L/g}$
 #### 规律、证据与核心概念
 - **单缝衍射**：光通过狭缝后偏离直线传播，屏上出现中央宽亮、两侧渐暗的条纹。
 - **特征**：中央亮纹最宽最亮，约为其他亮纹宽度的两倍；条纹间距<b>不均匀</b>。
-- **明显条件**：缝宽 a 越小、波长 λ 越大，λ/a 越大，中央亮纹越宽。第一暗纹近似满足 sinθ≈λ/a，中央亮纹角宽约为 2θ。
+- **明显条件**：缝宽 a 越小、波长 λ 越大，λ/a 越大，中央亮纹越宽。夫琅禾费单缝衍射第一暗纹满足 $a\sin\theta=\lambda$；只有小角度时才进一步近似 $\theta\approx\lambda/a$，中央亮纹角宽约为 $2\theta$。
 - **意义**：衍射是波特有现象，光能衍射证明光具有波动性。
 
 #### 公式、变量、单位与条件
-- 第一暗纹角 sinθ≈λ/a → 动画读数，拖 a↓ 或 λ↑ 时 θ 变大，屏上中央亮纹变宽。
+- 第一暗纹 $a\sin\theta=\lambda$；小角时 $\theta\approx\lambda/a$ → 动画读数，拖 a↓ 或 λ↑ 时 θ 变大，屏上中央亮纹变宽。
 - 缝宽 a 的可视高度、展开波前角度和屏上中央亮纹宽度直接对应。
 
 #### 边界检查与易错点
@@ -1205,7 +1231,7 @@ $T = 2\pi \sqrt{L/g}$
 
 ---
 
-<h4 id="polarization">X1-23 光的偏振 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="polarization">X1-23 光的偏振 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 #### 课标定位与学习目标
@@ -1217,14 +1243,15 @@ $T = 2\pi \sqrt{L/g}$
 - 后续应用：偏振太阳镜、液晶屏、3D 电影
 
 #### 情境与现象
-戴上偏振太阳镜看水面反光，转动镜片，刺眼的反光会明显变暗甚至消失。把两片偏振片叠起来慢慢转，会从透亮变到<b>全黑</b>。这说明光的振动是有"方向"的——只有横波才能被"筛选"方向，偏振是光是横波的直接证据。
+戴上偏振太阳镜看水面反光，转动镜片，刺眼的反光会明显变暗。理想偏振片模型中，两片偏振片正交时出射强度为零；真实器件可能仍有漏光。这说明光的振动是有"方向"的——只有横波才能被"筛选"方向，偏振是光是横波的直接证据。
 
+#### 本页主问题与引导演示
 **交互探究。**
-<iframe src="anim/xb1/polarization.html" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb1/polarization.html?lesson=X1-23" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 **证据任务。**
 - 自然光过<b>起偏器 P₁</b> 变成单方向振动的偏振光（强度 I₀）。
-- 直接拖<b>P₂ 检偏器</b>转动：θ=0°（平行）最亮 I=I₀；θ=90°（正交）<b>全黑</b> I=0；θ=180° 又最亮。
+- 直接拖<b>P₂ 检偏器</b>转动：理想模型中 θ=0°（平行）最亮 I=I₀；θ=90°（正交）消光 I=0；θ=180° 又最亮。
 - 看右侧亮度条随 cos²θ 连续变化，读数 I=I₀cos²θ。
 
 #### 规律、证据与核心概念
@@ -1249,7 +1276,7 @@ $T = 2\pi \sqrt{L/g}$
 
 ---
 
-<h4 id="photoelectric">X1-24 光电效应 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="photoelectric">X1-24 光电效应 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 #### 课标定位与学习目标
@@ -1263,8 +1290,9 @@ $T = 2\pi \sqrt{L/g}$
 #### 情境与现象
 让锌板与验电器先带负电，再用紫外线照射，电子逸出后验电器张角会减小；若换成同一金属截止频率以下的单色光，在普通单光子光电效应模型中，即使增大光强也不能发生光电子发射。这个“单个光子频率不够，增加光子数仍不能越过逸出功”的现象可由<b>光子</b>模型解释，是光具有<b>粒子性</b>的证据。
 
+#### 本页主问题与引导演示
 **交互探究。**
-<iframe src="anim/xb1/photoelectric.html" width="100%" height="640" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb1/photoelectric.html?lesson=X1-24" width="100%" height="640" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 **证据任务。**
 - 直接拖<b>蓝色 hν 能量条端点</b>改频率：低于截止频率 ν₀=W₀/h 时<b>无电子逸出</b>（无论光多强）；超过 ν₀ 才逸出。
@@ -1296,32 +1324,31 @@ $T = 2\pi \sqrt{L/g}$
 ---
 ---
 
-<h4 id="wave-reflection-refraction">X1-25 波的反射与折射 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="wave-reflection-refraction">X1-25 波的反射与折射 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: concept-law; editorial-review: P1-EDITOR-002/003 -->
 
 
 #### 课标定位与学习目标
 - 理解机械波遇到边界时会发生反射和折射。
 - 会判断反射角等于入射角，且角度都相对法线测量。
-
-
-
-> **公式首次使用卡**：适用边界——反射定律角度均相对法线；折射定律 n₁sin i=n₂sin r 适用于各向同性介质界面的几何光学；频率跨界面不变，速度和波长可变。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
-
-- 会用 $\sin \theta 1/v_{1} = \sin \theta 2/v_{2}$ 判断折射方向。
 - 知道波进入新介质时频率不变，波速和波长随介质改变。
 
 #### 情境与现象
 水波从深水区传到浅水区，波速变小，波前会转向，波长也变短；同时边界会产生反射波。这个过程和光的折射很像，但重点更朴素：波源振动频率由波源决定，过边界后频率不变，改变的是传播速度和波长。
 
+#### 本页主问题与引导演示
 **交互探究。**
-<iframe src="anim/xb1/wave-reflection-refraction.html" width="100%" height="710" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb1/wave-reflection-refraction.html?lesson=X1-25" width="100%" height="710" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
+> **公式首次使用卡**：适用边界——机械波反射角和折射角均相对法线；同一波源跨各向同性介质界面时频率不变，波速和波长可变，满足 $\sin\theta_1/v_1=\sin\theta_2/v_2$。这不是把光学折射率公式直接搬到任意机械波介质。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
 
 **证据任务。**
 - 拖动蓝色入射方向手柄：看反射角是否始终等于入射角。
 - 把 $v_{2}$ 调小：看折射角变小、波长变短。
 - 把 $v_{2}$ 调大：看折射角变大，入射角足够大时是否出现全反射边界。
 - 调频率 `f`：看两侧频率共同改变，但过边界本身不改变频率。
+
+- 会用 $\sin\theta_{1}/v_{1}=\sin\theta_{2}/v_{2}$ 判断折射方向。
 
 #### 规律、证据与核心概念
 
@@ -1343,7 +1370,7 @@ $T = 2\pi \sqrt{L/g}$
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：X1-25）
 
-<h4 id="laser-properties-applications">X1-26 激光的特性与应用 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="laser-properties-applications">X1-26 激光的特性与应用 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: stse-extension; editorial-review: P1-EDITOR-002/003 -->
 
 
@@ -1352,23 +1379,22 @@ $T = 2\pi \sqrt{L/g}$
 - 能把“发散角小”与远处光斑小、能量集中联系起来。
 - 能理解激光测距、光通信、材料加工等应用的共同物理依据。
 
-
-
-> **公式首次使用卡**：适用边界——小角度近似 r≈Lθ 中 θ 必须是光束半发散角并用弧度；若题目给全角应先除以二；实际光斑还受初始束腰和传播介质影响。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
-
-- 会用 $E=hc/\lambda$ 判断波长与光子能量关系。
-
 #### 技术与社会情境
 普通手电筒的光向四周发散，照到远处会变成很大的光斑；激光笔的光束很细，远处仍能形成小而亮的光斑。激光不是“功率一定巨大”，而是方向集中、频率集中、相位关系稳定，所以在测距、通信、准直和加工中很有用。
 
+#### 本页主问题与引导演示
 **交互探究。**
-<iframe src="anim/xb1/laser.html" width="100%" height="710" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb1/laser.html?lesson=X1-26" width="100%" height="710" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
+> **公式首次使用卡**：适用边界——小角度近似 r≈Lθ 中 θ 必须是光束半发散角并用弧度；若题目给全角应先除以二；实际光斑还受初始束腰和传播介质影响。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
 
 **证据任务。**
 - 拖动红色光束手柄：看发散角变小时，远处屏幕光斑如何缩小。
 - 调相干性：看干涉条纹从模糊到清晰。
 - 调波长：看颜色和光子能量 $E=hc/\lambda$ 如何变化。
 - 调功率：看高亮度应用为什么还要考虑安全防护。
+
+- 会用 $E=hc/\lambda$ 判断波长与光子能量关系。
 
 #### 核心物理机制与证据
 
@@ -1391,32 +1417,31 @@ $T = 2\pi \sqrt{L/g}$
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：X1-26）
 
-<h4 id="fiber-optic-communication">X1-27 光纤通信与全反射应用 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="fiber-optic-communication">X1-27 光纤通信与全反射应用 <span class="status review">physics + pedagogy passed · sources quarantined</span></h4>
 <!-- content-template: stse-extension; editorial-review: P1-EDITOR-002/003 -->
 
 
 #### 课标定位与学习目标
 - 能从全反射条件解释光为什么能沿光纤芯层传播。
-
-
-
-> **公式首次使用卡**：适用边界——光纤导光要求纤芯折射率大于包层且界面入射角满足 i>C；数值孔径关系使用指定外界介质和阶跃型光纤近似；弯曲过大会破坏全反射条件。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
-
-- 会用 $sinC=n_{2}/n_{1}$ 求临界角并判断是否全反射。
 - 理解芯层折射率应大于包层折射率。
 - 知道光纤通信利用光脉冲传递信息，弯曲过大会增加损耗。
 
 #### 技术与社会情境
 光纤不是让光“直线穿过一根管子”，而是让光在高折射率芯层和低折射率包层的边界上多次全反射。只要入射角足够大，光不会折射进包层，就能把脉冲信号传到远处。
 
+#### 本页主问题与引导演示
 **交互探究。**
-<iframe src="anim/xb1/fiber-optic.html" width="100%" height="710" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+<iframe src="anim/xb1/fiber-optic.html?lesson=X1-27" width="100%" height="710" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
+> **公式首次使用卡**：适用边界——光纤导光要求纤芯折射率大于包层且界面入射角满足 i>C；数值孔径关系使用指定外界介质和阶跃型光纤近似；弯曲过大会破坏全反射条件。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
 
 **证据任务。**
 - 拖动蓝色入射光线：看 `i` 与临界角 `C` 的大小关系如何改变传输状态。
 - 调大芯层折射率 $n_{1}$：看临界角如何变化，允许角度范围如何改变。
 - 调包层折射率 $n_{2}$：看 $n_{2}$ 接近 $n_{1}$ 时全反射条件为什么更苛刻。
-- 调弯曲程度：看弯曲过大为什么会让信号泄漏。
+- 调弯曲程度：动画按弯曲边界的局部法线逐次计算入射角；若任一次局部 $i\le C$，只给出“泄漏”的定性证据，不伪造材料损耗百分比。
+
+- 会用 $\sin C=n_{2}/n_{1}$ 求临界角并判断是否全反射。
 
 #### 核心物理机制与证据
 
@@ -1424,7 +1449,7 @@ $T = 2\pi \sqrt{L/g}$
 全反射条件：n1 > n2，且 i > C；i = C 为折射光沿界面掠出的临界状态
 临界角：sinC = n2 / n1
 光纤结构：芯层折射率较大，包层折射率较小
-通信方式：光脉冲多次全反射，沿芯层低损耗传播
+通信方式：光脉冲多次全反射，真实损耗还由材料吸收、散射、接续与弯曲等共同决定
 ```
 
 #### 证据限制与常见误区
