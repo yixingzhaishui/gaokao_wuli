@@ -74,6 +74,7 @@ const els = {
   records: document.getElementById('records')
 };
 const state = { running: false, time: 2.6, last: 0, drag: null, records: [] };
+const D0 = 2.0e-10;
 
 function clamp(x, lo, hi) { return Math.max(lo, Math.min(hi, x)); }
 function val(id) { return Number(els[id].value); }
@@ -92,13 +93,14 @@ function model() {
   const err = val('areaError') / 100;
   const pureMl = drops * dropMl / ratio;
   const pureM3 = pureMl * 1e-6;
-  const trueArea = areaUnit * 1000 * 1e-4;
-  const measuredArea = trueArea * (1 + err);
+  const trueArea = pureM3 / D0;
+  const tracedArea = areaUnit * 1000 * 1e-4;
+  const measuredArea = tracedArea * (1 + err);
   const d = pureM3 / measuredArea;
-  const trueD = pureM3 / trueArea;
+  const trueD = D0;
   const rel = Math.abs(d - trueD) / trueD * 100;
   const ok = d > 0.8e-10 && d < 8e-10 && rel < 10;
-  return { ratio, drops, dropMl, areaUnit, err, pureMl, pureM3, trueArea, measuredArea, d, trueD, rel, ok };
+  return { ratio, drops, dropMl, areaUnit, err, pureMl, pureM3, trueArea, tracedArea, measuredArea, d, trueD, rel, ok };
 }
 function roundRect(x, y, w, h, r) {
   ctx.beginPath();
@@ -144,7 +146,7 @@ function arrow(x1, y1, x2, y2, color, width = 3) {
   ctx.closePath();
   ctx.fill();
 }
-function filmRadius(q) { return Math.sqrt(q.trueArea / 0.5) * 116; }
+function filmRadius(q) { return Math.sqrt(q.tracedArea / 0.5) * 116; }
 function handles(q) {
   const r = filmRadius(q);
   return [
@@ -260,6 +262,7 @@ function draw() {
     `换算：<b>${(q.d * 1e10).toFixed(2)}×10⁻¹⁰m</b>，误差≈<b>${q.rel.toFixed(1)}%</b>`,
     q.ok ? '判定=<b>能用</b>' : '判定=<b>需重做</b>'
   ].join('<br>');
+  window.__EXP_TEST_STATE__={D0,trueD:q.trueD,pureM3:q.pureM3,trueArea:q.trueArea,tracedArea:q.tracedArea,measuredArea:q.measuredArea,d:q.d,rel:q.rel};
 }
 function loop(now) {
   if (!state.last) state.last = now;
@@ -341,5 +344,6 @@ for (const id of ['ratio', 'drops', 'dropVolume', 'filmArea', 'areaError']) els[
 renderRecords();
 requestAnimationFrame(loop);
 </script>
+<script src="guided-experiment.js"></script>
 </body>
 </html>

@@ -97,10 +97,10 @@
       return {raw,corrected:raw-q.z,main:Math.floor(raw),sub:Math.round((raw-Math.floor(raw))*10),precision:'1 mm刻度，估读0.1 mm'};
     }
     if(state.tool==='vernier'){
-      const raw=Math.round(q.L*20)/20;
+      const raw=Math.round(q.L/0.02)*0.02;
       const main=Math.floor(raw);
-      const sub=Math.round((raw-main)/0.05);
-      return {raw,corrected:raw-q.z,main,sub,precision:'50分度游标，精度0.02~0.05 mm'};
+      const sub=Math.round((raw-main)/0.02);
+      return {raw,corrected:raw-q.z,main,sub,precision:'50分度游标，分度值0.02 mm'};
     }
     const raw=Math.round(q.L*100)/100;
     const main=Math.floor(raw/0.5)*0.5;
@@ -128,9 +128,9 @@
     box(x-28,y-74,28,86,'#d9e2ec','#334e68'); box(jawX,y-74,28,86,'#e6f0ff','#2c7be5');
     box(x+5,y-32,q.L*scale-10,40,'#fff7e6','#f0a500');
     text('圆柱外径',x+q.L*scale/2,y-12,colors.gold,'center',12,'900');
-    line(jawX,y+28,jawX+260,y+28,colors.blue,22);
-    for(let i=0;i<=10;i++){const px=jawX+i*24;line(px,y+42,px,y+20,'#fff',1.5);if(i%5===0)text(String(i),px,y+58,colors.blue,'center',11,'900');}
-    line(jawX+r.sub*24/10,y+15,jawX+r.sub*24/10,y+72,colors.red,2);
+    line(jawX,y+28,jawX+250,y+28,colors.blue,22);
+    for(let i=0;i<=50;i++){const px=jawX+i*5;line(px,y+42,px,y+(i%5===0?18:23),'#fff',1.2);if(i%10===0)text(String(i),px,y+58,colors.blue,'center',10,'900');}
+    line(jawX+r.sub*5,y+15,jawX+r.sub*5,y+72,colors.red,2);
     handle(jawX+28,y-58,'拖量爪');
     text('主尺 '+r.main+' mm；游标对齐格约 '+r.sub+'；原读数 '+fmt(r.raw,2)+' mm',447,292,colors.blue,'center',14,'900');
   }
@@ -153,7 +153,7 @@
     text('工具选用与误差修正',447,380,colors.ink,'center',16,'900');
     const tools=[
       ['刻度尺','厘米级物体，精度约0.1 mm',state.tool==='ruler'],
-      ['游标卡尺','外径/内径/深度，精度约0.02~0.05 mm',state.tool==='vernier'],
+      ['游标卡尺','外径/内径/深度，50分度为0.02 mm',state.tool==='vernier'],
       ['螺旋测微器','细丝/薄片，精度0.01 mm',state.tool==='micrometer']
     ];
     tools.forEach((it,i)=>{const x=80+i*260;box(x,410,230,68,it[2]?'#e0f2fe':'#f8fafc',it[2]?'#2c7be5':'#d9e2ec');text(it[0],x+115,432,it[2]?colors.blue:colors.ink,'center',14,'900');text(it[1],x+115,458,colors.muted,'center',11,'700');});
@@ -170,6 +170,7 @@
       '修正读数：<b>'+fmt(r.corrected,2)+' mm</b>';
     els.rows.innerHTML=state.records.slice(-6).map(x=>'<tr><td>'+x.tool+'</td><td>'+fmt(x.raw,2)+'</td><td>'+fmt(x.zero,2)+'</td><td>'+fmt(x.corrected,2)+'</td></tr>').join('')||'<tr><td colspan="4">暂无记录</td></tr>';
     els.status.textContent = r.precision + '；读数时先读主尺或固定刻度，再读副尺，最后做零误差修正。';
+    window.__EXP_TEST_STATE__={tool:state.tool,raw:r.raw,main:r.main,sub:r.sub,precision:r.precision,corrected:r.corrected};
   }
   function draw(){
     const q=v(), r=reading();
@@ -202,5 +203,6 @@
   draw(); requestAnimationFrame(loop);
 })();
 </script>
+<script src="guided-experiment.js"></script>
 </body>
 </html>

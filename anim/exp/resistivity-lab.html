@@ -73,5 +73,6 @@ function renderRecords(){els.records.innerHTML=state.records.map((r,i)=>`<tr><td
 for(const id of ['length','diameter','voltage','rho','heat'])els[id].addEventListener('input',draw);
 renderRecords();requestAnimationFrame(loop);
 </script>
+<script src="guided-experiment.js"></script>
 </body>
 </html>

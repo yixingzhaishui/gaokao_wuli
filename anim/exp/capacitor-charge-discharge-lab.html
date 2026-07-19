@@ -44,7 +44,7 @@
       <label class="param"><span>电阻 R <b id="rLabel">20 kΩ</b></span><input id="r" type="range" min="5" max="80" step="1" value="20"></label>
       <label class="param"><span>电容 C <b id="cLabel">100 μF</b></span><input id="c" type="range" min="20" max="300" step="5" value="100"></label>
       <label class="param"><span>电源电压 E <b id="eLabel">6.0 V</b></span><input id="e" type="range" min="3" max="12" step="0.5" value="6"></label>
-      <div class="buttons"><button id="play">暂停</button><button id="record">记录点</button><button id="reset">重置</button></div>
+	      <div class="buttons"><button id="play">播放</button><button id="record">记录点</button><button id="reset">重置</button></div>
     </div>
     <div class="readout" id="readout"></div>
     <div class="card">
@@ -74,7 +74,7 @@
     readout: document.getElementById('readout'), rows: document.getElementById('rows'), status: document.getElementById('status'),
     play: document.getElementById('play')
   };
-  const state = { mode: 'charge', running: true, t: 0, Uc: 0, I: 0, drag: null, probe: null, history: [], records: [] };
+	  const state = { mode: 'charge', running: false, t: 0, Uc: 0, I: 0, drag: null, probe: null, history: [], records: [] };
   const colors = { ink: '#102a43', muted: '#486581', blue: '#2c7be5', red: '#e03131', green: '#087f5b', gold: '#f0a500', purple: '#7c3aed' };
 
   function param() {
@@ -255,7 +255,7 @@
   canvas.addEventListener('pointercancel', () => { state.drag=null; });
   [els.r,els.c,els.e].forEach(el => el.addEventListener('input', draw));
   els.play.addEventListener('click', () => { state.running=!state.running; els.play.textContent=state.running?'暂停':'播放'; });
-  document.getElementById('reset').addEventListener('click', () => { state.mode='charge'; state.running=true; state.t=0; state.Uc=0; state.I=0; state.probe=null; state.history=[]; state.records=[]; els.r.value=20; els.c.value=100; els.e.value=6; els.play.textContent='暂停'; draw(); });
+	  document.getElementById('reset').addEventListener('click', () => { state.mode='charge'; state.running=false; state.t=0; state.Uc=0; state.I=0; state.probe=null; state.history=[]; state.records=[]; els.r.value=20; els.c.value=100; els.e.value=6; els.play.textContent='播放'; draw(); });
   document.getElementById('record').addEventListener('click', () => {
     state.records.push({ mode: state.mode==='charge'?'充电':state.mode==='open'?'断开':'放电', t: state.t, U: state.Uc, I: state.I });
     if (state.records.length>8) state.records.shift();
@@ -291,6 +291,6 @@
   }
 })();
 </script>
-<script src="../bx3/guided-lesson.js"></script>
+<script src="guided-experiment.js"></script>
 </body>
 </html>

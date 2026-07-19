@@ -72,11 +72,12 @@ const modes = ['直流电压 V', '直流电流 A', '电阻 Ω'];
 const vRanges = [2.5, 10, 50];
 const aRanges = [0.1, 0.5, 2.0];
 const ohmMul = [1, 10, 100];
+const ohmMid = 10;
 function drawNeedle(cx, cy, radius, ratio, ohmMode) {
   const start = Math.PI * 0.82;
   const end = Math.PI * 0.18;
   const t = Math.max(0, Math.min(1, ratio));
-  const ang = ohmMode ? start + (1-t) * (end-start) : start + t * (end-start);
+  const ang = start + t * (end-start);
   ctx.strokeStyle = '#e03131';
   ctx.lineWidth = 4;
   ctx.beginPath();
@@ -111,7 +112,8 @@ function drawDial(cx, cy, radius, ohmMode) {
     ctx.lineTo(x2,y2);
     ctx.stroke();
     if (i%2===0) {
-      const label = ohmMode ? (i===0 ? '∞' : String((10-i)*10)) : String(i*10);
+      const resistance = i === 0 ? '∞' : (ohmMid * (1 / t - 1));
+      const label = ohmMode ? (i === 0 ? '∞' : resistance >= 10 ? resistance.toFixed(0) : resistance.toFixed(1)) : String(i*10);
       ctx.fillText(label, cx + (radius+18)*Math.cos(ang), cy - (radius+18)*Math.sin(ang)+4);
     }
   }
@@ -148,14 +150,15 @@ function draw() {
     const mul = ohmMul[rangeIndex];
     const scale = R / mul;
     const zeroFactor = zero / 100;
-    ratio = Math.max(0, Math.min(1, 1 - scale / 100)) * zeroFactor;
+    const idealRatio = ohmMid / (ohmMid + scale);
+    ratio = idealRatio * zeroFactor;
     rangeText = '×' + mul;
     trueText = R.toFixed(0) + 'Ω';
     connection = '断开电源，红黑表笔接被测电阻两端';
-    const readScale = scale / Math.max(0.2, zeroFactor);
+    const readScale = ratio > 0 ? ohmMid * (1 / ratio - 1) : Infinity;
     result = readScale.toFixed(1) + '×' + mul + '=' + (readScale*mul).toFixed(0) + 'Ω';
-    ok = !powered && zero >= 90 && scale >= 5 && scale <= 90;
-    problem = powered ? '测电阻必须先断开被测电路电源。' : zero < 90 ? '换挡后未欧姆调零，读数不可靠。' : scale < 5 || scale > 90 ? '表针位置太靠边，应换倍率。' : '倍率和调零合适。';
+    ok = !powered && zero >= 98 && idealRatio >= 0.2 && idealRatio <= 0.8;
+    problem = powered ? '测电阻必须先断开被测电路电源。' : zero < 98 ? '换挡后未欧姆调零，读数不可靠。' : idealRatio < 0.2 || idealRatio > 0.8 ? '表针位置太靠边，应换倍率。' : '倍率和调零合适。';
   }
   els.modeVal.textContent = modes[mode];
   els.rangeVal.textContent = rangeText;
@@ -245,6 +248,7 @@ function draw() {
   els.status.className = ok ? 'status' : 'status bad';
   els.status.textContent = ok ? '通过：挡位、接法和读数条件合格。' : '不通过：' + problem;
   els.playBtn.textContent = state.running ? '暂停' : '播放';
+  window.__EXP_TEST_STATE__={mode,rangeIndex,ratio,result,problem,ok,ohmMid};
 }
 Object.values(els).forEach(el => {
   if (el && el.tagName === 'INPUT') el.addEventListener('input', draw);
@@ -255,10 +259,10 @@ c.addEventListener('pointermove',e=>{const p=pos(e);if(!state.drag){c.style.curs
 c.addEventListener('pointerup',e=>{state.drag=null;try{c.releasePointerCapture(e.pointerId)}catch(err){}});c.addEventListener('pointercancel',()=>{state.drag=null;});
 els.playBtn.addEventListener('click',()=>{state.running=!state.running;state.last=0;draw();});
 els.resetBtn.addEventListener('click',()=>{state.running=false;state.time=0;state.records=[];els.mode.value=2;els.range.value=1;els.value.value=47;els.zero.value=100;els.power.value=0;els.records.innerHTML='';draw();});
-els.recordBtn.addEventListener('click',()=>{const mode=Number(els.mode.value),rangeIndex=Number(els.range.value),raw=Number(els.value.value),zero=Number(els.zero.value),powered=Number(els.power.value)===1;let rangeText='',result='';if(mode===0){const V=raw/10,range=vRanges[rangeIndex];rangeText=range+'V';result=V>range?'超量程':V.toFixed(2)+'V';}else if(mode===1){const A=raw/100,range=aRanges[rangeIndex];rangeText=range+'A';result=A>range?'超量程':A.toFixed(3)+'A';}else{const R=raw*10,mul=ohmMul[rangeIndex],scale=R/mul,zeroFactor=zero/100,readScale=scale/Math.max(.2,zeroFactor);rangeText='×'+mul;result=powered?'带电禁测':(readScale*mul).toFixed(0)+'Ω';}state.records.unshift({mode:modes[mode],rangeText,result});state.records=state.records.slice(0,4);els.records.innerHTML=state.records.map((r,i)=>`<tr><td style="text-align:left;border-bottom:1px solid #d9e2ec">${i+1}</td><td style="border-bottom:1px solid #d9e2ec">${r.mode}</td><td style="border-bottom:1px solid #d9e2ec">${r.rangeText}</td><td style="border-bottom:1px solid #d9e2ec">${r.result}</td></tr>`).join('');});
+els.recordBtn.addEventListener('click',()=>{const mode=Number(els.mode.value),rangeIndex=Number(els.range.value),raw=Number(els.value.value),zero=Number(els.zero.value),powered=Number(els.power.value)===1;let rangeText='',result='';if(mode===0){const V=raw/10,range=vRanges[rangeIndex];rangeText=range+'V';result=V>range?'超量程':V.toFixed(2)+'V';}else if(mode===1){const A=raw/100,range=aRanges[rangeIndex];rangeText=range+'A';result=A>range?'超量程':A.toFixed(3)+'A';}else{const R=raw*10,mul=ohmMul[rangeIndex],scale=R/mul,zeroFactor=zero/100,ratio=ohmMid/(ohmMid+scale)*zeroFactor,readScale=ratio>0?ohmMid*(1/ratio-1):Infinity;rangeText='×'+mul;result=powered?'带电禁测':(readScale*mul).toFixed(0)+'Ω';}state.records.unshift({mode:modes[mode],rangeText,result});state.records=state.records.slice(0,4);els.records.innerHTML=state.records.map((r,i)=>`<tr><td style="text-align:left;border-bottom:1px solid #d9e2ec">${i+1}</td><td style="border-bottom:1px solid #d9e2ec">${r.mode}</td><td style="border-bottom:1px solid #d9e2ec">${r.rangeText}</td><td style="border-bottom:1px solid #d9e2ec">${r.result}</td></tr>`).join('');});
 function loop(now){if(!state.last)state.last=now;const dt=Math.min(.04,(now-state.last)/1000);state.last=now;if(state.running)state.time+=dt;draw();requestAnimationFrame(loop);}
 requestAnimationFrame(loop);
 </script>
-<script src="../bx3/guided-lesson.js"></script>
+<script src="guided-experiment.js"></script>
 </body>
 </html>

@@ -189,5 +189,6 @@ els.recordBtn.addEventListener('click',()=>{const v0=Number(els.v0.value),a=Numb
 function loop(now){if(!state.last)state.last=now;const dtime=Math.min(.04,(now-state.last)/1000);state.last=now;if(state.running){state.time+=dtime;if(state.time>8*Number(els.period.value)){state.time=8*Number(els.period.value);state.running=false;}}draw();requestAnimationFrame(loop);}
 requestAnimationFrame(loop);
 </script>
+<script src="guided-experiment.js"></script>
 </body>
 </html>

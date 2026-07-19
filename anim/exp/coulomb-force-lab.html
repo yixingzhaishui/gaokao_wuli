@@ -79,7 +79,7 @@ const els = {
   recordRows: document.getElementById('recordRows')
 };
 const k0 = 8.99e9;
-const state = { running: false, last: 0, time: 0, meter: 0, drag: null, records: [] };
+const state = { running: false, last: 0, time: 0, meter: 0, drag: null, records: [], rejected: 0 };
 function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 function force(q1n, q2n, r) { return k0 * Math.abs(q1n * 1e-9 * q2n * 1e-9) / (r * r); }
 function fmtF(f) { return f >= 0.001 ? f.toFixed(4) : (f * 1000).toFixed(3) + 'm'; }
@@ -90,11 +90,12 @@ function values() {
   const mode = Number(els.mode.value);
   const leak = Number(els.leak.value);
   const F = force(q1, q2, r);
-  const Fread = F * (1 - leak / 100);
+  const Fsettled = F * (1 - leak / 100);
+  const Fread = Fsettled * state.meter;
   const kMeas = Math.abs(q1 * q2) > 0 ? Fread * r * r / Math.abs(q1 * 1e-9 * q2 * 1e-9) : 0;
   const rel = Math.abs(kMeas - k0) / k0 * 100;
   const relation = q1 * q2 > 0 ? '同号相斥' : q1 * q2 < 0 ? '异号相吸' : '有一球不带电';
-  return { q1, q2, r, mode, leak, F, Fread, kMeas, rel, relation };
+  return { q1, q2, r, mode, leak, F, Fsettled, Fread, kMeas, rel, relation };
 }
 function drawCharge(x, y, q, label) {
   ctx.fillStyle = q >= 0 ? '#ffe8cc' : '#d0ebff';
@@ -175,7 +176,7 @@ function drawScene(v) {
   ctx.font = '13px system-ui';
   ctx.fillText('r=' + v.r.toFixed(2) + 'm', (x1 + x2) / 2, y + 105);
   const attract = v.q1 * v.q2 < 0;
-  const len = clamp(v.Fread / 0.004 * 72, 8, 72) * state.meter;
+  const len = clamp(v.Fread / 0.004 * 72, 8, 72);
   if (v.q1 * v.q2 !== 0) {
     ctx.strokeStyle = '#e03131';
     ctx.lineWidth = 5;
@@ -194,10 +195,10 @@ function drawScene(v) {
   ctx.fillRect(76, 352, 286, 44);
   ctx.strokeRect(76, 352, 286, 44);
   ctx.fillStyle = '#2c7be5';
-  ctx.fillRect(88, 369, Math.min(262, v.Fread / 0.004 * 262 * state.meter), 12);
+  ctx.fillRect(88, 369, Math.min(262, v.Fread / 0.004 * 262), 12);
   ctx.fillStyle = '#102a43';
   ctx.font = '700 13px system-ui';
-  ctx.fillText('扭秤读数 F≈' + fmtF(v.Fread * state.meter) + 'N', 219, 388);
+  ctx.fillText('扭秤读数 F≈' + fmtF(v.Fread) + 'N', 219, 388);
 }
 function draw() {
   const v = values();
@@ -218,12 +219,14 @@ function draw() {
   els.readout.innerHTML = [
     `<div id="r1">方向：${v.relation}</div>`,
     `<div id="r2">F理论=k|q1q2|/r²≈${fmtF(v.F)}N</div>`,
-    `<div id="r3">F读≈${fmtF(v.Fread * state.meter)}N</div>`,
+    `<div id="r3">F读≈${fmtF(v.Fread)}N</div>`,
     `<div id="r4">F·r²/|q1q2|≈${(v.kMeas / 1e9).toFixed(2)}×10^9</div>`,
     `<div id="r5">相对误差≈${v.rel.toFixed(1)}%</div>`
   ].join('');
-  els.status.className = v.rel < 5 && v.q1 * v.q2 !== 0 ? 'status' : 'status bad';
-  els.status.textContent = v.q1 * v.q2 === 0 ? '不通过：有电荷为 0，无法验证库仑力关系。' : (v.rel < 5 ? '通过：反查的静电力常量接近 9.0×10^9。' : '不通过：漏电或读数误差使实验点明显偏离库仑定律。');
+  const settled = state.meter >= 0.99;
+  els.status.className = settled && v.rel < 5 && v.q1 * v.q2 !== 0 ? 'status' : 'status bad';
+  els.status.textContent = v.q1 * v.q2 === 0 ? '不通过：有电荷为 0，无法验证库仑力关系。' : !settled ? (state.rejected ? '已拒绝未稳定读数（'+state.rejected+' 次）：继续播放，待扭秤稳定后再记录。' : '等待：扭秤尚未稳定，当前读数不能反查静电力常量。') : (v.rel < 5 ? '通过：稳定读数反查的静电力常量接近 9.0×10^9。' : '不通过：漏电或读数误差使实验点明显偏离库仑定律。');
+  window.__EXP_TEST_STATE__={...v,meter:state.meter,settled,recordCount:state.records.length};
 }
 function renderRecords() {
   els.recordRows.innerHTML = state.records.slice(-5).map((p, i) =>
@@ -245,28 +248,28 @@ function loop(ts) {
   if (state.running) {
     state.time += dt;
     state.meter += (1 - state.meter) * dt * 2.8;
-  } else {
-    state.meter = Math.max(state.meter, 1);
   }
   draw();
   requestAnimationFrame(loop);
 }
 Object.values(els).forEach(el => {
-  if (el && el.tagName === 'INPUT') el.addEventListener('input', () => { state.meter = 0; draw(); });
+  if (el && el.tagName === 'INPUT') el.addEventListener('input', () => { state.meter = 0; state.rejected=0; draw(); });
 });
 els.playBtn.addEventListener('click', () => {
   state.running = !state.running;
-  if (state.running) state.meter = 0;
+  if (state.running) { state.meter = 0; state.rejected=0; }
   els.playBtn.textContent = state.running ? '暂停' : '播放';
 });
 els.recordBtn.addEventListener('click', () => {
   const v = values();
+  if (state.meter < 0.99) { state.rejected++; draw(); return; }
   state.records.push({ q1: v.q1, q2: v.q2, r: v.r, F: v.Fread, relation: v.relation });
   renderRecords();
 });
 els.resetBtn.addEventListener('click', () => {
   state.running = false;
-  state.meter = 1;
+  state.meter = 0;
+  state.rejected = 0;
   state.records = [];
   els.q1.value = '20';
   els.q2.value = '30';
@@ -289,9 +292,10 @@ c.addEventListener('pointermove', ev => {
 });
 c.addEventListener('pointerup', () => { state.drag = null; });
 c.addEventListener('pointerleave', () => { state.drag = null; });
-state.meter = 1;
+state.meter = 0;
 renderRecords();
 requestAnimationFrame(loop);
 </script>
+<script src="guided-experiment.js"></script>
 </body>
 </html>
