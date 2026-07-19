@@ -279,3 +279,66 @@ development_flow: continue
 source_gate: X3_39_formal_upgrade_pending_and_all_static_examples_quarantined
 teacher_signoff: pending
 ```
+
+---
+
+## 2026-07-18 整改与复审附录
+
+```yaml
+implementation_commit: 51ada562467fbc7954c59ff934515ffa01ff8213
+clean_xb3_evidence_commit: 51ada562467fbc7954c59ff934515ffa01ff8213
+clean_shared_page_evidence_commit: e505a2d0c9296665e2181300bd352d1e813c5258
+review_status: remediation_complete_reaudit_pass
+engineering_interaction: pass_37_of_37_unique_pages
+physics_semantic_regression: pass_12_of_12
+guided_pedagogy_desktop: pass_39_of_39
+guided_pedagogy_reduced_motion_mobile: pass_39_of_39
+critical_findings: closed_4_of_4
+node_major_findings: closed_6_of_6
+systemic_major_findings: closed_3_of_3
+minor_findings: closed_1_of_1
+implementation_release_gate: pass
+content_approval: pending
+teacher_signoff: pending
+source_gate: X3_39_formal_upgrade_pending_and_all_static_examples_quarantined
+development_flow: continue
+```
+
+本附录不覆盖或删除初审证据。上半部保留提交 `9acbf51` 的原始失败态，下面记录其整改闭环。`implementation_release_gate: pass` 表示本轮代码、物理语义、默认教学路径、移动端和交互证据可以发布到现有开发 PR；它不把正文中的 `interaction passed · content pending` 改成 `done`，也不代表正式题源或教师内容签署已经完成。
+
+### Finding 关闭矩阵
+
+| Finding | 修复实现 | 精确通过断言 | 复审结论 |
+|---|---|---|---|
+| X3-13 CRITICAL | 删除独立 `W` 输入；用同一准静态直线 p-V 路径计算 `Wout=∫p dV`、`W=-Wout`，再计算 `ΔU=Q+W` | `Wout≈areaWout`、`workError≈0`、`ΔU≈Q+W` | closed |
+| X3-18 CRITICAL | 明确两条对称接触线、单侧长度 `L`、切线角 `α`、忽略浮力；比较 `Fy=2σLsinα` 与 `G` | 浏览器改 `σ、L、α` 后 `Fy` 与几何公式一致 | closed |
+| X3-29 CRITICAL | 删除任意 `A/Eb` 拼接，改为 7 个常见核素的有界近似参考值；`Eb`、`Δm` 全部派生 | `A` 只落在参考集合；`Eb=A(Eb/A)`、`Δm=Eb/931.5` | closed |
+| X3-37 CRITICAL | 医学、工业、考古分别绑定 `99mTc/6 h`、`60Co/5.27 y`、`14C/5730 y`，场景同步切换坐标轴和单位 | 考古为 `14C、y、5730`；医学回到 `99mTc、h、6` | closed |
+| X3-20 MAJOR | 双缝落点改为带包络的双缝概率密度拒绝抽样，使用可复现实验种子 | 播放后随机样本增长；模型标识为 `seeded-random-double-slit-rejection-sampling` | closed |
+| X3-31 MAJOR | 删除伪精确聚变百分比，改为“条件不足/改善中/较有利”的定性趋势 | 读数明确“不是反应概率”，无 `%` | closed |
+| X3-32 MAJOR | 电荷检查只给“必要条件满足”或“由电荷排除” | 通过态明确仍需能量、动量、角动量，不能断言通道成立 | closed |
+| X3-34 MAJOR | 新增 72 个随机行走样本，实时从位移平方取平均生成 MSD 历史 | `samples=72`、`msd>0`、历史样本增长，模型为 measured ensemble | closed |
+| X3-38 MAJOR | 删除无标定剂量和安全阈值，改为射线—材料语境下的相对响应趋势 | 页面只显示趋势，并明确安全必须依赖真实源项、材料和剂量标定 | closed |
+| X3-39 MAJOR | 删除无效“电荷/质量情境”滑块；先选对象/过程，再用尺度作自洽检查 | 单独改尺度不改变所选作用；切换对象会改变主导作用 | closed |
+| X3-36 MINOR | `θ=90°` 单列为 `cosθ=0、h∞=0` 的临界态，并用受控初始位移演示松弛 | `cm≈0`、`data-capillary-state=critical-neutral`；播放过程真实变化 | closed |
+| X3-SYS-01 | 新增 39 份逐节点问题、预测、真实动作、证据、解释、边界、迁移和重播配置 | 桌面逐页 39/39 完成，公式与读数在验证前遮蔽 | closed |
+| X3-SYS-02 | 36 个 xb3 动画及共享 X3-19 接入统一引导；加入 reduced-motion 路径 | 390×844 + reduced-motion 39/39，无横向溢出或运行时错误 | closed |
+| X3-SYS-03 | 正文物理重排为 X3-01..X3-39 单调递增，39 个 iframe 绑定精确 `lesson=X3-XX` | 39 节、39 个单 iframe、顺序与编号完全一致 | closed |
+
+### 复审证据
+
+| 命令 / 证据 | 结果 | 绑定关系 |
+|---|---|---|
+| `npm run audit:physics:x3` | 12/12 PASS | X3-13/18/20/29/31/32/34/36/37/38/39 与正文关闭断言 |
+| `npm run audit:pedagogy:x3` | 4/4 测试组 PASS；桌面 39/39、reduced-motion 移动 39/39 | 每节点真实预测动作、延迟证据、解释、边界、迁移、重播 |
+| `npm run check` | PASS；229 节点门禁、206 页静态评估、0 issues | 编辑覆盖、数学、解答隔离、静态回退和 P0/P1 门禁 |
+| `node scripts/gen-data.js --check` | PASS；目录 229、进度 229 | 未重写 id-map，未擅自提升完成状态 |
+| `audit/results/xb3-remediated-51ada56.json` | 36/36 PASS，score 100，0 blocked，0 hard failure，`worktree_clean=true` | 精确绑定实现提交 `51ada562467fbc7954c59ff934515ffa01ff8213` |
+| `audit/results/x3-shared-photoelectric-e505a2d.json` | 1/1 PASS，score 100，0 hard failure，`worktree_clean=true` | 精确绑定证据提交 `e505a2d0c9296665e2181300bd352d1e813c5258`；X3-19 引导另由 39 节测试覆盖 |
+
+### 仍未关闭的内容治理事项
+
+1. X3-39 的正式大陆高考、区域考试或大型联考题源升级仍为 `pending`；本轮没有用聚合题库、不可靠 OCR 或自编题冒充真题。
+2. X3-01..X3-39 的静态例题区继续标记“来源审核中”并保持隔离，不计入可发布训练题。
+3. 教师内容签署仍为 `pending`。自动化与总编复审关闭了本报告列出的实现 finding，但不能替代最终教师签字。
+4. 因而本轮批准的是开发分支/PR 中的实现发布，不是把 X3 内容状态改为 `done`。
