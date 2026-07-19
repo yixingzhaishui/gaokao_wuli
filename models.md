@@ -7,7 +7,7 @@
 
 <iframe src="anim/model/model-selector.html" width="100%" height="860" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
-**观察任务**：先输入或点击题目信号，看系统给出的候选模型；再核对研究对象、过程、真实受力和约束方程。关键词只能帮助初筛，不能代替“对象—约束—过程—边界”的建模判断。
+**观察任务**：先选择研究对象、过程、约束和目标量，看系统是否具备足够信息给出候选模型；再核对研究对象、过程、真实受力和约束方程。诊断只使用结构化事实；信息不足或候选并列时必须继续补充条件，不能靠关键词强行推荐。
 
 这个诊断台用来训练“第一反应”，现在覆盖 15 个高频模型：
 
@@ -24,33 +24,46 @@
 
 ## 高频模型清单（15 个，逐项开发）
 
-> 清单不是验收结果本身。每个模型必须点进去看到：图、交互、判据、易错点和例题训练。A 档/核心模型按“基础题 + 中档题 + 高综合题”组织，板块模型已补到 4 题闭环。
+> 清单不是验收结果本身。每个模型必须点进去看到：图、交互、判据、易错点和例题训练。例题只在来源政策 2.0 与答案独立复算均通过后发布；当前15个模型均为来源复核中。
 
-| 编号 | 模型入口 | 关联知识点 | 例题训练入口 | 状态 |
+| 编号 | 模型入口 | 关联知识点 | 真题来源门禁 | 状态 |
 |---|---|---|---|---|
-| M-01 | [连接体模型](models?id=model-connecting-body) | B1-27 | 3 题：整体法、摩擦、内力辨析 | interaction passed · content pending |
-| M-02 | [板块模型](models?id=model-plank-block) | B1-28 | [4 题闭环：临界、滑动、误区、滑痕能量](models?id=model-plank-block-training) | interaction passed · content pending |
-| M-03 | [传送带模型](models?id=model-conveyor-belt) | B1-29 | [4 题：共速、短带、反向初速、热量](models?id=model-conveyor-belt-training) | interaction passed · content pending |
-| M-04 | [弹簧瞬时问题](models?id=model-spring-instant) | B1-30 | 4 题：剪绳、撤支撑、弹簧力不突变 | interaction passed · content pending |
-| M-05 | [平抛与类平抛](models?id=model-projectile-like) | B2-03, B3-08 | 3 题：平抛、电场偏转、分区运动 | interaction passed · content pending |
-| M-06 | [圆周临界模型](models?id=model-circular-critical) | B2-08, X2-06 | 3 题：绳、杆、轨道临界 | interaction passed · content pending |
-| M-07 | [天体运动模型](models?id=model-orbital-motion) | B2-11, B2-13, B2-14 | 3 题：卫星、双星、变轨 | interaction passed · content pending |
-| M-08 | [机车启动模型](models?id=model-vehicle-start) | B2-17 | 3 题：恒力、恒功率、图像 | interaction passed · content pending |
-| M-09 | [功能关系综合](models?id=model-work-energy) | B2-22, B2-23 | 3 题：守恒、非保守力、能量账本 | interaction passed · content pending |
-| M-10 | [碰撞模型](models?id=model-collision) | X1-05, X1-06 | 3 题：粘连、弹碰、能量损失 | interaction passed · content pending |
-| M-11 | [导轨模型](models?id=model-rail-rod) | X2-11 | 3 题：电动势、电流、安培力 | interaction passed · content pending |
-| M-12 | [交流电综合](models?id=model-ac-transformer) | X2-15, X2-16, X2-17 | 3 题：有效值、变压器、输电 | interaction passed · content pending |
-| M-13 | [带电粒子在复合场中运动](models?id=model-compound-field-particle) | X2-05, B3-08 | 3 题：选择器、偏转、圆周 | interaction passed · content pending |
-| M-14 | [气体状态变化模型](models?id=model-gas-state-change) | X3-10, X3-11 | 3 题：状态方程、p-V 图、做功 | interaction passed · content pending |
-| M-15 | [核反应与质能方程](models?id=model-nuclear-energy) | X3-27, X3-29 | 3 题：守恒、半衰期、质能 | interaction passed · content pending |
+| M-01 | [连接体模型](models?id=model-connecting-body) | B1-27 | 0题可发布；来源复核中 | physics/pedagogy reviewed · source pending |
+| M-02 | [板块模型](models?id=model-plank-block) | B1-28 | 0题可发布；来源复核中 | physics/pedagogy reviewed · source pending |
+| M-03 | [传送带模型](models?id=model-conveyor-belt) | B1-29 | 0题可发布；来源复核中 | physics/pedagogy reviewed · source pending |
+| M-04 | [弹簧瞬时问题](models?id=model-spring-instant) | B1-30 | 0题可发布；来源复核中 | physics/pedagogy reviewed · source pending |
+| M-05 | [平抛与类平抛](models?id=model-projectile-like) | B2-03, B3-08 | 0题可发布；来源复核中 | physics/pedagogy reviewed · source pending |
+| M-06 | [圆周临界模型](models?id=model-circular-critical) | B2-08, X2-06 | 0题可发布；来源复核中 | physics/pedagogy reviewed · source pending |
+| M-07 | [天体运动模型](models?id=model-orbital-motion) | B2-11, B2-13, B2-14 | 0题可发布；来源复核中 | physics/pedagogy reviewed · source pending |
+| M-08 | [机车启动模型](models?id=model-vehicle-start) | B2-17 | 0题可发布；来源复核中 | physics/pedagogy reviewed · source pending |
+| M-09 | [功能关系综合](models?id=model-work-energy) | B2-22, B2-23 | 0题可发布；来源复核中 | physics/pedagogy reviewed · source pending |
+| M-10 | [碰撞模型](models?id=model-collision) | X1-05, X1-06 | 0题可发布；来源复核中 | physics/pedagogy reviewed · source pending |
+| M-11 | [导轨模型](models?id=model-rail-rod) | X2-11 | 0题可发布；来源复核中 | physics/pedagogy reviewed · source pending |
+| M-12 | [交流电综合](models?id=model-ac-transformer) | X2-15, X2-16, X2-17 | 0题可发布；来源复核中 | physics/pedagogy reviewed · source pending |
+| M-13 | [带电粒子在复合场中运动](models?id=model-compound-field-particle) | X2-05, B3-08 | 0题可发布；来源复核中 | physics/pedagogy reviewed · source pending |
+| M-14 | [气体状态变化模型](models?id=model-gas-state-change) | X3-10, X3-11 | 0题可发布；来源复核中 | physics/pedagogy reviewed · source pending |
+| M-15 | [核反应与质能方程](models?id=model-nuclear-energy) | X3-27, X3-29 | 0题可发布；来源复核中 | physics/pedagogy reviewed · source pending |
 
 > 模型专题正在逐项开发；未完成项仍标为 pending，不冒充完成。
 
 ---
 
-<h4 id="model-connecting-body">M-01 连接体模型 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="model-connecting-body">M-01 连接体模型 <span class="status review">physics/pedagogy reviewed · source pending</span></h4>
 <!-- content-template: model; editorial-review: P1-EDITOR-002/003 -->
 
+
+#### 本页主问题与引导演示
+
+**主问题**：连接体在约束成立时能否共同加速，内力应在什么时候求？
+
+先完成画面内预测，再触发真实控件观察；用“预测—实际结果—画面证据—因果解释—模型边界—高考迁移”完成证据链。
+
+**交互模型。**
+<iframe src="anim/bx1/connecting-body.html?lesson=M-01" width="100%" height="820" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
+> **公式首次使用卡**：适用边界——轻绳不可伸长时，绳两端物体沿绳方向加速度大小相同；轻杆连接时，杆可以传拉力也可以传压力，要看受力方向；若绳跨过轻滑轮，通常绳两端速度和加速度大小相同，但方向要沿各自绳段判断。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
+
+**证据后的公式入口**：约束确认后，对所选系统列 $F_{\mathrm{net}}=ma$；整体法中不写系统内力。
 
 #### 模型任务与研究对象
 连接体模型处理“多个物体被绳、杆、弹簧或接触面联系在一起”的动力学问题。高考里常问加速度关系、绳中张力或接触力、某个物体的受力情况。轻绳不可伸长、轻杆定长、滑轮几何和弹簧伸缩对应不同约束；“相连”本身并不保证加速度大小和方向相同。
@@ -79,13 +92,7 @@
   </defs>
 </svg>
 
-**交互模型。**
-<iframe src="anim/bx1/connecting-body.html" width="100%" height="820" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
-
-
-
-> **公式首次使用卡**：适用边界——轻绳不可伸长时，绳两端物体沿绳方向加速度大小相同；轻杆连接时，杆可以传拉力也可以传压力，要看受力方向；若绳跨过轻滑轮，通常绳两端速度和加速度大小相同，但方向要沿各自绳段判断。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
 
 可拖动参数：$m_{1}$、$m_{2}$、外力 `F`、摩擦因数 $\mu$、斜面角 $\theta$、重力加速度 `g`，并可切换水平轻绳、粗糙水平、斜面-水平组合、滑轮悬挂。实时变化：共同加速度、绳张力、净外力、摩擦力、重力分量、整体/隔离方程和 `a-F` 图像。
 
@@ -118,19 +125,13 @@
 #### 公式、变量、单位与条件
 无摩擦水平连接体：
 
-```text
-整体：F = (m1+m2)a
-所以：a = F/(m1+m2)
-隔离 m1：T = m1a
-隔离 m2：F - T = m2a
-```
+- 对整体：$F=(m_1+m_2)a$，所以 $a=\dfrac{F}{m_1+m_2}$。
+- 隔离 $m_1$：$T=m_1a$；隔离 $m_2$：$F-T=m_2a$。
 
 有摩擦时，以下公式只适用于两物体均在水平面上滑动、滑动摩擦因数相同且 $N_i=m_i g$ 的情形；静摩擦不能直接写成 $\mu mg$：
 
-```text
-整体：F - μ(m1+m2)g = (m1+m2)a
-隔离 m1：T - μm1g = m1a
-```
+- 两物体都已滑动且动摩擦因数相同：$F-\mu(m_1+m_2)g=(m_1+m_2)a$。
+- 隔离 $m_1$：$T-\mu m_1g=m_1a$。
 
 画面中 `F` 是右侧红色箭头，`a` 是共同运动箭头，`T` 是连接处绳的拉力，摩擦力与运动趋势相反。
 
@@ -157,23 +158,31 @@
 | 求张力时仍用整体 | 内力在整体里看不见 | 隔离单个物体 |
 | 忘记两个物体摩擦都要算 | 总外力少减了摩擦 | 整体摩擦为总摩擦 |
 | 默认所有连接体加速度相同 | 弹簧或滑动时可能不同 | 先判断约束条件 |
-| 张力方向随便画 | 方程符号混乱 | 先假设方向，算出负值再反向 |
+| 把轻绳张力当成可反向的力 | 轻绳只能沿绳拉，不能推 | 张力算出负值时判定绳松弛或原运动假设失效；轻杆才可能拉或压 |
 
 #### 例题与训练（来源审核中）
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：M-01）
 
-<h4 id="model-plank-block">M-02 板块模型 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="model-plank-block">M-02 板块模型 <span class="status review">physics/pedagogy reviewed · source pending</span></h4>
 <!-- content-template: model; editorial-review: P1-EDITOR-002/003 -->
 
 
-#### 模型任务与研究对象
-板块模型处理“物块放在木板上，外力拉物块或拉木板”的问题。难点不是套公式，而是判断物块和木板是否保持相对静止；一旦相对滑动，两个物体就要分别列牛顿第二定律。
+#### 本页主问题与引导演示
 
+**主问题**：增大外力后，物块与木板何时从共同运动转为相对滑动？
 
+先完成画面内预测，再触发真实控件观察；用“预测—实际结果—画面证据—因果解释—模型边界—高考迁移”完成证据链。
 
+**交互模型。**
+<iframe src="anim/bx1/plank-block.html?lesson=M-02" width="100%" height="820" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 > **公式首次使用卡**：适用边界——以上公式针对外力拉上方物块且地面光滑的典型情形；若外力拉木板，所需静摩擦对象会改变，临界式也要重列；若地面有摩擦，整体方程要加入地面对木板的摩擦。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
+
+**证据后的公式入口**：共同运动假设需要满足 $f_{\mathrm{s,need}}\le f_{\mathrm{s,max}}$。
+
+#### 模型任务与研究对象
+板块模型处理“物块放在木板上，外力拉物块或拉木板”的问题。难点不是套公式，而是判断物块和木板是否保持相对静止；一旦相对滑动，两个物体就要分别列牛顿第二定律。
 
 核心链路有两步：先判断静摩擦够不够让两者共同加速；一旦打滑，再用相对位移判断是否滑下木板，并用 $Q=f\Delta x$ 解释摩擦生热。
 
@@ -181,10 +190,10 @@
 
 | 题目问法 | 先做什么 | 立刻跳到 |
 |---|---|---|
-| 能否一起运动、临界外力 | 假设共动，算 $f_{\text{静需}}$ 与 `fₛ,max` | [例题 1](models?id=model-plank-block-example-1) |
-| 已经打滑，求两个加速度 | 分别隔离物块和木板 | [例题 2](models?id=model-plank-block-example-2) |
-| 静摩擦到底是不是 $\mu mg$ | 先由运动需要求静摩擦 | [例题 3](models?id=model-plank-block-example-3) |
-| 给初速度、问滑痕/滑下/热量 | 直接写相对运动，比较 $\Delta x$ 和 `L` | [例题 4](models?id=model-plank-block-example-4) |
+| 能否一起运动、临界外力 | 假设共动，算 $f_{\text{静需}}$ 与 `fₛ,max` | 来源复核中（暂不发布） |
+| 已经打滑，求两个加速度 | 分别隔离物块和木板 | 来源复核中（暂不发布） |
+| 静摩擦到底是不是 $\mu mg$ | 先由运动需要求静摩擦 | 来源复核中（暂不发布） |
+| 给初速度、问滑痕/滑下/热量 | 直接写相对运动，比较 $\Delta x$ 和 `L` | 来源复核中（暂不发布） |
 
 **解题检查表**：先判临界，不够才分列；分列后看相对运动；有限长木板必须比较 $\Delta x$ 与 `L`；问热量只用接触面相对位移 $Q=f\Delta x$。
 
@@ -214,8 +223,7 @@
   </defs>
 </svg>
 
-**交互模型。**
-<iframe src="anim/bx1/plank-block.html" width="100%" height="820" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
 
 可拖动参数：外力 `F` 或初速度 $v_{0}$、摩擦因数 $\mu$、物块质量 `m`、木板质量 `M`、板长 `L`、时间游标 `t`。实时变化：临界状态、摩擦方向、`am/aM`、相对滑痕 $\Delta x$、是否滑下、摩擦生热 $Q=f\Delta x$，并同时显示侧视实物、俯视滑痕和 $x_{\text{相}}-t / v-t$ 图像。
 
@@ -244,21 +252,14 @@
 #### 公式、变量、单位与条件
 外力拉上方物块、水平地面光滑时：
 
-```text
-假设共同运动：a = F/(m+M)
-木板只能靠摩擦获得加速度：f静需 = M a
-最大静摩擦：fₛ,max = μmg
-临界条件：M·F/(m+M) = μmg
-F临 = μmg(m+M)/M
-```
+- 假设共同运动：$a=\dfrac{F}{m+M}$，木板所需静摩擦为 $f_{\mathrm{s,need}}=Ma$。
+- 最大静摩擦 $f_{\mathrm{s,max}}=\mu_smg$；临界条件为 $\dfrac{MF}{m+M}=\mu_smg$。
+- 因而 $F_{\mathrm{crit}}=\dfrac{\mu_smg(m+M)}{M}$。
 
 相对滑动后：
 
-```text
-物块：F - μmg = m am
-木板：μmg = M aM
-若 am > aM，物块相对木板向右滑
-```
+- 相对滑动后，物块满足 $F-\mu_kmg=ma_m$，木板满足 $\mu_kmg=Ma_M$。
+- 若 $a_m>a_M$，物块相对木板向右滑；这里的 $\mu_k$ 是动摩擦因数。
 
 画面中红色箭头是外力 `F`，黄色箭头是摩擦力，读数中的 `am`、`aM` 直接对应两个物体的加速度。
 
@@ -291,17 +292,25 @@ F临 = μmg(m+M)/M
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：M-02）
 
-<h4 id="model-conveyor-belt">M-03 传送带模型 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="model-conveyor-belt">M-03 传送带模型 <span class="status review">physics/pedagogy reviewed · source pending</span></h4>
 <!-- content-template: model; editorial-review: P1-EDITOR-002/003 -->
 
 
-#### 模型任务与研究对象
-传送带模型处理“物块放到运动传送带上”的分段运动问题。它最容易错在摩擦力方向：摩擦力不是固定阻碍物块对地运动，而是阻碍物块相对传送带的运动。
+#### 本页主问题与引导演示
 
+**主问题**：物块放上传送带后，摩擦方向由什么决定，何时能够共速？
 
+先完成画面内预测，再触发真实控件观察；用“预测—实际结果—画面证据—因果解释—模型边界—高考迁移”完成证据链。
 
+**交互模型。**
+<iframe src="anim/bx1/conveyor-belt.html?lesson=M-03" width="100%" height="820" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 > **公式首次使用卡**：适用边界——水平传送带中，摩擦加速度大小为 \mu g；共速后若没有其他水平力，一般静摩擦为 0；倾斜传送带要加入重力沿斜面分量，不能直接套 a=\mu g。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
+
+**证据后的公式入口**：先判断相对速度 $v_{\mathrm{rel}}=v_{\mathrm{block}}-v_{\mathrm{belt}}$ 的符号。
+
+#### 模型任务与研究对象
+传送带模型处理“物块放到运动传送带上”的分段运动问题。它最容易错在摩擦力方向：摩擦力不是固定阻碍物块对地运动，而是阻碍物块相对传送带的运动。
 
 核心判断：比较物块速度 $v_{\text{物}}$ 与传送带速度 $v_{\text{带}}$。小于时被加速，大于时被减速，等于时共速，通常无摩擦。
 
@@ -330,8 +339,7 @@ F临 = μmg(m+M)/M
   </defs>
 </svg>
 
-**交互模型。**
-<iframe src="anim/bx1/conveyor-belt.html" width="100%" height="820" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
 
 可拖动参数：传送带速度 $v_{\text{带}}$、物块初速度 $v_{0}$（可为反向）、动摩擦因数 $\mu$、传送带长度 `L`、重力加速度 `g`、传送方向 `direction` 和观察时刻 `t`。实时变化：速度、摩擦方向、运动阶段、是否到达末端、共速时间、物块位移、划痕长度和摩擦生热。
 
@@ -362,13 +370,9 @@ F临 = μmg(m+M)/M
 #### 公式、变量、单位与条件
 水平传送带、物块轻放、$v_{0}<v_{\text{带}}$：
 
-```text
-a = μg
-t共 = (v带-v0)/(μg)
-x物 = v0 t共 + 1/2 μg t共²
-x带 = v带 t共
-划痕长度 = |x带 - x物|
-```
+- 滑动阶段加速度大小：$a=\mu_kg$；若能追上带速，$t_c=\dfrac{v_{\mathrm{belt}}-v_0}{\mu_kg}$。
+- $x_{\mathrm{block}}=v_0t_c+\dfrac12\mu_kgt_c^2$，$x_{\mathrm{belt}}=v_{\mathrm{belt}}t_c$。
+- 划痕长度：$\left|x_{\mathrm{belt}}-x_{\mathrm{block}}\right|$。摩擦方向必须先由相对运动趋势判断。
 
 若 $x_{\text{物}}<L$，物块先共速，再匀速走完剩余长度。若 $x_{\text{物}}\ge L$，物块还没共速就离开传送带，要用位移方程直接求离开时间。
 
@@ -403,17 +407,25 @@ x带 = v带 t共
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：M-03）
 
-<h4 id="model-spring-instant">M-04 弹簧瞬时问题 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="model-spring-instant">M-04 弹簧瞬时问题 <span class="status review">physics/pedagogy reviewed · source pending</span></h4>
 <!-- content-template: model; editorial-review: P1-EDITOR-002/003 -->
 
 
-#### 模型任务与研究对象
-弹簧瞬时问题处理“剪断绳、撤去支撑、突然释放”之后的一瞬间受力和加速度。它的关键不在复杂计算，而在判断哪些力能立刻改变、哪些力不能立刻改变。
+#### 本页主问题与引导演示
 
+**主问题**：外力或约束突变的一瞬间，哪些力能突变，哪些状态量保持连续？
 
+先完成画面内预测，再触发真实控件观察；用“预测—实际结果—画面证据—因果解释—模型边界—高考迁移”完成证据链。
 
+**交互模型。**
+<iframe src="anim/bx1/spring-instant.html?lesson=M-04" width="100%" height="820" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 > **公式首次使用卡**：适用边界——“瞬时不变”只针对刚剪断的一瞬间，之后弹簧会运动并改变形变量；轻绳只能拉不能压，剪断后张力为 0；轻杆可拉可压，受力是否突变要看约束是否仍存在。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
+
+**证据后的公式入口**：理想轻弹簧满足 $F_{\mathrm{spring}}=kx$，瞬间形变量连续。
+
+#### 模型任务与研究对象
+弹簧瞬时问题处理“剪断绳、撤去支撑、突然释放”之后的一瞬间受力和加速度。它的关键不在复杂计算，而在判断哪些力能立刻改变、哪些力不能立刻改变。
 
 核心规则：轻绳、轻杆的力可以突变；弹簧弹力由形变量决定，形变量在瞬间来不及改变，所以弹簧弹力在 $t=0+$ 保持剪断前的数值。
 
@@ -452,8 +464,7 @@ x带 = v带 t共
   </defs>
 </svg>
 
-**交互模型。**
-<iframe src="anim/bx1/spring-instant.html" width="100%" height="900" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
 
 可拖动参数：$m_{1}$、$m_{2}$、劲度系数 `k`、弹簧形变量 `x`、重力加速度 `g`；可切换 $cut_target$ 为“剪断 A-B 绳 / 剪断上弹簧 / 撤去下支撑”。画面对比 $t=0-$ 与 $t=0+$ 的受力、平衡差、瞬时加速度。
 
@@ -484,19 +495,13 @@ x带 = v带 t共
 #### 公式、变量、单位与条件
 图中剪断前物块静止：
 
-```text
-t=0-：F弹 = mg + T0
-F弹 = kx
-```
+- 突变前若系统平衡：$F_{\mathrm{spring}}=mg+T_0$。
+- 胡克定律适用时：$F_{\mathrm{spring}}=kx$。
 
 剪断轻绳后：
 
-```text
-t=0+：T = 0
-F弹 仍等于 mg + T0
-合力 = F弹 - mg = T0
-a = T0/m
-```
+- 剪断轻绳后的瞬间 $T=0$，但弹簧形变量来不及改变，所以 $F_{\mathrm{spring}}=mg+T_0$。
+- 此刻合力 $F_{\mathrm{net}}=F_{\mathrm{spring}}-mg=T_0$，故 $a=T_0/m$。
 
 画面中弹簧长度和 $F_{\text{弹}}$ 读数在剪断瞬间不变，虚线绳表示张力已经消失，紫色箭头表示瞬时加速度方向。
 
@@ -529,9 +534,22 @@ a = T0/m
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：M-04）
 
-<h4 id="model-projectile-like">M-05 平抛与类平抛 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="model-projectile-like">M-05 平抛与类平抛 <span class="status review">physics/pedagogy reviewed · source pending</span></h4>
 <!-- content-template: model; editorial-review: P1-EDITOR-002/003 -->
 
+
+#### 本页主问题与引导演示
+
+**主问题**：同高度平抛增大水平初速度，落地时间与水平射程分别怎样变化？
+
+先完成画面内预测，再触发真实控件观察；用“预测—实际结果—画面证据—因果解释—模型边界—高考迁移”完成证据链。
+
+**交互模型。**
+<iframe src="anim/bx2/projectile.html?lesson=M-05" width="100%" height="820" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
+> **公式首次使用卡**：适用边界——空气阻力忽略；平抛要求初速度水平，竖直初速度为 0；类平抛要求加速度恒定，且与初速度方向垂直。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
+
+**证据后的公式入口**：沿初速度方向 $x=v_0t$，垂直方向再按匀加速处理。
 
 #### 模型任务与研究对象
 平抛与类平抛模型处理“一个方向匀速、垂直方向匀加速”的二维运动。普通平抛的恒力是重力；带电粒子在匀强电场中的偏转，恒力可以是电场力。力的来源不同，数学结构相同。
@@ -539,10 +557,6 @@ a = T0/m
 核心方法：先沿恒力方向求时间或偏移，再沿初速度方向求位移。
 
 #### 情境表征
-
-
-
-> **公式首次使用卡**：适用边界——空气阻力忽略；平抛要求初速度水平，竖直初速度为 0；类平抛要求加速度恒定，且与初速度方向垂直。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
 
 平抛中，水平方向没有力，速度保持 $v_{0}$；竖直方向受重力，做初速度为 0 的匀加速运动。类平抛只需把“竖直方向”和“重力”换成“受恒力方向”和“恒加速度”。
 
@@ -566,10 +580,8 @@ a = T0/m
   </defs>
 </svg>
 
-**交互模型。**
-<iframe src="anim/bx2/projectile.html" width="100%" height="820" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
-<iframe src="anim/bx2/oblique-throw.html" width="100%" height="560" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px;margin-top:12px"></iframe>
+
 
 可拖动参数：$v_{0}$、`h`、`g`、`q`、`m`、`E`、$plate_length$ 和时间 `t`；可切换“重力平抛 / 电场类平抛”。实时变化：轨迹、水平位移、偏转位移、速度分量、偏角、落地/出场时间和电偏转加速度 $a=qE/m$。下方斜抛实验台可作为拓展对照。
 
@@ -599,26 +611,15 @@ a = T0/m
 #### 公式、变量、单位与条件
 普通平抛：
 
-```text
-x = v0t
-y = 1/2 gt²
-vy = gt
-t落 = √(2h/g)
-R = v0√(2h/g)
-tanθ = vy/vx = gt/v0
-```
+- 水平方向：$x=v_0t$；竖直方向：$y=\dfrac12gt^2$、$v_y=gt$。
+- 从高度 $h$ 水平抛出：$t_{\mathrm{land}}=\sqrt{\dfrac{2h}{g}}$，$R=v_0\sqrt{\dfrac{2h}{g}}$。
+- 速度偏角满足 $\tan\theta=\dfrac{v_y}{v_x}=\dfrac{gt}{v_0}$。
 
 电场类平抛，粒子以 $v_{0}$ 垂直进入匀强电场：
 
-```text
-x = v0t
-a = qE/m
-y = 1/2 at² = qE t²/(2m)
-vy = at
-tanθ = vy/vx
-若极板长度为 l：t = l/v0
-偏移 y = qE l²/(2m v0²)
-```
+- 匀强电场中：$a=\dfrac{qE}{m}$，$x=v_0t$，$y=\dfrac12at^2=\dfrac{qEt^2}{2m}$。
+- 若极板长为 $l$，$t=l/v_0$，偏移 $y=\dfrac{qEl^2}{2mv_0^2}$。
+- $q$ 带符号决定偏转方向；公式给出的位移正负必须结合坐标轴解释。
 
 画面中的水平位移对应 $x=v_{0}t$，竖直偏移对应 $y=1/2at^{2}$，速度方向角由两个速度分量的比值决定。
 
@@ -651,9 +652,22 @@ tanθ = vy/vx
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：M-05）
 
-<h4 id="model-circular-critical">M-06 圆周临界模型 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="model-circular-critical">M-06 圆周临界模型 <span class="status review">physics/pedagogy reviewed · source pending</span></h4>
 <!-- content-template: model; editorial-review: P1-EDITOR-002/003 -->
 
+
+#### 本页主问题与引导演示
+
+**主问题**：竖直圆周最高点的约束力减小到零时，临界速度是多少？
+
+先完成画面内预测，再触发真实控件观察；用“预测—实际结果—画面证据—因果解释—模型边界—高考迁移”完成证据链。
+
+**交互模型。**
+<iframe src="anim/bx2/vertical-circle.html?lesson=M-06" width="100%" height="820" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
+> **公式首次使用卡**：适用边界——最高点最小速度等于 √(gr) 只适用于轻绳或内轨道恰好不松弛、不脱离的边界；轻杆或圆管可以提供双向约束，必须重新判断最高点约束力方向。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
+
+**证据后的公式入口**：沿半径方向列 $\sum F_r=mv^2/r$，再施加约束力边界。
 
 #### 模型任务与研究对象
 圆周临界模型处理“刚好能通过、刚好不脱离、刚好相切、刚好打到边界”的问题。它的本质不是某个固定公式，而是把临界条件翻译成受力或几何边界。
@@ -661,10 +675,6 @@ tanθ = vy/vx
 竖直圆周最常见：最高点速度太小，绳会松或轨道会脱离；速度刚好时，约束力为 0。磁场圆周临界则常表现为轨迹圆刚好与边界相切。
 
 #### 情境表征
-
-
-
-> **公式首次使用卡**：适用边界——最高点最小速度等于 √(gr) 只适用于轻绳或内轨道恰好不松弛、不脱离的边界；轻杆或圆管可以提供双向约束，必须重新判断最高点约束力方向。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
 
 最高点是竖直圆周的关键位置，因为此时圆心在下方，向心方向向下。绳只能向下拉，不能向上推，所以绳模型要求最高点速度至少达到 $\sqrt{gr}$。
 
@@ -691,8 +701,7 @@ tanθ = vy/vx
   </defs>
 </svg>
 
-**交互模型。**
-<iframe src="anim/bx2/vertical-circle.html" width="100%" height="820" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
 
 可拖动参数：质量 `m`、半径 `r`、速度 `v`、重力加速度 `g`、位置角 $position_angle$，并可切换 $type_rope_or_rod$。实时变化：径向合力 $ΣF_{\text{径}}=mv^{2}/r$、约束力、最高点临界速度 $\sqrt{gr}$、最低点支持/拉力和磁场迁移半径 $r=mv/qB$。
 
@@ -723,28 +732,18 @@ tanθ = vy/vx
 #### 公式、变量、单位与条件
 绳模型最高点：
 
-```text
-mg + T = mv_top²/r
-T ≥ 0
-临界：T=0
-v_top,min = √(gr)
-```
+- 轻绳模型最高点：$mg+T=\dfrac{mv_{\mathrm{top}}^2}{r}$ 且 $T\ge0$。
+- 刚好不断绳时 $T=0$，所以 $v_{\mathrm{top,min}}=\sqrt{gr}$。
 
 从最低点恰好完成完整圆周：
 
-```text
-最高点：v_top² = gr
-能量：1/2mv_bottom² = 1/2mv_top² + mg·2r
-v_bottom,min = √(5gr)
-```
+- 临界最高点：$v_{\mathrm{top}}^2=gr$。
+- 若机械能守恒，$\dfrac12mv_{\mathrm{bottom}}^2=\dfrac12mv_{\mathrm{top}}^2+2mgr$，故 $v_{\mathrm{bottom,min}}=\sqrt{5gr}$。
 
 磁场圆周迁移：
 
-```text
-qvB = mv²/R
-R = mv/(qB)
-临界常由“轨迹圆刚好与边界相切”给出 R 的几何关系
-```
+- 垂直进入匀强磁场时，$|q|vB=\dfrac{mv^2}{R}$，所以 $R=\dfrac{mv}{|q|B}$。
+- 电荷正负只改变弯曲方向，不改变半径大小；边界临界通常再由轨迹圆相切关系确定。
 
 画面中最高点约束力读数若为 0，就是绳模型临界；若为负，说明绳模型不成立，杆模型则表示杆向上托。
 
@@ -777,9 +776,22 @@ R = mv/(qB)
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：M-06）
 
-<h4 id="model-orbital-motion">M-07 天体运动模型 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="model-orbital-motion">M-07 天体运动模型 <span class="status review">physics/pedagogy reviewed · source pending</span></h4>
 <!-- content-template: model; editorial-review: P1-EDITOR-002/003 -->
 
+
+#### 本页主问题与引导演示
+
+**主问题**：同一中心天体的圆轨道半径增大后，速度和周期怎样变化？
+
+先完成画面内预测，再触发真实控件观察；用“预测—实际结果—画面证据—因果解释—模型边界—高考迁移”完成证据链。
+
+**交互模型。**
+<iframe src="anim/bx2/satellite.html?lesson=M-07" width="100%" height="820" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
+> **公式首次使用卡**：适用边界——圆轨道公式只适用于稳定圆轨道，不可直接套到椭圆轨道所有位置；变轨同一点比较时，引力大小由位置决定，点火前后同一点引力不突变；高圆轨道速度小于低圆轨道速度，但在转移轨道近地点速度可大于低圆轨道速度。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
+
+**证据后的公式入口**：稳定圆轨道由 $GMm/r^2=mv^2/r$ 起步。
 
 #### 模型任务与研究对象
 天体运动模型处理卫星圆轨道、变轨、同步卫星、双星等问题。它的共同核心是：万有引力提供向心力；但不同题型的比较对象不同，不能把圆轨道公式、椭圆轨道同点变速、双星关系混在一起。
@@ -813,12 +825,9 @@ R = mv/(qB)
   </defs>
 </svg>
 
-**交互模型。**
-<iframe src="anim/bx2/satellite.html" width="100%" height="560" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
-<iframe src="anim/bx2/orbit-transfer.html" width="100%" height="570" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px;margin-top:12px"></iframe>
 
-<iframe src="anim/bx2/binary-star.html" width="100%" height="560" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px;margin-top:12px"></iframe>
+
 
 可拖动参数：轨道半径、变轨轨道、双星质量。实时变化：圆轨道速度/周期、近地点远地点速度、双星半径、角速度和周期。
 
@@ -840,10 +849,6 @@ R = mv/(qB)
 #### 约束方程与求解路线
 1. 先分类：圆轨道、变轨、双星。
 
-
-
-> **公式首次使用卡**：适用边界——圆轨道公式只适用于稳定圆轨道，不可直接套到椭圆轨道所有位置；变轨同一点比较时，引力大小由位置决定，点火前后同一点引力不突变；高圆轨道速度小于低圆轨道速度，但在转移轨道近地点速度可大于低圆轨道速度。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
-
 2. 圆轨道：写 $GMm/r^{2}=mv^{2}/r$。
 3. 变轨：先看同一点点火前后速度变化，再看转移轨道远近点。
 4. 双星：先找共同质心，写 $r_{1}+r_{2}=L$、$m_{1}r_{1}=m_{2}r_{2}$。
@@ -852,30 +857,18 @@ R = mv/(qB)
 #### 公式、变量、单位与条件
 圆轨道：
 
-```text
-GMm/r² = mv²/r
-v = √(GM/r)
-ω = √(GM/r³)
-T = 2π√(r³/GM)
-a = GM/r²
-```
+- 圆轨道条件：$\dfrac{GMm}{r^2}=\dfrac{mv^2}{r}$。
+- $v=\sqrt{\dfrac{GM}{r}}$，$\omega=\sqrt{\dfrac{GM}{r^3}}$，$T=2\pi\sqrt{\dfrac{r^3}{GM}}$，$a=\dfrac{GM}{r^2}$。
 
 变轨：
 
-```text
-同一点加速：速度瞬间增大，进入更高转移轨道
-同一点减速：速度瞬间减小，进入更低转移轨道
-椭圆轨道：近地点速度大，远地点速度小
-```
+- 同一点瞬时加速会进入以该点为近地点的更高转移轨道；瞬时减速会进入以该点为远地点的更低转移轨道。
+- 同一椭圆轨道上近地点速度大、远地点速度小；这不是圆轨道公式的直接代入。
 
 双星：
 
-```text
-r1 + r2 = L
-m1r1 = m2r2
-ω1 = ω2
-Gm1m2/L² = m1ω²r1 = m2ω²r2
-```
+- 双星间距为 $L$：$r_1+r_2=L$，且 $m_1r_1=m_2r_2$、$\omega_1=\omega_2$。
+- 引力分别提供向心力：$\dfrac{Gm_1m_2}{L^2}=m_1\omega^2r_1=m_2\omega^2r_2$。
 
 画面中圆轨道半径对应 `r`，变轨箭头对应同一点速度改变，双星中红点是共同质心。
 
@@ -883,14 +876,14 @@ Gm1m2/L² = m1ω²r1 = m2ω²r2
 - 圆轨道公式只适用于稳定圆轨道，不可直接套到椭圆轨道所有位置。
 - 变轨同一点比较时，引力大小由位置决定，点火前后同一点引力不突变。
 - 高圆轨道速度小于低圆轨道速度，但在转移轨道近地点速度可大于低圆轨道速度。
-- 同步卫星还要求周期为 24 h、赤道平面、同向绕行。
+- 地球同步卫星还要求周期等于地球自转恒星日（约 23 h 56 min）；高中题常近似取 24 h，并要求赤道平面、同向绕行。
 - 双星不是一个星静止、另一个绕它转，而是两星都绕共同质心转。
 
 #### 迁移情境
 | 题型 | 第一反应 |
 |---|---|
 | 圆轨道比较 | 看 `r`，高轨低速长周期 |
-| 同步卫星 | 先写 $T=24h$ |
+| 同步卫星 | 先写 $T$ 等于地球自转恒星日；按题意可近似 24 h |
 | 升轨变轨 | 近地点加速、远地点再加速 |
 | 降轨变轨 | 远地点减速、近地点再减速 |
 | 双星比较 | 同周期同角速度，半径与质量反比 |
@@ -908,15 +901,24 @@ Gm1m2/L² = m1ω²r1 = m2ω²r2
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：M-07）
 
-<h4 id="model-vehicle-start">M-08 机车启动模型 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="model-vehicle-start">M-08 机车启动模型 <span class="status review">physics/pedagogy reviewed · source pending</span></h4>
 <!-- content-template: model; editorial-review: P1-EDITOR-002/003 -->
 
 
-#### 模型任务与研究对象
+#### 本页主问题与引导演示
 
+**主问题**：机车进入恒功率阶段后，速度增大时牵引力与加速度怎样变化？
 
+先完成画面内预测，再触发真实控件观察；用“预测—实际结果—画面证据—因果解释—模型边界—高考迁移”完成证据链。
+
+**交互模型。**
+<iframe src="anim/bx2/vehicle-start.html?lesson=M-08" width="100%" height="820" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 > **公式首次使用卡**：适用边界——阻力常按恒定处理，若题目给 f=kv 或空气阻力变化，不能直接用恒阻模型；恒功率启动不能从 v=0 直接套 F=P/v，真实车辆起步通常先有限牵引力；最大速度是加速度为 0 的稳定速度，不是发动机停止工作。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
+
+**证据后的公式入口**：瞬时功率关系为 $P=Fv$，必须先判恒牵引力或恒功率阶段。
+
+#### 模型任务与研究对象
 
 机车启动模型处理牵引力、功率、速度、阻力和加速度之间的联动。它不是单独的功率题，也不是单独的牛顿第二定律题，而是把 $P=Fv$ 与 $F-f=ma$ 连在一起。
 
@@ -946,8 +948,7 @@ Gm1m2/L² = m1ω²r1 = m2ω²r2
   </defs>
 </svg>
 
-**交互模型。**
-<iframe src="anim/bx2/vehicle-start.html" width="100%" height="560" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
 
 可拖动参数：启动方式、额定功率、阻力、质量、恒牵引力、当前速度。实时变化：牵引力、输出功率、加速度、最大速度和阶段判断。
 
@@ -977,22 +978,13 @@ Gm1m2/L² = m1ω²r1 = m2ω²r2
 #### 公式、变量、单位与条件
 恒功率启动：
 
-```text
-P=P额
-F=P额/v
-a=(P额/v - f)/m
-vmax=P额/f
-```
+- 恒功率阶段：$P=P_{\mathrm{rated}}$，$F=\dfrac{P_{\mathrm{rated}}}{v}$。
+- $a=\dfrac{P_{\mathrm{rated}}/v-f}{m}$，终端速度 $v_{\max}=\dfrac{P_{\mathrm{rated}}}{f}$。
 
 恒牵引力到额定功率：
 
-```text
-F=F0
-a=(F0-f)/m
-P=F0v
-达到额定功率：v1=P额/F0
-之后转入恒功率阶段
-```
+- 恒牵引力阶段：$F=F_0$，$a=\dfrac{F_0-f}{m}$，瞬时功率 $P=F_0v$。
+- 当 $v_1=\dfrac{P_{\mathrm{rated}}}{F_0}$ 时达到额定功率，随后转入恒功率阶段。
 
 画面中红色箭头对应牵引力 `F`，紫色箭头对应阻力 `f`，蓝色箭头对应速度 `v`，读数直接显示 $a=(F-f)/m$。
 
@@ -1025,9 +1017,22 @@ P=F0v
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：M-08）
 
-<h4 id="model-work-energy">M-09 功能关系综合 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="model-work-energy">M-09 功能关系综合 <span class="status review">physics/pedagogy reviewed · source pending</span></h4>
 <!-- content-template: model; editorial-review: P1-EDITOR-002/003 -->
 
+
+#### 本页主问题与引导演示
+
+**主问题**：摩擦力做功一定为负吗，机械能变化应由哪一类功决定？
+
+先完成画面内预测，再触发真实控件观察；用“预测—实际结果—画面证据—因果解释—模型边界—高考迁移”完成证据链。
+
+**交互模型。**
+<iframe src="anim/bx2/work-energy-relation.html?lesson=M-09" width="100%" height="820" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
+> **公式首次使用卡**：适用边界——动能定理适用于任何过程，但必须用所有力做功的代数和；机械能守恒要求只有重力或弹力做功，或其他力做功代数和为 0；支持力、绳拉力不一定破坏机械能，关键看是否做功。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
+
+**证据后的公式入口**：质点动能定理是 $W_{\mathrm{net}}=\Delta E_k$，系统机械能另行记账。
 
 #### 模型任务与研究对象
 功能关系综合处理“力做功和能量变化怎么对应”的问题。它不是把所有能量公式堆在一起，而是先问：哪个力做功？题目问哪种能量变化？
@@ -1060,10 +1065,8 @@ P=F0v
   </defs>
 </svg>
 
-**交互模型。**
-<iframe src="anim/bx2/work-energy-relation.html" width="100%" height="760" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
-<iframe src="anim/bx2/energy-conservation.html" width="100%" height="760" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px;margin-top:12px"></iframe>
+
 
 可拖动参数：高度、摩擦因数、质量等。实时变化：重力做功、摩擦做功、动能变化、机械能变化、内能和总能量。
 
@@ -1076,10 +1079,6 @@ P=F0v
 #### 模型假设与识别条件
 | 题目信号 | 说明 |
 |---|---|
-
-
-
-> **公式首次使用卡**：适用边界——动能定理适用于任何过程，但必须用所有力做功的代数和；机械能守恒要求只有重力或弹力做功，或其他力做功代数和为 0；支持力、绳拉力不一定破坏机械能，关键看是否做功。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
 
 | 问速度、动能变化 | 优先动能定理 $W_{\text{合}}=\Delta E_{k}$ |
 | 问机械能减少 | 看非保守力做功 |
@@ -1097,23 +1096,15 @@ P=F0v
 #### 公式、变量、单位与条件
 常用关系：
 
-```text
-合力做功：W合 = ΔEₖ
-重力做功：WG = -ΔEp
-弹力做功：W弹 = -ΔEp弹
-除重力和弹力外其他力做功：W其他 = ΔE机械
-总能量守恒：E机械初 = E机械末 + E内 + 其他形式能
-```
+- 合力做功：$W_{\mathrm{net}}=\Delta E_k$；重力做功：$W_G=-\Delta E_p$；弹力做功：$W_s=-\Delta E_{p,s}$。
+- 除重力、系统内弹力以外的力做功：$W_{\mathrm{other}}=\Delta E_{\mathrm{mech}}$。
+- 封闭系统总能量守恒时，应把内能和其他形式能一并记账。
 
 粗糙斜面下滑：
 
-```text
-WG = mgh
-Wf = -fs
-ΔEₖ = WG + Wf
-ΔE机械 = Wf
-E内 = -Wf
-```
+- 重力做功的正负由位移方向决定，可写为 $W_G=-\Delta E_p$；摩擦力做功一般写 $W_f=fs\cos\theta$，可能为正、负或零。
+- 质点动能满足 $\Delta E_k=W_G+W_f+\cdots$；系统机械能变化满足 $\Delta E_{\mathrm{mech}}=W_{\mathrm{nonconservative}}$。
+- 接触面摩擦生热为 $Q=f_k\Delta x_{\mathrm{relative}}\ge0$，不能与某一物体所受摩擦力的功混为一谈。
 
 画面中红色箭头对应重力做功，紫色箭头对应摩擦做功，能量柱显示动能、势能、内能之间的转化。
 
@@ -1138,7 +1129,7 @@ E内 = -Wf
 |---|---|---|
 | 某个力做功等于动能变化 | 动能变化对应合力总功 | 求 `ΣW` |
 | 有支持力就说机械能不守恒 | 支持力可能不做功 | 看做功而不是看受力 |
-| 摩擦力做功正负号乱 | 摩擦通常做负功 | 按位移方向定符号 |
+| 摩擦力做功正负号乱 | 摩擦对单个物体可做正功、负功或零功 | 按该物体位移与摩擦力夹角定符号 |
 | 机械能不守恒就不能用能量 | 总能量仍守恒 | 加上内能 |
 | 热量用物块位移 | 摩擦生热看相对位移 | 用 $Q=f\cdot s_{\text{相对}}$ |
 
@@ -1146,9 +1137,22 @@ E内 = -Wf
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：M-09）
 
-<h4 id="model-collision">M-10 碰撞模型 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="model-collision">M-10 碰撞模型 <span class="status review">physics/pedagogy reviewed · source pending</span></h4>
 <!-- content-template: model; editorial-review: P1-EDITOR-002/003 -->
 
+
+#### 本页主问题与引导演示
+
+**主问题**：碰撞过程中何时可以使用动量守恒，动能是否也一定守恒？
+
+先完成画面内预测，再触发真实控件观察；用“预测—实际结果—画面证据—因果解释—模型边界—高考迁移”完成证据链。
+
+**交互模型。**
+<iframe src="anim/xb1/momentum-collision.html?lesson=M-10" width="100%" height="820" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
+> **公式首次使用卡**：适用边界——动量守恒是矢量关系，一维必须规定正方向；碰撞过程中外力冲量可忽略时，系统动量近似守恒；弹性碰撞不是“速度交换”的同义词；只有等质量、一动一静等特殊情况才交换速度。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
+
+**证据后的公式入口**：外力冲量可忽略时，系统满足 $\sum p_{\mathrm{before}}=\sum p_{\mathrm{after}}$。
 
 #### 模型任务与研究对象
 碰撞模型处理两个物体短时间强相互作用后的速度、动能损失和类型判断。碰撞题的第一原则是动量守恒，前提是系统所受合外力为零，或碰撞时间极短、内力远大于外力。
@@ -1181,8 +1185,7 @@ E内 = -Wf
   </defs>
 </svg>
 
-**交互模型。**
-<iframe src="anim/xb1/momentum-collision.html" width="100%" height="560" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
 
 可拖动参数：两物体质量、碰前速度、碰撞类型。实时变化：碰前后总动量、碰前后总动能、碰后速度和是否粘连。
 
@@ -1208,32 +1211,22 @@ E内 = -Wf
 4. 写动量守恒方程。
 5. 根据题目类型补第二个条件：弹性用动能守恒，完全非弹性用共同速度。
 
-
-
-> **公式首次使用卡**：适用边界——动量守恒是矢量关系，一维必须规定正方向；碰撞过程中外力冲量可忽略时，系统动量近似守恒；弹性碰撞不是“速度交换”的同义词；只有等质量、一动一静等特殊情况才交换速度。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
-
 6. 若问损失能量，再算 $\Delta E_{k}$。
 
 #### 公式、变量、单位与条件
 动量守恒：
 
-```text
-m1v1 + m2v2 = m1v1' + m2v2'
-```
+- 一维碰撞动量守恒：$m_1v_1+m_2v_2=m_1v_1'+m_2v_2'$。
+- 使用前必须确认所选系统在碰撞短时内外力冲量可忽略。
 
 弹性碰撞还满足：
 
-```text
-1/2m1v1² + 1/2m2v2² = 1/2m1v1'² + 1/2m2v2'²
-```
+- 只有弹性碰撞还满足 $\dfrac12m_1v_1^2+\dfrac12m_2v_2^2=\dfrac12m_1v_1'^2+\dfrac12m_2v_2'^2$。
 
 完全非弹性碰撞：
 
-```text
-v1' = v2' = v共
-v共 = (m1v1+m2v2)/(m1+m2)
-损失动能 = Eₖ前 - Eₖ后
-```
+- 完全非弹性碰撞：$v_1'=v_2'=v_c$，$v_c=\dfrac{m_1v_1+m_2v_2}{m_1+m_2}$。
+- 损失的动能为 $E_{k,\mathrm{before}}-E_{k,\mathrm{after}}$，但总能量仍守恒。
 
 画面中两个“总动量”读数用于检查守恒；两个“总动能”读数用于区分弹性与非弹性。
 
@@ -1260,15 +1253,28 @@ v共 = (m1v1+m2v2)/(m1+m2)
 | 用动能守恒解粘连题 | 粘连一定损失动能 | 用共同速度条件 |
 | 忘记速度方向 | 动量是矢量 | 先规定正方向 |
 | 一个方程解弹性碰撞两个未知量 | 条件不够 | 加动能守恒 |
-| 认为动能可以增加 | 普通碰撞不会凭空增加机械能 | 检查 $Ek_{\text{后}}\le Ek_{\text{前}}$ |
+| 把所有碰撞都判成动能不增加 | 只对无内部能量释放的普通被动碰撞成立 | 被动碰撞检查 $E_{k,\text{后}}\le E_{k,\text{前}}$；爆炸、反冲或超弹性过程另列内部能量账 |
 
 #### 例题与训练（来源审核中）
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：M-10）
 
-<h4 id="model-rail-rod">M-11 导轨模型 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="model-rail-rod">M-11 导轨模型 <span class="status review">physics/pedagogy reviewed · source pending</span></h4>
 <!-- content-template: model; editorial-review: P1-EDITOR-002/003 -->
 
+
+#### 本页主问题与引导演示
+
+**主问题**：导体棒切割磁感线后，机械功率如何转化为电功率和内能？
+
+先完成画面内预测，再触发真实控件观察；用“预测—实际结果—画面证据—因果解释—模型边界—高考迁移”完成证据链。
+
+**交互模型。**
+<iframe src="anim/xb2/rail-rod.html?lesson=M-11" width="100%" height="820" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
+> **公式首次使用卡**：适用边界——E=BLv 要求 B、L、v 两两垂直；若有夹角要取垂直分量；回路总电阻包括外电阻、导体棒电阻和导轨电阻，题目若给内阻不能漏；安培力方向由楞次定律判断，结果总是阻碍磁通量变化，不一定总是向左。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
+
+**证据后的公式入口**：垂直切割特例中 $\mathcal E=BLv$，闭合回路才有持续电流。
 
 #### 模型任务与研究对象
 导轨模型处理导体棒在磁场中运动、切割磁感线产生感应电动势的问题。它同时考电磁感应、电路、安培力、动力学和能量守恒，是电磁感应大题的标准骨架。
@@ -1300,16 +1306,11 @@ v共 = (m1v1+m2v2)/(m1+m2)
   </defs>
 </svg>
 
-**交互模型。**
-<iframe src="anim/xb2/rail-rod.html" width="100%" height="640" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
 
 可拖动参数：磁感应强度 `B`、导体棒长度 `L`、速度 `v`、电阻 `R`。实时变化：动生电动势、电流、安培阻力和运动状态。
 
 **证据任务。**
-
-
-
-> **公式首次使用卡**：适用边界——E=BLv 要求 B、L、v 两两垂直；若有夹角要取垂直分量；回路总电阻包括外电阻、导体棒电阻和导轨电阻，题目若给内阻不能漏；安培力方向由楞次定律判断，结果总是阻碍磁通量变化，不一定总是向左。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
 
 - 增大 `v`：看 `E`、`I`、$F_{\text{安}}$ 是否同步增大。
 - 增大 `R`：看电流和安培阻力为什么变小。
@@ -1336,21 +1337,14 @@ v共 = (m1v1+m2v2)/(m1+m2)
 #### 公式、变量、单位与条件
 基本链条：
 
-```text
-E = BLv
-I = E/R = BLv/R
-F安 = BIL = B²L²v/R
-P电 = I²R
-匀速拉动时：F外 = F安
-外力功率：P外 = F外 v = I²R
-```
+- 导体棒垂直切割磁感线：$\mathcal E=BLv$，$I=\mathcal E/R=BLv/R$。
+- 安培力 $F_A=BIL=B^2L^2v/R$，电功率 $P_e=I^2R$。
+- 匀速拉动时 $F_{\mathrm{ext}}=F_A$，且 $P_{\mathrm{ext}}=F_{\mathrm{ext}}v=I^2R$。
 
 若撤去外力，安培力做负功，棒减速：
 
-```text
-Q = 初动能 - 末动能
-若最终停下：Q = 1/2mv0²
-```
+- 电路焦耳热等于机械能减少量；若仅受安培阻力并最终停下，$Q=\dfrac12mv_0^2$。
+- 若还存在其他外力或机械能储存项，必须完整列能量账本，不能直接套末式。
 
 画面中红色棒是等效电源，蓝色箭头是速度，绿色/紫色力箭头是安培阻力，电阻框对应外电路。
 
@@ -1383,9 +1377,22 @@ Q = 初动能 - 末动能
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：M-11）
 
-<h4 id="model-ac-transformer">M-12 交流电综合 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="model-ac-transformer">M-12 交流电综合 <span class="status review">physics/pedagogy reviewed · source pending</span></h4>
 <!-- content-template: model; editorial-review: P1-EDITOR-002/003 -->
 
+
+#### 本页主问题与引导演示
+
+**主问题**：理想变压器改变匝数比时，副边电压和电流如何联动？
+
+先完成画面内预测，再触发真实控件观察；用“预测—实际结果—画面证据—因果解释—模型边界—高考迁移”完成证据链。
+
+**交互模型。**
+<iframe src="anim/xb2/transformer.html?lesson=M-12" width="100%" height="820" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
+> **公式首次使用卡**：适用边界——有效值等于峰值除以 √2 只适用于正弦交流；理想变压器忽略铜损、铁损和漏磁且只处理交流；实际输电还要计入线路电阻和功率损耗。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
+
+**证据后的公式入口**：理想变压器满足 $U_1/U_2=n_1/n_2$。
 
 #### 模型任务与研究对象
 交流电综合处理正弦交流的瞬时值、峰值、有效值、平均值，以及变压器和远距离输电。高考常见错误是把峰值当有效值、把变压器当成能量放大器，或在输电损耗中用错电压侧。
@@ -1412,10 +1419,8 @@ Q = 初动能 - 末动能
   <text x="380" y="36" font-size="17" fill="#102a43" text-anchor="middle" font-weight="700">交流电先分清四值，变压器再用有效值计算</text>
 </svg>
 
-**交互模型。**
-<iframe src="anim/xb2/ac-generation.html" width="100%" height="560" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
-<iframe src="anim/xb2/transformer.html" width="100%" height="620" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px;margin-top:12px"></iframe>
+
 
 可拖动参数：线圈转速、磁场、匝数、原副线圈匝数等。实时变化：交流电瞬时值、峰值、有效值、变压器电压比、电流比和功率关系。
 
@@ -1428,10 +1433,6 @@ Q = 初动能 - 末动能
 #### 模型假设与识别条件
 | 题目信号 | 说明 |
 |---|---|
-
-
-
-> **公式首次使用卡**：适用边界——有效值等于峰值除以 √2 只适用于正弦交流；理想变压器忽略铜损、铁损和漏磁且只处理交流；实际输电还要计入线路电阻和功率损耗。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
 
 | $u=Umsin\omega t$ | 读峰值、角频率、周期 |
 | 电器铭牌、电表读数、功率热量 | 用有效值 |
@@ -1449,31 +1450,19 @@ Q = 初动能 - 末动能
 #### 公式、变量、单位与条件
 正弦交流：
 
-```text
-u = Um sin(ωt)
-T = 2π/ω
-f = 1/T
-U = Um/√2
-I = Im/√2
-P = UI = U²/R = I²R
-```
+- 正弦交流：$u=U_m\sin\omega t$，$T=\dfrac{2\pi}{\omega}$，$f=1/T$。
+- 有效值：$U=U_m/\sqrt2$、$I=I_m/\sqrt2$。
+- 仅对正弦交流的纯电阻负载，平均功率才可写为 $P=UI=U^2/R=I^2R$；一般交流负载需考虑功率因数。
 
 理想变压器：
 
-```text
-U1/U2 = n1/n2
-P1 = P2
-U1I1 = U2I2
-I1/I2 = n2/n1
-```
+- 理想变压器：$\dfrac{U_1}{U_2}=\dfrac{n_1}{n_2}$，且 $P_1=P_2$。
+- 因而 $U_1I_1=U_2I_2$，$\dfrac{I_1}{I_2}=\dfrac{n_2}{n_1}$。
 
 远距离输电：
 
-```text
-I线 = P输/U高
-P损 = I线²r
-P用户 = P输 - P损
-```
+- 输电线电流：$I_{\mathrm{line}}=P_{\mathrm{trans}}/U_{\mathrm{high}}$。
+- 线路损耗：$P_{\mathrm{loss}}=I_{\mathrm{line}}^2r$；用户得到 $P_{\mathrm{user}}=P_{\mathrm{trans}}-P_{\mathrm{loss}}$。
 
 画面中正弦曲线显示瞬时值，水平有效值线用于功率计算；变压器线圈匝数对应电压比。
 
@@ -1506,19 +1495,27 @@ P用户 = P输 - P损
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：M-12）
 
-<h4 id="model-compound-field-particle">M-13 带电粒子在复合场中运动 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="model-compound-field-particle">M-13 带电粒子在复合场中运动 <span class="status review">physics/pedagogy reviewed · source pending</span></h4>
 <!-- content-template: model; editorial-review: P1-EDITOR-002/003 -->
 
+
+#### 本页主问题与引导演示
+
+**主问题**：速度选择器与磁场偏转各自依据什么受力条件？
+
+先完成画面内预测，再触发真实控件观察；用“预测—实际结果—画面证据—因果解释—模型边界—高考迁移”完成证据链。
+
+**交互模型。**
+<iframe src="anim/model/compound-field-particle.html?lesson=M-13" width="100%" height="820" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
+> **公式首次使用卡**：适用边界——洛伦兹力公式要求速度与磁场垂直时取 qvB；有夹角要乘 \sin \theta；v=E/B 是直线通过复合场的条件，不是所有复合场题都能直接套；电场力会改变动能，磁场力不改变动能。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
+
+**证据后的公式入口**：速度选择器严格平衡时 $v=E/B$，出场半径使用 $|q|$。
 
 #### 模型任务与研究对象
 复合场粒子模型处理带电粒子同时受到电场力和磁场力时的运动。高考常见装置是速度选择器、质谱仪、电偏转后进磁场等。
 
-
-
-
-> **公式首次使用卡**：适用边界——洛伦兹力公式要求速度与磁场垂直时取 qvB；有夹角要乘 \sin \theta；v=E/B 是直线通过复合场的条件，不是所有复合场题都能直接套；电场力会改变动能，磁场力不改变动能。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
-
-核心判断：电场力可能做功并改变速率；洛伦兹力始终垂直速度，不做功，只改变方向。速度选择器的直线条件是 $qE=qvB$，即 $v=E/B$。
+核心判断：电场力可能做功并改变速率；洛伦兹力始终垂直速度，不做功，只改变方向。速度选择器的直线条件是 $|q|E=|q|vB$ 且两力方向相反，即 $v=E/B$。
 
 #### 情境表征
 下面这张图把速度选择器和后续纯磁场半径测量放在同一条路径上：左侧复合场中，红色 `qE` 与紫色 `qvB` 必须等大反向，粒子才直线穿出；右侧纯磁场中，洛伦兹力提供向心力，轨迹半径就是 $R=mv/(\vert q\vert B)$。
@@ -1550,7 +1547,7 @@ P用户 = P输 - P损
   <path d="M604 214 A78 78 0 0 1 704 106" fill="none" stroke="#38b2ac" stroke-width="4"></path>
   <line x1="656" y1="166" x2="724" y2="126" stroke="#38b2ac" stroke-width="3" marker-end="url(#m13-arrow-green)"></line>
   <text x="707" y="157" font-size="15" fill="#38b2ac" font-weight="700">R</text>
-  <text x="430" y="296" font-size="17" fill="#102a43" text-anchor="middle" font-weight="700">直线通过：qE=qvB → v=E/B；出场圆周：qvB=mv²/R → R=mv/(|q|B)</text>
+  <text x="430" y="296" font-size="17" fill="#102a43" text-anchor="middle" font-weight="700">直线通过：|q|E=|q|vB → v=E/B；出场圆周：|q|vB=mv²/R → R=mv/(|q|B)</text>
   <defs>
     <marker id="m13-arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#2c7be5"></path></marker>
     <marker id="m13-arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#e03131"></path></marker>
@@ -1560,8 +1557,7 @@ P用户 = P输 - P损
   </defs>
 </svg>
 
-**交互模型。**
-<iframe src="anim/model/compound-field-particle.html" width="100%" height="760" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
 
 可拖动参数：电荷正负、电场强度、磁感应强度、入射速度、质量；也可以直接拖动画面里的蓝色速度手柄。实时变化：`qE`、`qvB`、选择速度、偏转方向、轨迹频闪点、力表盘、`F-v` 图像游标、数据记录和进入纯磁场后的半径标尺。
 
@@ -1578,40 +1574,32 @@ P用户 = P输 - P损
 |---|---|
 | 电场和磁场同时存在 | 先分别画 `qE` 与 `qvB` |
 | 粒子直线通过 | 合力为零，常用 $v=E/B$ |
-| 进入纯磁场区域 | 做匀速圆周，$R=mv/(qB)$ |
+| 进入纯磁场区域 | 做匀速圆周，$R=mv/(|q|B)$，电荷正负只改变偏转方向 |
 | 进入纯电场区域 | 类平抛或匀加速偏转 |
 | 质谱仪、速度选择器 | 先选速度，再用磁场半径分离 |
 
 #### 约束方程与求解路线
 1. 判断粒子电性，确定电场力方向。
 2. 用左手定则判断洛伦兹力方向，负电荷方向相反。
-3. 若题目说直线通过，令 $qE=qvB$。
+3. 若题目说直线通过，令 $|q|E=|q|vB$ 并核对两力方向相反。
 4. 若进入纯磁场，写 $qvB=mv^{2}/R$。
 5. 若进入纯电场，写 $a=qE/m$，按类平抛处理。
 
 #### 公式、变量、单位与条件
 速度选择器：
 
-```text
-qE = qvB
-v = E/B
-```
+- 速度选择器直线通过条件：电场力与磁场力大小相等且方向相反，即 $|q|E=|q|vB$。
+- 因而 $v=E/B$；电荷正负改变两种力的方向，但合力为零的速率不变。
 
 纯磁场圆周：
 
-```text
-qvB = mv²/R
-R = mv/(|q|B)
-T = 2πm/(|q|B)
-```
+- 垂直进入磁场：$|q|vB=mv^2/R$，所以 $R=\dfrac{mv}{|q|B}$。
+- 回旋周期 $T=\dfrac{2\pi m}{|q|B}$；电荷正负只决定偏转方向。
 
 纯电场偏转：
 
-```text
-a = qE/m
-x = v0t
-y = 1/2at²
-```
+- 匀强电场中带电粒子加速度：$a=qE/m$。
+- 若初速度沿 $x$ 轴，$x=v_0t$、$y=\dfrac12at^2$；$q$ 的符号决定 $y$ 的方向。
 
 图中红色箭头对应 `qE`，紫色箭头对应 `qvB`，蓝色轨迹和频闪点显示偏转方向；动画右侧的 `F-v` 图像用水平线表示 `qE`，用斜线表示 `qvB`，二者交点的竖线就是 $v_{0}=E/B$。半径标尺读出的 `R` 对应 $R=mv/(\vert q\vert B)$。
 
@@ -1626,7 +1614,7 @@ y = 1/2at²
 | 题型 | 第一反应 |
 |---|---|
 | 速度选择器 | $v=E/B$ |
-| 质谱仪半径 | $R=mv/(qB)$ |
+| 质谱仪半径 | $R=mv/(|q|B)$ |
 | 电偏转后入磁场 | 先电场求速度，再磁场求半径 |
 | 判断偏转方向 | 分别判 `qE` 与 `qvB` |
 | 选择粒子种类 | 比荷 `q/m` 决定半径和周期 |
@@ -1636,7 +1624,7 @@ y = 1/2at²
 |---|---|---|
 | 负电荷仍按正电荷判力 | 方向相反 | 先判电性 |
 | 认为磁场力做功 | 洛伦兹力垂直速度 | 磁场只改方向 |
-| 直线通过还写圆周 | 合力为零时不偏转 | 用 $qE=qvB$ |
+| 直线通过还写圆周 | 合力为零时不偏转 | 用 $|q|E=|q|vB$ 并核对方向 |
 | 进入纯磁场忘记速度来源 | 速度可能由电场加速得到 | 分段求 |
 | 把 `q` 符号带进半径大小 | 半径取正值 | 用 `|q|` |
 
@@ -1644,9 +1632,22 @@ y = 1/2at²
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：M-13）
 
-<h4 id="model-gas-state-change">M-14 气体状态变化模型 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="model-gas-state-change">M-14 气体状态变化模型 <span class="status review">physics/pedagogy reviewed · source pending</span></h4>
 <!-- content-template: model; editorial-review: P1-EDITOR-002/003 -->
 
+
+#### 本页主问题与引导演示
+
+**主问题**：同样的初末状态沿不同p-V路径变化，气体做功是否相同？
+
+先完成画面内预测，再触发真实控件观察；用“预测—实际结果—画面证据—因果解释—模型边界—高考迁移”完成证据链。
+
+**交互模型。**
+<iframe src="anim/xb3/pv-graph.html?lesson=M-14" width="100%" height="820" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
+
+> **公式首次使用卡**：适用边界——状态方程适用于理想气体近似：高温、低压、分子间作用可忽略；p_{1}V_{1}/T_{1}=p_{2}V_{2}/T_{2} 要求物质的量不变；漏气、充气要用 pV=nRT；温度必须用 K，不能直接用摄氏温度比。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
+
+**证据后的公式入口**：高中先以 $p$-$V$ 路径下有向面积判断气体做功；积分只作拓展。
 
 #### 模型任务与研究对象
 气体状态变化模型处理一定量理想气体在等温、等容、等压或综合过程中的 `p、V、T` 关系，以及 p-V 图像中的做功判断。它的第一步永远不是代公式，而是确认：气体是否定量，温度是否用 K，过程是哪一种。
@@ -1654,10 +1655,6 @@ y = 1/2at²
 核心链条：状态方程定状态，p-V 图像读过程，图线下方面积读气体对外做功。
 
 #### 情境表征
-
-
-
-> **公式首次使用卡**：适用边界——状态方程适用于理想气体近似：高温、低压、分子间作用可忽略；p_{1}V_{1}/T_{1}=p_{2}V_{2}/T_{2} 要求物质的量不变；漏气、充气要用 pV=nRT；温度必须用 K，不能直接用摄氏温度比。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
 
 一个气缸中的气体有三个状态参量：压强 `p`、体积 `V`、热力学温度 `T`。如果气体物质的量不变，就有 $pV/T=\text{常量}$。
 
@@ -1678,10 +1675,8 @@ y = 1/2at²
   <defs><marker id="m14piston" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#e03131"></path></marker></defs>
 </svg>
 
-**交互模型。**
-<iframe src="anim/xb3/gas-law.html" width="100%" height="760" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
-<iframe src="anim/xb3/pv-graph.html" width="100%" height="760" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px;margin-top:12px"></iframe>
+
 
 可直接拖动：气缸活塞改变体积 `V`，温度表改变 `T`，p-V 图像中的状态点改变初末状态；右侧控件可切换等温、等压、等容过程。实时变化：分子运动快慢、压强箭头、$p=nRT/V$、`pV/T`、p-V 图线、面积做功 $W=\int p dV$ 和数据记录。
 
@@ -1711,27 +1706,18 @@ y = 1/2at²
 #### 公式、变量、单位与条件
 一定量理想气体：
 
-```text
-pV/T = 常量
-p1V1/T1 = p2V2/T2
-```
+- 一定质量理想气体：$\dfrac{pV}{T}=\text{常量}$。
+- 两状态比较：$\dfrac{p_1V_1}{T_1}=\dfrac{p_2V_2}{T_2}$；热力学温度必须使用 K。
 
 特殊过程：
 
-```text
-等温：pV=常量
-等容：p/T=常量
-等压：V/T=常量
-```
+- 等温过程：$pV=\text{常量}$；等容过程：$p/T=\text{常量}$；等压过程：$V/T=\text{常量}$。
+- 三式都以一定质量理想气体为前提。
 
 p-V 图像做功：
 
-```text
-W = ∫p dV
-膨胀：dV>0，气体对外做正功
-压缩：dV<0，气体对外做负功
-等容：dV=0，W=0
-```
+- 高中定性判据：气体对外做功等于 $p$-$V$ 图线下的有向面积；膨胀为正、压缩为负、等容为零。
+- [拓展] 准静态过程中可写 $W=\int p\,\mathrm dV$。只有路径上压强已知时，初末状态才足以算功。
 
 动画中活塞位置对应体积，压力表对应压强，分子速度对应温度，p-V 图像阴影面积对应做功。
 
@@ -1764,17 +1750,25 @@ W = ∫p dV
 
 > 本节点的历史自由文本例题已移入隔离区。仅当结构化题目通过来源政策 2.0、答案独立复算和发布门禁后，才会在此生成学生可见的静态例题。（节点：M-14）
 
-<h4 id="model-nuclear-energy">M-15 核反应与质能方程 <span class="status review">interaction passed · content pending</span></h4>
+<h4 id="model-nuclear-energy">M-15 核反应与质能方程 <span class="status review">physics/pedagogy reviewed · source pending</span></h4>
 <!-- content-template: model; editorial-review: P1-EDITOR-002/003 -->
 
 
-#### 模型任务与研究对象
-核反应与质能方程模型处理核反应方程配平、质量亏损、结合能、裂变和聚变放能原因。它的核心不是“质量数不守恒”，而是：质量数和电荷数守恒，但反应前后精确静止质量可以有微小差别，这个差别对应能量。
+#### 本页主问题与引导演示
 
+**主问题**：核反应前后质量亏损的正负怎样判断释放能量还是吸收能量？
 
+先完成画面内预测，再触发真实控件观察；用“预测—实际结果—画面证据—因果解释—模型边界—高考迁移”完成证据链。
 
+**交互模型。**
+<iframe src="anim/xb3/nuclear-energy.html?lesson=M-15" width="100%" height="820" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
 > **公式首次使用卡**：适用边界——质量数守恒是核子数守恒，不表示精确静止质量完全相等；931.5MeV 换算要求质量亏损单位为 u；平均结合能用于比较核稳定性，总结合能不能直接比较不同大小核的稳定性。符号含义在紧邻公式的正文、图注或表格中定义；除题目另有单位外，代入前统一为 SI，结果保留单位并做量纲检查。
+
+**证据后的公式入口**：先取 $\Delta m=m_{\mathrm{before}}-m_{\mathrm{after}}$，再用 $E=\Delta mc^2$。
+
+#### 模型任务与研究对象
+核反应与质能方程模型处理核反应方程配平、质量亏损、结合能、裂变和聚变放能原因。它的核心不是“质量数不守恒”，而是：质量数和电荷数守恒，但反应前后精确静止质量可以有微小差别，这个差别对应能量。
 
 第一步配平 `A` 和 `Z`，第二步算质量亏损，第三步用 $E=\Delta mc^{2}$ 或 $\Delta m\times 931.5\ \mathrm{MeV}$ 求能量。
 
@@ -1803,22 +1797,17 @@ W = ∫p dV
   </defs>
 </svg>
 
-**交互模型。**
-<iframe src="anim/model/nuclear-mass-energy.html" width="100%" height="760" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
-<iframe src="anim/xb3/nuclear-reaction.html" width="100%" height="760" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px"></iframe>
 
-<iframe src="anim/xb3/nuclear-energy.html" width="100%" height="760" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px;margin-top:12px"></iframe>
 
-<iframe src="anim/xb3/binding-energy.html" width="100%" height="760" frameborder="0" style="border:1px solid #d9e2ec;border-radius:8px;margin-top:12px"></iframe>
 
-可拖动参数：核反应模板、未知粒子的 `A/Z`、质量亏损、反应次数、质量数、结合能；也可以直接拖动画面里的未知粒子卡片、$\Delta m$ 砝码和结合能曲线探针。实时变化：质量数/电荷数守恒检查、释放或吸收能量、总能量、平均结合能、稳定性判断、图像游标和数据记录。新版模型总控台把“配平 → 质量亏损 → 质能换算 → 结合能稳定性 → 数据记录”放在同一个画面内，便于从高考题干一步迁移到计算。
+
+可拖动参数：质量亏损、反应次数和裂变/聚变情境；也可以直接拖动画面里的金色 $\Delta m$ 砝码。实时变化：反应前后质量天平、释放/吸收判定、单次能量、累计能量和 $E-\Delta m$ 图像。当前主交互聚焦“质量亏损符号 → 质能换算 → 放能/吸能”；`A/Z` 配平与有来源的结合能数据仍作为解题前置条件和模型边界，不用无来源曲线代替核素数据。
 
 **证据任务。**
-- 切换核反应模板并拖动未知粒子卡片：看左右两边 `A`、`Z` 是否同时守恒，差值图像是否回到 0。
+- 切换裂变/聚变情境：确认情境名称不改变“先配平 `A/Z`、再计算精确质量差”的顺序。
 - 拖动 $\Delta m$ 砝码：看质量天平、能量计和 $E-\Delta m$ 图像怎样同步变化；$\Delta m<0$ 时看状态如何变成吸能。
 - 增大反应次数：看总能量如何累加。
-- 拖动结合能曲线探针：比较 `Eb/A` 与对比线，看为什么产物更稳定时会释放能量。
 
 #### 模型假设与识别条件
 | 题目信号 | 说明 |
@@ -1840,35 +1829,25 @@ W = ∫p dV
 #### 公式、变量、单位与条件
 核反应配平：
 
-```text
-ΣA反应前 = ΣA反应后
-ΣZ反应前 = ΣZ反应后
-```
+- 核反应方程先守恒质量数：$\sum A_{\mathrm{before}}=\sum A_{\mathrm{after}}$。
+- 再守恒电荷数：$\sum Z_{\mathrm{before}}=\sum Z_{\mathrm{after}}$。
 
 质能方程：
 
-```text
-E = Δmc²
-Δm = m前 - m后
-Δm>0：释放能量
-Δm<0：吸收能量
-```
+- 取 $\Delta m=m_{\mathrm{before}}-m_{\mathrm{after}}$，质能变化为 $E=\Delta mc^2$。
+- $\Delta m>0$ 表示释放能量；$\Delta m<0$ 表示需要吸收能量。
 
 用原子质量单位：
 
-```text
-E/MeV ≈ Δm/u × 931.5
-```
+- 使用原子质量单位时，$E/\mathrm{MeV}\approx(\Delta m/\mathrm u)\times931.5$。
+- 代入前必须统一使用原子质量或核质量，不能混用。
 
 结合能：
 
-```text
-Eb = Δmc²
-平均结合能 = Eb/A
-平均结合能越大，通常原子核越稳定
-```
+- 结合能 $E_b=\Delta mc^2$，平均结合能为 $E_b/A$。
+- 平均结合能越大，原子核通常越稳定；比较具体反应仍需按反应前后总质量或总结合能计算。
 
-动画中核反应实验台的守恒账本显示 `ΣA`、`ΣZ` 差值；质能实验台的质量天平和能量计对应 $E=\Delta mc^{2}$ 与 $E/MeV\approx \Delta m/u\times 931.5$；结合能实验台的曲线探针对应 `Eb/A`，用于比较稳定性。
+动画中的质量天平、能量计和 $E-\Delta m$ 图对应 $E=\Delta mc^{2}$ 与 $E/MeV\approx \Delta m/u\times 931.5$。配平 `ΣA/ΣZ` 与平均结合能比较必须另按题目给出的核素数据完成，本页不生成连续“真实结合能曲线”。
 
 **模型失效边界。**
 - 质量数守恒是核子数守恒，不表示精确静止质量完全相等。

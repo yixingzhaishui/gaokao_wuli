@@ -1,6 +1,9 @@
 (function () {
   'use strict';
 
+  const requestedLesson = new URLSearchParams(window.location.search).get('lesson');
+  if (requestedLesson && requestedLesson.startsWith('M-')) return;
+
   const config = window.B2_GUIDE;
   if (!config) return;
 

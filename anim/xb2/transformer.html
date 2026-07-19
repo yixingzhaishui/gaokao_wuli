@@ -45,7 +45,7 @@ canvas{display:block;width:100%;max-width:700px;background:#fff;border:1px solid
     <span class="r">n₁:n₂ = <b id="ratio-val">1000:100</b></span>
     <span class="r" id="type-val">降压变压器</span>
   </div>
-  <div class="hint"><b>观察任务</b>：拖左右线圈或滑动 n₁、n₂，对照铁芯线圈侧视装置、电压电流图像和数据记录，看 U₂ 跟 n₂/n₁ 同步；比较同一时刻两侧电流。</div>
+  <div class="hint"><b>观察任务 / 模型边界</b>：本页是理想变压器、副边纯电阻负载，U、I 均为有效值，因此可用 P=UI 且 P₁=P₂。拖左右线圈或滑动 n₁、n₂，观察 U₂ 跟 n₂/n₁ 同步并比较两侧电流。</div>
 </div>
 <script>
 (function(){
@@ -162,6 +162,6 @@ canvas{display:block;width:100%;max-width:700px;background:#fff;border:1px solid
   requestAnimationFrame(loop);
 })();
 </script>
-<script src="guided-lesson.js"></script>
+<script src="guided-lesson.js"></script><script src="../model/guided-lesson.js"></script>
 </body>
 </html>

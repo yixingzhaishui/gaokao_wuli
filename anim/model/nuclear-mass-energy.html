@@ -46,13 +46,13 @@
       <input id="dm" type="range" min="-0.04" max="0.32" value="0.21" step="0.005">
       <label for="count">反应次数 N/(10^20 次)：<span id="countVal"></span></label>
       <input id="count" type="range" min="1" max="80" value="12" step="1">
-      <label for="binding">产物平均结合能 Eb/A/MeV：<span id="bindingVal"></span></label>
-      <input id="binding" type="range" min="6.5" max="8.8" value="8.45" step="0.05">
-      <label for="probeA">结合能曲线探针 A：<span id="probeVal"></span></label>
-      <input id="probeA" type="range" min="2" max="240" value="56" step="1">
+      <label for="binding">参考核素（离散实数据）：<span id="bindingVal"></span></label>
+      <input id="binding" type="range" min="0" max="7" value="4" step="1">
+      <label for="probeA">比较核素：<span id="probeVal"></span></label>
+      <input id="probeA" type="range" min="0" max="7" value="5" step="1">
       <div id="readout" class="readout"></div>
       <div id="status" class="status"></div>
-      <div class="hint">观察任务：拖动画面里的 Δm 砝码或曲线探针，看质量天平、E=Δmc²、E/MeV≈Δm/u×931.5、ΣA/ΣZ 守恒和数据记录如何同步变化。</div>
+      <div class="hint">观察任务：拖动画面里的 Δm 砝码，或在离散实核素数据间切换。结合能图只显示核素表中数据，不把经验拟合曲线当成真实测量。</div>
       <table aria-label="实验数据记录表">
         <thead><tr><th>数据记录</th><th>Δm/u</th><th>Q/MeV</th><th>判定</th></tr></thead>
         <tbody id="recordBody"><tr><td colspan="4">点击“记录”保存一次读数</td></tr></tbody>
@@ -76,22 +76,26 @@ const templates={
   fusion:{name:'氘氚聚变',left:'²H + ³H',right:'⁴He + ¹n',aL:5,zL:2,aR:5,zR:2,baseDm:.0189,reactants:[2,3],products:[4,1]},
   alpha:{name:'α 衰变配平',left:'²³⁸U',right:'²³⁴Th + ⁴He',aL:238,zL:92,aR:238,zR:92,baseDm:.0046,reactants:[238],products:[234,4]}
 };
+const NUCLIDES=[
+  {symbol:'²H',A:2,eb:1.112},{symbol:'⁴He',A:4,eb:7.074},{symbol:'¹²C',A:12,eb:7.680},{symbol:'¹⁶O',A:16,eb:7.976},
+  {symbol:'⁵⁶Fe',A:56,eb:8.790},{symbol:'⁶²Ni',A:62,eb:8.795},{symbol:'²³⁵U',A:235,eb:7.591},{symbol:'²³⁸U',A:238,eb:7.570}
+];
 let playing=false,last=0,t=0,records=[],dragging=null;
 const box={rx:54,ry:76,rw:520,rh:250,scaleX:74,scaleY:386,graphX:618,graphY:86,graphW:264,graphH:180,curveX:618,curveY:316,curveW:264,curveH:200};
 function params(){
   const tpl=templates[els.template.value];
-  const dm=Number(els.dm.value),count=Number(els.count.value),binding=Number(els.binding.value),probeA=Number(els.probeA.value);
+  const dm=Number(els.dm.value),count=Number(els.count.value),bindingIndex=Number(els.binding.value),probeIndex=Number(els.probeA.value);
+  const bindingNuclide=NUCLIDES[bindingIndex],probeNuclide=NUCLIDES[probeIndex];
   const q=dm*931.5;
   const joule=q*1.602e-13*count*1e20;
-  const stable=binding>=8.0||dm>0;
-  return {tpl,dm,count,binding,probeA,q,joule,stable};
+  return {tpl,dm,count,bindingIndex,probeIndex,bindingNuclide,probeNuclide,q,joule};
 }
 function setLabels(p){
   els.templateVal.textContent=p.tpl.name;
   els.dmVal.textContent=p.dm.toFixed(3);
   els.countVal.textContent=p.count.toFixed(0);
-  els.bindingVal.textContent=p.binding.toFixed(2);
-  els.probeVal.textContent=p.probeA.toFixed(0);
+  els.bindingVal.textContent=`${p.bindingNuclide.symbol}，Eb/A=${p.bindingNuclide.eb.toFixed(3)} MeV`;
+  els.probeVal.textContent=`${p.probeNuclide.symbol}（A=${p.probeNuclide.A}）`;
 }
 function label(text,x,y,color='#102a43',size=13,align='center',weight='700'){
   ctx.fillStyle=color;ctx.font=`${weight} ${size}px system-ui,-apple-system,"Segoe UI",sans-serif`;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(text,x,y);
@@ -159,29 +163,20 @@ function drawEnergyGraph(p){
   ctx.setLineDash([4,4]);ctx.strokeStyle='#087f5b';ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px,y+h-34);ctx.lineTo(x+34,py);ctx.stroke();ctx.setLineDash([]);
   label('E=Δmc²',x+w-70,y+66,'#2c7be5',13);
 }
-function bindingAt(A){
-  return 1.2+7.7*(1-Math.exp(-A/18))-0.00045*Math.max(0,A-56)**1.55;
-}
 function drawBindingCurve(p){
   const x=box.curveX,y=box.curveY,w=box.curveW,h=box.curveH;
   ctx.fillStyle='#fbfcfe';ctx.strokeStyle='#d9e2ec';ctx.lineWidth=1;ctx.fillRect(x,y,w,h);ctx.strokeRect(x,y,w,h);
-  label('结合能曲线：产物更稳定时释放能量',x+w/2,y+18,'#102a43',14);
+  label('离散实核素平均结合能（非连续拟合）',x+w/2,y+18,'#102a43',14);
   arrow(x+35,y+h-34,x+w-18,y+h-34,'#52606d',2);arrow(x+35,y+h-34,x+35,y+38,'#52606d',2);
   label('A',x+w-18,y+h-17,'#52606d',11);label('Eb/A',x+33,y+29,'#52606d',11);
-  ctx.strokeStyle='#38b2ac';ctx.lineWidth=3;ctx.beginPath();
-  for(let i=0;i<=120;i++){
-    const A=2+i*238/120,eb=bindingAt(A);
-    const px=x+42+(A-2)/238*(w-72),py=y+h-34-(eb/9.2)*(h-78);
-    if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
-  }
-  ctx.stroke();
-  const px=x+42+(p.probeA-2)/238*(w-72),py=y+h-34-(bindingAt(p.probeA)/9.2)*(h-78);
+  NUCLIDES.forEach(n=>{const px=x+42+(n.A-2)/236*(w-72),py=y+h-34-(n.eb/9.2)*(h-78);ctx.fillStyle='#38b2ac';ctx.beginPath();ctx.arc(px,py,4.5,0,Math.PI*2);ctx.fill();});
+  const px=x+42+(p.probeNuclide.A-2)/236*(w-72),py=y+h-34-(p.probeNuclide.eb/9.2)*(h-78);
   ctx.fillStyle='#7b2cbf';ctx.beginPath();ctx.arc(px,py,8,0,Math.PI*2);ctx.fill();
   ctx.strokeStyle='#7b2cbf';ctx.lineWidth=2;ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px,y+h-34);ctx.stroke();ctx.setLineDash([]);
-  label('拖动探针',Math.min(x+w-58,px+38),py-14,'#7b2cbf',11);
-  const targetY=y+h-34-(p.binding/9.2)*(h-78);
+  label(p.probeNuclide.symbol,Math.min(x+w-24,px+24),py-14,'#7b2cbf',11);
+  const targetY=y+h-34-(p.bindingNuclide.eb/9.2)*(h-78);
   ctx.strokeStyle='#f0a500';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x+42,targetY);ctx.lineTo(x+w-24,targetY);ctx.stroke();
-  label('产物 Eb/A',x+w-70,targetY-12,'#9c5c00',11);
+  label(`${p.bindingNuclide.symbol} Eb/A`,x+w-70,targetY-12,'#9c5c00',11);
 }
 function drawMultiView(p){
   ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
@@ -196,7 +191,7 @@ function updateReadout(p){
     `<div>守恒检查：ΣA ${p.tpl.aL}=${p.tpl.aR}，ΣZ ${p.tpl.zL}=${p.tpl.zR}</div>`,
     `<div>质能换算：Q=Δm×931.5=${p.q.toFixed(2)} MeV</div>`,
     `<div>总能量：N=${p.count.toFixed(0)}×10^20 次，E=${p.joule.toExponential(2)} J</div>`,
-    `<div>结合能读数：Eb/A=${p.binding.toFixed(2)} MeV，探针 A=${p.probeA.toFixed(0)}</div>`,
+    `<div>离散核素读数：${p.bindingNuclide.symbol} 的 Eb/A=${p.bindingNuclide.eb.toFixed(3)} MeV；比较 ${p.probeNuclide.symbol}=${p.probeNuclide.eb.toFixed(3)} MeV</div>`,
     `<div>公式绑定：E=Δmc²，E/MeV≈Δm/u×931.5；Δm>0 放能，Δm<0 吸能</div>`
   ].join('');
   els.status.className=p.q>=0&&ok?'status':'status warn';
@@ -219,7 +214,7 @@ function record(){
 }
 function reset(){
   const tpl=templates[els.template.value];
-  els.dm.value=tpl.baseDm;els.count.value=12;els.binding.value=els.template.value==='fusion'?7.1:8.45;els.probeA.value=els.template.value==='fission'?56:4;t=0;playing=false;last=0;records=[];els.playBtn.textContent='播放';els.recordBody.innerHTML='<tr><td colspan="4">点击“记录”保存一次核反应估算</td></tr>';
+  els.dm.value=tpl.baseDm;els.count.value=12;els.binding.value=els.template.value==='fusion'?1:4;els.probeA.value=els.template.value==='fission'?5:2;t=0;playing=false;last=0;records=[];els.playBtn.textContent='播放';els.recordBody.innerHTML='<tr><td colspan="4">点击“记录”保存一次核反应估算</td></tr>';
 }
 function pointerPos(e){
   const r=canvas.getBoundingClientRect();
@@ -231,14 +226,15 @@ function applyDrag(pos){
     els.dm.value=String(Math.max(-.04,Math.min(.32,val)).toFixed(3));
   }
   if(dragging==='probe'){
-    const val=2+(pos.x-(box.curveX+42))/(box.curveW-72)*238;
-    els.probeA.value=String(Math.max(2,Math.min(240,val)).toFixed(0));
+    const targetA=2+(pos.x-(box.curveX+42))/(box.curveW-72)*236;
+    let nearest=0;NUCLIDES.forEach((n,i)=>{if(Math.abs(n.A-targetA)<Math.abs(NUCLIDES[nearest].A-targetA))nearest=i;});
+    els.probeA.value=String(nearest);
   }
 }
 canvas.addEventListener('pointerdown',e=>{
   const p=params(),pos=pointerPos(e);
   const blockX=box.scaleX+372,blockY=box.scaleY+72+Math.max(-26,Math.min(46,(.21-p.dm)*115));
-  const probeX=box.curveX+42+(p.probeA-2)/238*(box.curveW-72);
+  const probeX=box.curveX+42+(p.probeNuclide.A-2)/236*(box.curveW-72);
   if(Math.hypot(pos.x-blockX,pos.y-blockY)<44)dragging='mass';
   else if(Math.abs(pos.x-probeX)<28&&pos.y>box.curveY+40)dragging='probe';
   if(dragging){canvas.setPointerCapture(e.pointerId);applyDrag(pos);}

@@ -48,7 +48,7 @@
       <input id="mass" type="range" min="1" max="6" value="2" step="0.5">
       <div id="readout" class="readout"></div>
       <div id="status" class="status"></div>
-      <div class="hint">观察任务：拖动画面里的蓝色入射速度手柄，或点“播放”，看轨迹、力表盘、偏差图像和数据记录怎样同步变化。直线通过时应满足 qE=qvB，即 v=E/B。</div>
+      <div class="hint">观察任务：拖动画面里的蓝色入射速度手柄，或点“播放”，看轨迹、力表盘、偏差图像和数据记录怎样同步变化。直线通过时应满足 |q|E=|q|vB 且两力方向相反，即 v=E/B。</div>
       <table aria-label="数据记录表">
         <thead><tr><th>数据记录</th><th>v</th><th>v0</th><th>偏差</th></tr></thead>
         <tbody id="recordBody"><tr><td colspan="4">点击“记录”保存一次测量</td></tr></tbody>
@@ -263,6 +263,6 @@ els.recordBtn.addEventListener('click',()=>{
 render();
 requestAnimationFrame(animate);
 </script>
-<script src="../skill/guided-lesson.js"></script>
+<script src="../skill/guided-lesson.js"></script><script src="guided-lesson.js"></script>
 </body>
 </html>

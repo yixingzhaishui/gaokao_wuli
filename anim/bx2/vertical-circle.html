@@ -64,14 +64,14 @@
         <div class="meter"><span>ΣF径 / mv²/r</span><b id="radialText">5.0 / 5.0 N</b></div>
         <div class="meter"><span>约束力</span><b id="forceText">0.0 N</b></div>
         <div class="meter"><span>v_min / 最低点N</span><b id="critText">3.1 / 29.8</b></div>
-        <div class="meter"><span>磁场半径</span><b id="magText">r=mv/qB</b></div>
+        <div class="meter"><span>磁场半径</span><b id="magText">r=mv/(|q|B)</b></div>
       </div>
     </div>
     <div class="card formula" id="formulaCard" hidden>
       <div><span>径向方程</span><b>ΣF径=mv²/r</b></div>
       <div><span>绳最高点</span><b>v_min=√(gr)</b></div>
       <div><span>最低点</span><b>N-mg=mv²/r</b></div>
-      <div><span>磁场迁移</span><b>r=mv/qB</b></div>
+      <div><span>磁场迁移</span><b>r=mv/(|q|B)</b></div>
     </div>
     <div class="card small"><b>模型：</b>底部 `v_top` 是最高点速度。播放时由机械能计算当前位置速度，不把重力场中的整圈运动误画成恒速；绳在任意位置都必须满足 `T≥0`。</div>
     <div class="status" id="status">先找圆心方向，再沿径向列方程。</div>
@@ -145,8 +145,8 @@
   }
   function drawMagneticPanel(vs){
     box(612,470,298,76,8,'#fff','#d7dee8');
-    text('磁场圆周迁移：r=mv/qB',761,492,'#0f172a','center',14,'900');
-    text(`若 qB=1，当前 r磁=${fmt(vs.magR,2)} m`,760,522,colors.cyan,'center',13,'900');
+    text('磁场圆周迁移：r=mv/(|q|B)',761,492,'#0f172a','center',14,'900');
+    text(`若 |q|B=1，当前 r磁=${fmt(vs.magR,2)} m`,760,522,colors.cyan,'center',13,'900');
   }
   function ruler(x1,y,x2,label,c,hx,txt,active){
     line(x1,y,x2,y,'#0f172a',2);for(let i=0;i<=5;i++){const x=x1+(x2-x1)*i/5;line(x,y-5,x,y+5,'#0f172a',1)}text(label,(x1+x2)/2,y-18,c,'center',12,'900');handle(hx,y,txt,active,c);
@@ -247,5 +247,6 @@
   }
 })();
 </script>
+<script src="../model/guided-lesson.js"></script>
 </body>
 </html>
