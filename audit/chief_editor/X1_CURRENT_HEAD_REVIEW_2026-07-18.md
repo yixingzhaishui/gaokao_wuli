@@ -4,7 +4,7 @@
 repository: yixingzhaishui/gaokao_wuli
 branch: codex/repository-fixes
 baseline_head: 9928e1d9ef39d6cab1b4fa6bcc1869cf4a4cd20c
-remediation_head: pending_commit
+remediation_head: 22758f8699957590d1d0375b12e199618b155824
 review_date: 2026-07-18
 review_role: Codex 物理内容 / 高中物理教学设计 / 交互教材总编复审
 scope: X1-01..X1-27 正文、21 个 anim/xb1 动画、当前测试与 CI 门禁
@@ -195,8 +195,9 @@ approval_impact: mobile layout may pass, but accessibility and pedagogy approval
 | `npm run audit:physics:x1` | 11/11 PASS；覆盖 5 个原 CRITICAL、关键边界、移动端与正文条件 |
 | `npm run audit:pedagogy:x1` | 4/4 PASS；27 个节点完整证据链、21 个动画统一引导、390×844 减少动态 |
 | `AUDIT_MODULE=xb1 AUDIT_REPORT=x1-remediation-worktree-final.json npx playwright test tests/interaction-audit.spec.js --workers=1` | 21/21 PASS；score 100；0 BLOCKED；0 hard failure |
+| `AUDIT_MODULE=xb1 AUDIT_REPORT=x1-complete-22758f8.json npx playwright test tests/interaction-audit.spec.js --workers=1` | 干净实现提交 `22758f8` 上 21/21 PASS；`worktree_clean=true`；差异哈希为空树 SHA-256 |
 
-工作树复审报告：`audit/results/x1-remediation-worktree-final.json`。它绑定基线提交与本次差异哈希，因尚未提交而如实记录 `worktree_clean=false`；提交后另生成 clean-commit 最终报告。
+工作树复审报告：`audit/results/x1-remediation-worktree-final.json`。它绑定基线提交与本次差异哈希，并如实记录 `worktree_clean=false`。最终发布证据：`audit/results/x1-complete-22758f8.json`，绑定完整实现提交 `22758f8699957590d1d0375b12e199618b155824`，记录 `worktree_clean=true`、21/21 PASS、0 BLOCKED。
 
 ## 整改后双轨评分
 
