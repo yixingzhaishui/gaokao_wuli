@@ -40,28 +40,10 @@ function drawEnergy(p){box(560,92,276,150,'#fff');text('能量柱图像',698,116
 function drawGraph(p){box(64,420,772,120,'#fff');text('q-t / i-t 图像与相位探针',450,440,K.ink,'center',14,'800');const gx=105,gy=510,gw=660,gh=48;line(gx,gy,gx+gw,gy,K.ink,2);line(gx,gy-gh,gx,gy+gh,K.ink,2);let lastQ,lastI,lastX;for(let n=0;n<=180;n++){const u=n/180*2*Math.PI,x=gx+n/180*gw,yq=gy-Math.cos(u)*gh,yi=gy+Math.sin(u)*gh*.75;if(n){line(lastX,lastQ,x,yq,K.blue,2);line(lastX,lastI,x,yi,K.red,2)}lastX=x;lastQ=yq;lastI=yi}const px=gx+(p.phase/(Math.PI*2))*gw;line(px,gy-gh,px,gy+gh,K.purple,3,[5,4]);text('探针',px,gy-gh-14,K.purple,'center',12,'900');ctx.fillStyle=K.purple;ctx.beginPath();ctx.arc(px,gy,8,0,Math.PI*2);ctx.fill();text('蓝 q，红 i',780,460,K.muted,'center',12,'800')}
 function update(){const p=par();els.lLabel.textContent=fmt(p.L*1000,0)+' mH';els.cLabel.textContent=fmt(p.C*1e6,0)+' μF';els.uLabel.textContent=fmt(p.U,1)+' V';els.readout.innerHTML='周期 T：<b>'+fmt(p.T*1000,1)+' ms</b><br>电荷 q：<b>'+fmt(p.q*1e6,1)+' μC</b><br>电流 i：<b>'+fmt(p.i*1000,1)+' mA</b><br>总能量：<b>'+fmt(p.e*1000,2)+' mJ</b>';els.status.textContent=Math.abs(p.q/p.Q)>.85?'电容电荷接近最大，电场能最大，电流接近 0。':Math.abs(p.i/(p.Q*p.w))>.85?'电流接近最大，磁场能最大，电容电荷接近 0。':'电场能和磁场能正在相互转化。';els.rows.innerHTML=S.records.slice(-6).map(r=>'<tr><td>'+r.ph+'</td><td>'+r.q+'</td><td>'+r.i+'</td><td>'+r.en+'</td></tr>').join('')||'<tr><td colspan="4">暂无记录</td></tr>'}
 function record(){const p=par();S.records.push({ph:fmt(p.phase/Math.PI,2)+'π',q:fmt(p.q*1e6,1),i:fmt(p.i*1000,1),en:fmt(p.e*1000,2)});if(S.records.length>8)S.records.shift();update()}
-[els.l,els.c,els.u].forEach(el=>el.addEventListener('input',()=>{draw();update()}));els.play.addEventListener('click',()=>{S.run=!S.run;els.play.textContent=S.run?'暂停':'播放'});els.record.addEventListener('click',record);canvas.addEventListener('pointerdown',e=>{S.drag=true;canvas.setPointerCapture(e.pointerId)});canvas.addEventListener('pointermove',e=>{if(!S.drag)return;const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width;const p=par(),phase=Math.max(0,Math.min(1,(x-105)/660))*Math.PI*2;S.t=phase/p.w;draw()});canvas.addEventListener('pointerup',e=>{S.drag=false;record();try{canvas.releasePointerCapture(e.pointerId)}catch(_){}});function loop(){const p=par();if(S.run)S.t+=0.016;draw();requestAnimationFrame(loop)}record();loop();
+[els.l,els.c,els.u].forEach(el=>el.addEventListener('input',()=>{draw();update()}));els.play.addEventListener('click',()=>{S.run=!S.run;els.play.textContent=S.run?'暂停':'播放'});els.record.addEventListener('click',record);canvas.addEventListener('pointerdown',e=>{S.drag=true;canvas.setPointerCapture(e.pointerId)});canvas.addEventListener('pointermove',e=>{if(!S.drag)return;const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width;const p=par(),phase=Math.max(0,Math.min(1,(x-105)/660))*Math.PI*2;S.t=phase/p.w;draw()});canvas.addEventListener('pointerup',e=>{S.drag=false;record();try{canvas.releasePointerCapture(e.pointerId)}catch(_){}});window.__resetLC=()=>{els.l.value=2;els.c.value=20;els.u.value=6;S.t=0;S.run=false;S.drag=false;S.records=[];els.play.textContent='播放';record();draw()};function loop(){const p=par();if(S.run)S.t+=0.016;draw();requestAnimationFrame(loop)}record();loop();
 })();
 </script>
-<div data-audit-reset-bar><button type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){location.reload()});})();</script>
-<script>/* GKWL: unified full reset (2026-07-12 review remediation) */
-(function(){
-  var btns=[].slice.call(document.querySelectorAll('button'));
-  var resets=btns.filter(function(b){return /重置|复位/.test(b.textContent)});
-  if(!resets.length)return;
-  var scoped=/播放|时间|回放/;
-  var primary=resets[0];
-  if(scoped.test(primary.textContent)){
-    var nb=document.createElement('button');
-    nb.textContent='全部重置';
-    nb.className=primary.className;
-    nb.setAttribute('data-gkwl-full-reset','1');
-    nb.addEventListener('click',function(){location.reload()});
-    primary.parentNode.insertBefore(nb,primary.nextSibling);
-  }else{
-    resets.forEach(function(b){b.addEventListener('click',function(){setTimeout(function(){location.reload()},60)})});
-  }
-})();
-</script>
+<div data-audit-reset-bar><button id="reset" type="button" data-audit-reset aria-label="重置当前动画">重置</button></div><script>(function(){var b=document.querySelector("[data-audit-reset]");if(b)b.addEventListener("click",function(){window.__resetLC()});})();</script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

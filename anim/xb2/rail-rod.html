@@ -136,7 +136,8 @@ function drawGraph(){
   if(trail.length>1){ctx.beginPath();trail.forEach((p,i)=>{const x=ox+i*w/150,y=oy-p*34;if(i)ctx.lineTo(x,y);else ctx.moveTo(x,y)});ctx.strokeStyle='#7c3aed';ctx.lineWidth=2.5;ctx.stroke()}
   text('Φ',44,446,11,'#7c3aed','900');text('dΦ/dt=BLv='+E().toFixed(2),610,424,11,'#7c3aed','900');
 }
-function update(dt){if(playing){xRod+=v()*dt*.012;if(xRod<.20)xRod=.20;if(xRod>.94)xRod=.94}trail.push(B()*L()*xRod);if(trail.length>151)trail.shift()}
+function stopAtBoundary(side){xRod=side==='left'?.20:.94;el('v').value=0;playing=false;el('play-btn').classList.remove('on');el('play-btn').textContent='播放'}
+function update(dt){if(playing){const next=xRod+v()*dt*.12;if(next<=.20)stopAtBoundary('left');else if(next>=.94)stopAtBoundary('right');else xRod=next}trail.push(B()*L()*xRod);if(trail.length>151)trail.shift()}
 function draw(){
   ctx.clearRect(0,0,780,500);ctx.fillStyle='#f8fbff';ctx.fillRect(0,0,780,500);
   drawPanel();drawField3D();drawRails();drawTopView();drawRodInside();drawMeterPower();drawGraph();
@@ -148,15 +149,18 @@ function sync(){
   el('v-d').textContent=v().toFixed(1);el('b-d').textContent=B().toFixed(2);el('l-d').textContent=L().toFixed(2);el('r-d').textContent=R().toFixed(1);el('cam-d').textContent=raw('cam');
   el('e-v').textContent=Math.abs(E()).toFixed(2);el('i-v').textContent=Math.abs(I()).toFixed(2);el('f-v').textContent=F().toFixed(2);el('p-v').textContent=P().toFixed(2);
   el('state-v').textContent=Math.abs(v())<.05?'v=0，E=0':(F()>0?'安培力阻碍运动':'无明显电流');
+  const atLeft=xRod<=.2001,atRight=xRod>=.9399;
+  canvas.dataset.boundaryState=atLeft?'left':atRight?'right':'inside';canvas.dataset.rodVelocity=v().toFixed(1);canvas.dataset.emf=E().toFixed(4);canvas.dataset.current=I().toFixed(4);canvas.dataset.power=P().toFixed(4);
+  window.__ANIM_TEST_STATE__={xRod,playing,v:v(),E:E(),I:I(),F:F(),P:P(),boundaryState:canvas.dataset.boundaryState};
 }
 function pos(e){const r=canvas.getBoundingClientRect(),sx=canvas.width/r.width,sy=canvas.height/r.height;return{x:(e.clientX-r.left)*sx,y:(e.clientY-r.top)*sy}}
 canvas.addEventListener('pointerdown',e=>{const p=pos(e);if(p.x>70&&p.x<500&&p.y>90&&p.y<335){dragRod=true;playing=false;el('play-btn').classList.remove('on');el('play-btn').textContent='播放';lastDragX=p.x;lastDragT=performance.now();canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing'}});
 canvas.addEventListener('pointermove',e=>{if(!dragRod)return;const p=pos(e),now=performance.now();xRod=clamp((p.x-95)/388,.2,.94);const sp=(p.x-lastDragX)/Math.max((now-lastDragT)/1000,0.016);el('v').value=clamp(Math.round(sp/8),-90,90);lastDragX=p.x;lastDragT=now;trail=[];sync();draw()});
 window.addEventListener('pointerup',()=>{dragRod=false;canvas.style.cursor='grab'});
 ['v','b','l','r','cam'].forEach(id=>el(id).addEventListener('input',()=>{trail=[];sync();draw()}));
-el('play-btn').onclick=function(){playing=!playing;this.classList.toggle('on',playing);this.textContent=playing?'暂停':'播放'};
+el('play-btn').onclick=function(){if(!playing&&Math.abs(v())<.05&&(xRod<=.2001||xRod>=.9399))el('v').value=xRod>=.9399?-50:50;playing=!playing;this.classList.toggle('on',playing);this.textContent=playing?'暂停':'播放'};
 el('reverse-b').onclick=()=>{el('b').value=-raw('b');trail=[];sync();draw()};
-el('reverse-v').onclick=()=>{el('v').value=-raw('v');trail=[];sync();draw()};
+el('reverse-v').onclick=()=>{const current=raw('v');el('v').value=Math.abs(current)<.05?(xRod>=.9399?-50:xRod<=.2001?50:50):-current;trail=[];sync();draw()};
 el('reset-btn').onclick=()=>{
   // Reset the entire experiment so the visible default state and all numerical
   // readouts agree; resetting only the rod position left altered controls live.
@@ -169,5 +173,6 @@ function loop(now){const dt=Math.min((now-last)/1000,.05);last=now;update(dt);sy
 requestAnimationFrame(loop);
 })();
 </script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

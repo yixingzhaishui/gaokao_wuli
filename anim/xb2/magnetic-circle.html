@@ -122,7 +122,9 @@
     line(g.O.x,g.O.y,g.x,g.y,C.muted,1.5,[4,4]);text(`R=${fmt(c.Rcm,1)} cm`,(g.O.x+g.x)/2,(g.O.y+g.y)/2-12,C.muted,'center',12,'800');ctx.fillStyle=C.ink;ctx.beginPath();ctx.arc(g.O.x,g.O.y,4,0,Math.PI*2);ctx.fill();text('圆心',g.O.x,g.O.y-18,C.ink,'center',11,'800');
     for(const point of state.trail){const p={x:g.O.x+g.rp*Math.cos(point.phase),y:g.O.y+g.rp*Math.sin(point.phase)};ctx.fillStyle='rgba(37,99,235,.28)';ctx.beginPath();ctx.arc(p.x,p.y,2.5,0,Math.PI*2);ctx.fill()}
     const charge=state.sign>0?C.red:C.blue;ctx.save();ctx.fillStyle=charge;ctx.shadowColor=charge;ctx.shadowBlur=12;ctx.beginPath();ctx.arc(g.x,g.y,13,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;text(state.sign>0?'+':'−',g.x,g.y,'#fff','center',15,'900');ctx.restore();
-    const turn=state.sign;const tangent={x:-Math.sin(state.phase)*turn,y:Math.cos(state.phase)*turn};const vLen=clamp(34+c.vp/1e6*18,34,108);arrow(g.x,g.y,g.x+tangent.x*vLen,g.y+tangent.y*vLen,C.blue,3);text('v⊥',g.x+tangent.x*(vLen+16),g.y+tangent.y*(vLen+16),C.blue,'center',12,'900');
+    // Canvas y increases downward.  For B into the page a positive charge must
+    // therefore move with a decreasing polar angle to look counter-clockwise.
+    const turn=-state.sign;const tangent={x:-Math.sin(state.phase)*turn,y:Math.cos(state.phase)*turn};const vLen=clamp(34+c.vp/1e6*18,34,108);arrow(g.x,g.y,g.x+tangent.x*vLen,g.y+tangent.y*vLen,C.blue,3);text('v⊥',g.x+tangent.x*(vLen+16),g.y+tangent.y*(vLen+16),C.blue,'center',12,'900');
     const inward={x:-Math.cos(state.phase),y:-Math.sin(state.phase)};const fLen=clamp(25+c.F/1e-13*12,25,62);arrow(g.x,g.y,g.x+inward.x*fLen,g.y+inward.y*fLen,C.red,3);text('F洛',g.x+inward.x*(fLen+16),g.y+inward.y*(fLen+16),C.red,'center',12,'900');
     text(state.sign>0?'正电荷：逆时针':'负电荷：顺时针',f.x+f.w/2,f.y+f.h-16,state.sign>0?C.red:C.blue,'center',12,'800');
   }
@@ -142,7 +144,7 @@
     el.vo.textContent=`${fmt(state.v,1)}×10⁶`;el.bo.textContent=`${fmt(state.B,2)} T`;el.ao.textContent=`${Math.round(state.alpha)}°`;el.mo.textContent=`${fmt(state.m,1)}mₚ`;
     const helix=c.pitchCm>.1;el.status.classList.toggle('warn',c.vp<1e4);el.status.textContent=c.vp<1e4?'α≈0°：v 几乎平行 B，洛伦兹力接近 0，粒子近似沿直线前进。':helix?`斜射：v∥=${fmt(c.vz/1e6,2)}×10⁶ m/s 推进，v⊥=${fmt(c.vp/1e6,2)}×10⁶ m/s 转弯，轨迹是螺旋。`:`垂直入射：v∥≈0，洛伦兹力提供向心力，轨迹是匀速圆周。`;
   }
-  function draw(){const c=calc(),L=layout();ctx.clearRect(0,0,W,H);const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#fbfdff');bg.addColorStop(1,'#eaf0f7');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);text('带电粒子在磁场中运动：v⊥转弯，v∥推进',W/2,20,C.ink,'center',Math.max(15,Math.min(20,W/44)),'900');drawField(c,L);drawSide(c,L);drawGraph(c,L);update(c);window.__ANIM_TEST_STATE__={...state,calc:{Rcm:c.Rcm,Tus:c.Tus,F:c.F,pitchCm:c.pitchCm}}}
+  function draw(){const c=calc(),L=layout();ctx.clearRect(0,0,W,H);const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#fbfdff');bg.addColorStop(1,'#eaf0f7');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);text('带电粒子在磁场中运动：v⊥转弯，v∥推进',W/2,20,C.ink,'center',Math.max(15,Math.min(20,W/44)),'900');drawField(c,L);drawSide(c,L);drawGraph(c,L);update(c);canvas.dataset.magneticFieldDirection='into-page';canvas.dataset.positiveChargeDirection='counter-clockwise';canvas.dataset.crossProduct='F=q-v-cross-B';window.__ANIM_TEST_STATE__={...state,visualDirection:state.sign>0?'counter-clockwise':'clockwise',calc:{Rcm:c.Rcm,Tus:c.Tus,F:c.F,pitchCm:c.pitchCm}}}
   function resize(){const rect=canvas.getBoundingClientRect();W=Math.max(320,Math.min(960,rect.width||960));H=W<640?Math.max(520,Math.round(W*1.45)):620;dpr=Math.min(window.devicePixelRatio||1,2);canvas.style.height=H+'px';canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);draw()}
   function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}}
   function distance(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
@@ -154,14 +156,15 @@
   function reset(){Object.assign(state,defaults, {trail:[]});syncInputs();el.play.textContent='播放';draw()}
   canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
   el.play.addEventListener('click',()=>{state.running=!state.running;el.play.textContent=state.running?'暂停':'播放';draw()});
-  document.getElementById('stepBtn').addEventListener('click',()=>{state.running=false;el.play.textContent='播放';state.phase+=.42;state.trail.push({phase:state.phase});if(state.trail.length>80)state.trail.shift();draw()});
+  document.getElementById('stepBtn').addEventListener('click',()=>{state.running=false;el.play.textContent='播放';state.phase-=state.sign*.42;state.trail.push({phase:state.phase});if(state.trail.length>80)state.trail.shift();draw()});
   document.getElementById('resetBtn').addEventListener('click',reset);
   [[el.v,'v'],[el.b,'B'],[el.a,'alpha'],[el.m,'m']].forEach(([input,key])=>input.addEventListener('input',()=>{state[key]=Number(input.value);state.trail=[];draw()}));
   document.querySelectorAll('[data-sign]').forEach(btn=>btn.addEventListener('click',()=>{state.sign=Number(btn.dataset.sign);state.trail=[];syncInputs();draw()}));
   document.querySelectorAll('[data-case]').forEach(btn=>btn.addEventListener('click',()=>{const kind=btn.dataset.case;if(kind==='circle'){state.v=2;state.B=.5;state.alpha=90;state.m=1}if(kind==='helix'){state.v=2;state.B=.5;state.alpha=35;state.m=1}if(kind==='fast'){state.v=4.5;state.B=.5;state.alpha=90;state.m=1}if(kind==='strongB'){state.v=2;state.B=1.1;state.alpha=90;state.m=1}state.trail=[];syncInputs();draw()}));
-  let last=performance.now();function tick(now){const dt=Math.min((now-last)/1000,.05);last=now;if(state.running){const c=calc();state.phase+=state.sign*dt*(2*Math.PI/c.T)*.045;state.trail.push({phase:state.phase});if(state.trail.length>100)state.trail.shift();draw()}requestAnimationFrame(tick)}
+  let last=performance.now();function tick(now){const dt=Math.min((now-last)/1000,.05);last=now;if(state.running){const c=calc();state.phase-=state.sign*dt*(2*Math.PI/c.T)*.045;state.trail.push({phase:state.phase});if(state.trail.length>100)state.trail.shift();draw()}requestAnimationFrame(tick)}
   if(window.ResizeObserver)new ResizeObserver(resize).observe(canvas);requestAnimationFrame(resize);requestAnimationFrame(tick);
 })();
 </script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>

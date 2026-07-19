@@ -25,37 +25,37 @@ canvas{display:block;width:100%;max-width:700px;background:#fff;border:1px solid
   <h2>自感：线圈阻碍自身电流变化（电流不能突变）</h2>
   <div class="ctrls">
     <button class="btn" id="toggle">闭合开关</button>
-    <button class="btn" id="play-btn">暂停自动通断</button>
+    <button class="btn" id="play-btn">暂停演示</button>
     <button class="btn" id="reset-btn">重置</button>
     <label>L = <span id="ll">2.0</span> H<input id="lr" type="range" min="0.2" max="5" step="0.1" value="2"></label>
-    <label>R = <span id="rl">2.0</span> Ω<input id="rr" type="range" min="1" max="6" step="0.5" value="2"></label>
+    <label>线圈电阻 R<sub>L</sub> = <span id="rl">2.0</span> Ω<input id="rr" type="range" min="1" max="6" step="0.5" value="2"></label>
     <span style="font-size:13px;color:#5a6b7b">或直接拨动开关</span>
   </div>
   <canvas id="cv" width="700" height="420" aria-label="自感实验台：线圈侧视装置、电流图像和数据记录"></canvas>
   <div class="chips">
     <span class="chip">自感系数 L = <b id="lv">2.0</b> H</span>
-    <span class="chip">时间常数 τ=L/R = <b id="tauv">1.0</b> s</span>
+    <span class="chip">当前时间常数 <b id="tauname">τ通</b> = <b id="tauv">1.0</b> s</span>
     <span class="chip">电流 I = <b id="iv">0.00</b> A</span>
     <span class="chip">状态：<b id="statev">断开</b></span>
   </div>
-  <div class="hint"><b>观察任务</b>：直接拨动开关。对照线圈侧视装置、电流图像和数据记录，闭合瞬间灯泡慢慢变亮；断开瞬间灯泡会闪一下再熄灭。拖 L 变大：电流上升更慢。</div>
+  <div class="hint"><b>观察任务</b>：直接拨动开关。闭合时线圈支路电流逐渐建立，反向二极管截止，续流指示灯不亮；断开电源后，线圈、二极管和指示灯仍组成闭合回路，线圈电流连续并短暂点亮指示灯。拖 L 变大：建立和衰减都更慢。</div>
 </div>
 <script>
 (function(){
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
-let L=2,R=2,closed=false,t=0,I=0,flash=0,history=[],last=performance.now(),dragSwitch=false,autoDemo=true,demoClock=0;
-const V=6;
+let L=2,R=2,closed=false,t=0,I=0,history=[],last=performance.now(),dragSwitch=false,autoDemo=true,simRunning=true,demoClock=0;
+const V=6,R_LAMP=6;
+function tauOn(){return L/R}
+function tauOff(){return L/(R+R_LAMP)}
+function activeTau(){return closed?tauOn():tauOff()}
 function targetI(){return closed?V/R:0}
-function tau(){return L/R}
-function sync(){document.getElementById('lv').textContent=L.toFixed(1);document.getElementById('tauv').textContent=tau().toFixed(2);document.getElementById('iv').textContent=I.toFixed(2);document.getElementById('statev').textContent=closed?'通电：阻碍增大':'断电：维持减小';document.getElementById('ll').textContent=L.toFixed(1);document.getElementById('rl').textContent=R.toFixed(1);document.getElementById('toggle').textContent=closed?'断开开关':'闭合开关'}
-function step(dt){
-  const k=1-Math.exp(-dt/Math.max(0.05,tau()));
-  const before=I;
-  I+=(targetI()-I)*k;
-  if(!closed)flash=Math.max(0,flash-dt*2.2);
-  history.push(I); if(history.length>180)history.shift();
-  if(closed&&I>before)flash=0;
+function lampBrightness(){return closed?0:Math.min(1,I/Math.max(.01,V/R))}
+function sync(){
+  document.getElementById('lv').textContent=L.toFixed(1);document.getElementById('tauv').textContent=activeTau().toFixed(2);document.getElementById('tauname').textContent=closed?'τ通':'τ续流';document.getElementById('iv').textContent=I.toFixed(2);document.getElementById('statev').textContent=closed?'通电：电流建立':'断电：续流衰减';document.getElementById('ll').textContent=L.toFixed(1);document.getElementById('rl').textContent=R.toFixed(1);document.getElementById('toggle').textContent=closed?'断开开关':'闭合开关';
+  cv.dataset.circuitState=closed?'source-connected':'source-disconnected';cv.dataset.dischargePath='closed-diode-lamp-loop';cv.dataset.current=I.toFixed(4);cv.dataset.indicatorBrightness=lampBrightness().toFixed(4);cv.dataset.tau=activeTau().toFixed(4);
+  window.__ANIM_TEST_STATE__={L,R,R_LAMP,closed,I,tauOn:tauOn(),tauOff:tauOff(),lampBrightness:lampBrightness(),dischargePath:cv.dataset.dischargePath};
 }
+function step(dt){const k=1-Math.exp(-dt/Math.max(0.03,activeTau()));I+=(targetI()-I)*k;if(I<.001&&!closed)I=0;history.push(I);if(history.length>180)history.shift()}
 function bulb(x,y,bright,label){
   const g=ctx.createRadialGradient(x,y,4,x,y,46);g.addColorStop(0,'rgba(255,214,102,'+Math.min(1,bright)+')');g.addColorStop(1,'rgba(255,214,102,0)');
   ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,48,0,7);ctx.fill();
@@ -77,39 +77,48 @@ function drawCoil(x,y){
 }
 function draw(){
   ctx.clearRect(0,0,W,H);
+  // The switch disconnects only the source.  The coil and reverse diode/lamp
+  // branch remain connected to one another and form the discharge loop.
   ctx.strokeStyle='#334e68';ctx.lineWidth=4;
   ctx.beginPath();ctx.moveTo(70,260);ctx.lineTo(70,110);ctx.lineTo(185,110);ctx.stroke();
+  ctx.fillStyle='#e03131';ctx.fillRect(54,155,32,4);ctx.fillStyle='#334e68';ctx.fillRect(61,170,18,4);ctx.fillStyle='#486581';ctx.font='11px system-ui';ctx.textAlign='center';ctx.fillText('6 V 电源',70,194);
   drawSwitch();
-  ctx.beginPath();ctx.moveTo(208,260);ctx.lineTo(300,260);ctx.lineTo(300,110);ctx.stroke();
-  bulb(235,110,Math.min(1,I/(V/R)+flash),'灯泡');
+  ctx.beginPath();ctx.moveTo(208,260);ctx.lineTo(285,260);ctx.lineTo(285,110);ctx.stroke();
   drawCoil(340,110);
-  ctx.beginPath();ctx.moveTo(445,110);ctx.lineTo(590,110);ctx.lineTo(590,260);ctx.lineTo(208,260);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(285,110);ctx.lineTo(340,110);ctx.moveTo(445,110);ctx.lineTo(590,110);ctx.lineTo(590,260);ctx.stroke();
+  // Reverse-biased while the source is connected; conducting during flyback.
+  ctx.strokeStyle=closed?'#94a3b8':'#2b8a3e';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(590,260);ctx.lineTo(465,260);ctx.stroke();
+  ctx.fillStyle=closed?'#94a3b8':'#2b8a3e';ctx.beginPath();ctx.moveTo(455,250);ctx.lineTo(455,270);ctx.lineTo(435,260);ctx.closePath();ctx.fill();ctx.fillRect(428,248,4,24);ctx.fillStyle='#486581';ctx.font='11px system-ui';ctx.textAlign='center';ctx.fillText('续流二极管',444,290);
+  ctx.strokeStyle='#334e68';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(428,260);ctx.lineTo(350,260);ctx.moveTo(300,260);ctx.lineTo(208,260);ctx.stroke();
+  bulb(325,260,lampBrightness(),'续流指示灯');
+  if(!closed&&I>.02){ctx.fillStyle='#2b8a3e';ctx.font='bold 12px system-ui';ctx.textAlign='center';ctx.fillText('I 续流方向 ←',460,235)}
   ctx.fillStyle='#e03131';ctx.font='13px system-ui';ctx.textAlign='left';
-  if(closed)ctx.fillText('闭合：自感电动势阻碍 I 增大，灯慢慢亮',30,34);
-  else ctx.fillText(flash>0.05?'断开瞬间：线圈维持电流，灯闪亮后熄灭':'断开：I 已衰减到 0',30,34);
+  if(closed)ctx.fillText('闭合：线圈电流按 τ通=L/RL 逐渐建立；续流二极管截止',30,34);
+  else ctx.fillText(I>.02?'断开：线圈—二极管—指示灯闭合续流，I 连续衰减':'断开：续流电流已衰减到 0',30,34);
   // Current graph
   const gx=410,gy=330,gw=240,gh=95;ctx.strokeStyle='#b0bcc9';ctx.lineWidth=1;ctx.strokeRect(gx,gy-gh,gw,gh);
   ctx.fillStyle='#486581';ctx.font='11px system-ui';ctx.textAlign='center';ctx.fillText('I-t 曲线：不能突变',gx+gw/2,gy+16);
   ctx.strokeStyle='#2b8a3e';ctx.lineWidth=2;ctx.beginPath();history.forEach((val,i)=>{const x=gx+i/(180-1)*gw,y=gy-Math.min(1,val/(V/R))*gh;if(i)ctx.lineTo(x,y);else ctx.moveTo(x,y)});ctx.stroke();
-  ctx.fillStyle='#243b53';ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillText('通电：I=Imax(1-e^{-t/τ})；断电：I 延迟衰减，τ=L/R',30,H-18);
+  ctx.fillStyle='#243b53';ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillText('通电：τ通=L/RL；续流：τ续流=L/(RL+R灯)，两阶段电流都不能突变',30,H-18);
   sync();
 }
-function setClosed(next){if(next===closed)return;if(closed&&!next)flash=Math.min(1.4,I/(V/R)+0.4);if(!closed&&next)flash=0;closed=next;t=0}
-function toggle(){setClosed(!closed)}
+function setClosed(next){if(next===closed)return;closed=next;t=0}
+function toggle(){autoDemo=false;setClosed(!closed)}
 function pos(e){const r=cv.getBoundingClientRect(),s=cv.width/r.width;return{x:(e.clientX-r.left)*s,y:(e.clientY-r.top)*s}}
 function setSwitchFromPoint(p){setClosed(p.x>145)}
-cv.addEventListener('pointerdown',e=>{const p=pos(e);if(p.x>80&&p.x<210&&p.y>210&&p.y<295){autoDemo=false;document.getElementById('play-btn').textContent='播放自动通断';dragSwitch=true;cv.setPointerCapture(e.pointerId);setSwitchFromPoint(p);draw()}});
+cv.addEventListener('pointerdown',e=>{const p=pos(e);if(p.x>80&&p.x<210&&p.y>210&&p.y<295){autoDemo=false;dragSwitch=true;cv.setPointerCapture(e.pointerId);setSwitchFromPoint(p);draw()}});
 cv.addEventListener('pointermove',e=>{if(!dragSwitch)return;setSwitchFromPoint(pos(e));draw()});
 cv.addEventListener('pointerup',()=>dragSwitch=false);
 cv.addEventListener('pointercancel',()=>dragSwitch=false);
 document.getElementById('toggle').onclick=toggle;
-document.getElementById('play-btn').onclick=()=>{autoDemo=!autoDemo;demoClock=0;document.getElementById('play-btn').textContent=autoDemo?'暂停自动通断':'播放自动通断'};
-document.getElementById('reset-btn').onclick=()=>{closed=false;t=0;I=0;flash=0;history=[];L=2;R=2;document.getElementById('lr').value=L;document.getElementById('rr').value=R;autoDemo=true;demoClock=0;document.getElementById('play-btn').textContent='暂停自动通断';draw()};
+document.getElementById('play-btn').onclick=()=>{simRunning=!simRunning;document.getElementById('play-btn').textContent=simRunning?'暂停演示':'播放演示'};
+document.getElementById('reset-btn').onclick=()=>{closed=false;t=0;I=0;history=[];L=2;R=2;document.getElementById('lr').value=L;document.getElementById('rr').value=R;autoDemo=true;simRunning=true;demoClock=0;document.getElementById('play-btn').textContent='暂停演示';draw()};
 document.getElementById('lr').oninput=e=>{L=parseFloat(e.target.value);draw()};
 document.getElementById('rr').oninput=e=>{R=parseFloat(e.target.value);draw()};
-function loop(now){const dt=Math.min((now-last)/1000,0.04);last=now;t+=dt;if(autoDemo){demoClock+=dt;if(demoClock>2.6){setClosed(!closed);demoClock=0}}step(dt);draw();requestAnimationFrame(loop)}
+function loop(now){const dt=Math.min((now-last)/1000,0.04);last=now;if(simRunning){t+=dt;if(autoDemo){demoClock+=dt;if(demoClock>2.6){setClosed(!closed);demoClock=0}}step(dt);draw()}requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
 })();
 </script>
+<script src="guided-lesson.js"></script>
 </body>
 </html>
