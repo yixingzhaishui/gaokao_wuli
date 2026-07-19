@@ -4,16 +4,18 @@
 repository: yixingzhaishui/gaokao_wuli
 branch: codex/repository-fixes
 baseline_head: 6b2595c0aa37a1a09e0c50ed5a406bc031f87021
+remediation_head: 493915057b85e2cbe5fedd1650ccc6f9949741c5
 review_date: 2026-07-18
+remediation_date: 2026-07-18
 review_role: Codex 物理内容 / 高中物理教学设计 / 交互教材总编初审
 scope: X2-01..X2-24 正文、22 个 anim/xb2 动画、当前交互与移动端门禁
 chapter_mapping: 第五大章 = X2 = 选择性必修2
 development_flow: continue
-physics_review: revise
-pedagogy_review: revise
+physics_review: pass_after_remediation
+pedagogy_review: pass_after_remediation
 content_approval: pending
-release_gate: blocked
-review_status: initial_review_complete
+release_gate: pass_for_code_publication
+review_status: remediation_complete_pending_source_and_teacher_signoff
 ```
 
 > 本文件审核的是第五大章 X2（选择性必修二），不是 B1/B2/B3，也不是 X1。报告绑定上面的精确 HEAD；本轮只形成审核基线和机器证据，没有修改教学实现，没有把任何 `interaction passed · content pending` 擅自改成完成。
@@ -185,3 +187,69 @@ development_flow: continue
 source_gate: blocked_until_source_verified_and_recalculated
 teacher_signoff: pending
 ```
+
+## 整改复审与逐项关闭（绑定实现提交 4939150）
+
+> 上文保留 `6b2595c` 初审时的失败现场和评分，作为可追溯基线；本节是当前裁决。实现提交为 `493915057b85e2cbe5fedd1650ccc6f9949741c5`，完整交互机器报告为 `audit/results/xb2-complete-4939150.json`。报告生成时 `worktree_clean=true`，受测模块为 `xb2`，22/22 PASS、score 100、0 blocked、0 hard failure。
+
+### 系统级 finding 关闭
+
+| Review ID | 状态 | 整改与验收证据 |
+|---|---|---|
+| X2-SYS-01 | **RESOLVED** | X2-01..X2-24 各自配置主问题、1—3 个预测点、真实控件动作、结果、画面证据、因果解释、模型边界、高考迁移和重新预测；默认先遮罩画面/读数/公式，验证后开放。`tests/x2-guided-pedagogy.spec.js` 验证 24/24。 |
+| X2-SYS-02 | **RESOLVED** | 22 个 `anim/xb2/*.html` 全部接入 `guided-lesson.js`；统一减少动态媒体查询、明确“重新预测并重置”入口，390×844 reduced-motion 路径 24/24 可完成且无横向溢出。 |
+
+X2-13、X2-20、X2-21、X2-23 的公式首次使用卡已经移到对应 iframe 之后且紧邻首次公式；X2-22、X2-24 也保持“先引导证据、再揭示公式”的顺序。编辑覆盖门禁重新通过 229/229 节点。
+
+### CRITICAL / MAJOR 逐项关闭
+
+| Review ID | 原级别 | 当前状态 | 关闭说明 |
+|---|---:|---|---|
+| X2-04 | MAJOR | **RESOLVED** | 力的大小统一为 `|q|vBsinθ`，电荷符号只负责方向；正文改为与圆周/螺旋轨迹证据一致。 |
+| X2-05 | CRITICAL | **RESOLVED** | B 入屏时正电荷相位递减并在画布上逆时针，负电荷反向；单步与连续播放统一，canvas 声明磁场、视觉转向和叉乘证据。 |
+| X2-06 | CRITICAL | **RESOLVED** | `R<L` 画完整右半圆，终点回到左边界，扫角 180°；`R≥L` 仍按右边界交点计算。 |
+| X2-07 | MAJOR | **RESOLVED** | 用有向面积分定义磁通量；`BS cosθ` 仅作为均匀 B、平面 S 的特例，“磁感线条数”降为直观比喻。 |
+| X2-11 | CRITICAL | **RESOLVED** | 棒到左右端点后同时令 v、E、I、F、P 归零并停止；“速度反向/播放”可向内恢复；安培阻力限定闭合、被动、无源回路。 |
+| X2-12 | CRITICAL | **RESOLVED** | 重画反向二极管—续流指示灯闭合支路；通电、续流分别使用 `L/RL` 与 `L/(RL+R灯)`；删除人为 `flash`。复审还发现“暂停只停自动通断”的语义问题，已改成冻结整个暂态并通过真实暂停门禁。 |
+| X2-15 | MAJOR | **RESOLVED** | 明确完整周期有符号平均为 0、`2Um/π` 是半周期平均大小；电荷量写为指定区间的 `N|ΔΦ|/R总`，方向另判。 |
+| X2-17 | CRITICAL | **RESOLVED** | 显式检查 `U>√(Pr/1000)`；无效组合隐藏 I/损耗/压降/用户功率/效率并显示所需最低电压，不再钳出伪功率。 |
+| X2-19 | MAJOR | **RESOLVED** | 电磁驱动改为固定圆盘中心、旋转磁场角与较慢圆盘角、转差率和切向驱动转矩；伪精确百分比改成弱/中/强相对量。 |
+| X2-21 | CRITICAL | **RESOLVED** | E/E₀、B/B₀ 两曲线改成同峰同谷；补 `E₀=cB₀` 和 `E×B→+x`，不再把不同量纲的 E、B 写成未标定相同数值。 |
+| X2-22 | MAJOR | **RESOLVED** | 调谐判据与距离衰减独立计算；同频远距显示“已调谐，但距离导致传播衰减”，失谐状态单独提示频率失配。 |
+| X2-24 | CRITICAL | **RESOLVED** | 发电机采用电动势—内阻—负载模型，电动机采用转矩功率、机械损耗和铜耗模型；所有功率统一为 W 且逐帧守恒，开路 I/输入功率/输出功率均为 0。 |
+
+### 其余边界整改
+
+- X2-01 将探针 `|B|` 明确为相对强度；X2-10 说明拖拽是受控速度与离散导数近似。
+- X2-14 补齐匀强磁场、固定轴、刚性线圈、匀角速度等正弦条件；X2-16 区分稳定直流、变化/脉冲直流和交流。
+- X2-18 明确本页为 NTC 并区分 PTC；X2-23 把波段边界标为约定近似，安全判断加入强度、剂量、时间、距离和防护条件。
+- 24/24 例题仍保持“来源审核中”并隔离；本轮没有伪造真题，也没有把题源完成度改成 done。
+
+### 复审门禁
+
+| 命令 / 证据 | 当前结果 |
+|---|---|
+| `npm run audit:physics:x2` | 10/10 PASS；覆盖方向、轨迹、端点、续流、输电有效域、转差、E/B 相位、调谐归因和能量守恒 |
+| `npm run audit:pedagogy:x2` | 4/4 PASS；24/24 完整引导，24/24 手机减少动态，22/22 动画统一接入 |
+| `AUDIT_MODULE=xb2 AUDIT_REPORT=xb2-complete-4939150.json playwright test tests/interaction-audit.spec.js --workers=1` | 22/22 PASS；score 100；0 hard failure；22/22 mobile PASS；报告绑定 `4939150` 且生成时工作区干净 |
+| `npm run check` | PASS；229 节点编辑覆盖，数学、解答隔离、静态回退、206 页/13 章静态门禁全通过 |
+| `node scripts/gen-data.js --check` | PASS；目录 229、进度 229，未重写 id-map 或进度状态 |
+
+### 当前裁决
+
+```yaml
+engineering_interaction: pass_22_of_22
+physics_content: pass_after_remediation
+pedagogy_review: pass_24_of_24
+interaction_qa: pass_generic_and_semantic
+mobile_qa: pass_22_of_22
+accessibility_reduced_motion: pass_22_of_22
+code_publication: approved
+content_approval: pending_teacher_signoff
+source_gate: pending_24_of_24_examples_remain_quarantined
+teacher_signoff: pending
+review_status: remediation_complete
+development_flow: continue
+```
+
+本裁决允许发布本轮代码与审核证据；它不把隔离中的题源或教师签署误报为完成。后续若发布真题/训练内容，仍必须另过来源政策 2.0、答案独立复算和教师签署门禁。
